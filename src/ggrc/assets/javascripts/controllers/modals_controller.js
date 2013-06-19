@@ -105,7 +105,6 @@ can.Control("GGRC.Controllers.Modals", {
      value = el.is(':checked');
    }
    this.set_value({name : el.attr("name"), value : value });
-   console.log('checkbox value=', value)
   }
 
   , set_value : function(item) {
