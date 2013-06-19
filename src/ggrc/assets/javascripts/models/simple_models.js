@@ -26,6 +26,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_collection : "directives"
   , findAll : "/api/directives"
   , create : "POST /api/directives"
+  , update : "PUT /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
     //, program : "CMS.Models.Program.model"
@@ -58,6 +59,11 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
     return m;
   }
+  , init : function() {
+    this.validatePresenceOf("title");
+    this.validateInclusionOf("kind", this.meta_kinds);
+    this._super.apply(this, arguments);
+  }
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
@@ -79,7 +85,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
 CMS.Models.Directive("CMS.Models.Regulation", {
   findAll : "/api/directives?kind=Regulation"
   , defaults : {
-    kind : "regulation"
+    kind : "Regulation"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -97,7 +103,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 CMS.Models.Directive("CMS.Models.Policy", {
   findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
   , defaults : {
-    kind : "policy"
+    kind : "Company Policy"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -115,7 +121,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
 CMS.Models.Directive("CMS.Models.Contract", {
   findAll : "/api/directives?kind=Contract"
   , defaults : {
-    kind : "contract"
+    kind : "Contract"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
