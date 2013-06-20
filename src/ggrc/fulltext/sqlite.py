@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy import event
@@ -13,6 +12,7 @@ class Sqlite3RecordProperty(db.Model):
 
   key = db.Column(db.String, primary_key=True)
   type = db.Column(db.String)
+  context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
   property = db.Column(db.String)
   content = db.Column(db.Text)
