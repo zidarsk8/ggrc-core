@@ -1,14 +1,14 @@
 """Add context columns for RBAC
 
 Revision ID: 4b22d3a098c7
-Revises: 2793676d8016
+Revises: 52a791eb9a71
 Create Date: 2013-06-19 22:39:29.563353
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '4b22d3a098c7'
-down_revision = '2793676d8016'
+down_revision = '52a791eb9a71'
 
 from alembic import op
 import sqlalchemy as sa

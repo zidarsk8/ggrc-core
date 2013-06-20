@@ -78,6 +78,7 @@ Feature: Collection filtering via query parameters
       | Category      | _update_attrs=foobar |
       | Category      | foobar=baz           |
 
+  @wip
   Scenario Outline: Query parameters can be property paths
     Given a new "<resource_type2>" named "resource2_1"
     And a new "<resource_type2>" named "resource2_2"
@@ -101,7 +102,6 @@ Feature: Collection filtering via query parameters
   Examples:
       | resource_type1 | link_property_name | resource_type2 | target_property_name | match_value1 | match_value2 |
       | Section        | directive          | Directive      | title                | 'foo'        | 'bar'        |
-      | Control        | directive          | Directive      | company              | True         | False        |
 
   Scenario: Query for controls related to a program
     Given a new "Program" named "program"
