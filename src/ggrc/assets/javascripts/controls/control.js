@@ -17,7 +17,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     return $.ajax({
       url : params.selfLink
       , type : "put"
-      , data : this.process_args(params, ["notes", "title", "description"])
+      , data : this.process_args(params, ["notes", "title", "description","company_control"])
     });
   }
   , attributes : {
