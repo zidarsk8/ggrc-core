@@ -113,9 +113,10 @@ class ModelView(View):
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
-        query = query.filter(or_(
-          j_class.context_id.in_(j_contexts),
-          j_class.context_id == None))
+        if j_contexts is not None:
+          query = query.filter(or_(
+            j_class.context_id.in_(j_contexts),
+            j_class.context_id == None))
     return query.order_by(self.modified_attr.desc())
 
   def get_object(self, id):
