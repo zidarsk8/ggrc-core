@@ -63,7 +63,12 @@ class AttributeQueryBuilder(object):
   def process_property_path(self, arg, value):
     joinlist = []
     filters = []
-    clean_arg = arg if not arg.endswith('__in') else arg[0:-4]
+    if arg.endswith('__in'):
+      clean_arg = arg[0:-4]
+    elif arg.endswith('__null'):
+      clean_arg = arg[0:-6]
+    else:
+      clean_arg = arg
     segments = clean_arg.split('.')
     if len(segments) > 1:
       current_model = self.model
@@ -81,6 +86,8 @@ class AttributeQueryBuilder(object):
       value = value.split(',')
       value = [self.coerce_value_for_query_param(attr, arg, v) for v in value]
       filters.append(attr.in_(value))
+    elif arg.endswith('__null'):
+      filters.append(attr == None)
     else:
       value = self.coerce_value_for_query_param(attr, arg, value)
       filters.append(attr == cast(value, attr.type))
