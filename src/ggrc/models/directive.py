@@ -14,7 +14,6 @@ from .reflection import PublishOnly
 class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
-  company = db.Column(db.Boolean, default=False, nullable=False)
   version = db.Column(db.String)
   organization = db.Column(db.String)
   scope = db.Column(db.Text)
@@ -47,7 +46,6 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
       'audit_start_date',
       'audit_frequency',
       'audit_duration',
-      'company',
       'controls',
       'kind',
       'organization',

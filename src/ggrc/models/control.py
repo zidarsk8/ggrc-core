@@ -32,6 +32,7 @@ class Control(
     Described, Hierarchical, Hyperlinked, Timeboxed, Slugged, db.Model):
   __tablename__ = 'controls'
 
+  company_control = db.Column(db.Boolean)
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'))
   type_id = db.Column(db.Integer)
   kind_id = db.Column(db.Integer)
@@ -91,6 +92,7 @@ class Control(
       # FIXME: add these in once eager-loading works correctly
       #'categories',
       #'assertions',
+      'company_control',
       'control_assessments',
       'directive',
       'documentation_description',

@@ -14,7 +14,6 @@ class Program(Documentable, Personable, BusinessObject, Timeboxed, db.Model):
 
   KINDS = [
       'Directive',
-      'Company Controls',
       ]
 
   KINDS_HIDDEN = [
