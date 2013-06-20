@@ -96,6 +96,7 @@ class ModelView(View):
       query = self.model.eager_query()
     else:
       query = db.session.query(self.model)
+    joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
       filter, joinlist = querybuilder.collection_filters(request.args)
