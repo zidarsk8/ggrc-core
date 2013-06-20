@@ -229,7 +229,7 @@
           join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.shortName);
+          join = this.get_new_join(option.id, option.constructor.getRootModelName());
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
@@ -313,7 +313,7 @@
     },
 
     get_page_object_type: function() {
-      return this.get_page_model().shortName;
+      return this.get_page_model().getRootModelName();
     }
 
   });

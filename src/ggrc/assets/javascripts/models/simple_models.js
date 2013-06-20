@@ -24,8 +24,11 @@ can.Model.Cacheable("CMS.Models.Program", {
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
   , root_collection : "directives"
+  // `rootModel` overrides `model.shortName` when determining polymorphic types
+  , root_model : "Directive"
   , findAll : "/api/directives"
   , create : "POST /api/directives"
+  , update : "PUT /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
     //, program : "CMS.Models.Program.model"
@@ -58,6 +61,11 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
     return m;
   }
+  , init : function() {
+    this.validatePresenceOf("title");
+    this.validateInclusionOf("kind", this.meta_kinds);
+    this._super.apply(this, arguments);
+  }
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
@@ -79,7 +87,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
 CMS.Models.Directive("CMS.Models.Regulation", {
   findAll : "/api/directives?kind=Regulation"
   , defaults : {
-    kind : "regulation"
+    kind : "Regulation"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -97,7 +105,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 CMS.Models.Directive("CMS.Models.Policy", {
   findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
   , defaults : {
-    kind : "policy"
+    kind : "Company Policy"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -115,7 +123,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
 CMS.Models.Directive("CMS.Models.Contract", {
   findAll : "/api/directives?kind=Contract"
   , defaults : {
-    kind : "contract"
+    kind : "Contract"
   }
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -135,6 +143,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , root_collection : "org_groups"
   , findAll : "/api/org_groups"
   , create : "POST /api/org_groups"
+  , update : "PUT /api/org_groups/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Project", {
@@ -142,6 +151,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , root_collection : "projects"
   , findAll : "/api/projects"
   , create : "POST /api/projects"
+  , update : "PUT /api/projects/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Facility", {
@@ -149,6 +159,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , root_collection : "facilities"
   , findAll : "/api/facilities"
   , create : "POST /api/facilities"
+  , update : "PUT /api/facilities/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Product", {
@@ -156,6 +167,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , root_collection : "products"
   , findAll : "/api/products"
   , create : "POST /api/products"
+  , update : "PUT /api/products/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.DataAsset", {
@@ -163,6 +175,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , root_collection : "data_assets"
   , findAll : "/api/data_assets"
   , create : "POST /api/data_assets"
+  , update : "PUT /api/data_assets/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Market", {
@@ -170,6 +183,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , root_collection : "markets"
   , findAll : "/api/markets"
   , create : "POST /api/markets"
+  , update : "PUT /api/markets/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.RiskyAttribute", {
@@ -177,6 +191,7 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   , root_collection : "risky_attributes"
   , findAll : "/api/risky_attributes"
   , create : "POST /api/risky_attributes"
+  , update : "PUT /api/risky_attributes/{id}"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Risk", {
@@ -210,6 +225,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
       return risks;
     });
   }
+  , update : "PUT /api/risks/{id}"
   , create : function(params) {
     params.trigger = params.risk_trigger;
     return $.ajax({
@@ -321,7 +337,7 @@ CMS.Models.get_link_type = function(instance, attr) {
   if (!type) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
-      type = model.shortName;
+      type = model.getRootModelName();
     else
       type = instance[attr].type;
   }

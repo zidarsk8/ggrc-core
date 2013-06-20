@@ -6,9 +6,10 @@
 -#
 -extends 'layouts/base.haml'
 
--macro dropup_create_new(type, type_plural, path)
+-macro dropup_create_new(type, type_plural, type_model=None)
+  -set type_model = type_model or type|nospace
   %li
-    %a{ 'href': "javascript://", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect', 'data-modal-class': 'modal-wide', 'data-object-singular' : '={type}', 'data-object-plural' : '={type_plural}' }
+    %a{ 'href': "javascript://", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect', 'data-modal-class': 'modal-wide', 'data-object-singular' : '={type_model}', 'data-object-plural' : '={type_plural}' }
       {{ type }}
 -endmacro
 
@@ -59,25 +60,25 @@
                         %ul.dropdown-menu
                           %li.divider
                           %li.title Create New ...
-                          =dropup_create_new("Program", "programs", "new_flow_program_path")
-                          =dropup_create_new("Regulation", "directives", "new_flow_directive_path(:meta_kind => :regulation)")
-                          =dropup_create_new("Contract", "directives", "new_flow_directive_path(:meta_kind => :contract)")
-                          =dropup_create_new("Policy", "policies", "new_flow_directive_path(:meta_kind => :policy)")
+                          =dropup_create_new("Program", "programs")
+                          =dropup_create_new("Regulation", "regulations")
+                          =dropup_create_new("Contract", "contracts")
+                          =dropup_create_new("Policy", "policies")
                           -# FIXME: Limit view to risk managers
                           -#if current_user.can_manage_risk
-                          =dropup_create_new("Risky Attribute", "risky_attributes", "new_flow_risky_attribute_path")
-                          =dropup_create_new("Risk", "risks", "new_flow_risk_path")
-                          =dropup_create_new("Control", "controls", "new_flow_control_path")
+                          =dropup_create_new("Risky Attribute", "risky_attributes")
+                          =dropup_create_new("Risk", "risks")
+                          =dropup_create_new("Control", "controls")
                           %li.divider
-                          =dropup_create_new("Process", 'systems', 'new_flow_system_path(:"system[is_biz_process]" => 1)')
-                          =dropup_create_new("System", 'systems', "new_flow_system_path")
+                          =dropup_create_new("Process", 'processes')
+                          =dropup_create_new("System", 'systems', "StrictSystem")
                           %li.divider
-                          =dropup_create_new("Org Group", 'org_groups' "new_flow_org_group_path")
-                          =dropup_create_new("Product", 'products', "new_flow_product_path")
-                          =dropup_create_new("Project", 'projects', "new_flow_project_path")
-                          =dropup_create_new("Facility", 'facilities', "new_flow_facility_path")
-                          =dropup_create_new("Market", 'markets', "new_flow_market_path")
-                          =dropup_create_new("Data Asset", 'data_assets', "new_flow_data_asset_path")
+                          =dropup_create_new("Org Group", 'org_groups')
+                          =dropup_create_new("Product", 'products')
+                          =dropup_create_new("Project", 'projects')
+                          =dropup_create_new("Facility", 'facilities')
+                          =dropup_create_new("Market", 'markets')
+                          =dropup_create_new("Data Asset", 'data_assets')
                 %li.black-link
                   %a{ 'href': "javascript://", 'data-toggle': 'modal-ajax', 'data-modal-type': 'helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
                     %i.grcicon-help
