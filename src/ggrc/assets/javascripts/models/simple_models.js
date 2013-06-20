@@ -12,8 +12,7 @@
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
-  , findAll : "/api/programs?company_controls_first=true"
-  , findOne : "/api/programs/{id}"
+  , findAll : "/api/programs?kind=Directive"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , init : function() {
@@ -26,7 +25,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
   , root_collection : "directives"
   , findAll : "/api/directives"
-  , findOne : "/api/directives/{id}"
   , create : "POST /api/directives"
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
@@ -36,6 +34,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
     "CMS.Models.Program.model" : function(val, type) {
       return {id : val.id, href : val.selfLink || val.href};
     }
+  }
+  , defaults : {
+    sections : []
   }
   , model : function(attrs) {
     if(!attrs[this.root_object]) {
@@ -62,16 +63,13 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this._super && this._super.apply(this, arguments);
     var that = this;
     this.attr("descendant_sections", can.compute(function() {
-      var sections;
-      if(!that.attr("sections"))
-        return [];
-      sections = [].slice.call(that.attr("sections"), 0);
+      var sections = [].slice.call(that.attr("sections"), 0);
       return can.reduce(that.sections, function(a, b) {
         return a.concat(can.makeArray(b.descendant_sections()));
       }, sections);
     }));
     this.attr("descendant_sections_count", can.compute(function() {
-      return that.attr("descendant_sections")().length;
+      return that.attr("descendant_sections")(true).length; //giving it a value to force revalidation
     }));
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }

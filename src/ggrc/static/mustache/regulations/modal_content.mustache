@@ -48,7 +48,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Kind/Type, Reference URL
+            Code, Reference URL
           </span>
         </a>
       </div>
@@ -68,10 +68,8 @@
           Kind/Type
           <i class="grcicon-help-black" rel="tooltip" title="Choose Kind/Type"></i>
         </label>
-        {{!FIXME: Need real values for kind/type}}
-        <select class="input-block-level" name="kind">
-          <option value="">Choose</option>
-        </select>
+        Regulation
+        <input type="hidden" name="kind" value="{{kind}}"/>
       </div>
       <div class="span6">
         <label>
