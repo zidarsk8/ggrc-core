@@ -13,12 +13,13 @@
 can.Model.Cacheable("CMS.Models.System", {
     root_object : "system"
     , root_collection : "systems"
+    , root_model : "System"
     , xable_type : "System"
     , findAll : "GET /api/systems"
     , findOne : "GET /api/systems/{id}"
     , create : "POST /api/systems"
     , update : function(id, params) {
-      var data = this.process_args(
+      /*var data = this.process_args(
           params['system']
           , ["notes"
             , "description"
@@ -31,10 +32,10 @@ can.Model.Cacheable("CMS.Models.System", {
             , "title"
             , "type_id"
             , "url"
-            , "version"]);
+            , "version"]);*/
       return $.ajax({
         url : "/api/systems/" + id
-        , data : data
+        , data : params
         , type : "put"
       });
     }

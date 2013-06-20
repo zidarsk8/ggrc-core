@@ -30,32 +30,27 @@ can.Model("can.Model.Cacheable", {
     });
     //can.getObject("cache", this, true);
 
-    if (!this.update.wrapped) {
-      this._update = this.update;
-      this.update = function(id, params) {
-        var ret = this._update
-          .call(this, id, this.process_args(params))
-          .fail(function(status) {
-            if(status === 409) {
-              //handle conflict.
-            }
-          });
-        delete ret.hasFailCallback;
-        return ret;
-      };
-      this.update.wrapped = true;
-    }
+    var _update = this.update;
+    this.update = function(id, params) {
+      var ret = _update
+        .call(this, id, this.process_args(params))
+        .fail(function(status) {
+          if(status === 409) {
+            //handle conflict.
+          }
+        });
+      delete ret.hasFailCallback;
+      return ret;
+    };
 
-    if (!this.create.wrapped) {
-      this._create = this.create;
-      this.create = function(params) {
-        var ret = this._create
-          .call(this, this.process_args(params));
-        delete ret.hasFailCallback;
-        return ret;
-      };
-      this.create.wrapped = true;
-    }
+    var _create = this.create;
+    this.create = function(params) {
+      var ret = _create
+        .call(this, this.process_args(params));
+      delete ret.hasFailCallback;
+      return ret;
+    };
+
 
     var _refresh = this.makeFindOne({ type : "get", url : "{href}" });
     this.refresh = function(params) {
@@ -160,6 +155,9 @@ can.Model("can.Model.Cacheable", {
     return m;
   }
   , tree_view_options : {}
+  , getRootModelName: function() {
+    return this.root_model || this.shortName;
+  }
 }, {
   init : function() {
     var obj_name = this.constructor.root_object;
@@ -194,15 +192,12 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function() {
-    return this.constructor.findOne({href : this.selfLink || this.href}).done(function(d) {
-      d.updated();
-    });
-    // return $.ajax({
-    //   url : this.selfLink || this.href
-    //   , type : "get"
-    //   , dataType : "json"
-    // })
-    // .then(can.proxy(this.constructor, "model"));
+    return $.ajax({
+      url : this.selfLink || this.href
+      , type : "get"
+      , dataType : "json"
+    })
+    .then(can.proxy(this.constructor, "model"));
   }
   , serialize : function() {
     var that = this, serial = {};
@@ -214,7 +209,7 @@ can.Model("can.Model.Cacheable", {
       if(that.constructor.attributes && that.constructor.attributes[name]) {
         fun_name = that.constructor.attributes[name].split(".").reverse()[0];
         if(fun_name === "models") {
-          serial[name] = can.map(val, this.stub);
+          serial[name] = can.map(val, function(v) { return v.stub(); });
         } else if(fun_name === "model") {
           serial[name] = val.stub();
         } else {
