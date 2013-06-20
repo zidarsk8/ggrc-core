@@ -13,13 +13,14 @@ can.Model.Cacheable("CMS.Models.Control", {
     root_object : "control"
   , root_collection : "controls"
   , create : "POST /api/controls"
-  , update : function(id, params) {
+  , update : "PUT /api/controls/{id}"
+/*  , update : function(id, params) {
     return $.ajax({
       url : params.selfLink
       , type : "put"
       , data : this.process_args(params, ["notes", "title", "description","company_control"])
     });
-  }
+  }*/
   , attributes : {
     object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
