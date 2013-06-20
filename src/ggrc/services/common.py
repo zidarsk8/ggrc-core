@@ -17,6 +17,8 @@ from ggrc.login import get_current_user_id
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 from werkzeug.exceptions import BadRequest, Forbidden
+from ggrc.models.event import Event
+from ggrc.models.revision import Revision
 from wsgiref.handlers import format_date_time
 from .attribute_query import AttributeQueryBuilder
 
@@ -204,21 +206,21 @@ class Resource(ModelView):
   """
 
   def dispatch_request(self, *args, **kwargs):
-    method = request.method.lower()
+    method = request.method
 
-    if method == 'get':
+    if method == 'GET':
       if self.pk in kwargs and kwargs[self.pk] is not None:
         return self.get(*args, **kwargs)
       else:
         return self.collection_get()
-    elif method == 'post':
+    elif method == 'POST':
       if self.pk in kwargs and kwargs[self.pk] is not None:
         return self.post(*args, **kwargs)
       else:
         return self.collection_post()
-    elif method == 'put':
+    elif method == 'PUT':
       return self.put(*args, **kwargs)
-    elif method == 'delete':
+    elif method == 'DELETE':
       return self.delete(*args, **kwargs)
     else:
       raise NotImplementedError()
@@ -290,6 +292,8 @@ class Resource(ModelView):
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    event = self.create_event(obj)
+    db.session.add(event)
     db.session.commit()
     obj = self.get_object(id)
     get_indexer().update_record(fts_record_for(obj))
@@ -307,6 +311,8 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
+    event = self.create_event(obj)
+    db.session.add(event)
     db.session.commit()
     get_indexer().delete_record(self.url_for(id=id))
     return self.json_success_response(
@@ -348,10 +354,36 @@ class Resource(ModelView):
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    db.session.flush() # this ensures that id is available for logging
+    event = self.create_event(obj)
+    db.session.add(event)
     db.session.commit()
     get_indexer().create_record(fts_record_for(obj))
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
+
+  def create_event(self, obj):
+      verb_to_action = {
+        'POST': 'created',
+        'PUT': 'modified',
+        'DELETE': 'deleted'
+      }
+      http_method = request.method
+      created_at = datetime.datetime.now() # VM There must be a common way
+      event = Event(
+        person_id = get_current_user_id(),
+        created_at = created_at,
+        http_method = http_method,
+        resource_id = obj.id,
+        resource_type = str(obj.__class__.__name__))
+      # VM - Examine changes to create revisions
+      revision = Revision(
+        resource_id = obj.id,
+        resource_type = str(obj.__class__.__name__),
+        action = verb_to_action[http_method],
+        content = as_json(obj.to_json(), sort_keys = True))
+      event.revisions.append(revision)
+      return event
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):

@@ -127,6 +127,12 @@ class Base(Identifiable, ChangeTracked, ContextRBAC):
   def eager_query(cls):
     return db.session.query(cls)
 
+  def to_json(self):
+      d = {}
+      for column in self.__table__.columns:
+          d[column.name] = getattr(self, column.name)
+      return d
+
 class Slugged(Base):
   """Several classes make use of the common mixins and additional are
   "slugged" and have additional fields related to their publishing in the
