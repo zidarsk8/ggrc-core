@@ -210,15 +210,19 @@ can.Model("can.Model.Cacheable", {
     this.each(function(val, name) {
       var fun_name;
       if(that.constructor.attributes && that.constructor.attributes[name]) {
-        fun_name = that.constructor.attributes[name].split(".").reverse()[0];
+        fun_name = that.constructor.attributes[name];
+        fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
         if(fun_name === "models") {
-          serial[name] = can.map(val, function(v) { return v.stub(); });
+          serial[name] = [];
+          for(var i = 0; i < val.length; i++) {
+            serial[name].push(val[i].stub());
+          }
         } else if(fun_name === "model") {
           serial[name] = val.stub();
         } else {
           serial[name] = that._super(name);
         }
-      } else if(val instanceof can.Model) {
+      } else if(val && typeof val.save === "function") {
         serial[name] = val.stub();
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
