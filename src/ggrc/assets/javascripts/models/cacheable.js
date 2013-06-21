@@ -197,7 +197,10 @@ can.Model("can.Model.Cacheable", {
       , type : "get"
       , dataType : "json"
     })
-    .then(can.proxy(this.constructor, "model"));
+    .then(can.proxy(this.constructor, "model"))
+    .done(function(d) {
+      d.updated();
+    });
   }
   , serialize : function() {
     var that = this, serial = {};
@@ -215,6 +218,8 @@ can.Model("can.Model.Cacheable", {
         } else {
           serial[name] = that._super(name);
         }
+      } else if(val instanceof can.Model) {
+        serial[name] = val.stub();
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
       }

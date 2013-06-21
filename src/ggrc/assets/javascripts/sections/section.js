@@ -140,6 +140,12 @@ CMS.Models.Section("CMS.Models.SectionSlug", {
       , property : "children"
     }]
   }
+  , defaults : {
+    controls : []
+    , title : ""
+    , slug : ""
+    , description : ""
+  }
   , init : function() {
     this._super.apply(this, arguments);
     this.tree_view_options.child_options[1].model = this;

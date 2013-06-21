@@ -95,7 +95,10 @@ can.Control("CMS.Controllers.TreeView", {
       }
       that.options.list.push(v);
       if(!v.instance.selfLink) {
-        v.instance.refresh();
+        can.Observe.startBatch();
+        v.instance.refresh().done(function() {
+          can.Observe.stopBatch();
+        });
       }
     });
     can.Observe.stopBatch();
@@ -172,9 +175,9 @@ can.Control("CMS.Controllers.TreeView", {
         data.attr("find_params", {});
       }
        if(data.parent_find_param){
-        data.attr("find_params." + data.parent_find_param, item.instance.id);
+        data.find_params[data.parent_find_param] = item.instance.id;
       } else {
-        data.attr("find_params.parent.id", item.instance.id);
+        data.find_params["parent.id"] = item.instance.id;
       }
     }
     // $subtree.cms_controllers_tree_view(opts);
