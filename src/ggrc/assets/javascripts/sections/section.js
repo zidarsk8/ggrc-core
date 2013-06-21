@@ -12,7 +12,7 @@
 can.Model.Cacheable("CMS.Models.Section", {
   root_object : "section"
   , root_collection : "sections"
-  , findAll : "GET /api/sections?" + window.cms_singularize((/^\/([^\/]+)\//.exec(window.location.pathname) || ["",""])[1]) + ".id=" + (/^\/[^\/]+\/([^\/]+)/.exec(window.location.pathname) || ["",""])[1]
+  , findAll : "GET /api/sections"
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , attributes : {

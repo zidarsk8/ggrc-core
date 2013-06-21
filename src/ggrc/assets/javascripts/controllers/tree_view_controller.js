@@ -171,14 +171,17 @@ can.Control("CMS.Controllers.TreeView", {
       data.attr("list", find_params);
     } else {
       find_params = data.attr("find_params");
-      if(!find_params) {
-        data.attr("find_params", {});
+      if(find_params) {
+        find_params = find_params.serialize();
+      } else {
+        find_params = {};
       }
        if(data.parent_find_param){
-        data.find_params[data.parent_find_param] = item.instance.id;
+        find_params[data.parent_find_param] = item.instance.id;
       } else {
-        data.find_params["parent.id"] = item.instance.id;
+        find_params["parent.id"] = item.instance.id;
       }
+      data.attr("find_params", new can.Observe(find_params));
     }
     // $subtree.cms_controllers_tree_view(opts);
   }
