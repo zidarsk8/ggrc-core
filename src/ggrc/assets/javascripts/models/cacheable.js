@@ -135,6 +135,11 @@ can.Model("can.Model.Cacheable", {
         }
     }
     if(m = this.findInCacheById(params.id)) {
+      if(!m.selfLink) {
+        //we are fleshing out a stub, which is much like creating an object new.
+        //But we don't want to trigger every change event on the new object's props.
+        m._init = 1;
+      }
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
         var p = val && val.serialize ? val.serialize() : val;
@@ -149,6 +154,7 @@ can.Model("can.Model.Cacheable", {
           m.attr(key, p);
         }
       });
+      delete m._init;
     } else {
       m = this._super(params);
     }
