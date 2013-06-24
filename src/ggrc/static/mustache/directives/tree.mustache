@@ -59,7 +59,7 @@
     {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
     <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
       {{#child_options}}
-      <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+      <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")._data) }}></ul>
       {{/child_options}}
     </div>
     {{/if_null}}

@@ -24,7 +24,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   , attributes : {
     object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
-    , implementing_controls : "CMS.Models.Control.models"
+    //, implementing_controls : "CMS.Models.Control.models"
     , control_sections : "CMS.Models.ControlSection.models"
     //, implemented_controls : "CMS.Models.Control.models"
     //, directive : "CMS.Models.Directive.model"
