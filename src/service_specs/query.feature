@@ -7,7 +7,7 @@ Feature: Collection filtering via query parameters
 
   Background:
     Given service description
-  
+
   @wip
   Scenario Outline: A single query parameter supplied to a collection finds matching resources
     Given a new "<resource_type>" named "resource1"
@@ -102,7 +102,7 @@ Feature: Collection filtering via query parameters
   Examples:
       | resource_type1 | link_property_name | resource_type2 | target_property_name | match_value1 | match_value2 |
       | Section        | directive          | Directive      | title                | 'foo'        | 'bar'        |
-      | Control        | directive          | Directive      | company              | True         | False        |
+      | Control        | directive          | Directive      | kind                 | 'Contract'   | 'Regulation' |
 
   Scenario: Query for controls related to a program
     Given a new "Program" named "program"
@@ -120,13 +120,13 @@ Feature: Collection filtering via query parameters
 
   Scenario: Query can use both a property path and an __in suffix to supply a comma separated list of values
     Given a new "Directive" named "directive"
-    And "directive" property "kind" is "foo"
+    And "directive" property "kind" is "Contract"
     And "directive" is POSTed to its collection
     And a new "Control" named "control"
     And "control" link property "directive" is "directive"
     And "control" is POSTed to its collection
-    When Querying "Control" with "directive.kind__in=bar,foo"
-    Then query result selfLink query string is "directive.kind__in=bar,foo"
+    When Querying "Control" with "directive.kind__in=bar,Contract"
+    Then query result selfLink query string is "directive.kind__in=bar,Contract"
     And "control" is in query result
     When Querying "Control" with "directive.kind__in=bar,baz"
     Then query result selfLink query string is "directive.kind__in=bar,baz"
@@ -134,12 +134,12 @@ Feature: Collection filtering via query parameters
 
   Scenario: Property link objects and be included with __include
     Given a new "Directive" named "directive"
-    And "directive" property "kind" is "Testing__include1"
+    And "directive" property "kind" is "Contract"
     And "directive" is POSTed to its collection
     And a new "Program" named "program"
     And "directive" is added to links property "directives" of "program"
     And "program" is POSTed to its collection
-    When Querying "Program" with "program_directives.directive.kind=Testing__include1&__include=directives"
-    Then query result selfLink query string is "program_directives.directive.kind=Testing__include1&__include=directives"
+    When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
+    Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
-    And evaluate "context.queryresultcollection['programs_collection']['programs'][0]['directives'][0]['kind'] == 'Testing__include1'"
+    And evaluate "context.queryresultcollection['programs_collection']['programs'][0]['directives'][0]['kind'] == 'Contract'"
