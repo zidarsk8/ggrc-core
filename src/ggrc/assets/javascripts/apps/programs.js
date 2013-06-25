@@ -75,8 +75,8 @@ $(function() {
   var $sections_tree = $("#directives .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
   $.when.apply(
     $
-    , [CMS.Models.SectionSlug.findAll()].concat(directive_dfds)
-  ).done(function(s, r, p, c) {
+    , directive_dfds
+  ).done(function(r, p, c) {
     var d = r.concat(p).concat(c);
 
     $sections_tree.cms_controllers_tree_view({
@@ -85,7 +85,8 @@ $(function() {
       , list_view : "/static/mustache/directives/tree.mustache"
       , child_options : [{
         model : CMS.Models.SectionSlug
-        , property : "sections"
+        , parent_find_param : "directive.id"
+        , find_params : { "parent_id__null" : true }
       }]
     });
   });

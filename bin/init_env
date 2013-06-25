@@ -9,6 +9,8 @@ then
   export DEV_PREFIX=${PREFIX}
 fi
 
+export DEV_PREFIX="$(cd ${DEV_PREFIX}; pwd -P)"
+
 export GGRC_SETTINGS_MODULE="development"
 
 source "${DEV_PREFIX}/opt/dev_virtualenv/bin/activate"

@@ -135,6 +135,11 @@ can.Model("can.Model.Cacheable", {
         }
     }
     if(m = this.findInCacheById(params.id)) {
+      if(!m.selfLink) {
+        //we are fleshing out a stub, which is much like creating an object new.
+        //But we don't want to trigger every change event on the new object's props.
+        m._init = 1;
+      }
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
         var p = val && val.serialize ? val.serialize() : val;
@@ -149,6 +154,7 @@ can.Model("can.Model.Cacheable", {
           m.attr(key, p);
         }
       });
+      delete m._init;
     } else {
       m = this._super(params);
     }
@@ -197,7 +203,10 @@ can.Model("can.Model.Cacheable", {
       , type : "get"
       , dataType : "json"
     })
-    .then(can.proxy(this.constructor, "model"));
+    .then(can.proxy(this.constructor, "model"))
+    .done(function(d) {
+      d.updated();
+    });
   }
   , serialize : function() {
     var that = this, serial = {};
@@ -207,14 +216,20 @@ can.Model("can.Model.Cacheable", {
     this.each(function(val, name) {
       var fun_name;
       if(that.constructor.attributes && that.constructor.attributes[name]) {
-        fun_name = that.constructor.attributes[name].split(".").reverse()[0];
+        fun_name = that.constructor.attributes[name];
+        fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
         if(fun_name === "models") {
-          serial[name] = can.map(val, function(v) { return v.stub(); });
+          serial[name] = [];
+          for(var i = 0; i < val.length; i++) {
+            serial[name].push(val[i].stub());
+          }
         } else if(fun_name === "model") {
           serial[name] = val.stub();
         } else {
           serial[name] = that._super(name);
         }
+      } else if(val && typeof val.save === "function") {
+        serial[name] = val.stub();
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
       }

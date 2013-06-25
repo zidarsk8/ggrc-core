@@ -110,7 +110,7 @@ class ModelFactoryMetaClass(FactoryMetaClass):
           attr_name = attr.attr_name
         else:
           attr_name = attr
-        if not hasattr(cls, attr_name):
+        if not attr_name in attrs:
           FactoryAttributeGenerator.generate(attrs, model_class, attr)
     return super(ModelFactoryMetaClass, cls).__new__(
         cls, class_name, bases, attrs)
@@ -149,3 +149,7 @@ def factory_for(model_class):
 class ProgramFactory(ModelFactory):
   MODEL = models.Program
   kind = FuzzyChoice(['Directive', 'Company Controls'])
+
+class DirectiveFactory(ModelFactory):
+  MODEL = models.Directive
+  kind = FuzzyChoice(['Company Policy'])

@@ -32,6 +32,7 @@ app.jinja_env.assets_environment = assets.environment
 
 # Configure Jinja2 extensions for app
 app.jinja_env.add_extension('jinja2.ext.autoescape')
+app.jinja_env.autoescape = True
 app.jinja_env.add_extension('jinja2.ext.with_')
 app.jinja_env.add_extension('hamlpy.ext.HamlPyExtension')
 

@@ -99,9 +99,10 @@ can.Model.Cacheable("CMS.Models.Category", {
     this._super && this._super.apply(this, arguments);
 
     this.attr("descendant_controls", can.compute(function() {
-      return that.attr("controls").concat(can.reduce(that.attr("children"), function(a, b) {
+      var ctls = [].concat(that.attr("controls"));
+      return can.reduce(that.attr("children"), function(a, b) {
         return a.concat(can.makeArray(b.descendant_controls()));
-      }, []));
+      }, ctls);
     }));
   }
 });

@@ -4,138 +4,34 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
-import json
 from behave import given, when, then
 from iso8601 import parse_date
 
-class DateTimeEncoder(json.JSONEncoder):
-  """Custom JSON Encoder to handle datetime objects
-
-  from:
-     `http://stackoverflow.com/questions/12122007/python-json-encoder-to-support-datetime`_
-  also consider:
-     `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
-  """
-  def default(self, obj):
-    if isinstance(obj, datetime.datetime):
-      return obj.isoformat('T')
-    elif isinstance(obj, datetime.date):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.timedelta):
-      return (datetime.datetime.min + obj).time().isoformat('T')
-    else:
-      return super(DateTimeEncoder, self).default(obj)
+from .utils import \
+    Example, handle_example_resource, handle_named_example_resource, \
+    set_property, get_resource, put_resource, get_resource_table_singular, \
+    get_service_endpoint_url, handle_get_resource_and_name_it, \
+    handle_post_named_example_to_collection_endpoint, \
+    handle_post_named_example, post_example, handle_get_example_resource
 
 def get_json_response(context):
   if not hasattr(context, 'json'):
     context.json = context.response.json()
   return context.json
 
-def post_example(context, resource_type, example, url):
-  #For **some** reason, I can't import this at the module level in a steps file
-  import requests
-  headers = {'Content-Type': 'application/json',}
-  data = json.dumps(
-      {get_resource_table_singular(resource_type): example},
-      cls=DateTimeEncoder,
-      )
-  response = requests.post(
-      context.base_url+url,
-      data=data,
-      headers=headers,
-      allow_redirects=False,
-      cookies=getattr(context, 'cookies', {}),
-      )
-  if response.status_code == 302:
-    # deal with login redirect, expect noop
-    headers={'Accept': 'text/html',}
-    if hasattr(context, 'current_user_json'):
-      headers['X-ggrc-user'] = context.current_user_json
-    response = requests.get(
-        response.headers['Location'],
-        headers=headers,
-        allow_redirects=False,
-        )
-    context.cookies = response.cookies
-    response = requests.post(
-        context.base_url+url,
-        data=data,
-        headers={
-          'Content-Type': 'application/json',
-          },
-        cookies=context.cookies,
-        )
-  context.cookies = response.cookies
-  return response
-
-def get_resource(context, url):
-  import requests
-  headers={'Accept': 'application/json',}
-  if hasattr(context, 'current_user_json'):
-    headers['X-ggrc-user'] = context.current_user_json
-  response = requests.get(
-      context.base_url+url,
-      headers=headers,
-      cookies=getattr(context, 'cookies', {})
-      )
-  context.cookies = response.cookies
-  return response
-
-import re
-def get_resource_table_singular(resource_type):
-  # This should match the implementation at
-  #   ggrc.models.inflector:ModelInflector.underscore_from_camelcase
-  s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', resource_type)
-  return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
-
-class Example(object):
-  """An example resource for use in a behave scenario, by name."""
-  def __init__(self, resource_type, value, response=None):
-    self.resource_type = resource_type
-    self.value = value
-    self.response = response
-
-  def get(self, attr):
-    return self.value.get(get_resource_table_singular(self.resource_type)).get(attr)
-
-  def set(self, attr, value):
-    self.value[attr] = value
-
-def set_property(obj, attr, value):
-  if isinstance(obj, Example):
-    obj.set(attr, value)
-  else:
-    setattr(obj, attr, value)
-
 @given('an example "{resource_type}"')
 def example_resource(context, resource_type):
-  resource_factory = factory_for(resource_type)
-  context.example_resource = resource_factory()
+  handle_example_resource(context, resource_type)
 
 @given('a new "{resource_type}" named "{name}"')
 def named_example_resource(context, resource_type, name, **kwargs):
-  resource_factory = factory_for(resource_type)
-  example = Example(resource_type, resource_factory(**kwargs))
-  setattr(context, name, example)
-
-def get_service_endpoint_url(context, endpoint_name):
-  """Return the URL for the `endpoint_name`. This assumes that there is a
-  `service_description` in the `context` to ues to lookup the endpoint url.
-  """
-  return context.service_description.get(u'service_description')\
-      .get(u'endpoints').get(unicode(endpoint_name)).get(u'href')
+  handle_named_example_resource(context, resource_type, name, **kwargs)
 
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
-  """Create a new resource for the given example. Expects that there is a
-  `service_description` in `context` to use to lookup the endpoint url. The
-  created resource is added to the context as the attribute name given by
-  `name`.
-  """
-  example = getattr(context, name)
-  url = get_service_endpoint_url(context, example.resource_type)
-  post_named_example(context, name, url, expected_status=expected_status)
+  handle_post_named_example_to_collection_endpoint(
+      context, name, expected_status)
 
 @given('HTTP POST of "{name}" to "{url}"')
 def simple_post_of_named(context, name, url):
@@ -149,15 +45,7 @@ def simple_post_of_named(context, name, url):
 
 @given('"{name}" is POSTed to "{url}"')
 def post_named_example(context, name, url, expected_status=201):
-  example = getattr(context, name)
-  response = post_example(
-      context, example.resource_type, example.value, url)
-  assert response.status_code == expected_status, \
-      'Expected status code {0}, received {1}'\
-        .format(expected_status, response.status_code)
-  if expected_status == 200 or expected_status == 201:
-    example = Example(example.resource_type, response.json())
-    setattr(context, name, example)
+  handle_post_named_example(context, name, url, expected_status)
 
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
@@ -171,25 +59,16 @@ def post_example_resource(context, resource_type, collection):
 
 @when('GET of "{url}" as "{name}"')
 def get_resource_and_name_it(context, url, name):
-  response = get_resource(context, url)
-  assert response.status_code == 200
-  setattr(context, name, response.json())
+  handle_get_resource_and_name_it(context, url, name)
 
 @when('GET of the resource "{name}"')
 def get_example_resource(context, name, expected_status=200):
-  example = getattr(context, name)
-  url = example.get('selfLink')
-  response = get_resource(context, url)
-  assert response.status_code == expected_status
-  if expected_status == 200 or expected_status == 201:
-    example = Example(
-        example.resource_type, response.json(), response=response)
-    setattr(context, name, example)
+  handle_get_example_resource(context, name, expected_status)
 
 @then('a "{status_code}" status code is received')
 def validate_status_code(context, status_code):
   assert context.response.status_code == int(status_code), \
-      'Expecxted status code {0}, received {1}'.format(
+      'Expected status code {0}, received {1}'.format(
           status_code, context.response.status_code)
 
 @then('a 201 status code is received')
@@ -264,26 +143,6 @@ def check_GET_is_allowed(context, resource_name):
 @then('GET of "{resource_name}" is forbidden')
 def check_GET_is_forbidden(context, resource_name):
   get_example_resource(context, resource_name, expected_status=403)
-
-def put_resource(context, url, resource):
-  import requests
-  headers={
-      'Content-Type': 'application/json',
-      'If-Match': resource.response.headers['Etag'],
-      'If-Unmodified-Since': resource.response.headers['Last-Modified'],
-      }
-  if hasattr(context, 'current_user_json'):
-    headers['X-ggrc-user'] = context.current_user_json
-  data = json.dumps(resource.value, cls=DateTimeEncoder)
-  print 'data:', data
-  response = requests.put(
-      context.base_url+url,
-      data=data,
-      headers=headers,
-      cookies=getattr(context, 'cookies', {})
-      )
-  context.cookies = response.cookies
-  return response
 
 def put_example_resource(context, name, expected_status=200):
   example = getattr(context, name)

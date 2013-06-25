@@ -19,7 +19,6 @@ dashboard-js-files:
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
   - can.jquery-all.js
-  - jquery-migrate.js
   - bootstrap/modal-ajax.js
   - bootstrap/scrollspy.js
   - bootstrap/affix.js

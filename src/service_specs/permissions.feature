@@ -183,11 +183,11 @@ Feature: RBAC Permissions enforcement for REST API
   Scenario: Property link objects can be included with __include if the user has read access to the target
     Given current user is "{\"email\": \"bobtester@testertester.com\", \"name\": \"Bob Tester\", \"permissions\": {\"create\": {\"Directive\": [1,2], \"Program\": [1,2]}, \"read\": {\"Directive\": [1,2], \"Program\": [1,2]}, \"update\": {\"Directive\": [1,2]}}}"
     And a new "Directive" named "directive_in_1"
-    And "directive_in_1" property "kind" is "Testing__include1"
+    And "directive_in_1" property "kind" is "Contract"
     And "directive_in_1" property "context_id" is literal "1"
     And "directive_in_1" is POSTed to its collection
     And a new "Directive" named "directive_in_2"
-    And "directive_in_2" property "kind" is "Testing__include1"
+    And "directive_in_2" property "kind" is "Contract"
     And "directive_in_2" property "context_id" is literal "2"
     And "directive_in_2" is POSTed to its collection
     And a new "Program" named "program"
@@ -195,20 +195,20 @@ Feature: RBAC Permissions enforcement for REST API
     And "directive_in_2" is added to links property "directives" of "program"
     And "program" property "context_id" is literal "1"
     And "program" is POSTed to its collection
-    When Querying "Program" with "program_directives.directive.kind=Testing__include1&__include=directives"
-    Then query result selfLink query string is "program_directives.directive.kind=Testing__include1&__include=directives"
+    When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
+    Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
     And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 2"
     And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0] and 'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][1]"
     Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"Directive\": [1]}, \"read\": {\"Directive\": [1], \"Program\": [1]}, \"update\": {\"Directive\": [1]}}}"
-    When Querying "Program" with "program_directives.directive.kind=Testing__include1&__include=directives"
-    Then query result selfLink query string is "program_directives.directive.kind=Testing__include1&__include=directives"
+    When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
+    Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
     And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 2"
     And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0] != 'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][1]"
     Given current user is "{\"email\": \"alicetester@testertester.com\", \"name\": \"Alice Tester\", \"permissions\": {\"read\": {\"Directive\": [3], \"Program\": [1]}, \"update\": {\"Directive\": [1]}}}"
-    When Querying "Program" with "program_directives.directive.kind=Testing__include1&__include=directives"
-    Then query result selfLink query string is "program_directives.directive.kind=Testing__include1&__include=directives"
+    When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
+    Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is not in query result
 
   Scenario Outline: A single query parameter supplied to a collection finds matching resources in contexts that the user is authorized to for read
