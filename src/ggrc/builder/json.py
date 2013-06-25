@@ -130,8 +130,11 @@ class UpdateAttrHandler(object):
     """Translate the JSON value for a ``Datetime`` column."""
     value = json_obj.get(attr_name)
     try:
-      d = iso8601.parse_date(value) if value else None
-      d = d.replace(tzinfo=None)
+      if value:
+        d = iso8601.parse_date(value)
+        d = d.replace(tzinfo=None)
+      else:
+        d = None
       return d
     except iso8601.ParseError as e:
       raise BadRequest(
