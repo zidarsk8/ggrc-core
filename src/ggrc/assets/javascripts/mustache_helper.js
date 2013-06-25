@@ -550,7 +550,7 @@ Mustache.registerHelper("allow_help_edit", function() {
 
 Mustache.registerHelper("all", function(type, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
-  , $dummy_content = $(options.fn({})).first()
+  , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , items_dfd, hook;
 

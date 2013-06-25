@@ -97,14 +97,10 @@ can.Control("GGRC.Controllers.Modals", {
     });
     can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
   }
-  
+
   , "input, textarea, select change" : function(el, ev) {
-    
     var value = el.val();
-   if (el.is('[type=checkbox]')) {
-     value = el.is(':checked');
-   }
-   this.set_value({name : el.attr("name"), value : value });
+    this.set_value({name : el.attr("name"), value : value });
   }
 
   , set_value : function(item) {
@@ -115,14 +111,17 @@ can.Control("GGRC.Controllers.Modals", {
     }
     var name = item.name.split(".")
       , $elem, value;
+    $elem = this.options.$content.find("[name='" + item.name + "']");
+
     if (typeof(item.value) == 'undefined') {
-        $elem = this.options.$content.find("[name='" + item.name + "']");
-        value = $elem.val();
-    if($elem.attr("numeric") && isNaN(parseInt(value, 10))) {
-      value = null;
-    }
+      value = $elem.val();
+      if($elem.attr("numeric") && isNaN(parseInt(value, 10))) {
+        value = null;
+      }
+    } else if ($elem.is("[type=checkbox]")) {
+      value = $elem.is(":checked");
     } else {
-        value = item.value;
+      value = item.value;
     }
     if(name.length > 1) {
       if(can.isArray(value)) {
@@ -139,7 +138,8 @@ can.Control("GGRC.Controllers.Modals", {
     , that = this
     , ajd;
 
-    
+    can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
+
     ajd = instance.save().done(function() {
       that.element.modal_form("hide");
     }).fail(function(xhr, status) {
