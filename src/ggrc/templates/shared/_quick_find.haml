@@ -21,23 +21,23 @@
 
 .tabbable.tabs-left{ 'id': "{{ tabbable_id }}" }
   %ul.nav.nav-tabs
-    =tab("Control", "Controls", "/search?s=&qr={0}".format(quick_result), "active")
-    =tab("Regulation", "Regulations", "/search?quick=true&qr={0}&meta_kind=regulation".format(quick_result))
-    =tab("Policy", "Policies", "/search?quick=true&qr={0}&meta_kind=regulation".format(quick_result))
-    =tab("Contract", "Contracts", "/search?quick=true&qr={0}&meta_kind=regulation".format(quick_result))
+    =tab("Control", "Controls", "/api/search?s=&qr={0}".format(quick_result), "active")
+    =tab("Regulation", "Regulations", "/api/search?quick=true&qr={0}&kind=Regulation".format(quick_result))
+    =tab("Policy", "Policies", "/api/search?quick=true&qr={0}&meta_kind=regulation".format(quick_result))
+    =tab("Contract", "Contracts", "/api/search?quick=true&qr={0}&meta_kind=regulation".format(quick_result))
       -#FIXME: Restrict to risk managers
       -#if current_user.can_manage_risk?
-    =tab("Risk", "Risks", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Risky Attribute", "Risky Attributes", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Process", "Processes", "/search?quick=true&qr={0}&is_biz_process=true".format(quick_result))
-    =tab("System", "Systems", "/search?quick=true&qr={0}&is_biz_process=false".format(quick_result))
-    =tab("Org Group", "Org Groups", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Project", "Projects", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Facility", "Facilities", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Product", "Products", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Data Asset", "Data Assets", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Market", "Markets", "/search?quick=true&qr={0}".format(quick_result))
-    =tab("Program", "Programs", "/search?quick=true&qr={0}".format(quick_result))
+    =tab("Risk", "Risks", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Risky Attribute", "Risky Attributes", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Process", "Processes", "/api/search?quick=true&qr={0}&is_biz_process=true".format(quick_result))
+    =tab("System", "Systems", "/api/search?quick=true&qr={0}&is_biz_process=false".format(quick_result))
+    =tab("Org Group", "Org Groups", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Project", "Projects", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Facility", "Facilities", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Product", "Products", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Data Asset", "Data Assets", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Market", "Markets", "/api/search?quick=true&qr={0}".format(quick_result))
+    =tab("Program", "Programs", "/api/search?quick=true&qr={0}".format(quick_result))
 
   .tab-content
     .tab-pane.active{ 'id': "{{ prefix }}_controls" }

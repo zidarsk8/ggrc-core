@@ -68,7 +68,7 @@ $(function() {
 
   var $controls_tree = $("#controls .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
   $.when(
-    CMS.Models.Category.findAll()
+    CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ directive_id : directive_id })
   ).done(function(cats, ctls) {
     var uncategorized = cats[cats.length - 1];
@@ -89,9 +89,9 @@ $(function() {
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
 
-  CMS.Models.SectionSlug.findAll({ directive_id : directive_id })
+  CMS.Models.SectionSlug.findAll({ directive_id : directive_id, "parent_id__null" : true })
   .done(function(s) {
-    
+
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.SectionSlug
       , edit_sections : true
