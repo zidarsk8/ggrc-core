@@ -1,4 +1,6 @@
 -extends 'layouts/_widget_box.haml'
+-if not model
+  -set model = controller.model
 
 -block widget_title
   References
@@ -9,10 +11,10 @@
     =instance.object_people|length
 
 -block widget_help
-  program_more_info
+  =model._inflector.table_singular + "_more_info"
 
 -block widget_id
-  program_more_info_widget
+  =model._inflector.model_singular + "_more_info_widget"
 
 -block main
   %ul.tree-structure.simple
