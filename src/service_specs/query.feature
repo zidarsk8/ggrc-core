@@ -8,7 +8,6 @@ Feature: Collection filtering via query parameters
   Background:
     Given service description
 
-  @wip
   Scenario Outline: A single query parameter supplied to a collection finds matching resources
     Given a new "<resource_type>" named "resource1"
     And a new "<resource_type>" named "resource2"
@@ -79,6 +78,7 @@ Feature: Collection filtering via query parameters
       | Category      | _update_attrs=foobar |
       | Category      | foobar=baz           |
 
+  @wip
   Scenario Outline: Query parameters can be property paths
     Given a new "<resource_type2>" named "resource2_1"
     And a new "<resource_type2>" named "resource2_2"
@@ -132,7 +132,7 @@ Feature: Collection filtering via query parameters
     Then query result selfLink query string is "directive.kind__in=bar,baz"
     And "control" is not in query result
 
-  Scenario: Property link objects and be included with __include
+  Scenario: Property link objects can be included with __include
     Given a new "Directive" named "directive"
     And "directive" property "kind" is "Contract"
     And "directive" is POSTed to its collection

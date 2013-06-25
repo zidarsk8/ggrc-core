@@ -1,7 +1,7 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 import datetime
 from behave import given, when, then
@@ -9,7 +9,7 @@ from iso8601 import parse_date
 
 from .utils import \
     Example, handle_example_resource, handle_named_example_resource, \
-    set_property, get_resource, get_resource_table_singular, \
+    set_property, get_resource, put_resource, get_resource_table_singular, \
     get_service_endpoint_url, handle_get_resource_and_name_it, \
     handle_post_named_example_to_collection_endpoint, \
     handle_post_named_example, post_example, handle_get_example_resource
@@ -28,17 +28,24 @@ def named_example_resource(context, resource_type, name, **kwargs):
   handle_named_example_resource(context, resource_type, name, **kwargs)
 
 @given('"{name}" is POSTed to its collection')
-def post_named_example_to_collection_endpoint(context, name):
-  """Create a new resource for the given example. Expects that there is a
-  `service_description` in `context` to use to lookup the endpoint url. The
-  created resource is added to the context as the attribute name given by
-  `name`.
-  """
-  handle_post_named_example_to_collection_endpoint(context, name)
+def post_named_example_to_collection_endpoint(
+    context, name, expected_status=201):
+  handle_post_named_example_to_collection_endpoint(
+      context, name, expected_status)
+
+@given('HTTP POST of "{name}" to "{url}"')
+def simple_post_of_named(context, name, url):
+  example = getattr(context, name)
+  response = post_example(
+      context, example.resource_type, example.value, url)
+  assert response.status_code == 200, \
+      'Expected status code {0}, received {1}'.format(
+          200, response.status_code)
+  context.response = response
 
 @given('"{name}" is POSTed to "{url}"')
-def post_named_example(context, name, url):
-  handle_post_named_example(context, name, url)
+def post_named_example(context, name, url, expected_status=201):
+  handle_post_named_example(context, name, url, expected_status)
 
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
@@ -55,13 +62,13 @@ def get_resource_and_name_it(context, url, name):
   handle_get_resource_and_name_it(context, url, name)
 
 @when('GET of the resource "{name}"')
-def get_example_resource(context, name):
-  handle_get_example_resource(context, name)
+def get_example_resource(context, name, expected_status=200):
+  handle_get_example_resource(context, name, expected_status)
 
 @then('a "{status_code}" status code is received')
 def validate_status_code(context, status_code):
   assert context.response.status_code == int(status_code), \
-      'Expecxted status code {0}, received {1}'.format(
+      'Expected status code {0}, received {1}'.format(
           status_code, context.response.status_code)
 
 @then('a 201 status code is received')
@@ -105,3 +112,82 @@ def check_resource_equality_for_response(context, resource_type):
       response = datetime.datetime.strptime(response, '%Y-%m-%d').date()
     assert original == response, 'for {0}: expected {1}, received {2}'.format(
         k, original, response)
+
+@given('current user is "{user_json}"')
+def define_current_user(context, user_json):
+  import requests
+  if hasattr(context, 'current_user_json'):
+    # logout current user
+    response = requests.get(
+        context.base_url+'/logout',
+        headers={'Accept': 'text/html'},
+        cookies=getattr(context, 'cookies', {})
+        )
+    assert response.status_code == 200, 'Failed to logout!!'
+    delattr(context, 'cookies')
+  context.current_user_json = user_json.replace('\\"', '"')
+
+@then('POST of "{resource_name}" to its collection is allowed')
+def check_POST_is_allowed(context, resource_name):
+  post_named_example_to_collection_endpoint(context, resource_name)
+
+@then('POST of "{resource_name}" to its collection is forbidden')
+def check_POST_is_forbidden(context, resource_name):
+  post_named_example_to_collection_endpoint(
+      context, resource_name, expected_status=403)
+
+@then('GET of "{resource_name}" is allowed')
+def check_GET_is_allowed(context, resource_name):
+  get_example_resource(context, resource_name)
+
+@then('GET of "{resource_name}" is forbidden')
+def check_GET_is_forbidden(context, resource_name):
+  get_example_resource(context, resource_name, expected_status=403)
+
+def put_example_resource(context, name, expected_status=200):
+  example = getattr(context, name)
+  url = example.get('selfLink')
+  response = put_resource(context, url, example)
+  assert response.status_code == expected_status
+  if expected_status == 200 or expected_status == 201:
+    example = Example(example.resource_type, response.json())
+    setattr(context, name, example)
+
+@then('PUT of "{resource_name}" is allowed')
+def check_PUT_is_allowed(context, resource_name):
+  put_example_resource(context, resource_name)
+
+@then('PUT of "{resource_name}" is forbidden')
+def check_PUT_is_forbidden(context, resource_name):
+  put_example_resource(context, resource_name, expected_status=403)
+
+def delete_resource(context, url, resource):
+  import requests
+  headers={
+      'Content-Type': 'application/json',
+      'If-Match': resource.response.headers['Etag'],
+      'If-Unmodified-Since': resource.response.headers['Last-Modified'],
+      }
+  if hasattr(context, 'current_user_json'):
+    headers['X-ggrc-user'] = context.current_user_json
+  response = requests.delete(
+      context.base_url+url,
+      headers=headers,
+      cookies=getattr(context, 'cookies', {})
+      )
+  context.cookies = response.cookies
+  return response
+
+def delete_example_resource(context, name, expected_status=200):
+  example = getattr(context, name)
+  url = example.get('selfLink')
+  response = delete_resource(context, url, example)
+  assert response.status_code == expected_status
+
+@then('DELETE of "{resource_name}" is allowed')
+def check_DELETE_is_allowed(context, resource_name):
+  delete_example_resource(context, resource_name, expected_status=200)
+
+@then('DELETE of "{resource_name}" is forbidden')
+def check_DELETE_is_allowed(context, resource_name):
+  delete_example_resource(context, resource_name, expected_status=403)

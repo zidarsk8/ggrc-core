@@ -11,9 +11,10 @@ from factories import factory_for
 
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
-  def __init__(self, resource_type, value):
+  def __init__(self, resource_type, value, response=None):
     self.resource_type = resource_type
     self.value = value
+    self.response = response
 
   def get(self, attr):
     return self.value.get(get_resource_table_singular(self.resource_type)).get(attr)
@@ -44,49 +45,105 @@ def handle_get_resource_and_name_it(context, url, name):
 
 def get_resource(context, url):
   import requests
-  return requests.get(
+  headers={'Accept': 'application/json',}
+  if hasattr(context, 'current_user_json'):
+    headers['X-ggrc-user'] = context.current_user_json
+  response = requests.get(
       context.base_url+url,
-      headers={
-        'Accept': 'application/json',
-        },
+      headers=headers,
+      cookies=getattr(context, 'cookies', {})
       )
+  context.cookies = response.cookies
+  return response
 
-def handle_get_example_resource(context, name):
+def put_resource(context, url, resource):
+  import requests
+  headers={
+      'Content-Type': 'application/json',
+      'If-Match': resource.response.headers['Etag'],
+      'If-Unmodified-Since': resource.response.headers['Last-Modified'],
+      }
+  if hasattr(context, 'current_user_json'):
+    headers['X-ggrc-user'] = context.current_user_json
+  data = json.dumps(resource.value, cls=DateTimeEncoder)
+  print 'data:', data
+  response = requests.put(
+      context.base_url+url,
+      data=data,
+      headers=headers,
+      cookies=getattr(context, 'cookies', {})
+      )
+  context.cookies = response.cookies
+  return response
+
+def handle_get_example_resource(context, name, expected_status=200):
   example = getattr(context, name)
   url = example.get('selfLink')
   response = get_resource(context, url)
-  assert response.status_code == 200
-  example = Example(example.resource_type, response.json())
-  setattr(context, name, example)  
+  assert response.status_code == expected_status
+  if expected_status == 200 or expected_status == 201:
+    example = Example(
+        example.resource_type, response.json(), response=response)
+    setattr(context, name, example)
 
-def handle_post_named_example_to_collection_endpoint(context, name):
+def handle_post_named_example_to_collection_endpoint(
+    context, name, expected_status=201):
+  """Create a new resource for the given example. Expects that there is a
+  `service_description` in `context` to use to lookup the endpoint url. The
+  created resource is added to the context as the attribute name given by
+  `name`.
+  """
   example = getattr(context, name)
   url = get_service_endpoint_url(context, example.resource_type)
-  handle_post_named_example(context, name, url)
+  handle_post_named_example(context, name, url, expected_status)
 
-def handle_post_named_example(context, name, url):
+def handle_post_named_example(context, name, url, expected_status=201):
   example = getattr(context, name)
   response = post_example(
       context, example.resource_type, example.value, url)
-  assert response.status_code == 201, \
-      'Expected status code 201, received {0}'.format(response.status_code)
-  example = Example(example.resource_type, response.json())
-  setattr(context, name, example)
+  assert response.status_code == expected_status, \
+      'Expected status code {0}, received {1}'\
+        .format(expected_status, response.status_code)
+  if expected_status == 200 or expected_status == 201:
+    example = Example(example.resource_type, response.json())
+    setattr(context, name, example)
 
 def post_example(context, resource_type, example, url):
   #For **some** reason, I can't import this at the module level in a steps file
   import requests
+  headers = {'Content-Type': 'application/json',}
   data = json.dumps(
       {get_resource_table_singular(resource_type): example},
       cls=DateTimeEncoder,
       )
-  return requests.post(
+  response = requests.post(
       context.base_url+url,
       data=data,
-      headers={
-        'Content-Type': 'application/json',
-        },
+      headers=headers,
+      allow_redirects=False,
+      cookies=getattr(context, 'cookies', {}),
       )
+  if response.status_code == 302:
+    # deal with login redirect, expect noop
+    headers={'Accept': 'text/html',}
+    if hasattr(context, 'current_user_json'):
+      headers['X-ggrc-user'] = context.current_user_json
+    response = requests.get(
+        response.headers['Location'],
+        headers=headers,
+        allow_redirects=False,
+        )
+    context.cookies = response.cookies
+    response = requests.post(
+        context.base_url+url,
+        data=data,
+        headers={
+          'Content-Type': 'application/json',
+          },
+        cookies=context.cookies,
+        )
+  context.cookies = response.cookies
+  return response
 
 class DateTimeEncoder(json.JSONEncoder):
   """Custom JSON Encoder to handle datetime objects

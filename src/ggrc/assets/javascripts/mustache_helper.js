@@ -550,7 +550,7 @@ Mustache.registerHelper("allow_help_edit", function() {
 
 Mustache.registerHelper("all", function(type, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
-  , $dummy_content = $(options.fn({})).first()
+  , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , items_dfd, hook;
 
@@ -578,6 +578,10 @@ Mustache.registerHelper("all", function(type, options) {
     items_dfd = model.findAll();
   }
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
+});
+
+Mustache.registerHelper("handle_context", function() {
+  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
 });
 
 })(this, jQuery, can);
