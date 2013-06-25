@@ -580,4 +580,8 @@ Mustache.registerHelper("all", function(type, options) {
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
+Mustache.registerHelper("handle_context", function() {
+  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
+});
+
 })(this, jQuery, can);
