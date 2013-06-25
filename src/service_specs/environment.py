@@ -9,7 +9,7 @@ from ggrc.app import app
 from ggrc.models import create_db, drop_db
 from wsgiref.simple_server import make_server
 
-use_migrations = True
+use_migrations = False
 
 def before_all(context):
   context.base_url = 'http://localhost:9000'
