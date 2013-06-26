@@ -1,6 +1,7 @@
 {{#list}}
-  <li class="{{system_or_process}}" data-object-id="{{id}}" data-id="{{id}}" data-object-meta-type="system" data-object-type="{{system_or_process}}" data-model="true" {{data 'model'}}>
-  <div class="item-main">
+<li class="{{system_or_process}}" data-object-id="{{instance.id}}" data-id="{{instance.id}}" data-object-meta-type="system" data-object-type="{{instance.system_or_process}}">
+  {{#instance}}
+  <div class="item-main" data-model="true" {{data 'model'}}>
     {{#draw_children}}
         <div class="openclose {{#if start_expanded}}active{{/if}}"></div>
     {{/draw_children}}
@@ -61,6 +62,7 @@
       </div>
     </div>
   </div>
+  {{/instance}}
   {{#draw_children}}
   <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
     {{#child_options}}

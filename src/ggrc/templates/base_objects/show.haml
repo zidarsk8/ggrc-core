@@ -58,7 +58,7 @@
         -#   e.g. 'programs/_main.haml', 'programs/_main.html', 'base_objects/_main.haml', ...
         -#   perhaps traverse MRO, then 'shared/'
         -with widget_class = 'business'
-          -#include lookup("main", instance)
+          -include 'base_objects/_main.haml'
         -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
           -include 'shared/_related.haml'
         -#if instance|has_valid_relationships

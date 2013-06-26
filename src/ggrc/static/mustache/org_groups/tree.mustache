@@ -1,0 +1,94 @@
+{{#list}}
+<li class="orggroup" data-object-id="{{instance.id}}" data-object-type="org_group">
+  {{#instance}}
+  <div class="item-main">
+    <div class="lastchild openclose"></div>
+    <div class="item-title">
+      <div class="row-fluid">
+        <div class="span8">
+          <div class="oneline expand-on-hover">
+            <i class="grcicon-orggroup-color"></i>
+            <span class="title">
+              {{title}}
+            </span>
+            <span class="code">
+              {{slug}}
+            </span>
+            <span class="description-inline">
+
+              <i class="description-inline">
+                {{firstnonempty description_inline ''}}
+              </i>
+            </span>
+          </div>
+          <div class="description {{^description}}no-description{{/description}}">
+            <div class="rtf">{{{firstnonempty description '<i>No description</i>'}}}</div>
+          </div>
+        </div>
+        <div class="span1">
+          <a class="view-more" href="javascript://">
+            view
+          </a>
+        </div>
+
+      </div>
+      <div class="item-actions">
+        <a class="btn btn-mini" data-object-plural="org_groups" data-object-singular="OrgGroup" data-object-id="{{id}}" data-form-target="refresh" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit this object">
+          <i class="grcicon-edit"></i>
+        </a>
+        <a class="btn btn-mini"
+          href="javascript://"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="modal-relationship-selector"
+          data-modal-class="modal-wide"
+          data-modal-reset="reset"
+          data-original-title="Link org groups to this object"
+          data-related-model="OrgGroup"
+          data-related-title-singular="Org Group"
+          data-related-title-plural="Org Groups"
+          data-related-side="destination"
+          data-related-table-plural="org_groups"
+          data-related-model-singular="Org Group"
+          data-relationship-type="org_group_relies_upon_org_group"
+          data-tab-target="#related-objects-org_group_relies_upon_org_group">
+          <i class="grcicon-link"></i>
+        </a>
+        <a class="btn btn-mini"
+          href="javascript://"
+          rel="tooltip"
+          title="Link processes to this object"
+          data-modal-class="modal-wide"
+          data-modal-reset="reset"
+          data-placement="left"
+          data-toggle="modal-relationship-selector"
+          data-related-model="Process"
+          data-related-title-singular="Process"
+          data-related-title-plural="Processes"
+          data-related-side="source"
+          data-related-table-plural="processes"
+          data-related-model-singular="Process"
+          data-relationship-type="org_group_has_process"
+          data-tab-target="#related-objects-org_group_has_process">
+          <i class="grcicon-link"></i>
+        </a>
+        {{^single_object}}
+        <a class="btn btn-mini" data-placement="left" href="{{viewLink}}" rel="tooltip" title="Go to this object's page">
+          <i class="grcicon-goto"></i>
+        </a>
+        {{/single_object}}
+      </div>
+    </div>
+  </div>
+  {{/instance}}
+  {{#if draw_children}}
+  {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+  <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
+    {{#child_options}}
+    <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+    {{/child_options}}
+  </div>
+  {{/if_null}}
+  {{/if}}
+</li>
+{{/list}}

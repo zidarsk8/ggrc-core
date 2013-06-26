@@ -26,6 +26,7 @@ can.Control("CMS.Controllers.TreeView", {
     , find_params : {}
     , start_expanded : true
     , draw_children : true
+    , find_function : null
     , child_options : [] //this is how we can make nested configs. if you want to use an existing 
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
@@ -62,10 +63,9 @@ can.Control("CMS.Controllers.TreeView", {
     if(can.isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr("id", this.options.parent_id);
     }
-    this.find_all_deferred = this.options.model[this.options.single_object ? "findOne" : "findAll"](
+    this.find_all_deferred = this.options.model[this.options.find_function || (this.options.single_object ? "findOne" : "findAll")](
       this.options.find_params.serialize()
-      , this.proxy("draw_list")
-    );
+    ).done(this.proxy("draw_list"));
   }
   , draw_list : function(list) {
     var that = this;

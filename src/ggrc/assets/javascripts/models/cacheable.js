@@ -93,13 +93,24 @@ can.Model("can.Model.Cacheable", {
     return pargs;
   }
   , findRelated : function(params) {
-    return $.ajax({
-      url : "/relationships/related_objects.json"
-      , data : {
-        oid : params.id
-        , otype : params.otype || this.shortName
-        , related_model : typeof params.related_model === "string" ? params.related_model : params.related_model.shortName
-      }
+    if(!params.source_type) {
+      params.source_type = this.shortName;
+    }
+    return CMS.Models.Relationship.findAll(params).then(function(relationships) {
+      var dfds = [], things = new can.Model.List();
+      can.each(relationships, function(rel,idx) {
+        var dfd;
+        if(rel.destination.selfLink) {
+          things.push(rel.destination);
+        } else {
+          dfd = rel.destination.refresh().then(function(dest) {
+            things.splice(idx, 1, dest);
+          });
+          dfds.push(dfd);
+          things.push(dfd);
+        }
+      });
+      return $.when.apply($, dfds).then(function(){ return things; });
     });
   }
   , models : function(params) {

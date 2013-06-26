@@ -9,6 +9,71 @@
 
 (function(can) {
 
+can.Model.Cacheable("CMS.Models.Relationship", {
+    root_object: "relationship"
+  , root_collection: "relationships"
+  , findAll: "GET /api/relationships"
+  , create: function(params) {
+      var _params = {
+          relationship: {
+              source: {
+                  id: params.relationship.source_id
+                , type: params.relationship.source_type
+                }
+            , destination: {
+                  id: params.relationship.destination_id
+                , type: params.relationship.destination_type
+                }
+            , relationship_type_id: params.relationship.relationship_type_id
+          }
+      };
+
+      return $.ajax({
+          type: "POST"
+        , url: "/api/relationships"
+        , dataType: "json"
+        , data: _params
+      });
+    }
+  , destroy: "DELETE /api/relationships/{id}"
+}, {
+    init: function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("source", CMS.Models.get_instance(
+                  this.source_type || this.source.type
+                  , this.source_id || this.source.id
+                  , this.source));
+            this.attr("destination", CMS.Models.get_instance(
+                  this.destination_type || this.destination.type
+                  , this.destination_id || this.destination.id
+                  , this.destination));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+  , destroy: function() {
+      return $.ajax({
+        url: "/api/relationships/" + this.id
+      , headers: {
+          "If-Match": this.etag
+        , "If-Unmodified-Since": this['last-modified']
+        }
+      , type: "DELETE"
+      })
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
@@ -144,6 +209,38 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , findAll : "/api/org_groups"
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/org_groups/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : { 
+        "destination_type" : "System"
+        , "source_type" : "OrgGroup"
+        , relationship_type_id : "org_group_is_responsible_for_process"  
+      }
+      , parent_find_param : "source_id"
+      , draw_children : false
+      , find_function : "findRelated"
+    }, {
+      model : null
+      , find_params : { 
+        "destination_type" : "OrgGroup"
+        , "source_type" : "OrgGroup"
+        , relationship_type_id: "org_group_is_responsible_for_org_group"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , start_expanded : true
+      , find_function : "findRelated"
+    }]}
+    , init : function() {
+      var that = this
+      this._super && this._super.apply(this, arguments);
+      $(function(){
+        that.tree_view_options.child_options[0].model = CMS.Models.Process;
+      });
+      this.tree_view_options.child_options[1].model = this;
+    }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Project", {
@@ -262,69 +359,6 @@ can.Model.Cacheable("CMS.Models.Help", {
   , update : "PUT /api/help/{id}"
   , create : "POST /api/help"
 }, {});
-
-can.Model.Cacheable("CMS.Models.Relationship", {
-    root_object: "relationship"
-  , root_collection: "relationships"
-  , findAll: "GET /api/relationships"
-  , create: function(params) {
-      var _params = {
-          relationship: {
-              source: {
-                  id: params.relationship.source_id
-                , type: params.relationship.source_type
-                }
-            , destination: {
-                  id: params.relationship.destination_id
-                , type: params.relationship.destination_type
-                }
-            , relationship_type_id: params.relationship.relationship_type_id
-          }
-      };
-
-      return $.ajax({
-          type: "POST"
-        , url: "/api/relationships"
-        , dataType: "json"
-        , data: _params
-      });
-    }
-  , destroy: "DELETE /api/relationships/{id}"
-}, {
-    init: function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("source", CMS.Models.get_instance(
-                  this.source_type || this.source.type,
-                  this.source_id || this.source.id));
-            this.attr("destination", CMS.Models.get_instance(
-                  this.destination_type || this.destination.type,
-                  this.destination_id || this.destination.id));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-  , destroy: function() {
-      return $.ajax({
-        url: "/api/relationships/" + this.id
-      , headers: {
-          "If-Match": this.etag
-        , "If-Unmodified-Since": this['last-modified']
-        }
-      , type: "DELETE"
-      })
-    }
-});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model = CMS.Models[object_type]

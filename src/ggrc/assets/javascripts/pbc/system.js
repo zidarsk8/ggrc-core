@@ -156,7 +156,10 @@ CMS.Models.System("CMS.Models.StrictSystem", {
     return this._super(params);
   }
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() { 
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});
 
 CMS.Models.System("CMS.Models.Process", {
@@ -166,5 +169,8 @@ CMS.Models.System("CMS.Models.Process", {
     return this._super(params);
   }
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() { 
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});

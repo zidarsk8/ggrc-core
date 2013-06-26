@@ -74,6 +74,7 @@ dashboard-js-files:
   - apps/programs.js
   - apps/quick_search.js
   - apps/systems.js
+  - apps/business_objects.js
   - sections/notes_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
