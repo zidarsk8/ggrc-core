@@ -60,3 +60,13 @@ class CategorizationFactory(ModelFactory):
   category_id = None
   categorizable_id = None
   categorizable_type = None
+
+class ProgramFactory(ModelFactory):
+  FACTORY_FOR = Program
+  title = 'program_title'
+  slug = 'program_slug'
+
+class DirectiveFactory(ModelFactory):
+  FACTORY_FOR = Directive
+  title = 'directive_title'
+  slug = 'directive_slug'
