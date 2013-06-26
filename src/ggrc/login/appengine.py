@@ -14,7 +14,7 @@ E.g., ``login: required`` must be specified *at least* for the '/login' route.
 from google.appengine.api import users
 from ggrc.login.common import find_or_create_user_by_email, get_next_url
 import flask_login
-from flask import url_for, redirect, request
+from flask import url_for, redirect, request, session
 
 
 def get_user():
@@ -27,6 +27,8 @@ def get_user():
 def login():
   user = get_user()
   flask_login.login_user(user)
+  #FIXME adding default permissions of None to session for now.
+  session['permissions'] = None
   return redirect(
     get_next_url(request, default_url=url_for('dashboard')))
   #return redirect(
@@ -34,6 +36,8 @@ def login():
   #    get_next_url(request, default_url=url_for('dashboard'))))
 
 def logout():
+  if 'permissions' in session:
+    del session['permissions']
   flask_login.logout_user()
   return redirect(
     users.create_logout_url(
