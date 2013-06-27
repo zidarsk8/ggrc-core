@@ -208,9 +208,9 @@ can.Model("can.Model.Cacheable", {
   , tree_view_options : {}
   , risk_tree_options : {
     single_object : true
-    , list_view : ""
     , child_options : [{
       model : null
+      , list_view : GGRC.mustache_path + "/risks/tree.mustache"
       , draw_children : false
       , find_params : {
         source_type : "Risk"
