@@ -118,16 +118,6 @@ can.Model.Cacheable("CMS.Models.ObjectPerson", {
         this.bind("created", can.proxy(reinit, this));
 
         reinit.call(this);
-    },
-    destroy: function() {
-      return $.ajax({
-        url: "/api/object_people/" + this.id
-      , headers: {
-          "If-Match": this.etag
-        , "If-Unmodified-Since": this['last-modified']
-        }
-      , type: "DELETE"
-      })
     }
 });
 

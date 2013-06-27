@@ -41,16 +41,6 @@ can.Model.Cacheable("CMS.Models.Relationship", {
 
         reinit.call(this);
     }
-  , destroy: function() {
-      return $.ajax({
-        url: "/api/relationships/" + this.id
-      , headers: {
-          "If-Match": this.etag
-        , "If-Unmodified-Since": this['last-modified']
-        }
-      , type: "DELETE"
-      })
-    }
 });
 
 can.Model.Cacheable("CMS.Models.Program", {

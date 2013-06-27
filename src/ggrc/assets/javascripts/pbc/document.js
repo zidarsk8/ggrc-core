@@ -103,16 +103,6 @@ can.Model.Cacheable("CMS.Models.ObjectDocument", {
         this.bind("created", can.proxy(reinit, this));
 
         reinit.call(this);
-    },
-    destroy: function() {
-      return $.ajax({
-        url: "/api/object_documents/" + this.id
-      , headers: {
-          "If-Match": this.etag
-        , "If-Unmodified-Since": this['last-modified']
-        }
-      , type: "DELETE"
-      })
     }
 });
 
