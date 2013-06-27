@@ -98,7 +98,7 @@ can.Model.Cacheable("CMS.Models.System", {
       , child_options : [{
         model : CMS.Models.Control
         , list_view : "/static/mustache/controls/tree.mustache"
-        , parent_find_param : "system_id"
+        , property : "controls"
       },{
         model : null ///filled in after init.
         , list_view : "/static/mustache/systems/tree.mustache"

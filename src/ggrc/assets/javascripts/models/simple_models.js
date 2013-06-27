@@ -210,7 +210,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/org_groups/tree.mustache"
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -219,7 +219,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
         , relationship_type_id : "org_group_has_process"
       }
       , parent_find_param : "source_id"
-      , draw_children : false
+      , draw_children : true
       , find_function : "findRelated"
       , related_side : "source"
       , create_link : true
@@ -257,6 +257,30 @@ can.Model.Cacheable("CMS.Models.Project", {
   , findAll : "/api/projects"
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "System"
+        , "source_type" : "Project"
+        , relationship_type_id : "project_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    this.risk_tree_options.child_options.splice(1, 1);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Facility", {

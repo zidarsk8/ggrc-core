@@ -86,7 +86,7 @@ can.Model("can.Model.Cacheable", {
     var that = this;
     this.risk_tree_options = can.extend(true, {}, this.risk_tree_options); //for subclasses
     var risk_child_options = that.risk_tree_options.child_options[0];
-    this.risk_tree_options.list_view = GGRC.mustache_path + "/" + this.root_collection + "/tree.mustache";
+    this.risk_tree_options.list_view = GGRC.mustache_path + "/base_objects/tree.mustache";
     if(risk_child_options) {
       risk_child_options.find_params.destination_type = that.shortName;
       risk_child_options.find_params.relationship_type_id = "risk_is_a_threat_to_" + this.root_object;
@@ -101,12 +101,12 @@ can.Model("can.Model.Cacheable", {
     if(this.root_collection) {
       this.model_plural = this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
       this.title_plural = this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_plural = this.root_collection;      
+      this.table_plural = this.root_collection;
     }
     if(this.root_object) {
       this.model_singular = this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
       this.title_singular = this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_singular = this.root_object;      
+      this.table_singular = this.root_object;
     }
 
   }
