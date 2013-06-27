@@ -13,28 +13,7 @@ can.Model.Cacheable("CMS.Models.Relationship", {
     root_object: "relationship"
   , root_collection: "relationships"
   , findAll: "GET /api/relationships"
-  , create: function(params) {
-      var _params = {
-          relationship: {
-              source: {
-                  id: params.relationship.source_id
-                , type: params.relationship.source_type
-                }
-            , destination: {
-                  id: params.relationship.destination_id
-                , type: params.relationship.destination_type
-                }
-            , relationship_type_id: params.relationship.relationship_type_id
-          }
-      };
-
-      return $.ajax({
-          type: "POST"
-        , url: "/api/relationships"
-        , dataType: "json"
-        , data: _params
-      });
-    }
+  , create: "POST /api/relationships"
   , destroy: "DELETE /api/relationships/{id}"
 }, {
     init: function() {
