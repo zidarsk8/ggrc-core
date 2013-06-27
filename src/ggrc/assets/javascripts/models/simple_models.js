@@ -493,6 +493,70 @@ can.Model.Cacheable("CMS.Models.Risk", {
   , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
 }, {});
 
+can.Model.Cacheable("CMS.Models.SystemControl", {
+    root_object : "system_control"
+    , root_collection : "system_controls"
+    , findAll: "GET /api/system_controls"
+    , create: "POST /api/system_controls"
+    , destroy : "DELETE /api/system_controls/{id}"
+}, {
+    init : function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("system", CMS.Models.get_instance(
+              "System",
+              this.system_id || (this.system && this.system.id)));
+            this.attr("control", CMS.Models.get_instance(
+              "Control",
+              this.control_id || (this.control && this.control.id)));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+});
+
+can.Model.Cacheable("CMS.Models.SystemSystem", {
+    root_object : "system_system"
+    , root_collection : "system_systems"
+    , findAll: "GET /api/system_systems"
+    , create: "POST /api/system_systems"
+    , destroy : "DELETE /api/system_systems/{id}"
+}, {
+    init : function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("parent", CMS.Models.get_instance(
+              "System",
+              this.parent_id || (this.parent && this.parent.id)));
+            this.attr("child", CMS.Models.get_instance(
+              "System",
+              this.child_id || (this.child && this.child.id)));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
   , root_collection : "helps"

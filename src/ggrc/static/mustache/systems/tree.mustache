@@ -47,10 +47,10 @@
         </a>
         {{/single_object}}
         {{#link_buttons}}
-        <a class="btn btn-mini link-object" data-child-type="system" data-child-property="child_id" data-modal-class="modal-wide" data-modal-reset="reset" data-toggle="modal-ajax-relationship-selector" href="/system_systems/list_edit?parent_id={{id}}" rel="tooltip" title="Link systems to this {{system_or_process}}">
+        <a class="btn btn-mini link-object" data-child-type="system" data-child-property="child_id" data-modal-class="modal-wide" data-modal-reset="reset" data-toggle="modal-selector" data-modal-selector-options="system_systems" data-join-object-id="{{id}}" href="javascript://" rel="tooltip" title="Link systems to this {{system_or_process}}">
           <i class="grcicon-link"></i>
         </a>
-        <a class="btn btn-mini link-object" data-child-type="control" data-child-property="control_id" data-modal-class="modal-wide" data-modal-reset="reset" data-toggle="modal-ajax-relationship-selector" href="/system_controls/list_edit?system_id={{id}}" rel="tooltip" title="Link controls to this {{system_or_process}}">
+        <a class="btn btn-mini link-object" data-child-type="control" data-child-property="control_id" data-modal-class="modal-wide" data-modal-reset="reset" data-toggle="modal-selector" data-modal-selector-options="system_controls" data-join-object-id="{{id}}" href="javascript://" rel="tooltip" title="Link controls to this {{system_or_process}}">
           <i class="grcicon-link"></i>
         </a>
         {{/link_buttons}}
