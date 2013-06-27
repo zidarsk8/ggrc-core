@@ -98,16 +98,19 @@ can.Model.Cacheable("CMS.Models.System", {
       , child_options : [{
         model : CMS.Models.Control
         , list_view : "/static/mustache/controls/tree.mustache"
-        , property : "controls"
+        , parent_find_param : "system_controls.system_id"
+        , link_buttons : true
+        , draw_children : false
       },{
         model : null ///filled in after init.
         , list_view : "/static/mustache/systems/tree.mustache"
-        , property : "sub_systems"
+        , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]
     }
     , attributes : {
       controls : "CMS.Models.Control.models"
+      , sub_systems : "CMS.Models.System.models"
     }
 }, {
 
@@ -171,6 +174,7 @@ CMS.Models.System("CMS.Models.Process", {
     params.is_biz_process = true;
     return this._super(params);
   }
+
   , cache : can.getObject("cache", CMS.Models.System, true)
   , init : function() {
     this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);

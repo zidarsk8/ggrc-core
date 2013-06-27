@@ -184,7 +184,7 @@ can.Control("CMS.Controllers.TreeView", {
       } else {
         find_params = {};
       }
-       if(data.parent_find_param){
+      if(data.parent_find_param){
         find_params[data.parent_find_param] = item.instance.id;
       } else {
         find_params["parent.id"] = item.instance.id;
