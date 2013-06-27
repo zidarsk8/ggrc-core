@@ -12,7 +12,14 @@ can.Observe("can.Observe.TreeOptions", {
     instance : undefined
     , children_drawn : false
   }
-}, {});
+}, {
+  // init : function() {
+  //   this.bind("child_options.*.list", function(ev, newVal) {
+  //     this.attr("children_drawn", !newVal.length)
+  //     .attr("children_drawn", !!newVal.length);
+  //   });
+  // }
+});
 
 can.Control("CMS.Controllers.TreeView", {
   //static properties
@@ -27,6 +34,7 @@ can.Control("CMS.Controllers.TreeView", {
     , start_expanded : true
     , draw_children : true
     , find_function : null
+    , options_property : "tree_view_options"
     , child_options : [] //this is how we can make nested configs. if you want to use an existing 
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
@@ -41,7 +49,7 @@ can.Control("CMS.Controllers.TreeView", {
 
       this.options = opts;
       if(this.options.model) {
-        can.each(this.options.model.tree_view_options, function(v, k) {
+        can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function(v, k) {
           that.options.hasOwnProperty(k) || that.options.attr(k, v);
         });
       }      
@@ -49,12 +57,11 @@ can.Control("CMS.Controllers.TreeView", {
         that.options.hasOwnProperty(k) || that.options.attr(k, v);
       });
     } else {
-      this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model.tree_view_options : {}).attr(opts);
+      this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
 
   , init : function(el, opts) {
-    //this.options.attr(this.options.model.tree_view_options).attr(opts instanceof can.Observe ? opts._data : opts);
     this.options.list ? this.draw_list() : this.fetch_list(this.options.parent_id);
     this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
     this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
@@ -153,6 +160,7 @@ can.Control("CMS.Controllers.TreeView", {
         options.attr(k, v);
       });
       that.add_child_list(item, options);
+      options.attr("options_property", that.options.options_property);
       item.child_options.push(options);
     });
   }

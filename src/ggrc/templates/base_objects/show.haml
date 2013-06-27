@@ -59,6 +59,8 @@
         -#   perhaps traverse MRO, then 'shared/'
         -with widget_class = 'business'
           -include 'base_objects/_main.haml'
+        -with widget_class = 'risk'
+          -include 'base_objects/_risks.haml'
         -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
           -include 'shared/_related.haml'
         -#if instance|has_valid_relationships

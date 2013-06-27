@@ -25,10 +25,17 @@ $(function() {
 
   var $top_tree = $("#" + object_class.root_object + "_widget .tree-structure").cms_controllers_tree_view({
     model : object_class
-    // , list_view : GGRC.mustache_path + "/" + object_class.root_collection + "/tree.mustache"
     , single_object : true
     , list : [object]
   });
+
+  var $risk_tree = $("#" + object_class.root_object + "_risk_widget .tree-structure").cms_controllers_tree_view({
+    model : object_class
+    , single_object : true
+    , list : [object]
+    , options_property : "risk_tree_options"
+  });
+
 
   $(document.body).on("modal:success", ".link-objects", function(ev, data) {
     $top_tree.trigger("linkObject", $.extend($(this).data(), {

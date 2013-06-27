@@ -213,34 +213,42 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     list_view : GGRC.mustache_path + "/org_groups/tree.mustache"
     , child_options : [{
       model : null
-      , find_params : { 
+      , find_params : {
         "destination_type" : "System"
         , "source_type" : "OrgGroup"
-        , relationship_type_id : "org_group_is_responsible_for_process"  
+        , relationship_type_id : "org_group_has_process"
       }
       , parent_find_param : "source_id"
       , draw_children : false
       , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
     }, {
       model : null
-      , find_params : { 
+      , find_params : {
         "destination_type" : "OrgGroup"
         , "source_type" : "OrgGroup"
-        , relationship_type_id: "org_group_is_responsible_for_org_group"
+        , relationship_type_id: "org_group_relies_upon_org_group"
       }
-      , parent_find_param : "source_id"
+      , parent_find_param : "destination_id"
       , draw_children : true
-      , start_expanded : true
-      , find_function : "findRelated"
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
     }]}
-    , init : function() {
-      var that = this
-      this._super && this._super.apply(this, arguments);
-      $(function(){
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
-    }
+  , init : function() {
+    var that = this
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
+    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
+    this.risk_tree_options.child_options[1].create_link = false;
+
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Project", {
@@ -350,6 +358,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
       , dataType : "json"
     });
   }
+  , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
 }, {});
 
 can.Model.Cacheable("CMS.Models.Help", {
