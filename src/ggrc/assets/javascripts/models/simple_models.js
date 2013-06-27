@@ -279,7 +279,6 @@ can.Model.Cacheable("CMS.Models.Project", {
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
-
   }
 }, {});
 
@@ -289,6 +288,45 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , findAll : "/api/facilities"
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "System"
+        , "source_type" : "Facility"
+        , relationship_type_id : "facility_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }, {
+      model : null
+      , find_params : {
+        "destination_type" : "Facility"
+        , "source_type" : "Facility"
+        , relationship_type_id: "facility_relies_upon_facility"
+      }
+      , parent_find_param : "destination_id"
+      , draw_children : true
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
+    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
+    this.risk_tree_options.child_options[1].create_link = false;
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Product", {
@@ -303,6 +341,45 @@ can.Model.Cacheable("CMS.Models.Product", {
   , defaults : {
     type : {}
   }
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "System"
+        , "source_type" : "Product"
+        , relationship_type_id : "product_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }, {
+      model : null
+      , find_params : {
+        "destination_type" : "Product"
+        , "source_type" : "Product"
+        , relationship_type_id: "product_relies_upon_product"
+      }
+      , parent_find_param : "destination_id"
+      , draw_children : true
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
+    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
+    this.risk_tree_options.child_options[1].create_link = false;
+  }
 }, {
   attr : function(key, val) {
     if(key === "type" && typeof val === "undefined" && this[key] && !this[key].selfLink) {
@@ -315,7 +392,7 @@ can.Model.Cacheable("CMS.Models.Product", {
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
   , root_collection : "options"
-}, {})
+}, {});
 
 can.Model.Cacheable("CMS.Models.DataAsset", {
   root_object : "data_asset"
@@ -323,6 +400,45 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , findAll : "/api/data_assets"
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "System"
+        , "source_type" : "DataAsset"
+        , relationship_type_id : "data_asset_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }, {
+      model : null
+      , find_params : {
+        "destination_type" : "DataAsset"
+        , "source_type" : "DataAsset"
+        , relationship_type_id: "data_asset_relies_upon_data_asset"
+      }
+      , parent_find_param : "destination_id"
+      , draw_children : true
+      , start_expanded : false
+      , find_function : "findRelatedSource"
+      , related_side : "destination"
+      , single_object : false
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this
+    this._super && this._super.apply(this, arguments);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+    this.tree_view_options.child_options[1].model = this;
+    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
+    this.risk_tree_options.child_options[1].create_link = false;
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Market", {
@@ -331,6 +447,29 @@ can.Model.Cacheable("CMS.Models.Market", {
   , findAll : "/api/markets"
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , child_options : [{
+      model : null
+      , find_params : {
+        "destination_type" : "System"
+        , "source_type" : "Market"
+        , relationship_type_id : "market_has_process"
+      }
+      , parent_find_param : "source_id"
+      , draw_children : true
+      , find_function : "findRelated"
+      , related_side : "source"
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    this.risk_tree_options.child_options.splice(1, 1);
+    $(function(){
+      that.tree_view_options.child_options[0].model = CMS.Models.Process;
+    });
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.RiskyAttribute", {
