@@ -8,6 +8,32 @@
 //= require can.jquery-all
 
 (function(can) {
+
+var makeFindRelated = function(thistype, othertype) {
+  return function(params) {
+    if(!params[thistype + "_type"]) {
+      params[thistype + "_type"] = this.shortName;
+    }
+    return CMS.Models.Relationship.findAll(params).then(function(relationships) {
+      var dfds = [], things = new can.Model.List();
+      can.each(relationships, function(rel,idx) {
+        var dfd;
+        if(rel[othertype].selfLink) {
+          things.push(rel[othertype]);
+        } else {
+          dfd = rel[othertype].refresh().then(function(dest) {
+            things.splice(idx, 1, dest);
+          });
+          dfds.push(dfd);
+          things.push(dfd);
+        }
+      });
+      return $.when.apply($, dfds).then(function(){ return things; });
+    });
+  };
+};
+
+
 can.Model("can.Model.Cacheable", {
 
   findOne : "GET {href}"
@@ -56,6 +82,33 @@ can.Model("can.Model.Cacheable", {
     this.refresh = function(params) {
       return _refresh.call(this, {href : params.selfLink || params.href});
     };
+
+    var that = this;
+    this.risk_tree_options = can.extend(true, {}, this.risk_tree_options); //for subclasses
+    var risk_child_options = that.risk_tree_options.child_options[0];
+    this.risk_tree_options.list_view = GGRC.mustache_path + "/base_objects/tree.mustache";
+    if(risk_child_options) {
+      risk_child_options.find_params.destination_type = that.shortName;
+      risk_child_options.find_params.relationship_type_id = "risk_is_a_threat_to_" + this.root_object;
+    }
+    $(function() {
+      if(risk_child_options)
+        risk_child_options.model = CMS.Models.Risk;
+      if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
+        that.risk_tree_options.child_options[1].model = that;
+    });
+
+    if(this.root_collection) {
+      this.model_plural = this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
+      this.title_plural = this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
+      this.table_plural = this.root_collection;
+    }
+    if(this.root_object) {
+      this.model_singular = this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
+      this.title_singular = this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
+      this.table_singular = this.root_object;
+    }
+
   }
 
   , findInCacheById : function(id) {
@@ -92,16 +145,8 @@ can.Model("can.Model.Cacheable", {
     }
     return pargs;
   }
-  , findRelated : function(params) {
-    return $.ajax({
-      url : "/relationships/related_objects.json"
-      , data : {
-        oid : params.id
-        , otype : params.otype || this.shortName
-        , related_model : typeof params.related_model === "string" ? params.related_model : params.related_model.shortName
-      }
-    });
-  }
+  , findRelated : makeFindRelated("source", "destination")
+  , findRelatedSource : makeFindRelated("destination", "source")
   , models : function(params) {
     if(params[this.root_collection + "_collection"]) {
       params = params[this.root_collection + "_collection"];
@@ -161,6 +206,25 @@ can.Model("can.Model.Cacheable", {
     return m;
   }
   , tree_view_options : {}
+  , risk_tree_options : {
+    single_object : true
+    , list_view : ""
+    , child_options : [{
+      model : null
+      , draw_children : false
+      , find_params : {
+        source_type : "Risk"
+      }
+      , find_function : "findRelatedSource"
+      , create_link : true
+      , related_side : "destination"
+      , parent_find_param : "destination_id"
+    }, {
+      model : null
+      , start_expanded : true
+      , draw_children : true
+    }]
+  }
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }

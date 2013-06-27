@@ -58,7 +58,9 @@
         -#   e.g. 'programs/_main.haml', 'programs/_main.html', 'base_objects/_main.haml', ...
         -#   perhaps traverse MRO, then 'shared/'
         -with widget_class = 'business'
-          -#include lookup("main", instance)
+          -include 'base_objects/_main.haml'
+        -with widget_class = 'risk'
+          -include 'base_objects/_risks.haml'
         -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
           -include 'shared/_related.haml'
         -#if instance|has_valid_relationships
@@ -68,7 +70,7 @@
 
       #right_column.span4.widget-area
         -with widget_class = 'business'
+          -include 'base_objects/_info.haml'
           -include 'base_objects/_more_info.haml'
-          -#include lookup('info')
           -#include lookup('more_info')
         -include 'shared/_add_widget_section.haml'

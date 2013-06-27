@@ -68,18 +68,27 @@ $(function() {
 
   var $controls_tree = $("#controls .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
   $.when(
-    CMS.Models.Category.findAll()
+    CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ directive_id : directive_id })
   ).done(function(cats, ctls) {
-    var uncategorized = cats[cats.length - 1];
+    var uncategorized = cats[cats.length - 1]
+    , ctl_cache = {}
+    , uncat_cache = {};
     can.each(ctls, function(c) {
-      if(c.category_ids.length < 1) {
-        uncategorized.linked_controls.push(c);
-      }
-      can.each(c.category_ids, function(id) {
-        CMS.Models.Category.findInCacheById(id).linked_controls.push(c);
-      });
-    })
+      uncat_cache[c.id] = ctl_cache[c.id] = c;
+    });
+    function link_controls(c) {
+      //empty out the category controls that aren't part of the program
+      c.controls.replace(can.map(c.controls, function(ctl) {
+        delete uncat_cache[c.id];
+        return ctl_cache[c.id];
+      }));
+      can.each(c.children, link_controls);
+    }
+    can.each(cats, link_controls);
+    can.each(Object.keys(uncat_cache), function(cid) {
+        uncategorized.controls.push(uncat_cache[cid]);
+    });
 
     $controls_tree.cms_controllers_tree_view({
       model : CMS.Models.Category
@@ -89,9 +98,9 @@ $(function() {
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
 
-  CMS.Models.SectionSlug.findAll({ directive_id : directive_id })
+  CMS.Models.SectionSlug.findAll({ directive_id : directive_id, "parent_id__null" : true })
   .done(function(s) {
-    
+
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.SectionSlug
       , edit_sections : true

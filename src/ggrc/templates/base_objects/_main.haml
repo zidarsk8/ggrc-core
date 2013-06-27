@@ -1,0 +1,16 @@
+-extends 'layouts/_widget_box.haml'
+
+-if not model
+  -set model = controller.model
+
+-block widget_id
+  =model._inflector.table_singular + "_widget"
+
+-block widget_help
+  =model._inflector.table_singular + "_widget_help"
+
+-block widget_title
+  =model._inflector.title_singular
+
+-block main
+  %ul.tree-structure

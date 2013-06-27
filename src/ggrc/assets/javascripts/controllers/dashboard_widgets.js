@@ -12,7 +12,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   defaults : {
     model : null
     , list_view : "/static/mustache/dashboard/object_list.mustache"
-    , related_list_view : "/static/mustache/dashboard/related_list.mustache"
+    , related_list_view : "/static/mustache/base_objects/related_list.mustache"
     //, show_view : "/static/mustache/controls/tree.mustache"
     , tooltip_view : "/static/mustache/dashboard/object_tooltip.mustache"
     , widget_view : "/static/mustache/dashboard/object_widget.mustache"

@@ -12,15 +12,23 @@
 if(!/^\/systems\/\d+/.test(window.location.pathname))
  return;
 
-var system_id = /^\/systems\/(\d+)/.exec(window.location.pathname)[1];
 
 $(function() {
-  
-  var $top_tree = $("#system_sub_systems_widget .tree-structure").cms_controllers_tree_view({
+  var system = GGRC.make_model_instance(GGRC.page_object);
+
+  var $top_tree = $("#system_widget .tree-structure").cms_controllers_tree_view({
     model : CMS.Models.System
     , single_object : true
-    , find_params : { id : system_id }
+    , list : [system]
   });
+
+  var $top_risk_tree = $("#system_risk_widget .tree-structure").cms_controllers_tree_view({
+    model : CMS.Models.System
+    , single_object : true
+    , list : [system]
+    , options_property : "risk_tree_options"
+  });
+
 
   $(document.body).on("modal:success", ".link-objects", function(ev, data) {
     $top_tree.trigger("linkObject", $.extend($(this).data(), {

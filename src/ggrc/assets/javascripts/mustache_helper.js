@@ -526,19 +526,32 @@ Mustache.registerHelper("related_count", function() {
 Mustache.registerHelper("show_expander", function() {
   var options = arguments[arguments.length - 1]
   , args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , disjunctions = [[]];
+  , disjunctions = [[]]
+  , not = false;
   for(var i = 0; i < args.length; i++) {
     if(args[i] === "||") {
       disjunctions.push([]);
+    } else if (args[i] === "!") {
+      not = true;
     } else {
-      disjunctions[disjunctions.length - 1].push(args[i]);
+      disjunctions[disjunctions.length - 1].push(not ? { not : args[i] } : args[i]);
+      not = false;
     }
   }
 
   return can.reduce(disjunctions, function(a, b) {
     return a || can.reduce(b, function(c, d) {
+      if(!c)
+        return false;
+
+      var not = !!d.not;
+      d = d.not ? d.not : d;
+
       typeof d === "function" && (d = d());
-      return c && (d && (d.length == null || d.length > 0));
+
+      var pred = (d && (d.length == null || d.length > 0));
+      if(not) pred = !pred;
+      return pred;
     }, true);
   }, false) ? options.fn(this) : options.inverse(this);
 });

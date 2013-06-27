@@ -16,7 +16,6 @@ can.Model.Cacheable("CMS.Models.System", {
     , root_model : "System"
     , xable_type : "System"
     , findAll : "GET /api/systems"
-    , findOne : "GET /api/systems/{id}"
     , create : "POST /api/systems"
     , update : function(id, params) {
       /*var data = this.process_args(
@@ -51,7 +50,7 @@ can.Model.Cacheable("CMS.Models.System", {
                   return {
                     label: item.system.slug + ' ' + item.system.title + ' (' + system_or_process + ')',
                     value: item.system.id
-                  }
+                  };
                 }));
             }
         });
@@ -95,23 +94,30 @@ can.Model.Cacheable("CMS.Models.System", {
     }
     , tree_view_options : {
       list_view : "/static/mustache/systems/tree.mustache"
+      , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
         , list_view : "/static/mustache/controls/tree.mustache"
-        , parent_find_param : "system_id"
+        , parent_find_param : "system_controls.system_id"
+        , link_buttons : true
+        , draw_children : false
       },{
         model : null ///filled in after init.
         , list_view : "/static/mustache/systems/tree.mustache"
-        , parent_find_param : "parent_id"
+        , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]
+    }
+    , attributes : {
+      controls : "CMS.Models.Control.models"
+      , sub_systems : "CMS.Models.System.models"
     }
 }, {
 
     init : function() {
       var that = this;
       this._super && this._super();
-      this.bind("created updated", can.proxy(this, 'reinit'))
+      this.bind("created updated", can.proxy(this, 'reinit'));
       this.reinit();
       //careful to only do this on init.  Once live binding is set up, some live binding
       //  stops happening when doing removeAttr instead of attr(..., null)
@@ -156,7 +162,10 @@ CMS.Models.System("CMS.Models.StrictSystem", {
     return this._super(params);
   }
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() {
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});
 
 CMS.Models.System("CMS.Models.Process", {
@@ -165,6 +174,10 @@ CMS.Models.System("CMS.Models.Process", {
     params.is_biz_process = true;
     return this._super(params);
   }
+
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() {
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});
