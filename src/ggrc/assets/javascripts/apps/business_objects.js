@@ -10,6 +10,9 @@
 (function(can, $) {
 
 $(function() {
+  if (!GGRC.page_object)
+    return;
+
   var object_class = GGRC.infer_object_type(GGRC.page_object);
   var object = GGRC.make_model_instance(GGRC.page_object);
 
