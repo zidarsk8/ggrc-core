@@ -54,7 +54,7 @@ def all_collections():
     service('risk_risky_attributes', models.RiskRiskyAttribute),
     service('sections', models.Section),
     service('systems', models.System),
-    service('systems_systems', models.SystemSystem),
+    service('system_systems', models.SystemSystem),
     service('system_controls', models.SystemControl),
     service('transactions', models.Transaction),
     ]
