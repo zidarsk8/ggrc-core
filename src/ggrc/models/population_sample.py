@@ -10,7 +10,7 @@ from .mixins import Base
 class PopulationSample(Base, db.Model):
   __tablename__ = 'population_samples'
 
-  response_id = db.Column(db.Integer, db.ForeignKey('responses.id'))
+  response_id = db.Column(db.Integer, db.ForeignKey('responses.id'), nullable=False)
   population_document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
   population = db.Column(db.Integer)
   sample_worksheet_document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))

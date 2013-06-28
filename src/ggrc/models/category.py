@@ -34,7 +34,8 @@ class Category(Base, Hierarchical, db.Model):
 
   categorizations = db.relationship(
       'ggrc.models.categorization.Categorization',
-      backref='category',
+      backref='category', 
+      cascade='all, delete-orphan',
       )
   control_categorizations = db.relationship(
       'Categorization',

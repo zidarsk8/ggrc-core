@@ -15,7 +15,7 @@ class ObjectDocument(Base, Timeboxed, db.Model):
 
   role = db.Column(db.String)
   notes = db.Column(db.Text)
-  document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
+  document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
 
   # TODO: Polymorphic relationship
   documentable_id = db.Column(db.Integer)

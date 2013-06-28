@@ -72,6 +72,7 @@ class Control(
       'ControlControl',
       foreign_keys='ControlControl.control_id',
       backref='control',
+      cascade='all, delete-orphan',
       )
   implemented_controls = association_proxy(
       'control_controls', 'implemented_control', 'ControlControl')
@@ -79,6 +80,7 @@ class Control(
       'ControlControl',
       foreign_keys='ControlControl.implemented_control_id',
       backref='implemented_control',
+      cascade='all, delete-orphan',
       )
   implementing_controls = association_proxy(
       'implementing_control_controls', 'control', 'ControlControl')
