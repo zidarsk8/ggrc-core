@@ -14,4 +14,4 @@ class Revision(Identifiable, db.Model):
   resource_type = db.Column(db.String, nullable = False)
   event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable = False)
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'), nullable = False)
-  content = db.Column(db.Text)
+  content = db.Column(db.Text, nullable=False)
