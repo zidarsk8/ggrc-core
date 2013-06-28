@@ -5,14 +5,15 @@
 
 import os.path
 import sys
+from alembic import command, util
 from alembic.config import Config
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
 from ggrc import settings
 
 class ExtensionPackageEnv(object):
-  def __init__(self, extension_module):
-    self.extension_module = extension_module
+  def __init__(self, extension_module_name):
+    self.extension_module = get_extension_module(extension_module_name)
     self.config = make_extension_config(self.extension_module)
     self.script_dir = ScriptDirectory.from_config(self.config)
 
@@ -37,7 +38,7 @@ def get_extension_migrations_dir(module):
 def get_base_migrations_dir():
   import ggrc
   return os.path.join(
-      os.path.dirname(os.path.dirname(os.path.abspath(ggrc.__file__))),
+      os.path.dirname(os.path.abspath(ggrc.__file__)),
       'migrations',
       )
 
@@ -57,7 +58,8 @@ def make_extension_config(module):
   return config
 
 def extension_version_table(module):
-  return '{0}_alembic_version'.format(module.__name__)
+  module_name = module if type(module) is str else module.__name__
+  return '{0}_alembic_version'.format(module_name)
 
 def get_extension_module(module_name):
   __import__(module_name)
@@ -81,31 +83,118 @@ def extension_migrations_list():
       ret.append(migrations_dir)
   return ret
 
-def upgrade(extension_module_name):
-  extension_module = get_extension_module(extension_module_name)
-  pkg_env = ExtensionPackageEnv(extension_module)
-  revision = pkg_env.script_dir.get_current_head()
+def run_simple_command(extension_module_name, cmd, *args, **kwargs):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+  cmd(pkg_env.config, *args, **kwargs)
+
+def list_templates(extension_module_name):
+  run_simple_command(extension_module_name, command.list_templates)
+
+def init(extension_module_name, **kwargs):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+  command.init(pkg_env.config, pkg_env.script_dir, **kwargs)
+
+def revision(extension_module_name, **kwargs):
+  run_simple_command(extension_module_name, command.revision, **kwargs)
+
+def upgrade(extension_module_name, revision, sql=False, tag=None):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+  revision = revision or 'head'
+  starting_rev = None
+  if revision == 'head':
+    revision = pkg_env.script_dir.get_current_head()
+  if ':' in revision:
+    if not sql:
+      raise util.CommandError('Range revision not allowed')
+    starting_rev, revision = revision.split(':', 2)
+
   print('Upgrading Extension Module {0}:'.format(extension_module_name))
 
-  def do_upgrade(rev, context):
-    if rev == revision:
-      print('  - extension module is already up to date.')
-      return []
-    print('  - upgrading extension module from {0} to {1}...'.format(
-        rev, revision))
+  def upgrade(rev, context):
     return context.script._upgrade_revs(revision, rev)
 
   pkg_env.run_env(
-      do_upgrade,
-      starting_rev=None,
+      upgrade,
+      starting_rev=starting_rev,
       destination_rev=revision,
+      as_sql=sql,
+      tag=tag,
       )
-  print
+
+def downgrade(
+    extension_module_name, revision,
+    sql=False, tag=None, drop_versions_table=False):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+  starting_rev = None
+  if ':' in revision:
+    if not sql:
+      raise util.CommandError('Range revision not allowed')
+    starting_rev, revision = revision.split(':', 2)
+
+  print('Downgrading Extension Module {0} to {1}:'.format(
+    extension_module_name, revision))
+
+  def downgrade(rev, context):
+    return context.script._downgrade_revs(revision, rev)
+
+  pkg_env.run_env(
+      downgrade,
+      starting_rev=starting_rev,
+      destination_rev=revision,
+      as_sql=sql,
+      tag=tag,
+      )
+  
+  if drop_versions_table:
+    from ggrc.app import db
+    db.session.execute('DROP TABLE {0}'.format(
+        extension_version_table(extension_module_name)))
+
+def history(extension_module_name):
+  run_simple_command(extension_module_name, command.history)
+
+def branches(extension_module_name):
+  run_simple_command(extension_module_name, command.branches)
+
+def current(extension_module_name):
+  run_simple_command(extension_module_name, command.current)
+
+def stamp(extension_module_name, revision, sql=False, tag=None):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+
+  print('Stamping Extension Module {0} to {1}:'.format(
+    extension_module_name, revision))
+
+  def stamp(rev, context):
+    if sql:
+      current = False
+    else:
+      current = context._current_rev()
+    dest = pkg_env.script.get_revision(revision)
+    if dest is not None:
+      dest = dest.revision
+    context.script._update_current_rev(current, dest)
+    return []
+
+  pkg_env.run_env(
+      stamp,
+      destination_rev=revision,
+      as_sql=sql,
+      tag=tag,
+      )
+
+def all_extensions():
+  extension_modules = ['ggrc']
+  extension_modules.extend(getattr(settings, 'EXTENSIONS', []))
+  return extension_modules
 
 def upgradeall():
-  extension_modules = getattr(settings, 'EXTENSIONS', [])
-  for module_name in extension_modules:
-    upgrade(module_name)
+  for module_name in all_extensions():
+    upgrade(module_name, 'head')
+
+def downgradeall(drop_versions_table=False):
+  for module_name in all_extensions():
+    downgrade(module_name, 'base', drop_versions_table=drop_versions_table)
 
 def main(args):
   if len(args) < 3:
@@ -113,9 +202,18 @@ def main(args):
     return -1
   action = args[2]
   if action == 'upgrade':
-    upgrade(args[1])
+    extension_module_name = args[1]
+    revision = args[2] if len(args) >= 3 else None
+    upgrade(extension_module_name, revision)
   elif action == 'upgradeall':
     upgradeall()
+  elif action == 'current':
+    extension_module_name = args[1]
+    current(extension_module_name)
+  elif action == 'downgrade':
+    extension_module_name = args[1]
+    revision = args[2]
+    downgrade(extension_module_name, revision)
   return 0
 
 if __name__ == '__main__':
