@@ -13,6 +13,10 @@ class ProgramDirective(Base, db.Model):
   program_id = db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False)
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
 
+  __table_args__ = (
+    db.UniqueConstraint('program_id', 'directive_id'),
+  )
+
   _publish_attrs = [
       'program',
       'directive',

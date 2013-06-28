@@ -34,20 +34,20 @@ class System(
   notes = db.Column(db.Text)
   # TODO: handle option
   network_zone_id = db.Column(db.Integer)
-  system_controls = db.relationship('SystemControl', backref='system')
+  system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
   controls = association_proxy('system_controls', 'control', 'SystemControl')
-  responses = db.relationship('Response', backref='system')
+  responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')
   #TODO What about system_section?
   owner = db.relationship('Person', uselist=False)
   sub_system_systems = db.relationship(
-      'SystemSystem', foreign_keys='SystemSystem.parent_id', backref='parent')
+      'SystemSystem', foreign_keys='SystemSystem.parent_id', backref='parent', cascade='all, delete-orphan')
   sub_systems = association_proxy(
       'sub_system_systems', 'child', 'SystemSystem')
   super_system_systems = db.relationship(
-      'SystemSystem', foreign_keys='SystemSystem.child_id', backref='child')
+      'SystemSystem', foreign_keys='SystemSystem.child_id', backref='child', cascade='all, delete-orphan')
   super_systems = association_proxy(
       'super_system_systems', 'parent', 'SystemSystem')
-  transactions = db.relationship('Transaction', backref='system')
+  transactions = db.relationship('Transaction', backref='system', cascade='all, delete-orphan')
   type = db.relationship(
       'Option',
       primaryjoin='and_(foreign(System.type_id) == Option.id, '\

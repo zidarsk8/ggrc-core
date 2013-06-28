@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .associationproxy import association_proxy
@@ -25,9 +24,9 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
   audit_duration_id = db.Column(db.Integer)
   kind = db.Column(db.String)
   sections = db.relationship(
-      'Section', backref='directive', order_by='Section.slug')
+      'Section', backref='directive', order_by='Section.slug', cascade='all, delete-orphan')
   controls = db.relationship(
-      'Control', backref='directive', order_by='Control.slug')
+      'Control', backref='directive', order_by='Control.slug', cascade='all, delete-orphan')
   program_directives = db.relationship('ProgramDirective', backref='directive', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_directives', 'program', 'ProgramDirective')
