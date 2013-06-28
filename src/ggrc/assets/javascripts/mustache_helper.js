@@ -598,3 +598,19 @@ Mustache.registerHelper("handle_context", function() {
 });
 
 })(this, jQuery, can);
+
+Mustache.registerHelper("with_page_object_as", function(name, options) {
+  if(!options) {
+    options = name;
+    name = "page_object"
+  }
+  var page_object = GGRC.make_model_instance(GGRC.page_object);
+  if(page_object) {
+    var p = {};
+    p[name] = page_object;
+    options.contexts.push(p);
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});

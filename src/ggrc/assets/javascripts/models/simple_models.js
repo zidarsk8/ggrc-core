@@ -55,6 +55,37 @@ can.Model.Cacheable("CMS.Models.Program", {
   }
 }, {});
 
+can.Model.Cacheable("CMS.Models.ProgramDirective", {
+    root_object : "program_directive"
+    , root_collection : "program_directives"
+    , create: "POST /api/program_directives"
+    , destroy : "DELETE /api/program_directives/{id}"
+}, {
+    init : function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("program", CMS.Models.get_instance(
+              "Program",
+              this.program_id || (this.program && this.program.id)));
+            this.attr("directive", CMS.Models.get_instance(
+              (this.directive ? this.directive.type : "Directive"),
+              this.directive_id || (this.directive && this.directive.id)));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
   , root_collection : "directives"
@@ -79,9 +110,14 @@ can.Model.Cacheable("CMS.Models.Directive", {
     if(!attrs[this.root_object]) {
       attrs = { directive : attrs };
     }
-    var kind = GGRC.infer_object_type(attrs) || CMS.Models.Directive;
+    var kind;
+    try {
+      kind = GGRC.infer_object_type(attrs);
+    } catch(e) {
+      console.warn("infer_object_type threw an error on Directive stub (likely no 'kind')");
+    }
     var m = this.findInCacheById(attrs.directive.id);
-    if(!m || m.constructor !== kind) {
+    if(!m || m.constructor === CMS.Models.Directive) {
       //We accidentally created a Directive or haven't created a subtype yet.
       if(m) {
         delete CMS.Models.Directive.cache[m.id];
@@ -115,7 +151,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }));
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
-
+  , stub : function() {
+    return $.extend(this._super(), {kind : this.kind });
+  }
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
