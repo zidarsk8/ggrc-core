@@ -47,7 +47,6 @@ class System(
       'SystemSystem', foreign_keys='SystemSystem.child_id', backref='child', cascade='all, delete-orphan')
   super_systems = association_proxy(
       'super_system_systems', 'parent', 'SystemSystem')
-  transactions = db.relationship('Transaction', backref='system', cascade='all, delete-orphan')
   type = db.relationship(
       'Option',
       primaryjoin='and_(foreign(System.type_id) == Option.id, '\
@@ -77,7 +76,6 @@ class System(
       'sub_systems',
       'super_system_systems',
       'super_systems',
-      'transactions',
       ]
   _update_attrs = [
       'infrastructure',
@@ -91,7 +89,6 @@ class System(
       'owner',
       'sub_systems',
       'super_systems',
-      'transactions',
       ]
 
   def kind_model(self):
@@ -117,8 +114,7 @@ class System(
         orm.subqueryload('responses'),
         orm.subqueryload_all('system_controls.control'),
         orm.subqueryload_all('sub_system_systems.child'),
-        orm.subqueryload_all('super_system_systems.parent'),
-        orm.subqueryload('transactions'))
+        orm.subqueryload_all('super_system_systems.parent'))
 
 class Process(System):
   _kind_plural = 'processes'

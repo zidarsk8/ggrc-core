@@ -17,7 +17,7 @@ class Document(Base, db.Model):
   kind_id = db.Column(db.Integer)
   year_id = db.Column(db.Integer)
   language_id = db.Column(db.Integer)
-  object_documents = db.relationship('ObjectDocument', backref='document')
+  object_documents = db.relationship('ObjectDocument', backref='document', cascade='all, delete-orphan')
   population_worksheets_documented = db.relationship(
       'PopulationSample',
       foreign_keys='PopulationSample.population_document_id',

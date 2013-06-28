@@ -15,7 +15,7 @@ class Person(Base, db.Model):
   name = db.Column(db.String)
   language_id = db.Column(db.Integer)
   company = db.Column(db.String)
-  object_people = db.relationship('ObjectPerson', backref='person')
+  object_people = db.relationship('ObjectPerson', backref='person', cascade='all, delete-orphan')
   language = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Person.language_id) == Option.id, '\

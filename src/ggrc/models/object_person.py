@@ -15,7 +15,7 @@ class ObjectPerson(Base, Timeboxed, db.Model):
 
   role = db.Column(db.String)
   notes = db.Column(db.Text)
-  person_id = db.Column(db.Integer, db.ForeignKey('people.id'))
+  person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
 
   # TODO: Polymorphic relationship
   personable_id = db.Column(db.Integer)

@@ -16,7 +16,7 @@ class Response(Documentable, Personable, Base, db.Model):
   status = db.Column(db.String)
   meetings = db.relationship('Meeting', backref='response', cascade='all, delete-orphan')
   population_sample = db.relationship(
-      'PopulationSample', backref='response', uselist=False)
+      'PopulationSample', backref='response', uselist=False, cascade='all, delete-orphan')
 
   __table_args__ = (
     db.UniqueConstraint('request_id', 'system_id'),
