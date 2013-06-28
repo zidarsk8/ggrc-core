@@ -303,10 +303,17 @@ can.Model("can.Model.Cacheable", {
 });
 
 can.Observe.prototype.stub = function() {
+  var type;
+
+  if (this.constructor.getRootModelName)
+    type = this.constructor.getRootModelName();
+  else
+    type = this.type;
+
   return {
     id : this.id,
     href : this.selfLink || this.href,
-    type : this.constructor.getRootModelName()
+    type : type
   };
 };
 
