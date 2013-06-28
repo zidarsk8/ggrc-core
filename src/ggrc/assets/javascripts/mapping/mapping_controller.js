@@ -15,6 +15,8 @@ function mapunmap(unmap) {
   return function(section, rcontrol, ccontrol) {
       var params = {
         ccontrol : ccontrol
+        // FIXME: context_id should be meaningful
+      , context_id : 0
       };
       if(unmap)
         params.u = "1";
