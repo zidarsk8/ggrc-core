@@ -19,6 +19,10 @@ class ControlAssessment(Base, db.Model):
   notes = db.Column(db.Text)
   requests = db.relationship('Request', backref='control_assessment')
 
+  __table_args__ = (
+    db.UniqueConstraint('pbc_list_id', 'control_id'),
+  )
+
   _publish_attrs = [
       'pbc_list',
       'control',
