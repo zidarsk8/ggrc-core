@@ -161,6 +161,7 @@ can.Control("CMS.Controllers.TreeView", {
       });
       that.add_child_list(item, options);
       options.attr("options_property", that.options.options_property);
+      options.attr("single_object", false);
       item.child_options.push(options);
     });
   }
