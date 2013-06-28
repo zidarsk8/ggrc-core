@@ -188,7 +188,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     options.contentType = "application/json";
     jqXHR.setRequestHeader("If-Match", (etags[originalOptions.url] || [])[0]);
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
-    options.data = options.url.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
+    options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
   }
   if( /^\/api\/\w+(\/\d+|$)/.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
