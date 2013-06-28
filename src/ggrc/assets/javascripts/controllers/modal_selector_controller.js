@@ -525,7 +525,8 @@
 
       can.each($this.data(), function(v, k) {
         data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        delete data_set[k];
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
       });
 
       if (typeof(options) === "string")
