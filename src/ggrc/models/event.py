@@ -1,4 +1,3 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: vraj@reciprocitylabs.com
@@ -16,5 +15,6 @@ class Event(Identifiable, db.Model):
   resource_id = db.Column(db.Integer, nullable = False)
   resource_type = db.Column(db.String, nullable = False)
 
-  events = db.relationship('Revision', backref='event', lazy='subquery') # We always need the revisions
+  # Following relationship uses lazy='subquery' as we always need the revisions
+  events = db.relationship('Revision', backref='event', lazy='subquery', cascade='all, delete-orphan') 
   person = db.relationship('Person')

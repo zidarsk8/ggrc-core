@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .associationproxy import association_proxy
@@ -32,10 +31,10 @@ class Risk(
   risk_mitigation = db.Column(db.Text)
   residual_risk = db.Column(db.Text)
   impact = db.Column(db.Text)
-  control_risks = db.relationship('ControlRisk', backref='risk')
+  control_risks = db.relationship('ControlRisk', backref='risk', cascade='all, delete-orphan')
   controls = association_proxy('control_risks', 'control', 'ControlRisk')
   risk_risky_attributes = db.relationship(
-      'RiskRiskyAttribute', backref='risk')
+      'RiskRiskyAttribute', backref='risk', cascade='all, delete-orphan')
   risky_attributes = association_proxy(
       'risk_risky_attributes', 'risky_attribute', 'RiskRiskyAttribute')
 

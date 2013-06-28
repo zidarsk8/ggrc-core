@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .mixins import Base
@@ -10,8 +9,8 @@ from .mixins import Base
 class ControlAssessment(Base, db.Model):
   __tablename__ = 'control_assessments'
 
-  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'))
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
+  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False)
+  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
   control_version = db.Column(db.String)
   internal_tod = db.Column(db.Boolean)
   internal_toe = db.Column(db.Boolean)

@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 import factory
 import random
@@ -31,9 +30,14 @@ class SlugFactory(factory.Factory):
   slug = factory.LazyAttribute(lambda m: random_string('slug'))
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
+class DirectiveFactory(ModelFactory):
+  FACTORY_FOR = Directive
+  title = 'directive_title'
+  slug = 'directive_slug'
+
 class ControlFactory(ModelFactory, SlugFactory):
   FACTORY_FOR = Control
-  directive_id = None
+  directive = factory.SubFactory(DirectiveFactory)
   type_id = None
   kind_id = None
   version = None
@@ -60,3 +64,8 @@ class CategorizationFactory(ModelFactory):
   category_id = None
   categorizable_id = None
   categorizable_type = None
+
+class ProgramFactory(ModelFactory):
+  FACTORY_FOR = Program
+  title = 'program_title'
+  slug = 'program_slug'

@@ -21,10 +21,10 @@ class Program(Documentable, Personable, BusinessObject, Timeboxed, db.Model):
       ]
 
   kind = db.Column(db.String)
-  program_directives = db.relationship('ProgramDirective', backref='program')
+  program_directives = db.relationship('ProgramDirective', backref='program', cascade='all, delete-orphan')
   directives = association_proxy(
       'program_directives', 'directive', 'ProgramDirective')
-  cycles = db.relationship('Cycle', backref='program')
+  cycles = db.relationship('Cycle', backref='program', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'kind',
