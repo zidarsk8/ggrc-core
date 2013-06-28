@@ -1,9 +1,8 @@
--#
 -# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 -# Created By:
 -# Maintained By:
--#
+
 -extends "layouts/dashboard.haml"
 
 -set model = controller.model
@@ -54,23 +53,17 @@
   .container-fluid
     #show_columns.row-fluid{ 'data-resize': "true" }
       #middle_column.span8.widget-area
-        -# FIXME: Make a good pattern for lookup paths
-        -#   e.g. 'programs/_main.haml', 'programs/_main.html', 'base_objects/_main.haml', ...
-        -#   perhaps traverse MRO, then 'shared/'
         -with widget_class = 'business'
           -include 'base_objects/_main.haml'
         -with widget_class = 'risk'
           -include 'base_objects/_risks.haml'
-        -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-          -include 'shared/_related.haml'
-        -#if instance|has_valid_relationships
-          -with widget_class = 'widget-tabs widget-tabs-horizontal business'
-            -#include lookup('related')
+        -if related_objects(instance)
+          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+            -include 'shared/_related.haml'
         -include 'shared/_add_widget_section.haml'
 
       #right_column.span4.widget-area
         -with widget_class = 'business'
           -include 'base_objects/_info.haml'
           -include 'base_objects/_more_info.haml'
-          -#include lookup('more_info')
         -include 'shared/_add_widget_section.haml'
