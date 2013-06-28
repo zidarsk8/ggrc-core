@@ -5,7 +5,6 @@
 
 from collections import namedtuple
 from flask import session
-from ggrc.login import get_current_user
 from .user_permissions import UserPermissions
 
 Permission = namedtuple('Permission', 'action resource_type context_id')
@@ -18,16 +17,38 @@ class DefaultUserPermissionsProvider(object):
     return DefaultUserPermissions()
 
 class DefaultUserPermissions(UserPermissions):
+  # super user, context_id 0 indicates all contexts
+  ADMIN_PERMISSION = Permission(
+      '__GGRC_ADMIN__',
+      '__GGRC_ALL__',
+      0,
+      )
+
+  def _admin_permission_for_context(self, context_id):
+    return Permission(
+        self.ADMIN_PERMISSION.action,
+        self.ADMIN_PERMISSION.resource_type,
+        context_id)
+
+  def _permission_match(self, permission, permissions):
+    return permission.context_id in \
+        permissions\
+          .get(permission.action, {})\
+          .get(permission.resource_type, ())
+
   def _is_allowed(self, permission):
     if 'permissions' not in session:
       return False
     permissions = session['permissions']
     if permissions is None:
       return True
-    return permission.context_id in \
-        permissions\
-          .get(permission.action, {})\
-          .get(permission.resource_type, ())
+    if self._permission_match(permission, permissions):
+      return True
+    if self._permission_match(self.ADMIN_PERMISSION, permissions):
+      return True
+    return self._permission_match(
+        self._admin_permission_for_context(permission.context_id),
+        permissions)
 
   def is_allowed_create(self, resource_type, context_id):
     """Whether or not the user is allowed to create a resource of the specified
@@ -55,7 +76,13 @@ class DefaultUserPermissions(UserPermissions):
     permissions = session['permissions']
     if permissions is None:
       return None
+    if self._permission_match(self.ADMIN_PERMISSION, permissions):
+      return None
     ret = list(permissions.get(action, {}).get(resource_type, ()))
+    # Extend with the list of all contexts for which the user is an ADMIN
+    ret.extend(list(
+        permissions.get(self.ADMIN_PERMISSION.action, {})\
+            .get(self.ADMIN_PERMISSION.resource_type, ())))
     return ret
 
   def create_contexts_for(self, resource_type):

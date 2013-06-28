@@ -5,13 +5,10 @@
 
 from collections import namedtuple
 from .common import *
+from .registry import service
 
 """All gGRC REST services."""
 
-ServiceEntry = namedtuple('ServiceEntry', 'name model_class service_class')
-
-def service(name, model_class, service_class=Resource):
-  return ServiceEntry(name, model_class, service_class)
 
 def all_collections():
   """The list of all gGRC collection services as a list of
