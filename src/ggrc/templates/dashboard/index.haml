@@ -23,13 +23,13 @@
 -block main
   .container-fluid
     #columns.row-fluid{ 'data-resize': "true" }
-      #left_column.span6.widget-area
+      #left_column.span1.widget-area
         -with widget_class = 'widget-tabs'
           -include 'dashboard/_governance.haml'
           -include 'dashboard/_business_objects.haml'
         -include 'shared/_add_widget_section.haml'
 
-      #right_column.span6.widget-area
+      #right_column.span11.widget-area
         -with widget_class = 'widget-tabs'
           -include 'dashboard/_programs.haml'
           -#FIXME: Restrict 'risk' visibility

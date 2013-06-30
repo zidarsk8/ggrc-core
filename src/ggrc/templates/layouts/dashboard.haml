@@ -144,19 +144,18 @@
     -block subheader_plus
 
     %section.content{ 'data-spy': 'affix', 'data-offset-top': '25' }
-      .container-fluid
-        .flash
-          -#FIXME: Flash messages
-          -#flash.each do |type, value|
-            -value = [value] unless value.is_a?(Array)
-            -value = value.map(:presence).compact
-            -if value.size > 0
-              %div{ 'class': type }
-                %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                  &times;
+      .flash
+        -#FIXME: Flash messages
+        -#flash.each do |type, value|
+          -value = [value] unless value.is_a?(Array)
+          -value = value.map(:presence).compact
+          -if value.size > 0
+            %div{ 'class': type }
+              %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                &times;
 
-                -value.each do |message|
-                  %p=message
+              -value.each do |message|
+                %p=message
       -block main
 
     %section.footer

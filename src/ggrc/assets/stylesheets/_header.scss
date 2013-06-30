@@ -1,6 +1,7 @@
 .header.main {
   height: 60px;
 }
+
 .header-bar {
   background: $headerBgnd;
   position: fixed;
@@ -41,6 +42,7 @@
   }
   .logo {
     line-height:30px;
+		padding-left:20px;
   }
   .menu {
     @include clearfix();
@@ -302,6 +304,7 @@
     margin-top: 27px;
   }
   .dashboard-title {
+		padding-left:20px;
     i {
       margin-top: 6px;
     }
