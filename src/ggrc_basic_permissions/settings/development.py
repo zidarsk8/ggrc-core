@@ -3,3 +3,5 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+EXTENSIONS = ['ggrc_basic_permissions']
+BOOTSTRAP_ADMIN_USERS = ['example.admin@example.com',]

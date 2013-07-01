@@ -14,6 +14,7 @@ AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 FULLTEXT_INDEXER = None
 USER_PERMISSIONS_PROVIDER = None
+EXTENSIONS = []
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."

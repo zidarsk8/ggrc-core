@@ -20,23 +20,35 @@ import sqlalchemy as sa
 
 def upgrade():
   op.create_table('roles',
-    sa.Column('name', sa.String(length=128), nullable=False, primary_key=True),
+    sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
+    sa.Column('name', sa.String(length=128), nullable=False),
+    sa.Column('permissions_json', sa.Text(), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
-    )
-  op.create_table('roles_permissions',
-    sa.Column('role_name', sa.String(length=128), nullable=False),
-    sa.Column('permission', sa.String(length=6), nullable=False),
-    sa.Column('resource_type', sa.String(length=128), nullable=False),
-    sa.Column('context_id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint(
-      'role_name', 'permission', 'resource_type', 'context_id',),
-    sa.ForeignKeyConstraint('role_name', 'roles.name'),
+    sa.Column('modified_by_id', sa.Integer()),
+    sa.Column(
+      'created_at', sa.DateTime(), default=sa.text('current_timestamp')),
+    sa.Column(
+      'updated_at',
+      sa.DateTime(),
+      default=sa.text('current_timestamp'),
+      onupdate=sa.text('current_timestamp')),
+    sa.Column('context_id', sa.Integer()),
     )
   op.create_table('users_roles',
-    sa.Column('role_name', sa.String(length=128), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('role_name', 'user_id'),
-    sa.ForeignKeyConstraint('role_name', 'roles.name'),
+    sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('user_email', sa.String(length=128), nullable=False),
+    sa.Column('target_context_id', sa.Integer(), nullable=False),
+    sa.Column('modified_by_id', sa.Integer()),
+    sa.Column(
+      'created_at', sa.DateTime(), default=sa.text('current_timestamp')),
+    sa.Column(
+      'updated_at',
+      sa.DateTime(),
+      default=sa.text('current_timestamp'),
+      onupdate=sa.text('current_timestamp')),
+    sa.Column('context_id', sa.Integer()),
+    sa.ForeignKeyConstraint(['role_id',], ['roles.id',]),
     )
 
 def downgrade():

@@ -3,38 +3,45 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+import json
 from ggrc import db
+from ggrc.builder import simple_property
+from ggrc.models.mixins import Base, Described
 
-class Role(db.Model):
+class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
+  
+  :permissions:
+    example -
+      { 'create': ['Program', 'Control'],
+        'read': ['Program', 'Control'],
+        'update': ['Program', 'Control'],
+        'delete': ['Program']
+      }
   """
   __tablename__ = 'roles'
 
-  name  = db.Column(db.String(128), primary_key=True)
-  description = db.Column(db.Text())
-  permissions = db.relationship('RolePermission', backref='role')
+  name  = db.Column(db.String(128), nullable=False)
+  permissions_json = db.Column(db.Text(), nullable=False)
 
-  _publish_attrs = ['name', 'description', 'permissions',]
+  @simple_property
+  def permissions(self):
+    return json.loads(self.permissions_json)
 
-class RolePermission(db.Model):
-  """Mapping of role to (permission, resource_type, context_id) tuples"""
-  __tablename__ = 'roles_permissions'
+  @permissions.setter
+  def permissions(self, value):
+    self.permissions_json = json.dumps(value)
 
-  role_name = db.Column(
-      db.String(128), db.ForeignKey('roles.name'), primary_key=True)
-  action = db.Column(db.String(6), primary_key=True)
-  resource_type = db.Column(db.String(), primary_key=True)
-  context_id = db.Column(db.Integer, primary_key=True)
+  _publish_attrs = ['name', 'permissions']
 
-  _publish_attrs = ['role', 'action', 'resource_type', 'context_id',]
-
-class UserRole(db.Model):
+class UserRole(Base, db.Model):
   __tablename__ = 'users_roles'
 
-  role_name = db.Column(
-      db.String(128), db.ForeignKey('roles.name'), primary_key=True)
-  user_id = db.Column(db.String(128), primary_key=True)
-  role = db.relationship('roles')
+  role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
+  user_email = db.Column(db.String(128), nullable=False)
+  target_context_id = db.Column(db.Integer(), nullable=False)
+  role = db.relationship('Role')
 
   _publish_attrs = ['role', 'user_id']
+

@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 import ggrc
 import ggrc.builder
@@ -73,6 +72,7 @@ class TestResource(TestCase):
         u'modified_by_id': model.modified_by_id,
         u'updated_at': updated_at,
         u'created_at': created_at,
+        u'context_id': model.context_id,
         u'foo': (unicode(model.foo) if model.foo else None),
         }
 
@@ -164,7 +164,8 @@ class TestResource(TestCase):
         self.client.delete(URL_MOCK_COLLECTION), COLLECTION_ALLOWED)
 
   def test_collection_post_successful(self):
-    data = json.dumps({ 'services_test_mock_model': { 'foo': 'bar' } })
+    data = json.dumps(
+        { 'services_test_mock_model': { 'foo': 'bar', 'context_id': None} })
     response = self.client.post(
         URL_MOCK_COLLECTION, 
         content_type='application/json',

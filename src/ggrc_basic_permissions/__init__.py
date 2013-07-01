@@ -3,11 +3,11 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from flask import session
-from ggrc import db
+from flask import Blueprint, render_template, session
+from ggrc import db, settings
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
-from .models import Role, RolePermission, UserRole
+from .models import Role, UserRole
 
 class CompletePermissionsProvider(object):
   def __init__(self, settings):
@@ -18,18 +18,34 @@ class CompletePermissionsProvider(object):
       self.add_permissions_to_session(user)
     return DefaultUserPermissions()
 
+  def handle_admin_user(self, user):
+    pass
+
   def add_permissions_to_session(self, user):
-    permissions = db.session.query(RolePermission)\
-        .join(UserRole.user_id==user.id)
-    d = {}
-    for p in permissions:
-      d.get(p.permission, {}).get(p.resource_type, []).append(p.context_id)
-    session['permissions'] = d
+    if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
+        and user.email == settings.BOOTSTRAP_ADMIN_USERS:
+      permissions = {
+          DefaultUserPermissions.ADMIN_PERMISSION.action: {
+            DefaultUserPermissions.ADMIN_PERMISSION.resource_type: [
+              DefaultUserPermissions.ADMIN_PERMISSION.context_id,
+              ],
+            },
+          }
+    else:
+      permissions = {}
+      user_roles = db.session.query(UserRole).filter(
+          UserRole.user_email==user.email)
+      for user_role in user_roles:
+        for action, resource_types in user_role.role.permissions:
+          for resource_type in resource_types:
+            permissions.get(action, {}).get(resource_type, []).append(
+                user_role.target_context_id)
+    session['permissions'] = permissions
 
 def all_collections():
   """The list of all collections provided by this extension."""
   return [
       service('roles', Role),
-      service('roles_permissions', RolePermission),
       service('roles_users', UserRole),
       ]
+

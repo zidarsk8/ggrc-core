@@ -66,7 +66,6 @@ def put_resource(context, url, resource):
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
   data = json.dumps(resource.value, cls=DateTimeEncoder)
-  print 'data:', data
   response = requests.put(
       context.base_url+url,
       data=data,

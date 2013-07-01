@@ -38,7 +38,7 @@ class DefaultUserPermissions(UserPermissions):
 
   def _is_allowed(self, permission):
     if 'permissions' not in session:
-      return False
+      return True
     permissions = session['permissions']
     if permissions is None:
       return True
@@ -72,7 +72,7 @@ class DefaultUserPermissions(UserPermissions):
 
   def _get_contexts_for(self, action, resource_type):
     if 'permissions' not in session:
-      return False
+      return None
     permissions = session['permissions']
     if permissions is None:
       return None
