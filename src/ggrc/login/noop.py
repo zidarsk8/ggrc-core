@@ -15,7 +15,7 @@ def get_user():
     json_user = json.loads(request.headers['X-ggrc-user'])
     email = json_user.get('email', 'user@example.com')
     name = json_user.get('name', 'Example User')
-    permissions = json_user.get('permissions', ())
+    permissions = json_user.get('permissions', None)
   else:
     email = 'user@example.com'
     name = 'Example User'
@@ -23,7 +23,8 @@ def get_user():
   user = find_or_create_user_by_email(
     email=email,
     name=name)
-  session['permissions'] = permissions
+  if permissions is not None:
+    session['permissions'] = permissions
   return user
 
 def login():
@@ -32,5 +33,6 @@ def login():
   return redirect(get_next_url(request, default_url=url_for('dashboard')))
 
 def logout():
+  del session['permissions']
   flask_login.logout_user()
   return redirect(get_next_url(request, default_url=url_for('index')))

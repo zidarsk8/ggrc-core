@@ -22,8 +22,9 @@ class CompletePermissionsProvider(object):
     pass
 
   def add_permissions_to_session(self, user):
-    if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
-        and user.email == settings.BOOTSTRAP_ADMIN_USERS:
+    if user is not None \
+        and hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
+        and user.email in settings.BOOTSTRAP_ADMIN_USERS:
       permissions = {
           DefaultUserPermissions.ADMIN_PERMISSION.action: {
             DefaultUserPermissions.ADMIN_PERMISSION.resource_type: [
@@ -31,21 +32,23 @@ class CompletePermissionsProvider(object):
               ],
             },
           }
-    else:
+    elif user is not None:
       permissions = {}
       user_roles = db.session.query(UserRole).filter(
           UserRole.user_email==user.email)
       for user_role in user_roles:
-        for action, resource_types in user_role.role.permissions:
+        for action, resource_types in user_role.role.permissions.items():
           for resource_type in resource_types:
-            permissions.get(action, {}).get(resource_type, []).append(
-                user_role.target_context_id)
+            permissions.setdefault(action, {}).setdefault(resource_type, [])\
+                .append(user_role.target_context_id)
+    else:
+      permissions = {}
     session['permissions'] = permissions
 
 def all_collections():
   """The list of all collections provided by this extension."""
   return [
       service('roles', Role),
-      service('roles_users', UserRole),
+      service('users_roles', UserRole),
       ]
 

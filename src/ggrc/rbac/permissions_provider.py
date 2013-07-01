@@ -34,7 +34,7 @@ class DefaultUserPermissions(UserPermissions):
     return permission.context_id in \
         permissions\
           .get(permission.action, {})\
-          .get(permission.resource_type, ())
+          .get(permission.resource_type, [])
 
   def _is_allowed(self, permission):
     if 'permissions' not in session:

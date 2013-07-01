@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from flask import g
+from flask.ext.login import current_user
 from ggrc.extensions import get_extension_instance
 
 def get_permissions_provider():
@@ -17,6 +18,8 @@ def permissions_for(user):
 def get_user():
   if hasattr(g, 'user'):
     return g.user
+  else:
+    return current_user
   return None
 
 def is_allowed_create(resource_type, context_id):

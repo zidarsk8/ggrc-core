@@ -5,3 +5,4 @@
 
 EXTENSIONS = ['ggrc_basic_permissions']
 BOOTSTRAP_ADMIN_USERS = ['example.admin@example.com',]
+USER_PERMISSIONS_PROVIDER = 'ggrc_basic_permissions.CompletePermissionsProvider'
