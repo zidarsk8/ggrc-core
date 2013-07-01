@@ -53,6 +53,5 @@ def upgrade():
 
 def downgrade():
   op.drop_table('users_roles')
-  op.drop_table('roles_permissions')
   op.drop_table('roles')
 
