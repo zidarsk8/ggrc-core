@@ -363,25 +363,25 @@ class Resource(ModelView):
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
 
   def create_event(self, obj):
-      verb_to_action = {
-        'POST': 'created',
-        'PUT': 'modified',
-        'DELETE': 'deleted'
-      }
-      http_method = request.method
-      event = Event(
-        person_id = get_current_user_id(),
-        http_method = http_method,
-        resource_id = obj.id,
-        resource_type = str(obj.__class__.__name__))
-      # VM - Examine changes to create revisions
-      revision = Revision(
-        resource_id = obj.id,
-        resource_type = str(obj.__class__.__name__),
-        action = verb_to_action[http_method],
-        content = as_json(obj.to_json(), sort_keys = True))
-      event.revisions.append(revision)
-      return event
+    verb_to_action = {
+      'POST': 'created',
+      'PUT': 'modified',
+      'DELETE': 'deleted'
+    }
+    http_method = request.method
+    event = Event(
+      person_id = get_current_user_id(),
+      http_method = http_method,
+      resource_id = obj.id,
+      resource_type = str(obj.__class__.__name__))
+    # VM - Examine changes to create revisions
+    revision = Revision(
+      resource_id = obj.id,
+      resource_type = str(obj.__class__.__name__),
+      action = verb_to_action[http_method],
+      content = as_json(obj.to_json(), sort_keys = True))
+    event.revisions.append(revision)
+    return event
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
