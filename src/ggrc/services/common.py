@@ -369,10 +369,8 @@ class Resource(ModelView):
         'DELETE': 'deleted'
       }
       http_method = request.method
-      created_at = datetime.datetime.now() # VM There must be a common way
       event = Event(
         person_id = get_current_user_id(),
-        created_at = created_at,
         http_method = http_method,
         resource_id = obj.id,
         resource_type = str(obj.__class__.__name__))

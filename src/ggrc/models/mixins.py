@@ -128,10 +128,10 @@ class Base(Identifiable, ChangeTracked, ContextRBAC):
     return db.session.query(cls)
 
   def to_json(self):
-      d = {}
-      for column in self.__table__.columns:
-          d[column.name] = getattr(self, column.name)
-      return d
+    d = {}
+    for column in self.__table__.columns:
+      d[column.name] = getattr(self, column.name)
+    return d
 
 class Slugged(Base):
   """Several classes make use of the common mixins and additional are
