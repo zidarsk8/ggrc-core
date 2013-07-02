@@ -56,7 +56,6 @@ def all_collections():
     service('systems', models.System),
     service('system_systems', models.SystemSystem),
     service('system_controls', models.SystemControl),
-    service('transactions', models.Transaction),
     ]
 
 def init_all_services(app):

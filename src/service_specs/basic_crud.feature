@@ -47,5 +47,4 @@ Feature: Basic RESTful CRUD Support
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
