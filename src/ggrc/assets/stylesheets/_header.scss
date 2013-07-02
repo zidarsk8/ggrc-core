@@ -1,5 +1,5 @@
 .header.main {
-  height: 60px;
+  height: 30px;
 }
 
 .header-bar {
@@ -267,14 +267,13 @@
 }
 
 .header-content {
-  height:60px;
-  margin-top: 30px;
   background: $white;
   z-index: 1001;
   &.affix {
     position: fixed;
     top: 30px;
     margin-top: 0px;
+    margin-left:240px;
     height: 36px;
     z-index: 900;
     left: 0;

@@ -444,14 +444,6 @@ input.disabled.pending-ajax{
 }
 
 // additional styles
-li.text-compliance,
-span.text-compliance,
-strong.text-compliance {
-  color:$compliance;
-  a {
-    color:$compliance !important;
-  }
-}
 
 li.text-governance,
 span.text-governance,
@@ -465,17 +457,8 @@ strong.text-governance {
 
 span,
 strong {
-  &.text-compliance {
-    color:$compliance;    
-    a {
-      color:$compliance !important;
-    }
-  }
   &.text-risk {
     color:$risk;    
-  }
-  &.text-governance {
-    color:$governance;    
   }
   &.text-business {
     color:$business;    
@@ -558,5 +541,95 @@ span.no-data {
 // container-fluid reset
 
 .container-fluid {
-	padding:0;
+  padding:0;
+}
+
+// lhs implementation
+
+.lhs, 
+.area,
+.rhs {
+	float:left;
+}
+
+.lhs {
+  width:240px;
+  @include gradient-horizontal(#fff,#e1e1e1);
+  .lhs-search {
+    padding:10px;
+    input {
+      @include border-radius(10px);
+    }
+  }
+}
+
+.lhs-nav {
+  padding:10px 0 0 10px;
+  ul {
+    @include reset-list();
+    margin-bottom:14px;
+    li {
+      font-size:14px;
+      line-height:24px;
+      i {
+        margin-top:4px;
+      }
+      small {
+        font-size:12px;
+      }
+      a {
+        display:block;
+        &:hover {
+          text-decoration:none;
+          background:#fff;
+        }
+      }
+      &.programs {
+        a {
+          color:$programs;
+        }
+      }
+    }
+    li {
+      &.governance {
+        a {
+          color:$governance;
+        }
+      }
+    }
+    li {
+      &.business {
+        a {
+          color:$business;
+        }
+      }
+    }
+    li {
+      &.risk {
+        a {
+          color:$risk;
+        }
+      }
+    }
+  }
+  h2 {
+    font-size:15px;
+    font-weight:normal;
+  }
+}
+
+.bar-h {
+  height:6px;
+  background-color:#fff;
+  border-top:1px solid #aaa;
+  border-bottom:1px solid #aaa;
+  background-image: image-url("bgnds/drag-h.png");
+  @include background-size(30px 2px);
+  background-repeat:no-repeat;
+  background-position:50% 2px;
+  @include opacity(0.3);
+  &:hover {
+    @include opacity(1);
+    cursor:move;
+  };
 }
