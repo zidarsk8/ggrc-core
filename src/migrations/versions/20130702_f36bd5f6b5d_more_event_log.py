@@ -1,4 +1,4 @@
-"""Make revision.content TEXT
+"""Event log support
 
 Revision ID: 2a59bef8c738
 Revises: f36bd5f6b5d
@@ -22,8 +22,12 @@ def upgrade():
         existing_type = sa.VARCHAR(length=250),
         nullable = False
     )
+    op.add_column('events', sa.Column('context_id', sa.Integer(), nullable=True))
+    op.add_column('revisions', sa.Column('context_id', sa.Integer(), nullable=True))
 
 def downgrade():
+    op.drop_column('revisions', 'context_id')
+    op.drop_column('events', 'context_id')
     op.alter_column('events', 'http_method',
         type_ = sa.VARCHAR(length=250),
         existing_type = sa.Enum(u'POST', u'PUT', u'DELETE'),
