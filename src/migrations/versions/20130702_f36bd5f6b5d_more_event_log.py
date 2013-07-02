@@ -17,9 +17,18 @@ def upgrade():
     op.alter_column('revisions', u'content',
                existing_type=sa.TEXT,
                nullable=False)
-
+    op.alter_column('events', 'http_method',
+        type_ = sa.Enum(u'POST', u'PUT', u'DELETE'),
+        existing_type = sa.VARCHAR(length=250),
+        nullable = False
+    )
 
 def downgrade():
+    op.alter_column('events', 'http_method',
+        type_ = sa.VARCHAR(length=250),
+        existing_type = sa.Enum(u'POST', u'PUT', u'DELETE'),
+        nullable = False
+    )
     op.alter_column('revisions', u'content',
                existing_type=sa.VARCHAR(length=250),
                nullable=False)
