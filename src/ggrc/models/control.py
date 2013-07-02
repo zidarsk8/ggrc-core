@@ -33,7 +33,7 @@ class Control(
   __tablename__ = 'controls'
 
   company_control = db.Column(db.Boolean)
-  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
+  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'))
   type_id = db.Column(db.Integer)
   kind_id = db.Column(db.Integer)
   means_id = db.Column(db.Integer)
