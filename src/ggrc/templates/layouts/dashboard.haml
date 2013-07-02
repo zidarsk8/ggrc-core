@@ -189,11 +189,49 @@
                 %small
                   (12)
             %li.business
-              %a{ 'href': '#'}
+              %a{ 'href': '#', 'class': 'active' }
                 %i{ 'class': 'grcicon-orggroup-color' }
                 Org Groups
                 %small
                   (2)
+              %ul.sub-level
+                %li.business
+                  %a{ 'href': '#' }
+                    .row-fluid
+                      .span9
+                        %span.lhs-item
+                          West Virginia IT Disciples Pack of Hard Core Crew
+                      .span1
+                        &nbsp;
+                      .span1
+                        %i.grcicon-people-warning
+                %li.business
+                  %a{ 'href': '#' }
+                    .row-fluid
+                      .span9
+                        %span.lhs-item
+                          Google IT
+                      .span1
+                        &nbsp;
+                      .span1
+                %li.business
+                  %a{ 'href': '#' }
+                    .row-fluid
+                      .span9
+                        %span.lhs-item
+                          Misc
+                      .span1
+                        &nbsp;
+                      .span1
+                %li.view-more
+                  %a{ 'href': '#' }
+                    view more
+                    %i.grcicon-down
+                %li.add-new
+                  %a{ 'href': '#' }
+                    + Add New
+
+
             %li.business
               %a{ 'href': '#'}
                 %i{ 'class': 'grcicon-project-color' }
@@ -249,7 +287,7 @@
               %a{ 'href': '#'}
                 %i{ 'class': 'grcicon-policy-color' }
                 User Agreement
-            %li.program
+            %li.programs
               %a{ 'href': '#'}
                 %i{ 'class': 'grcicon-program-color' }
                 PCI Compliance
@@ -259,6 +297,7 @@
                 Southern China
 
         .bar-h
+      .bar-v
       .area
         .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
           .row-fluid

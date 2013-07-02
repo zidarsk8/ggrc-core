@@ -564,7 +564,7 @@ span.no-data {
 }
 
 .lhs-nav {
-  padding:10px 0 0 10px;
+  padding:10px 0 0 0;
   ul {
     @include reset-list();
     margin-bottom:14px;
@@ -579,6 +579,8 @@ span.no-data {
       }
       a {
         display:block;
+        padding-left:10px;
+        &.active,
         &:hover {
           text-decoration:none;
           background:#fff;
@@ -612,9 +614,47 @@ span.no-data {
       }
     }
   }
+  ul.sub-level {
+    background:#fff;
+    border-bottom:1px solid #ddd;
+    border-top:1px solid #eee;
+    li {
+      font-size:12px;
+      border-bottom:1px solid #eee;
+      a {
+        [class*="span"] {
+          min-height:24px;
+        }
+        padding-left:34px;
+        span.lhs-item {
+          display:block;
+          @include oneline();
+        }
+        &:hover {
+          text-decoration:underline;
+          span {
+            text-decoration:underline;
+          }
+        }
+      }
+      &.view-more {
+        a {
+          color:#4c9deb;
+        }
+      }
+      &.add-new {
+        a {
+          background:#eee;
+          color:#666;
+        }
+      }
+
+    }
+  }
   h2 {
     font-size:15px;
     font-weight:normal;
+    padding-left:10px;
   }
 }
 
@@ -630,6 +670,25 @@ span.no-data {
   @include opacity(0.3);
   &:hover {
     @include opacity(1);
+    cursor:move;
+  };
+}
+
+.bar-v {
+  float:left;
+  width:6px;
+  height:200px;
+  background-color:#ddd;
+  border-left:1px solid #aaa;
+  border-right:1px solid #aaa;
+  background-image: image-url("bgnds/drag-v.png");
+  @include background-size(2px 30px);
+  background-repeat:no-repeat;
+  background-position:2px 50%;
+  @include opacity(0.6);
+  &:hover {
+    @include opacity(1);
+    background-color:#fff;
     cursor:move;
   };
 }
