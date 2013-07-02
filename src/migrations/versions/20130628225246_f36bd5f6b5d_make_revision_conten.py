@@ -1,4 +1,4 @@
-"""Make revision.context TEXT
+"""Make revision.content TEXT
 
 Revision ID: 2a59bef8c738
 Revises: f36bd5f6b5d
