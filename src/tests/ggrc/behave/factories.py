@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 import datetime
 import factory
@@ -92,7 +91,11 @@ class FactoryAttributeGenerator(object):
     return []
 
   @classmethod
-  def property(cls, attr_name, class_atr):
+  def property(cls, attr_name, class_attr):
+    return None
+
+  @classmethod
+  def simple_property(cls, attr_name, class_attr):
     return None
 
 class ModelFactoryMetaClass(FactoryMetaClass):

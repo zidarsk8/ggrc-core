@@ -6,11 +6,10 @@
 import datetime
 from behave import given, when, then
 from iso8601 import parse_date
-
-from .utils import (
+from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
-    set_property, get_resource, put_resource, get_resource_table_singular,
-    get_service_endpoint_url, handle_get_resource_and_name_it,
+    put_resource, get_resource_table_singular, get_service_endpoint_url,
+    handle_get_resource_and_name_it,
     handle_post_named_example_to_collection_endpoint,
     handle_post_named_example, post_example, handle_get_example_resource,
     )

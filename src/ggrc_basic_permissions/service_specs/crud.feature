@@ -4,9 +4,10 @@ Feature: Role CRUD
     Given service description
 
   Scenario: Basic Role and UserRole CRUD using settings configured admin user
-    Given current user is "{\"email\": \"example.admin@.example.com\", \"name\": \"Jo Admin\"}"
+    Given current user is "{\"email\": \"example.admin@example.com\", \"name\": \"Jo Admin\"}"
     And a new Role named "role" is created from json
-      """{
+      """
+      {
         "name": "Program Editor",
         "description": "simple program editor role.",
         "permissions": {
@@ -16,10 +17,10 @@ Feature: Role CRUD
           "delete": ["Control"]
           },
         "context_id": 0
-        }
+      }
       """
     Then POST of "role" to its collection is allowed
-    And GET of "role is allowed
+    And GET of "role" is allowed
 
   #Scenario: A non-adminstrative user cannot access role information
 

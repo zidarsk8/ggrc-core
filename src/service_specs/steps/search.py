@@ -1,13 +1,14 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
-from .utils import \
-    handle_named_example_resource, get_service_endpoint_url, \
-    handle_get_resource_and_name_it, handle_get_example_resource, \
-    handle_post_named_example_to_collection_endpoint
+from behave import given, then, when
+from tests.ggrc.behave.utils import (
+    handle_named_example_resource, get_service_endpoint_url,
+    handle_get_resource_and_name_it, handle_get_example_resource,
+    handle_post_named_example_to_collection_endpoint,
+    )
 
 @given('the following resources are POSTed')
 def post_collection_of_resources(context):

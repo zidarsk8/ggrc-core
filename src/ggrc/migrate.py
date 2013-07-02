@@ -10,6 +10,7 @@ from alembic.config import Config
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
 from ggrc import settings
+from ggrc.extensions import get_extension_module, get_extension_modules
 
 class ExtensionPackageEnv(object):
   def __init__(self, extension_module_name):
@@ -61,13 +62,6 @@ def extension_version_table(module):
   module_name = module if type(module) is str else module.__name__
   return '{0}_alembic_version'.format(module_name)
 
-def get_extension_module(module_name):
-  __import__(module_name)
-  return sys.modules[module_name]
-
-def extensions_list():
-  return [get_extension_module(m) for m in settings.EXTENSIONS]
-
 def extension_migrations_dir(extension_module):
   module_dir = get_extension_dir(extension_module)
   migrations_dir = os.path.join(module_dir, 'migrations')
@@ -77,7 +71,7 @@ def extension_migrations_dir(extension_module):
 
 def extension_migrations_list():
   ret = []
-  for extension_module in extensions_list():
+  for extension_module in get_extension_modules():
     migrations_dir = extension_migrations_dir(extension_module)
     if migrations_dir:
       ret.append(migrations_dir)
