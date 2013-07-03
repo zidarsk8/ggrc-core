@@ -2,18 +2,10 @@
   <header class="header">
     <div class="row-fluid">
       <div class="span8">
+          <i class="grcicon-{{widget_id.toLowerCase}}"></i>
         <h2>
-          <i class="grcicon-{{object_type.toLowerCase}}"></i>
           {{object_display}}
-          {{#if is_related}}
-            related to {{parent_display}}
-          {{/if}}
           <span class="object_count">
-            {{#if is_related}}
-              {{related_count}}
-            {{else}}
-              {{list.length}}
-            {{/if}}
           </span>
         </h2>
       </div>
@@ -27,7 +19,7 @@
           <a class="active" href="javascript://"></a>
         </div>
         <div class="widget-action pull-right widget-action-help">
-          <a data-placement="top" data-toggle="modal-ajax" href="/help/{{object_type}}_list" rel="tooltip" data-original-title="Help">
+          <a data-placement="top" data-toggle="modal-ajax" href="/help/{{widget_id}}_widget" rel="tooltip" data-original-title="Help">
             <i class="grcicon-help"></i>
           </a>
         </div>
