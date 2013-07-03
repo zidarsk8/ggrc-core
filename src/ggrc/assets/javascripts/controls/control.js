@@ -12,6 +12,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   // static properties
     root_object : "control"
   , root_collection : "controls"
+  , category : "governance"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
 /*  , update : function(id, params) {
