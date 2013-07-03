@@ -559,16 +559,45 @@ span.no-data {
     padding:10px;
     input {
       @include border-radius(10px);
+      margin-bottom: 0;
+      background-image: image-url("grcicons/icons.png");
+      background-repeat: no-repeat;
+      @include background-size(296px 344px);
+      background-position:-268px -195px;
+      padding-left: 23px;
+      
     }
   }
 }
 
 .lhs-nav {
+  &.emphesized { // special case for programs
+   ul {
+     margin-bottom:0;
+   } 
+  }
   padding:10px 0 0 0;
   ul {
     @include reset-list();
     margin-bottom:14px;
     li {
+      position:relative;
+      .extended {
+        position:absolute;
+        top:-1px;
+        right:-422px;
+        z-index:200;
+        width:400px;
+        padding:2px 10px;
+        height:222px;
+        background:#fff;
+        border:1px solid #ddd;
+        @include opacity(0.9);
+        .rtf {
+          font-size:12px;
+          line-height:16px;
+        }
+      }
       font-size:14px;
       line-height:24px;
       i {
@@ -583,7 +612,8 @@ span.no-data {
         &.active,
         &:hover {
           text-decoration:none;
-          background:#fff;
+          background:#fff image-url('grcicons/open.png') no-repeat right center;
+          @include background-size(17px 12px);
         }
       }
       &.programs {
@@ -632,6 +662,7 @@ span.no-data {
         }
         &:hover {
           text-decoration:underline;
+          background:#fff;
           span {
             text-decoration:underline;
           }
