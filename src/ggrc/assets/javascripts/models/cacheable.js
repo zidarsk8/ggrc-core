@@ -40,6 +40,18 @@ can.Model("can.Model.Cacheable", {
   , setup : function(construct, name, statics, prototypes) {
     if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll)
       this.findAll = "GET /api/" + this.root_collection;
+
+    if(this.root_collection) {
+      this.model_plural = statics.model_plural || this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
+      this.title_plural = statics.title_plural || this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
+      this.table_plural = statics.table_plural || this.root_collection;
+    }
+    if(this.root_object) {
+      this.model_singular = statics.model_singular || this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
+      this.title_singular = statics.title_singular || this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
+      this.table_singular = statics.table_singular || this.root_object;
+    }
+
     return this._super.apply(this, arguments);
   }
   , init : function() {
@@ -98,16 +110,6 @@ can.Model("can.Model.Cacheable", {
         that.risk_tree_options.child_options[1].model = that;
     });
 
-    if(this.root_collection) {
-      this.model_plural = this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
-      this.title_plural = this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_plural = this.root_collection;
-    }
-    if(this.root_object) {
-      this.model_singular = this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
-      this.title_singular = this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_singular = this.root_object;
-    }
 
   }
 
