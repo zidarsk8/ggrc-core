@@ -35,7 +35,7 @@ class CompletePermissionsProvider(object):
     elif user is not None:
       permissions = {}
       user_roles = db.session.query(UserRole).filter(
-          UserRole.user_email==user.email)
+          UserRole.user_email==user.email).all()
       for user_role in user_roles:
         for action, resource_types in user_role.role.permissions.items():
           for resource_type in resource_types:

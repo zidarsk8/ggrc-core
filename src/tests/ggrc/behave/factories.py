@@ -134,9 +134,17 @@ def factory_for(model_class):
   will be used. Otherwise, one will be created and added to globals().
   """
   if type(model_class) is str or type(model_class) is unicode:
-    factory_name = model_class
-    import ggrc.models
-    model_class = getattr(ggrc.models, model_class)
+    if '.' in model_class:
+      import sys
+      path = model_class.split('.')
+      module_name = '.'.join(path[:-1])
+      factory_name = path[-1]
+      __import__(module_name)
+      model_class = getattr(sys.modules[module_name], factory_name)
+    else:
+      factory_name = model_class
+      import ggrc.models
+      model_class = getattr(ggrc.models, model_class)
   else:
     factory_name = model_class.__name__
   factory_name = '{0}Factory'.format(factory_name)

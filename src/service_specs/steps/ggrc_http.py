@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
+import json
 from behave import given, when, then
 from iso8601 import parse_date
 from tests.ggrc.behave.utils import (
@@ -23,9 +24,21 @@ def get_json_response(context):
 def example_resource(context, resource_type):
   handle_example_resource(context, resource_type)
 
-@given('a new "{resource_type}" named "{name}"')
-def named_example_resource(context, resource_type, name, **kwargs):
-  handle_named_example_resource(context, resource_type, name, **kwargs)
+@given('a new "{resource_type}" named "{example_name}" is created from json')
+def named_example_from_json(context, resource_type, example_name):
+  if '{{' in context.text:
+    from jinja2 import Template
+    template = Template(context.text)
+    text = template.render(context=context)
+  else:
+    text = context.text
+  json_obj = json.loads(text)
+  handle_named_example_resource(
+      context, resource_type, example_name, **json_obj)
+
+@given('a new "{resource_type}" named "{example_name}"')
+def named_example_resource(context, resource_type, example_name, **kwargs):
+  handle_named_example_resource(context, resource_type, example_name, **kwargs)
 
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
@@ -112,6 +125,10 @@ def check_resource_equality_for_response(context, resource_type):
       response = datetime.datetime.strptime(response, '%Y-%m-%d').date()
     assert original == response, 'for {0}: expected {1}, received {2}'.format(
         k, original, response)
+
+@given('the current user')
+def define_current_user_from_pystring(context):
+  define_current_user(context, context.text.replace("\n", " ").strip())
 
 @given('current user is "{user_json}"')
 def define_current_user(context, user_json):

@@ -36,6 +36,10 @@ def handle_example_resource(context, resource_type):
 
 def handle_named_example_resource(
     context, resource_type, example_name, **kwargs):
+  if type(resource_type) is str and '.' in resource_type:
+    import sys
+    __import__(resource_type)
+    resource_type = sys.modules[resource_type]
   resource_factory = factory_for(resource_type)
   example = Example(resource_type, resource_factory(**kwargs))
   setattr(context, example_name, example)
@@ -165,8 +169,12 @@ class DateTimeEncoder(json.JSONEncoder):
       return super(DateTimeEncoder, self).default(obj)
 
 def resource_type_string(resource_type):
-  return resource_type \
-      if type(resource_type) in [str,unicode] else resource_type.__name__
+  if type(resource_type) in [str,unicode]:
+    if '.' in resource_type:
+      return resource_type.split('.')[-1]
+    return resource_type
+  else:
+    return resource_type.__name__
 
 def get_resource_table_singular(resource_type):
   # This should match the implementation at
