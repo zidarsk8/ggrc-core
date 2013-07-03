@@ -46,6 +46,7 @@ can.Model.Cacheable("CMS.Models.Relationship", {
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
+  , category : "programs"
   , findAll : "/api/programs?kind=Directive"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
@@ -89,6 +90,7 @@ can.Model.Cacheable("CMS.Models.ProgramDirective", {
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
   , root_collection : "directives"
+  , category : "governance"
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
@@ -157,7 +159,13 @@ can.Model.Cacheable("CMS.Models.Directive", {
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
-  findAll : "/api/directives?kind=Regulation"
+  model_plural : "Regulations"
+  , table_plural : "regulations"
+  , title_plural : "Regulations"
+  , model_singular : "Regulation"
+  , title_singular : "Regulation"
+  , table_singular : "Regulations"
+  , findAll : "/api/directives?kind=Regulation"
   , defaults : {
     kind : "Regulation"
   }
@@ -175,7 +183,13 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Policy", {
-  findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
+  model_plural : "Policies"
+  , table_plural : "policies"
+  , title_plural : "Policies"
+  , model_singular : "Policy"
+  , title_singular : "Policy"
+  , table_singular : "policy"
+  , findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
   , defaults : {
     kind : "Company Policy"
   }
@@ -193,7 +207,13 @@ CMS.Models.Directive("CMS.Models.Policy", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Contract", {
-  findAll : "/api/directives?kind=Contract"
+  model_plural : "Contracts"
+  , table_plural : "contracts"
+  , title_plural : "Contracts"
+  , model_singular : "Contract"
+  , title_singular : "Contract"
+  , table_singular : "contract"
+  , findAll : "/api/directives?kind=Contract"
   , defaults : {
     kind : "Contract"
   }
@@ -213,6 +233,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
 can.Model.Cacheable("CMS.Models.OrgGroup", {
   root_object : "org_group"
   , root_collection : "org_groups"
+  , category : "business"
   , findAll : "/api/org_groups"
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
@@ -261,6 +282,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
 can.Model.Cacheable("CMS.Models.Project", {
   root_object : "project"
   , root_collection : "projects"
+  , category : "business"
   , findAll : "/api/projects"
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
@@ -292,6 +314,7 @@ can.Model.Cacheable("CMS.Models.Project", {
 can.Model.Cacheable("CMS.Models.Facility", {
   root_object : "facility"
   , root_collection : "facilities"
+  , category : "business"
   , findAll : "/api/facilities"
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
@@ -339,6 +362,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
 can.Model.Cacheable("CMS.Models.Product", {
   root_object : "product"
   , root_collection : "products"
+  , category : "business"
   , findAll : "/api/products"
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
@@ -404,6 +428,7 @@ can.Model.Cacheable("CMS.Models.Option", {
 can.Model.Cacheable("CMS.Models.DataAsset", {
   root_object : "data_asset"
   , root_collection : "data_assets"
+  , category : "business"
   , findAll : "/api/data_assets"
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
@@ -451,6 +476,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
 can.Model.Cacheable("CMS.Models.Market", {
   root_object : "market"
   , root_collection : "markets"
+  , category : "business"
   , findAll : "/api/markets"
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
@@ -482,6 +508,7 @@ can.Model.Cacheable("CMS.Models.Market", {
 can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   root_object : "risky_attribute"
   , root_collection : "risky_attributes"
+  , category : "risk"
   , findAll : "/api/risky_attributes"
   , create : "POST /api/risky_attributes"
   , update : "PUT /api/risky_attributes/{id}"
@@ -490,6 +517,7 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
 can.Model.Cacheable("CMS.Models.Risk", {
   root_object : "risk"
   , root_collection : "risks"
+  , category : "risk"
   , findAll : function(params) {
     var root_object =  this.root_object
     , root_collection = this.root_collection;

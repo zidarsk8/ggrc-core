@@ -87,10 +87,17 @@ can.Control("CMS.Controllers.AddWidget", {
 
   , addWidgetByDescriptor : function(descriptor) {
     var that = this;
-    if(descriptor && !$("#" + descriptor.object_type + "_list_widget").length) {
+    if(descriptor && !$("#" + descriptor.object_type + "_widget").length) {
       $("<section class='widget'>")
       .insertBefore(that.element)
-      .cms_controllers_dashboard_widgets($.extend(descriptor, { is_related : this.options.is_related }))
+      .cms_controllers_dashboard_widgets({
+        content_controller : GGRC.Controllers.ListView
+        , content_controller_options : $.extend(descriptor, { is_related : this.options.is_related })
+        , widget_id : descriptor.model.table_singular
+        , widget_name : descriptor.model.title_plural
+        , widget_icon : descriptor.model.table_singular
+        , model : descriptor.model
+        , object_category : descriptor.model.category || descriptor.object_category })
       .trigger("sortreceive");
     }
   }
