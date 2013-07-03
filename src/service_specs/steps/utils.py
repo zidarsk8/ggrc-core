@@ -7,7 +7,7 @@ multiple steps/*.py modules.
 
 import json
 import datetime
-from factories import factory_for
+from factories import factory_for, FactoryStubMarker
 
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
@@ -66,7 +66,6 @@ def put_resource(context, url, resource):
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
   data = json.dumps(resource.value, cls=DateTimeEncoder)
-  print 'data:', data
   response = requests.put(
       context.base_url+url,
       data=data,
@@ -93,14 +92,12 @@ def handle_post_named_example_to_collection_endpoint(
   created resource is added to the context as the attribute name given by
   `name`.
   """
-  example = getattr(context, name)
-  url = get_service_endpoint_url(context, example.resource_type)
-  handle_post_named_example(context, name, url, expected_status)
+  handle_post_named_example(context, name, expected_status)
 
-def handle_post_named_example(context, name, url, expected_status=201):
+def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)
   response = post_example(
-      context, example.resource_type, example.value, url)
+      context, example.resource_type, example.value)
   assert response.status_code == expected_status, \
       'Expected status code {0}, received {1}'\
         .format(expected_status, response.status_code)
@@ -108,9 +105,40 @@ def handle_post_named_example(context, name, url, expected_status=201):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
-def post_example(context, resource_type, example, url):
+def post_example(context, resource_type, example, url=None, context_id=None):
+  if context_id is None:
+    context_id = example.get("context_id", None)
+  if url is None:
+    url = get_service_endpoint_url(context, resource_type)
+
+  # Find any required FactoryStubMarker and recurse to POST/create
+  # required resources
+  for attr, value in example.items():
+    if isinstance(value, FactoryStubMarker):
+      value_resource_type = value.class_.__name__
+      value_resource_factory = factory_for(value_resource_type)
+      value_resource = value_resource_factory()
+      value_response = post_example(
+          context, value_resource_type, value_resource, context_id=context_id)
+      # If not a successful creation, then it didn't create the object we need
+      if value_response.status_code != 201:
+        return value_response
+      # Get the value of the first/only (key,value) pair
+      #   (and just assume the root key is correct)
+      value_data = value_response.json().items()[0][1]
+      example[attr] = {
+        'href': value_data["selfLink"],
+        'id': value_data["id"],
+        'type': value_resource_type
+        }
+
+  # Assign overriding `context_id`, if specified
+  if context_id is not None:
+    example["context_id"] = context_id
+
   #For **some** reason, I can't import this at the module level in a steps file
   import requests
+
   headers = {'Content-Type': 'application/json',}
   data = json.dumps(
       {get_resource_table_singular(resource_type): example},

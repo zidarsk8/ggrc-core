@@ -16,3 +16,7 @@ class RiskRiskyAttribute(Base, db.Model):
     db.UniqueConstraint('risk_id', 'risky_attribute_id'),
   )
 
+  _publish_attrs = [
+      'risk',
+      'risky_attribute',
+      ]

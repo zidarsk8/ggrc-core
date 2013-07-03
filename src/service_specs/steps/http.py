@@ -6,13 +6,14 @@
 import datetime
 from behave import given, when, then
 from iso8601 import parse_date
+import json
 
 from .utils import \
     Example, handle_example_resource, handle_named_example_resource, \
     set_property, get_resource, put_resource, get_resource_table_singular, \
-    get_service_endpoint_url, handle_get_resource_and_name_it, \
+    handle_get_resource_and_name_it, \
     handle_post_named_example_to_collection_endpoint, \
-    handle_post_named_example, post_example, handle_get_example_resource
+    post_example, handle_get_example_resource
 
 def get_json_response(context):
   if not hasattr(context, 'json'):
@@ -43,19 +44,13 @@ def simple_post_of_named(context, name, url):
           200, response.status_code)
   context.response = response
 
-@given('"{name}" is POSTed to "{url}"')
-def post_named_example(context, name, url, expected_status=201):
-  handle_post_named_example(context, name, url, expected_status)
-
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
-  endpoint_url = get_service_endpoint_url(context, resource_type)
-  post_example_resource(context, resource_type, endpoint_url)
+  post_example_resource(context, resource_type)
 
-@when('the example "{resource_type}" is POSTed to the "{collection}"')
-def post_example_resource(context, resource_type, collection):
+def post_example_resource(context, resource_type, url=None):
   context.response = post_example(
-      context, resource_type, context.example_resource, collection)
+      context, resource_type, context.example_resource, url)
 
 @when('GET of "{url}" as "{name}"')
 def get_resource_and_name_it(context, url, name):
@@ -125,7 +120,24 @@ def define_current_user(context, user_json):
         )
     assert response.status_code == 200, 'Failed to logout!!'
     delattr(context, 'cookies')
-  context.current_user_json = user_json.replace('\\"', '"')
+  context.current_user_data = json.loads(user_json.replace('\\"', '"'))
+  context.current_user_json = json.dumps(context.current_user_data)
+
+@given('current user has permissions "{permissions}" on resource types "{permission_resource_types}" in context "{context_id}"')
+def add_user_permissions(
+    context, permissions, permission_resource_types, context_id):
+  if permissions == 'None' or permission_resource_types == 'None':
+    return
+  context_id = int(context_id)
+  context.current_user_data.setdefault("permissions", {})
+  user_perms = context.current_user_data["permissions"]
+  for permission_type in permissions.split(","):
+    user_perms.setdefault(permission_type, {})
+    for resource_type in permission_resource_types.split(","):
+      user_perms[permission_type].setdefault(resource_type, [])
+      if context_id not in user_perms[permission_type][resource_type]:
+        user_perms[permission_type][resource_type].append(context_id)
+  context.current_user_json = json.dumps(context.current_user_data)
 
 @then('POST of "{resource_name}" to its collection is allowed')
 def check_POST_is_allowed(context, resource_name):
