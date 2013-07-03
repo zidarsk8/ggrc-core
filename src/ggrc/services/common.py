@@ -370,13 +370,14 @@ class Resource(ModelView):
     }
     http_method = request.method
     event = Event(
-      person_id = get_current_user_id(),
+      modified_by_id = get_current_user_id(),
       http_method = http_method,
       resource_id = obj.id,
       resource_type = str(obj.__class__.__name__))
     # VM - Examine changes to create revisions
     revision = Revision(
       resource_id = obj.id,
+      modified_by_id = get_current_user_id(),
       resource_type = str(obj.__class__.__name__),
       action = verb_to_action[http_method],
       content = as_json(obj.to_json(), sort_keys = True))
