@@ -598,6 +598,16 @@ span.no-data {
           font-weight:normal;
           color:#e00;
         }
+        a.main-title {
+          i {
+            @include opacity(0.5);
+          }
+          &:hover {
+            i {
+              @include opacity(1);
+            }
+          }
+        }
         .rtf {
           font-size:12px;
           line-height:16px;
