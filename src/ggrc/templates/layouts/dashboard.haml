@@ -13,6 +13,19 @@
       {{ type }}
 -endmacro
 
+-macro search_result(type, type_plural, li_class='')
+  %li{ 'class': ['{{ li_class }}', 'accordion-group'] }
+    %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-toggle' : "collapse", 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
+      %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
+      {{ type_plural|title }}
+      %small
+        (
+        %span.item-count> ...
+        )
+    .extended.fade
+    %ul.sub-level.collapse{ 'id' : '={ type_plural|underscore }_sub_level'}
+-endmacro
+
 -block page_help scoped
 
 -block body
@@ -37,7 +50,7 @@
                   -else
                     Google GRC
               %ul.menu
-                %li.quick-search
+                -#%li.quick-search
                   .quick-search-holder
                     %button{'type':'submit'}
                       %i.grcicon-search-white
@@ -135,221 +148,42 @@
     -block subheader_plus
 
     .clearfix
-      .lhs
+      #lhs.lhs.accordion
         -#NEW LHS
         .lhs-search
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search...' }
+          %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
         .lhs-nav.emphesized
           %ul.top-level
-            %li.programs
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-program-color' }
-                Programs
-                %small
-                  (5)
+            =search_result('Program', 'programs', 'programs')   
         .lhs-nav
           %h2.governance Governance
           %ul.top-level
-            %li.governance
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-control-color' }
-                Controls
-                %small
-                  (142)
-            %li.governance
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-contract-color' }
-                Contracts
-                %small
-                  (12)
-            %li.governance
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-policy-color' }
-                Policies
-                %small
-                  (2)
-            %li.governance
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-regulation-color' }
-                Regulations
-                %small
-                  (7)
+            =search_result('Control', 'controls', 'governance')
+            =search_result('Contract', 'contracts', 'governance')
+            =search_result('Policy', 'policies', 'governance')
+            =search_result('Regulation', 'regulations', 'governance')
           %h2.business Assets/Business
           %ul.top-level
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-process-color' }
-                Processes
-                %small
-                  (142)
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-system-color' }
-                Systems
-                %small
-                  (12)
-            %li.business
-              %a{ 'href': '#', 'class': 'active' }
-                %i{ 'class': 'grcicon-orggroup-color' }
-                Org Groups
-                %small
-                  (10)
-              .extended
-                .row-fluid
-                  .span12
-                    %a.main-title.business.oneline{ 'href': '#' }
-                      West Virginia IT Disciples Pack of Hard Core Crew
-                      %i.grcicon-goto
-                .row-fluid
-                  .span12
-                    .rtf
-                      %p
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                    %a.url.oneline{ 'href': '#' }
-                      http://gdrive.google.com/googleplex/4839009/westvirginia/process/7894324974328974
-                .row-fluid
-                  .span6
-                    .info
-                      %strong Owner:
-                      %span.error
-                        Not Assigned
-                  .span6
-                    .info
-                      %i.grcicon-control-color
-                      6
-                      &nbsp;&nbsp;
-                      %i.grcicon-process-color
-                      9
-                      &nbsp;&nbsp;
-                      %i.grcicon-system-color
-                      1
-                .links
-                  .row-fluid
-                    .span6
-                      %a.secondary{ 'href': '#' }
-                        View Org Group
-                    .span6
-                      %a.primary{ 'href': '#' }
-                        Map to this program
-                        %i.grcicon-reg-map
-              %ul.sub-level
-                %li.business
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          Google IT
-                      .span1
-                        &nbsp;
-                      .span1
-                %li.business
-                  %a{ 'href': '#', 'class': 'active' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          West Virginia IT Disciples Pack of Hard Core Crew
-                      .span1
-                        &nbsp;
-                      .span1
-                        %i.grcicon-people-warning
-                %li.business
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          Abroad
-                      .span1
-                        &nbsp;
-                      .span1
-                %li.business
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          Google MTV
-                      .span1
-                        &nbsp;
-                      .span1
-                %li.business
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          Google SFO
-                      .span1
-                        &nbsp;
-                      .span1
-                %li.business
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span9
-                        %span.lhs-item
-                          Misc
-                      .span1
-                        &nbsp;
-                      .span1
-
-                %li.view-more
-                  %a{ 'href': '#' }
-                    view more
-                    %i.grcicon-down
-                %li.add-new
-                  %a{ 'href': '#' }
-                    + add new
-
-
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-project-color' }
-                Projects
-                %small
-                  (7)
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-facility-color' }
-                Facilities
-                %small
-                  (2)
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-product-color' }
-                Products
-                %small
-                  (0)
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-dataasset-color' }
-                Data Assets
-                %small
-                  (13)
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-market-color' }
-                Markets
-                %small
-                  (11)
+            =search_result('Process', 'processes', 'business')
+            =search_result('System', 'systems', 'business')
+            =search_result('OrgGroup', 'org groups', 'business')
+            =search_result('Project', 'projects', 'business')
+            =search_result('Facility', 'facilities', 'business')
+            =search_result('Product', 'products', 'business')
+            =search_result('DataAsset', 'data assets', 'business')
+            =search_result('Market', 'markets', 'business')
           %h2.risk Risk Management
           %ul.top-level
-            %li.risk
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-risk-color' }
-                Risks
-                %small
-                  (12)
-            %li.risk
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-riskyattribute-color' }
-                Attributes
-                %small
-                  (9)
+            =search_result('Risk', 'risks', 'risk')
+            =search_result('RiskyAttribute', 'risky attributes', 'risk')
         .bar-h
         -#.lhs-nav
           -#%h2 My Work
         -#.bar-h
-        .lhs-nav
+        .lhs-nav.recent
           %h2 Recently Viewed
           %ul.top-level
-            %li.governance
+            %li.risk
               %a{ 'href': '#'}
                 %i{ 'class': 'grcicon-policy-color' }
                 User Agreement

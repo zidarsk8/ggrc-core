@@ -576,10 +576,19 @@ span.no-data {
      margin-bottom:0;
    } 
   }
+  .accordion-group { // override bootstrap
+    border:none;
+  }
   padding:10px 0 0 0;
   ul {
     @include reset-list();
     margin-bottom:14px;
+    &.collapse {
+      margin-bottom:0px;
+      &.in {
+        margin-bottom:14px;
+      }
+    }
     li {
       position:relative;
       .extended {
@@ -592,7 +601,14 @@ span.no-data {
         min-height:222px;
         background:#fff;
         border:1px solid #ddd;
-        @include opacity(0.95);
+        &.fade {
+          @include opacity(0);
+          display : none;
+        }
+        &.in {
+          @include opacity(0.95);
+          display : block;
+        }
         span.error {
           font-size:12px;
           font-weight:normal;
@@ -692,6 +708,15 @@ span.no-data {
     background:#fff;
     border-bottom:1px solid #ccc;
     border-top:1px solid #ddd;
+    &.collapse {
+      border-bottom:none;
+      border-top:none;
+      &.in {
+        border-bottom:1px solid #ccc;
+        border-top:1px solid #ddd;
+      }
+    }
+
     li {
       font-size:12px;
       border-bottom:1px solid #ddd;
