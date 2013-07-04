@@ -11,7 +11,7 @@
 
 $(function() {
 
-  function bindQuickSearch(ev) {
+  function bindQuickSearch(ev, opts) {
 
     var $qs = $(this).uniqueId();
     var obs = new can.Observe();
@@ -20,15 +20,28 @@ $(function() {
         obs.attr("value", $(ev.target).val());
     });
     can.getObject("Instances", CMS.Controllers.QuickSearch, true)[$qs.attr("id")] = 
-     $qs.find(".quick-search-results, section.content")
-      .cms_controllers_quick_search({
+     $qs.find(".lhs-nav:not(.recent), section.content")
+      .cms_controllers_quick_search(can.extend({
         observer : obs
         , spin : $qs.is(":not(section)")
-      }).control(CMS.Controllers.QuickSearch);
+      }, opts)).control(CMS.Controllers.QuickSearch);
 
   }
-  $("section.widget-tabs").each(bindQuickSearch);//get anything that exists on the page already.
+  $("section.widget-tabs").each(function() {
+    bindQuickSearch.call(this, {}, {});
+  });//get anything that exists on the page already.
 
+  $(".lhs").each(function() {
+    bindQuickSearch.call(this, {}, {
+      list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
+      , spin : false
+      , tab_selector : 'ul.top-level > li > a'
+      // , tab_href_attr : [ "href", "data-tab-href" ]
+      , tab_target_attr : "href"
+      // , tab_model_attr : [ "data-model", "data-object-singular" ]
+      , limit : 6
+    });
+  });
   //Then listen for new ones
   $(document.body).on("click", ".quick-search:not(:has(.cms_controllers_quick_search)), section.widget-tabs:not(:has(.cms_controllers_quick_search))", bindQuickSearch);
 

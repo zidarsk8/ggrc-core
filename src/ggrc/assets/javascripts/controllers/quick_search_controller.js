@@ -17,10 +17,29 @@
       return href + '?' + params;
   }
 
+  function get_attr(el, attrnames) {
+    var attrval = null
+    , $el = $(el);
+    can.each(can.makeArray(attrnames), function(attrname) {
+      var a = $el.attr(attrname);
+      if(a) {
+        attrval = a;
+        return false;
+      }
+    });
+    return attrval;
+  }
+
 CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   defaults : {
-    list_view : "/static/mustache/dashboard/object_list.mustache"
+    list_view : GGRC.mustache_path + "/dashboard/object_list.mustache"
+    , tooltip_view : GGRC.mustache_path + "/dashboard/object_tooltip.mustache"
     , spin : true
+    , tab_selector : 'ul.nav-tabs:first > li > a'
+    , tab_href_attr : [ "href", "data-tab-href" ]
+    , tab_target_attr : [ "data-tab-target", "href" ]
+    , tab_model_attr : [ "data-model", "data-object-singular" ]
+    , limit : null
   }
 }, {
 
@@ -33,15 +52,15 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
 
   , init : function(opts) {
     var that = this;
-    var $tabs = this.element.find('ul.nav-tabs:first > li > a');
+    var $tabs = this.element.find(this.options.tab_selector);
     $tabs.each(function(i, tab) {
       var $tab = $(tab)
-      , href = $tab.attr('href') || $tab.data('tab-href')
+      , href = get_attr($tab, that.options.tab_href_attr)
       , loaded = $tab.data('tab-loaded')
-      , pane = ($tab.data('tab-target') || $tab.attr('href'))
+      , pane = get_attr($tab, that.options.tab_target_attr)
       , $pane = $(pane)
-      , template = $tab.data("template")
-      , model_name = $tab.attr("data-model") || $tab.attr("data-object-singular")
+      , template = $tab.data("template") || that.options.list_view
+      , model_name = get_attr($tab, that.options.tab_model_attr)
       , model = can.getObject("CMS.Models." + model_name) || can.getObject("GGRC.Models." + model_name)
       , view_data = null
       , spinner;
@@ -53,21 +72,30 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       if(model && template) {
         view_data = new can.Observe({
           list: new model.List()
-          //, list_view : template
+          , all_items: new model.List()
           , observer: that.options.observer
-          , tooltip_view : "/static/mustache/dashboard/object_tooltip.mustache"
+          , tooltip_view : that.options.tooltip_view
         });
 
         $tab.data("view_data", view_data);
         $tab.data("model", model);
         model.findAll().done(function(data) {
+          view_data.attr('all_items', data);
           if($tab.is("li.active a")) {
             can.Observe.startBatch();
-            view_data.attr('list', data);
+            if(that.options.limit != null) {
+              view_data.attr('list').replace(data.slice(0, that.options.limit));
+            } else {
+              view_data.attr('list', data);
+            }
             can.Observe.stopBatch();
           } else {
             GGRC.queue_event(function() {
-              view_data.attr("list", data);
+              if(that.options.limit != null) {
+                view_data.attr('list').replace(data.slice(0, that.options.limit));
+              } else {
+                view_data.attr('list', data);
+              }
             });
           }
           $tab.find(".item-count").html(data ? data.length : 0);
@@ -89,13 +117,28 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       }
 
       if (view_data) {
-        can.view(template /*GGRC.mustache_path + "/dashboard/quick_search_results.mustache"*/, view_data, function(frag, xhr) {
+        can.view(template, view_data, function(frag, xhr) {
           $tab.data('tab-loaded', true);
           $pane.html(frag).trigger("loaded", xhr, $tab.data("list"));
         });
       }
     });
   }
+
+  , ".view-more click" : function(el, ev) {
+    var that = this
+    , $tab = this.element
+              .find(this.options.tab_selector)
+              .map(function(i, v) {
+                if(that.element.find(get_attr(v, that.options.tab_target_attr)).has(el).length) {
+                  return v;
+                }
+              })
+    , view_data = $tab.data("view_data");
+
+    view_data.list.replace(view_data.all_items);
+  }
+
 
   , "{observer} value" : function(el, ev, newval) {
     this.filter(newval);
@@ -105,7 +148,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   // @override
   , redo_last_filter : function(id_to_add) {
     var that = this;
-    var $tabs = $(this.element).find('ul.nav-tabs:first > li > a');
+    var $tabs = $(this.element).find(this.options.tab_selector);
     var old_sel = this.options.filterable_items_selector;
     var old_ids = this.last_filter_ids;
 
@@ -114,7 +157,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       , model = $tab.data("model")
       , res = old_ids ? that.last_filter.getResultsFor(model) : null;
 
-      that.options.filterable_items_selector = $($tab.attr("href") || $tab.attr("data-href")).find("li");
+      that.options.filterable_items_selector = $(get_attr($tab, that.options.tab_href_attr)).find("li:not(.view-more, .add-new)");
       that.last_filter_ids = res = res ? can.unique(can.map(res, function(v) { return v.id; })) : null; //null is the show-all case
       that._super();
       // res = can.map(res, function(obj, i) {
