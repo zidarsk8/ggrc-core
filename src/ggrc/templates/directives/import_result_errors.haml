@@ -1,0 +1,51 @@
+-extends "directives/import_result.haml"
+
+.row-fluid
+  %hr.hr-widget
+
+-set import_errors = 2
+-set import_warnings = 2
+-set m = "This is a random error/warning message..."
+
+-block errors_and_table
+  .row-fluid
+    #sampleData.span12
+      {% if all_errors|length > 0 %}
+        {% for i in all_errors %}
+          %p.label-error
+            {{all_errors[loop.index0]}}
+        {% endfor %}
+      {% endif %}
+      %br
+      {% if all_warnings|length > 0 %}
+        {% for i in all_warnings %}
+          %p.label-warning
+            {{all_warnings[loop.index0]}}
+        {% endfor %}
+      {% endif %}
+
+      %h4 Data to Import
+      -include "directives/_import_table.haml"
+%br
+
+.row-fluid
+
+-block bottom_buttons
+  .row-fluid
+    .span8 
+    .span1
+      %form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
+      %input{"value":"Cancel","class":'btn btn-large',"type":'submit'}
+    .span2
+      {% if import_errors > 0 %}
+        %form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
+        %input{"value":"Correct Errors Before Proceeding","class":'btn btn-large btn-warning pull-right',"type":'submit'}
+      {% endif %}   
+      -#elsif import_warnings > 0
+        -#messages.any? || (@warnings.any? { |k,v| v.present? })
+        -#=submit_tag "Proceed With Caution", :class => %w(btn btn-large btn-warning pull-right), :name => 'confirm'
+      -#else
+        -#=submit_tag "Finish Importing", :class => %w(btn btn-large btn-success pull-right), :name => 'confirm'
+
+    -#.span12
+      -#=yield_content! :import_success

@@ -7,6 +7,8 @@ from ggrc.app import db, app
 from .tooltip import TooltipView
 from .relationships import RelatedObjectResults
 from . import filters
+from ggrc.converters.sections import SectionsConverter
+from pprint import pprint
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -53,6 +55,37 @@ def styleguide():
   """The style guide page
   """
   return render_template("styleguide.haml")
+
+@app.route("/testimport")
+def testImport():
+  """ create route to test import/export HAMLs for directives
+  """
+  return render_template("directives/import.haml")
+
+
+@app.route("/testrender")
+def testRender():
+  """ create route to test rendering of HAMLs for directives
+  """
+  converter = SectionsConverter.start_import("/vagrant/extras/Import_Test-Regulations_Legal.csv")
+  results = converter.final_results
+  print "HERE ARE THE RESULTS: "
+  pprint(results)
+  print "HERE ARE THE ERRORS: "
+  pprint(converter.errors)
+  print "HERE ARE THE WARNINGS: "
+  pprint(converter.warnings)
+  dummy_data = results
+  return render_template("directives/import_result_errors.haml",dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+
+@app.route("/directives/{id}/import_sections")
+def import_sections(id):
+  #file = flask.uploaded_file[0]
+  #if file:
+  #  converter = blah
+  #else:
+  #
+  pass
 
 def _all_views(view_list):
   import ggrc.services
