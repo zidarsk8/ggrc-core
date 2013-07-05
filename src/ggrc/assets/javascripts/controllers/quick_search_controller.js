@@ -75,6 +75,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
           , all_items: new model.List()
           , observer: that.options.observer
           , tooltip_view : that.options.tooltip_view
+          , model : model
         });
 
         $tab.data("view_data", view_data);
@@ -181,6 +182,19 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
     el.closest(".widget").find(".object-type").text(singular)
       .closest("a").attr("data-object-plural", plural.split(" ").join("_").toLowerCase())
       .attr("data-object-singular", singular.replace(" ", ""));
+  }
+
+  , ".show-extended click" : function(el, ev) {
+    var $extended = el.closest(":has(.extended)").find(".extended:first")
+    , instance = el.closest("[data-model]").data("model") || el.closest(":data(model)").data("model");
+
+    if($extended.hasClass("in") && $extended.data("model") === instance) {
+      $extended.removeClass("in");
+    } else {
+      can.view(this.options.tooltip_view, instance, function(frag) {
+        $extended.html(frag).addClass("in").data("model", instance);
+      });
+    }
   }
 
 });
