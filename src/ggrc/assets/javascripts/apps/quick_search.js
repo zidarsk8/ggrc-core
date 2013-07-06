@@ -11,6 +11,8 @@
 
 $(function() {
 
+  $(".recent").ggrc_controllers_recently_viewed();
+
   function bindQuickSearch(ev, opts) {
 
     var $qs = $(this).uniqueId();
