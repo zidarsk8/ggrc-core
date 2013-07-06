@@ -708,6 +708,6 @@ jQuery(function($) {
 	var areaSize = winSize - 240 -8 ; //bar = 8px
 	var areaHeight = winHeight - 30;
 	$(".area").css('width', areaSize);
-	$(".lhs").css('height', areaHeight);
-	$(".bar-v").css('height', areaHeight);
+	// $(".lhs").css('height', areaHeight);
+	// $(".bar-v").css('height', areaHeight);
 });

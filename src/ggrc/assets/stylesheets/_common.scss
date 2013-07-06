@@ -553,7 +553,9 @@ span.no-data {
 }
 
 .lhs {
+  position:relative;
   width:240px;
+  margin-right: 8px;
   @include gradient-horizontal(#fff,#e1e1e1);
   .lhs-bg {
     margin-top:5px;
@@ -797,9 +799,11 @@ span.no-data {
 }
 
 .bar-v {
-  float:left;
+  position: absolute;
+  right: -8px;
+  top:0;
+  height:100%;
   width:6px;
-  height:200px;
   background-color:#ddd;
   border-left:1px solid #aaa;
   border-right:1px solid #aaa;

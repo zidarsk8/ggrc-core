@@ -148,77 +148,77 @@
     -block subheader_plus
 
     .clearfix
-      #lhs.lhs.accordion
-        -#NEW LHS
-        .lhs-search
-          %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
-        .lhs-bg
-        .lhs-nav.emphesized
-          %ul.top-level
-            =search_result('Program', 'programs', 'programs')   
-        .lhs-nav
-          %h2.governance Governance
-          %ul.top-level
-            =search_result('Control', 'controls', 'governance')
-            =search_result('Contract', 'contracts', 'governance')
-            =search_result('Policy', 'policies', 'governance')
-            =search_result('Regulation', 'regulations', 'governance')
-          %h2.business Assets/Business
-          %ul.top-level
-            =search_result('Process', 'processes', 'business')
-            =search_result('System', 'systems', 'business')
-            =search_result('OrgGroup', 'org groups', 'business')
-            =search_result('Project', 'projects', 'business')
-            =search_result('Facility', 'facilities', 'business')
-            =search_result('Product', 'products', 'business')
-            =search_result('DataAsset', 'data assets', 'business')
-            =search_result('Market', 'markets', 'business')
-          %h2.risk Risk Management
-          %ul.top-level
-            =search_result('Risk', 'risks', 'risk')
-            =search_result('RiskyAttribute', 'risky attributes', 'risk')
-        .bar-h
-        -#.lhs-nav
-          -#%h2 My Work
-        -#.bar-h
-        .lhs-nav.recent
-          %h2 Recently Viewed
-          %ul.top-level
-            %li.risk
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-policy-color' }
-                User Agreement
-            %li.programs
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-program-color' }
-                PCI Compliance
-            %li.business
-              %a{ 'href': '#'}
-                %i{ 'class': 'grcicon-market-color' }
-                Southern China
-
-        .bar-h
+    #lhs.lhs.accordion
       .bar-v
-      .area
-        .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
-          .row-fluid
-            .span5
-              -block header
-            .span7
-              -block subheader_extras
-        %section.content{ 'data-spy': 'affix', 'data-offset-top': '25' }
-          .flash
-            -#FIXME: Flash messages
-            -#flash.each do |type, value|
-              -value = [value] unless value.is_a?(Array)
-              -value = value.map(:presence).compact
-              -if value.size > 0
-                %div{ 'class': type }
-                  %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                    &times;
-                  -value.each do |message|
-                    %p=message
-          -block main
+      -#NEW LHS
+      .lhs-search
+        %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
+      .lhs-bg
+      .lhs-nav.emphesized
+        %ul.top-level
+          =search_result('Program', 'programs', 'programs')   
+      .lhs-nav
+        %h2.governance Governance
+        %ul.top-level
+          =search_result('Control', 'controls', 'governance')
+          =search_result('Contract', 'contracts', 'governance')
+          =search_result('Policy', 'policies', 'governance')
+          =search_result('Regulation', 'regulations', 'governance')
+        %h2.business Assets/Business
+        %ul.top-level
+          =search_result('Process', 'processes', 'business')
+          =search_result('System', 'systems', 'business')
+          =search_result('OrgGroup', 'org groups', 'business')
+          =search_result('Project', 'projects', 'business')
+          =search_result('Facility', 'facilities', 'business')
+          =search_result('Product', 'products', 'business')
+          =search_result('DataAsset', 'data assets', 'business')
+          =search_result('Market', 'markets', 'business')
+        %h2.risk Risk Management
+        %ul.top-level
+          =search_result('Risk', 'risks', 'risk')
+          =search_result('RiskyAttribute', 'risky attributes', 'risk')
+      .bar-h
+      -#.lhs-nav
+        -#%h2 My Work
+      -#.bar-h
+      .lhs-nav.recent
+        %h2 Recently Viewed
+        %ul.top-level
+          %li.risk
+            %a{ 'href': '#'}
+              %i{ 'class': 'grcicon-policy-color' }
+              User Agreement
+          %li.programs
+            %a{ 'href': '#'}
+              %i{ 'class': 'grcicon-program-color' }
+              PCI Compliance
+          %li.business
+            %a{ 'href': '#'}
+              %i{ 'class': 'grcicon-market-color' }
+              Southern China
+
+      .bar-h
+    .area
+      .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
+        .row-fluid
+          .span5
+            -block header
+          .span7
+            -block subheader_extras
+      %section.content{ 'data-spy': 'affix', 'data-offset-top': '25' }
+        .flash
+          -#FIXME: Flash messages
+          -#flash.each do |type, value|
+            -value = [value] unless value.is_a?(Array)
+            -value = value.map(:presence).compact
+            -if value.size > 0
+              %div{ 'class': type }
+                %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                  &times;
+                -value.each do |message|
+                  %p=message
+        -block main
     %section.footer
       .container-fluid
         .row-fluid
