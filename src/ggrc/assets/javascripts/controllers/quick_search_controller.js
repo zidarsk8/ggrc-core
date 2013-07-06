@@ -73,6 +73,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
         view_data = new can.Observe({
           list: new model.List()
           , all_items: new model.List()
+          , filtered_items: new model.List()
           , observer: that.options.observer
           , tooltip_view : that.options.tooltip_view
           , model : model
@@ -82,6 +83,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
         $tab.data("model", model);
         model.findAll().done(function(data) {
           view_data.attr('all_items', data);
+          view_data.attr('filtered_items', data.slice(0));
           if($tab.is("li.active a")) {
             can.Observe.startBatch();
             if(that.options.limit != null) {
@@ -156,11 +158,19 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
     $tabs.each(function(i, tab) {
       var $tab = $(tab)
       , model = $tab.data("model")
-      , res = old_ids ? that.last_filter.getResultsFor(model) : null;
+      , res = old_ids ? that.last_filter.getResultsFor(model) : null
+      , view_data = $tab.data("view_data");
 
-      that.options.filterable_items_selector = $(get_attr($tab, that.options.tab_href_attr)).find("li:not(.view-more, .add-new)");
+      //that.options.filterable_items_selector = $(get_attr($tab, that.options.tab_href_attr)).find("li:not(.view-more, .add-new)");
       that.last_filter_ids = res = res ? can.unique(can.map(res, function(v) { return v.id; })) : null; //null is the show-all case
-      that._super();
+      if(res) {
+        view_data.filtered_items.replace(can.map(view_data.all_items, function(item) { return ~can.inArray(item.id, res) ? item : undefined; }));
+      } else {
+        view_data.filtered_items.replace(view_data.all_items.slice(0));
+      }
+      view_data.list.replace(that.options.limit ? view_data.filtered_items.slice(0, that.options.limit) : view_data.filtered_items);
+
+      //that._super();
       // res = can.map(res, function(obj, i) {
       //   var m = new model(obj);
       //   if(!m.selfLink) {
@@ -168,7 +178,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       //   }
       //   return m;
       // });
-      $tab.find(".item-count").html(res ? res.length : $tab.data("view_data").list.length);
+      $tab.find(".item-count").html(res ? res.length : $tab.data("view_data").filtered_items.length);
     });
   }
 
