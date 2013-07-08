@@ -194,16 +194,28 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       .attr("data-object-singular", singular.replace(" ", ""));
   }
 
-  , ".show-extended click" : function(el, ev) {
-    var $extended = el.closest(":has(.extended)").find(".extended:first")
+  , ".show-extended mouseover" : function(el, ev) {
+    var $allext = this.element.find(".extended, .show-extended")
+    , $extended = el.closest(":has(.extended)").find(".extended:first")
     , instance = el.closest("[data-model]").data("model") || el.closest(":data(model)").data("model");
 
-    if($extended.hasClass("in") && $extended.data("model") === instance) {
-      $extended.removeClass("in");
-    } else {
+    if(!$extended.hasClass("in")) {
+      $allext.removeClass("in");
       can.view(this.options.tooltip_view, instance, function(frag) {
-        $extended.html(frag).addClass("in").data("model", instance);
+        this.fade_in_timeout = setTimeout(function() {
+          $extended.html(frag).addClass("in").data("model", instance);
+          el.addClass("in");
+        }, 30);
       });
+    }
+  }
+
+  , ".show-extended, .extended mouseout" : function(el, ev) {
+    var $extended = this.element.find(".extended.in");
+    if(!$(ev.relatedTarget).is(".show-extended.in, .extended.in, .show-extended.in *, .extended.in *")) {
+      clearTimeout(this.fade_in_timeout);
+      el.removeClass("in");
+      $extended.removeClass("in");
     }
   }
 

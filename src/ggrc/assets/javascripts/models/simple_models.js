@@ -115,6 +115,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
       kind = GGRC.infer_object_type(attrs);
     } catch(e) {
       console.warn("infer_object_type threw an error on Directive stub (likely no 'kind')");
+      kind = CMS.Models.Directive;
     }
     var m = this.findInCacheById(attrs.directive.id);
     if(!m || m.constructor === CMS.Models.Directive) {
@@ -136,6 +137,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }
+  , meta_kinds : []
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
