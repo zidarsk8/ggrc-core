@@ -40,6 +40,13 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+@app.route("/admin")
+@login_required
+def admin():
+  """The dashboard page
+  """
+  return render_template("admin/index.haml")
+
 @app.route("/design")
 @login_required
 def styleguide():
@@ -91,6 +98,7 @@ def all_tooltip_views():
       'data_assets',
       'risky_attributes',
       'risks',
+      'people',
       ])
 
 def init_all_object_views(app):
