@@ -5,9 +5,9 @@
 -# Maintained By:
 -#
 
--macro tab(type, type_plural, path, li_class='', meta_kind='')
+-macro tab(type, type_plural, path, li_class='', meta_kind='', template='/static/mustache/dashboard/object_list.mustache')
   %li{ 'class': '{{ li_class }}' }
-    %a{ 'href': '##{ prefix }_{{ type_plural|underscore }}', 'data-tab-href': '{{ path }}', 'data-toggle': 'tab', 'data-template' : '/static/mustache/dashboard/object_list.mustache', 'data-object-singular' : "={type|nospace}", 'data-object-plural' : "={type_plural|lower|replace(\" \", \"_\")}" }
+    %a{ 'href': '##{ prefix }_{{ type_plural|underscore }}', 'data-tab-href': '{{ path }}', 'data-toggle': 'tab', 'data-template' : "={ template }", 'data-object-singular' : "={type|nospace}", 'data-object-plural' : "={type_plural|lower|replace(\" \", \"_\")}" }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
       %span{'class' : '={meta_kind}' } 
         {{ type_plural|title }}
