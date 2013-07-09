@@ -269,6 +269,9 @@ class Resource(ModelView):
           ))
     return None
 
+  def json_update(self, obj, src):
+    ggrc.builder.json.update(obj, src)
+
   def put(self, id):
     obj = self.get_object(id)
     if obj is None:
@@ -288,7 +291,7 @@ class Resource(ModelView):
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
       raise Forbidden()
-    ggrc.builder.json.update(obj, src)
+    self.json_update(obj, src)
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
@@ -333,6 +336,9 @@ class Resource(ModelView):
     return self.json_success_response(
       collection, self.collection_last_modified())
 
+  def json_create(self, obj, src):
+    ggrc.builder.json.create(obj, src)
+
   def collection_post(self):
     if self.request.headers['Content-Type'] != 'application/json':
       return current_app.make_response((
@@ -350,7 +356,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_create(
         self.model.__name__, src['context_id']):
       raise Forbidden()
-    ggrc.builder.json.create(obj, src)
+    self.json_create(obj, src)
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
@@ -410,9 +416,9 @@ class Resource(ModelView):
   def as_json(cls, obj, **kwargs):
     return as_json(obj, **kwargs)
 
-  def object_for_json(self, obj, model_name=None):
+  def object_for_json(self, obj, model_name=None, properties_to_include=None):
     model_name = model_name or self.model._inflector.table_singular
-    json_obj = ggrc.builder.json.publish(obj)
+    json_obj = ggrc.builder.json.publish(obj, properties_to_include or [])
     return { model_name: json_obj }
 
   def get_properties_to_include(self):

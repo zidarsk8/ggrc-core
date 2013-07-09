@@ -48,6 +48,9 @@ ggrc.views.init_all_object_views(app)
 from ggrc.fulltext import get_indexer
 ggrc.indexer = get_indexer()
 
+from ggrc.rbac import permissions
+permissions.get_permissions_provider()
+
 if settings.ENABLE_JASMINE:
   # Configure Flask-Jasmine, for dev mode unit testing
   from flask.ext.jasmine import Jasmine, Asset

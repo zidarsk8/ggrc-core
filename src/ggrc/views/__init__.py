@@ -102,6 +102,8 @@ def all_tooltip_views():
       ])
 
 def init_all_object_views(app):
+  import sys
+  from ggrc import settings
   from .common import BaseObjectView
 
   for k,v in all_object_views():
@@ -111,3 +113,11 @@ def init_all_object_views(app):
   for k,v in all_tooltip_views():
     TooltipView.add_to(
       app, '/{0}'.format(k), v, decorators=(login_required,))
+
+  if hasattr(settings, 'EXTENSIONS'):
+    for extension in settings.EXTENSIONS:
+      __import__(extension)
+      extension_module = sys.modules[extension]
+      if hasattr(extension_module, 'initialize_all_object_views'):
+        extension_module.initialize_all_object_views(app)
+
