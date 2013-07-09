@@ -3,7 +3,7 @@
     <div class="row-fluid">
       <div class="span8">
         <h2>
-          <i class="grcicon-{{object_type.toLowerCase}}"></i>
+          <i class="grcicon-{{object_type.toLowerCase}}-color"></i>
           {{object_display}}
           {{#if is_related}}
             related to {{parent_display}}
@@ -20,7 +20,7 @@
       <div class="span4">
         <div class="widget-action pull-right remove-widget" rel="tooltip" title="Remove">
           <a class="remove" href="javascript://">
-            <i class="grcicon-x-white"></i>
+            <i class="grcicon-x-grey"></i>
           </a>
         </div>
         <div class="widget-action pull-right widget-showhide" rel="tooltip" title="Expand / Collapse">
@@ -28,7 +28,7 @@
         </div>
         <div class="widget-action pull-right widget-action-help">
           <a data-placement="top" data-toggle="modal-ajax" href="/help/{{object_type}}_list" rel="tooltip" data-original-title="Help">
-            <i class="grcicon-help"></i>
+            <i class="grcicon-help-black"></i>
           </a>
         </div>
       </div>
