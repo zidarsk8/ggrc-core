@@ -13,6 +13,7 @@ class Event(Base, db.Model):
   resource_id = db.Column(db.Integer, nullable = False)
   resource_type = db.Column(db.String, nullable = False)
 
+  person = db.relationship('Person', primaryjoin='Event.modified_by_id == Person.id', foreign_keys='Event.modified_by_id')
   revisions = db.relationship('Revision', backref='event', lazy='subquery') # We always need the revisions
 
   _publish_attrs = [
@@ -20,5 +21,6 @@ class Event(Base, db.Model):
       'resource_id',
       'resource_type',
       'revisions',
+      'person',
   ]
 
