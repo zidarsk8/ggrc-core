@@ -13,13 +13,13 @@
 -block main
   #show_columns.row-fluid{ 'data-resize': "true" }
     #middle_column.widget-area
-      -with widget_class = 'business'
+      -with widget_class = 'governance'
         -include "directives/_main.haml"
       -if related_objects(instance)
-        -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+        -with widget_class = 'widget-tabs widget-tabs-horizontal related governance'
           -include 'shared/_related.haml'
-      -with widget_class = 'business'
+      -with widget_class = 'governance'
         -include 'base_objects/_info.haml'
-      -with widget_class = 'business'
+      -with widget_class = 'governance'
         -include 'base_objects/_more_info.haml'
       -include 'shared/_add_widget_section.haml'
