@@ -200,7 +200,8 @@ class UpdateAttrHandler(object):
     #  properties
     # rel_class = None
     # return cls.query_for(rel_class, json_obj, attr_name, True)
-    if attr_name in json_obj:
+    attr_value = json_obj.get(attr_name, None)
+    if attr_value:
       import ggrc.models
       rel_class_name = json_obj[attr_name]['type']
       rel_class = ggrc.models.get_model(rel_class_name)

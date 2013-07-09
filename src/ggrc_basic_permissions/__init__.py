@@ -3,7 +3,7 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from flask import Blueprint, render_template, session
+from flask import session
 from ggrc import db, settings
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
