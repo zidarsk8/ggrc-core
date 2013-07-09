@@ -393,7 +393,7 @@ class Resource(ModelView):
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
     if model_class:
-      service_class = type(model_class.__name__, (Resource,), {
+      service_class = type(model_class.__name__, (cls,), {
         '_model': model_class,
         })
       import ggrc.services
@@ -482,3 +482,12 @@ class Resource(ModelView):
     if args:
       return src.get(unicode(attr), *args)
     return src.get(unicode(attr))
+
+class ReadOnlyResource(Resource):
+  def dispatch_request(self, *args, **kwargs):
+    method = request.method
+
+    if method == 'GET':
+      return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
+    else:
+      raise NotImplementedError()
