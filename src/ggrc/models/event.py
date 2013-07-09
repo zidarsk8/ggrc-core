@@ -13,7 +13,7 @@ class Event(Base, db.Model):
   resource_id = db.Column(db.Integer, nullable = False)
   resource_type = db.Column(db.String, nullable = False)
 
-  revisions = db.relationship('Revision', backref='event', lazy='subquery') # We always need the revisions
+  revisions = db.relationship('Revision', backref='event')
 
   _publish_attrs = [
       'http_method',
@@ -22,3 +22,10 @@ class Event(Base, db.Model):
       'revisions',
   ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Event, cls).eager_query()
+    return query.options(
+        orm.subqueryload('revisions'))
