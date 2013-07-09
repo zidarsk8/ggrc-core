@@ -21,15 +21,15 @@
 
 -block header
   %h1{ 'class': "={ model_display_class }" }
-    .grcobject.business{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}" }
+    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}", 'class': "={ model_display_class }" }
       -if model_title == "Org Group"
         %i.grcicon-orggroup
       -elif model_title == "Market"
         %i.grcicon-market
       -elif model_title == "Facility"
         %i.grcicon-facility
-        -elif model_title == "Product"
-          %i.grcicon-product
+      -elif model_title == "Product"
+        %i.grcicon-product
       -elif model_title == "Project"
         %i.grcicon-project
       -elif model_title == "Data Asset"
@@ -37,6 +37,7 @@
       -else
         &nbsp;
     =instance.title
+
 -block subheader_extras
   %ul.actions.pull-right
     %li
