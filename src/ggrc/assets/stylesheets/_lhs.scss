@@ -291,6 +291,30 @@
         text-decoration:none;
       }
     }
+    &.business {
+      li.active {
+        a {
+          color:#fff;
+          background:$business;
+        }
+      }
+    }
+    &.governance {
+      li.active {
+        a {
+          color:#fff;
+          background:$governance;
+        }
+      }
+    }
+    &.risk {
+      li.active {
+        a {
+          color:#fff;
+          background:$risk;
+        }
+      }
+    }
   }
 }
 

@@ -11,15 +11,29 @@
         %span Edit ={instance.kind_singular}
 
 -block main
-  #show_columns.column-set{ 'data-resize': "true" }
-    #middle_column.widget-area
-      -with widget_class = 'governance'
-        -include "directives/_main.haml"
-      -if related_objects(instance)
-        -with widget_class = 'widget-tabs widget-tabs-horizontal related governance'
-          -include 'shared/_related.haml'
-      -with widget_class = 'governance'
-        -include 'base_objects/_info.haml'
-      -with widget_class = 'governance'
-        -include 'base_objects/_more_info.haml'
-      -include 'shared/_add_widget_section.haml'
+  .clearfix
+    .inner-nav
+      %ul{ 'class': "internav ={ model_display_class }" }
+        %li.active
+          %a{ 'href': '#' }
+            Something
+        %li
+          %a{ 'href': '#' }
+            Something 2
+        %li
+          %a{ 'href': '#' }
+            Something 3
+
+    .object-area
+      #show_columns.column-set{ 'data-resize': "true" }
+        #middle_column.widget-area
+          -with widget_class = 'governance'
+            -include "directives/_main.haml"
+          -if related_objects(instance)
+            -with widget_class = 'widget-tabs widget-tabs-horizontal related governance'
+              -include 'shared/_related.haml'
+          -with widget_class = 'governance'
+            -include 'base_objects/_info.haml'
+          -with widget_class = 'governance'
+            -include 'base_objects/_more_info.haml'
+          -include 'shared/_add_widget_section.haml'
