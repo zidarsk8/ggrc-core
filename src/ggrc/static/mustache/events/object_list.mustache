@@ -7,15 +7,13 @@
         <div class="span12">
           <div class="item-identifier">
             <span class="title">
-                {{#revisions}}
-                  <div>
-                  At {{created_at}}
-                  {{#modified_by}}
-                      User {{id}}
-                  {{/modified_by}}
-                    {{action}} {{resource_type}} {{resource_id}}
-                  </div>
-                {{/revisions}}
+              At {{created_at}}
+              {{#modified_by}}
+                {{name}}
+              {{/modified_by}}
+              {{#revisions}}
+                {{action}} {{resource_type}} {{resource_id}}
+              {{/revisions}}
             </span>
           </div>
         </div>
