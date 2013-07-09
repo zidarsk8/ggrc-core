@@ -1,0 +1,24 @@
+{{! dashboard object listing}}
+<ul class="tree-structure simple single-row-tabs">
+{{#list}}
+  <li data-model="true" {{data 'model'}} class="{{object_type}}">
+    <a href='javascript://'>
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="item-identifier">
+            <span class="title">
+              {{#modified_by}}
+                {{email}}
+              {{/modified_by}}
+              {{#revisions}}
+                {{action}} {{resource_type}} {{resource_id}}
+              {{/revisions}}
+              on {{created_at}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </li>
+{{/list}}
+</ul>

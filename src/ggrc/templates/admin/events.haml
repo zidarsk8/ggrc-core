@@ -1,0 +1,24 @@
+-extends "layouts/dashboard.haml"
+
+-block title
+  Admin Dashboard
+
+-block page_help
+  admin_events
+
+-block header
+  %ul.breadcrumbs
+    &nbsp;
+
+  %h1.dashboard-title
+    %i.grciconlarge-dashboard
+    Admin Dashboard
+
+-block main
+  .container-fluid
+    #columns.row-fluid{ 'data-resize': "true" }
+      #left-column.span6.widget-area
+        -with widget_class = 'widget-tabs'
+          -include 'admin/_events.haml'
+
+      #right_column.span6.widget-area

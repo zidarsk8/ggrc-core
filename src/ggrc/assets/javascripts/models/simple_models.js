@@ -633,6 +633,12 @@ can.Model.Cacheable("CMS.Models.Help", {
   , create : "POST /api/help"
 }, {});
 
+can.Model.Cacheable("CMS.Models.Event", {
+  root_object : "event"
+  , root_collection : "events"
+  , findAll : "GET /api/events?__include=revisions,modified_by"
+}, {});
+
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model = CMS.Models[object_type]
     , params = {}
