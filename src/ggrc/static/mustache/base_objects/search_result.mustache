@@ -1,0 +1,34 @@
+{{#list}}
+<li class="{{constructor.category}}" data-model="true" {{data 'model'}}>
+  <a href="{{viewLink}}" class="show-extended">
+    <div class="row-fluid">
+      <div class="span9">
+        <span class="lhs-item">
+          {{title}}
+        </span>
+      </div>
+      <div class="span1">
+        &nbsp;
+      </div>
+      <div class="span1">
+      {{^people}}
+        <i class="grcicon-people-warning"></i>
+      {{/people}}
+      </div>
+    </div>
+  </a>
+</li>
+{{/list}}
+{{^if_equals list.length filtered_items.length}}
+<li class="view-more">
+  <a href="javascript://">
+    view more
+    <i class="grcicon-down"></i>
+  </a>
+</li>
+{{/if_equals}}
+<li class="add-new">
+  <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" data-form-target="refresh" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" >
+    + add new
+  </a>
+</li>
