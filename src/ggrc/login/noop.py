@@ -33,6 +33,7 @@ def login():
   return redirect(get_next_url(request, default_url=url_for('dashboard')))
 
 def logout():
-  del session['permissions']
+  if 'permissions' in session:
+    del session['permissions']
   flask_login.logout_user()
   return redirect(get_next_url(request, default_url=url_for('index')))

@@ -71,6 +71,8 @@ class DefaultUserPermissions(UserPermissions):
     return self._is_allowed(Permission('delete', resource_type, context_id))
 
   def _get_contexts_for(self, action, resource_type):
+    # FIXME: (Security) When applicable, we should explicitly assert that no
+    #   permissions are expected (e.g. that every user has ADMIN_PERMISSION).
     if 'permissions' not in session:
       return None
     permissions = session['permissions']

@@ -7,13 +7,13 @@ import sys
 from ggrc import settings
 
 def get_extension_name(extension_setting, default):
-    extension_name = getattr(settings, extension_setting, default)
-    if extension_name is not None:
-      extension_name = extension_name if not callable(extension_name) else \
-          extension_name()
-    else:
-      extension_name = default
-    return extension_name
+  extension_name = getattr(settings, extension_setting, default)
+  if extension_name is not None:
+    extension_name = extension_name if not callable(extension_name) else \
+        extension_name()
+  else:
+    extension_name = default
+  return extension_name
 
 def get_extension_modules(modules=[]):
   if len(modules) == 0:
