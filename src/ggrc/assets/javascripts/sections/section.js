@@ -44,7 +44,7 @@ can.Model.Cacheable("CMS.Models.Section", {
       return new CMS.Models.ControlSection({
         section : section.stub()
         , control : params.control.stub()
-        , context_id : params.context_id
+        , context : { id : params.context_id }
       }).save();
     }
 
