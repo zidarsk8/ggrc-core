@@ -57,7 +57,9 @@ $(function() {
     } else {
       newAreaWidth = newAreaWidth - 200;
     };
+    var newObjectAreaWidth = newAreaWidth - 200;
     $(".area").css("width", newAreaWidth);
+    $(".object-area").css("width", newObjectAreaWidth);
   });
 
 });

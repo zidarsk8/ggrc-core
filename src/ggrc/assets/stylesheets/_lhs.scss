@@ -269,3 +269,32 @@
     cursor:move;
   };
 }
+
+
+// INNER NAV
+
+.inner-nav {
+  width:200px;
+  float:left;
+  ul.internav {
+    border-top:1px solid #ddd;
+    @include reset-list();
+    a {
+      display:block;
+      line-height:30px;
+      border-bottom:1px solid #eee;
+      padding-left:20px;
+      color:#777;
+      &:hover {
+        background:#444;
+        color:#fff;
+        text-decoration:none;
+      }
+    }
+  }
+}
+
+.object-area {
+  float:left;
+}
+
