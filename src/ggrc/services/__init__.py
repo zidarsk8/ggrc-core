@@ -5,21 +5,20 @@
 
 from collections import namedtuple
 from .common import *
+from .registry import service
 
 """All gGRC REST services."""
 
-ServiceEntry = namedtuple('ServiceEntry', 'name model_class service_class')
-
-def service(name, model_class, service_class=Resource):
-  return ServiceEntry(name, model_class, service_class)
 
 def all_collections():
   """The list of all gGRC collection services as a list of
   (url, ModelClass) tuples.
   """
   import ggrc.models.all_models as models
+  import sys
+  from ggrc import settings
 
-  return [
+  ret = [
     service('categorizations', models.Categorization),
     service('categories', models.Category),
     service('controls', models.Control),
@@ -60,6 +59,16 @@ def all_collections():
     service('system_controls', models.SystemControl),
     service('transactions', models.Transaction),
     ]
+
+  for extension in settings.EXTENSIONS:
+    __import__(extension)
+    extension_module = sys.modules[extension]
+    if hasattr(extension_module, 'all_collections'):
+      entries = extension_module.all_collections
+      if callable(entries):
+        entries = entries()
+      ret.extend(entries)
+  return ret
 
 def init_all_services(app):
   """Register all gGRC REST services with the Flask application ``app``."""

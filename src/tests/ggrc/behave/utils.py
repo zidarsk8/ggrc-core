@@ -4,10 +4,11 @@ Don't use ``@when``, ``@given``, etc. here, as it will raise
 ``behave.step_registry.AmbiguousStep``, since this module is included in
 multiple steps/*.py modules.
 """
+from __future__ import absolute_import
 
 import json
 import datetime
-from factories import factory_for
+from .factories import factory_for
 
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
@@ -33,10 +34,15 @@ def handle_example_resource(context, resource_type):
   resource_factory = factory_for(resource_type)
   context.example_resource = resource_factory()
 
-def handle_named_example_resource(context, resource_type, name, **kwargs):
+def handle_named_example_resource(
+    context, resource_type, example_name, **kwargs):
+  if type(resource_type) is str and '.' in resource_type:
+    import sys
+    __import__(resource_type)
+    resource_type = sys.modules[resource_type]
   resource_factory = factory_for(resource_type)
   example = Example(resource_type, resource_factory(**kwargs))
-  setattr(context, name, example)
+  setattr(context, example_name, example)
 
 def handle_get_resource_and_name_it(context, url, name):
   response = get_resource(context, url)
@@ -66,7 +72,6 @@ def put_resource(context, url, resource):
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
   data = json.dumps(resource.value, cls=DateTimeEncoder)
-  print 'data:', data
   response = requests.put(
       context.base_url+url,
       data=data,
@@ -163,10 +168,19 @@ class DateTimeEncoder(json.JSONEncoder):
     else:
       return super(DateTimeEncoder, self).default(obj)
 
+def resource_type_string(resource_type):
+  if type(resource_type) in [str,unicode]:
+    if '.' in resource_type:
+      return resource_type.split('.')[-1]
+    return resource_type
+  else:
+    return resource_type.__name__
+
 def get_resource_table_singular(resource_type):
   # This should match the implementation at
   #   ggrc.models.inflector:ModelInflector.underscore_from_camelcase
   import re
+  resource_type = resource_type_string(resource_type)
   s1 = re.sub(r'(.)([A-Z][a-z]+)', r'\1_\2', resource_type)
   return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
@@ -174,5 +188,6 @@ def get_service_endpoint_url(context, endpoint_name):
   """Return the URL for the `endpoint_name`. This assumes that there is a
   `service_description` in the `context` to ues to lookup the endpoint url.
   """
+  endpoint_name = resource_type_string(endpoint_name)
   return context.service_description.get(u'service_description')\
       .get(u'endpoints').get(unicode(endpoint_name)).get(u'href')

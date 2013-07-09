@@ -4,6 +4,5 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
 
-
-python -c "import ggrc.migrate; ggrc.migrate.upgradeall()"
+python -c "import ggrc.models; ggrc.models.drop_db(use_migrations=True)"
 

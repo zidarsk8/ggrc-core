@@ -37,6 +37,16 @@ for module_name in settings_modules.split(" "):
   filename = "{0}.py".format(module_name)
   fullpath = os.path.join(SETTINGS_DIR, filename)
 
+  if not os.path.exists(fullpath):
+    fullpath = "{0}.py".format(os.path.join(*module_name.split('.')))
+  if not os.path.exists(fullpath):
+    import imp
+    module_name_parts = module_name.split('.')
+    base_package = module_name_parts[0]
+    file, pathname, description = imp.find_module(base_package)
+    fullpath = "{0}/{1}.py".format(
+        pathname, os.path.join(*module_name_parts[1:]))
+
   try:
     execfile(fullpath)
   except Exception, e:

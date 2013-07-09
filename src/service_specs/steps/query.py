@@ -3,8 +3,10 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from .utils import \
-    get_resource, get_service_endpoint_url, handle_get_resource_and_name_it
+from behave import then, when
+from tests.ggrc.behave.utils import (
+    get_resource, get_service_endpoint_url, handle_get_resource_and_name_it,
+    )
 
 @when('Querying "{resource_type}" with "{querystring}"')
 def query_resource_collection(context, resource_type, querystring):
