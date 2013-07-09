@@ -21,7 +21,7 @@
     Dashboard
 
 -block main
-  #columns.row-fluid{ 'data-resize': "true" }
+  #columns.column-set{ 'data-resize': "true" }
     #left_column.widget-area
       -with widget_class = 'widget-tabs'
         -include 'dashboard/_governance.haml'
