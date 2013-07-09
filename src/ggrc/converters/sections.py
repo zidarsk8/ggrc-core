@@ -1,4 +1,3 @@
-from handlers import *
 from .base import *
 
 from ggrc.models import Directive, Section

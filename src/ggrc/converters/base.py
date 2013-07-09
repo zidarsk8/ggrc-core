@@ -116,10 +116,13 @@ class BaseConverter(object):
     for element in keys:
       missing_columns.remove(element)
 
+    print "HERE ARE THE MISSING COLUMNS:"
+    pprint(missing_columns)
+
     if len(missing_columns):
       missing_text = ", ".join([self.get_header_for_column(col) for col in missing_columns])
-      self.warnings.append("Missing column{plural}: {missing_text}".format(
-        plural='s' if len(missing_columns) > 1 else '', missing_text=missing_text))
+      self.warnings.append("Missing column{plural}: {missing}".format(
+        plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
 
     return keys
 
