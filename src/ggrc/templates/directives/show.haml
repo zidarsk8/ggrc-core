@@ -11,19 +11,16 @@
         %span Edit ={instance.kind_singular}
 
 -block main
-  .container-fluid
-    #show_columns.row-fluid{ 'data-resize': "true" }
-      #middle_column.span8.widget-area
-        -with widget_class = 'business'
-          -include "directives/_main.haml"
-        -if related_objects(instance)
-          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-            -include 'shared/_related.haml'
-        -include 'shared/_add_widget_section.haml'
-
-      #right_column.span4.widget-area
-        -with widget_class = 'business'
-          -include 'base_objects/_info.haml'
-        -with widget_class = 'business'
-          -include 'base_objects/_more_info.haml'
-        -include 'shared/_add_widget_section.haml'
+  #show_columns.row-fluid{ 'data-resize': "true" }
+    #middle_column.widget-area
+      -with widget_class = 'business'
+        -include "directives/_main.haml"
+      -if related_objects(instance)
+        -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+          -include 'shared/_related.haml'
+      -include 'shared/_add_widget_section.haml'
+      -with widget_class = 'business'
+        -include 'base_objects/_info.haml'
+      -with widget_class = 'business'
+        -include 'base_objects/_more_info.haml'
+      -include 'shared/_add_widget_section.haml'

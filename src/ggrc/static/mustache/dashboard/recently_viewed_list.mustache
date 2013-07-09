@@ -1,8 +1,16 @@
 {{#list}}
 <li class="{{model.category.toLowerCase}}">
+  
   <a href="{{viewLink}}">
-    <i class="grcicon-{{model.table_singular}}-color"></i>
-    {{title}}
+    <div class="row-fluid">
+      <div class="span11">
+        <div class="oneline">
+          <i class="grcicon-{{model.table_singular}}-color"></i>
+          {{title}}
+        </div>
+      </div>
+    </div>
   </a>
+
 </li>
 {{/list}}

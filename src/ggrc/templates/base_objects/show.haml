@@ -50,20 +50,19 @@
   %a.navbarplus.fltrt{ 'href': "url-for-new-#{model_name}", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect', 'data-modal-class': 'modal-wide'}
 
 -block main
-  .container-fluid
-    #show_columns.row-fluid{ 'data-resize': "true" }
-      #middle_column.span8.widget-area
-        -with widget_class = 'business'
-          -include 'base_objects/_main.haml'
-        -with widget_class = 'risk'
-          -include 'base_objects/_risks.haml'
-        -if related_objects(instance)
-          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-            -include 'shared/_related.haml'
-        -include 'shared/_add_widget_section.haml'
+  #show_columns.row-fluid{ 'data-resize': "true" }
+    #middle_column.span12.widget-area
+      -with widget_class = 'business'
+        -include 'base_objects/_main.haml'
+      -with widget_class = 'risk'
+        -include 'base_objects/_risks.haml'
+      -if related_objects(instance)
+        -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+          -include 'shared/_related.haml'
+      -include 'shared/_add_widget_section.haml'
+      -with widget_class = 'business'
+        -include 'base_objects/_info.haml'
+        -include 'base_objects/_more_info.haml'
+      -include 'shared/_add_widget_section.haml'
 
-      #right_column.span4.widget-area
-        -with widget_class = 'business'
-          -include 'base_objects/_info.haml'
-          -include 'base_objects/_more_info.haml'
-        -include 'shared/_add_widget_section.haml'
+
