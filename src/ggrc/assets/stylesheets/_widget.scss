@@ -621,7 +621,6 @@
 .widget-add-placeholder {
   background: $popOverHeaderBgnd;
   border: 1px solid $popOverHeaderBorder;
-  @include border-radius($default-border-radius);
   padding: 51px 0 49px 0;
   margin-bottom: 20px;
   text-align: center;

@@ -703,11 +703,11 @@ jQuery(function($) {
 
 // FIXME: mock script to set area's width
 jQuery(function($) {
-	var winSize = $(window).width();
-	var winHeight = $(window).height();
-	var areaSize = winSize - 240 -8 ; //bar = 8px
-	var areaHeight = winHeight - 30;
-	$(".area").css('width', areaSize);
-	// $(".lhs").css('height', areaHeight);
-	// $(".bar-v").css('height', areaHeight);
+  var winSize = $(window).width();
+  var winHeight = $(window).height();
+  var areaSize = winSize - 240 -8 ; //bar = 8px
+  var areaHeight = winHeight - 30;
+  $(".area").css('width', areaSize);
+  $(".lhs").css('height', areaHeight);
+  $(".bar-v").css('height', areaHeight);
 });

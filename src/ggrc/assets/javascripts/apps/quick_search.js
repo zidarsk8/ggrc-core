@@ -48,9 +48,16 @@ $(function() {
   //Then listen for new ones
   $(document.body).on("click", ".quick-search:not(:has(.cms_controllers_quick_search)), section.widget-tabs:not(:has(.cms_controllers_quick_search))", bindQuickSearch);
 
-
+  
   $(document.body).on("click", ".bar-v", function(ev) {
     $("#lhs").toggleClass("lhs-closed");
+    var newAreaWidth = $(".area").width();
+    if ($("#lhs").hasClass("lhs-closed")) {
+      newAreaWidth = newAreaWidth + 200;
+    } else {
+      newAreaWidth = newAreaWidth - 200;
+    };
+    $(".area").css("width", newAreaWidth);
   });
 
 });
