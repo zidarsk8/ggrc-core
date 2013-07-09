@@ -52,13 +52,19 @@ class ChangeTracked(object):
   updated_at = db.Column(
       db.DateTime,
       **updated_at_args())
+  @declared_attr
+  def modified_by(cls):
+    return db.relationship(
+        'Person',
+        primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
+        foreign_keys='{0}.modified_by_id'.format(cls.__name__))
   #TODO Add a transaction id, this will be handy for generating etags
   #and for tracking the changes made to several resources together.
   #transaction_id = db.Column(db.Integer)
 
   # REST properties
   _publish_attrs = [
-      #'modified_by_id' link to person??
+      'modified_by',
       'created_at',
       'updated_at',
       ]

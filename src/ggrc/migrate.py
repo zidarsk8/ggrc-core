@@ -138,7 +138,7 @@ def downgrade(
       as_sql=sql,
       tag=tag,
       )
-  
+
   if drop_versions_table:
     from ggrc.app import db
     db.session.execute('DROP TABLE {0}'.format(
@@ -150,8 +150,29 @@ def history(extension_module_name):
 def branches(extension_module_name):
   run_simple_command(extension_module_name, command.branches)
 
-def current(extension_module_name):
-  run_simple_command(extension_module_name, command.current)
+def current(extension_module_name, head_only=False):
+  pkg_env = ExtensionPackageEnv(extension_module_name)
+  config = pkg_env.config
+
+  script = ScriptDirectory.from_config(config)
+  def display_version(rev, context):
+      rev = script.get_revision(rev)
+
+      if head_only:
+          config.print_stdout("%s%s" % (
+              rev.revision if rev else None,
+              " (head)" if rev and rev.is_head else ""))
+
+      else:
+          config.print_stdout("Current revision for %s: %s",
+                              util.obfuscate_url_pw(
+                                  context.connection.engine.url),
+                              rev)
+      return []
+
+  pkg_env.run_env(
+      display_version,
+      )
 
 def stamp(extension_module_name, revision, sql=False, tag=None):
   pkg_env = ExtensionPackageEnv(extension_module_name)
@@ -197,7 +218,7 @@ def main(args):
   action = args[2]
   if action == 'upgrade':
     extension_module_name = args[1]
-    revision = args[2] if len(args) >= 3 else None
+    revision = args[3] if len(args) >= 4 else None
     upgrade(extension_module_name, revision)
   elif action == 'upgradeall':
     upgradeall()
@@ -206,7 +227,7 @@ def main(args):
     current(extension_module_name)
   elif action == 'downgrade':
     extension_module_name = args[1]
-    revision = args[2]
+    revision = args[3]
     downgrade(extension_module_name, revision)
   return 0
 
