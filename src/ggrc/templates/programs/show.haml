@@ -7,12 +7,7 @@
   .breadcrumbs-holder
     %ul.breadcrumbs
       %li
-        %a{ 'href': '={ url_for("dashboard") }' }
-          Dashboard
-      %li
-        %span
-          =instance.title
-
+        &nbsp;
   %h1.programs
     -if instance.company_controls
       .grcobject.governance{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Program" }
@@ -57,8 +52,6 @@
       -if instance.company_controls
         -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
           -include 'programs/_linked_programs.haml'
-      -else
-        -include 'shared/_add_widget_section.haml'
       -with widget_class = 'programs'
         -include 'programs/_info.haml'
       -if not instance.company_controls

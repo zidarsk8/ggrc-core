@@ -20,8 +20,8 @@
 
 -block header
   %ul.breadcrumbs
-    %li=link_to 'dashboard', dashboard_path
-    %li=instance.slug
+    %li
+      &nbsp;
 
   %h1.business
     .grcobject.business{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}" }
@@ -31,6 +31,8 @@
         %i.grcicon-market
       -elif model_title == "Facility"
         %i.grcicon-facility
+        -elif model_title == "Product"
+          %i.grcicon-product
       -elif model_title == "Project"
         %i.grcicon-project
       -elif model_title == "Data Asset"
@@ -38,7 +40,6 @@
       -else
         &nbsp;
     =instance.title
-
 -block subheader_extras
   %ul.actions.pull-right
     %li
@@ -59,10 +60,7 @@
       -if related_objects(instance)
         -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
           -include 'shared/_related.haml'
-      -include 'shared/_add_widget_section.haml'
       -with widget_class = 'business'
         -include 'base_objects/_info.haml'
         -include 'base_objects/_more_info.haml'
       -include 'shared/_add_widget_section.haml'
-
-
