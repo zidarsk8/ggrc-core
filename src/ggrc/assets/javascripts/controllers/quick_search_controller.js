@@ -139,7 +139,8 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
               })
     , view_data = $tab.data("view_data");
 
-    view_data.list.replace(view_data.all_items);
+    //show twice as many items each time.
+    view_data.list.replace(view_data.filtered_items.slice(0, view_data.list.length * 2));
   }
 
 

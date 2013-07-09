@@ -17,6 +17,9 @@ $(function() {
 
     var $qs = $(this).uniqueId();
     var obs = new can.Observe();
+    if($qs.find("ul.tree-structure").length) {
+      return;
+    }
     $qs.bind("keypress", "input.widgetsearch", function(ev) {
       if(ev.which === 13)
         obs.attr("value", $(ev.target).val());

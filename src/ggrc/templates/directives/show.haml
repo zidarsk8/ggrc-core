@@ -11,7 +11,7 @@
         %span Edit ={instance.kind_singular}
 
 -block main
-  #show_columns.row-fluid{ 'data-resize': "true" }
+  #show_columns.column-set{ 'data-resize': "true" }
     #middle_column.widget-area
       -with widget_class = 'governance'
         -include "directives/_main.haml"
