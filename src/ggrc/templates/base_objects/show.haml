@@ -8,6 +8,7 @@
 -set model = controller.model
 -set model_title = model._inflector.title_singular
 -set model_name = model._inflector.table_singular
+-set model_display_class = model|display_class
 
 -block title
   =instance.title
@@ -19,7 +20,7 @@
   GGRC.page_object = ={ instance_json()|safe };
 
 -block header
-  %h1.business
+  %h1{ 'class': "={ model_display_class }" }
     .grcobject.business{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}" }
       -if model_title == "Org Group"
         %i.grcicon-orggroup
@@ -63,14 +64,14 @@
     .object-area
       #show_columns.column-set{ 'data-resize': "true" }
         #middle_column.span12.widget-area
-          -with widget_class = 'business'
+          -with widget_class = model_display_class
             -include 'base_objects/_main.haml'
           -with widget_class = 'risk'
             -include 'base_objects/_risks.haml'
           -if related_objects(instance)
-            -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+            -with widget_class = 'widget-tabs widget-tabs-horizontal related ' + model_display_class
               -include 'shared/_related.haml'
-          -with widget_class = 'business'
+          -with widget_class = model_display_class
             -include 'base_objects/_info.haml'
             -include 'base_objects/_more_info.haml'
           -include 'shared/_add_widget_section.haml'
