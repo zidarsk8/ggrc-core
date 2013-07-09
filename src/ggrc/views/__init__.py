@@ -40,10 +40,17 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+@app.route("/admin/events")
+@login_required
+def admin_events():
+  """The page showing events and revisions
+  """
+  return render_template("admin/events.haml")
+
 @app.route("/admin")
 @login_required
 def admin():
-  """The dashboard page
+  """The admin dashboard page
   """
   return render_template("admin/index.haml")
 
@@ -99,6 +106,7 @@ def all_tooltip_views():
       'risky_attributes',
       'risks',
       'people',
+      'events',
       ])
 
 def init_all_object_views(app):
