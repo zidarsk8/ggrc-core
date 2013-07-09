@@ -21,18 +21,14 @@
     Dashboard
 
 -block main
-  .container-fluid
-    #columns.row-fluid{ 'data-resize': "true" }
-      #left_column.span6.widget-area
-        -with widget_class = 'widget-tabs'
-          -include 'dashboard/_governance.haml'
-          -include 'dashboard/_business_objects.haml'
-        -include 'shared/_add_widget_section.haml'
-
-      #right_column.span6.widget-area
-        -with widget_class = 'widget-tabs'
-          -include 'dashboard/_programs.haml'
-          -#FIXME: Restrict 'risk' visibility
-          -#  e.g., if current_user.can_manage_risk()
-          -include 'dashboard/_risk.haml'
-        -include 'shared/_add_widget_section.haml'
+  #columns.row-fluid{ 'data-resize': "true" }
+    #left_column.widget-area
+      -with widget_class = 'widget-tabs'
+        -include 'dashboard/_governance.haml'
+        -include 'dashboard/_business_objects.haml'
+        -include 'dashboard/_programs.haml'
+        -#FIXME: Restrict 'risk' visibility
+        -#  e.g., if current_user.can_manage_risk()
+        -include 'dashboard/_risk.haml'
+      -include 'shared/_add_widget_section.haml'
+    -#right_column

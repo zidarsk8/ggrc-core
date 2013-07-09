@@ -2,13 +2,12 @@
 
 .bs-docs-sidenav {
   background-color: $white;
-  @include border-radius();
   margin: 0;
   padding: 0;
   width: 220px;
   &.affix {
     position: fixed;
-    top: 85px;
+    top: 66px;
   }
   &.affix-bottom {
     bottom: 270px;
@@ -26,16 +25,6 @@
         .icon-chevron-right {
           @include opacity(0.5);
         }
-      }
-    }
-    &:first-child {
-      a {
-        @include border-radius(4px 4px 0 0);
-      }
-    }
-    &:last-child {
-      a {
-        @include border-radius(0 0 4px 4px);
       }
     }
   }

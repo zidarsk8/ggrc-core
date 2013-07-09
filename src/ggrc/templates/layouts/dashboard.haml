@@ -13,6 +13,19 @@
       {{ type }}
 -endmacro
 
+-macro search_result(type, type_plural, li_class='')
+  %li{ 'class': ['{{ li_class }}', 'accordion-group'] }
+    %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-toggle' : "collapse", 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
+      %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
+      {{ type_plural|title }}
+      %small
+        (
+        %span.item-count> ...
+        )
+    .extended.fade
+    %ul.sub-level.collapse{ 'id' : '={ type_plural|underscore }_sub_level'}
+-endmacro
+
 -block page_help scoped
 
 -block body
@@ -37,7 +50,7 @@
                   -else
                     Google GRC
               %ul.menu
-                %li.quick-search
+                -#%li.quick-search
                   .quick-search-holder
                     %button{'type':'submit'}
                       %i.grcicon-search-white
@@ -132,35 +145,69 @@
                       %a{'href': '#', 'tabindex': "-1"}
                         %i.grcicon-normal
                         Narrow
+    -block subheader_plus
 
-      .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
-        .container-fluid
+    .clearfix
+      #lhs.lhs.accordion
+        .bar-v
+        -#NEW LHS
+        .lhs-search
+          %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
+        .lhs-bg
+        .lhs-nav.emphesized
+          %ul.top-level
+            =search_result('Program', 'programs', 'programs')   
+        .lhs-nav
+          %h2.governance Governance
+          %ul.top-level
+            =search_result('Control', 'controls', 'governance')
+            =search_result('Contract', 'contracts', 'governance')
+            =search_result('Policy', 'policies', 'governance')
+            =search_result('Regulation', 'regulations', 'governance')
+          %h2.business Assets/Business
+          %ul.top-level
+            =search_result('Process', 'processes', 'business')
+            =search_result('System', 'systems', 'business')
+            =search_result('OrgGroup', 'org groups', 'business')
+            =search_result('Project', 'projects', 'business')
+            =search_result('Facility', 'facilities', 'business')
+            =search_result('Product', 'products', 'business')
+            =search_result('DataAsset', 'data assets', 'business')
+            =search_result('Market', 'markets', 'business')
+          %h2.risk Risk Management
+          %ul.top-level
+            =search_result('Risk', 'risks', 'risk')
+            =search_result('RiskyAttribute', 'risky attributes', 'risk')
+        .bar-h
+        -#.lhs-nav
+          -#%h2 My Work
+        -#.bar-h
+        .lhs-nav.recent
+          %h2 Recently Viewed
+          %ul.top-level
+
+        .bar-h
+      .area
+        .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
           .row-fluid
             .span5
               -block header
             .span7
               -block subheader_extras
-
-    -block subheader_plus
-
-    %section.content{ 'data-spy': 'affix', 'data-offset-top': '25' }
-      .container-fluid
-        .flash
-          -#FIXME: Flash messages
-          -#flash.each do |type, value|
-            -value = [value] unless value.is_a?(Array)
-            -value = value.map(:presence).compact
-            -if value.size > 0
-              %div{ 'class': type }
-                %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                  &times;
-
-                -value.each do |message|
-                  %p=message
-      -block main
-
-    %section.footer
-      .container-fluid
+        %section.content
+          .flash
+            -#FIXME: Flash messages
+            -#flash.each do |type, value|
+              -value = [value] unless value.is_a?(Array)
+              -value = value.map(:presence).compact
+              -if value.size > 0
+                %div{ 'class': type }
+                  %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                    &times;
+                  -value.each do |message|
+                    %p=message
+          -block main
+      %section.footer
         .row-fluid
           .span12
             %ul.bottom-nav.pull-left

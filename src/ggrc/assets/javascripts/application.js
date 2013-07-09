@@ -147,12 +147,20 @@ jQuery.extend(GGRC, {
         subtree;
     }
 
-    return can.reduce(Object.keys(data), function(a, b) {
-      return a || resolve(decision_tree[b], data[b]);
-    }, null);
+    if(!data) {
+      return null;
+    } else {
+      return can.reduce(Object.keys(data), function(a, b) {
+        return a || resolve(decision_tree[b], data[b]);
+      }, null);
+    }
   }
   , make_model_instance : function(data) {
-    return GGRC.infer_object_type(data).model($.extend({}, data));
+    if(!data) {
+      return null;
+    } else {
+      return GGRC.infer_object_type(data).model($.extend({}, data));
+    }
   }
 
   , queue_event : function(event) {
