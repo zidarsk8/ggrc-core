@@ -16,7 +16,10 @@ Feature: Role CRUD
           "update": ["Program","Control"],
           "delete": ["Control"]
           },
-        "context_id": 0
+        "context": {
+          "id": 1,
+          "type": "Context"
+        }
       }
       """
     Then POST of "role" to its collection is allowed
@@ -41,7 +44,10 @@ Feature: Role CRUD
           "update": ["Program","Control"],
           "delete": ["Control"]
           },
-        "context_id": 0
+        "context": {
+          "id": 1,
+          "type": "Context"
+        }
       }
       """
     And "role" is POSTed to its collection
@@ -60,7 +66,7 @@ Feature: Role CRUD
         "email": "example.user2@example.com",
         "name": "Jayne User",
         "permissions": {
-          "read": { "Role": [0] }
+          "read": { "Role": [1] }
         }
       }
       """
@@ -85,7 +91,10 @@ Feature: Role CRUD
           "update": ["Role","UserRole"],
           "delete": ["Role","UserRole"]
           },
-        "context_id": 0
+        "context": {
+          "id": 1,
+          "type": "Context"
+        }
       }
       """
     And "role" is POSTed to its collection
@@ -98,7 +107,11 @@ Feature: Role CRUD
           "type": "Role"
         },
         "user_email": "another.admin@example.com",
-        "target_context_id": 0
+        "target_context_id": 1,
+        "context": {
+          "id": 1,
+          "type": "Context"
+        }
       }
       """
     And "user_role" is POSTed to its collection
@@ -118,7 +131,10 @@ Feature: Role CRUD
           "update": ["Section","Directive"],
           "delete": ["Section","Directive"]
           },
-        "context_id": 0
+        "context": {
+          "id": 1,
+          "type": "Context"
+        }
       }
       """
     Then POST of "role2" to its collection is allowed

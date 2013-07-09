@@ -114,9 +114,15 @@ class Timeboxed(object):
   _publish_attrs = ['start_date', 'end_date']
 
 class ContextRBAC(object):
-  context_id = db.Column(db.Integer)
+  @declared_attr
+  def context_id(self):
+    return db.Column(db.Integer, db.ForeignKey('contexts.id'))
 
-  _publish_attrs = ['context_id']
+  @declared_attr
+  def context(self):
+    return db.relationship('Context', uselist=False)
+
+  _publish_attrs = ['context']
 
 class Base(Identifiable, ChangeTracked, ContextRBAC):
   """Several of the models use the same mixins. This class covers that common

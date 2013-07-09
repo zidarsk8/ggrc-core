@@ -35,14 +35,14 @@ def handle_example_resource(context, resource_type):
   context.example_resource = resource_factory()
 
 def handle_named_example_resource(
-    context, resource_type, example_name, **kwargs):
+    step_context, resource_type, example_name, **kwargs):
   if type(resource_type) is str and '.' in resource_type:
     import sys
     __import__(resource_type)
     resource_type = sys.modules[resource_type]
   resource_factory = factory_for(resource_type)
   example = Example(resource_type, resource_factory(**kwargs))
-  setattr(context, example_name, example)
+  setattr(step_context, example_name, example)
 
 def handle_get_resource_and_name_it(context, url, name):
   response = get_resource(context, url)
@@ -191,3 +191,11 @@ def get_service_endpoint_url(context, endpoint_name):
   endpoint_name = resource_type_string(endpoint_name)
   return context.service_description.get(u'service_description')\
       .get(u'endpoints').get(unicode(endpoint_name)).get(u'href')
+
+def handle_template_text(context, src):
+  if '{{' in src:
+    from jinja2 import Template
+    template = Template(src)
+    return template.render(context=context)
+  return src
+
