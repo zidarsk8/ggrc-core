@@ -31,7 +31,7 @@
 -block body
   -# FIXME: Fix page_type_attributes, etc
   -#{ page_type_attributes, :class => "#{has_feature?(:BETA) ? 'BETA' : ''}" }
-  %body{ 'data-target': '.bs-docs-sidebar', 'data-spy': 'scroll' }
+  %body{ 'data-target': '.inner-nav', 'data-spy': 'scroll' }
 
     %header.header.main
       .header-bar
@@ -148,47 +148,48 @@
     -block subheader_plus
 
     .clearfix
-      #lhs.lhs.accordion
-        .bar-v
-        -#NEW LHS
-        .lhs-search
-          %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
-        .lhs-bg
-        .lhs-nav.emphesized
-          %ul.top-level
-            =search_result('Program', 'programs', 'programs')   
-        .lhs-nav
-          %h2.governance Governance
-          %ul.top-level
-            =search_result('Control', 'controls', 'governance')
-            =search_result('Contract', 'contracts', 'governance')
-            =search_result('Policy', 'policies', 'governance')
-            =search_result('Regulation', 'regulations', 'governance')
-          %h2.business Assets/Business
-          %ul.top-level
-            =search_result('Process', 'processes', 'business')
-            =search_result('System', 'systems', 'business')
-            =search_result('OrgGroup', 'org groups', 'business')
-            =search_result('Project', 'projects', 'business')
-            =search_result('Facility', 'facilities', 'business')
-            =search_result('Product', 'products', 'business')
-            =search_result('DataAsset', 'data assets', 'business')
-            =search_result('Market', 'markets', 'business')
-          %h2.risk Risk Management
-          %ul.top-level
-            =search_result('Risk', 'risks', 'risk')
-            =search_result('RiskyAttribute', 'risky attributes', 'risk')
-        .bar-h
-        -#.lhs-nav
-          -#%h2 My Work
-        -#.bar-h
-        .lhs-nav.recent
-          %h2 Recently Viewed
-          %ul.top-level
+      .lhs-holder
+        #lhs.lhs.accordion
+          .bar-v
+          -#NEW LHS
+          .lhs-search
+            %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
+          .lhs-bg
+          .lhs-nav.emphesized
+            %ul.top-level
+              =search_result('Program', 'programs', 'programs')   
+          .lhs-nav
+            %h2.governance Governance
+            %ul.top-level
+              =search_result('Control', 'controls', 'governance')
+              =search_result('Contract', 'contracts', 'governance')
+              =search_result('Policy', 'policies', 'governance')
+              =search_result('Regulation', 'regulations', 'governance')
+            %h2.business Assets/Business
+            %ul.top-level
+              =search_result('Process', 'processes', 'business')
+              =search_result('System', 'systems', 'business')
+              =search_result('OrgGroup', 'org groups', 'business')
+              =search_result('Project', 'projects', 'business')
+              =search_result('Facility', 'facilities', 'business')
+              =search_result('Product', 'products', 'business')
+              =search_result('DataAsset', 'data assets', 'business')
+              =search_result('Market', 'markets', 'business')
+            %h2.risk Risk Management
+            %ul.top-level
+              =search_result('Risk', 'risks', 'risk')
+              =search_result('RiskyAttribute', 'risky attributes', 'risk')
+          .bar-h
+          -#.lhs-nav
+            -#%h2 My Work
+          -#.bar-h
+          .lhs-nav.recent
+            %h2 Recently Viewed
+            %ul.top-level
 
-        .bar-h
+          .bar-h
       .area
-        .header-content{ 'data-spy': 'affix', 'data-offset-top': '25' }
+        .header-content{ 'data-spy': 'affix', 'data-offset-top': '1' }
           .row-fluid
             .span5
               -block header

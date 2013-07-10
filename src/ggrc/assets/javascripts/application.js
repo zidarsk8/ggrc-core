@@ -650,6 +650,16 @@ $(window).load(function(){
     , handle : "header, .header"
     , items : ".widget"
   });
+  
+  
+  // affix setup
+  $(window).scroll(function(){
+    if($('.header-content').hasClass('affix')) {
+      $('.header-content').next('.content').addClass('affixed');
+    } else {
+      $('.header-content').next('.content').removeClass('affixed');
+    }
+  });
 
 });
 

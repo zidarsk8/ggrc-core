@@ -4,11 +4,22 @@
 	float:left;
 }
 
+.lhs-holder {
+  min-height:100px;
+  float:left;
+}
+
 .lhs {
   position:relative;
   width:240px;
   margin-right: 8px;
   @include gradient-horizontal(#fff,#e1e1e1);
+  &.affix {
+    position: fixed;
+    top: 30px;
+    z-index: 900;
+    height:100%;
+  }
   .lhs-bg {
     margin-top:5px;
     display:none;
@@ -276,9 +287,17 @@
 .inner-nav {
   width:200px;
   float:left;
+  min-height:600px;
   ul.internav {
     border-top:1px solid #ddd;
     @include reset-list();
+    &.affix {
+      position: fixed;
+      top: 76px;
+      z-index: 900;
+      width:200px;
+      height:100%;
+    }
     a {
       display:block;
       line-height:30px;
@@ -289,6 +308,9 @@
         background:#444;
         color:#fff;
         text-decoration:none;
+      }
+      span {
+        font-size:11px;
       }
     }
     &.business {

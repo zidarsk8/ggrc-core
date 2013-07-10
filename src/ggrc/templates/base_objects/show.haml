@@ -55,16 +55,33 @@
 -block main
   .clearfix
     .inner-nav
-      %ul{ 'class': "internav ={ model_display_class }" }
+      %ul{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
         %li.active
           %a{ 'href': '#' }
-            Something
+            Object
+            %span
+              (5)
         %li
           %a{ 'href': '#' }
-            Something 2
+            Risks
+            %span
+              (2)
         %li
           %a{ 'href': '#' }
-            Something 3
+            Related to Object
+            %span
+              (8)
+        %li
+          %a{ 'href': '#' }
+            References
+            %span (2),
+            People
+            %span (5)
+        %li
+          %a{ 'href': '#' }
+            Object Info
+            %span
+              (4)
 
     .object-area
       #show_columns.column-set{ 'data-resize': "true" }

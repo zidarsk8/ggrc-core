@@ -543,3 +543,10 @@ span.no-data {
 .container-fluid {
   padding:0;
 }
+
+// affixed fixes
+.content {
+  &.affixed {
+    margin-top:46px;
+  }
+}

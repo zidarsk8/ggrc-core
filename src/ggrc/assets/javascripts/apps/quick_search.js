@@ -55,12 +55,16 @@ $(function() {
   $(document.body).on("click", ".bar-v", function(ev) {
     $("#lhs").toggleClass("lhs-closed");
     var newAreaWidth = $(".area").width();
+    var affixValue = 248;
     if ($("#lhs").hasClass("lhs-closed")) {
       newAreaWidth = newAreaWidth + 200;
+      affixValue = 48;
     } else {
       newAreaWidth = newAreaWidth - 200;
+      affixValue = 248;
     };
     var newObjectAreaWidth = newAreaWidth - 200;
+    $(".header-content").css('left', affixValue);
     $(".area").css("width", newAreaWidth);
     $(".object-area").css("width", newObjectAreaWidth);
   });
