@@ -1,7 +1,7 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
-# Maintained By: david@reciprocitylabs.com
+# Maintained By: vraj@reciprocitylabs.com
 
 from collections import namedtuple
 from .common import *
@@ -31,6 +31,7 @@ def all_collections():
     service('data_assets', models.DataAsset),
     service('directives', models.Directive),
     service('documents', models.Document),
+    service('events', models.Event, ReadOnlyResource),
     service('facilities', models.Facility),
     service('help', models.Help),
     service('markets', models.Market),
@@ -49,6 +50,7 @@ def all_collections():
     service('relationships', models.Relationship),
     service('requests', models.Request),
     service('responses', models.Response),
+    service('revisions', models.Revision, ReadOnlyResource),
     service('risks', models.Risk),
     service('risky_attributes', models.RiskyAttribute),
     service('risk_risky_attributes', models.RiskRiskyAttribute),
@@ -71,7 +73,6 @@ def all_collections():
 
 def init_all_services(app):
   """Register all gGRC REST services with the Flask application ``app``."""
-  #from .common import Resource
   from ggrc.login import login_required
 
   for entry in all_collections():
