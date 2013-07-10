@@ -48,7 +48,7 @@ window.onerror = function(message, url, linenumber) {
   $.ajax({
     type : "post"
     , url : "/api/log_events"
-    , dataType : "json"
+    , dataType : "text"
     , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
   });
 };
