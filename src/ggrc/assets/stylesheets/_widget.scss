@@ -159,6 +159,7 @@
   }
   .header {
     background:$lightGray;
+    border-bottom:1px solid darken($lightGray, 10%);
     @include transition(background-color 0.2s);
     color:$text;
     height: 30px;

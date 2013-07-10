@@ -69,6 +69,9 @@ $(function() {
     $(".object-area").css("width", newObjectAreaWidth);
   });
 
+  $(document.body).on("click", ".top-level li.accordion-group a", function(ev) {
+    $(this).toggleClass("active");
+  });
 });
 
 })(this, jQuery);

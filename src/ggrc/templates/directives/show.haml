@@ -3,6 +3,19 @@
 -block page_help scoped
   =instance.kind|underscore
 
+-block header
+  %h1{ 'class': "={ model_display_class }" }
+    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}", 'class': "={ model_display_class }" }
+      -if instance.kind_singular == "Contract"
+        %i.grcicon-contract
+      -elif instance.kind_singular == "Policy"
+        %i.grcicon-policy
+      -elif instance.kind_singular == "Regulation"
+        %i.grcicon-regulation
+      -else
+        &nbsp;
+    =instance.title
+
 -block subheader_extras
   %ul.actions.pull-right
     %li

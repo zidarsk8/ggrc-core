@@ -337,6 +337,15 @@
         }
       }
     }
+    &.program {
+      li.active {
+        a {
+          color:#fff;
+          background:$programs;
+        }
+      }
+    }
+
   }
 }
 

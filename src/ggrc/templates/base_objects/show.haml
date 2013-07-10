@@ -28,6 +28,8 @@
         %i.grcicon-market
       -elif model_title == "Risk"
         %i.grcicon-risk
+      -elif model_title == "Control"
+        %i.grcicon-control
       -elif model_title == "Risky Attribute"
         %i.grcicon-riskyattribute
       -elif model_title == "Facility"
@@ -58,9 +60,7 @@
       %ul{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
         %li.active
           %a{ 'href': '#' }
-            Object
-            %span
-              (5)
+            =model_title
         %li
           %a{ 'href': '#' }
             Risks
