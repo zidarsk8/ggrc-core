@@ -28,6 +28,10 @@ class Identifiable(object):
 
   _inflector = ModelInflectorDescriptor()
 
+  @classmethod
+  def eager_query(cls):
+    return db.session.query(cls)
+
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
   return {'default': db.text('current_timestamp'),}
@@ -69,6 +73,14 @@ class ChangeTracked(object):
       'updated_at',
       ]
   _update_attrs = []
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ChangeTracked, cls).eager_query()
+    return query.options(
+        orm.subqueryload('modified_by'))
 
 class Described(object):
   description = db.Column(db.Text)
@@ -120,18 +132,20 @@ class Timeboxed(object):
   _publish_attrs = ['start_date', 'end_date']
 
 class ContextRBAC(object):
-  context_id = db.Column(db.Integer)
+  @declared_attr
+  def context_id(self):
+    return db.Column(db.Integer, db.ForeignKey('contexts.id'))
 
-  _publish_attrs = ['context_id']
+  @declared_attr
+  def context(self):
+    return db.relationship('Context', uselist=False)
 
-class Base(Identifiable, ChangeTracked, ContextRBAC):
+  _publish_attrs = ['context']
+
+class Base(ChangeTracked, Identifiable, ContextRBAC):
   """Several of the models use the same mixins. This class covers that common
   case.
   """
-
-  @classmethod
-  def eager_query(cls):
-    return db.session.query(cls)
 
   def to_json(self):
     d = {}

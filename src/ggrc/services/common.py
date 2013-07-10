@@ -291,6 +291,10 @@ class Resource(ModelView):
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
       raise Forbidden()
+    new_context = self.get_context_id_from_json(src)
+    if new_context != obj.context_id \
+        and not permissions.is_allowed_update(self.model.__name__, new_context):
+      raise Forbidden()
     self.json_update(obj, src)
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
@@ -339,6 +343,12 @@ class Resource(ModelView):
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
 
+  def get_context_id_from_json(self, src):
+    context = src.get('context', None)
+    if context:
+      return context.get('id', None)
+    return None
+
   def collection_post(self):
     if self.request.headers['Content-Type'] != 'application/json':
       return current_app.make_response((
@@ -351,13 +361,12 @@ class Resource(ModelView):
     except KeyError, e:
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
-    if 'context_id' not in src:
-      raise BadRequest('context_id MUST be specified.')
+    if 'context' not in src:
+      raise BadRequest('context MUST be specified.')
     if not permissions.is_allowed_create(
-        self.model.__name__, src['context_id']):
+        self.model.__name__, self.get_context_id_from_json(src)):
       raise Forbidden()
     self.json_create(obj, src)
-    #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     db.session.flush() # this ensures that id is available for logging

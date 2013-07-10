@@ -13,6 +13,7 @@ from tests.ggrc.behave.utils import (
     handle_get_resource_and_name_it,
     handle_post_named_example_to_collection_endpoint,
     handle_post_named_example, post_example, handle_get_example_resource,
+    handle_template_text,
     )
 
 def get_json_response(context):
@@ -26,12 +27,7 @@ def example_resource(context, resource_type):
 
 @given('a new "{resource_type}" named "{example_name}" is created from json')
 def named_example_from_json(context, resource_type, example_name):
-  if '{{' in context.text:
-    from jinja2 import Template
-    template = Template(context.text)
-    text = template.render(context=context)
-  else:
-    text = context.text
+  text = handle_template_text(context, context.text)
   json_obj = json.loads(text)
   handle_named_example_resource(
       context, resource_type, example_name, **json_obj)
@@ -45,6 +41,11 @@ def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
   handle_post_named_example_to_collection_endpoint(
       context, name, expected_status)
+
+@given('"{name}" is in context "{context_id}"')
+def set_context_id_for(context, name, context_id):
+  example = getattr(context, name)
+  example.set('context', {'id': int(context_id)})
 
 @given('HTTP POST of "{name}" to "{url}"')
 def simple_post_of_named(context, name, url):
@@ -133,6 +134,7 @@ def define_current_user_from_pystring(context):
 @given('current user is "{user_json}"')
 def define_current_user(context, user_json):
   import requests
+  user_json = handle_template_text(context, user_json)
   if hasattr(context, 'current_user_json'):
     # logout current user
     response = requests.get(

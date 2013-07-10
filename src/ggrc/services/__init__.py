@@ -21,6 +21,7 @@ def all_collections():
   ret = [
     service('categorizations', models.Categorization),
     service('categories', models.Category),
+    service('contexts', models.Context),
     service('controls', models.Control),
     service('control_assessments', models.ControlAssessment),
     service('control_controls', models.ControlControl),
