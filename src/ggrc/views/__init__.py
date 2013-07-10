@@ -68,15 +68,18 @@ def testRender():
   """ create route to test rendering of HAMLs for directives
   """
   converter = SectionsConverter.start_import("/vagrant/extras/Import_Test-Regulations_Legal.csv")
-  results = converter.final_results
-  print "HERE ARE THE RESULTS: "
-  pprint(results)
-  print "HERE ARE THE ERRORS: "
-  pprint(converter.errors)
-  print "HERE ARE THE WARNINGS: "
-  pprint(converter.warnings)
-  dummy_data = results
-  return render_template("directives/import_result_errors.haml",dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+  if converter.import_exception is None:
+    results = converter.final_results
+    print "HERE ARE THE RESULTS: "
+    pprint(results)
+    print "HERE ARE THE ERRORS: "
+    pprint(converter.errors)
+    print "HERE ARE THE WARNINGS: "
+    pprint(converter.warnings)
+    dummy_data = results
+    return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+  else:
+    return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
 
 @app.route("/directives/{id}/import_sections")
 def import_sections(id):

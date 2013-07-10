@@ -10,4 +10,8 @@ def prepare_slug(slug):
   return re.sub(r'\r|\n'," ", slug.strip()).upper()
 
 class ImportException(Exception):
-  pass
+  def __init__(self, message):
+    self.message = message
+
+  def __repr__(self):
+    return self.message if self.message else "Could not import: verify the file is correctly formatted."

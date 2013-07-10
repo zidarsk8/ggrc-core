@@ -1,8 +1,6 @@
 import csv
 from .common import *
 
-
-
 class BaseConverter(object):
 
   def __init__(self, rows_or_objects, **options):
@@ -16,6 +14,7 @@ class BaseConverter(object):
     self.warnings = []
     self.slugs = []
     self.final_results = []
+    self.import_exception = None
 
   def results(self):
     return self.objects
@@ -73,7 +72,7 @@ class BaseConverter(object):
   def import_metadata(self):
     if len(self.rows) < 5:
       self.errors.append("There must be at least 5 input lines")
-      raise ImportException # Should be caught by handle_csv_import
+      raise ImportException("Could not import: there must be at least 5 input lines") # Should be caught by handle_csv_import
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
     print '{:-^40}'.format(' METADATA HEADERS ')
     pprint(headers)
@@ -91,7 +90,8 @@ class BaseConverter(object):
 
   def get_header_for_column(self, column_name):
     for header in self.object_map:
-      return header if self.object_map[header] == column_name else ''
+      if self.object_map[header] == column_name:
+        return header
 
   def read_headers(self, import_map, row):
     ignored_colums = []
@@ -118,6 +118,7 @@ class BaseConverter(object):
 
     print "HERE ARE THE MISSING COLUMNS:"
     pprint(missing_columns)
+    print ""
 
     if len(missing_columns):
       missing_text = ", ".join([self.get_header_for_column(col) for col in missing_columns])
@@ -134,32 +135,34 @@ class BaseConverter(object):
     return not len(string) or string.isspace()
 
   def do_import(self, dry_run = True):
-    print '\n{:-^40}'.format(' IMPORTING ')
-    self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0))
-    print '{:-^40}'.format(' OBJECT HEADERS: ')
-    pprint(object_headers)
-    row_attrs = self.read_objects(object_headers, self.rows)
-    print '{:-^40}'.format(' WARNINGS: ')
-    pprint(self.warnings)
-    print '{:-^40}'.format(' ROW ATTRIBUTES ')
-    pprint(row_attrs)
+    try:
+      print '\n{:-^40}'.format(' IMPORTING ')
+      self.import_metadata()
+      object_headers = self.read_headers(self.object_map, self.rows.pop(0))
+      print '{:-^40}'.format(' OBJECT HEADERS: ')
+      pprint(object_headers)
+      row_attrs = self.read_objects(object_headers, self.rows)
+      print '{:-^40}'.format(' WARNINGS: ')
+      pprint(self.warnings)
+      print '{:-^40}'.format(' ROW ATTRIBUTES ')
+      pprint(row_attrs)
 
+      for index, row_attrs in enumerate(row_attrs):
+        row = self.row_converter(self, row_attrs, index)
+        row.setup()
+        self.final_results.append(row.reify())
+        self.objects.append(row)
 
+      if not dry_run:
+        pass # TODO: Add save here
 
-    for index, row_attrs in enumerate(row_attrs):
-      row = self.row_converter(self, row_attrs, index)
-      row.setup()
-      self.final_results.append(row.reify())
-      self.objects.append(row)
+      print '{:-^40}'.format(' END OF IMPORT ')
+      return self
 
-
-
-    if not dry_run:
-      pass # TODO: Add save here
-
-    print '{:-^40}'.format(' END OF IMPORT ')
-    return self
+    except ImportException as e:
+      print "EXCEPTION: " + str(e)
+      self.import_exception = e
+      return self
 
 
   def read_objects(self, headers, rows):

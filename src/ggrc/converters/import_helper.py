@@ -11,6 +11,7 @@ def handle_csv_import(converter_class, filepath, **options):
   # TODO: Add preview check here. Defaulting to preview for now.
   return converter.do_import()
 
+
 # This will force utf-8 encoding in order to yield appropriate data
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
   # csv.py doesn't do Unicode; encode temporarily as UTF-8:

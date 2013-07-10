@@ -10,7 +10,7 @@
 -block errors_and_table
   .row-fluid
     #sampleData.span12
-      {% if all_errors|length > 0 %}
+      {% if all_errors %}
         {% for i in all_errors %}
           %p.label-error
             {{all_errors[loop.index0]}}
