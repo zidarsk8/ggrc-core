@@ -1,0 +1,28 @@
+-extends "base_objects/show.haml"
+
+-block main
+  .clearfix
+    .inner-nav
+      %ul{ 'class': "internav ={ model_display_class }" }
+        %li.active
+          %a{ 'href': '#' }
+            Something
+        %li
+          %a{ 'href': '#' }
+            Something 2
+        %li
+          %a{ 'href': '#' }
+            Something 3
+
+    .object-area
+      #show_columns.column-set{ 'data-resize': "true" }
+        #middle_column.widget-area
+          -with widget_class = model_display_class
+            -include 'base_objects/_main.haml'
+          -if related_objects(instance)
+            -with widget_class = 'widget-tabs widget-tabs-horizontal related ' + model_display_class
+              -include 'shared/_related.haml'
+          -with widget_class = model_display_class
+            -include 'base_objects/_info.haml'
+            -include 'base_objects/_more_info.haml'
+          -include 'shared/_add_widget_section.haml'
