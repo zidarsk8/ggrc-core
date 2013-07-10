@@ -11,7 +11,10 @@
                 {{email}}
               {{/modified_by}}
               {{#revisions}}
-                {{action}} {{resource_type}} {{resource_id}}
+                {{action}} {{resource_type}}(#{{resource_id}})
+                {{#content}}
+                  {{firstnonempty title name}}
+                {{/content}}
               {{/revisions}}
               on {{created_at}}
             </span>
