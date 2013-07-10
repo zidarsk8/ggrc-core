@@ -399,7 +399,7 @@ jQuery(document).ready(function($) {
   };
 
   // Listeners for initial mouseovers for stick-hover
-  $('body').on('mouseover', 'a[data-popover-trigger="sticky-hover"]', function(e) {
+  $('body').on('mouseover', '[data-popover-trigger="sticky-hover"]', function(e) {
     // If popover instance doesn't exist already, create it and
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {

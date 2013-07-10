@@ -9,6 +9,16 @@
 -block widget_title
   People
 
+-block widget_buttons
+  .filter
+    .row-fluid
+      .span8
+        %input.ui-corner-all.widgetsearch.clear-value{type : 'text', placeholder : 'Search'}
+      .span4
+        %a.btn.btn-add.pull-right{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': 'Person', 'data-object-plural': 'people' }
+          %i.grcicon-add
+          %span.object-type Person
+
 -set quick_result = quick_result if quick_result is defined else None
 -set prefix = "qf" if quick_result else "dash"
 -set tabbable_id = '' if quick_result is defined else 'quick_find'
