@@ -1,14 +1,14 @@
 """Add context model
 
 Revision ID: 201c3f33e44c
-Revises: 2a59bef8c738
+Revises: 26641df89c2c
 Create Date: 2013-07-09 12:21:54.312795
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '201c3f33e44c'
-down_revision = '2a59bef8c738'
+down_revision = '26641df89c2c'
 
 from alembic import op
 from sqlalchemy.sql import table, column
@@ -92,6 +92,8 @@ def upgrade():
       context_id = 1,
       ))
   for t in all_tables:
+    op.execute(
+      'UPDATE {table_name} SET context_id = NULL'.format(table_name=t))
     op.create_foreign_key(
         'fk_{0}_contexts'.format(t),
         t,

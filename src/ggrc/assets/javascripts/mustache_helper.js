@@ -595,8 +595,8 @@ Mustache.registerHelper("all", function(type, options) {
 
 Mustache.registerHelper("handle_context", function() {
   return [
-    "<input type='hidden' name='context.href' value='" + this.attr('context_href') + "' />",
-    "<input type='hidden' name='context.id' value='" + this.attr('context_id') + "' numeric />"
+    "<input type='hidden' name='context.href' value='" + this.attr('context.href') + "' />",
+    "<input type='hidden' name='context.id' value='" + this.attr('context.id') + "' numeric />"
     ].join("\n");
 });
 
