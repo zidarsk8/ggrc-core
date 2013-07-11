@@ -323,7 +323,7 @@ class Resource(ModelView):
         ).first()
     if not context:
       context = Context(
-          name='Personal Context for {0}'.current_user_id,
+          name='Personal Context for {0}'.format(current_user_id),
           description='',
           context_id=1,
           related_object_id=current_user_id,
