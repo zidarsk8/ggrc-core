@@ -6,7 +6,7 @@
 import json
 from flask import request, current_app
 from ggrc.fulltext import get_indexer
-from .common import DateTimeEncoder
+from ggrc.utils import DateTimeEncoder
 from .util import url_for
 
 def search():

@@ -5,21 +5,7 @@
 
 from ggrc import db
 from .mixins import Base
-import json
-
-import sqlalchemy.types as types
-
-class JsonType(types.TypeDecorator):
-  '''
-  Converts stored JSON strings into a Python object
-  on reads
-  '''
-
-  impl = types.Text
-
-  def process_result_value(self, value, dialect):
-    return json.loads(value)
-
+from .types import JsonType
 
 class Revision(Base, db.Model):
   __tablename__ = 'revisions'
