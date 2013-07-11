@@ -295,8 +295,7 @@ class Resource(ModelView):
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     obj = self.get_object(id)
     get_indexer().update_record(fts_record_for(obj))
@@ -314,8 +313,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().delete_record(self.url_for(id=id))
     return self.json_success_response(
@@ -361,14 +359,13 @@ class Resource(ModelView):
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     db.session.flush() # this ensures that id is available for logging
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().create_record(fts_record_for(obj))
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
 
-  def create_event(self, obj):
+  def log_event(self, session, obj):
     verb_to_action = {
       'POST': 'created',
       'PUT': 'modified',
@@ -388,7 +385,7 @@ class Resource(ModelView):
       action = verb_to_action[http_method],
       content = as_json(obj.to_json(), sort_keys = True))
     event.revisions.append(revision)
-    return event
+    session.add(event)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
