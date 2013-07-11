@@ -126,6 +126,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "role" : CMS.Models.Role
     };
 
     function resolve_by_key(subtree, data) {

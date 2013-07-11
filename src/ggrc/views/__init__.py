@@ -88,6 +88,7 @@ def all_object_views():
       'risks',
       'people',
       'pbc_lists',
+      'roles',
       ])
 
 def all_tooltip_views():

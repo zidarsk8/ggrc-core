@@ -639,6 +639,27 @@ can.Model.Cacheable("CMS.Models.Event", {
   , findAll : "GET /api/events?__include=revisions,modified_by"
 }, {});
 
+can.Model.Cacheable("CMS.Models.Role", {
+  root_object : "role"
+  , root_collection : "roles"
+  , findAll : "GET /api/roles"
+  , update : "PUT /api/roles/{id}"
+  , create : "POST /api/roles"
+}, {});
+
+CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
+  var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
+  return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+}
+
+can.Model.Cacheable("CMS.Models.UserRole", {
+  root_object : "user_role"
+  , root_collection : "user_roles"
+  , findAll : "GET /api/user_roles"
+  , update : "PUT /api/user_roles/{id}"
+  , create : "POST /api/user_roles"
+}, {});
+
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model = CMS.Models[object_type]
     , params = {}
