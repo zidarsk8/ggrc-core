@@ -5,6 +5,7 @@
 
 from flask import session
 from ggrc import db, settings
+from ggrc.models.context import Context
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from .models import Role, UserRole
@@ -41,6 +42,14 @@ class CompletePermissionsProvider(object):
           for resource_type in resource_types:
             permissions.setdefault(action, {}).setdefault(resource_type, [])\
                 .append(user_role.target_context_id)
+      #grab personal context
+      personal_context = db.session.query(Context).filter(
+          Context.related_object_id == user.id,
+          Context.related_object_type == 'Person',
+          ).one()
+      permissions['__GGRC_ADMIN__'] = {
+          '__GGRC_ALL__': [personal_context.id,],
+          }
     else:
       permissions = {}
     session['permissions'] = permissions

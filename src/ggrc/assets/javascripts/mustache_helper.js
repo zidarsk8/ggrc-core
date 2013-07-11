@@ -630,3 +630,14 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
   ].join("");
 });
 
+Mustache.registerHelper("private_program", function(modal_title) {
+  return modal_title.indexOf("New ") !=0 ? '' : [
+    '<div class="span6">'
+    , '<label>'
+    , 'Private'
+    , '</label>'
+    , '<input class="input-block-level" name="private" value="private" type="checkbox">'
+    , '</div>'
+  ].join("");
+});
+

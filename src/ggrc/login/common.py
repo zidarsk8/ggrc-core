@@ -2,6 +2,7 @@
 """
 
 from ggrc import db
+from ggrc.models.context import Context
 from ggrc.models.person import Person
 
 def find_user_by_id(id):
@@ -17,6 +18,14 @@ def find_user_by_email(email):
 def create_user(email, **kwargs):
   user = Person(email=email, **kwargs)
   db.session.add(user)
+  db.session.commit()
+  user_context = Context(
+      name='Personal Context for {0}'.format(email),
+      description='',
+      related=user,
+      context_id=1,
+      )
+  db.session.add(user_context)
   db.session.commit()
   return user
 

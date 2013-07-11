@@ -3,9 +3,11 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from ggrc.rbac import permissions
 from ggrc.services.common import ModelView, as_json
 import ggrc.builder
 from flask import request, render_template, current_app
+from werkzeug.exceptions import Forbidden
 
 
 class BaseObjectView(ModelView):
@@ -53,6 +55,8 @@ class BaseObjectView(ModelView):
        'text/html' not in self.request.headers['Accept']:
       return current_app.make_response((
         'text/html', 406, [('Content-Type', 'text/plain')]))
+    if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+      raise Forbidden()
 
     rendered_template = self.render_template_for_object(obj)
 
