@@ -51,7 +51,17 @@ can.Control("CMS.Controllers.SortableWidgets", {
         }
       }
       $widget.appendTo(that.element);
+      //add this widget to the inner nav list
+      $("<li>")
+      .append(
+        $("<a>")
+        .attr("href", "#" + $widget.attr("id"))
+        .text($widget.find(".header").text()))
+      .appendTo(".inner-nav .internav");
     });
+    setTimeout(function() {
+      $(document.body).scrollTop(0).scrollspy().scrollspy("refresh");
+    }, 10);
     if(firstchild) {
       firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
     }
