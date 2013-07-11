@@ -58,8 +58,6 @@ $(APPENGINE_PACKAGES_DIR) : $(APPENGINE_ENV_DIR)
 		pip install --no-deps -r "$(APPENGINE_REQUIREMENTS_TXT)" --target "$(APPENGINE_PACKAGES_DIR)"
 	cd "$(APPENGINE_PACKAGES_DIR)/webassets"; \
 		patch -p3 < "${PREFIX}/extras/webassets__fix_builtin_filter_loading.diff"
-	cd "$(APPENGINE_PACKAGES_DIR)/sqlalchemy"; \
-		patch -p3 < "${PREFIX}/extras/sqlalchemy__fix_gaerdbms_exceptions.diff"
 
 appengine_packages : $(APPENGINE_PACKAGES_DIR)
 
