@@ -242,6 +242,18 @@
     font-weight:normal;
     padding-left:10px;
   }
+  &.recent {
+    ul.top-level {
+      a {
+        font-size:12px;
+        color:#333;
+        &:hover {
+         background:#fff;
+         text-decoration:underline;
+        }
+      }
+    }
+  }
 }
 
 .bar-h {
