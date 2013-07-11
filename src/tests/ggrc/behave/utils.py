@@ -6,6 +6,7 @@ multiple steps/*.py modules.
 """
 from __future__ import absolute_import
 
+from ggrc.utils import as_json
 import json
 import datetime
 from .factories import factory_for
@@ -71,7 +72,7 @@ def put_resource(context, url, resource):
       }
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
-  data = json.dumps(resource.value, cls=DateTimeEncoder)
+  data = as_json(resource.value)
   response = requests.put(
       context.base_url+url,
       data=data,
@@ -117,10 +118,8 @@ def post_example(context, resource_type, example, url):
   #For **some** reason, I can't import this at the module level in a steps file
   import requests
   headers = {'Content-Type': 'application/json',}
-  data = json.dumps(
-      {get_resource_table_singular(resource_type): example},
-      cls=DateTimeEncoder,
-      )
+  data = as_json(
+      {get_resource_table_singular(resource_type): example})
   response = requests.post(
       context.base_url+url,
       data=data,
@@ -149,24 +148,6 @@ def post_example(context, resource_type, example, url):
         )
   context.cookies = response.cookies
   return response
-
-class DateTimeEncoder(json.JSONEncoder):
-  """Custom JSON Encoder to handle datetime objects
-
-  from:
-     `http://stackoverflow.com/questions/12122007/python-json-encoder-to-support-datetime`_
-  also consider:
-     `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
-  """
-  def default(self, obj):
-    if isinstance(obj, datetime.datetime):
-      return obj.isoformat('T')
-    elif isinstance(obj, datetime.date):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.timedelta):
-      return (datetime.datetime.min + obj).time().isoformat('T')
-    else:
-      return super(DateTimeEncoder, self).default(obj)
 
 def resource_type_string(resource_type):
   if type(resource_type) in [str,unicode]:

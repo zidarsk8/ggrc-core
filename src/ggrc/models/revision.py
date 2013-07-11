@@ -5,6 +5,7 @@
 
 from ggrc import db
 from .mixins import Base
+from .types import JsonType
 
 class Revision(Base, db.Model):
   __tablename__ = 'revisions'
@@ -13,7 +14,7 @@ class Revision(Base, db.Model):
   resource_type = db.Column(db.String, nullable = False)
   event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable = False)
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'), nullable = False)
-  content = db.Column(db.Text, nullable=False)
+  content = db.Column(JsonType, nullable=False)
 
   _publish_attrs = [
       'resource_id',

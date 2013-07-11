@@ -6,11 +6,11 @@
 import datetime
 import ggrc.builder.json
 import hashlib
-import json
 import time
 from flask import url_for, request, current_app
 from flask.views import View
 from ggrc import db
+from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
@@ -26,42 +26,9 @@ from .attribute_query import AttributeQueryBuilder
 resources.
 """
 
-class DateTimeEncoder(json.JSONEncoder):
-  """Custom JSON Encoder to handle datetime objects
-
-  from:
-     `http://stackoverflow.com/questions/12122007/python-json-encoder-to-support-datetime`_
-  also consider:
-     `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
-  """
-  def default(self, obj):
-    if isinstance(obj, datetime.datetime):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.date):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.timedelta):
-      return (datetime.datetime.min + obj).time().isoformat()
-    else:
-      return super(DateTimeEncoder, self).default(obj)
-
-class UnicodeSafeJsonWrapper(dict):
-  """JSON received via POST has keys as unicode. This makes get work with plain
-  `str` keys.
-  """
-  def __getitem__(self, key):
-    ret = self.get(key)
-    if ret is None:
-      raise KeyError(key)
-    return ret
-
-  def get(self, key, default=None):
-    return super(UnicodeSafeJsonWrapper, self).get(unicode(key), default)
 
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
-
-def as_json(obj, **kwargs):
-  return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
 
 class ModelView(View):
   pk = 'id'
@@ -299,8 +266,7 @@ class Resource(ModelView):
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     obj = self.get_object(id)
     get_indexer().update_record(fts_record_for(obj))
@@ -318,8 +284,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().delete_record(self.url_for(id=id))
     return self.json_success_response(
@@ -370,14 +335,13 @@ class Resource(ModelView):
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     db.session.flush() # this ensures that id is available for logging
-    event = self.create_event(obj)
-    db.session.add(event)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().create_record(fts_record_for(obj))
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
 
-  def create_event(self, obj):
+  def log_event(self, session, obj):
     verb_to_action = {
       'POST': 'created',
       'PUT': 'modified',
@@ -395,9 +359,9 @@ class Resource(ModelView):
       modified_by_id = get_current_user_id(),
       resource_type = str(obj.__class__.__name__),
       action = verb_to_action[http_method],
-      content = as_json(obj.to_json(), sort_keys = True))
+      content = obj.to_json())
     event.revisions.append(revision)
-    return event
+    session.add(event)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
