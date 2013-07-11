@@ -617,3 +617,16 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     return options.inverse(options.contexts);
   }
 });
+
+Mustache.registerHelper("role_checkbox", function(role, model, operation) {
+  return [
+    '<input type="checkbox" name="permissions."'
+    , operation
+    , '" value="'
+    , model.model_singular
+    , '"'
+    , role.allowed(operation, model) ? ' checked="checked"' : ''
+    , '>'
+  ].join("");
+});
+
