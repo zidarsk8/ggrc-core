@@ -71,12 +71,6 @@ def testRender():
   converter = SectionsConverter.start_import("/vagrant/extras/Import_Test-Regulations_Legal.csv")
   if converter.import_exception is None:
     results = converter.final_results
-    print "HERE ARE THE RESULTS: "
-    pprint(results)
-    print "HERE ARE THE ERRORS: "
-    pprint(converter.errors)
-    print "HERE ARE THE WARNINGS: "
-    pprint(converter.warnings)
     return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=results, all_warnings=converter.warnings, all_errors=converter.errors)
   else:
     return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
@@ -94,23 +88,14 @@ def import_sections(directive_id):
     csv_file = request.files['file']
     if csv_file and allowed_file(csv_file.filename):
       filename = secure_filename(csv_file.filename)
-      print "HERE IS THE FILENAME: " + filename
-      print "ATTEMPTING TO PROCESS: "
       converter = SectionsConverter.start_import(csv_file)
       if converter.import_exception is None:
         results = converter.final_results
-        print "HERE ARE THE RESULTS: "
-        pprint(results)
-        print "HERE ARE THE ERRORS: "
-        pprint(converter.errors)
-        print "HERE ARE THE WARNINGS: "
-        pprint(converter.warnings)
         dummy_data = results
-        return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+        return render_template("directives/import.haml",directive_id = directive_id, converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
       else:
-        return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
+        return render_template("directives/import.haml", exception_message = str(converter.import_exception))
 
-  print "{}: Here is the id: {}".format(request.method, str(directive_id))
   return render_template("directives/import.haml")
 
 def _all_views(view_list):

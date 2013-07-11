@@ -13,8 +13,8 @@
         %a{ 'href': '={ url_for("dashboard") }' }
           Dashboard
       %li
-        %a{ 'href': '={ url_for("dashboard") }' }
-          Random Directive
+        %a{ 'href': '/directives/={directive_id}' }
+          Directive
       %li import
 
   %h1.dashboard-title
@@ -26,4 +26,6 @@
     #columns.row-fluid{ 'data-resize': "true" }
       #left_column.span6.widget-area
     -include 'directives/_import.haml'
-          
+    {% if converter is defined %}
+      -include 'directives/import_result_errors.haml' 
+    {% endif %}

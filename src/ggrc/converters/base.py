@@ -15,6 +15,7 @@ class BaseConverter(object):
     self.slugs = []
     self.final_results = []
     self.import_exception = None
+    self.import_slug = None
 
   def results(self):
     return self.objects
@@ -58,27 +59,17 @@ class BaseConverter(object):
       if obj.has_warnings(): return True
    return False
 
-  # Currently bypassing this method because python makes it easy to send the
-  # list of lists (rows) to from_rows
-  @classmethod
-  def from_string(cls, csv_string, option = None):
-    print 'Method call: (from_string) for class: {0}'.format(cls.__name__)
-
   @classmethod
   def from_rows(cls, rows, **options):
-    print 'Attempting to create a: ' + cls.__name__ + ' object from rows!'
     return cls(rows, **options)
 
   def import_metadata(self):
     if len(self.rows) < 5:
       self.errors.append("There must be at least 5 input lines")
-      raise ImportException("Could not import: there must be at least 5 input lines") # Should be caught by handle_csv_import
+      raise ImportException("Import Error: There must be at least 5 input lines")
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
-    print '{:-^40}'.format(' METADATA HEADERS ')
-    pprint(headers)
     values = self.read_values(headers, self.rows.pop(0))
-    print '{:-^40}'.format(' METADATA VALUES ')
-    pprint(values)
+    self.import_slug = values.get('slug')
     self.rows.pop(0)
     self.rows.pop(0)
     # TODO: Implement validation (absent in rails version as well?)
@@ -116,10 +107,6 @@ class BaseConverter(object):
     for element in keys:
       missing_columns.remove(element)
 
-    print "HERE ARE THE MISSING COLUMNS:"
-    pprint(missing_columns)
-    print ""
-
     if len(missing_columns):
       missing_text = ", ".join([self.get_header_for_column(col) for col in missing_columns])
       self.warnings.append("Missing column{plural}: {missing}".format(
@@ -136,16 +123,9 @@ class BaseConverter(object):
 
   def do_import(self, dry_run = True):
     try:
-      print '\n{:-^40}'.format(' IMPORTING ')
       self.import_metadata()
       object_headers = self.read_headers(self.object_map, self.rows.pop(0))
-      print '{:-^40}'.format(' OBJECT HEADERS: ')
-      pprint(object_headers)
       row_attrs = self.read_objects(object_headers, self.rows)
-      print '{:-^40}'.format(' WARNINGS: ')
-      pprint(self.warnings)
-      print '{:-^40}'.format(' ROW ATTRIBUTES ')
-      pprint(row_attrs)
 
       for index, row_attrs in enumerate(row_attrs):
         row = self.row_converter(self, row_attrs, index)
@@ -156,11 +136,9 @@ class BaseConverter(object):
       if not dry_run:
         pass # TODO: Add save here
 
-      print '{:-^40}'.format(' END OF IMPORT ')
       return self
 
     except ImportException as e:
-      print "EXCEPTION: " + str(e)
       self.import_exception = e
       return self
 

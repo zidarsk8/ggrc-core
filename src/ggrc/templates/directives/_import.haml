@@ -32,8 +32,9 @@
           %input{"value":"Upload and Review","class":'btn btn-primary',"type":'submit'}
           %a{href:"/help/sections_import",target:'_blank',class:"import-help",'data-toggle':'modal-ajax'}
             View Help
+    {% if exception_message is defined %}
+      -include 'directives/import_errors.haml'
+    {% endif %}
 
 
-
--block widget_footer
 

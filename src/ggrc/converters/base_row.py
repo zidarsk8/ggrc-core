@@ -52,7 +52,6 @@ class BaseRowConverter(object):
     return any(warnings) or any([val.warnings for val in self.handlers.values()])
 
   def setup(self):
-    print '{}"s row converter is starting the setup()!'.format(self.__class__.__name__)
     pass
 
   #FIXME: changed_attributes on rails side needs to be converted

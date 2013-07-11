@@ -7,7 +7,8 @@
   .span6
     %h4
       {% if exception_message is defined %}
-        {{ exception_message }}
+        %b
+          {{ exception_message }}
       {% else %}
         =default_message
       {% endif %}

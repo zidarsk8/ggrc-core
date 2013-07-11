@@ -20,7 +20,6 @@ class SectionRowConverter(BaseRowConverter):
       obj.directive = self.importer.options.get('directive')
 
   def reify(self):
-    print 'reifying...'
     self.handle('slug', SlugColumnHandler)
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
