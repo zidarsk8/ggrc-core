@@ -26,7 +26,7 @@
 -block main
   .clearfix
     .inner-nav
-      %ul{ 'class': "internav ={ model_display_class }" }
+      %ul{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
         %li.active
           %a{ 'href': '#' }
             Something
