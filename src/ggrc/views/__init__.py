@@ -9,7 +9,8 @@ from .relationships import RelatedObjectResults
 from . import filters
 from ggrc.converters.sections import SectionsConverter
 from pprint import pprint
-
+from flask import request, redirect, url_for
+from werkzeug import secure_filename
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
@@ -76,19 +77,41 @@ def testRender():
     pprint(converter.errors)
     print "HERE ARE THE WARNINGS: "
     pprint(converter.warnings)
-    dummy_data = results
-    return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+    return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=results, all_warnings=converter.warnings, all_errors=converter.errors)
   else:
     return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
 
-@app.route("/directives/{id}/import_sections")
-def import_sections(id):
-  #file = flask.uploaded_file[0]
-  #if file:
-  #  converter = blah
-  #else:
-  #
-  pass
+
+
+def allowed_file(filename):
+  return filename.rsplit('.',1)[1] == 'csv'
+
+
+@app.route("/directives/<directive_id>/import_sections", methods=['GET', 'POST'])
+def import_sections(directive_id):
+
+  if request.method == 'POST':
+    csv_file = request.files['file']
+    if csv_file and allowed_file(csv_file.filename):
+      filename = secure_filename(csv_file.filename)
+      print "HERE IS THE FILENAME: " + filename
+      print "ATTEMPTING TO PROCESS: "
+      converter = SectionsConverter.start_import(csv_file)
+      if converter.import_exception is None:
+        results = converter.final_results
+        print "HERE ARE THE RESULTS: "
+        pprint(results)
+        print "HERE ARE THE ERRORS: "
+        pprint(converter.errors)
+        print "HERE ARE THE WARNINGS: "
+        pprint(converter.warnings)
+        dummy_data = results
+        return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
+      else:
+        return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
+
+  print "{}: Here is the id: {}".format(request.method, str(directive_id))
+  return render_template("directives/import.haml")
 
 def _all_views(view_list):
   import ggrc.services

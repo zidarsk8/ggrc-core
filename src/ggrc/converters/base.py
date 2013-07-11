@@ -164,7 +164,6 @@ class BaseConverter(object):
       self.import_exception = e
       return self
 
-
   def read_objects(self, headers, rows):
     attrs_collection = []
     for row in rows:

@@ -22,12 +22,12 @@
 -block main
   .container-fluid
     .row-fluid
-      %form{"class":'import',"multipart":True,"remote":True,'data-type':'html','data-update-target':'#results-container'}   
+      %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True,"remote":True,'data-type':'html','data-update-target':'#results-container'}   
         %label{for:"file"}
             %strong
                 File to Upload
           -#=file_field_tag "upload"
-        %input{"value":"choose file","type":'file'}
+        %input{"name":'file', "value":"choose file","type":'file'}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           %input{"value":"Upload and Review","class":'btn btn-primary',"type":'submit'}
           %a{href:"/help/sections_import",target:'_blank',class:"import-help",'data-toggle':'modal-ajax'}
