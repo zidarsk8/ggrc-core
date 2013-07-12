@@ -46,7 +46,17 @@ class CompletePermissionsProvider(object):
       personal_context = db.session.query(Context).filter(
           Context.related_object_id == user.id,
           Context.related_object_type == 'Person',
-          ).one()
+          ).first()
+      if not personal_context:
+        personal_context = Context(
+            name='Personal Context for {0}'.format(user.id),
+            description='',
+            context_id=1,
+            related_object_id=user.id,
+            related_object_type='Person',
+            )
+        db.session.add(personal_context)
+        db.session.commit()
       permissions['__GGRC_ADMIN__'] = {
           '__GGRC_ALL__': [personal_context.id,],
           }
