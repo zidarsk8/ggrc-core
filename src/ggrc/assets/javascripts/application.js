@@ -199,7 +199,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
   }
-  if( /^\/api\/\w+(\/\d+|$)/.test(options.url) && (options.type.toUpperCase() === "GET")) {
+  if( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
   }
   if( /^\/api\/\w+/.test(options.url)) {
