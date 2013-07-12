@@ -649,3 +649,19 @@ Mustache.registerHelper("private_program", function(modal_title) {
   ].join("");
 });
 
+
+Mustache.registerHelper("can_link_to_page_object", function(context, options) {
+  if(!options) {
+    options = context;
+    context = options.contexts ? options.contexts[options.contexts.length - 1] : this;
+  }
+
+  var page_type = GGRC.infer_object_type(GGRC.page_object);
+
+  if(~can.inArray(context.constructor.model_singular, page_type.links_to)) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+

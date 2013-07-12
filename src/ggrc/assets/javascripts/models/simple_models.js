@@ -50,6 +50,21 @@ can.Model.Cacheable("CMS.Models.Program", {
   , findAll : "/api/programs?kind=Directive"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
+  , links_to : [
+    "Regulation"
+    , "Policy"
+    , "Contract"
+    , "System"
+    , "Process"
+    //, "Control"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
@@ -140,6 +155,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this._super.apply(this, arguments);
   }
   , meta_kinds : []
+  , links_to : ["Control", "Program"]
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
@@ -268,6 +284,18 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
       , single_object : false
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -303,6 +331,18 @@ can.Model.Cacheable("CMS.Models.Project", {
       , related_side : "source"
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
@@ -349,6 +389,18 @@ can.Model.Cacheable("CMS.Models.Facility", {
       , single_object : false
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -403,6 +455,18 @@ can.Model.Cacheable("CMS.Models.Product", {
       , single_object : false
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -463,6 +527,18 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       , single_object : false
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -497,6 +573,18 @@ can.Model.Cacheable("CMS.Models.Market", {
       , related_side : "source"
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Program"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    ]
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
@@ -514,6 +602,7 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   , findAll : "/api/risky_attributes"
   , create : "POST /api/risky_attributes"
   , update : "PUT /api/risky_attributes/{id}"
+  , links_to : ["Risk"]
 }, {});
 
 can.Model.Cacheable("CMS.Models.Risk", {
@@ -574,6 +663,18 @@ can.Model.Cacheable("CMS.Models.Risk", {
       , start_expanded : false
       , create_link : true
     }]}
+  , links_to : [
+    "System"
+    , "Process"
+    , "Product"
+    , "Facility"
+    , "OrgGroup"
+    , "Project"
+    , "DataAsset"
+    , "Product"
+    , "Market"
+    , "RiskyAttribute"
+    ]
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
