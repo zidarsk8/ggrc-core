@@ -1,22 +1,33 @@
 {{! dashboard object listing}}
-<ul class="tree-structure simple single-row-tabs">
+<ul class="tree-structure simple single-row-tabs event-log">
 {{#list}}
-  <li data-model="true" {{data 'model'}} class="{{object_type}}">
+  <li data-model="true" {{data 'model'}} class="{{resource_type.toLowerCase}}">
     <a href='javascript://'>
       <div class="row-fluid">
         <div class="span12">
           <div class="item-identifier">
             <span class="title">
-              {{#modified_by}}
-                {{email}}
-              {{/modified_by}}
+              <i class="grcicon-{{resource_type.toLowerCase}}-color" rel="tooltip" title="{{resource_type}}"></i>
               {{#revisions}}
-                {{action}} {{resource_type}}(#{{resource_id}})
+                <!--(#{{resource_id}}) -->
                 {{#content}}
-                  {{firstnonempty title name}}
+                  <span style="font-weight:bold;">
+                    {{firstnonempty title name}}
+                  </span>
                 {{/content}}
+                <span style="font-size:11px; color:#777;">
+                  {{action}}
+                </span>
               {{/revisions}}
-              on {{created_at}}
+              <span style="font-size:11px; color:#777;">
+                by
+                {{#modified_by}}
+                  {{email}}
+                {{/modified_by}}
+              </span>
+              <span style="font-size:11px; color:#777;">
+                on {{created_at}}
+              </span>
             </span>
           </div>
         </div>
