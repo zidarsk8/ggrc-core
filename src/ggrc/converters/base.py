@@ -1,5 +1,6 @@
 import csv
 from .common import *
+from ggrc import db
 
 class BaseConverter(object):
 
@@ -122,6 +123,7 @@ class BaseConverter(object):
     return not len(string) or string.isspace()
 
   def do_import(self, dry_run = True):
+
     try:
       self.import_metadata()
       object_headers = self.read_headers(self.object_map, self.rows.pop(0))
@@ -133,14 +135,25 @@ class BaseConverter(object):
         self.final_results.append(row.reify())
         self.objects.append(row)
 
+      #dry_run = False  # TESTING IMPORT RESULTS SAVE
       if not dry_run:
-        pass # TODO: Add save here
+        self.save_import()
 
       return self
 
     except ImportException as e:
       self.import_exception = e
       return self
+
+  def save_import(self):
+    db_session = db.session
+    for row_converter in self.objects:
+      print "Saving object: " + str(row_converter.obj)
+      row_converter.save_object(db_session, **self.options)
+
+    db_session.commit()
+    print 'FINISHED THE COMMIT!'
+
 
   def read_objects(self, headers, rows):
     attrs_collection = []

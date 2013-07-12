@@ -34,13 +34,11 @@
   .row-fluid
     .span8 
     .span1
-      %form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
+      -#%form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
       %input{"value":"Cancel","class":'btn btn-large',"type":'submit'}
     .span2
-      {% if import_errors > 0 %}
-        %form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
-        %input{"value":"Correct Errors Before Proceeding","class":'btn btn-large btn-warning pull-right',"type":'submit'}
-      {% endif %}   
+      -#%form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
+      %input{"value":"Finish Importing","class":'btn btn-large btn-warning pull-right',"type":'submit','name':'confirm'}
       -#elsif import_warnings > 0
         -#messages.any? || (@warnings.any? { |k,v| v.present? })
         -#=submit_tag "Proceed With Caution", :class => %w(btn btn-large btn-warning pull-right), :name => 'confirm'

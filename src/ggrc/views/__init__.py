@@ -73,8 +73,7 @@ def testRender():
     results = converter.final_results
     return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=results, all_warnings=converter.warnings, all_errors=converter.errors)
   else:
-    return render_template("directives/import_errors.haml", exception_message = str(converter.import_exception))
-
+    return render_template("directives/import_errors.haml", converter=converter, exception_message = str(converter.import_exception))
 
 
 def allowed_file(filename):
@@ -85,10 +84,11 @@ def allowed_file(filename):
 def import_sections(directive_id):
 
   if request.method == 'POST':
+    dry_run = 'confirm' in request.form
     csv_file = request.files['file']
     if csv_file and allowed_file(csv_file.filename):
       filename = secure_filename(csv_file.filename)
-      converter = SectionsConverter.start_import(csv_file)
+      converter = SectionsConverter.start_import(csv_file, directive_id = directive_id, dry_run = dry_run)
       if converter.import_exception is None:
         results = converter.final_results
         dummy_data = results

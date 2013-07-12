@@ -79,7 +79,7 @@ class BaseRowConverter(object):
     self.setup_object_by_slug(self.attrs)
 
   def setup_object_by_slug(self, attrs):
-    slug = prepare_slug(attrs['slug']) if attrs['slug'] else ''
+    slug = prepare_slug(attrs['slug']) if attrs.get('slug') else ''
     if not slug:
       self.obj = self.model_class()
     else:

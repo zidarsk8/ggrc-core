@@ -13,7 +13,7 @@ def handle_csv_import(converter_class, filepath, **options):
   rows = [row for row in csv_reader]
   csv_file.close()
   converter = converter_class.from_rows(rows, **options)
-  return converter.do_import()
+  return converter.do_import(options.get('dry_run', True))
 
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
   csv_reader = csv.reader(utf_8_encoder(unicode_csv_data),

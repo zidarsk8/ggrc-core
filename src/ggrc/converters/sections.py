@@ -5,19 +5,15 @@ from .import_helper import *
 from .base_row import *
 
 class SectionRowConverter(BaseRowConverter):
-
   model_class = Section
 
   def setup_object(self):
-    obj = self.setup_object_by_slug(self.attrs)
-    if obj.directive \
-        and obj.directive is not self.converter.options.get('directive'):
-      self.add_error('slug', "Code is used in {0}: {1}".format(
-        obj.directive.meta_kind,
-        obj.directive.slug
-        ))
+    self.obj = self.setup_object_by_slug(self.attrs)
+    if self.obj.directive \
+        and self.obj.directive is not self.importer.options.get('directive'):
+          self.importer.errors.append('Slug code is already used.')
     else:
-      obj.directive = self.importer.options.get('directive')
+      self.obj.directive = self.importer.options.get('directive')
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
@@ -30,8 +26,15 @@ class SectionRowConverter(BaseRowConverter):
 
     return [str(self.obj.slug),str(self.obj.title), str(self.obj.description), str(self.obj.notes)]
 
+  def save_object(self, db_session, **options):
+    if options.get('directive_id'):
+      self.obj.directive_id = int(options.get('directive_id'))
+      db_session.add(self.obj)
+
+
 
 class SectionsConverter(BaseConverter):
+
   metadata_export_order = ['type', 'slug']
 
   metadata_map = {
