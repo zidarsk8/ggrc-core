@@ -159,8 +159,10 @@ jQuery.extend(GGRC, {
   , make_model_instance : function(data) {
     if(!data) {
       return null;
+    } else if(!!GGRC.page_model && GGRC.page_object === data) {
+      return GGRC.page_model;
     } else {
-      return GGRC.infer_object_type(data).model($.extend({}, data));
+      return GGRC.page_model = GGRC.infer_object_type(data).model($.extend({}, data));
     }
   }
 
