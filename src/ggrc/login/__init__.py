@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
 """ggrc.login
 
 Provides basic login and session management using Flask-Login with various
@@ -5,23 +10,11 @@ backends
 """
 
 import flask_login
+from ggrc.extensions import get_extension_module_for
 from .common import find_user_by_id
 
-login_module = None
-
 def get_login_module():
-  global login_module
-  if login_module is None:
-    import sys
-    from ggrc import settings
-    login_module_name = settings.LOGIN_MANAGER
-
-    if login_module_name:
-      __import__(login_module_name)
-      login_module = sys.modules[login_module_name]
-    else:
-      login_module = False
-  return login_module
+  return get_extension_module_for('LOGIN_MANAGER', False)
 
 def user_loader(id):
   return find_user_by_id(id)

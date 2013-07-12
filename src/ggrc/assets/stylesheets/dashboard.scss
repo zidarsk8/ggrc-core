@@ -9,6 +9,9 @@
 
 //@import "jquery-ui";
 
+
+@import "bootstrap-setup";
+
 @import "bootstrap";
 @import "bootstrap-responsive";
 
@@ -17,6 +20,7 @@
 
 @import "setup";
 @import "common";
+@import "lhs";
 @import "layout";
 @import "widget";
 @import "tree";

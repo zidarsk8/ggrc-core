@@ -27,8 +27,6 @@ def get_user():
 def login():
   user = get_user()
   flask_login.login_user(user)
-  #FIXME adding default permissions of None to session for now.
-  session['permissions'] = None
   return redirect(
     get_next_url(request, default_url=url_for('dashboard')))
   #return redirect(

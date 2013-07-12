@@ -2,6 +2,7 @@
 {{#instance}}
 <form action="javascript://">
   {{{ handle_context }}}
+  <input type="hidden" name="kind" value="Directive" />
   <div class="row-fluid">
     <div class="span6">
       <label>
@@ -89,6 +90,7 @@
         </label>
         <input class="input-block-level" name="scope" placeholder="Enter Scope" type="text" value="{{scope}}">
       </div>
+      {{#private_program modal_title}}{{/private_program}}
     </div>
   </div>
 </form>

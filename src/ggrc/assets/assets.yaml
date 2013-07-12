@@ -36,6 +36,7 @@ dashboard-js-files:
   - models/local_storage.js
   - models/display_prefs.js
   - models/simple_models.js
+  - models/recently_viewed_object.js
   - models/search.js
   - controllers/add_widgets.js
   - controllers/filterable_controller.js
@@ -46,6 +47,7 @@ dashboard-js-files:
   - controllers/modal_selector_controller.js
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
+  - controllers/recently_viewed_controller.js
   - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js

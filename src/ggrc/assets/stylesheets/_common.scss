@@ -7,6 +7,7 @@ h1 {
   color:$headerTitle;
   font-size:$f-headline;
   line-height:36px;
+	padding-left:20px;
   span {
     color: $disabled;
     font-weight: normal;
@@ -443,14 +444,6 @@ input.disabled.pending-ajax{
 }
 
 // additional styles
-li.text-compliance,
-span.text-compliance,
-strong.text-compliance {
-  color:$compliance;
-  a {
-    color:$compliance !important;
-  }
-}
 
 li.text-governance,
 span.text-governance,
@@ -464,17 +457,8 @@ strong.text-governance {
 
 span,
 strong {
-  &.text-compliance {
-    color:$compliance;    
-    a {
-      color:$compliance !important;
-    }
-  }
   &.text-risk {
     color:$risk;    
-  }
-  &.text-governance {
-    color:$governance;    
   }
   &.text-business {
     color:$business;    
@@ -554,4 +538,15 @@ span.no-data {
   }
 }
 
+// container-fluid reset
 
+.container-fluid {
+  padding:0;
+}
+
+// affixed fixes
+.content {
+  &.affixed {
+    margin-top:46px;
+  }
+}

@@ -4,20 +4,13 @@
 # Maintained By: david@reciprocitylabs.com
 
 from flask import g
+from flask.ext.login import current_user
+from ggrc.extensions import get_extension_instance
 
-def get_permissions_provider(provider=[]):
-  if not provider:
-    import sys
-    from ggrc import settings
-    provider_name = settings.USER_PERMISSIONS_PROVIDER or \
-        'ggrc.rbac.permissions_provider.DefaultUserPermissionsProvider'
-    idx = provider_name.rfind('.')
-    module_name = provider_name[0:idx]
-    class_name = provider_name[idx+1:]
-    __import__(module_name)
-    module = sys.modules[module_name]
-    provider.append(getattr(module, class_name)(settings))
-  return provider[0]
+def get_permissions_provider():
+  return get_extension_instance(
+      'USER_PERMISSIONS_PROVIDER',
+      'ggrc.rbac.permissions_provider.DefaultUserPermissionsProvider')
 
 def permissions_for(user):
   return get_permissions_provider().permissions_for(user)
@@ -25,6 +18,8 @@ def permissions_for(user):
 def get_user():
   if hasattr(g, 'user'):
     return g.user
+  else:
+    return current_user
   return None
 
 def is_allowed_create(resource_type, context_id):

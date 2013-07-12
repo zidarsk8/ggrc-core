@@ -6,3 +6,4 @@
 APP_ENGINE = True
 ENABLE_JASMINE = False
 LOGIN_MANAGER = 'ggrc.login.appengine'
+FULLTEXT_INDEXER = 'ggrc.fulltext.mysql.MysqlIndexer'

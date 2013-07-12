@@ -23,7 +23,8 @@ $(function() {
     , CMS.Models.Product
     , CMS.Models.DataAsset
     , CMS.Models.Facility
-    , CMS.Models.Market]))
+    , CMS.Models.Market
+    , CMS.Models.Risk]))
     return;
 
   var $top_tree = $("#" + object_class.root_object + "_widget .tree-structure").cms_controllers_tree_view({

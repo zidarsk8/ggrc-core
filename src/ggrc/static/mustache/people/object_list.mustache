@@ -1,19 +1,23 @@
 {{! dashboard object listing}}
 <ul class="tree-structure simple single-row-tabs">
 {{#list}}
-  <li data-model="true" {{data 'model'}} class="{{object_type}}"> 
-    <a data-popover-trigger="sticky-hover" data-sticky-popover="true" data-popover-href="{{viewLink}}/tooltip">
-      {{{withattr "href" "{viewLink}"}}}
+  <li data-model="true" {{data 'model'}} class="{{object_type}}">
+    <div href="javascript://" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-popover-href="/people/{{id}}/tooltip">
       <div class="row-fluid">
         <div class="span12">
           <div class="item-identifier">
             <span class="title">
               {{firstexist name email}}
             </span>
+            <div class="item-actions">
+              <a class="btn btn-mini" data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-form-target="refresh" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" data-original-title="Edit this person">
+                <i class="grcicon-edit"></i>
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </a>
+    </div>
   </li>
 {{/list}}
 </ul>

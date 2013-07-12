@@ -3,9 +3,9 @@
 -set section_meta_kind = "clause" if instance.kind == "Contract" else "section"
 
 -block widget_title
-  %i{ 'class' : "grcicon-={section_meta_kind}" }
   ="{0}s".format(section_meta_kind|title)
   %span=instance.sections.count
+  and Controls
 
 
 -block widget_help

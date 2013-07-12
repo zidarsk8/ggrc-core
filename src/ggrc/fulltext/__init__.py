@@ -1,10 +1,14 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
+
+from ggrc.extensions import get_extension_instance
 
 class Indexer(object):
+  def __init__(self, settings):
+    pass
+
   def create_record(self, record):
     raise NotImplementedError()
 
@@ -25,20 +29,12 @@ class Record(object):
     self.tags = tags
     self.properties = kwargs
 
+def resolve_default_text_indexer():
+  from ggrc import settings
+  db_scheme = settings.SQLALCHEMY_DATABASE_URI.split(':')[0].split('+')[0]
+  return 'ggrc.fulltext.{db_scheme}.Indexer'.format(db_scheme=db_scheme)
+
 def get_indexer(indexer=[]):
-  if not indexer:
-    import sys
-    from ggrc import settings
-    if settings.FULLTEXT_INDEXER:
-      indexer_name = settings.FULLTEXT_INDEXER
-    else:
-      db_scheme = settings.SQLALCHEMY_DATABASE_URI.split(':')[0].split('+')[0]
-      indexer_name = 'ggrc.fulltext.{db_scheme}.Indexer'.format(
-          db_scheme=db_scheme)
-    idx = indexer_name.rfind('.')
-    module_name = indexer_name[0:idx]
-    class_name = indexer_name[idx+1:]
-    __import__(module_name)
-    module = sys.modules[module_name]
-    indexer.append(getattr(module, class_name)())
-  return indexer[0]
+  return get_extension_instance(
+      'FULLTEXT_INDEXER', resolve_default_text_indexer)
+

@@ -3,7 +3,8 @@
 # Created By:
 # Maintained By:
 
-from .utils import handle_named_example_resource
+from behave import given
+from tests.ggrc.behave.utils import handle_named_example_resource
 
 @given('a Category resource named "{name}" for scope "{scope}"')
 def create_category(context, name, scope):

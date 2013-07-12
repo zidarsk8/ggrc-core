@@ -3,7 +3,8 @@
 # Created By:
 # Maintained By:
 
-from .utils import handle_named_example_resource
+from behave import given
+from tests.ggrc.behave.utils import handle_named_example_resource
 
 @given('an Option named "{name}" with role "{role}"')
 def create_option(context, name, role):

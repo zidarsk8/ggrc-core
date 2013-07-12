@@ -594,7 +594,10 @@ Mustache.registerHelper("all", function(type, options) {
 });
 
 Mustache.registerHelper("handle_context", function() {
-  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
+  return [
+    "<input type='hidden' name='context.href' value='" + this.attr('context.href') + "' />",
+    "<input type='hidden' name='context.id' value='" + this.attr('context.id') + "' numeric />"
+    ].join("\n");
 });
 
 })(this, jQuery, can);
@@ -602,7 +605,7 @@ Mustache.registerHelper("handle_context", function() {
 Mustache.registerHelper("with_page_object_as", function(name, options) {
   if(!options) {
     options = name;
-    name = "page_object"
+    name = "page_object";
   }
   var page_object = GGRC.make_model_instance(GGRC.page_object);
   if(page_object) {
@@ -614,3 +617,27 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     return options.inverse(options.contexts);
   }
 });
+
+Mustache.registerHelper("role_checkbox", function(role, model, operation) {
+  return [
+    '<input type="checkbox" name="permissions."'
+    , operation
+    , '" value="'
+    , model.model_singular
+    , '"'
+    , role.allowed(operation, model) ? ' checked="checked"' : ''
+    , '>'
+  ].join("");
+});
+
+Mustache.registerHelper("private_program", function(modal_title) {
+  return modal_title.indexOf("New ") !=0 ? '' : [
+    '<div class="span6">'
+    , '<label>'
+    , 'Private'
+    , '</label>'
+    , '<input class="input-block-level" name="private" value="private" type="checkbox">'
+    , '</div>'
+  ].join("");
+});
+

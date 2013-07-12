@@ -47,10 +47,11 @@
             data-related-title-singular="{{model.title_singular}}"
             data-related-title-plural="{{model.title_plural}}"
             data-related-side="{{related_side}}"
+            data-object-side="risk"
             data-related-table-plural="{{model.table_plural}}"
             data-related-model-singular="{{model.model_singular}}"
             data-relationship-type="{{find_params.relationship_type_id}}"
-            data-tab-target="#related-objects-org_group_relies_upon_org_group">
+            data-tab-target="#related-objects-risk-{{model.title_plural}}">
             <i class="grcicon-link"></i>
           </a>
           {{/create_link}}
@@ -66,6 +67,15 @@
   {{/instance}}
   <div class="item-content">
   </div>
+  {{#if draw_children}}
+  {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+  <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
+    {{#child_options}}
+    <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+    {{/child_options}}
+  </div>
+  {{/if_null}}
+  {{/if}}
 </li>
 {{/list}}
 {{^list}}
