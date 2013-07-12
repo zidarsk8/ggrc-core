@@ -114,9 +114,9 @@ src/ggrc/static/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/
 
 src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml \
-		APPENGINE_INSTANCE=$(APPENGINE_INSTANCE) \
-		SETTINGS_MODULE=$(SETTINGS_MODULE) \
-		DATABASE_URI=$(DATABASE_URI)
+		APPENGINE_INSTANCE="$(APPENGINE_INSTANCE)" \
+		SETTINGS_MODULE="$(SETTINGS_MODULE)" \
+		DATABASE_URI="$(DATABASE_URI)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
 
