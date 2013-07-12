@@ -166,7 +166,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , title_plural : "Regulations"
   , model_singular : "Regulation"
   , title_singular : "Regulation"
-  , table_singular : "Regulations"
+  , table_singular : "regulation"
   , findAll : "/api/directives?kind=Regulation"
   , defaults : {
     kind : "Regulation"
