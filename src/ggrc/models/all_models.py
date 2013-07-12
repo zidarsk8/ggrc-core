@@ -1,4 +1,3 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
@@ -10,6 +9,7 @@
 #from .account import Account
 from .categorization import Categorization
 from .category import Category
+from .context import Context
 from .control import Control
 from .control_assessment import ControlAssessment
 from .control_control import ControlControl
@@ -60,6 +60,7 @@ from .event import Event
 all_models = [
   Categorization,
   Category,
+  Context,
   Control,
   ControlAssessment,
   ControlControl,

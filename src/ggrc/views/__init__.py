@@ -16,11 +16,10 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 @app.context_processor
-def inject_config():
+def base_context():
   from ggrc.models import get_model
   return dict(
       get_model=get_model,
-      config=app.config
       )
 
 from flask import render_template
@@ -43,10 +42,17 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+@app.route("/admin/events")
+@login_required
+def admin_events():
+  """The page showing events and revisions
+  """
+  return render_template("admin/events.haml")
+
 @app.route("/admin")
 @login_required
 def admin():
-  """The dashboard page
+  """The admin dashboard page
   """
   return render_template("admin/index.haml")
 
@@ -125,6 +131,7 @@ def all_object_views():
       'risks',
       'people',
       'pbc_lists',
+      'roles',
       ])
 
 def all_tooltip_views():
@@ -143,9 +150,12 @@ def all_tooltip_views():
       'risky_attributes',
       'risks',
       'people',
+      'events',
       ])
 
 def init_all_object_views(app):
+  import sys
+  from ggrc import settings
   from .common import BaseObjectView
 
   for k,v in all_object_views():
@@ -155,3 +165,11 @@ def init_all_object_views(app):
   for k,v in all_tooltip_views():
     TooltipView.add_to(
       app, '/{0}'.format(k), v, decorators=(login_required,))
+
+  if hasattr(settings, 'EXTENSIONS'):
+    for extension in settings.EXTENSIONS:
+      __import__(extension)
+      extension_module = sys.modules[extension]
+      if hasattr(extension_module, 'initialize_all_object_views'):
+        extension_module.initialize_all_object_views(app)
+

@@ -14,22 +14,9 @@ can.Model.Cacheable("CMS.Models.Person", {
    root_object : "person"
    , root_collection : "people"
    , findAll : "GET /api/people"
-   , create : function(params) {
-        var _params = {
-            person : {
-                name : params.person.name
-                , email : params.person.ldap || params.person.email
-                , company : params.person.company
-                , company_id : params.company_id
-            }
-        };
-        return $.ajax({
-            type : "POST"
-            , "url" : "/api/people"
-            , dataType : "json"
-            , data : _params
-        });
-    }
+   , findOne : "GET /api/people/{id}"
+   , create : "POST /api/people"
+   , update : "PUT /api/people/{id}"
     , search : function(request, response) {
         return $.ajax({
             type : "get"

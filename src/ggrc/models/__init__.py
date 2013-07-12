@@ -15,11 +15,11 @@ def create_db_with_create_all():
 
 def create_db_with_migrations(quiet=False):
   from ggrc.app import db
-  from alembic.config import main
+  from ggrc.migrate import upgradeall
   import logging
   if quiet:
     logging.disable(logging.INFO)
-  main(["-c", "migrations/alembic.ini", "upgrade", "head"])
+  upgradeall()
   if quiet:
     logging.disable(logging.NOTSET)
 
@@ -30,15 +30,21 @@ def drop_db_with_drop_all():
 
 def drop_db_with_migrations(quiet=False):
   from ggrc.app import db
-  from alembic.config import main
+  from ggrc.migrate import downgradeall
+  import ggrc.models.all_models
   import logging
+  from ggrc import settings
   if quiet:
     logging.disable(logging.INFO)
-  main(["-c", "migrations/alembic.ini", "downgrade", "base"])
+  downgradeall(drop_versions_table=True)
   if quiet:
     logging.disable(logging.NOTSET)
-  # Finally, clean up alembic_version itself
-  db.session.execute('DROP TABLE alembic_version')
+  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
+    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
+  db.drop_all()
+  db.session.commit()
+  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
+    db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
 
 def create_db(use_migrations=False, quiet=False):
   if use_migrations:

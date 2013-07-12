@@ -29,6 +29,7 @@ can.Control("CMS.Controllers.ResizeWidgets", {
     , minimum_widget_height : 100 // minimum size of the *content*, or the *tab content*, of the widget
     , resizable_selector : "section[id]"  // how to determine what on the page count as widgets
     , magic_content_height_offset : 17 //10px padding of the list inside the section + 7px height of resize handle -- probably shouldn't change this
+    , size_single_column : false //false to not set span-size when it's only one column, true to set span-size
   }
 }, {
 
@@ -115,6 +116,9 @@ can.Control("CMS.Controllers.ResizeWidgets", {
     , total_width = 0
     , that = this;
 
+    if($children.length < 2 && !this.options.size_single_column) {
+      return;
+    }
 
     widths = this.getWidthsForSelector($(this.element)) || [];
 

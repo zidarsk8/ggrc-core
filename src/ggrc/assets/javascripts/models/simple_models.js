@@ -117,6 +117,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
       kind = GGRC.infer_object_type(attrs);
     } catch(e) {
       console.warn("infer_object_type threw an error on Directive stub (likely no 'kind')");
+      kind = CMS.Models.Directive;
     }
     var m = this.findInCacheById(attrs.directive.id);
     if(!m || m.constructor === CMS.Models.Directive) {
@@ -138,6 +139,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }
+  , meta_kinds : []
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
@@ -557,6 +559,28 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/risks/tree.mustache"
+    , child_options : [{
+      model : null
+      , property : "controls"
+      , create_link : true
+      , draw_children : false
+      , start_expanded : false
+    }, {
+      model : CMS.Models.RiskyAttribute
+      , property : "risky_attributes"
+      , draw_children : false
+      , start_expanded : false
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    $(function() {
+      that.tree_view_options.child_options[0].model = CMS.Models.Control;
+    });
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.SystemControl", {
@@ -629,6 +653,33 @@ can.Model.Cacheable("CMS.Models.Help", {
   , findAll : "GET /api/help"
   , update : "PUT /api/help/{id}"
   , create : "POST /api/help"
+}, {});
+
+can.Model.Cacheable("CMS.Models.Event", {
+  root_object : "event"
+  , root_collection : "events"
+  , findAll : "GET /api/events?__include=revisions,modified_by"
+}, {});
+
+can.Model.Cacheable("CMS.Models.Role", {
+  root_object : "role"
+  , root_collection : "roles"
+  , findAll : "GET /api/roles"
+  , update : "PUT /api/roles/{id}"
+  , create : "POST /api/roles"
+}, {});
+
+CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
+  var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
+  return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+}
+
+can.Model.Cacheable("CMS.Models.UserRole", {
+  root_object : "user_role"
+  , root_collection : "user_roles"
+  , findAll : "GET /api/user_roles"
+  , update : "PUT /api/user_roles/{id}"
+  , create : "POST /api/user_roles"
 }, {});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {

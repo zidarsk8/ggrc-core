@@ -3,6 +3,19 @@
 -block page_help scoped
   =instance.kind|underscore
 
+-block header
+  %h1{ 'class': "={ model_display_class }" }
+    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}", 'class': "={ model_display_class }" }
+      -if instance.kind_singular == "Contract"
+        %i.grcicon-contract
+      -elif instance.kind_singular == "Policy"
+        %i.grcicon-policy
+      -elif instance.kind_singular == "Regulation"
+        %i.grcicon-regulation
+      -else
+        &nbsp;
+    =instance.title
+
 -block subheader_extras
   %ul.actions.pull-right
     %li
@@ -23,19 +36,20 @@
             Import Sections
 
 -block main
-  .container-fluid
-    #show_columns.row-fluid{ 'data-resize': "true" }
-      #middle_column.span8.widget-area
-        -with widget_class = 'business'
-          -include "directives/_main.haml"
-        -if related_objects(instance)
-          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-            -include 'shared/_related.haml'
-        -include 'shared/_add_widget_section.haml'
+  .clearfix
+    .inner-nav
+      %ul.nav{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
 
-      #right_column.span4.widget-area
-        -with widget_class = 'business'
-          -include 'base_objects/_info.haml'
-        -with widget_class = 'business'
-          -include 'base_objects/_more_info.haml'
-        -include 'shared/_add_widget_section.haml'
+    .object-area
+      #show_columns.column-set{ 'data-resize': "true" }
+        #middle_column.widget-area
+          -with widget_class = 'governance'
+            -include "directives/_main.haml"
+          -if related_objects(instance)
+            -with widget_class = 'widget-tabs widget-tabs-horizontal related governance'
+              -include 'shared/_related.haml'
+          -with widget_class = 'governance'
+            -include 'base_objects/_info.haml'
+          -with widget_class = 'governance'
+            -include 'base_objects/_more_info.haml'
+          -include 'shared/_add_widget_section.haml'

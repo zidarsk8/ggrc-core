@@ -1,6 +1,7 @@
 .header.main {
-  height: 60px;
+  height: 30px;
 }
+
 .header-bar {
   background: $headerBgnd;
   position: fixed;
@@ -41,6 +42,7 @@
   }
   .logo {
     line-height:30px;
+		padding-left:20px;
   }
   .menu {
     @include clearfix();
@@ -265,24 +267,27 @@
 }
 
 .header-content {
-  height:60px;
-  margin-top: 30px;
   background: $white;
   z-index: 1001;
+  h1 {
+    line-height: 36px;
+    padding-top:5px;
+    margin-bottom:-5px;
+  }
   &.affix {
     position: fixed;
     top: 30px;
-    margin-top: 0px;
-    height: 36px;
     z-index: 900;
-    left: 0;
+    left: 248px;
     right: 0;
     @include box-shadow(0 3px 6px -1px rgba(0, 0, 0, 0.2));
     .breadcrumbs {
       display: none;
     }
     h1 {
-      line-height: 32px;
+      line-height: 36px;
+      padding-top:5px;
+      margin-bottom:5px;
     }
     .actions {
       margin-top: 10px;
@@ -302,6 +307,7 @@
     margin-top: 27px;
   }
   .dashboard-title {
+		padding-left:20px;
     i {
       margin-top: 6px;
     }
@@ -310,8 +316,9 @@
 
 .actions {
   @include clearfix();
-  @include reset-list();
-  margin-top: 35px;
+	@include reset-list();
+	padding-right:20px;
+  margin-top: 16px;
   li {
     li a {
       font-size:$f-regular;
@@ -423,6 +430,7 @@
   text-transform:uppercase;
   margin-top:4px;
   @include oneline();
+	padding-left:20px;
   li {
     display: inline-block;
     font-size:$f-small;

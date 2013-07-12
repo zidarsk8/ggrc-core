@@ -48,7 +48,7 @@ window.onerror = function(message, url, linenumber) {
   $.ajax({
     type : "post"
     , url : "/api/log_events"
-    , dataType : "json"
+    , dataType : "text"
     , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
   });
 };
@@ -126,6 +126,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "role" : CMS.Models.Role
     };
 
     function resolve_by_key(subtree, data) {
@@ -147,12 +148,22 @@ jQuery.extend(GGRC, {
         subtree;
     }
 
-    return can.reduce(Object.keys(data), function(a, b) {
-      return a || resolve(decision_tree[b], data[b]);
-    }, null);
+    if(!data) {
+      return null;
+    } else {
+      return can.reduce(Object.keys(data), function(a, b) {
+        return a || resolve(decision_tree[b], data[b]);
+      }, null);
+    }
   }
   , make_model_instance : function(data) {
-    return GGRC.infer_object_type(data).model($.extend({}, data));
+    if(!data) {
+      return null;
+    } else if(!!GGRC.page_model && GGRC.page_object === data) {
+      return GGRC.page_model;
+    } else {
+      return GGRC.page_model = GGRC.infer_object_type(data).model($.extend({}, data));
+    }
   }
 
   , queue_event : function(event) {
@@ -190,7 +201,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
   }
-  if( /^\/api\/\w+(\/\d+|$)/.test(options.url) && (options.type.toUpperCase() === "GET")) {
+  if( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
   }
   if( /^\/api\/\w+/.test(options.url)) {
@@ -391,7 +402,7 @@ jQuery(document).ready(function($) {
   };
 
   // Listeners for initial mouseovers for stick-hover
-  $('body').on('mouseover', 'a[data-popover-trigger="sticky-hover"]', function(e) {
+  $('body').on('mouseover', '[data-popover-trigger="sticky-hover"]', function(e) {
     // If popover instance doesn't exist already, create it and
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {
@@ -641,6 +652,16 @@ $(window).load(function(){
     , placeholder: 'drop-placeholder'
     , handle : "header, .header"
     , items : ".widget"
+  });
+  
+  
+  // affix setup
+  $(window).scroll(function(){
+    if($('.header-content').hasClass('affix')) {
+      $('.header-content').next('.content').addClass('affixed');
+    } else {
+      $('.header-content').next('.content').removeClass('affixed');
+    }
   });
 
 });

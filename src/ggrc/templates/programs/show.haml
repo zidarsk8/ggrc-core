@@ -4,15 +4,6 @@
   GRC Program: ={ instance.title }
 
 -block header
-  .breadcrumbs-holder
-    %ul.breadcrumbs
-      %li
-        %a{ 'href': '={ url_for("dashboard") }' }
-          Dashboard
-      %li
-        %span
-          =instance.title
-
   %h1.programs
     -if instance.company_controls
       .grcobject.governance{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Program" }
@@ -46,28 +37,28 @@
   %a.navbarplus.fltrt{ 'href': "new_flow_program_path", 'data-toggle': 'modal-ajax-form', 'data-form-target': 'redirect', 'data-modal-reset': 'reset', 'data-modal-class': 'modal-wide' }
 
 -block main
-  .container-fluid
-    #columns.row-fluid{ 'data-resize': "true" }
-      #middle-column.span8.widget-area
-        -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
-          -include 'programs/_main.haml'
-        -if not instance.company_controls
-          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-            -with widget_title = "Impact/Scope"
-              -include 'shared/_related.haml'
-        -if instance.company_controls
-          -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
-            -include 'programs/_linked_programs.haml'
-        -else
-          -include 'shared/_add_widget_section.haml'
+  .clearfix
+    .inner-nav
+      %ul.nav{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
 
-      #right-column.span4.widget-area
-        -with widget_class = 'programs'
-          -include 'programs/_info.haml'
-        -if not instance.company_controls
+    .object-area
+      #columns.column-set{ 'data-resize': "true" }
+        #middle-column.widget-area
+          -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
+            -include 'programs/_main.haml'
+          -if not instance.company_controls
+            -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+              -with widget_title = "Impact/Scope"
+                -include 'shared/_related.haml'
+          -if instance.company_controls
+            -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
+              -include 'programs/_linked_programs.haml'
           -with widget_class = 'programs'
-            -include 'programs/_audit_cycles.haml'
-        -with widget_class = 'related business'
-          -include 'programs/_more_info.haml'
-        -if not instance.company_controls
-          -include 'shared/_add_widget_section.haml'
+            -include 'programs/_info.haml'
+          -if not instance.company_controls
+            -with widget_class = 'programs'
+              -include 'programs/_audit_cycles.haml'
+          -with widget_class = 'related business'
+            -include 'programs/_more_info.haml'
+          -if not instance.company_controls
+            -include 'shared/_add_widget_section.haml'

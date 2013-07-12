@@ -96,9 +96,12 @@ can.Control("CMS.Controllers.TreeView", {
     });
     can.Observe.startBatch();
     this.options.attr("list", []);
-    can.each(list, function(v) {
+    can.each(list, function(v, i) {
       if(!(v instanceof can.Observe.TreeOptions)) {
         v = new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
+      }
+      if(!(v.instance instanceof can.Model)) {
+        v.attr("instance", that.options.model.model(v.instance));
       }
       that.options.list.push(v);
       if(!v.instance.selfLink) {
