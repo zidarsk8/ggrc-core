@@ -85,9 +85,10 @@ class DefaultUserPermissions(UserPermissions):
       return None
     ret = list(permissions.get(action, {}).get(resource_type, ()))
     # Extend with the list of all contexts for which the user is an ADMIN
-    ret.extend(list(
+    admin_list = list(
         permissions.get(self.ADMIN_PERMISSION.action, {})\
-            .get(self.ADMIN_PERMISSION.resource_type, ())))
+            .get(self.ADMIN_PERMISSION.resource_type, ()))
+    ret.extend(admin_list)
     return ret
 
   def create_contexts_for(self, resource_type):

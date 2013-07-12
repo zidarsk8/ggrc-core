@@ -7,18 +7,19 @@ import datetime
 import ggrc.builder.json
 import hashlib
 import time
-from flask import url_for, request, current_app
+from flask import url_for, request, current_app, session
 from flask.views import View
 from ggrc import db
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
+from ggrc.models.context import Context
+from ggrc.models.event import Event
+from ggrc.models.revision import Revision
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 from werkzeug.exceptions import BadRequest, Forbidden
-from ggrc.models.event import Event
-from ggrc.models.revision import Revision
 from wsgiref.handlers import format_date_time
 from .attribute_query import AttributeQueryBuilder
 
@@ -314,6 +315,24 @@ class Resource(ModelView):
       return context.get('id', None)
     return None
 
+  def personal_context(self):
+    current_user_id = get_current_user_id()
+    context = db.session.query(Context).filter(
+        Context.related_object_id == current_user_id,
+        Context.related_object_type == 'Person',
+        ).first()
+    if not context:
+      context = Context(
+          name='Personal Context for {0}'.format(current_user_id),
+          description='',
+          context_id=1,
+          related_object_id=current_user_id,
+          related_object_type='Person',
+          )
+      db.session.add(context)
+      db.session.commit()
+    return context
+
   def collection_post(self):
     if self.request.headers['Content-Type'] != 'application/json':
       return current_app.make_response((
@@ -326,12 +345,29 @@ class Resource(ModelView):
     except KeyError, e:
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
-    if 'context' not in src:
+    if 'private' in src:
+      pass
+    elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
-    if not permissions.is_allowed_create(
-        self.model.__name__, self.get_context_id_from_json(src)):
-      raise Forbidden()
+    else:
+      if not permissions.is_allowed_create(
+          self.model.__name__, self.get_context_id_from_json(src)):
+        raise Forbidden()
     self.json_create(obj, src)
+    if 'private' in src:
+      context = self.personal_context()
+      #FIXME this is what should be done, but, this needs to be delegated
+      #to permissions so that the user gets an appropriate role added, too
+      #context = Context(
+          #context=person_as_context,
+          #name='{object_type} Context {timestamp}'.format(
+            #object_type=self.model.__name__,
+            #timestamp=datetime.datetime.now()),
+          #description='',
+          #)
+      #db.session.add(context)
+      #db.session.flush()
+      obj.context = context
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     db.session.flush() # this ensures that id is available for logging
