@@ -4,6 +4,8 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from ggrc.app import db, app
+from ggrc.rbac import permissions
+from werkzeug.exceptions import Forbidden
 from .tooltip import TooltipView
 from .relationships import RelatedObjectResults
 from . import filters
@@ -39,18 +41,13 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
-@app.route("/admin/events")
-@login_required
-def admin_events():
-  """The page showing events and revisions
-  """
-  return render_template("admin/events.haml")
-
 @app.route("/admin")
 @login_required
 def admin():
   """The admin dashboard page
   """
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
   return render_template("admin/index.haml")
 
 @app.route("/design")
