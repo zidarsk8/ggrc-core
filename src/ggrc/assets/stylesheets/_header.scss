@@ -269,21 +269,25 @@
 .header-content {
   background: $white;
   z-index: 1001;
+  h1 {
+    line-height: 36px;
+    padding-top:5px;
+    margin-bottom:-5px;
+  }
   &.affix {
     position: fixed;
     top: 30px;
-    margin-top: 0px;
-    margin-left:248px;
-    height: 36px;
     z-index: 900;
-    left: 0;
+    left: 248px;
     right: 0;
     @include box-shadow(0 3px 6px -1px rgba(0, 0, 0, 0.2));
     .breadcrumbs {
       display: none;
     }
     h1 {
-      line-height: 32px;
+      line-height: 36px;
+      padding-top:5px;
+      margin-bottom:5px;
     }
     .actions {
       margin-top: 10px;

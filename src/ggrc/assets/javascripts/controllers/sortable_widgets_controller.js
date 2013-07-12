@@ -51,12 +51,25 @@ can.Control("CMS.Controllers.SortableWidgets", {
         }
       }
       $widget.appendTo(that.element);
+      //add this widget to the inner nav list
     });
     if(firstchild) {
       firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
     }
 
     this.element.sortable().sortable("refresh");
+    can.each(this.element.data("ui-sortable").items, function(v) {
+      var $widget = v.item;
+      $("<li>")
+      .append(
+        $("<a>")
+        .attr("href", "#" + $widget.attr("id"))
+        .text($widget.find(".header").text()))
+      .appendTo(".inner-nav .internav");
+    });
+    setTimeout(function() {
+      $(document.body).scrollTop(0).scrollspy().scrollspy("refresh");
+    }, 10);
     this.is_initialized = true;
     this.force_add_widget_bottom();
   }

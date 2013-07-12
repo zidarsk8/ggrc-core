@@ -605,7 +605,7 @@ Mustache.registerHelper("handle_context", function() {
 Mustache.registerHelper("with_page_object_as", function(name, options) {
   if(!options) {
     options = name;
-    name = "page_object"
+    name = "page_object";
   }
   var page_object = GGRC.make_model_instance(GGRC.page_object);
   if(page_object) {

@@ -17,38 +17,6 @@
       }
     }
   }
-  &.governance {
-    .header {
-      background: $governance;
-      .widget-action {
-        background: darken($governance, 7%);
-      }
-    }
-  }
-  &.programs {
-    .header {
-      background: $programs;
-      .widget-action {
-        background: darken($programs, 7%);
-      }
-    }
-  }
-  &.risk {
-    .header {
-      background: $risk;
-      .widget-action {
-        background: darken($risk, 7%);
-      }
-    }
-  }
-  &.business {
-    .header {
-      background: $business;
-      .widget-action {
-        background: darken($business, 7%);
-      }
-    }
-  }
   &.widget-tabs {
     &.widget-tabs-horizontal {
       .content {
@@ -189,11 +157,11 @@
       }
     }
   }
-  
   .header {
-    background:$defaultWidget;
+    background:$lightGray;
+    border-bottom:1px solid darken($lightGray, 10%);
     @include transition(background-color 0.2s);
-    color:$white;
+    color:$text;
     height: 30px;
     padding-left: 16px;
     &:hover {
@@ -206,8 +174,6 @@
     .widget-action {
       height: 30px;
       width: 30px;
-      background: darken($defaultWidget, 7%);
-      @include box-shadow(inset 0 0 3px rgba(0, 0, 0, 0.5));
       i {
         @include opacity(0.5);
         @include transition(opacity 0.3s ease);
@@ -280,6 +246,35 @@
     }
     @include row-fluid-fix();
   }
+  &.governance {
+    .header {
+      h2 {
+        color: $governance;
+      }
+    }
+  }
+  &.programs {
+    .header {
+      h2 {
+        color: $programs;
+      }
+    }
+  }
+  &.risk {
+    .header {
+      h2 {
+        color: $risk;
+      }
+    }
+  }
+  &.business {
+    .header {
+      h2 {
+        color: $business;
+      }
+    }
+  }
+  
   .info {
     padding:0 6px;
     color:$text;

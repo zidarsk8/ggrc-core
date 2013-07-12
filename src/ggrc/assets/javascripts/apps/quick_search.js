@@ -17,6 +17,9 @@ $(function() {
 
     var $qs = $(this).uniqueId();
     var obs = new can.Observe();
+    if($qs.find("ul.tree-structure").length) {
+      return;
+    }
     $qs.bind("keypress", "input.widgetsearch", function(ev) {
       if(ev.which === 13)
         obs.attr("value", $(ev.target).val());
@@ -52,16 +55,23 @@ $(function() {
   $(document.body).on("click", ".bar-v", function(ev) {
     $("#lhs").toggleClass("lhs-closed");
     var newAreaWidth = $(".area").width();
+    var affixValue = 248;
     if ($("#lhs").hasClass("lhs-closed")) {
       newAreaWidth = newAreaWidth + 200;
+      affixValue = 48;
     } else {
       newAreaWidth = newAreaWidth - 200;
+      affixValue = 248;
     };
     var newObjectAreaWidth = newAreaWidth - 200;
+    $(".header-content").css('left', affixValue);
     $(".area").css("width", newAreaWidth);
     $(".object-area").css("width", newObjectAreaWidth);
   });
 
+  $(document.body).on("click", ".top-level li.accordion-group a", function(ev) {
+    $(this).toggleClass("active");
+  });
 });
 
 })(this, jQuery);

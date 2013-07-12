@@ -13,15 +13,13 @@
   dashboard
 
 -block header
-  %ul.breadcrumbs
-    &nbsp;
 
   %h1.dashboard-title
     %i.grciconlarge-dashboard
     Dashboard
 
 -block main
-  #columns.row-fluid{ 'data-resize': "true" }
+  #columns.column-set{ 'data-resize': "true" }
     #left_column.widget-area
       -with widget_class = 'widget-tabs'
         -include 'dashboard/_governance.haml'

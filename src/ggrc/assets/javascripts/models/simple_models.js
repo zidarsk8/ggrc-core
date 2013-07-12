@@ -559,6 +559,28 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
+  , tree_view_options : {
+    list_view : GGRC.mustache_path + "/risks/tree.mustache"
+    , child_options : [{
+      model : null
+      , property : "controls"
+      , create_link : true
+      , draw_children : false
+      , start_expanded : false
+    }, {
+      model : CMS.Models.RiskyAttribute
+      , property : "risky_attributes"
+      , draw_children : false
+      , start_expanded : false
+      , create_link : true
+    }]}
+  , init : function() {
+    var that = this;
+    this._super && this._super.apply(this, arguments);
+    $(function() {
+      that.tree_view_options.child_options[0].model = CMS.Models.Control;
+    });
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.SystemControl", {
