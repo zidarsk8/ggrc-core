@@ -294,7 +294,7 @@
         join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       // FIXME: context_id must get a real value
-      $.extend(join_params, this.options.extra_join_fields, { context_id: 0 });
+      $.extend(join_params, this.options.extra_join_fields, { context: { id: 0 } });
       return new (this.options.join_model)(join_params);
     },
 

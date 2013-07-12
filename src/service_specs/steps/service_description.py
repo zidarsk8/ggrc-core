@@ -1,9 +1,10 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
-from .utils import get_resource
+from behave import given, then
+from tests.ggrc.behave.utils import get_resource
 
 @then('all expected endpoints are listed and GETtable in "{resource_name}"')
 def validate_service_description(context, resource_name):

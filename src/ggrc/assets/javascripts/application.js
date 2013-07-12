@@ -48,7 +48,7 @@ window.onerror = function(message, url, linenumber) {
   $.ajax({
     type : "post"
     , url : "/api/log_events"
-    , dataType : "json"
+    , dataType : "text"
     , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
   });
 };
@@ -126,6 +126,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "role" : CMS.Models.Role
     };
 
     function resolve_by_key(subtree, data) {
@@ -399,7 +400,7 @@ jQuery(document).ready(function($) {
   };
 
   // Listeners for initial mouseovers for stick-hover
-  $('body').on('mouseover', 'a[data-popover-trigger="sticky-hover"]', function(e) {
+  $('body').on('mouseover', '[data-popover-trigger="sticky-hover"]', function(e) {
     // If popover instance doesn't exist already, create it and
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {

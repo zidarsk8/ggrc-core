@@ -29,19 +29,82 @@ Feature: Full text search
     And "cycle1" is in the "Cycle" group of "results"
 
   Scenario: Search finds a document with a matching description but only in authorized contexts
-    Given current user is "{\"email\": \"bobtester@testertester.com\", \"name\": \"Bob Tester\", \"permissions\": {\"create\": {\"Control\": [1,2]}, \"read\": {\"Control\": [1,2]}, \"update\": {\"Control\": [1,2]}}}"
+    Given the current user
+    """
+    { "email": "admin@testertester.com",
+      "name": "Admin Tester",
+      "permissions": {
+        "__GGRC_ADMIN__": {
+          "__GGRC_ALL__": [0]
+        }
+      }
+    }
+    """
+    Given a new "Context" named "context1"
+    And "context1" is POSTed to its collection
+    And a new "Context" named "context2"
+    And "context2" is POSTed to its collection
+    Given the current user
+    """
+    { "email": "bobtester@testertester.com",
+      "name": "Bob Tester",
+      "permissions": {
+        "create": {
+          "Control": [
+            {{context.context1.value['context']['id']}},
+            {{context.context2.value['context']['id']}}
+          ]
+        },
+        "read": {
+          "Control": [
+            {{context.context1.value['context']['id']}},
+            {{context.context2.value['context']['id']}}
+          ]
+        },
+        "update": {
+          "Control": [
+            {{context.context1.value['context']['id']}},
+            {{context.context2.value['context']['id']}}
+          ]
+        }
+      }
+    }
+    """
     And a new "Control" named "control1"
     And a new "Control" named "control2"
     And "control1" property "description" is "Let's match on foobar!"
     And "control2" property "description" is "Let's match on foobar, also!"
-    And "control1" property "context_id" is literal "1"
-    And "control2" property "context_id" is literal "2"
+    And "control1" link property "context" is "context1"
+    And "control2" link property "context" is "context2"
     And "control1" is POSTed to its collection
     And "control2" is POSTed to its collection
     When fulltext search for "foobar" as "results"
     Then "control1" is in the search result "results"
     Then "control2" is in the search result "results"
-    Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"Control\": [1]}, \"read\": {\"Control\": [1]}, \"update\": {\"Control\": [1]}}}"
+    Given the current user
+    """
+    { "email": "tester@testertester.com",
+      "name": "Jo Tester",
+      "permissions": {
+        "create": {
+          "Control": [
+            {{context.context1.value['context']['id']}}
+          ]
+        },
+        "read": {
+          "Control": [
+            {{context.context1.value['context']['id']}}
+          ]
+        },
+        "update": {
+          "Control": [
+            {{context.context1.value['context']['id']}}
+          ]
+        }
+      }
+    }
+    """
+    #Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"Control\": [1]}, \"read\": {\"Control\": [1]}, \"update\": {\"Control\": [1]}}}"
     When fulltext search for "foobar" as "results"
     Then "control1" is in the search result "results"
     Then "control2" isn't in the search result "results"

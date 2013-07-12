@@ -3,17 +3,10 @@
     <div class="row-fluid">
       <div class="span8">
         <h2>
-          <i class="grcicon-{{object_type.toLowerCase}}-color"></i>
-          {{object_display}}
-          {{#if is_related}}
-            related to {{parent_display}}
-          {{/if}}
+          <i class="grcicon-{{widget_icon}}-color"></i>
+          {{widget_name}}
           <span class="object_count">
-            {{#if is_related}}
-              {{related_count}}
-            {{else}}
-              {{list.length}}
-            {{/if}}
+            
           </span>
         </h2>
       </div>
@@ -27,14 +20,14 @@
           <a class="active" href="javascript://"></a>
         </div>
         <div class="widget-action pull-right widget-action-help">
-          <a data-placement="top" data-toggle="modal-ajax" href="/help/{{object_type}}_list" rel="tooltip" data-original-title="Help">
+          <a data-placement="top" data-toggle="modal-ajax" href="/help/{{firstnonemtpty widget_id model.table_plural}}_widget" rel="tooltip" data-original-title="Help">
             <i class="grcicon-help-black"></i>
           </a>
         </div>
       </div>
     </div>
   </header>
-  {{^if is_related}}
+  {{#if show_filter}}
   <div class="filter">
     <div class="row-fluid">
       <div class="span8">
@@ -49,8 +42,6 @@
     </div>
   </div>
   {{/if}}
-  <section class="content">
-    {{{render list_view}}}
-  </section>
+  <section class="content"></section>
               
 {{!/section}}

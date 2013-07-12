@@ -46,7 +46,7 @@ can.Control("CMS.Controllers.SortableWidgets", {
       if(!$widget.length) {
         var ctl = that.element.find(".cms_controllers_add_widget").control(CMS.Controllers.AddWidget);
         if(ctl) {
-          ctl.addWidgetByName(id.substr(0, id.indexOf("_list_widget")));
+          ctl.addWidgetByName(id.substr(0, id.indexOf("_widget")));
           $widget = $("#" + id).detach();
         }
       }

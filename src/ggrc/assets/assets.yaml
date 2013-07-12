@@ -40,8 +40,9 @@ dashboard-js-files:
   - models/search.js
   - controllers/add_widgets.js
   - controllers/filterable_controller.js
-  - controllers/dashboard_widgets.js
+  - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
+  - controllers/list_view_controller.js
   - controllers/modals_controller.js
   - controllers/modal_selector_controller.js
   - controllers/help_controller.js

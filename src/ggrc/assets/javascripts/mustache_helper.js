@@ -594,7 +594,10 @@ Mustache.registerHelper("all", function(type, options) {
 });
 
 Mustache.registerHelper("handle_context", function() {
-  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
+  return [
+    "<input type='hidden' name='context.href' value='" + this.attr('context.href') + "' />",
+    "<input type='hidden' name='context.id' value='" + this.attr('context.id') + "' numeric />"
+    ].join("\n");
 });
 
 })(this, jQuery, can);
@@ -614,3 +617,16 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     return options.inverse(options.contexts);
   }
 });
+
+Mustache.registerHelper("role_checkbox", function(role, model, operation) {
+  return [
+    '<input type="checkbox" name="permissions."'
+    , operation
+    , '" value="'
+    , model.model_singular
+    , '"'
+    , role.allowed(operation, model) ? ' checked="checked"' : ''
+    , '>'
+  ].join("");
+});
+

@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from behave import given, then
-from .utils import Example, set_property
+from tests.ggrc.behave.utils import Example, set_property
 
 @given('nothing new')
 def nothing_new(context):

@@ -1,0 +1,37 @@
+{{!div class="modal-body"}}
+{{#instance}}
+<form action="javascript://">
+  {{{ handle_context }}}
+  <div class="row-fluid">
+    <div class="span6">
+      <label>
+        Name
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Enter Name"></i>
+      </label>
+      <input class="input-block-level" placeholder="Enter Name" name="name" type="text" value="{{name}}">
+    </div>
+    <div class="span6">
+      <label>
+       Description 
+        <i class="grcicon-help-black" rel="tooltip" title="Enter Description"></i>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="role_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span2">
+      <label>
+        Program
+      </label>
+      <div class="checkbox-area">
+        <input type="checkbox" checked="checked">View</input>
+        <br/>
+        <input type="checkbox" checked="checked">Modify</input>
+      </div>
+    </div>
+</form>
+{{/instance}}
+{{!/div}}

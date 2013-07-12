@@ -57,21 +57,12 @@
   </div>
   <div class="hidden-fields-area" style="display:none">
     <div class="row-fluid">
-      <div class="span3">
+      <div class="span6">
         <label>
           Code
           <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
         </label>
         <input class="input-block-level" name="slug" placeholder="POLICY-XXX" type="text" value="{{slug}}">
-      </div>
-      <div class="span3">
-        <label>
-          Kind/Type
-          <i class="grcicon-help-black" rel="tooltip" title="Choose Kind/Type"></i>
-        </label>
-        <select class="input-block-level" name="kind">
-          <option {{^kind}}selected="selected"{{/kind}} {{#if_equals kind 'Regulation'}}selected="selected"{{/if_equals}} value="Regulation">Regulation</option>
-        </select>
       </div>
       <div class="span6">
         <label>

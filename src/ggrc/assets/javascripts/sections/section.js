@@ -12,6 +12,7 @@
 can.Model.Cacheable("CMS.Models.Section", {
   root_object : "section"
   , root_collection : "sections"
+  , category : "governance"
   , root_model : "Section"
   , findAll : "GET /api/sections"
   , create : "POST /api/sections"
@@ -43,7 +44,7 @@ can.Model.Cacheable("CMS.Models.Section", {
       return new CMS.Models.ControlSection({
         section : section.stub()
         , control : params.control.stub()
-        , context_id : params.context_id
+        , context : { id : params.context_id }
       }).save();
     }
 
