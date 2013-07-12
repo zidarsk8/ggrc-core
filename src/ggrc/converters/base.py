@@ -1,7 +1,7 @@
 import csv
 from .common import *
 from ggrc import db
-
+from flask import redirect, flash
 class BaseConverter(object):
 
   def __init__(self, rows_or_objects, **options):
@@ -135,7 +135,6 @@ class BaseConverter(object):
         self.final_results.append(row.reify())
         self.objects.append(row)
 
-      #dry_run = False  # TESTING IMPORT RESULTS SAVE
       if not dry_run:
         self.save_import()
 

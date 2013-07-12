@@ -8,8 +8,9 @@ from .tooltip import TooltipView
 from .relationships import RelatedObjectResults
 from . import filters
 from ggrc.converters.sections import SectionsConverter
+from ggrc.converters.import_helper import *
 from pprint import pprint
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, flash
 from werkzeug import secure_filename
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -57,25 +58,6 @@ def styleguide():
   """
   return render_template("styleguide.haml")
 
-@app.route("/testimport")
-def testImport():
-  """ create route to test import/export HAMLs for directives
-  """
-  return render_template("directives/import.haml")
-
-
-@app.route("/testrender")
-def testRender():
-  """ create route to test rendering of HAMLs for directives
-  """
-  converter = SectionsConverter.start_import("/vagrant/extras/Import_Test-Regulations_Legal.csv")
-  if converter.import_exception is None:
-    results = converter.final_results
-    return render_template("directives/import_result_errors.haml",converter = converter, dummy_data=results, all_warnings=converter.warnings, all_errors=converter.errors)
-  else:
-    return render_template("directives/import_errors.haml", converter=converter, exception_message = str(converter.import_exception))
-
-
 def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
@@ -84,19 +66,25 @@ def allowed_file(filename):
 def import_sections(directive_id):
 
   if request.method == 'POST':
-    dry_run = 'confirm' in request.form
+    dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
+
     if csv_file and allowed_file(csv_file.filename):
+      print "GOING IN WITH DRY_RUN: " + str(dry_run)
       filename = secure_filename(csv_file.filename)
-      converter = SectionsConverter.start_import(csv_file, directive_id = directive_id, dry_run = dry_run)
+      converter = handle_csv_import(SectionsConverter, csv_file, directive_id = directive_id, dry_run = dry_run)
       if converter.import_exception is None:
         results = converter.final_results
         dummy_data = results
+        if not dry_run:
+          flash("Import is done.")
+          return redirect('/directives/{}'.format(directive_id))
+
         return render_template("directives/import.haml",directive_id = directive_id, converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
       else:
-        return render_template("directives/import.haml", exception_message = str(converter.import_exception))
+        return render_template("directives/import.haml", directive_id = directive_id, exception_message = str(converter.import_exception))
 
-  return render_template("directives/import.haml")
+  return render_template("directives/import.haml", directive_id = directive_id)
 
 def _all_views(view_list):
   import ggrc.services

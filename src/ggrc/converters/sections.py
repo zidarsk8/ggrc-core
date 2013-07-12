@@ -32,7 +32,6 @@ class SectionRowConverter(BaseRowConverter):
       db_session.add(self.obj)
 
 
-
 class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
@@ -72,13 +71,7 @@ class SectionsConverter(BaseConverter):
   def directive(self):
     return self.options['directive']
 
-  # FIXME: Temporary as I test import from the command line
   @classmethod
   def start_import(cls, filepath, **options):
     return handle_csv_import(cls, filepath, **options)
-
-if __name__ == '__main__':
-  import sys
-  if sys.argv[1] == 'import' and sys.argv[2] != None:
-    SectionsConverter.start_import(sys.argv[2],)
 

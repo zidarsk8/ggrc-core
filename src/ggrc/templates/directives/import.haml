@@ -13,8 +13,14 @@
         %a{ 'href': '={ url_for("dashboard") }' }
           Dashboard
       %li
-        %a{ 'href': '/directives/={directive_id}' }
-          Directive
+        {% if directive_id is defined and directive_id != "" %}
+          %a{ 'href': '/directives/={directive_id}' }
+            Directive
+        {% else %}
+          %a{ 'href': '/dashboard' }
+            Directive
+        {% endif %}
+
       %li import
 
   %h1.dashboard-title
