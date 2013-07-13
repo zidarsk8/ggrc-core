@@ -123,6 +123,10 @@ can.Control("GGRC.Controllers.Modals", {
     } else {
       value = item.value;
     }
+
+    if ($elem.is("[null-if-empty]") && value.length == 0)
+      value = null;
+
     if(name.length > 1) {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));

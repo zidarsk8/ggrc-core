@@ -594,9 +594,17 @@ Mustache.registerHelper("all", function(type, options) {
 });
 
 Mustache.registerHelper("handle_context", function() {
+  var context_href = this.attr('context.href')
+    , context_id = this.attr('context.id')
+    ;
+
   return [
-    "<input type='hidden' name='context.href' value='" + this.attr('context.href') + "' />",
-    "<input type='hidden' name='context.id' value='" + this.attr('context.id') + "' numeric />"
+    "<input type='hidden' name='context.href'" +
+      (context_href ? ("value='" + context_href + "'") : "") +
+      " null-if-empty />",
+    "<input type='hidden' name='context.id'" +
+      (context_id ? ("value='" + context_id + "'") : "") +
+      " null-if-empty numeric />"
     ].join("\n");
 });
 
