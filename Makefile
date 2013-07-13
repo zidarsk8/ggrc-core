@@ -116,7 +116,8 @@ src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml \
 		APPENGINE_INSTANCE="$(APPENGINE_INSTANCE)" \
 		SETTINGS_MODULE="$(SETTINGS_MODULE)" \
-		DATABASE_URI="$(DATABASE_URI)"
+		DATABASE_URI="$(DATABASE_URI)" \
+		BOOTSTRAP_ADMIN_USERS="$(BOOTSTRAP_ADMIN_USERS)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
 
