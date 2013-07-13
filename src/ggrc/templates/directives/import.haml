@@ -1,0 +1,36 @@
+-extends "layouts/dashboard.haml"
+
+-block title
+  Import/Export
+
+-block page_help
+  dashboard
+
+-block header
+  .breadcrumbs-holder
+    %ul.breadcrumbs
+      %li
+        %a{ 'href': '={ url_for("dashboard") }' }
+          Dashboard
+      %li
+        -if directive_id is defined and directive_id != ""
+          %a{ 'href': '/directives/={directive_id}' }
+            Directive
+        -else
+          %a{ 'href': '/dashboard' }
+            Directive
+
+      %li import
+
+  %h1.dashboard-title
+    %i.grciconlarge-dashboard
+    Import Sections
+
+-block main
+  .container-fluid
+    %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True,"remote":True,'data-type':'html','data-update-target':'#results-container'}
+      #columns.row-fluid{ 'data-resize': "true" }
+        #left_column.span6.widget-area
+      -include 'directives/_import.haml'
+      -if converter is defined
+        -include 'directives/import_result_errors.haml'

@@ -1,0 +1,26 @@
+-# Locals: columns, header_overrides, width_pcts, converter
+-set width_pcts = [10 ,30, 35, 35]
+-set column_names = ["Section Code","Section Title","Section Description","Abstract"]
+%table.ggrc-table{cellspacing:"0",cellpadding:"0"}
+  -for a in width_pcts
+    %col{style:"width:{{a}}%" }
+  %thead
+    %tr
+      -for a in column_names
+        %th
+          {{a}}
+  %tbody
+    %tr
+      %td{colspan:"{{width_pcts|length}}",cellspacing:"0",cellpadding:"0"}
+        .inner-ggrc-table
+          %table.inner-ggrc-table{cellspacing:"0",cellpadding:"0"}
+            -for a in width_pcts
+              %col{style:"width:{{a}}%"}
+            %tbody
+              -for i in dummy_data
+                -set top_loop = loop
+                -set parity = "even" if (loop.index % 2 == 0) else "odd"
+                %tr{class:"={parity}"}
+                  -for j in column_names
+                    -set cellvalue = dummy_data[top_loop.index0][loop.index0]
+                    -include "directives/_import_cell.haml"

@@ -8,6 +8,9 @@ from . import settings
 
 # Initialize Flask app
 from flask import Flask
+# Using for import file upload
+from werkzeug import secure_filename
+
 
 app = Flask('ggrc', instance_relative_config=True)
 app.config.from_object(settings)
