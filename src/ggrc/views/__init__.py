@@ -45,6 +45,31 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+@app.route("/admin/reindex", methods=["POST"])
+@login_required
+def admin_reindex():
+  """Simple re-index of all indexable objects
+  """
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
+  from ggrc.fulltext import get_indexer
+  from ggrc.fulltext.recordbuilder import fts_record_for
+
+  indexer = get_indexer()
+  indexer.delete_all_records(False)
+
+  from ggrc.models import all_models
+  from ggrc.app import db
+
+  models = set(all_models.all_models) - set([all_models.LogEvent])
+  for model in models:
+    for instance in model.query.all():
+      indexer.create_record(fts_record_for(instance), False)
+  db.session.commit()
+
+  return redirect(url_for('admin'))
+
 @app.route("/admin")
 @login_required
 def admin():
