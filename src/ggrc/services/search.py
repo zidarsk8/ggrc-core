@@ -11,30 +11,55 @@ from .util import url_for
 
 def search():
   terms = request.args.get('q')
-  if not terms or terms is None:
+  if terms is None:
     return current_app.make_response((
       'Query parameter "q" specifying search terms must be provided.',
       400,
       [('Content-Type', 'text/plain')],
       ))
-  should_group_by_type = request.args.get('group_by_type')
-  if should_group_by_type is not None and \
-      should_group_by_type.lower() == 'true':
+
+  should_group_by_type = request.args.get('group_by_type', '')
+  should_group_by_type = should_group_by_type.lower() == 'true'
+  should_just_count = request.args.get('counts_only', '')
+  should_just_count = should_just_count.lower() == 'true'
+
+  if should_just_count:
+    return do_counts(terms)
+  if should_group_by_type:
     return group_by_type_search(terms)
   return basic_search(terms)
+
+def do_counts(terms):
+  indexer = get_indexer()
+  results = indexer.counts(terms)
+
+  return current_app.make_response((
+    json.dumps({ 'results': {
+        'selfLink': request.url,
+        'counts': dict(results)
+        }
+      }, cls=DateTimeEncoder),
+    200,
+    [('Content-Type', 'application/json')],
+    ))
 
 def do_search(terms, list_for_type):
   indexer = get_indexer()
   results = indexer.search(terms)
+  seen_results = {}
+
   for result in results:
     id = result.key
     model_type = result.type
-    entries_list = list_for_type(model_type)
-    entries_list.append({
-      'id': id,
-      'type': model_type,
-      'href': url_for(model_type, id=id),
-      })
+    result_pair = (model_type, id)
+    if result_pair not in seen_results:
+      seen_results[result_pair] = True
+      entries_list = list_for_type(model_type)
+      entries_list.append({
+        'id': id,
+        'type': model_type,
+        'href': url_for(model_type, id=id),
+        })
 
 def make_search_result(entries):
   return current_app.make_response((
