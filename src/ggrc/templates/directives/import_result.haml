@@ -1,32 +1,16 @@
--extends "layouts/dashboard.haml"
+#results-container
+  .row-fluid
+    .span6
+      %h4 Compliance Program
+      .row-fluid
+        .span10.control-group
+          %label{for:"slug"} Regulation / Contract / Policy
+          %input#slug.span12{disabled:"disabled",value:"{{converter.import_slug}}",type:"text"}/
+          %br/
 
-
--# Top level template for rendering an imported spread sheet
-
--#columns = %w(slug title description notes controls)
--#header_overrides = {}
-
--#content_for :import_cancel_path, flow_directive_path(@directive)
-
-  -#content_for :import_success do
-      Import of
-      =link_to @directive.title, flow_directive_path(@directive)
-      is done.
-
--block main
-  #results-container
-    .row-fluid
-      .span6
-        %h4 Compliance Program
-        .row-fluid
-          .span10.control-group
-            %label{for:"slug"} Regulation / Contract / Policy
-            %input#slug.span12{disabled:"disabled",value:"{{converter.import_slug}}",type:"text"}/
-            %br/
-
-          .span2
-            %label{for:"version"} Version
-            %input#version.span12{disabled:"disabled",value:"",type:"text"}
-    - block errors_and_table
-    - block bottom_buttons
-    %br
+        .span2
+          %label{for:"version"} Version
+          %input#version.span12{disabled:"disabled",value:"",type:"text"}
+  - block errors_and_table
+  - block bottom_buttons
+  %br

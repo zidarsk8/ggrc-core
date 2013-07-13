@@ -10,19 +10,17 @@
 -block errors_and_table
   .row-fluid
     #sampleData.span12
-      {% if all_errors %}
-        {% for i in all_errors %}
+      -if all_errors
+        -for i in all_errors
           %p.label-error
-            {{all_errors[loop.index0]}}
-        {% endfor %}
-      {% endif %}
+            =all_errors[loop.index0]
+
       %br
-      {% if all_warnings|length > 0 %}
-        {% for i in all_warnings %}
+
+      -if all_warnings|length > 0
+        -for i in all_warnings
           %p.label-warning
-            {{all_warnings[loop.index0]}}
-        {% endfor %}
-      {% endif %}
+            =all_warnings[loop.index0]
 
       %h4 Data to Import
       -include "directives/_import_table.haml"
@@ -32,19 +30,13 @@
 
 -block bottom_buttons
   .row-fluid
-    .span8 
+    .span8
     .span1
-      -#%form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
       %input{"value":"Cancel","class":'btn btn-large',"type":'submit'}
     .span2
-      -#%form{"class":'import',"remote":True,'data-type':'html','data-update-target':'#results-container'}    
-      {% if all_errors %}
+      -if all_errors
         %input{"value":"Correct Errors Before Proceeding","class":'btn btn-large btn-warning pull-right',"type":'submit','name':'confirm',"disabled":True}
-      {% elif all_warnings %}
+      -elif all_warnings
         %input{"value":"Proceed with Caution","class":'btn btn-large btn-warning pull-right',"type":'submit','name':'confirm'}
-      {% else %}
+      -else
         %input{"value":"Finish Importing","class":'btn btn-large btn-warning pull-right',"type":'submit','name':'confirm'}
-      {% endif %}
-
-    -#.span12
-      -#=yield_content! :import_success

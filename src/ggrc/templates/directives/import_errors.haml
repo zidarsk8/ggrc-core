@@ -6,10 +6,9 @@
 .row-fluid
   .span6
     %h4
-      {% if exception_message is defined %}
+      -if exception_message is defined
         %b
-          {{ exception_message }}
-      {% else %}
+          =exception_message
+      -else
         =default_message
-      {% endif %}
 

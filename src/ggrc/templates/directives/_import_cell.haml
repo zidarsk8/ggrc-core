@@ -1,70 +1,59 @@
 
 -# This HAML file renders an individual cell based up type
--#	LinkDocuments, Link, Textor HTML or everything else
+-#   LinkDocuments, Link, Textor HTML or everything else
 
-	-#column_name = column_name.to_sym
-	-#cell = result[column_name]
+-#column_name = column_name.to_sym
+-#cell = result[column_name]
 
-	-#td_class = cell.nil? ? '' : (cell.has_errors? ? 'member-failure' : (cell.has_warnings? ? 'member-warning' : '' ))
+-#td_class = cell.nil? ? '' : (cell.has_errors? ? 'member-failure' : (cell.has_warnings? ? 'member-warning' : '' ))
 
-%td{class:""}
+%td{ 'class': '' }
 
-	-# set values to test
+  -# set values to test
 
-	-set cell = ""
-	-set status = "created"
-	
-	{% if cell == "LinkDocumentsHandler" %}
-        %hr
-        -set first = True
-        {% if first %}
-        	-set first = False
-           {% else %}
-        	%hr
-        {% endif %}
-		
-		{% if status == "created" %}
-        	%span
-        	 =cellvalue
-      	{% elif status == "existing" %}
-        	=cellvalue
-      	{% else %}
-        	=cellvalue
-        {% endif %}
-		
-		{% if status == "created" %}
-        	%span
-        		%a{href:"document.link",rel:"tooltip",title:"document.link"}
-		{% elif status == "existing" %}
-        		%a{href:"document.link",rel:"tooltip",title:"document.link"}
-      	{% else %}
-			-#abc
-		{% endif %}
+  -set cell = ""
+  -set status = "created"
 
-	
-	{% elif cell == "LinkHandler" %}
-        -set first = True
-        {% if first %}
-        	-set first = False
-           {% else %}
-        	%hr
-        {% endif %}
-		
-		{% if status == "created" %}
-        	%span
-        	-#display cell new link
-      	{% elif status == "existing" %}
-        	display cell existing link
-      	{% else %}
-        	=value
-        {% endif %}
+  -if cell == "LinkDocumentsHandler"
+    %hr
+    -set first = True
+    -if first
+      -set first = False
+    -else
+      %hr
 
+    -if status == "created"
+      %span
+       =cellvalue
+    -elif status == "existing"
+      =cellvalue
+    -else
+      =cellvalue
 
-	{% elif cell == "TextOrHtmlColumnHandler" %}
-    	text or html
+    -if status == "created"
+      %span
+        %a{href:"document.link",rel:"tooltip",title:"document.link"}
+    -elif status == "existing"
+      %a{href:"document.link",rel:"tooltip",title:"document.link"}
+    -else
 
-   
-	{% else %}
-		={cellvalue}
-	{% endif %}
+  -elif cell == "LinkHandler"
+    -set first = True
+    -if first
+      -set first = False
+    -else
+      %hr
 
+    -if status == "created"
+      %span
+      -#display cell new link
+    -elif status == "existing"
+      display cell existing link
+    -else
+      =value
+
+  -elif cell == "TextOrHtmlColumnHandler"
+    text or html
+
+  -else
+    =cellvalue
