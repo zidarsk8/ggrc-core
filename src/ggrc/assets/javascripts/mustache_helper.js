@@ -658,7 +658,7 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
 
   var page_type = GGRC.infer_object_type(GGRC.page_object);
 
-  if(~can.inArray(context.constructor.model_singular, page_type.links_to)) {
+  if(page_type.links_to[context.constructor.model_singular] || ~can.inArray(context.constructor.model_singular, page_type.links_to)) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);

@@ -25,11 +25,11 @@ can.Model.Cacheable("CMS.Models.Relationship", {
             this.attr("source", CMS.Models.get_instance(
                   this.source_type || this.source.type
                   , this.source_id || this.source.id
-                  , this.source));
+                  , this.source) || this.source);
             this.attr("destination", CMS.Models.get_instance(
                   this.destination_type || this.destination.type
                   , this.destination_id || this.destination.id
-                  , this.destination));
+                  , this.destination) || this.destination);
 
             this.each(function(value, name) {
               if (value === null)
@@ -50,21 +50,21 @@ can.Model.Cacheable("CMS.Models.Program", {
   , findAll : "/api/programs?kind=Directive"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
-  , links_to : [
-    "Regulation"
-    , "Policy"
-    , "Contract"
-    , "System"
-    , "Process"
-    //, "Control"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "Regulation" : "ProgramDirective"
+    , "Policy" : "ProgramDirective"
+    , "Contract" : "ProgramDirective"
+    , "System" : {}
+    , "Process" : {}
+    //, "Control" 
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Product" : {}
+    , "Market" : {}
+  }
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
@@ -773,7 +773,7 @@ can.Model.Cacheable("CMS.Models.Role", {
 CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
   var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
   return !!~can.inArray(cls.model_singular, this.permissions[operation]);
-}
+};
 
 can.Model.Cacheable("CMS.Models.UserRole", {
   root_object : "user_role"

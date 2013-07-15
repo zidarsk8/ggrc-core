@@ -1,0 +1,50 @@
+{{!<div class="modal-body">}}
+
+<div class="row-fluid">
+
+  {{#page_object}}
+  <div class="span4 detail_column {{constructor.model_singular.toLowerCase}}">
+    <input type="hidden" name="source.type" value="{{constructor.model_singular}}"/>
+    <input type="hidden" name="source.id" value="{{id}}"/>
+    <div class="selector-info centered">
+        <h4 class="{{constructor.category}}">
+          <i class="grcicon-{{constructor.model_singular.toLowerCase}}-color"></i>
+          {{constructor.title_singular}}
+        </h4>
+        <br>
+        {{ title }}
+        <br>
+        {{ link }}
+        <br>
+    </div>
+  </div>
+  {{/page_object}}
+
+  <div class="span4 option_column">
+    {{#relationships}}
+    <input type="radio" name="relationship_type_id" value="{{id}}">
+    <span>{{name}}</span>
+    {{/relationships}}
+  </div>
+
+  {{#related_object}}
+  <div class="span4 detail_column {{constructor.model_singular.toLowerCase}}">
+    <input type="hidden" name="destination.type" value="{{constructor.model_singular}}"/>
+    <input type="hidden" name="destination.id" value="{{id}}"/>
+    <div class="selector-info centered">
+        <h4 class="{{constructor.category}}">
+          <i class="grcicon-{{constructor.model_singular.toLowerCase}}-color"></i>
+          {{constructor.title_singular}}
+        </h4>
+        <br>
+        {{ title }}
+        <br>
+        {{ link }}
+        <br>
+    </div>
+  </div>
+  {{/related_object}}
+
+  <input type="hidden" name="context.id" value="{{page_object.context.id}}" />
+</div>
+{{!</div>}}
