@@ -155,7 +155,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     this._super.apply(this, arguments);
   }
   , meta_kinds : []
-  , links_to : ["Control", "Program"]
+  , links_to : { "Control" : "DirectiveControl", "Program" : "ProgramDirective" }
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
@@ -284,20 +284,19 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
       , single_object : false
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
   , init : function() {
-    var that = this
+    var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
@@ -331,18 +330,17 @@ can.Model.Cacheable("CMS.Models.Project", {
       , related_side : "source"
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
@@ -389,18 +387,17 @@ can.Model.Cacheable("CMS.Models.Facility", {
       , single_object : false
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -455,18 +452,18 @@ can.Model.Cacheable("CMS.Models.Product", {
       , single_object : false
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Product" : {}
+    , "Market" : {}
+    }
   , init : function() {
     var that = this
     this._super && this._super.apply(this, arguments);
@@ -527,20 +524,19 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       , single_object : false
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
   , init : function() {
-    var that = this
+    var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
@@ -573,18 +569,17 @@ can.Model.Cacheable("CMS.Models.Market", {
       , related_side : "source"
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Program"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Program" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    }
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
@@ -663,18 +658,17 @@ can.Model.Cacheable("CMS.Models.Risk", {
       , start_expanded : false
       , create_link : true
     }]}
-  , links_to : [
-    "System"
-    , "Process"
-    , "Product"
-    , "Facility"
-    , "OrgGroup"
-    , "Project"
-    , "DataAsset"
-    , "Product"
-    , "Market"
-    , "RiskyAttribute"
-    ]
+  , links_to : {
+    "System" : {}
+    , "Process" : {}
+    , "Product" : {}
+    , "Facility" : {}
+    , "OrgGroup" : {}
+    , "Project" : {}
+    , "DataAsset" : {}
+    , "Market" : {}
+    , "RiskyAttribute" : "RiskRiskyAttribute"
+    }
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
@@ -769,6 +763,26 @@ can.Model.Cacheable("CMS.Models.Role", {
   , update : "PUT /api/roles/{id}"
   , create : "POST /api/roles"
 }, {});
+
+can.Model.Cacheable("GGRC.Models.DirectiveControl", {
+  findAll : function(params) {
+    throw "ERROR : DirectiveControl is not yet implemented";
+  }
+  , findOne : function(params) {
+    throw "ERROR : DirectiveControl is not yet implemented";
+  }
+  , update : function(params) {
+    throw "ERROR : DirectiveControl is not yet implemented";
+  }
+  , create : function(params) {
+    throw "ERROR : DirectiveControl is not yet implemented";
+  }
+  , destroy : function(params) {
+    throw "ERROR : DirectiveControl is not yet implemented";
+  }
+}, {
+
+});
 
 CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
   var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;

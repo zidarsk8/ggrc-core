@@ -117,20 +117,19 @@ can.Model.Cacheable("CMS.Models.System", {
       controls : "CMS.Models.Control.models"
       , sub_systems : "CMS.Models.System.models"
     }
-    , links_to : [
-      "System"
-      , "Process"
-      , "Control"
-      , "Product"
-      , "Facility"
-      , "OrgGroup"
-      , "Project"
-      , "DataAsset"
-      , "Program"
-      , "Product"
-      , "Market"
-      , "Risk"
-      ]
+    , links_to : {
+      "System" : "SystemSystem"
+      , "Process" : "SystemSystem"
+      , "Control" : "SystemControl"
+      , "Product" : {}
+      , "Facility" : {}
+      , "OrgGroup" : {}
+      , "Project" : {}
+      , "DataAsset" : {}
+      , "Program" : {}
+      , "Market" : {}
+      , "Risk" : {}
+      }
 }, {
 
     init : function() {
