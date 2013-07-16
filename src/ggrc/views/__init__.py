@@ -105,6 +105,7 @@ def import_sections(directive_id):
         results = converter.final_results
         dummy_data = results
         if not dry_run:
+          #FIXME: Flash from the server side does not seem to be working
           flash("Import is done.")
           return redirect('/directives/{}'.format(directive_id))
 
@@ -113,6 +114,17 @@ def import_sections(directive_id):
         return render_template("directives/import.haml", directive_id = directive_id, exception_message = str(converter.import_exception))
 
   return render_template("directives/import.haml", directive_id = directive_id)
+
+
+@app.route("/directives/<directive_id>/export_sections", methods=['GET', 'POST'])
+def export_sections(directive_id):
+
+  if request.method == 'GET':
+    handle_converter_csv_export(directive_id, SectionsConverter)
+
+  return redirect('directives/{}'.format(directive_id))
+
+
 
 def _all_views(view_list):
   import ggrc.services

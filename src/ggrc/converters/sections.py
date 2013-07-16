@@ -38,7 +38,7 @@ class SectionsConverter(BaseConverter):
 
   metadata_map = {
     'Type' : 'type',
-    'Section Code'  : 'slug',
+    'Regulation Code'  : 'slug',
     'Section Title' : 'title',
     'Section Description' : 'description',
     'Version' : 'version',

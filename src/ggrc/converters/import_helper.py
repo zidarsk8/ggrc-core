@@ -1,7 +1,7 @@
 import csv
 import os
-import tempfile
-import io
+from ggrc.models import Directive, Section
+
 
 def handle_csv_import(converter_class, filepath, **options):
   rows = []
@@ -25,4 +25,16 @@ def utf_8_encoder(unicode_csv_data):
   for line in unicode_csv_data:
     yield line.encode('utf-8')
 
+def handle_csv_export(filename):
+  pass
+
+def handle_converter_csv_export(directive_id, converter_class, **options):
+  options['export'] = True
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  filename = "{}.csv".format(directive.slug)
+  objects = directive.sections
+  print "HERE ARE THE SECTIONS: " + str(objects)
+  for section in objects:
+    print "FOUND SECTION:{}".format(section.slug)
+  #handle_csv_export(filename)
 
