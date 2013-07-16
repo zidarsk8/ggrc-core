@@ -72,11 +72,19 @@ def get_property_from(context, property_path, resource):
   traversed = []
   for p in property_path:
     traversed.append(p)
-    obj = obj.get(unicode(p))
+    if isinstance(obj, list):
+      obj = obj[int(p)]
+    else:
+      obj = obj.get(unicode(p))
     assert obj is not None, \
         'Could not traverse entire property path, stopped at {0}.'.format(
             traversed)
   return obj
+
+@then('the value of the "{property_path}" property of the "{resource}" is {expected}')
+def check_property_path_value(context, property_path, resource, expected):
+  actual = get_property_from(context, property_path, resource)
+  assert expected == actual, 'Expected {}, found {}: {}'.format(expected, actual, getattr(context, resource))
 
 @then('the "{property_path}" property of the "{resource}" is empty')
 def check_empty_property(context, property_path, resource):

@@ -36,6 +36,7 @@ def named_example_from_json(context, resource_type, example_name):
 def named_example_resource(context, resource_type, example_name, **kwargs):
   handle_named_example_resource(context, resource_type, example_name, **kwargs)
 
+@when('"{name}" is POSTed to its collection')
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
@@ -172,6 +173,7 @@ def put_example_resource(context, name, expected_status=200):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
+@when('PUT "{resource_name}"')
 @then('PUT of "{resource_name}" is allowed')
 def check_PUT_is_allowed(context, resource_name):
   put_example_resource(context, resource_name)
@@ -203,6 +205,7 @@ def delete_example_resource(context, name, expected_status=200):
   response = delete_resource(context, url, example)
   assert response.status_code == expected_status
 
+@when('DELETE "{resource_name}"')
 @then('DELETE of "{resource_name}" is allowed')
 def check_DELETE_is_allowed(context, resource_name):
   delete_example_resource(context, resource_name, expected_status=200)
