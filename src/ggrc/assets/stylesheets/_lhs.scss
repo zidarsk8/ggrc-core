@@ -311,16 +311,21 @@
       height:100%;
     }
     a {
-      padding-left:10px;
+      padding-left:20px;
       display:block;
       line-height:30px;
       font-size:13px;
       border-bottom:1px solid #eee;
       color:#777;
       &:hover {
-        background:#444;
+        background-color:#444;
+        background-image: image-url("grcicons/icons.png");
+        background-repeat: no-repeat;
+        @include background-size(296px 344px);
+        background-position: -270px -313px;
         color:#fff;
         text-decoration:none;
+        cursor:move;
       }
       span {
         font-size:11px;
@@ -328,7 +333,7 @@
     }
     li.active {
       a {
-        background:#333;
+        background-color:#333;
         color:#fff;
       }
     }
@@ -336,7 +341,7 @@
       li.active {
         a {
           color:#fff;
-          background:$business;
+          background-color:$business;
         }
       }
     }
@@ -344,7 +349,7 @@
       li.active {
         a {
           color:#fff;
-          background:$governance;
+          background-color:$governance;
         }
       }
     }
@@ -352,7 +357,7 @@
       li.active {
         a {
           color:#fff;
-          background:$risk;
+          background-color:$risk;
         }
       }
     }
@@ -360,7 +365,7 @@
       li.active {
         a {
           color:#fff;
-          background:$programs;
+          background-color:$programs;
         }
       }
     }
