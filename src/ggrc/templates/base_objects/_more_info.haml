@@ -5,10 +5,10 @@
 -block widget_title
   References
   %span
-    =instance.object_documents|length
+    (={ instance.object_documents|length })
   , People
   %span
-    =instance.object_people|length
+    (={ instance.object_people|length })
 
 -block widget_help
   =model._inflector.table_singular + "_more_info"

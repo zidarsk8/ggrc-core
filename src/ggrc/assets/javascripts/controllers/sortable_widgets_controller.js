@@ -64,7 +64,9 @@ can.Control("CMS.Controllers.SortableWidgets", {
       .append(
         $("<a>")
         .attr("href", "#" + $widget.attr("id"))
-        .text($widget.find(".header").text()))
+          .append(
+            $("<div class='oneline'>")
+              .text($widget.find(".header").text())))
       .appendTo(".inner-nav .internav");
     });
     setTimeout(function() {
