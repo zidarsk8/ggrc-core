@@ -190,11 +190,36 @@ can.Model("can.Model.Cacheable", {
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
         var p = val && val.serialize ? val.serialize() : val;
+        var i = 0, j = 0, k;
         if(m[key] instanceof can.Observe.List) {
           m[key].replace(
             m[key].constructor.models ?
               m[key].constructor.models(p)
               : p);
+          // TODO -- experimental list optimization below -- BM 7/15/2013
+          // p = m[key].constructor.models ? m[key].constructor.models(p) : p;
+          // while(i < m[key].length && j < p.length) {
+          //   if(m[key][i] === p[j]) {
+          //     i++; j++;
+          //   } else if((k = can.inArray(m[key][i], p)) > j) {
+          //     m[key].splice(i, 0, p.slice(j, k - j));
+          //     i += k - j + 1;
+          //     j = k + 1;
+          //   } else if((k = can.inArray(p[j], m[key])) > i) {
+          //     m[key].splice(i, k - i);
+          //     i++;
+          //     j++;
+          //   } else {
+          //     m[key].splice(i, 1);
+          //   }
+          // }
+          // i = m[key].length;
+          // j = p.length;
+          // if(i < j) {
+          //   m[key].splice(i, 0, p.slice(i, j - i));
+          // } else if(j < i) {
+          //   m[key].splice(j, i - j);
+          // }
         } else if(m[key] instanceof can.Model) {
           m[key].constructor.model(params[key]);
         } else {

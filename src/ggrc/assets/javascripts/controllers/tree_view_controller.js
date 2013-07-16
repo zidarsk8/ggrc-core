@@ -27,7 +27,7 @@ can.Control("CMS.Controllers.TreeView", {
     model : null
     , list_view : "/static/mustache/controls/tree.mustache"
     , show_view : "/static/mustache/controls/show.mustache"
-    , parent_id : null
+    , parent : null
     , list : null
     , single_object : false
     , find_params : {}
@@ -62,13 +62,14 @@ can.Control("CMS.Controllers.TreeView", {
   }
 
   , init : function(el, opts) {
-    this.options.list ? this.draw_list() : this.fetch_list(this.options.parent_id);
+    this.element.uniqueId();
+    this.options.list ? this.draw_list() : this.fetch_list();
     this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
     this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
   }
   , fetch_list : function() {
     if(can.isEmptyObject(this.options.find_params.serialize())) {
-      this.options.find_params.attr("id", this.options.parent_id);
+      this.options.find_params.attr("id", this.options.parent ? this.options.parent.id : undefined);
     }
     this.find_all_deferred = this.options.model[this.options.find_function || (this.options.single_object ? "findOne" : "findAll")](
       this.options.find_params.serialize()
@@ -77,25 +78,15 @@ can.Control("CMS.Controllers.TreeView", {
   , draw_list : function(list) {
     var that = this;
     if(list) {
-      list = list.length == null ? [list] : list;
+      list = list.length == null ? new can.Observe.List([list]) : list;
     } else {
       list = this.options.list;
     }
-    list.bind("add", function(ev, newVals, index) {
-      can.each(newVals, function(newVal) {
-        that.element.trigger("newChild", new can.Observe.TreeOptions({instance : newVal}));
-      });
-    }).bind("remove", function(ev, oldVals, index) {
-      can.each(oldVals, function(oldVal) {
-        for(var i = that.options.list.length - 1; i >= 0; i--) {
-          if(that.options.list[i].instance === oldVal) {
-            that.options.list.splice(i, 1);
-          }
-        }
-      });
-    });
+
     can.Observe.startBatch();
+    this.options.attr("original_list", list);
     this.options.attr("list", []);
+    this.on();
     can.each(list, function(v, i) {
       if(!(v instanceof can.Observe.TreeOptions)) {
         v = new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
@@ -119,6 +110,23 @@ can.Control("CMS.Controllers.TreeView", {
           that.add_child_lists(that.options.attr("list")); //since the view is handling adding new controllers now, configure before rendering.
         }
       });
+    });
+  }
+
+  , "{original_list} add" : function(list, ev, newVals, index) {
+    var that = this;
+    can.each(newVals, function(newVal) {
+      that.element.trigger("newChild", new can.Observe.TreeOptions({instance : newVal}));
+    });
+  }
+  , "{original_list} remove" : function(list, ev, oldVals, index) {
+    var that = this;
+    can.each(oldVals, function(oldVal) {
+      for(var i = that.options.list.length - 1; i >= 0; i--) {
+        if(that.options.list[i].instance === oldVal) {
+          that.options.list.splice(i, 1);
+        }
+      }
     });
   }
 
@@ -201,7 +209,7 @@ can.Control("CMS.Controllers.TreeView", {
   , " newChild" : function(el, ev, data) {
     var that = this;
     var model;
-    if(!this.options.parent_id || (this.options.parent_id === data.parent_id)) { // '==' just because null vs. undefined sometimes happens here
+    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
       model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
       this.add_child_lists([model]);
       this.options.list.push(new can.Observe.TreeOptions({ instance : model}));
@@ -211,6 +219,24 @@ can.Control("CMS.Controllers.TreeView", {
       ev.stopPropagation();
     }
   }
+  , " removeChild" : function(el, ev, data) {
+    var that = this;
+    var model;
+    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
+      model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
+      that.options.list.replace(
+        can.map(
+          this.options.list
+          , function(v, i) {
+            if(v.instance.id !== model.id) {
+              return v;
+            }
+          })
+      );
+      ev.stopPropagation();
+    }
+  }
+
   , ".edit-object modal:success" : function(el, ev, data) {
     var model = el.closest("[data-model]").data("model");
     model.attr(data[model.constructor.root_object] || data);
