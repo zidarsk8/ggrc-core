@@ -8,6 +8,16 @@
   min-height:100px;
   float:left;
 }
+.affix-holder {
+  &.affix {
+    position: fixed;
+    top: 30px;
+    z-index: 900;
+    height:100%;
+    overflow:auto;
+  }
+}
+
 
 .lhs {
   position:relative;
