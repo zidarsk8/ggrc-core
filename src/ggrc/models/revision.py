@@ -22,3 +22,10 @@ class Revision(Base, db.Model):
       'action',
       'content',
   ]
+
+  def __init__(self, obj, modified_by_id, action, content):
+    self.resource_id = obj.id
+    self.modified_by_id = modified_by_id
+    self.resource_type = str(obj.__class__.__name__)
+    self.action = action
+    self.content = content
