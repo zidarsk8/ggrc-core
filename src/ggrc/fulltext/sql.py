@@ -13,6 +13,7 @@ class SqlIndexer(Indexer):
       db.session.add(self.record_type(
         key=record.key,
         type=record.type,
+        context_id=record.context_id,
         tags=record.tags,
         property=k,
         content=v,

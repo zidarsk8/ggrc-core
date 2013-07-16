@@ -1,0 +1,11 @@
+-extends 'layouts/_widget_box.haml'
+-set model = instance.__class__
+
+-block widget_title
+  =model._inflector.title_singular + " Info"
+
+-block widget_help
+  =model._inflector.table_singular + "_info"
+
+-block widget_id
+  =model._inflector.table_singular + "_info_widget"

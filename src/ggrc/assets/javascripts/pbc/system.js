@@ -13,15 +13,13 @@
 can.Model.Cacheable("CMS.Models.System", {
     root_object : "system"
     , root_collection : "systems"
+    , root_model : "System"
     , xable_type : "System"
-    , findAll : "GET /api/systems?responseid={id}"
-    , findOne : "GET /api/systems/{id}"
+    , findAll : "GET /api/systems"
     , create : "POST /api/systems"
     , update : function(id, params) {
-      return $.ajax({
-        url : "/systems/" + id + ".json"
-        , data : this.process_args(
-          params
+      /*var data = this.process_args(
+          params['system']
           , ["notes"
             , "description"
             , "infrastructure"
@@ -33,7 +31,10 @@ can.Model.Cacheable("CMS.Models.System", {
             , "title"
             , "type_id"
             , "url"
-            , "version"])
+            , "version"]);*/
+      return $.ajax({
+        url : "/api/systems/" + id
+        , data : params
         , type : "put"
       });
     }
@@ -49,7 +50,7 @@ can.Model.Cacheable("CMS.Models.System", {
                   return {
                     label: item.system.slug + ' ' + item.system.title + ' (' + system_or_process + ')',
                     value: item.system.id
-                  }
+                  };
                 }));
             }
         });
@@ -87,29 +88,40 @@ can.Model.Cacheable("CMS.Models.System", {
             }
         });
         this.tree_view_options.child_options[1].model = CMS.Models.System;
+        this.risk_tree_options.child_options[1].list_view = "/static/mustache/systems/tree.mustache";
+        this.risk_tree_options.child_options[1].parent_find_param = "super_system_systems.parent_id";
+        this.risk_tree_options.child_options[1].link_buttons = true;
+
 
         this.validatePresenceOf("title");
         this.validateFormatOf("network_zone", /[0-9]*/);
     }
     , tree_view_options : {
       list_view : "/static/mustache/systems/tree.mustache"
+      , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
         , list_view : "/static/mustache/controls/tree.mustache"
-        , parent_find_param : "system_id"
+        , parent_find_param : "system_controls.system_id"
+        , link_buttons : true
+        , draw_children : false
       },{
         model : null ///filled in after init.
         , list_view : "/static/mustache/systems/tree.mustache"
-        , parent_find_param : "parent_id"
-				, link_buttons: true
+        , parent_find_param : "super_system_systems.parent_id"
+        , link_buttons: true
       }]
+    }
+    , attributes : {
+      controls : "CMS.Models.Control.models"
+      , sub_systems : "CMS.Models.System.models"
     }
 }, {
 
     init : function() {
       var that = this;
       this._super && this._super();
-      this.bind("created updated", can.proxy(this, 'reinit'))
+      this.bind("created updated", can.proxy(this, 'reinit'));
       this.reinit();
       //careful to only do this on init.  Once live binding is set up, some live binding
       //  stops happening when doing removeAttr instead of attr(..., null)
@@ -150,19 +162,26 @@ can.Model.Cacheable("CMS.Models.System", {
 CMS.Models.System("CMS.Models.StrictSystem", {
   findAll : "GET /api/systems?is_biz_process=false"
   , create : function(params) {
-    params[is_biz_process] = false;
+    params.is_biz_process = false;
     return this._super(params);
   }
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() {
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});
 
 CMS.Models.System("CMS.Models.Process", {
   findAll : "GET /api/systems?is_biz_process=true"
   , create : function(params) {
-    params[is_biz_process] = true;
+    params.is_biz_process = true;
     return this._super(params);
   }
+
   , cache : can.getObject("cache", CMS.Models.System, true)
-  , init : function() { } //don't rebind the ObjectDocument/ObjectPerson events.
+  , init : function() {
+    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this.tree_view_options.child_options[1].model = this;
+  } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});

@@ -13,11 +13,12 @@ SQLALCHEMY_POOL_RECYCLE = 120
 AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 FULLTEXT_INDEXER = None
+USER_PERMISSIONS_PROVIDER = None
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
-VERSION = "s5"
+VERSION = "s6"
 
 # Initialize from environment if present
 import os

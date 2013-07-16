@@ -1,19 +1,18 @@
--#
 -# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 -# Created By:
 -# Maintained By:
--#
+
 -extends "layouts/dashboard.haml"
 
 -set model = controller.model
--set model_name = controller.model_name
--set model_title = model_name|title
+-set model_title = model._inflector.title_singular
+-set model_name = model._inflector.table_singular
 
 -block title
   =instance.title
 
--block page_help
+-block page_help scoped
   =model_name
 
 -block extra_javascript
@@ -43,7 +42,7 @@
 -block subheader_extras
   %ul.actions.pull-right
     %li
-      %a{ 'href': "url-for-edit-#{model_name}-#{instance.id}", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'title': "Edit #{model_title}" }
+      %a{ 'href': "javascript://", 'data-toggle': 'modal-ajax-form', 'data-object-plural': '={model._inflector.table_plural}', 'data-object-singular': '={model._inflector.model_singular}', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'title': "Edit #{model_title}", 'data-object-id': 'page' }
         %i.grcicon-edit
         %span Edit #{model_title}
 
@@ -54,21 +53,17 @@
   .container-fluid
     #show_columns.row-fluid{ 'data-resize': "true" }
       #middle_column.span8.widget-area
-        -# FIXME: Make a good pattern for lookup paths
-        -#   e.g. 'programs/_main.haml', 'programs/_main.html', 'base_objects/_main.haml', ...
-        -#   perhaps traverse MRO, then 'shared/'
         -with widget_class = 'business'
-          -#include lookup("main", instance)
-        -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-          -include 'shared/_related.haml'
-        -#if instance|has_valid_relationships
-          -with widget_class = 'widget-tabs widget-tabs-horizontal business'
-            -#include lookup('related')
+          -include 'base_objects/_main.haml'
+        -with widget_class = 'risk'
+          -include 'base_objects/_risks.haml'
+        -if related_objects(instance)
+          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+            -include 'shared/_related.haml'
         -include 'shared/_add_widget_section.haml'
 
       #right_column.span4.widget-area
         -with widget_class = 'business'
+          -include 'base_objects/_info.haml'
           -include 'base_objects/_more_info.haml'
-          -#include lookup('info')
-          -#include lookup('more_info')
         -include 'shared/_add_widget_section.haml'

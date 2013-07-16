@@ -19,7 +19,6 @@
    *     option_detail_view:
    *
    *   Models and Queries:
-   *     object_model: The model being linked to (the "one" in "one-to-many")
    *     option_model: The model being "selected" (the "many")
    *     option_query:
    *       Any additional parameters needed to restrict valid options
@@ -54,12 +53,12 @@
       active_object_view: null, //GGRC.mustache_path + "/selectors/active_object.mustache",
       option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
 
-      object_model: null,
       option_model: null,
       option_query: {},
       active_query: {},
       join_model: null,
       join_query: {},
+      join_object: null,
 
       modal_title: null,
       option_list_title: null,
@@ -98,7 +97,7 @@
             return new can.Observe({
               option: CMS.Models.get_instance(
                 CMS.Models.get_link_type(join, self.options.option_attr),
-                join[self.options.option_attr].id)
+                join[self.options.option_id_field] || join[self.options.option_attr].id)
             , join: join
             });
           }))
@@ -112,8 +111,6 @@
           $(list_target).tmpl_setitems(self.join_list);
       });
 
-      this.object_model = this.get_page_model();
-
       $.when(
         this.post_init(),
         this.fetch_data()
@@ -124,12 +121,12 @@
 
     fetch_data: function() {
       var self = this
-        , join_query = {}
+        , join_query = can.extend({}, this.options.join_query)
         ;
 
-      join_query[this.options.join_id_field] = this.get_page_object_id();
+      join_query[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
-        join_query[this.options.join_type_field] = this.get_page_object_type();
+        join_query[this.options.join_type_field] = this.get_join_object_type();
       }
       $.extend(join_query, this.options.extra_join_fields);
 
@@ -229,7 +226,7 @@
           join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.shortName);
+          join = this.get_new_join(option.id, option.constructor.getRootModelName());
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
@@ -292,35 +289,32 @@
       if (this.options.option_type_field) {
         join_params[this.options.option_type_field] = option_type;
       }
-      join_params[this.options.join_id_field] = this.get_page_object_id();
+      join_params[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
-        join_params[this.options.join_type_field] = this.get_page_object_type();
+        join_params[this.options.join_type_field] = this.get_join_object_type();
       }
-      $.extend(join_params, this.options.extra_join_fields);
+      // FIXME: context_id must get a real value
+      $.extend(join_params, this.options.extra_join_fields, { context_id: 0 });
       return new (this.options.join_model)(join_params);
     },
 
-    get_page_object: function() {
-      return GGRC.make_model_instance(GGRC.page_object);
+    get_join_object_id: function() {
+      return this.options.join_object.id;
     },
 
-    get_page_model: function() {
-      return this.get_page_object().constructor;
+    get_join_object_type: function() {
+      return this.options.join_object.constructor.getRootModelName();
     },
-
-    get_page_object_id: function() {
-      return this.get_page_object().id;
-    },
-
-    get_page_object_type: function() {
-      return this.get_page_model().shortName;
-    }
 
   });
 
-  function get_option_set(name) {
+  function get_page_object() {
+    return GGRC.make_model_instance(GGRC.page_object);
+  }
+
+  function get_option_set(name, data) {
     // Construct options for Person and Reference selectors
-    OPTION_SETS = {
+    var OPTION_SETS = {
       object_documents: {
         option_column_view: GGRC.mustache_path + "/documents/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/documents/active_column.mustache",
@@ -343,6 +337,8 @@
         option_type_field: null,
         join_id_field: 'documentable_id',
         join_type_field: 'documentable_type',
+
+        join_object: get_page_object(),
       },
 
       object_people: {
@@ -367,9 +363,89 @@
         option_type_field: null,
         join_id_field: 'personable_id',
         join_type_field: 'personable_type',
+
+        join_object: get_page_object(),
+      },
+
+      system_systems: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "System",
+        modal_title: "Select Systems",
+
+        related_model_singular: "System",
+        related_table_plural: "systems",
+        related_title_singular: "System",
+        related_title_plural: "Systems",
+
+        option_model: CMS.Models.System,
+
+        join_model: CMS.Models.SystemSystem,
+        option_attr: 'child',
+        join_attr: 'parent',
+        option_id_field: 'child_id',
+        option_type_field: null,
+        join_id_field: 'parent_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.System.findInCacheById(data.join_object_id)
+      },
+
+      system_controls: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Control",
+        modal_title: "Select Controls",
+
+        related_model_singular: "Control",
+        related_table_plural: "controls",
+        related_title_singular: "Control",
+        related_title_plural: "Controls",
+
+        option_model: CMS.Models.Control,
+
+        join_model: CMS.Models.SystemControl,
+        option_attr: 'control',
+        join_attr: 'system',
+        option_id_field: 'control_id',
+        option_type_field: null,
+        join_id_field: 'system_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.System.findInCacheById(data.join_object_id)
       }
-    }
-    return OPTION_SETS[name];
+      , program_directives : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: data.related_title_singular,
+        modal_title: "Select " + data.related_title_plural,
+
+        related_model_singular: "Directive",
+        related_table_plural: "directives",
+        related_title_singular: "System",
+        related_title_plural: "Systems",
+
+        option_model: CMS.Models[data.child_meta_type],
+        join_model: CMS.Models.ProgramDirective,
+
+        option_attr: 'directive',
+        option_id_field: 'directive_id',
+        option_type_field: 'directive_type',
+        join_id_field: 'program_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
+      }
+    };
+    return can.extend(OPTION_SETS[name], {
+      join_query : can.deparam(data.join_query)
+    });
   }
 
   function get_relationship_option_set(data) {
@@ -408,9 +484,12 @@
     options.join_id_field = data.related_side + "_id";
     options.join_type_field = data.related_side + "_type";
 
+    options.join_object = get_page_object();
+
     options.extra_join_fields = {
       relationship_type_id: data.relationship_type
     };
+
 
     return options;
   }
@@ -432,6 +511,7 @@
           , related_side: $this.data('related-side')
           , related_model: $this.data('related-model')
           , relationship_type: $this.data('relationship-type')
+          , join_query: $this.data('join-query')
         }));
     });
   });
@@ -440,10 +520,20 @@
     $('body').on('click', '[data-toggle="modal-selector"]', function(e) {
       var $this = $(this)
         , options = $this.data('modal-selector-options')
+        , data_set = can.extend({}, $this.data())
         ;
 
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
       if (typeof(options) === "string")
-        options = get_option_set(options);
+        options = get_option_set(
+          options
+          , data_set
+        );
 
       e.preventDefault();
 

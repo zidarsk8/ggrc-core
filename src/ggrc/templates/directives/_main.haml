@@ -1,0 +1,55 @@
+-extends "programs/_main.haml"
+-#sections = directive.sections.includes(:controls => :implementing_controls)
+-set section_meta_kind = "clause" if instance.kind == "Contract" else "section"
+
+-block widget_title
+  %i{ 'class' : "grcicon-={section_meta_kind}" }
+  ="{0}s".format(section_meta_kind|title)
+  %span=instance.sections.count
+
+
+-block widget_help
+  directive_controls
+
+-block widget_id
+  directive_controls_widget
+
+-block widget_buttons
+  .filter
+    -if not instance.company_controls
+      .row-fluid
+        .span6
+          -#%input.ui-corner-all.widgetsearch.clear-value(type='text' placeholder='Search')
+        .span6
+          .pull-right
+            %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#regulations, #combo', 'data-route' : "regulations", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : "Create New #{section_meta_kind|title}", 'data-object-singular' : 'Section', 'data-object-plural' : 'sections' }
+              %i.grcicon-add
+              =section_meta_kind|title
+            %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
+              %i.grcicon-add
+              Control
+
+-block main
+  .tabbable
+    %ul.nav.nav-tabs
+      -if not instance.company_controls
+        %li.text-governance.active
+          %a{ 'href' : '#sections', 'data-toggle' : 'tab' }
+            %i{ 'class' : "grcicon-={section_meta_kind}-color" }
+            ="{0}s".format(section_meta_kind|title)
+      %li.text-governance
+        %a{ 'href' : '#controls', 'data-toggle' : 'tab' }
+          %i.grcicon-control-color 
+          Controls
+    .action-items
+      %a.expandAll.btn.btn-mini{'href' : "#", 'rel' : "tooltip", 'title' : "Expand all"}
+        %i.grcicon-wide-black
+      %a.shrinkAll.btn.btn-mini{'href' : "#", 'rel' : "tooltip", 'title' : "Collapse all"}
+        %i.grcicon-normal-black
+
+    .tab-content
+      #sections.tab-pane
+        %ul.tree-structure
+      #controls.tab-pane
+        %ul.tree-structure
+        

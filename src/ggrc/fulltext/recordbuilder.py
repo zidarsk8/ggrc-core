@@ -18,6 +18,7 @@ class RecordBuilder(object):
     return Record(
         obj.id,
         obj.__class__.__name__,
+        obj.context_id,
         '', #FIXME get any qualifying fields to help in search partitioning...
         **properties
         )

@@ -69,6 +69,7 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.instance = new can.Observe(params || this.find_params());
       dfd = new $.Deferred().resolve(this.options.instance);
     }
+    
     return dfd;
   }
 
@@ -94,9 +95,12 @@ can.Control("GGRC.Controllers.Modals", {
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
+    can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
   }
+
   , "input, textarea, select change" : function(el, ev) {
-    this.set_value({name : el.attr("name"), value : el.val() });
+    var value = el.val();
+    this.set_value({name : el.attr("name"), value : value });
   }
 
   , set_value : function(item) {
@@ -105,11 +109,19 @@ can.Control("GGRC.Controllers.Modals", {
       instance = this.options.instance
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
     }
-    var name = item.name.split(".");
-    var $elem = this.options.$content.find("[name='" + item.name + "']");
-    var value = $elem.val();
-    if($elem.attr("numeric") && isNaN(parseInt(value, 10))) {
-      value = null;
+    var name = item.name.split(".")
+      , $elem, value;
+    $elem = this.options.$content.find("[name='" + item.name + "']");
+
+    if (typeof(item.value) == 'undefined') {
+      value = $elem.val();
+      if($elem.attr("numeric") && isNaN(parseInt(value, 10))) {
+        value = null;
+      }
+    } else if ($elem.is("[type=checkbox]")) {
+      value = $elem.is(":checked");
+    } else {
+      value = item.value;
     }
     if(name.length > 1) {
       if(can.isArray(value)) {
@@ -131,16 +143,26 @@ can.Control("GGRC.Controllers.Modals", {
     ajd = instance.save().done(function() {
       that.element.modal_form("hide");
     }).fail(function(xhr, status) {
-      var error = xhr.responseText
-      , tmpl = '<div class="alert alert-error"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
-        + error
-        + '</span></div>';
-
-      that.options.$content.find(".flash").length || that.options.$content.prepend("<div class='flash'>");
-
-      error && that.options.$content.find(".flash").append(tmpl);
+      el.trigger("ajax:flash", { error : xhr.responseText });
     });
     this.bindXHRToButton(ajd, el, "Saving, please wait...");
+  }
+
+  , " ajax:flash" : function(el, ev, mesg) {
+    var that = this;
+    this.options.$content.find(".flash").length || that.options.$content.prepend("<div class='flash'>");
+
+    can.each(["success", "warning", "error"], function(type) {
+      var tmpl;
+      if(mesg[type]) {
+        tmpl = '<div class="alert alert-'
+        + type
+        +'"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
+        + mesg[type]
+        + '</span></div>';
+        that.options.$content.find(".flash").append(tmpl);
+      }
+    });
   }
 
   , destroy : function() {

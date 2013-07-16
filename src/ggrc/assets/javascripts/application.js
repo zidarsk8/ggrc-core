@@ -36,6 +36,13 @@ var GGRC = {
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
+function ModelError(message, data) {
+  this.name = "ModelError";
+  this.message = message || "Invalid Model encountered";
+  this.data = data;
+}
+ModelError.prototype = Error.prototype;
+
 window.onerror = function(message, url, linenumber) {
   $(document.body).trigger("ajax:flash", {"error" : message});
   $.ajax({
@@ -89,10 +96,17 @@ jQuery.extend(GGRC, {
     var decision_tree = {
       "program" : CMS.Models.Program
       , "directive" : {
-        _key : "kind"
-        , "regulation" : CMS.Models.Regulation
-        , "policy" : CMS.Models.Policy
-        , "contract" : CMS.Models.Contract
+        _discriminator: function(data) {
+          var model_i, model;
+          models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
+          for (model_i in models) {
+            model = models[model_i];
+            if (model.meta_kinds.indexOf(data.kind) >= 0) {
+              return model;
+            }
+          }
+          throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
+        }
       }
       , "org_group" : CMS.Models.OrgGroup
       , "project" : CMS.Models.Project
@@ -101,9 +115,12 @@ jQuery.extend(GGRC, {
       , "data_asset" : CMS.Models.DataAsset
       , "market" : CMS.Models.Market
       , "system" : {
-        _key : "is_biz_process"
-        , "true" : CMS.Models.Process
-        , "false" : CMS.Models.StrictSystem
+        _discriminator: function(data) {
+          if (data.is_biz_process)
+            return CMS.Models.Process;
+          else
+            return CMS.Models.StrictSystem;
+        }
       }
       , "control" : CMS.Models.Control
       , "risky_attribute" : CMS.Models.RiskyAttribute
@@ -126,8 +143,7 @@ jQuery.extend(GGRC, {
       if(typeof subtree === "undefined")
         return null;
       return can.isPlainObject(subtree) ?
-        //resolve(subtree[data[subtree._key]], data) :
-        resolve_by_key(subtree, data) :
+        subtree._discriminator(data) :
         subtree;
     }
 
@@ -159,27 +175,49 @@ jQuery.extend(GGRC, {
 });
 })(GGRC);
 
+(function($){
+
 // Set up all PUT requests to the server to respect ETags, to ensure that
 //  we are not overwriting more recent data than was viewed by the user.
-jQuery.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+var etags = {};
+$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   var data;
-  if ( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "PUT" || options.type.toUpperCase() === "POST" )) {
-    data = can.deparam(options.data);
+  if ( /^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
+    data = originalOptions.data;
     options.dataType = "json";
     options.contentType = "application/json";
-    jqXHR.setRequestHeader("If-Match", data.etag);
-    jqXHR.setRequestHeader("If-Unmodified-Since", data["last-modified"]);
-    delete data.etag;
-    delete data["last-modified"];
-    options.data = JSON.stringify(data);
+    jqXHR.setRequestHeader("If-Match", (etags[originalOptions.url] || [])[0]);
+    jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
+    options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
   }
-  if( /^\/api\/\w+\/\d+/.test(options.url) && (options.type.toUpperCase() === "GET") ) {
+  if( /^\/api\/\w+(\/\d+|$)/.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
+  }
+  if( /^\/api\/\w+/.test(options.url)) {
+    jqXHR.done(function(data, status, xhr) {
+      if(!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
+        return;
+      switch(options.type.toUpperCase()) {
+        case "GET":
+        case "PUT":
+          etags[originalOptions.url] = [xhr.getResponseHeader("ETag"), xhr.getResponseHeader("Last-Modified")];
+          break;
+        case "POST":
+          for(var d in data) {
+            if(data.hasOwnProperty(d) && data[d].selfLink) {
+              etags[data[d].selfLink] = [xhr.getResponseHeader("ETag"), xhr.getResponseHeader("Last-Modified")];
+            }
+          }
+          break;
+        case "DELETE":
+          delete etags[originalOptions.url];
+          break;
+      }
+    });
   }
 });
 
 //Set up default failure callbacks if nonesuch exist.
-(function($){
   var _old_ajax = $.ajax;
 
   var statusmsgs = {
@@ -196,11 +234,11 @@ jQuery.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   //  then() or pipe()), then the original one won't normally be notified of failure.
   can.ajax = $.ajax = function() {
     var _ajax = _old_ajax.apply($, arguments);
-    var _old_then = _ajax.then;
-    var _old_fail = _ajax.fail;
-    var _old_pipe = _ajax.pipe;
 
     function setup(_new_ajax, _old_ajax) {
+      var _old_then = _new_ajax.then;
+      var _old_fail = _new_ajax.fail;
+      var _old_pipe = _new_ajax.pipe;
       _old_ajax && (_new_ajax.hasFailCallback = _old_ajax.hasFailCallback);
       _new_ajax.then = function() {
         var _new_ajax = _old_then.apply(this, arguments);

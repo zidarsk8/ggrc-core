@@ -9,10 +9,17 @@
 
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
-    instance : null
+    instance : undefined
     , children_drawn : false
   }
-}, {});
+}, {
+  // init : function() {
+  //   this.bind("child_options.*.list", function(ev, newVal) {
+  //     this.attr("children_drawn", !newVal.length)
+  //     .attr("children_drawn", !!newVal.length);
+  //   });
+  // }
+});
 
 can.Control("CMS.Controllers.TreeView", {
   //static properties
@@ -26,6 +33,8 @@ can.Control("CMS.Controllers.TreeView", {
     , find_params : {}
     , start_expanded : true
     , draw_children : true
+    , find_function : null
+    , options_property : "tree_view_options"
     , child_options : [] //this is how we can make nested configs. if you want to use an existing 
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
@@ -40,7 +49,7 @@ can.Control("CMS.Controllers.TreeView", {
 
       this.options = opts;
       if(this.options.model) {
-        can.each(this.options.model.tree_view_options, function(v, k) {
+        can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function(v, k) {
           that.options.hasOwnProperty(k) || that.options.attr(k, v);
         });
       }      
@@ -48,12 +57,11 @@ can.Control("CMS.Controllers.TreeView", {
         that.options.hasOwnProperty(k) || that.options.attr(k, v);
       });
     } else {
-      this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model.tree_view_options : {}).attr(opts);
+      this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
 
   , init : function(el, opts) {
-    //this.options.attr(this.options.model.tree_view_options).attr(opts instanceof can.Observe ? opts._data : opts);
     this.options.list ? this.draw_list() : this.fetch_list(this.options.parent_id);
     this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
     this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
@@ -62,23 +70,45 @@ can.Control("CMS.Controllers.TreeView", {
     if(can.isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr("id", this.options.parent_id);
     }
-    this.find_all_deferred = this.options.model[this.options.single_object ? "findOne" : "findAll"](
+    this.find_all_deferred = this.options.model[this.options.find_function || (this.options.single_object ? "findOne" : "findAll")](
       this.options.find_params.serialize()
-      , this.proxy("draw_list")
-    );
+    ).done(this.proxy("draw_list"));
   }
   , draw_list : function(list) {
     var that = this;
     if(list) {
-      this.options.attr("list", list.length == null ? [list] : list);
+      list = list.length == null ? [list] : list;
+    } else {
+      list = this.options.list;
     }
-    this.options.list.replace(can.map(this.options.list, function(v) {
-      if(v instanceof can.Observe.TreeOptions) {
-        return v;
-      } else {
-        return new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
+    list.bind("add", function(ev, newVals, index) {
+      can.each(newVals, function(newVal) {
+        that.element.trigger("newChild", new can.Observe.TreeOptions({instance : newVal}));
+      });
+    }).bind("remove", function(ev, oldVals, index) {
+      can.each(oldVals, function(oldVal) {
+        for(var i = that.options.list.length - 1; i >= 0; i--) {
+          if(that.options.list[i].instance === oldVal) {
+            that.options.list.splice(i, 1);
+          }
+        }
+      });
+    });
+    can.Observe.startBatch();
+    this.options.attr("list", []);
+    can.each(list, function(v) {
+      if(!(v instanceof can.Observe.TreeOptions)) {
+        v = new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
       }
-    }));
+      that.options.list.push(v);
+      if(!v.instance.selfLink) {
+        can.Observe.startBatch();
+        v.instance.refresh().done(function() {
+          can.Observe.stopBatch();
+        });
+      }
+    });
+    can.Observe.stopBatch();
     can.view(this.options.list_view, this.options, function(frag) {
       GGRC.queue_event(function() {
         that.element && that.element.html(frag);
@@ -130,6 +160,8 @@ can.Control("CMS.Controllers.TreeView", {
         options.attr(k, v);
       });
       that.add_child_list(item, options);
+      options.attr("options_property", that.options.options_property);
+      options.attr("single_object", false);
       item.child_options.push(options);
     });
   }
@@ -145,17 +177,20 @@ can.Control("CMS.Controllers.TreeView", {
       if(find_params && find_params.length) {
         find_params = find_params.slice(0);
       }
-     data.attr("list", find_params);
+      data.attr("list", find_params);
     } else {
       find_params = data.attr("find_params");
-      if(!find_params) {
-        data.attr("find_params", {});
-      }
-       if(data.parent_find_param){
-        data.attr("find_params." + data.parent_find_param, item.instance.id);
+      if(find_params) {
+        find_params = find_params.serialize();
       } else {
-        data.attr("find_params.parent.id", item.instance.id);
+        find_params = {};
       }
+      if(data.parent_find_param){
+        find_params[data.parent_find_param] = item.instance.id;
+      } else {
+        find_params["parent.id"] = item.instance.id;
+      }
+      data.attr("find_params", new can.Observe(find_params));
     }
     // $subtree.cms_controllers_tree_view(opts);
   }
@@ -166,7 +201,7 @@ can.Control("CMS.Controllers.TreeView", {
     if(!this.options.parent_id || (this.options.parent_id === data.parent_id)) { // '==' just because null vs. undefined sometimes happens here
       model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
       this.add_child_lists([model]);
-      this.options.list.push(model);
+      this.options.list.push(new can.Observe.TreeOptions({ instance : model}));
       setTimeout(function() {
         $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
       }, 10);

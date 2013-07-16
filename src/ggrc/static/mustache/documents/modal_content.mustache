@@ -1,6 +1,7 @@
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
+  {{{ handle_context }}}
   <div class="row-fluid">
     <div class="span12">
       <label>
@@ -8,7 +9,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Enter Title"></i>
       </label>
-      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{this.title}}">
+      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
     </div>
     {{!<div class="span2">
       <label for="document_year_id">Year</label>

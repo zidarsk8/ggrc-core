@@ -1,4 +1,4 @@
-#i Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
@@ -7,7 +7,6 @@ import ggrc.builder
 import ggrc.services
 import iso8601
 from datetime import datetime
-from flask import _request_ctx_stack
 from ggrc import db
 from ggrc.models.reflection import AttributeInfo
 from ggrc.services.util import url_for
@@ -38,11 +37,13 @@ def get_json_builder(obj):
     setattr(ggrc.builder, cls.__name__, builder)
   return builder
 
-def publish(obj, inclusions=()):
+def publish(obj, inclusions=(), inclusion_filter=None):
   """Translate ``obj`` into a valid JSON value. Objects with properties are
   translated into a ``dict`` object representing a JSON object while simple
   values are returned unchanged or specially formatted if needed.
   """
+  if inclusion_filter is None:
+    inclusion_filter = lambda x: True
   publisher = get_json_builder(obj)
   if publisher and hasattr(publisher, '_publish_attrs') \
       and publisher._publish_attrs:
@@ -53,7 +54,8 @@ def publish(obj, inclusions=()):
     view_url = view_url_for(obj)
     if view_url:
       ret['viewLink'] = view_url
-    ret.update(publisher.publish_contribution(obj, inclusions))
+    ret.update(publisher.publish_contribution(
+      obj, inclusions, inclusion_filter))
     return ret
   # Otherwise, just return the value itself by default
   return obj
@@ -128,7 +130,12 @@ class UpdateAttrHandler(object):
     """Translate the JSON value for a ``Datetime`` column."""
     value = json_obj.get(attr_name)
     try:
-      return iso8601.parse_date(value) if value else None
+      if value:
+        d = iso8601.parse_date(value)
+        d = d.replace(tzinfo=None)
+      else:
+        d = None
+      return d
     except iso8601.ParseError as e:
       raise BadRequest(
           'Malformed DateTime {0} for parameter {1}. '
@@ -163,8 +170,9 @@ class UpdateAttrHandler(object):
       rel_obj = json_obj.get(attr_name)
       if rel_obj:
         try:
+          # FIXME: Should this be .one() instead of .first() ?
           return db.session.query(rel_class).filter(
-            rel_class.id == rel_obj[u'id']).one()
+            rel_class.id == rel_obj[u'id']).first()
         except(TypeError):
           raise TypeError(''.join(['Failed to convert attribute ', attr_name]))
       return None
@@ -202,14 +210,15 @@ class UpdateAttrHandler(object):
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  def generate_link_object_for(self, obj, inclusions, include):
+  def generate_link_object_for(
+      self, obj, inclusions, include, inclusion_filter):
     """Generate a link object for this object. If there are property paths
     to be included specified in the ``inclusions`` parameter, those properties
     will be added to the object representation. If the ``include`` parameter
     is ``True`` the entire object will be represented in the result.
     """
-    if include:
-      return publish(obj, inclusions)
+    if include and inclusion_filter(obj):
+      return publish(obj, inclusions, inclusion_filter)
     result = {'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj)}
     for path in inclusions:
       if type(path) is not str and type(path) is not unicode:
@@ -219,42 +228,50 @@ class Builder(AttributeInfo):
       result[attr_name] = self.publish_attr(obj, attr_name, remaining_path)
     return result
 
-  def publish_link_collection(self, obj, attr_name, inclusions, include):
+  def publish_link_collection(
+      self, obj, attr_name, inclusions, include, inclusion_filter):
     """The ``attr_name`` attribute is a collection of object references;
     translate the collection of object references into a collection of link
     objects for the JSON dictionary representation.
     """
     # FIXME: Remove the "if o is not None" when we can guarantee referential
     #   integrity
-    return [self.generate_link_object_for(o, inclusions, include)
-      for o in getattr(obj, attr_name) if o is not None]
+    return [
+        self.generate_link_object_for(o, inclusions, include, inclusion_filter)
+        for o in getattr(obj, attr_name) if o is not None]
 
-  def publish_link(self, obj, attr_name, inclusions, include):
+  def publish_link(
+      self, obj, attr_name, inclusions, include, inclusion_filter):
     """The ``attr_name`` attribute is an object reference; translate the object
     reference into a link object for the JSON dictionary representation.
     """
     attr_value = getattr(obj, attr_name)
     if attr_value:
-      return self.generate_link_object_for(attr_value, inclusions, include)
+      return self.generate_link_object_for(
+          attr_value, inclusions, include, inclusion_filter)
     return None
 
-  def publish_attr(self, obj, attr_name, inclusions, include):
+  def publish_attr(
+      self, obj, attr_name, inclusions, include, inclusion_filter):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
-      return self.publish_link_collection(obj, attr_name, inclusions, include)
+      return self.publish_link_collection(
+          obj, attr_name, inclusions, include, inclusion_filter)
     elif isinstance(class_attr, InstrumentedAttribute) and \
          isinstance(class_attr.property, RelationshipProperty):
       if class_attr.property.uselist:
         return self.publish_link_collection(
-            obj, attr_name, inclusions, include)
+            obj, attr_name, inclusions, include, inclusion_filter)
       else:
-        return self.publish_link(obj, attr_name, inclusions, include)
+        return self.publish_link(
+            obj, attr_name, inclusions, include, inclusion_filter)
     elif isinstance(class_attr, property):
-      return self.publish_link(obj, attr_name, inclusions, include)
+      return self.publish_link(
+          obj, attr_name, inclusions, include, inclusion_filter)
     else:
       return getattr(obj, attr_name)
 
-  def publish_attrs(self, obj, json_obj, inclusions):
+  def publish_attrs(self, obj, json_obj, inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into the JSON dictionary
     ``json_obj``.
     
@@ -281,7 +298,8 @@ class Builder(AttributeInfo):
           local_inclusion = inclusion
           break
       json_obj[attr_name] = self.publish_attr(
-          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0)
+          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
+          inclusion_filter)
 
   @classmethod
   def do_update_attrs(cls, obj, json_obj, attrs):
@@ -304,10 +322,10 @@ class Builder(AttributeInfo):
     """
     self.do_update_attrs(obj, json_obj, self._create_attrs)
 
-  def publish_contribution(self, obj, inclusions):
+  def publish_contribution(self, obj, inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
-    self.publish_attrs(obj, json_obj, inclusions)
+    self.publish_attrs(obj, json_obj, inclusions, inclusion_filter)
     return json_obj
 
   def update(self, obj, json_obj):

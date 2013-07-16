@@ -70,26 +70,7 @@ can.Model.Cacheable("CMS.Models.ObjectPerson", {
     root_object : "object_person"
     , root_collection : "object_people"
     , findAll: "GET /api/object_people"
-    , create : function(params) {
-        var _params = {
-            object_person : {
-              personable: {
-                id: params.object_person.personable_id || params.xable_id,
-                type: params.object_person.personable_type || params.xable_type
-              }
-            , person: {
-                id: params.object_person.person_id
-              }
-            , role : params.role
-            }
-        };
-        return $.ajax({
-            type : "POST"
-            , "url" : "/api/object_people"
-            , dataType : "json"
-            , data : _params
-        });
-    }
+    , create : "POST /api/object_people"
     , update : function(id, object) {
         var _params = {
             object_person : {
@@ -137,16 +118,6 @@ can.Model.Cacheable("CMS.Models.ObjectPerson", {
         this.bind("created", can.proxy(reinit, this));
 
         reinit.call(this);
-    },
-    destroy: function() {
-      return $.ajax({
-        url: "/api/object_people/" + this.id
-      , headers: {
-          "If-Match": this.etag
-        , "If-Unmodified-Since": this['last-modified']
-        }
-      , type: "DELETE"
-      })
     }
 });
 

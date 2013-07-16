@@ -12,31 +12,23 @@ can.Model.Cacheable("CMS.Models.Control", {
   // static properties
     root_object : "control"
   , root_collection : "controls"
-  , findAll : "GET /api/controls"
-  , findOne : "GET /api/controls/{id}"
   , create : "POST /api/controls"
-  , update : function(id, params) {
+  , update : "PUT /api/controls/{id}"
+/*  , update : function(id, params) {
     return $.ajax({
       url : params.selfLink
       , type : "put"
-      , data : this.process_args(params, ["notes", "title", "description"])
+      , data : this.process_args(params, ["notes", "title", "description","company_control"])
     });
-  }
+  }*/
   , attributes : {
     object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
-    , implementing_controls : "CMS.Models.Control.models"
+    //, implementing_controls : "CMS.Models.Control.models"
+    , control_sections : "CMS.Models.ControlSection.models"
     //, implemented_controls : "CMS.Models.Control.models"
     //, directive : "CMS.Models.Directive.model"
     //, sections : "CMS.Models.SectionSlug.models"
-  }
-  , serialize : {
-    "CMS.Models.Directive.model" : function(val, type) {
-      return {id : val.id, href : val.selfLink || val.href };
-    }
-    , "CMS.Models.SectionSlug.models" : function(val, type) {
-      return can.map(val, function(v) { return {id : v.id, href : v.selfLink || v.href }; });
-    }
   }
   // , model : function(attrs) {
   //   var id;
@@ -46,6 +38,13 @@ can.Model.Cacheable("CMS.Models.Control", {
   //     return this._super.apply(this, arguments);
   //   }
   // }
+  , defaults : {
+    "type" : {id : 1}
+    , "selected" : false
+    , "title" : this.title || ""
+    , "slug" : this.slug || ""
+    , "description" : this.description || ""
+  }
 }
 , {
 // prototype properties
@@ -62,8 +61,6 @@ can.Model.Cacheable("CMS.Models.Control", {
     // }
     this.attr({
       "content_id" : Math.floor(Math.random() * 10000000)
-      , "type" : {id : 1}
-      , "selected" : false
     });
     this._super();
   }

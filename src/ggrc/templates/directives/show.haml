@@ -1,0 +1,29 @@
+-extends "base_objects/show.haml"
+
+-block page_help scoped
+  =instance.kind|underscore
+
+-block subheader_extras
+  %ul.actions.pull-right
+    %li
+      %a{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': '={instance.kind_singular}', 'data-object-plural': '={instance.kind_plural}', 'data-object-id': 'page' }
+        %i.grcicon-edit
+        %span Edit ={instance.kind_singular}
+
+-block main
+  .container-fluid
+    #show_columns.row-fluid{ 'data-resize': "true" }
+      #middle_column.span8.widget-area
+        -with widget_class = 'business'
+          -include "directives/_main.haml"
+        -if related_objects(instance)
+          -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
+            -include 'shared/_related.haml'
+        -include 'shared/_add_widget_section.haml'
+
+      #right_column.span4.widget-area
+        -with widget_class = 'business'
+          -include 'base_objects/_info.haml'
+        -with widget_class = 'business'
+          -include 'base_objects/_more_info.haml'
+        -include 'shared/_add_widget_section.haml'

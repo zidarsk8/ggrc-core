@@ -526,19 +526,32 @@ Mustache.registerHelper("related_count", function() {
 Mustache.registerHelper("show_expander", function() {
   var options = arguments[arguments.length - 1]
   , args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , disjunctions = [[]];
+  , disjunctions = [[]]
+  , not = false;
   for(var i = 0; i < args.length; i++) {
     if(args[i] === "||") {
       disjunctions.push([]);
+    } else if (args[i] === "!") {
+      not = true;
     } else {
-      disjunctions[disjunctions.length - 1].push(args[i]);
+      disjunctions[disjunctions.length - 1].push(not ? { not : args[i] } : args[i]);
+      not = false;
     }
   }
 
   return can.reduce(disjunctions, function(a, b) {
     return a || can.reduce(b, function(c, d) {
+      if(!c)
+        return false;
+
+      var not = !!d.not;
+      d = d.not ? d.not : d;
+
       typeof d === "function" && (d = d());
-      return c && (d && (d.length == null || d.length > 0));
+
+      var pred = (d && (d.length == null || d.length > 0));
+      if(not) pred = !pred;
+      return pred;
     }, true);
   }, false) ? options.fn(this) : options.inverse(this);
 });
@@ -550,7 +563,7 @@ Mustache.registerHelper("allow_help_edit", function() {
 
 Mustache.registerHelper("all", function(type, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
-  , $dummy_content = $(options.fn({})).first()
+  , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , items_dfd, hook;
 
@@ -580,4 +593,24 @@ Mustache.registerHelper("all", function(type, options) {
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
+Mustache.registerHelper("handle_context", function() {
+  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
+});
+
 })(this, jQuery, can);
+
+Mustache.registerHelper("with_page_object_as", function(name, options) {
+  if(!options) {
+    options = name;
+    name = "page_object"
+  }
+  var page_object = GGRC.make_model_instance(GGRC.page_object);
+  if(page_object) {
+    var p = {};
+    p[name] = page_object;
+    options.contexts.push(p);
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
