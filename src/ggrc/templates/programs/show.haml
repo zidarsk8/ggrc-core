@@ -44,6 +44,8 @@
     .object-area
       #columns.column-set{ 'data-resize': "true" }
         #middle-column.widget-area
+          -with widget_class = 'programs'
+            -include 'programs/_info.haml'
           -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
             -include 'programs/_main.haml'
           -if not instance.company_controls
@@ -53,8 +55,6 @@
           -if instance.company_controls
             -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
               -include 'programs/_linked_programs.haml'
-          -with widget_class = 'programs'
-            -include 'programs/_info.haml'
           -if not instance.company_controls
             -with widget_class = 'programs'
               -include 'programs/_audit_cycles.haml'
