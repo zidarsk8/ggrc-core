@@ -31,7 +31,7 @@ event.listen(
 class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
-  def search(self, terms):
+  def _get_type_clause(self):
     type_clauses =[]
     for model in all_models:
       clause = 'type = "{0}"'.format(model.__name__)
@@ -51,10 +51,35 @@ class MysqlIndexer(SqlIndexer):
     type_clauses_str = ' or '.join(type_clauses) 
     if len(type_clauses) > 1:
       type_clauses_str = '({0})'.format(type_clauses_str)
-    query = db.session.query(self.record_type).filter(
-      '(match (content) against (:terms)) and {0}'.format(type_clauses_str))\
-          .params(terms=terms).all()
-    return query
+
+    # Include 'NULL' context for all types
+    type_clauses_str = '(context_id IS NULL or {0})'.format(type_clauses_str)
+
+    return type_clauses_str
+
+  def filter_by_terms(self, query, terms, type_clauses_str='1'):
+    if not terms:
+      return query.filter(type_clauses_str)
+    else:
+      return query.filter(
+        '(match (content) against (:terms)) and {0}'.format(type_clauses_str))\
+            .params(terms=terms)
+
+  def search(self, terms):
+    type_clauses_str = self._get_type_clause()
+    return self.filter_by_terms(
+        db.session.query(self.record_type), terms, type_clauses_str).all()
+
+  def counts(self, terms, group_by_type=True):
+    from sqlalchemy import func, distinct
+    type_clauses_str = self._get_type_clause()
+
+    query = db.session.query(
+        self.record_type.type, func.count(distinct(self.record_type.key)))
+    if group_by_type:
+      query = query.group_by(self.record_type.type)
+
+    return self.filter_by_terms(query, terms, type_clauses_str).all()
 
 Indexer = MysqlIndexer
 
