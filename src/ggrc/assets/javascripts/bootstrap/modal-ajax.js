@@ -215,6 +215,7 @@
     'helpform' : function($target, $trigger, option) {
       $target.modal_form(option, $trigger).ggrc_controllers_help({ slug : $trigger.attr('data-help-slug') });
     }
+
   };
 
 

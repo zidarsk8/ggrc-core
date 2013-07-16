@@ -15,13 +15,6 @@ can.Model.Cacheable("CMS.Models.Control", {
   , category : "governance"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
-/*  , update : function(id, params) {
-    return $.ajax({
-      url : params.selfLink
-      , type : "put"
-      , data : this.process_args(params, ["notes", "title", "description","company_control"])
-    });
-  }*/
   , attributes : {
     object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
@@ -31,14 +24,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     //, directive : "CMS.Models.Directive.model"
     //, sections : "CMS.Models.SectionSlug.models"
   }
-  // , model : function(attrs) {
-  //   var id;
-  //   if((id = attrs.id || (attrs[this.root_object] && attrs[this.root_object].id)) && this.findInCacheById(id)) {
-  //     return this.findInCacheById(id);
-  //   } else {
-  //     return this._super.apply(this, arguments);
-  //   }
-  // }
+  , links_to : {"Section" : "ControlSection", "Regulation" : "DirectiveControl", "Policy" : "DirectiveControl", "Contract" : "DirectiveControl", "Risk" : {}}
   , defaults : {
     "type" : {id : 1}
     , "selected" : false

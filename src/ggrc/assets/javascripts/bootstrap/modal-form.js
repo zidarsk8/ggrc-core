@@ -248,7 +248,9 @@
         , html;
 
       // Find or create the flash-message holder
-      $target = e.target ? $(e.target) : $('body');
+      $target = $(e.target);
+      if($target.has(".modal-body").length < 1) 
+        $target = $('body');
       $flash_holder = $target.find('.flash');
 
       if ($flash_holder.length == 0) {
