@@ -710,6 +710,6 @@ jQuery(function($) {
   var areaHeight = winHeight - 30;
   $(".area").css('width', areaSize);
   $(".object-area").css('width', objectAreaSize);
-  $(".lhs").css('height', areaHeight);
+  $(".affix-holder").css('height', areaHeight);
   $(".bar-v").css('height', areaHeight);
 });

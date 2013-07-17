@@ -2709,808 +2709,808 @@
             .date
             .centered
 
--# Help Modal Empty
-#helpModalEmpty{ 'class': 'modal hide fade', 'tabindex': '-1' }
-  .modal-header
-    %a.btn.btn-mini.pull-right{ 'data-dismiss': 'modal', 'href': '#' }
-      %i.grcicon-x-grey
-    %a.btn.btn-mini.pull-right.help-edit{ 'href': '#' }
-      %i.grcicon-edit
-    %h2
-      %span
-        Help Title
-  .modal-body
-    .help
-      %h2.centered
-        There is no content available for this topic.
-      %p.centered
-        Enter help title and content below:
-      -#.help-content.rtf
-        %ol
-          %li
-            The Quick Find window helps you locate specific business objects within the GRC system.
-          %li
-            Click the tab of the type of object you are looking for
-            %i
-              (ex: Controls, Products, etc)
-          %li
-            Type the first few letters of the name of the object you're looking for and press Enter/Return
-        %p
-          %strong
-            Scroll through the short list of
-          objects found to find the specific object you're looking for the object to go to that object page
-      #helpedit
-        .row-fluid
-          .span12
-            .wysiwyg-area
-              %label
-                Help Title
-              %input{ 'class': 'span12', 'type': 'text', 'placeholder': 'Enter Help Title Here' }
-              %label
-                Help Content
-              %textarea{ 'class': 'span12 triple', 'placeholder': 'Enter Help Content Here' }
-              .row-fluid
-                .span12
-                  %input{ 'class': 'btn btn-warning pull-right disabled', 'type': 'submit', 'value': 'Save' }
-
--# Help Modal
-#helpModal{ 'class': 'modal hide fade', 'tabindex': '-1' }
-  .modal-header
-    %a.btn.btn-mini.pull-right{ 'data-dismiss': 'modal', 'href': '#' }
-      %i.grcicon-x-grey
-    %a.btn.btn-mini.pull-right.help-edit{ 'href': '#' }
-      %i.grcicon-edit
-    %h2
-      %span
-        Quick Help Window
-  .modal-body
-    .help
-      .help-content.rtf
-        %ol
-          %li
-            The Quick Find window helps you locate specific business objects within the GRC system.
-          %li
-            Click the tab of the type of object you are looking for
-            %i
-              (ex: Controls, Products, etc)
-          %li
-            Type the first few letters of the name of the object you're looking for and press Enter/Return
-        %p
-          %strong
-            Scroll through the short list of
-          objects found to find the specific object you're looking for the object to go to that object page
-      #helpedit
-        .row-fluid
-          .span12
-            .wysiwyg-area
-              %label
-                Help Title
-              %input{ 'class': 'span12', 'type': 'text', 'value': 'Quick Help Window' }
-              %label
-                Help Content
-              %textarea{ 'class': 'span12 triple', 'placeholder': 'Enter Help Content Here' }
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              .row-fluid
-                .span12
-                  %input{ 'class': 'btn btn-primary pull-right', 'type': 'submit', 'value': 'Save' }
-
--# Section to Control Mapper
-#selectorSectionToControl{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+  -# Help Modal Empty
+  #helpModalEmpty{ 'class': 'modal hide fade', 'tabindex': '-1' }
+    .modal-header
+      %a.btn.btn-mini.pull-right{ 'data-dismiss': 'modal', 'href': '#' }
         %i.grcicon-x-grey
-    %h2
-      Map Controls to
-      SECTION-2201
-  .modal-filter
-    .row-fluid
-      .span3
-        &nbsp;
-      .span3
-        .modal-search
-          %a.btn.btn-mini.search-reset{ 'href': '#' }
-            %i.grcicon-x-grey
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search controls' }
-      .span3.checkbox-filter
-        %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
-        %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
-          Controls for this program only:
-      .span3
-        .pull-right
-          %a.btn.btn-add{ 'href': '#' }
-            %i.grcicon-add
-            Control
-  .modal-content
-    .row-fluid
-      .span3
-        .selector-info{ 'style': 'margin-right:-10%;' }
-          %h4
-            %i.grcicon-section-color
-            Use of Assets
-          %p.code.governance Section-2201
-          .rtf
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            %ul
-              %li Ut enim ad minim veniam
-              %li Ut enim ad minim veniam
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          %h5
-            Already Mapped Controls (2)
-          %ul.linked-controls
+      %a.btn.btn-mini.pull-right.help-edit{ 'href': '#' }
+        %i.grcicon-edit
+      %h2
+        %span
+          Help Title
+    .modal-body
+      .help
+        %h2.centered
+          There is no content available for this topic.
+        %p.centered
+          Enter help title and content below:
+        -#.help-content.rtf
+          %ol
             %li
-              %a{ 'href': '#', 'class': 'jump-to-control' }
-                %span
-                  this is a new control (kostya)
-                %small
-                  CONTROL-0477
+              The Quick Find window helps you locate specific business objects within the GRC system.
             %li
-              %a{ 'href': '#', 'class': 'jump-to-control' }
-                %span
-                  another control (k)
-                %small
-                  CONTROL-0478
-      .span6
-        .search-title
+              Click the tab of the type of object you are looking for
+              %i
+                (ex: Controls, Products, etc)
+            %li
+              Type the first few letters of the name of the object you're looking for and press Enter/Return
+          %p
+            %strong
+              Scroll through the short list of
+            objects found to find the specific object you're looking for the object to go to that object page
+        #helpedit
           .row-fluid
-            .span6
-              %h4
-                Search Results (3)
-            .span6
-              .guide
-                map/unmap all
-        .selector-list
-          %ul.tree-structure.simple
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Superb control
-                        %span.code K1
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Another control
-                        %span.code CONTROL-AMAZING
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Control per se
-                        %span.code CK-L
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control.selected
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Verify Passwords via X
-                        %span.code ctr.2201
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title J' something
-                        %span.code ctr.xyz
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Control per du
-                        %span.code ctr.221101
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title J' something
-                        %span.code ctr.xyz
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Control per du
-                        %span.code ctr.221101
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title J' something
-                        %span.code ctr.xyz
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-      .span3
-        .selector-info{ 'style': 'margin-left:-10%' }
-          %h4
-            %i.grcicon-control-color
-            Verify Passwords via X
-          %p.code.governance CTR.2201
-          .rtf
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            %ul
-              %li Ut enim ad minim veniam
-              %li Ut enim ad minim veniam
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
-            Save
+            .span12
+              .wysiwyg-area
+                %label
+                  Help Title
+                %input{ 'class': 'span12', 'type': 'text', 'placeholder': 'Enter Help Title Here' }
+                %label
+                  Help Content
+                %textarea{ 'class': 'span12 triple', 'placeholder': 'Enter Help Content Here' }
+                .row-fluid
+                  .span12
+                    %input{ 'class': 'btn btn-warning pull-right disabled', 'type': 'submit', 'value': 'Save' }
 
--# Section to Control Mapper N/A
-#selectorSectionToControlNA{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+  -# Help Modal
+  #helpModal{ 'class': 'modal hide fade', 'tabindex': '-1' }
+    .modal-header
+      %a.btn.btn-mini.pull-right{ 'data-dismiss': 'modal', 'href': '#' }
         %i.grcicon-x-grey
-    %h2
-      Map Controls to
-      SECTION-2201
-  .modal-filter
-    .row-fluid
-      .span3
-        &nbsp;
-      .span3
-        .modal-search
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search controls' }
-      .span3.checkbox-filter
-        %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
-        %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
-          Controls for this program only:
-      .span3
-        .pull-right
-          %a.btn.btn-add{ 'href': '#' }
-            %i.grcicon-add
-            Control
-  .modal-content
-    .row-fluid
-      .span3
-        .selector-info{ 'style': 'margin-right:-10%;' }
-          %h4
-            %i.grcicon-section-color
-            Use of Assets
-          %p.code.governance Section-2201
-          .rtf
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            %ul
-              %li Ut enim ad minim veniam
-              %li Ut enim ad minim veniam
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          %h5
-            Mapped Controls
-          %input{ 'type': 'checkbox' }
-          %strong Controls are not applicable (N/A)
+      %a.btn.btn-mini.pull-right.help-edit{ 'href': '#' }
+        %i.grcicon-edit
+      %h2
+        %span
+          Quick Help Window
+    .modal-body
+      .help
+        .help-content.rtf
+          %ol
+            %li
+              The Quick Find window helps you locate specific business objects within the GRC system.
+            %li
+              Click the tab of the type of object you are looking for
+              %i
+                (ex: Controls, Products, etc)
+            %li
+              Type the first few letters of the name of the object you're looking for and press Enter/Return
+          %p
+            %strong
+              Scroll through the short list of
+            objects found to find the specific object you're looking for the object to go to that object page
+        #helpedit
+          .row-fluid
+            .span12
+              .wysiwyg-area
+                %label
+                  Help Title
+                %input{ 'class': 'span12', 'type': 'text', 'value': 'Quick Help Window' }
+                %label
+                  Help Content
+                %textarea{ 'class': 'span12 triple', 'placeholder': 'Enter Help Content Here' }
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                .row-fluid
+                  .span12
+                    %input{ 'class': 'btn btn-primary pull-right', 'type': 'submit', 'value': 'Save' }
 
-      .span6
-        .selector-list
-      .span3
-        .selector-info{ 'style': 'margin-left:-10%' }
-          .no-content
-            %h4 NO CONTROL IS SELECTED
-            %p Choose one of the controls from the list.
+  -# Section to Control Mapper
+  #selectorSectionToControl{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Map Controls to
+        SECTION-2201
+    .modal-filter
+      .row-fluid
+        .span3
+          &nbsp;
+        .span3
+          .modal-search
+            %a.btn.btn-mini.search-reset{ 'href': '#' }
+              %i.grcicon-x-grey
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search controls' }
+        .span3.checkbox-filter
+          %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
+          %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
+            Controls for this program only:
+        .span3
+          .pull-right
+            %a.btn.btn-add{ 'href': '#' }
+              %i.grcicon-add
+              Control
+    .modal-content
+      .row-fluid
+        .span3
+          .selector-info{ 'style': 'margin-right:-10%;' }
+            %h4
+              %i.grcicon-section-color
+              Use of Assets
+            %p.code.governance Section-2201
+            .rtf
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              %ul
+                %li Ut enim ad minim veniam
+                %li Ut enim ad minim veniam
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            %h5
+              Already Mapped Controls (2)
+            %ul.linked-controls
+              %li
+                %a{ 'href': '#', 'class': 'jump-to-control' }
+                  %span
+                    this is a new control (kostya)
+                  %small
+                    CONTROL-0477
+              %li
+                %a{ 'href': '#', 'class': 'jump-to-control' }
+                  %span
+                    another control (k)
+                  %small
+                    CONTROL-0478
+        .span6
+          .search-title
+            .row-fluid
+              .span6
+                %h4
+                  Search Results (3)
+              .span6
+                .guide
+                  map/unmap all
+          .selector-list
+            %ul.tree-structure.simple
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Superb control
+                          %span.code K1
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Another control
+                          %span.code CONTROL-AMAZING
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Control per se
+                          %span.code CK-L
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control.selected
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Verify Passwords via X
+                          %span.code ctr.2201
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title J' something
+                          %span.code ctr.xyz
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Control per du
+                          %span.code ctr.221101
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title J' something
+                          %span.code ctr.xyz
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Control per du
+                          %span.code ctr.221101
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title J' something
+                          %span.code ctr.xyz
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+        .span3
+          .selector-info{ 'style': 'margin-left:-10%' }
+            %h4
+              %i.grcicon-control-color
+              Verify Passwords via X
+            %p.code.governance CTR.2201
+            .rtf
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              %ul
+                %li Ut enim ad minim veniam
+                %li Ut enim ad minim veniam
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
+              Save
 
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
-            Save
+  -# Section to Control Mapper N/A
+  #selectorSectionToControlNA{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Map Controls to
+        SECTION-2201
+    .modal-filter
+      .row-fluid
+        .span3
+          &nbsp;
+        .span3
+          .modal-search
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search controls' }
+        .span3.checkbox-filter
+          %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
+          %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
+            Controls for this program only:
+        .span3
+          .pull-right
+            %a.btn.btn-add{ 'href': '#' }
+              %i.grcicon-add
+              Control
+    .modal-content
+      .row-fluid
+        .span3
+          .selector-info{ 'style': 'margin-right:-10%;' }
+            %h4
+              %i.grcicon-section-color
+              Use of Assets
+            %p.code.governance Section-2201
+            .rtf
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              %ul
+                %li Ut enim ad minim veniam
+                %li Ut enim ad minim veniam
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              %p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            %h5
+              Mapped Controls
+            %input{ 'type': 'checkbox' }
+            %strong Controls are not applicable (N/A)
+
+        .span6
+          .selector-list
+        .span3
+          .selector-info{ 'style': 'margin-left:-10%' }
+            .no-content
+              %h4 NO CONTROL IS SELECTED
+              %p Choose one of the controls from the list.
+
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
+              Save
 
 
--# Create New Program
-#programNew{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
-        %i.grcicon-x-grey
-    %h2
-      Create New Program
-  .modal-body
-    .row-fluid
-      .span6.field-failure
-        .field_with_errors
+  -# Create New Program
+  #programNew{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Create New Program
+    .modal-body
+      .row-fluid
+        .span6.field-failure
+          .field_with_errors
+            %label
+              Title
+              %span.required
+                *
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Title of Program'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title' }
+            %span.help-inline
+              %span
+                Title can not be empty
+      .row-fluid
+        .span6
+          %label
+            Description
+            %span.required
+              *
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
+          .wysiwyg-area
+            %textarea{ 'class': 'span12 double', 'placeholder': 'Enter Description' }
+        .span6
+          %label
+            Owner/Person of Contact
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Email of primary contact'}
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter email address' }
+          %label
+            Program URL
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'URL'}
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
+      .row-fluid
+        .span12
+          .expand-link
+            %a{ 'href': '#', 'class': 'show-hidden-fields' }
+              %i.grcicon-show
+              Show Advanced
+              %span.hidden-fields
+                Code, Reference URL, Scope, Organization
+      .hidden-fields-area
+        .row-fluid
+          .span6
+            %label
+              Code
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter unique code'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'PROGRAM-XXX' }
+          .span6
+            %label
+              Reference URL
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Reference URL'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
+        .row-fluid
+          .span6
+            %label
+              Organization
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter organization'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Organization' }
+          .span6
+            %label
+              Program Scope
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Scope of Program'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Scope' }
+        .row-fluid
+          .span12
+            .expand-link
+              %a{ 'href': '#', 'class': 'show-hidden-fields hide-hidden-fields' }
+                %i.grcicon-hide
+                Hide Advanced
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick
+              Save
+
+  -# Create New Base Object
+  #baseObjectNew{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Create Base Objects
+    .modal-body
+      .row-fluid
+        .span6
           %label
             Title
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Title'}
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title' }
+      .row-fluid
+        .span6
+          %label
+            Description
+            %span.required
+              *
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
+          .wysiwyg-area
+            %textarea{ 'class': 'span12 double', 'placeholder': 'Enter Description' }
+        .span6
+          %label
+            Owner/Person of Contact
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Email of primary contact'}
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter email address' }
+          %label
+            Object URL
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'URL'}
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
+      .row-fluid
+        .span12
+          .expand-link
+            %a{ 'href': '#', 'class': 'show-hidden-fields' }
+              %i.grcicon-show
+              Show Advanced
+              %span.hidden-fields
+                Code, Reference URL, Effective Date, Stop Date
+      .hidden-fields-area
+        .row-fluid
+          .span6
+            %label
+              Code
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter unique code'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'PROGRAM-XXX' }
+          .span6
+            %label
+              Reference URL
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Reference URL'}
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
+        .row-fluid
+          .span3
+            %label
+              Efective Date
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Effective Date'}
+            %input{ 'type': 'text', 'class': 'input-block-level date', 'placeholder': 'MM/DD/YYYY' }
+          .span3
+            %label
+              Stop Date
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Stop Date'}
+            %input{ 'type': 'text', 'class': 'input-block-level date', 'placeholder': 'MM/DD/YYYY' }
+          .span6
+            %label
+              Kind/Type
+              %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Choose Kind/Type'}
+            %select.input-block-level
+              %option -- Select --
+        .row-fluid
+          .span12
+            .expand-link
+              %a{ 'href': '#', 'class': 'show-hidden-fields hide-hidden-fields' }
+                %i.grcicon-hide
+                Hide Advanced
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick
+              Save
+
+
+  -# People Selector
+  #selectorPeople{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Map People to
+        PCI Compliance Program
+    .modal-filter
+      .row-fluid
+        .span3
+          &nbsp;
+        .span6
+          .modal-search
+            %a.btn.btn-mini.search-reset{ 'href': '#' }
+              %i.grcicon-x-grey
+            %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search people' }
+        -#.span3.checkbox-filter
+          %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
+          %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
+            Controls for this program only:
+        .span3
+          .pull-right
+            %a.btn.btn-add{ 'href': '#' }
+              %i.grcicon-add
+              Person
+    .modal-content
+      .row-fluid
+        .span3
+          .selector-info{ 'style': 'margin-right:-10%;' }
+            .pull-right
+              %a{ 'class': 'btn btn-mini', 'rel': 'tooltip', 'title': 'Edit' }
+                %i.grcicon-edit
+              %a{ 'class': 'btn btn-mini', 'rel': 'tooltip', 'title': 'Remove' }
+                %i.grcicon-remove
+            %p
+              %img{ 'src': '/static/images/sample/profile100.jpg', 'alt': '' }
+            %h4
+              Ernest Mandel
+              %br
+              Program Manager
+              %br
+              %small
+                Google, inc
+              %small
+              %br
+                %a{ 'href': 'mailto:ernestmandel@gmail.com' }
+                  ernestmandel@gmail.com
+        .span4
+          .search-title
+            .row-fluid
+              .span6
+                %h4
+                  Search Results (9)
+              .span6
+                .guide
+                  &nbsp;
+          .selector-list
+            %ul.tree-structure.simple
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Alexander Mikkovski
+                          %span.address alexmikkovski@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Douglas Hyde
+                          %span.address douglashyde@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Gilbert Bourgeaud
+                          %span.address gilbertbourgeaud@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control.selected
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Ernest Mandel
+                          %span.address ernestmandel@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Lev Davidovich Bronstein
+                          %span.address levdavidovichbronstein@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Chris Hani
+                          %span.address chris.hani@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Michael Yuhanna
+                          %span.address michael.yuhanna@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Herbert Ernst
+                          %span.address herbert.ernst@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+              %li.control
+                .item-main
+                  .item-title
+                    .row-fluid
+                      .span11
+                        .oneline
+                          %span.title Rita Antoinette
+                          %span.address rita.antoinette@google.com
+                      .span1
+                        %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
+        .span5{ 'style': 'margin-left:0; width:42.17094%' }
+          .selector-info
+            %h4
+              %i.grcicon-user-black
+              Related People (2)
+            %ul.linked-people
+              %li
+                %select.role.pull-right
+                  %option
+                    Accountable
+                  %option
+                    Responsible
+                %a{ 'href': '#', 'class': 'jump-to-control' }
+                  %span
+                    Lev Davidovich Bronstein
+              %li
+                %select.role.pull-right
+                  %option
+                    Accountable
+                  %option
+                    Responsible
+                %a{ 'href': '#', 'class': 'jump-to-control' }
+                  %span
+                    Chris Hani
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
+              Save
+
+
+  -# Edit Role
+  #editRole{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
+    .modal-header
+      .pull-right
+        %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
+          %i.grcicon-x-grey
+      %h2
+        Edit Role
+    .modal-body
+      .row-fluid
+        .span6
+          %label
+            Role Name
             %span.required
               *
             %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Title of Program'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title' }
-          %span.help-inline
-            %span
-              Title can not be empty
-    .row-fluid
-      .span6
-        %label
-          Description
-          %span.required
-            *
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
-        .wysiwyg-area
-          %textarea{ 'class': 'span12 double', 'placeholder': 'Enter Description' }
-      .span6
-        %label
-          Owner/Person of Contact
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Email of primary contact'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter email address' }
-        %label
-          Program URL
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'URL'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
-    .row-fluid
-      .span12
-        .expand-link
-          %a{ 'href': '#', 'class': 'show-hidden-fields' }
-            %i.grcicon-show
-            Show Advanced
-            %span.hidden-fields
-              Code, Reference URL, Scope, Organization
-    .hidden-fields-area
-      .row-fluid
+          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title', 'value': 'SOX Program Manager' }
         .span6
           %label
-            Code
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter unique code'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'PROGRAM-XXX' }
-        .span6
-          %label
-            Reference URL
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Reference URL'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
-      .row-fluid
-        .span6
-          %label
-            Organization
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter organization'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Organization' }
-        .span6
-          %label
-            Program Scope
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Scope of Program'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Scope' }
-      .row-fluid
-        .span12
-          .expand-link
-            %a{ 'href': '#', 'class': 'show-hidden-fields hide-hidden-fields' }
-              %i.grcicon-hide
-              Hide Advanced
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick
-            Save
-
--# Create New Base Object
-#baseObjectNew{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
-        %i.grcicon-x-grey
-    %h2
-      Create Base Objects
-  .modal-body
-    .row-fluid
-      .span6
-        %label
-          Title
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Title'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title' }
-    .row-fluid
-      .span6
-        %label
-          Description
-          %span.required
-            *
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
-        .wysiwyg-area
-          %textarea{ 'class': 'span12 double', 'placeholder': 'Enter Description' }
-      .span6
-        %label
-          Owner/Person of Contact
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Email of primary contact'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter email address' }
-        %label
-          Object URL
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'URL'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
-    .row-fluid
-      .span12
-        .expand-link
-          %a{ 'href': '#', 'class': 'show-hidden-fields' }
-            %i.grcicon-show
-            Show Advanced
-            %span.hidden-fields
-              Code, Reference URL, Effective Date, Stop Date
-    .hidden-fields-area
-      .row-fluid
-        .span6
-          %label
-            Code
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter unique code'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'PROGRAM-XXX' }
-        .span6
-          %label
-            Reference URL
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Enter Reference URL'}
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'http://www.domain.com/' }
-      .row-fluid
-        .span3
-          %label
-            Efective Date
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Effective Date'}
-          %input{ 'type': 'text', 'class': 'input-block-level date', 'placeholder': 'MM/DD/YYYY' }
-        .span3
-          %label
-            Stop Date
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Stop Date'}
-          %input{ 'type': 'text', 'class': 'input-block-level date', 'placeholder': 'MM/DD/YYYY' }
-        .span6
-          %label
-            Kind/Type
-            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Choose Kind/Type'}
-          %select.input-block-level
-            %option -- Select --
-      .row-fluid
-        .span12
-          .expand-link
-            %a{ 'href': '#', 'class': 'show-hidden-fields hide-hidden-fields' }
-              %i.grcicon-hide
-              Hide Advanced
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick
-            Save
-
-
--# People Selector
-#selectorPeople{ 'class': 'modal modal-selector hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
-        %i.grcicon-x-grey
-    %h2
-      Map People to
-      PCI Compliance Program
-  .modal-filter
-    .row-fluid
-      .span3
-        &nbsp;
-      .span6
-        .modal-search
-          %a.btn.btn-mini.search-reset{ 'href': '#' }
-            %i.grcicon-x-grey
-          %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Search people' }
-      -#.span3.checkbox-filter
-        %input{ 'type': 'checkbox', 'id': 'control-type-filter', 'class': 'control-type-filter inline pull-right', 'checked': 'checked' }
-        %label{ 'class': 'inline pull-right', 'for': 'control-type-filter' }
-          Controls for this program only:
-      .span3
-        .pull-right
-          %a.btn.btn-add{ 'href': '#' }
-            %i.grcicon-add
-            Person
-  .modal-content
-    .row-fluid
-      .span3
-        .selector-info{ 'style': 'margin-right:-10%;' }
-          .pull-right
-            %a{ 'class': 'btn btn-mini', 'rel': 'tooltip', 'title': 'Edit' }
-              %i.grcicon-edit
-            %a{ 'class': 'btn btn-mini', 'rel': 'tooltip', 'title': 'Remove' }
-              %i.grcicon-remove
-          %p
-            %img{ 'src': '/static/images/sample/profile100.jpg', 'alt': '' }
-          %h4
-            Ernest Mandel
-            %br
-            Program Manager
-            %br
-            %small
-              Google, inc
-            %small
-            %br
-              %a{ 'href': 'mailto:ernestmandel@gmail.com' }
-                ernestmandel@gmail.com
-      .span4
-        .search-title
-          .row-fluid
-            .span6
-              %h4
-                Search Results (9)
-            .span6
-              .guide
-                &nbsp;
-        .selector-list
-          %ul.tree-structure.simple
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Alexander Mikkovski
-                        %span.address alexmikkovski@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Douglas Hyde
-                        %span.address douglashyde@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Gilbert Bourgeaud
-                        %span.address gilbertbourgeaud@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control.selected
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Ernest Mandel
-                        %span.address ernestmandel@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Lev Davidovich Bronstein
-                        %span.address levdavidovichbronstein@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Chris Hani
-                        %span.address chris.hani@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map', 'checked': 'checked' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Michael Yuhanna
-                        %span.address michael.yuhanna@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Herbert Ernst
-                        %span.address herbert.ernst@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-            %li.control
-              .item-main
-                .item-title
-                  .row-fluid
-                    .span11
-                      .oneline
-                        %span.title Rita Antoinette
-                        %span.address rita.antoinette@google.com
-                    .span1
-                      %input{ 'type': 'checkbox', 'rel': 'tooltip', 'title': 'map' }
-      .span5{ 'style': 'margin-left:0; width:42.17094%' }
-        .selector-info
-          %h4
-            %i.grcicon-user-black
-            Related People (2)
-          %ul.linked-people
-            %li
-              %select.role.pull-right
-                %option
-                  Accountable
-                %option
-                  Responsible
-              %a{ 'href': '#', 'class': 'jump-to-control' }
-                %span
-                  Lev Davidovich Bronstein
-            %li
-              %select.role.pull-right
-                %option
-                  Accountable
-                %option
-                  Responsible
-              %a{ 'href': '#', 'class': 'jump-to-control' }
-                %span
-                  Chris Hani
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick{ 'data-toggle': 'modal-submit', 'href': '#' }
-            Save
-
-
--# Edit Role
-#editRole{ 'class': 'modal modal-wide hide fade', 'tabindex': '-1' }
-  .modal-header
-    .pull-right
-      %a.btn.btn-mini{ 'data-dismiss': 'modal', 'href': '#' }
-        %i.grcicon-x-grey
-    %h2
-      Edit Role
-  .modal-body
-    .row-fluid
-      .span6
-        %label
-          Role Name
-          %span.required
-            *
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Title of Program'}
-        %input{ 'type': 'text', 'class': 'input-block-level', 'placeholder': 'Enter Title', 'value': 'SOX Program Manager' }
-      .span6
-        %label
-          Object
-          %span.required
-            *
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Choose Object'}
-        %select{ 'class': 'input-block-level' }
-          %option
-            SOX Program
+            Object
+            %span.required
+              *
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Choose Object'}
+          %select{ 'class': 'input-block-level' }
+            %option
+              SOX Program
           
-    .row-fluid
-      .span12
-        %br
-        %label
-          Role-specific Priviledges for Dependent Objects
-          %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
-        .checkbox-area
-          %input{ 'type': 'checkbox', 'checked': 'checked' }
-            Create
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %input{ 'type': 'checkbox', 'checked': 'checked' }
-            Read
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %input{ 'type': 'checkbox', 'checked': 'checked' }
-            Update
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %input{ 'type': 'checkbox', 'checked': 'checked' }
-            Delete
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %input{ 'type': 'checkbox', 'checked': 'checked' }
-            List
-        
-    .row-fluid
-      .span12
-        .expand-link
-          %a{ 'href': 'javascript://', 'class': 'show-hidden-fields' }
-            %span.out
-              %i.grcicon-show
-              Show
-            %span.in
-              %i.grcicon-hide
-              Hide
-            Advanced
-    .hidden-fields-area{ 'style': 'display:none'}
       .row-fluid
-        .span2
+        .span12
+          %br
           %label
-            Program Info
+            Role-specific Priviledges for Dependent Objects
+            %i.grcicon-help-black{ 'rel': 'tooltip', 'title': 'Describe program in few sentences'}
           .checkbox-area
             %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
+              Create
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-        .span2
-          %label
-            Controls
-          .checkbox-area
+              Read
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
+              Update
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-        .span2
-          %label
-            Directives
-          .checkbox-area
+              Delete
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-        .span2
-          %label
-            References
-          .checkbox-area
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-        .span2
-          %label
-            People
-          .checkbox-area
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-        .span2
-          %label
-            Impact/Scope
-          .checkbox-area
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              View
-            %br
-            %input{ 'type': 'checkbox', 'checked': 'checked' }
-              Modify
-  .modal-footer
-    .row-fluid
-      .span6
-        .deny-buttons
-      .span6
-        .confirm-buttons
-          %a.btn.btn-primary.preventdoubleclick
-            Save
+              List
+        
+      .row-fluid
+        .span12
+          .expand-link
+            %a{ 'href': 'javascript://', 'class': 'show-hidden-fields' }
+              %span.out
+                %i.grcicon-show
+                Show
+              %span.in
+                %i.grcicon-hide
+                Hide
+              Advanced
+      .hidden-fields-area{ 'style': 'display:none'}
+        .row-fluid
+          .span2
+            %label
+              Program Info
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+          .span2
+            %label
+              Controls
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+          .span2
+            %label
+              Directives
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+          .span2
+            %label
+              References
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+          .span2
+            %label
+              People
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+          .span2
+            %label
+              Impact/Scope
+            .checkbox-area
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                View
+              %br
+              %input{ 'type': 'checkbox', 'checked': 'checked' }
+                Modify
+    .modal-footer
+      .row-fluid
+        .span6
+          .deny-buttons
+        .span6
+          .confirm-buttons
+            %a.btn.btn-primary.preventdoubleclick
+              Save
