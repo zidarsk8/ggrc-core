@@ -701,15 +701,32 @@ jQuery(function($) {
   });
 });
 
-// FIXME: mock script to set area's width
-jQuery(function($) {
-  var winSize = $(window).width();
-  var winHeight = $(window).height();
-  var areaSize = winSize - 240 -8 -5 ; //bar = 8px, border-right = 5
-  var objectAreaSize = areaSize - 200;
-  var areaHeight = winHeight - 30;
-  $(".area").css('width', areaSize);
-  $(".object-area").css('width', objectAreaSize);
+function resize_areas() {
+  var $window, $header, $lhs, $internav, $object_area
+    , areaWidth, areaHeight, affixRight
+    ;
+
+  $window = $(window);
+  $header = $('header.main');
+  $lhs = $('#lhs');
+  $inner_nav = $('.area .inner-nav');
+
+  winWidth = $window.width();
+  winHeight = $window.height();
+  affixRight = $lhs.offset().left + $lhs.width();
+  headerHeight = $header.height();
+  internavWidth = ($inner_nav.length > 0 ? $inner_nav.width() : 0);
+
+  areaWidth = winWidth - affixRight - 8 - 5; // bar=8px, border-right=5px
+  objectAreaWidth = areaWidth - internavWidth;
+  areaHeight = winHeight - headerHeight;
+
+  $(".area").css("width", areaWidth);
+  $(".object-area").css("width", objectAreaWidth);
+
   $(".affix-holder").css('height', areaHeight);
   $(".bar-v").css('height', areaHeight);
-});
+}
+
+jQuery(resize_areas);
+jQuery(window).on("resize", resize_areas);
