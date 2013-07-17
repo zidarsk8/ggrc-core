@@ -129,7 +129,7 @@
               %ul.top-level
 
             .bar-h
-      .area
+      .area{ 'class': '={ model_display_class }' }
         .header-content{ 'data-spy': 'affix', 'data-offset-top': '1' }
           .row-fluid
             .span7
@@ -149,30 +149,30 @@
                   -value.each do |message|
                     %p=message
           -block main
-      %section.footer
-        .row-fluid
-          .span12
-            %ul.bottom-nav.pull-left
-              -#FIXME: demo mode?
-              -#%li
-                -if controller_name == 'design'
-                  -path = dashboard_path
-                -else
-                  -path = request.fullpath
-                -path = path.gsub(/BETA=[^&]*&?/, '').sub(/[?&]$/, '')
-                -path += path.include?('?') ? '&' : '?'
-                -if has_feature? 'BETA'
-                  %a.demo-hide{ 'href': "#{path}BETA=0" }
-                    Hide Demo
-                -else
-                  %a.demo-show{ 'href': "#{path}BETA=1" }
-                    Show Demo
-            %p
-              -#FIXME: Copyright footer
-              -#=CMS_CONFIG['COMPANY']
-              Confidential.
-              Copyright &copy;
-              -#=Time.now.year
-              =config.get('COMPANY')
-              Version
-              =config.get('VERSION')
+        %section.footer
+          .row-fluid
+            .span12
+              %ul.bottom-nav.pull-left
+                -#FIXME: demo mode?
+                -#%li
+                  -if controller_name == 'design'
+                    -path = dashboard_path
+                  -else
+                    -path = request.fullpath
+                  -path = path.gsub(/BETA=[^&]*&?/, '').sub(/[?&]$/, '')
+                  -path += path.include?('?') ? '&' : '?'
+                  -if has_feature? 'BETA'
+                    %a.demo-hide{ 'href': "#{path}BETA=0" }
+                      Hide Demo
+                  -else
+                    %a.demo-show{ 'href': "#{path}BETA=1" }
+                      Show Demo
+              %p
+                -#FIXME: Copyright footer
+                -#=CMS_CONFIG['COMPANY']
+                Confidential.
+                Copyright &copy;
+                -#=Time.now.year
+                =config.get('COMPANY')
+                Version
+                =config.get('VERSION')

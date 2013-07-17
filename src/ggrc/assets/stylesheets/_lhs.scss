@@ -4,6 +4,22 @@
 	float:left;
 }
 
+.area {
+  border-right:5px solid #444;
+  &.governance {
+    border-color:$governance;
+  }
+  &.risk {
+    border-color:$risk;
+  }
+  &.program {
+    border-color:$programs;
+  }
+  &.business {
+    border-color:$business;
+  }
+}
+
 .lhs-holder {
   min-height:100px;
   float:left;
