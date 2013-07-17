@@ -11,6 +11,8 @@
       </label>
       <input class="input-block-level" placeholder="Enter Name" name="name" type="text" value="{{name}}">
     </div>
+  </div>
+  <div class="row-fluid">
     <div class="span6">
       <label>
        Description 
@@ -20,16 +22,45 @@
         <textarea id="role_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
       </div>
     </div>
+    <div class="span6">
+      <label>
+       Assigned Users
+        <i class="grcicon-help-black" rel="tooltip" title="Hold CTRL (CMD) to select multiple users"></i>
+      </label>
+      <select multiple="multiple" class="multiple-selector input-block-level">
+        <option>John Locke</option>
+        <option selected>Epicurus</option>
+        <option>Zeno of Citium</option>
+        <option>Avicenna</option>
+        <option selected>Thomas Aquinas</option>
+        <option>Confucius</option>
+        <option>Rene Descartes</option>
+        <option>Paul of Tarsus</option>
+        <option>Plato</option>
+        <option>Aristotle</option>
+      </select>
+    </div>
   </div>
   <div class="row-fluid">
-    <div class="span2">
+    <div class="span6">
       <label>
-        Program
+        Context
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Choose Context"></i>
+      </label>
+      <select disabled class="input-block-level">
+        <option>Program</option>
+      </select>
+    </div>
+    <div class="span6">
+      <label>
+        Permissions
+        <i class="grcicon-help-black" rel="tooltip" title="Choose permissions for a role"></i>
       </label>
       <div class="checkbox-area">
-        <input type="checkbox" checked="checked">View</input>
-        <br/>
-        <input type="checkbox" checked="checked">Modify</input>
+        <input type="checkbox" checked="checked"> View
+        &nbsp;&nbsp;
+        <input type="checkbox" checked="checked"> Modify
       </div>
     </div>
 </form>
