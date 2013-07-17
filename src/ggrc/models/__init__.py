@@ -36,11 +36,11 @@ def drop_db_with_migrations(quiet=False):
   from ggrc import settings
   if quiet:
     logging.disable(logging.INFO)
+  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
+    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
   downgradeall(drop_versions_table=True)
   if quiet:
     logging.disable(logging.NOTSET)
-  if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
-    db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
   db.drop_all()
   db.session.commit()
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:

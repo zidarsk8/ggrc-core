@@ -40,8 +40,7 @@ class UserRole(Base, db.Model):
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
   user_email = db.Column(db.String(128), nullable=False)
-  target_context_id = db.Column(db.Integer(), nullable=False)
   role = db.relationship('Role')
 
-  _publish_attrs = ['role', 'user_email', 'target_context_id']
+  _publish_attrs = ['role', 'user_email',]
 
