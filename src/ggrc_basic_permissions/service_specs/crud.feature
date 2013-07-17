@@ -4,7 +4,14 @@ Feature: Role CRUD
     Given service description
 
   Scenario: Basic Role and UserRole CRUD using settings configured admin user
-    Given current user is "{\"email\": \"example.admin@example.com\", \"name\": \"Jo Admin\"}"
+    Given the current user 
+      """
+      { "email": "example.admin@example.com", "name": "Jo Admin",
+        "permissions": {
+          "__GGRC_ADMIN__": {"__GGRC_ALL__": [0]}
+        }
+      }
+      """
     And a new Role named "role" is created from json
       """
       {
@@ -31,7 +38,11 @@ Feature: Role CRUD
   Scenario: A non-adminstrative user cannot access role information
     Given the current user
       """
-      { "email": "example.admin@example.com", "name": "Jo Admin" }
+      { "email": "example.admin@example.com", "name": "Jo Admin",
+        "permissions": {
+          "__GGRC_ADMIN__": {"__GGRC_ALL__": [0]}
+        }
+      }
       """
     And a new Role named "role" is created from json
       """
@@ -78,7 +89,11 @@ Feature: Role CRUD
   Scenario: Use settings configured admin user to add other admin users
     Given the current user
       """
-      { "email": "example.admin@example.com", "name": "Jo Admin" }
+      { "email": "example.admin@example.com", "name": "Jo Admin",
+        "permissions": {
+          "__GGRC_ADMIN__": {"__GGRC_ALL__": [0]}
+        }
+      }
       """
     And a new Role named "role" is created from json
       """
@@ -107,7 +122,6 @@ Feature: Role CRUD
           "type": "Role"
         },
         "user_email": "another.admin@example.com",
-        "target_context_id": 1,
         "context": {
           "id": 1,
           "type": "Context"

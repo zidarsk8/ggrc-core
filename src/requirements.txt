@@ -13,5 +13,6 @@ Flask-Assets==0.8
 git+https://github.com/danring/HamlPy.git#egg=HamlPy
 iso8601
 SQLAlchemy==0.8.2
+blinker==1.3
 # Flask-SQLAlchemy must be last - it somehow mangles `distribute` / `setuptools`
 Flask-SQLAlchemy==0.16

@@ -25,3 +25,4 @@ def after_all(context):
   context.thread.join()
   db.session.remove()
   drop_db(use_migrations)
+
