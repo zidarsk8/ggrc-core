@@ -118,7 +118,6 @@ class BaseRowConverter(object):
       self.handlers[key].do_import(self.attrs.get(key))
       self.add_after_save_hook(self.handlers[key])
 
-
   def handle_text_or_html(self, key, **options):
     self.handle(key, TextOrHtmlColumnHandler, **options)
 
@@ -203,9 +202,6 @@ class TextOrHtmlColumnHandler(ColumnHandler):
         value = unicode(value, 'utf-8')
     return value if value else ''
 
-  def export(self):
-    return getattr(self.importer, self.key)
-
 class SlugColumnHandler(ColumnHandler):
 
   # Dont overwrite slug on object
@@ -250,6 +246,9 @@ class DateColumnHandler(ColumnHandler):
     else:
       return getattr(self.importer.obj, self.key) if self.importer.obj else ''
 
+  def export(self):
+    date_result = getattr(self.importer.obj, self.key)
+    return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
 
 class LinksHandler(ColumnHandler):
 
