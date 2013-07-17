@@ -705,7 +705,7 @@ jQuery(function($) {
 jQuery(function($) {
   var winSize = $(window).width();
   var winHeight = $(window).height();
-  var areaSize = winSize - 240 -8 ; //bar = 8px
+  var areaSize = winSize - 240 -8 -5 ; //bar = 8px, border-right = 5
   var objectAreaSize = areaSize - 200;
   var areaHeight = winHeight - 30;
   $(".area").css('width', areaSize);

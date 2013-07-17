@@ -1,30 +1,14 @@
 .footer {
   border-top: 1px solid $footerBorder;
+  background:#eee;
   height: 40px;
   text-align: center;
   p {
     margin: 0;
     line-height: 40px;
     color:$headerTitle;
-    font-size: $f-small;
+    font-size:12px;
     text-align: right;
-  }
-  .bottom-nav {
-    @include reset-list();
-    li {
-      text-align: left;
-      a {
-        line-height: 40px;
-        color: $link;
-        font-size: $f-small;
-        text-decoration: underline;
-        &:hover {
-          text-decoration: none;
-        }
-        i {
-          margin: 10px 4px 0 0;
-        }
-      }
-    }
+    padding-right:20px;
   }
 }
