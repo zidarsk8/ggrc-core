@@ -642,9 +642,12 @@ Mustache.registerHelper("private_program", function(modal_title) {
   return modal_title.indexOf("New ") !=0 ? '' : [
     '<div class="span6">'
     , '<label>'
-    , 'Private'
+    , 'Privacy'
+    , '<i class="grcicon-help-black" rel="tooltip" title="Program won\'t be visible to others"></i>'
     , '</label>'
-    , '<input class="input-block-level" name="private" value="private" type="checkbox">'
+    , '<div class="checkbox-area">'
+    , '<input name="private" value="private" type="checkbox"> Private Program'
+    , '</div>'
     , '</div>'
   ].join("");
 });
