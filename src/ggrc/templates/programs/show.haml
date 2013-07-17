@@ -40,7 +40,7 @@
     .object-area
       #columns.column-set{ 'data-resize': "true" }
         #middle-column.widget-area
-          -with widget_class = 'programs'
+          -with widget_class = 'programs', widget_view_mustache = '/programs/info.mustache'
             -include 'programs/_info.haml'
           -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
             -include 'programs/_main.haml'
