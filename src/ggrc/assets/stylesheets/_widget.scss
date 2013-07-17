@@ -452,7 +452,10 @@
         line-height:22px;
         color:$text;
       }
-      
+      h4.no-data {
+        font-style:italic;
+        color:#999;
+      }
     }
   }
   .risk-content {
