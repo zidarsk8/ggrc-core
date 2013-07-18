@@ -678,6 +678,81 @@ can.Model.Cacheable("CMS.Models.Risk", {
   }
 }, {});
 
+can.Model.Cacheable("CMS.Models.Objective", {
+  root_object : "objective"
+  , root_collection : "objectives"
+  , category : "governance"
+  , findAll : "/api/objectives"
+  , create : "POST /api/objectives"
+  , update : "PUT /api/objectives/{id}"
+  , links_to : {
+  }
+}, {});
+
+can.Model.Cacheable("CMS.Models.ObjectiveControl", {
+    root_object : "objective_control"
+    , root_collection : "objective_controls"
+    , findAll: "GET /api/objective_controls"
+    , create: "POST /api/objective_controls"
+    , destroy : "DELETE /api/objective_controls/{id}"
+}, {
+    init : function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("objective", CMS.Models.get_instance(
+              "Objective",
+              this.objective_id || (this.objective && this.objective.id)));
+            this.attr("control", CMS.Models.get_instance(
+              "Control",
+              this.control_id || (this.control && this.control.id)));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+});
+
+can.Model.Cacheable("CMS.Models.SectionObjective", {
+    root_object : "section_objective"
+    , root_collection : "section_objectives"
+    , findAll: "GET /api/section_objectives"
+    , create: "POST /api/section_objectives"
+    , destroy : "DELETE /api/section_objectives/{id}"
+}, {
+    init : function() {
+        var _super = this._super;
+        function reinit() {
+            var that = this;
+
+            typeof _super === "function" && _super.call(this);
+            this.attr("section", CMS.Models.get_instance(
+              "Section",
+              this.section_id || (this.section && this.section.id)));
+            this.attr("objective", CMS.Models.get_instance(
+              "Objective",
+              this.objective_id || (this.objective && this.objective.id)));
+
+            this.each(function(value, name) {
+              if (value === null)
+              that.removeAttr(name);
+            });
+        }
+
+        this.bind("created", can.proxy(reinit, this));
+
+        reinit.call(this);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.SystemControl", {
     root_object : "system_control"
     , root_collection : "system_controls"
