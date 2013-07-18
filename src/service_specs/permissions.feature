@@ -51,6 +51,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Help               |
       | Market             |
       | Meeting            |
+      | Objective          |
+      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | PbcList            |
@@ -66,6 +68,7 @@ Feature: RBAC Permissions enforcement for REST API
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |
@@ -120,6 +123,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Help               |
       | Market             |
       | Meeting            |
+      | Objective          |
+      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | PbcList            |
@@ -135,6 +140,7 @@ Feature: RBAC Permissions enforcement for REST API
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |
@@ -197,6 +203,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Help               |
       | Market             |
       | Meeting            |
+      | Objective          |
+      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | PbcList            |
@@ -212,6 +220,7 @@ Feature: RBAC Permissions enforcement for REST API
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |
@@ -274,6 +283,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Help               |
       | Market             |
       | Meeting            |
+      | Objective          |
+      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | PbcList            |
@@ -289,6 +300,7 @@ Feature: RBAC Permissions enforcement for REST API
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |
