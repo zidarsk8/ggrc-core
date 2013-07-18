@@ -8,6 +8,7 @@ multiple steps/*.py modules.
 import json
 import datetime
 from factories import factory_for, FactoryStubMarker
+import requests
 
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
@@ -44,7 +45,6 @@ def handle_get_resource_and_name_it(context, url, name):
   setattr(context, name, response.json())
 
 def get_resource(context, url):
-  import requests
   headers={'Accept': 'application/json',}
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
@@ -57,7 +57,6 @@ def get_resource(context, url):
   return response
 
 def put_resource(context, url, resource):
-  import requests
   headers={
       'Content-Type': 'application/json',
       'If-Match': resource.response.headers['Etag'],
@@ -131,13 +130,9 @@ def post_example(context, resource_type, example, url=None, context_id=None):
         'id': value_data["id"],
         'type': value_resource_type
         }
-
   # Assign overriding `context_id`, if specified
   if context_id is not None:
     example["context_id"] = context_id
-
-  #For **some** reason, I can't import this at the module level in a steps file
-  import requests
 
   headers = {'Content-Type': 'application/json',}
   data = json.dumps(

@@ -6,9 +6,11 @@
 import datetime
 from behave import given, when, then
 from iso8601 import parse_date
+import ggrc.app
+from sqlalchemy.orm.properties import RelationshipProperty
 import json
 
-from .utils import \
+from utils import \
     Example, handle_example_resource, handle_named_example_resource, \
     set_property, get_resource, put_resource, get_resource_table_singular, \
     handle_get_resource_and_name_it, \
@@ -19,6 +21,19 @@ def get_json_response(context):
   if not hasattr(context, 'json'):
     context.json = context.response.json()
   return context.json
+
+def add_create_permissions(context, context_id, resource_types):
+  if hasattr(context, 'current_user_data'):
+    context.current_user_data.setdefault("permissions", {})
+    user_perms = context.current_user_data["permissions"]
+    permission_type = 'create'
+    user_perms.setdefault(permission_type, {})
+    for resource_type in resource_types:
+      user_perms[permission_type].setdefault(resource_type, [])
+      context_id = int(context_id)
+      if context_id not in user_perms[permission_type][resource_type]:
+        user_perms[permission_type][resource_type].append(context_id)
+      context.current_user_json = json.dumps(context.current_user_data)
 
 @given('an example "{resource_type}"')
 def example_resource(context, resource_type):
@@ -123,21 +138,22 @@ def define_current_user(context, user_json):
   context.current_user_data = json.loads(user_json.replace('\\"', '"'))
   context.current_user_json = json.dumps(context.current_user_data)
 
-@given('current user has permissions "{permissions}" on resource types "{permission_resource_types}" in context "{context_id}"')
-def add_user_permissions(
-    context, permissions, permission_resource_types, context_id):
-  if permissions == 'None' or permission_resource_types == 'None':
-    return
-  context_id = int(context_id)
-  context.current_user_data.setdefault("permissions", {})
-  user_perms = context.current_user_data["permissions"]
-  for permission_type in permissions.split(","):
-    user_perms.setdefault(permission_type, {})
-    for resource_type in permission_resource_types.split(","):
-      user_perms[permission_type].setdefault(resource_type, [])
-      if context_id not in user_perms[permission_type][resource_type]:
-        user_perms[permission_type][resource_type].append(context_id)
-  context.current_user_json = json.dumps(context.current_user_data)
+def get_related_resource_types(resource_type, resource_types):
+  model = getattr(ggrc.models, resource_type)
+  for attr in ggrc.db.inspect(model).attrs:
+    if isinstance(attr, RelationshipProperty):
+      columns = tuple(attr.local_columns)[0]
+      if not (attr.uselist or columns.primary_key or columns.nullable):
+        related_resource_type = attr.mapper.class_.__name__
+        if related_resource_type not in resource_types:
+          resource_types.add(related_resource_type)
+          get_related_resource_types(related_resource_type, resource_types)
+
+@given('current user has create permissions on resource types that "{resource_type}" depends on in context "{context_id}"')
+def add_related_resource_permissions(context, resource_type, context_id):
+  resource_types = set()
+  get_related_resource_types(resource_type, resource_types)
+  add_create_permissions(context, context_id, resource_types)
 
 @then('POST of "{resource_name}" to its collection is allowed')
 def check_POST_is_allowed(context, resource_name):

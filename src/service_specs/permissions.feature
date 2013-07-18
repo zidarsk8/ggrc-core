@@ -5,51 +5,52 @@ Feature: RBAC Permissions enforcement for REST API
 
   Scenario Outline: POST requires create permission for the context
     Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1111]}}}"
-    And current user has permissions "<permissions>" on resource types "<permission_resource_types>" in context "1111"
     And a new "<resource_type>" named "resource"
     And "resource" property "context_id" is literal "1111"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "1111"
     Then POST of "resource" to its collection is allowed
     Given a new "<resource_type>" named "resource"
     And "resource" property "context_id" is literal "1112"
     Then POST of "resource" to its collection is forbidden
 
   Examples:
-      | resource_type      | permissions | permission_resource_types |
-      | Category           | None        | None                      |
-      | Control            | None        | None                      |
-      | ControlAssessment  | create      | PbcList,Cycle,Program,Control |
-      | ControlRisk        | create      | Control,Risk              |
-      | Cycle              | create      | Program                   |
-      | DataAsset          | None        | None                      |
-      | Directive          | None        | None                      |
-      | Document           | None        | None                      |
-      | Facility           | None        | None                      |
-      | Help               | None        | None                      |
-      | Market             | None        | None                      |
-      | Meeting            | create      | Response,Request,PbcList,Cycle,Program,System |
-      | Option             | None        | None                      |
-      | OrgGroup           | None        | None                      |
-      | PbcList            | create      | Cycle,Program             |
-      | Person             | None        | None                      |
-      | PopulationSample   | create      | Response,Request,PbcList,Cycle,Program,System |
-      | Product            | None        | None                      |
-      | Project            | None        | None                      |
-      | Program            | None        | None                      |
-      | ProgramDirective   | create      | Program,Directive         |
-      | Request            | create      | PbcList,Cycle,Program     |
-      | Response           | create      | Request,PbcList,Cycle,Program,System |
-      | Risk               | None        | None                      |
-      | RiskyAttribute     | None        | None                      |
-      | RiskRiskyAttribute | create      | Risk,RiskyAttribute       |
-      | Section            | create      | Directive                 |
-      | System             | None        | None                      |
-      | SystemSystem       | create      | System                    |
-      | SystemControl      | create      | System,Control            |
+      | resource_type      |
+      | Category           |
+      | Control            |
+      | ControlAssessment  |
+      | ControlRisk        |
+      | Cycle              |
+      | DataAsset          |
+      | Directive          |
+      | Document           |
+      | Facility           |
+      | Help               |
+      | Market             |
+      | Meeting            |
+      | Option             |
+      | OrgGroup           |
+      | PbcList            |
+      | Person             |
+      | PopulationSample   |
+      | Product            |
+      | Project            |
+      | Program            |
+      | ProgramDirective   |
+      | Request            |
+      | Response           |
+      | Risk               |
+      | RiskyAttribute     |
+      | RiskRiskyAttribute |
+      | Section            |
+      | System             |
+      | SystemSystem       |
+      | SystemControl      |
 
   Scenario Outline: GET requires read permission for the context
     Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1111]}, \"read\": {\"<resource_type>\": [1111]}}}"
     And a new "<resource_type>" named "resource"
     And "resource" property "context_id" is literal "1111"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "1111"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Given current user is "{\"email\": \"bobtester@testertester.com\", \"name\": \"Bob Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1112]}}}"
@@ -87,12 +88,12 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario Outline: PUT requires update permission for the context
     Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1111]}, \"read\": {\"<resource_type>\": [1111]}, \"update\": {\"<resource_type>\": [1111]}}}"
     And a new "<resource_type>" named "resource"
     And "resource" property "context_id" is literal "1111"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "1111"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Then PUT of "resource" is allowed
@@ -132,12 +133,12 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario Outline: DELETE requires delete permission for the context
     Given current user is "{\"email\": \"tester@testertester.com\", \"name\": \"Jo Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1111]}, \"read\": {\"<resource_type>\": [1111]}, \"update\": {\"<resource_type>\": [1111]}}}"
     And a new "<resource_type>" named "resource"
     And "resource" property "context_id" is literal "1111"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "1111"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Then DELETE of "resource" is forbidden 
@@ -177,7 +178,6 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   @wip
   Scenario: Property link objects can be included with __include if the user has read access to the target
@@ -219,6 +219,8 @@ Feature: RBAC Permissions enforcement for REST API
     And "resource1" property "context_id" is literal "1"
     And "resource2" property "context_id" is literal "2"
     And current user is "{\"email\": \"bobtester@testertester.com\", \"name\": \"Bob Tester\", \"permissions\": {\"create\": {\"<resource_type>\": [1,2]}, \"read\": {\"<resource_type>\": [1,2]}, \"update\": {\"<resource_type>\": [1,2]}}}"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "2"
     And "resource1" is POSTed to its collection
     And "resource2" is POSTed to its collection
     When Querying "<resource_type>" with "<property_name>=<match_value>"
