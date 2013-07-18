@@ -32,6 +32,10 @@
                 %li
                   %a{ 'href': "/directives/={instance.id}/import_sections" }
                     Import Sections
+                %li.divider
+                %li
+                  %a{ 'href': "/directives/={instance.id}/export_sections" }
+                    Export Sections
 
             %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#regulations, #combo', 'data-route' : "regulations", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : "Create New #{section_meta_kind|title}", 'data-object-singular' : 'Section', 'data-object-plural' : 'sections' }
               %i.grcicon-add
@@ -62,4 +66,4 @@
         %ul.tree-structure
       #controls.tab-pane
         %ul.tree-structure
-        
+
