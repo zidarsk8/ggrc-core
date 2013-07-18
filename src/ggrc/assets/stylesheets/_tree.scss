@@ -686,3 +686,56 @@ ul.tree-structure.event-log {
     }
   }
 }
+
+ul.new-tree {
+  @include reset-list();
+  li.tree-item {
+    border-bottom:1px solid #ddd;
+    line-height:30px;
+    &:last-child {
+      border-color: #fff;
+    }
+  }
+  [class^="grcicon-"] {
+    margin-top:7px;
+  }
+  .tree-description {
+    &.short {
+      height:54px;
+      overflow:hidden;
+    }
+    p {
+      line-height:18px;
+      font-size:13px;
+    }
+  }
+  a.show-long {
+    color:$disabled;
+    display:block;
+    font-size:13px;
+    line-height:18px;
+    margin-top:-2px;
+    text-decoration:underline;
+    &:hover {
+      color:$link;
+      text-decoration:underline;
+    }
+  }
+  .tree-info {
+    @include oneline();
+    font-size:13px;
+  }
+  .tree-actions {
+    border-top:1px solid #eee;
+    font-size:13px;
+    a {
+      color:$disabled;
+      &:hover {
+        color:$link;
+        text-decoration:none;
+      }
+    }
+    
+  }
+}
+  
