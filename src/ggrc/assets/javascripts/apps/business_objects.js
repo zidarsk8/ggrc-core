@@ -31,6 +31,21 @@ $(function() {
     model : object_class
     , single_object : true
     , list : [object]
+  }).on("modal:relationshipcreated modal:relationshipdestroyed", "li", function(ev, data) {
+    var tree_obj = $(this).find(".item-main:first").data("model")
+    , other_obj;
+
+    if((other_obj = data.getOtherSide(tree_obj)) != null) {
+      $(this)
+      .find([".tree-structure[data-object-sub-type="
+        , other_obj.constructor.table_singular
+        , "], .tree-structure[data-object-type="
+        , other_obj.constructor.shortName + "], .tree-structure[data-object-meta-type="
+        , other_obj.constructor.root_object
+        , "]"].join(""))
+      .first()
+      .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", other_obj);
+    }
   });
 
   var $risk_tree = $("#" + object_class.root_object + "_risk_widget .tree-structure").cms_controllers_tree_view({

@@ -83,6 +83,8 @@ can.Control("CMS.Controllers.TreeView", {
       list = this.options.list;
     }
 
+    if(!this.element)
+      return;  //controller has been destroyed
     can.Observe.startBatch();
     this.options.attr("original_list", list);
     this.options.attr("list", []);
@@ -116,7 +118,7 @@ can.Control("CMS.Controllers.TreeView", {
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this;
     can.each(newVals, function(newVal) {
-      that.element.trigger("newChild", new can.Observe.TreeOptions({instance : newVal}));
+      that.element.trigger("newChild", newVal);
     });
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
@@ -210,9 +212,11 @@ can.Control("CMS.Controllers.TreeView", {
     var that = this;
     var model;
     if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
-      model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
+      model = new can.Observe.TreeOptions({
+        instance : data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data)
+      });
       this.add_child_lists([model]);
-      this.options.list.push(new can.Observe.TreeOptions({ instance : model}));
+      this.options.list.push(model);
       setTimeout(function() {
         $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
       }, 10);

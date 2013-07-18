@@ -38,9 +38,19 @@ can.Model("can.Model.Cacheable", {
 
   findOne : "GET {href}"
   , setup : function(construct, name, statics, prototypes) {
-    if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll)
-      this.findAll = "GET /api/" + this.root_collection;
-
+    var overrideFindAll = false;
+    if(this.fullName === "can.Model.Cacheable") {
+      this.findAll = function() {
+        throw "No default findAll() exists for subclasses of Cacheable";
+      };
+    }
+    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
+      if(this.root_collection) {
+        this.findAll = "GET /api/" + this.root_collection;
+      } else {
+        overrideFindAll = true;
+      }
+    }
     if(this.root_collection) {
       this.model_plural = statics.model_plural || this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
       this.title_plural = statics.title_plural || this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
@@ -52,7 +62,10 @@ can.Model("can.Model.Cacheable", {
       this.table_singular = statics.table_singular || this.root_object;
     }
 
-    return this._super.apply(this, arguments);
+    var ret = this._super.apply(this, arguments);
+    if(overrideFindAll)
+      this.findAll = can.Model.Cacheable.findAll;
+    return ret;
   }
   , init : function() {
     this.bind("created", function(ev, new_obj) {
