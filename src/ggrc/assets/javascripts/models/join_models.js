@@ -99,7 +99,7 @@ can.Model.Join("CMS.Models.ProgramDirective", {
   }
 });
 
-can.Model.Cacheable("CMS.Models.ObjectiveControl", {
+can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"
   , join_keys : {
@@ -135,7 +135,7 @@ can.Model.Cacheable("CMS.Models.ObjectiveControl", {
   }
 });
 
-can.Model.Cacheable("CMS.Models.SectionObjective", {
+can.Model.Join("CMS.Models.SectionObjective", {
   root_object : "section_objective"
   , root_collection : "section_objectives"
   , join_keys : {
