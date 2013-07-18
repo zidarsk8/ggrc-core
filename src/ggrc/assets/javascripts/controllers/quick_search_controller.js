@@ -204,7 +204,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       $allext.removeClass("in");
       can.view(this.options.tooltip_view, instance, function(frag) {
         this.fade_in_timeout = setTimeout(function() {
-          $extended.html(frag).addClass("in").data("model", instance);
+          $extended.html(frag).addClass("in").css("top", el.offset().top - el.closest(".accordion-group").offset().top).data("model", instance);
           el.addClass("in");
         }, 30);
       });
