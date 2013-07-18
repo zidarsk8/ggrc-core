@@ -6,6 +6,7 @@
 import json
 from ggrc import db
 from ggrc.builder import simple_property
+from ggrc.models.context import Context
 from ggrc.models.mixins import Base, Described
 
 class Role(Base, Described, db.Model):
@@ -43,4 +44,16 @@ class UserRole(Base, db.Model):
   role = db.relationship('Role')
 
   _publish_attrs = ['role', 'user_email',]
+
+  @classmethod
+  def role_assignments_for(cls, context):
+    context_id = context.id if type(context) is Context else context
+    all_assignments = db.session.query(UserRole)\
+        .filter(UserRole.context_id == context_id)
+    assignments_by_user = {}
+    for assignment in all_assignments:
+        assignments_by_user.setdefault(assignment.user_email, [])\
+            .append(assignment.role)
+    print 'role_assignments_for', assignments_by_user
+    return assignments_by_user
 

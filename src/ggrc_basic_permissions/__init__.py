@@ -4,15 +4,24 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
-from flask import session
+from flask import session, Blueprint
 from ggrc import db, settings
+from ggrc.app import app
 from ggrc.login import get_current_user
 from ggrc.models.context import Context
 from ggrc.models.program import Program
+from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
+from ggrc.views.common import BaseObjectView
 from .models import Role, UserRole
+
+blueprint = Blueprint(
+    'permissions',
+    __name__,
+    template_folder='templates',
+    )
 
 class CompletePermissionsProvider(object):
   def __init__(self, settings):
@@ -122,4 +131,21 @@ def handle_program_post(sender, obj=None, src=None, service=None):
           )
       db.session.add(role_reader_for_user)
       db.session.flush()
+
+@BaseObjectView.extension_contributions.connect_via(Program)
+def contribute_to_program_view(sender, obj=None, context=None):
+  print 'contribute_to_program_view', obj
+  print session['permissions']
+  if obj.context_id != None and \
+      permissions.is_allowed_read(Role, 1) and \
+      permissions.is_allowed_read(UserRole, obj.context_id) and \
+      permissions.is_allowed_create(UserRole, obj.context_id) and \
+      permissions.is_allowed_update(UserRole, obj.context_id) and \
+      permissions.is_allowed_delete(UserRole, obj.context_id):
+    return 'permissions/programs/_role_assignments.haml'
+  return None
+
+@app.context_processor
+def authorized_users_for():
+  return {'authorized_users_for': UserRole.role_assignments_for,}
 

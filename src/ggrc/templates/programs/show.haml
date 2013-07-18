@@ -58,3 +58,5 @@
             -include 'programs/_more_info.haml'
           -if not instance.company_controls
             -include 'shared/_add_widget_section.haml'
+          -for extension in controller.extension_content(instance)
+            -include extension
