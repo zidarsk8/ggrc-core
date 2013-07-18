@@ -5,7 +5,7 @@
 
 import os.path
 import sys
-from alembic import command, util
+from alembic import command, util, autogenerate as autogen
 from alembic.config import Config, CommandLine
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
@@ -88,8 +88,43 @@ def init(extension_module_name, **kwargs):
   pkg_env = ExtensionPackageEnv(extension_module_name)
   command.init(pkg_env.config, pkg_env.script_dir, **kwargs)
 
-def revision_command(extension_module_name, **kwargs):
-  run_simple_command(extension_module_name, command.revision, **kwargs)
+def revision_command(extension_module_name, message=None, autogenerate=False, sql=False, **kwargs):
+    """Create a new revision file."""
+    pkg_env = ExtensionPackageEnv(extension_module_name)
+    config = pkg_env.config
+
+    # The rest of this method is a direct copy of alembic.command:revision,
+    # except for replacing ``with EnvironmentContext...`` with
+    # ``pkg_env.run_env...``
+    script = ScriptDirectory.from_config(config)
+    template_args = {
+        'config': config  # Let templates use config for
+                          # e.g. multiple databases
+    }
+    imports = set()
+
+    environment = util.asbool(
+        config.get_main_option("revision_environment")
+    )
+
+    if autogenerate:
+        environment = True
+        def retrieve_migrations(rev, context):
+            if script.get_revision(rev) is not script.get_revision("head"):
+                raise util.CommandError("Target database is not up to date.")
+            autogen._produce_migration_diffs(context, template_args, imports)
+            return []
+    elif environment:
+        def retrieve_migrations(rev, context):
+            return []
+
+    if environment:
+        pkg_env.run_env(
+            fn=retrieve_migrations,
+            as_sql=sql,
+            template_args=template_args,
+        )
+    script.generate_revision(util.rev_id(), message, **template_args)
 
 def upgrade(extension_module_name, revision, sql=False, tag=None):
   pkg_env = ExtensionPackageEnv(extension_module_name)
