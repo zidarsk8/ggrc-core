@@ -613,6 +613,17 @@ can.Model.Cacheable("CMS.Models.Risk", {
   }
 }, {});
 
+can.Model.Cacheable("CMS.Models.Objective", {
+  root_object : "objective"
+  , root_collection : "objectives"
+  , category : "governance"
+  , findAll : "/api/objectives"
+  , create : "POST /api/objectives"
+  , update : "PUT /api/objectives/{id}"
+  , links_to : {
+  }
+}, {});
+
 can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
   , root_collection : "helps"
