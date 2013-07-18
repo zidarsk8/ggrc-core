@@ -16,25 +16,6 @@
         &nbsp;
     =instance.title
 
--block subheader_extras
-  %ul.actions.pull-right
-    %li
-      %a{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': '={instance.kind_singular}', 'data-object-plural': '={instance.kind_plural}', 'data-object-id': 'page' }
-        %i.grcicon-edit
-        %span Edit ={instance.kind_singular}
-
-    %li.btn-group
-      %a.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown'}
-        %i.grcicon-imp-exp
-        %span Import/Export
-        %span.caret
-
-      %ul.dropdown-menu
-        %li.divider
-        %li
-          %a{ 'href': "/directives/={instance.id}/import_sections" }
-            Import Sections
-
 -block main
   .clearfix
     .inner-nav

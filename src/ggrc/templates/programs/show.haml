@@ -22,15 +22,6 @@
         %a{ 'href': "#", 'class': "disabled"}
           %i.grcicon-reg-map
           %span Consolidate Controls
-    -else
-      %li
-        %a{ 'href': "new_flow_cycle_path(program_id => instance.id)", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect' }
-          %i.grcicon-audit
-          %span Start Audit
-    %li
-      %a{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': 'Program', 'data-object-plural': 'programs', 'data-object-id': 'page' }
-        %i.grcicon-edit
-        %span Edit Program
 
 -block main
   .clearfix

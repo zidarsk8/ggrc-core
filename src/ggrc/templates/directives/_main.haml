@@ -22,13 +22,23 @@
           -#%input.ui-corner-all.widgetsearch.clear-value(type='text' placeholder='Search')
         .span6
           .pull-right
+            .btn-group.pull-left{ 'style': 'margin-right:4px;' }
+              %a.btn.btn-add.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown'}
+                %i.grcicon-imp-exp-white
+                %span Import/Export
+                %span.caret
+              %ul.dropdown-menu
+                %li.divider
+                %li
+                  %a{ 'href': "/directives/={instance.id}/import_sections" }
+                    Import Sections
+
             %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#regulations, #combo', 'data-route' : "regulations", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : "Create New #{section_meta_kind|title}", 'data-object-singular' : 'Section', 'data-object-plural' : 'sections' }
               %i.grcicon-add
               =section_meta_kind|title
             %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
               %i.grcicon-add
               Control
-
 -block main
   .tabbable
     %ul.nav.nav-tabs
