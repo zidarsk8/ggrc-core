@@ -74,7 +74,7 @@
         , $target = $('<div id="' + modal_id + '" class="modal modal-selector fade hide"></div>')
         ;
 
-      $target
+      return $target
         .modal_form({}, $trigger)
         .ggrc_controllers_modal_selector($.extend(
           { $trigger: $trigger },
@@ -230,6 +230,7 @@
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
+              self.element.trigger("relationshipcreated", join);
             //});
           });
         }
@@ -253,6 +254,7 @@
                 if (join_index >= 0) {
                   self.join_list.splice(join_index, 1);
                 }
+                self.element.trigger("relationshipdestroyed", join);
               });
             });
           }
@@ -537,7 +539,9 @@
           , object_side: $this.data('object-side')
           , relationship_type: $this.data('relationship-type')
           , join_query: $this.data('join-query')
-        }));
+        })).on("relationshipcreated relationshipdestroyed", function(ev, data) {
+          $this.trigger("modal:" + ev.type, data);
+        });
     });
   });
 
@@ -563,7 +567,10 @@
       e.preventDefault();
 
       // Trigger the controller
-      GGRC.Controllers.ModalSelector.launch($this, options);
+      GGRC.Controllers.ModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
     });
   });
 

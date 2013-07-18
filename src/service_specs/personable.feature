@@ -23,6 +23,7 @@ Feature: Some resources can be related to Person resources
       | Directive       |
       | Facility        |
       | Market          |
+      | Objective       |
       | OrgGroup        |
       | Product         |
       | Program         |

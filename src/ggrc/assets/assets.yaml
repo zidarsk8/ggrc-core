@@ -58,6 +58,7 @@ dashboard-js-files:
   - pbc/document.js
   - pbc/person.js
   - pbc/system.js
+  - models/join_models.js
   - apps/dashboard.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js

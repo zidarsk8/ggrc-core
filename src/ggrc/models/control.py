@@ -68,6 +68,8 @@ class Control(
   systems = association_proxy('system_controls', 'system', 'SystemControl')
   control_sections = db.relationship('ControlSection', backref='control')
   sections = association_proxy('control_sections', 'section', 'ControlSection')
+  objective_controls = db.relationship('ObjectiveControl', backref='control')
+  objectives = association_proxy('objective_controls', 'objective', 'ObjectiveControl')
   control_controls = db.relationship(
       'ControlControl',
       foreign_keys='ControlControl.control_id',
@@ -105,6 +107,7 @@ class Control(
       'notes',
       'risks',
       'sections',
+      'objectives',
       'systems',
       'type',
       'verify_frequency',
@@ -112,6 +115,7 @@ class Control(
       PublishOnly('control_controls'),
       PublishOnly('control_risks'),
       PublishOnly('control_sections'),
+      PublishOnly('objective_controls'),
       PublishOnly('implementing_control_controls'),
       PublishOnly('system_controls'),
       ]
@@ -129,6 +133,7 @@ class Control(
         orm.joinedload('verify_frequency'),
         orm.subqueryload_all('system_controls.system'),
         orm.subqueryload_all('control_sections.section'),
+        orm.subqueryload_all('objective_controls.objective'),
         orm.subqueryload_all('control_controls.implemented_control'),
         orm.subqueryload_all('implementing_control_controls.control'),
         orm.subqueryload_all('control_risks.risk'),

@@ -9,11 +9,7 @@ from werkzeug.exceptions import Forbidden
 from .tooltip import TooltipView
 from .relationships import RelatedObjectResults
 from . import filters
-from ggrc.converters.sections import SectionsConverter
-from ggrc.converters.import_helper import *
-from pprint import pprint
 from flask import request, redirect, url_for, flash
-from werkzeug import secure_filename
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
@@ -92,6 +88,9 @@ def allowed_file(filename):
 
 @app.route("/directives/<directive_id>/import_sections", methods=['GET', 'POST'])
 def import_sections(directive_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.sections import SectionsConverter
+  from ggrc.converters.import_helper import handle_csv_import
 
   if request.method == 'POST':
     dry_run = not ('confirm' in request.form)
@@ -116,6 +115,8 @@ def import_sections(directive_id):
 
 @app.route("/directives/<directive_id>/export_sections", methods=['GET', 'POST'])
 def export_sections(directive_id):
+  from ggrc.converters.sections import SectionsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
 
   if request.method == 'GET':
     return handle_converter_csv_export(directive_id, SectionsConverter)
@@ -140,6 +141,7 @@ def all_object_views():
       'directives',
       'cycles',
       'controls',
+      'objectives',
       'systems',
       'products',
       'org_groups',
@@ -160,6 +162,7 @@ def all_tooltip_views():
       'directives',
       'cycles',
       'controls',
+      'objectives',
       'systems',
       'products',
       'org_groups',

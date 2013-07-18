@@ -23,6 +23,7 @@ Feature: Some resources can be related to Document resources
       | Directive         |
       | Facility          |
       | Market            |
+      | Objective         |
       | OrgGroup          |
       | Product           |
       | Program           |

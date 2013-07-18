@@ -1,7 +1,7 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
-# Maintained By: vraj@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 from collections import namedtuple
 from .common import *
@@ -38,6 +38,8 @@ def all_collections():
     service('meetings', models.Meeting),
     service('object_documents', models.ObjectDocument),
     service('object_people', models.ObjectPerson),
+    service('objectives', models.Objective),
+    service('objective_controls', models.ObjectiveControl),
     service('options', models.Option),
     service('org_groups', models.OrgGroup),
     service('pbc_lists', models.PbcList),
@@ -55,6 +57,7 @@ def all_collections():
     service('risky_attributes', models.RiskyAttribute),
     service('risk_risky_attributes', models.RiskRiskyAttribute),
     service('sections', models.Section),
+    service('section_objectives', models.SectionObjective),
     service('systems', models.System),
     service('system_systems', models.SystemSystem),
     service('system_controls', models.SystemControl),

@@ -30,12 +30,16 @@ Feature: Many resources type pairs reference each other M x N relations. This
     And "resource_a" is in the links property "<link_property_b>" of "resource_b"
 
    Examples: m-by-n link Resources
-      | type_a    | link_property_a      | type_b   | link_property_b       |
-     #| Control   | documents            | Document | FIXME no property??   |
-     #| Control   | people               | Person   | ??                    |
-      | Control   | systems              | System   | controls              |
-      | Control   | sections             | Section  | controls              |
-      | Control   | implemented_controls | Control  | implementing_controls |
-      | Control   | risks                | Risk     | controls              |
-      | Directive | programs             | Program  | directives            |
-      | System    | sub_systems          | System   | super_systems         |
+      | type_a    | link_property_a      | type_b    | link_property_b       |
+     #| Control   | documents            | Document  | FIXME no property??   |
+     #| Control   | people               | Person    | ??                    |
+      | Control   | systems              | System    | controls              |
+      | Control   | sections             | Section   | controls              |
+      | Control   | implemented_controls | Control   | implementing_controls |
+      | Control   | risks                | Risk      | controls              |
+      | Directive | programs             | Program   | directives            |
+      | Control   | objectives           | Objective | controls              |
+      | Section   | objectives           | Objective | sections              |
+      | Objective | controls             | Control   | objectives            |
+      | Objective | sections             | Section   | objectives            |
+      | System    | sub_systems          | System    | super_systems         |
