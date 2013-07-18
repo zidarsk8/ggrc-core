@@ -38,9 +38,19 @@ can.Model("can.Model.Cacheable", {
 
   findOne : "GET {href}"
   , setup : function(construct, name, statics, prototypes) {
-    if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll)
-      this.findAll = "GET /api/" + this.root_collection;
-
+    var overrideFindAll = false;
+    if(this.fullName === "can.Model.Cacheable") {
+      this.findAll = function() {
+        throw "No default findAll() exists for subclasses of Cacheable";
+      };
+    }
+    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
+      if(this.root_collection) {
+        this.findAll = "GET /api/" + this.root_collection;
+      } else {
+        overrideFindAll = true;
+      }
+    }
     if(this.root_collection) {
       this.model_plural = statics.model_plural || this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
       this.title_plural = statics.title_plural || this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
@@ -52,7 +62,10 @@ can.Model("can.Model.Cacheable", {
       this.table_singular = statics.table_singular || this.root_object;
     }
 
-    return this._super.apply(this, arguments);
+    var ret = this._super.apply(this, arguments);
+    if(overrideFindAll)
+      this.findAll = can.Model.Cacheable.findAll;
+    return ret;
   }
   , init : function() {
     this.bind("created", function(ev, new_obj) {
@@ -190,11 +203,36 @@ can.Model("can.Model.Cacheable", {
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
         var p = val && val.serialize ? val.serialize() : val;
+        var i = 0, j = 0, k;
         if(m[key] instanceof can.Observe.List) {
           m[key].replace(
             m[key].constructor.models ?
               m[key].constructor.models(p)
               : p);
+          // TODO -- experimental list optimization below -- BM 7/15/2013
+          // p = m[key].constructor.models ? m[key].constructor.models(p) : p;
+          // while(i < m[key].length && j < p.length) {
+          //   if(m[key][i] === p[j]) {
+          //     i++; j++;
+          //   } else if((k = can.inArray(m[key][i], p)) > j) {
+          //     m[key].splice(i, 0, p.slice(j, k - j));
+          //     i += k - j + 1;
+          //     j = k + 1;
+          //   } else if((k = can.inArray(p[j], m[key])) > i) {
+          //     m[key].splice(i, k - i);
+          //     i++;
+          //     j++;
+          //   } else {
+          //     m[key].splice(i, 1);
+          //   }
+          // }
+          // i = m[key].length;
+          // j = p.length;
+          // if(i < j) {
+          //   m[key].splice(i, 0, p.slice(i, j - i));
+          // } else if(j < i) {
+          //   m[key].splice(j, i - j);
+          // }
         } else if(m[key] instanceof can.Model) {
           m[key].constructor.model(params[key]);
         } else {

@@ -32,8 +32,10 @@ function getPageModel() {
 //Note that this also applies to programs
 jQuery(function($) { 
   $("body").on("click", "a.controllist", function(ev) {
+    var $trigger = $(ev.target);
+    var $section = $trigger.closest("[data-id]");
     var $dialog = $("#mapping_dialog");
-    var id = $(ev.target).closest("[data-id]").data("id")
+    var id = $section.data("id")
     if(!$dialog.length) {
       $dialog = $('<div id="mapping_dialog" class="modal modal-selector hide"></div>')
         .appendTo(document.body)
@@ -52,6 +54,36 @@ jQuery(function($) {
         , parent_id : directive_id
       });
       $(document.body).trigger('kill-all-popovers');
+
+      var timeout, oldvals;
+      section.controls.bind("change.mapper", function(ev, attr, how, newVal, oldVal) {
+        if(!~attr.indexOf(".") && how === "add") { // when newval and oldval are correct
+          if(timeout) {
+            can.each(oldvals, function(v) {
+              if(!~can.inArray(v, newVal)) {
+                $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("removeChild", v);
+              }
+            });
+            clearTimeout(timeout);
+          }
+          can.each(newVal, function(v) {
+            if(!~can.inArray(v, oldVal)) {
+              $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("newChild", v);
+            }
+          });
+        } else if(!~attr.indexOf(".") && how === "remove") {
+          oldvals = oldVal;
+          timeout = setTimeout(function() {
+            can.each(oldVal, function(v) {
+              $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("removeChild", v);
+            });
+            timeout = null;
+          }, 100);
+        }
+      });
+      $dialog.one("hide", function() {
+        section.controls.unbind("change.mapper");
+      });
     });
   });
 });

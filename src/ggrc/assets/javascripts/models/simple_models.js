@@ -9,40 +9,6 @@
 
 (function(can) {
 
-can.Model.Cacheable("CMS.Models.Relationship", {
-    root_object: "relationship"
-  , root_collection: "relationships"
-  , findAll: "GET /api/relationships"
-  , create: "POST /api/relationships"
-  , destroy: "DELETE /api/relationships/{id}"
-}, {
-    init: function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("source", CMS.Models.get_instance(
-                  this.source_type || this.source.type
-                  , this.source_id || this.source.id
-                  , this.source) || this.source);
-            this.attr("destination", CMS.Models.get_instance(
-                  this.destination_type || this.destination.type
-                  , this.destination_id || this.destination.id
-                  , this.destination) || this.destination);
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
@@ -70,37 +36,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {});
-
-can.Model.Cacheable("CMS.Models.ProgramDirective", {
-    root_object : "program_directive"
-    , root_collection : "program_directives"
-    , create: "POST /api/program_directives"
-    , destroy : "DELETE /api/program_directives/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("program", CMS.Models.get_instance(
-              "Program",
-              this.program_id || (this.program && this.program.id)));
-            this.attr("directive", CMS.Models.get_instance(
-              (this.directive ? this.directive.type : "Directive"),
-              this.directive_id || (this.directive && this.directive.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
 
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
@@ -689,134 +624,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   }
 }, {});
 
-can.Model.Cacheable("CMS.Models.ObjectiveControl", {
-    root_object : "objective_control"
-    , root_collection : "objective_controls"
-    , findAll: "GET /api/objective_controls"
-    , create: "POST /api/objective_controls"
-    , destroy : "DELETE /api/objective_controls/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("objective", CMS.Models.get_instance(
-              "Objective",
-              this.objective_id || (this.objective && this.objective.id)));
-            this.attr("control", CMS.Models.get_instance(
-              "Control",
-              this.control_id || (this.control && this.control.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
-can.Model.Cacheable("CMS.Models.SectionObjective", {
-    root_object : "section_objective"
-    , root_collection : "section_objectives"
-    , findAll: "GET /api/section_objectives"
-    , create: "POST /api/section_objectives"
-    , destroy : "DELETE /api/section_objectives/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("section", CMS.Models.get_instance(
-              "Section",
-              this.section_id || (this.section && this.section.id)));
-            this.attr("objective", CMS.Models.get_instance(
-              "Objective",
-              this.objective_id || (this.objective && this.objective.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
-can.Model.Cacheable("CMS.Models.SystemControl", {
-    root_object : "system_control"
-    , root_collection : "system_controls"
-    , findAll: "GET /api/system_controls"
-    , create: "POST /api/system_controls"
-    , destroy : "DELETE /api/system_controls/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("system", CMS.Models.get_instance(
-              "System",
-              this.system_id || (this.system && this.system.id)));
-            this.attr("control", CMS.Models.get_instance(
-              "Control",
-              this.control_id || (this.control && this.control.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
-can.Model.Cacheable("CMS.Models.SystemSystem", {
-    root_object : "system_system"
-    , root_collection : "system_systems"
-    , findAll: "GET /api/system_systems"
-    , create: "POST /api/system_systems"
-    , destroy : "DELETE /api/system_systems/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("parent", CMS.Models.get_instance(
-              "System",
-              this.parent_id || (this.parent && this.parent.id)));
-            this.attr("child", CMS.Models.get_instance(
-              "System",
-              this.child_id || (this.child && this.child.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
 can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
   , root_collection : "helps"
@@ -839,38 +646,10 @@ can.Model.Cacheable("CMS.Models.Role", {
   , create : "POST /api/roles"
 }, {});
 
-can.Model.Cacheable("GGRC.Models.DirectiveControl", {
-  findAll : function(params) {
-    throw "ERROR : DirectiveControl is not yet implemented";
-  }
-  , findOne : function(params) {
-    throw "ERROR : DirectiveControl is not yet implemented";
-  }
-  , update : function(params) {
-    throw "ERROR : DirectiveControl is not yet implemented";
-  }
-  , create : function(params) {
-    throw "ERROR : DirectiveControl is not yet implemented";
-  }
-  , destroy : function(params) {
-    throw "ERROR : DirectiveControl is not yet implemented";
-  }
-}, {
-
-});
-
 CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
   var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
   return !!~can.inArray(cls.model_singular, this.permissions[operation]);
 };
-
-can.Model.Cacheable("CMS.Models.UserRole", {
-  root_object : "user_role"
-  , root_collection : "user_roles"
-  , findAll : "GET /api/user_roles"
-  , update : "PUT /api/user_roles/{id}"
-  , create : "POST /api/user_roles"
-}, {});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model = CMS.Models[object_type]
