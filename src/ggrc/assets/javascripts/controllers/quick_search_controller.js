@@ -198,26 +198,39 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   , ".show-extended mouseover" : function(el, ev) {
     var $allext = this.element.find(".extended, .show-extended")
     , $extended = el.closest(":has(.extended)").find(".extended:first")
-    , instance = el.closest("[data-model]").data("model") || el.closest(":data(model)").data("model");
+    , instance = el.closest("[data-model]").data("model") || el.closest(":data(model)").data("model")
+    , that = this;
 
-    if(!$extended.hasClass("in")) {
-      $allext.removeClass("in");
-      can.view(this.options.tooltip_view, instance, function(frag) {
-        this.fade_in_timeout = setTimeout(function() {
+    if(!$extended.hasClass("in") || this.fade_out_timeout) {
+      clearTimeout(this.fade_in_timeout);
+      clearTimeout(that.fade_out_timeout);
+      that.fade_in_timeout = setTimeout(function() {
+        can.view(that.options.tooltip_view, instance, function(frag) {
+          $allext.removeClass("in");
+          that.fade_in_timeout = null;
           $extended.html(frag).addClass("in").css("top", el.offset().top - el.closest(".accordion-group").offset().top).data("model", instance);
           el.addClass("in");
-        }, 30);
-      });
+        });
+      }, 300);
     }
   }
 
-  , ".show-extended, .extended mouseout" : function(el, ev) {
-    var $extended = this.element.find(".extended.in");
-    if(!$(ev.relatedTarget).is(".show-extended.in, .extended.in, .show-extended.in *, .extended.in *")) {
-      clearTimeout(this.fade_in_timeout);
-      el.removeClass("in");
-      $extended.removeClass("in");
-    }
+  , ".extended mouseover" : function(el, ev) {
+    clearTimeout(this.fade_out_timeout);
+    this.fade_out_timeout = null;
+  }
+
+  , ".show-extended, .extended mouseleave" : function(el, ev) {
+    var $extended = this.element.find(".extended.in")
+    , that = this;
+    this.fade_out_timeout = setTimeout(function() {
+      if(!$(ev.relatedTarget).is(".show-extended.in, .extended.in, .show-extended.in *, .extended.in *")) {
+        clearTimeout(that.fade_in_timeout);
+        that.fade_out_timeout = null;
+        el.removeClass("in");
+        $extended.removeClass("in");
+      }
+    }, 300);
   }
 
 });
