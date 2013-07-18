@@ -98,7 +98,6 @@ def import_sections(directive_id):
     csv_file = request.files['file']
 
     if csv_file and allowed_file(csv_file.filename):
-      print "GOING IN WITH DRY_RUN: " + str(dry_run)
       filename = secure_filename(csv_file.filename)
       converter = handle_csv_import(SectionsConverter, csv_file, directive_id = directive_id, dry_run = dry_run)
       if converter.import_exception is None:
@@ -113,6 +112,17 @@ def import_sections(directive_id):
         return render_template("directives/import.haml", directive_id = directive_id, exception_message = str(converter.import_exception))
 
   return render_template("directives/import.haml", directive_id = directive_id)
+
+
+@app.route("/directives/<directive_id>/export_sections", methods=['GET', 'POST'])
+def export_sections(directive_id):
+
+  if request.method == 'GET':
+    return handle_converter_csv_export(directive_id, SectionsConverter)
+
+  return redirect('directives/{}'.format(directive_id))
+
+
 
 def _all_views(view_list):
   import ggrc.services
