@@ -328,7 +328,7 @@ can.Model("can.Model.Cacheable", {
             serial[name].push(val[i].stub());
           }
         } else if(fun_name === "model") {
-          serial[name] = val.stub();
+          serial[name] = (val ? val.stub() : null);
         } else {
           serial[name] = that._super(name);
         }
