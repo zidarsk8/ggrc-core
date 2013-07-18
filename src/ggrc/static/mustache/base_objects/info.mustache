@@ -1,51 +1,19 @@
-<ul class="info-list">
-  <li class="float-element">
-    <label>
-      Code
-    </label>
-    <span>
-      <strong>{{slug}}</strong>
-    </span>
-  </li>
-  <li class="float-element">
-    <label>
-      Title
-    </label>
-    <span>
-      <strong>{{title}}</strong>
-    </span>
-  </li>
+<section class="info">
+  <h3>{{title}}</h3>
   {{#if type}}
-  <li class="float-element">
-    <label>
-      Type
-    </label>
-    <span>
-      <strong>{{type.title}}</strong>
-    </span>
-  </li>
+  <p>
+    {{type.title}}
+  </p>
   {{/if}}
-  <li>
-    <label>
-      Description
-    </label>
-    <div class="rtf">{{{firstnonempty description '<h2>No description</h2>'}}}</div>
-  </li>
-  <li class="float-element">
-    <label>
-      Direct link
-    </label>
-    <span>
-      <a href="{{url}}" class="inner-element" target="_blank">{{url}}</a>
-    </span>
-  </li>
-</ul>
-<section class="footer">
-  <div class="row-fluid">
-    <div class="span6">
-      <p class="footer-left">
-        Created: {{created_at}}
-      </p>
-    </div>
+  <div class="rtf-block">
+    {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
   </div>
+  <p>
+    <a href="{{url}}" class="inner-element" target="_blank">
+      {{url}}
+    </a>
+  </p>
+  <p>
+    <small>Code: {{slug}} | Created: {{created_at}}</small>
+  </p>
 </section>

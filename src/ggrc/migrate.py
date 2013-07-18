@@ -6,7 +6,7 @@
 import os.path
 import sys
 from alembic import command, util
-from alembic.config import Config
+from alembic.config import Config, CommandLine
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
 from ggrc import settings
@@ -88,7 +88,7 @@ def init(extension_module_name, **kwargs):
   pkg_env = ExtensionPackageEnv(extension_module_name)
   command.init(pkg_env.config, pkg_env.script_dir, **kwargs)
 
-def revision(extension_module_name, **kwargs):
+def revision_command(extension_module_name, **kwargs):
   run_simple_command(extension_module_name, command.revision, **kwargs)
 
 def upgrade(extension_module_name, revision, sql=False, tag=None):
@@ -215,20 +215,27 @@ def main(args):
   if len(args) < 3:
     print 'usage: migrate module_name <alembic command string>'
     return -1
+  extension_module_name = args[1]
+  cmd_line = CommandLine()
+  options = cmd_line.parser.parse_args(args[2:])
+  fn, positional, kwarg = options.cmd
   action = args[2]
   if action == 'upgrade':
-    extension_module_name = args[1]
     revision = args[3] if len(args) >= 4 else None
     upgrade(extension_module_name, revision)
   elif action == 'upgradeall':
     upgradeall()
   elif action == 'current':
-    extension_module_name = args[1]
     current(extension_module_name)
   elif action == 'downgrade':
-    extension_module_name = args[1]
     revision = args[3]
     downgrade(extension_module_name, revision)
+  elif action == 'revision':
+    revision_command(
+        extension_module_name,
+        **dict((k, getattr(options, k)) for k in kwarg))
+  elif action == 'history':
+    history(extension_module_name)
   return 0
 
 if __name__ == '__main__':

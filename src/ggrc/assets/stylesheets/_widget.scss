@@ -274,14 +274,6 @@
       }
     }
   }
-  
-  .info {
-    padding:0 6px;
-    color:$text;
-    .rtf {
-      margin:0 20% 10px 0;
-    }
-  }
   .filter {
     padding:3px 2px;
     background: $filterBgnd;
@@ -447,50 +439,22 @@
       }
     }
   }
-  .info-list {
-    @include reset-list();
-    margin-bottom: 20px;
-    li {
-      padding: 4px 0 2px 7px;
-      &:last-child {
-        border-bottom: none;
+  .info {
+    padding:5px 10px 0 10px;
+    h3 {
+      font-weight:normal;
+      padding-bottom:6px;
+    }
+    .rtf-block {
+      margin-bottom:10px;
+      p {
+        margin-bottom:10px;
+        line-height:22px;
+        color:$text;
       }
-      label {
-        font-weight: normal;
-        text-transform:uppercase;
-        color: $darkGray;
-      }
-      .rtf {
-        border:1px solid darken($lightGray,5%);
-        @include border-radius();
-        padding:6px 16px 6px 6px;
-        margin-left: 0;
-        font-size: $f-small !important;
-        ul,
-        ol {
-          margin-top:0;
-          padding-top:0;
-          li {
-            border: none;
-            padding: 0 0 6px 0;
-          }
-        }
-        p.no-data {
-          margin-bottom:0;
-        }
-      }
-      &.float-element {
-        @include clearfix();
-        label {
-          float: left;
-          width: 35%;
-          margin: 0 10px 0 0;
-          color:$text;
-        }
-        span {
-          float: left;
-          width: 60%;
-        }
+      h4.no-data {
+        font-style:italic;
+        color:#999;
       }
     }
   }

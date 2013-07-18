@@ -32,7 +32,7 @@
   .row-fluid
     .span8
     .span1
-      %input{"value":"Cancel","class":'btn btn-large',"type":'submit'}
+      %input{"value":"Cancel","class":'btn btn-large',"type":'submit', "href": '/directives/={directive_id}'}
     .span2
       -if all_errors
         %input{"value":"Correct Errors Before Proceeding","class":'btn btn-large btn-warning pull-right',"type":'submit','name':'confirm',"disabled":True}

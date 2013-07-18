@@ -7,9 +7,12 @@ class BaseConverter(object):
   def __init__(self, rows_or_objects, **options):
 
     self.options = options.copy()
-    self.objects = []
-    self.rows = rows_or_objects[:]
-
+    if self.options.get('export'):
+      self.objects = rows_or_objects
+      self.rows = []
+    else:
+      self.objects = []
+      self.rows = rows_or_objects[:]
     self.all_objects = {}
     self.errors = []
     self.warnings = []
@@ -17,6 +20,7 @@ class BaseConverter(object):
     self.final_results = []
     self.import_exception = None
     self.import_slug = None
+    self.create_metadata_map()
 
   def results(self):
     return self.objects
@@ -73,7 +77,6 @@ class BaseConverter(object):
     self.import_slug = values.get('slug')
     self.rows.pop(0)
     self.rows.pop(0)
-    # TODO: Implement validation (absent in rails version as well?)
     self.validate_metadata(values)
 
   def read_values(self, headers, row):
@@ -147,11 +150,8 @@ class BaseConverter(object):
   def save_import(self):
     db_session = db.session
     for row_converter in self.objects:
-      print "Saving object: " + str(row_converter.obj)
       row_converter.save_object(db_session, **self.options)
-
     db_session.commit()
-    print 'FINISHED THE COMMIT!'
 
 
   def read_objects(self, headers, rows):
@@ -163,17 +163,38 @@ class BaseConverter(object):
     return attrs_collection
 
   def validate_metadata(self, attrs):
-    pass
+    print 'validating metadata'
+    if self.options.get('directive'):
+      self.validate_metadata_type(attrs, self.directive().kind)
+      self.validate_code(attrs)
 
-  def validate_metadata_type(attrs, type):
-    pass
+  def validate_code(self, attrs):
+    if not attrs.get('slug'):
+      self.errors.append('Missing {} Code heading'.format(self.directive().kind))
+    elif attrs['slug'] != self.directive().slug:
+      self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
-  # FIXME: Provide a way to save all the objects
-  def save():
-    pass
+  def validate_metadata_type(self, attrs, required_type):
+    if not attrs.get('type'):
+      self.errors.append('Missing "Type" heading')
+    elif attrs['type'] != required_type:
+      self.errors.append("Type must be {}".format(required_type))
 
-  def do_export():
-    pass
+  def do_export(self, csv_writer):
+    for i,obj in enumerate(self.objects):
+      row = self.row_converter(self, obj, i, export = True)
+      row.setup()
+      row.reify()
+      if row:
+        self.rows.append(row.attrs)
+
+    row_header_map = self.object_map
+    for row in self.rows:
+      csv_row = []
+      for key in row_header_map.keys():
+        field = row_header_map.get(key)
+        csv_row.append(row[field])
+      csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 
   def metadata_map(self):
     return self.__class__.metadata_map

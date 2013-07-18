@@ -7,6 +7,7 @@ import datetime
 import ggrc.builder.json
 import hashlib
 import time
+from blinker import Namespace
 from flask import url_for, request, current_app, session
 from flask.views import View
 from ggrc import db
@@ -26,7 +27,6 @@ from .attribute_query import AttributeQueryBuilder
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
 """
-
 
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
@@ -172,6 +172,20 @@ class Resource(ModelView):
 
   By default will only support the `application/json` content-type.
   """
+
+  signals = Namespace()
+  model_posted = signals.signal('Model POSTed',
+    """
+    Indicates that a model object was received via POST and will be committed
+    to the database. The sender in the signal will be the model class of the
+    POSTed resource. The following arguments will be sent along with the
+    signal:
+
+      :obj: The model instance created from the POSTed JSON.
+      :src: The original POSTed JSON dictionary.
+      :service: The instance of Resource handling the POST request.  
+    """,
+    )
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -333,6 +347,10 @@ class Resource(ModelView):
       db.session.commit()
     return context
 
+  def handle_create(self, obj, src):
+    """Do NOTHING by default"""
+    pass
+
   def collection_post(self):
     if self.request.headers['Content-Type'] != 'application/json':
       return current_app.make_response((
@@ -354,20 +372,7 @@ class Resource(ModelView):
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
     self.json_create(obj, src)
-    if 'private' in src:
-      context = self.personal_context()
-      #FIXME this is what should be done, but, this needs to be delegated
-      #to permissions so that the user gets an appropriate role added, too
-      #context = Context(
-          #context=person_as_context,
-          #name='{object_type} Context {timestamp}'.format(
-            #object_type=self.model.__name__,
-            #timestamp=datetime.datetime.now()),
-          #description='',
-          #)
-      #db.session.add(context)
-      #db.session.flush()
-      obj.context = context
+    self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     self.log_event(db.session, obj)
