@@ -3,10 +3,6 @@
 .row-fluid
   %hr.hr-widget
 
--set import_errors = 2
--set import_warnings = 2
--set m = "This is a random error/warning message..."
-
 -block errors_and_table
   .row-fluid
     #sampleData.span12
@@ -14,7 +10,6 @@
         -for i in all_errors
           %p.label-error
             =all_errors[loop.index0]
-
       %br
 
       -if all_warnings|length > 0

@@ -87,6 +87,7 @@ class BaseConverter(object):
     for header in self.object_map:
       if self.object_map[header] == column_name:
         return header
+    return ''
 
   def read_headers(self, import_map, row):
     ignored_colums = []
@@ -112,7 +113,8 @@ class BaseConverter(object):
       missing_columns.remove(element)
 
     if len(missing_columns):
-      missing_text = ", ".join([self.get_header_for_column(col) for col in missing_columns])
+      missing_headers = [self.get_header_for_column(temp) for temp in missing_columns if temp is not None]
+      missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
       self.warnings.append("Missing column{plural}: {missing}".format(
         plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
 
@@ -170,7 +172,7 @@ class BaseConverter(object):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.directive().kind))
+      self.errors.append('Missing "{}" Code heading'.format(self.directive().kind))
     elif attrs['slug'] != self.directive().slug:
       self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
@@ -178,7 +180,7 @@ class BaseConverter(object):
     if not attrs.get('type'):
       self.errors.append('Missing "Type" heading')
     elif attrs['type'] != required_type:
-      self.errors.append("Type must be {}".format(required_type))
+      self.errors.append('Type must be "{}"'.format(required_type))
 
   def do_export(self, csv_writer):
     for i,obj in enumerate(self.objects):
