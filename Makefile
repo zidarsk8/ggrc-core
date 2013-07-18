@@ -5,7 +5,7 @@ PREFIX := $(shell pwd)
 DEV_PREFIX ?= $(PREFIX)
 DEV_PREFIX := $(shell cd $(DEV_PREFIX); pwd)
 
-APPENGINE_SDK_VERSION=1.7.6
+APPENGINE_SDK_VERSION=1.8.1
 APPENGINE_ZIP_NAME=google_appengine_$(APPENGINE_SDK_VERSION).zip
 APPENGINE_ZIP_HREF=http://googleappengine.googlecode.com/files/$(APPENGINE_ZIP_NAME)
 APPENGINE_ZIP_PATH=$(DEV_PREFIX)/opt/$(APPENGINE_ZIP_NAME)
@@ -58,8 +58,6 @@ $(APPENGINE_PACKAGES_DIR) : $(APPENGINE_ENV_DIR)
 		pip install --no-deps -r "$(APPENGINE_REQUIREMENTS_TXT)" --target "$(APPENGINE_PACKAGES_DIR)"
 	cd "$(APPENGINE_PACKAGES_DIR)/webassets"; \
 		patch -p3 < "${PREFIX}/extras/webassets__fix_builtin_filter_loading.diff"
-	cd "$(APPENGINE_PACKAGES_DIR)/sqlalchemy"; \
-		patch -p3 < "${PREFIX}/extras/sqlalchemy__fix_gaerdbms_exceptions.diff"
 
 appengine_packages : $(APPENGINE_PACKAGES_DIR)
 
@@ -116,9 +114,10 @@ src/ggrc/static/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/
 
 src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml \
-		APPENGINE_INSTANCE=$(APPENGINE_INSTANCE) \
-		SETTINGS_MODULE=$(SETTINGS_MODULE) \
-		DATABASE_URI=$(DATABASE_URI)
+		APPENGINE_INSTANCE="$(APPENGINE_INSTANCE)" \
+		SETTINGS_MODULE="$(SETTINGS_MODULE)" \
+		DATABASE_URI="$(DATABASE_URI)" \
+		BOOTSTRAP_ADMIN_USERS="$(BOOTSTRAP_ADMIN_USERS)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
 

@@ -14,11 +14,12 @@ AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 FULLTEXT_INDEXER = None
 USER_PERMISSIONS_PROVIDER = None
+EXTENSIONS = []
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
-VERSION = "s6"
+VERSION = "s8"
 
 # Initialize from environment if present
 import os

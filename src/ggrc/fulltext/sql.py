@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from . import Indexer
@@ -21,12 +20,17 @@ class SqlIndexer(Indexer):
     if commit:
       db.session.commit()
 
-  def update_record(self, record):
+  def update_record(self, record, commit=True):
     self.delete_record(record.key, commit=False)
-    self.create_record(record, commit=True)
+    self.create_record(record, commit=commit)
 
   def delete_record(self, key, commit=True):
     db.session.query(self.record_type).filter(\
         self.record_type.key == key).delete()
+    if commit:
+      db.session.commit()
+
+  def delete_all_records(self, commit=True):
+    db.session.query(self.record_type).delete()
     if commit:
       db.session.commit()

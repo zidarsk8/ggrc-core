@@ -48,7 +48,7 @@ window.onerror = function(message, url, linenumber) {
   $.ajax({
     type : "post"
     , url : "/api/log_events"
-    , dataType : "json"
+    , dataType : "text"
     , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
   });
 };
@@ -123,9 +123,11 @@ jQuery.extend(GGRC, {
         }
       }
       , "control" : CMS.Models.Control
+      , "objective" : CMS.Models.Objective
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "role" : CMS.Models.Role
     };
 
     function resolve_by_key(subtree, data) {
@@ -147,12 +149,22 @@ jQuery.extend(GGRC, {
         subtree;
     }
 
-    return can.reduce(Object.keys(data), function(a, b) {
-      return a || resolve(decision_tree[b], data[b]);
-    }, null);
+    if(!data) {
+      return null;
+    } else {
+      return can.reduce(Object.keys(data), function(a, b) {
+        return a || resolve(decision_tree[b], data[b]);
+      }, null);
+    }
   }
   , make_model_instance : function(data) {
-    return GGRC.infer_object_type(data).model($.extend({}, data));
+    if(!data) {
+      return null;
+    } else if(!!GGRC.page_model && GGRC.page_object === data) {
+      return GGRC.page_model;
+    } else {
+      return GGRC.page_model = GGRC.infer_object_type(data).model($.extend({}, data));
+    }
   }
 
   , queue_event : function(event) {
@@ -190,7 +202,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
   }
-  if( /^\/api\/\w+(\/\d+|$)/.test(options.url) && (options.type.toUpperCase() === "GET")) {
+  if( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
   }
   if( /^\/api\/\w+/.test(options.url)) {
@@ -391,7 +403,7 @@ jQuery(document).ready(function($) {
   };
 
   // Listeners for initial mouseovers for stick-hover
-  $('body').on('mouseover', 'a[data-popover-trigger="sticky-hover"]', function(e) {
+  $('body').on('mouseover', '[data-popover-trigger="sticky-hover"]', function(e) {
     // If popover instance doesn't exist already, create it and
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {
@@ -642,55 +654,17 @@ $(window).load(function(){
     , handle : "header, .header"
     , items : ".widget"
   });
-
-});
-
-jQuery(document).ready(function($) {
-  var containerSize = $('.container-fluid').width(),
-      containerWide = 1200,
-      containerNarrow = 960,
-      containerDelta = $(window).width() - containerSize;
-
-  $('.container-fluid').css('width', containerSize);
-
-  $(window).on('resize', function(e) {
-    var width = $(window).width();
-    // Only auto-resize when in 100% mode
-    if ($('body').find('.menu').find('.screen-size span').text().trim() == '100%') {
-      $('.container-fluid').addClass('resizable').css('width', width - containerDelta);
-      $(this).closest('.menu').find('.screen-size span').text('100%');
-    }
-
-    if(width < 720) {
-      $(".quick-search-results").css("width", width);
+  
+  
+  // affix setup
+  $(window).scroll(function(){
+    if($('.header-content').hasClass('affix')) {
+      $('.header-content').next('.content').addClass('affixed');
     } else {
-      $(".quick-search-results").css("width", "");      
+      $('.header-content').next('.content').removeClass('affixed');
     }
   });
 
-  $('body').on('click', '.full-view', function(e) {
-    var width = $(window).width();
-    e.preventDefault();
-    $('.container-fluid').addClass('resizable').css('width', width - containerDelta);
-    $(this).closest('.menu').find('.screen-size span').text('100%');
-  });
-
-  $('body').on('click', '.wide-view', function(e) {
-    e.preventDefault();
-    $('.container-fluid').addClass('resizable').css('width', containerWide);
-    $(this).closest('.menu').find('.screen-size span').text('Wide');
-  });
-
-  $('body').on('click', '.narrow-view', function(e) {
-    e.preventDefault();
-    $('.container-fluid').addClass('resizable').css('width', containerNarrow);
-    $(this).closest('.menu').find('.screen-size span').text('Narrow');
-  });
-  
-  if ($('#welcome').length > 0) {
-		$('#user_session_email').focus();
-	}
-  
 });
 
 jQuery(function($){

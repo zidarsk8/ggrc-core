@@ -46,17 +46,32 @@ can.Control("CMS.Controllers.SortableWidgets", {
       if(!$widget.length) {
         var ctl = that.element.find(".cms_controllers_add_widget").control(CMS.Controllers.AddWidget);
         if(ctl) {
-          ctl.addWidgetByName(id.substr(0, id.indexOf("_list_widget")));
+          ctl.addWidgetByName(id.substr(0, id.indexOf("_widget")));
           $widget = $("#" + id).detach();
         }
       }
       $widget.appendTo(that.element);
+      //add this widget to the inner nav list
     });
     if(firstchild) {
       firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
     }
 
     this.element.sortable().sortable("refresh");
+    can.each(this.element.data("ui-sortable").items, function(v) {
+      var $widget = v.item;
+      $("<li>")
+      .append(
+        $("<a>")
+        .attr("href", "#" + $widget.attr("id"))
+          .append(
+            $("<div class='oneline'>")
+              .text($widget.find(".header").text())))
+      .appendTo(".inner-nav .internav");
+    });
+    setTimeout(function() {
+      $(document.body).scrollTop(0).scrollspy().scrollspy("refresh");
+    }, 10);
     this.is_initialized = true;
     this.force_add_widget_bottom();
   }

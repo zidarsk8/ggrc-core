@@ -99,12 +99,9 @@ $(function() {
       });
   });
 
-  $(document.body).on("modal:success", "a[href^='/program_directives/list_edit']", function(ev, data) {
-    $("a[href='#directives']").click();
-    directives_by_type[$(this).data("child-meta-type")] = data;
-    $sections_tree.trigger("linkObject", $.extend($(this).data(), {
-      data : directives_by_type.regulation.concat(directives_by_type.contract).concat(directives_by_type.policy)
-    }));
+  $(document.body).on("modal:relationshipcreated modal:relationshipdestroyed", ".add-new-item a", function(ev, data) {
+    $sections_tree
+    .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", data.directive || CMS.Models.Directive.findInCacheById(data.directive_id));
   });
 
 });

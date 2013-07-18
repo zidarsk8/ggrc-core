@@ -200,12 +200,17 @@ class UpdateAttrHandler(object):
     #  properties
     # rel_class = None
     # return cls.query_for(rel_class, json_obj, attr_name, True)
-    if attr_name in json_obj:
+    attr_value = json_obj.get(attr_name, None)
+    if attr_value:
       import ggrc.models
       rel_class_name = json_obj[attr_name]['type']
       rel_class = ggrc.models.get_model(rel_class_name)
       return cls.query_for(rel_class, json_obj, attr_name, False)
     return None
+
+  @classmethod
+  def simple_property(cls, obj, json_obj, attr_name, class_attr):
+    return json_obj.get(attr_name)
 
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
@@ -265,7 +270,7 @@ class Builder(AttributeInfo):
       else:
         return self.publish_link(
             obj, attr_name, inclusions, include, inclusion_filter)
-    elif isinstance(class_attr, property):
+    elif class_attr.__class__.__name__ == 'property':
       return self.publish_link(
           obj, attr_name, inclusions, include, inclusion_filter)
     else:

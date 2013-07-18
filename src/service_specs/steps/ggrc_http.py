@@ -4,18 +4,19 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
+import json
 from behave import given, when, then
 from iso8601 import parse_date
-import ggrc.app
 from sqlalchemy.orm.properties import RelationshipProperty
-import json
 
-from utils import \
-    Example, handle_example_resource, handle_named_example_resource, \
-    set_property, get_resource, put_resource, get_resource_table_singular, \
-    handle_get_resource_and_name_it, \
-    handle_post_named_example_to_collection_endpoint, \
-    post_example, handle_get_example_resource
+from tests.ggrc.behave.utils import (
+    Example, handle_example_resource, handle_named_example_resource,
+    put_resource, get_resource_table_singular, get_service_endpoint_url,
+    handle_get_resource_and_name_it,
+    handle_post_named_example_to_collection_endpoint,
+    handle_post_named_example, post_example, handle_get_example_resource,
+    handle_template_text,
+    )
 
 def get_json_response(context):
   if not hasattr(context, 'json'):
@@ -39,15 +40,28 @@ def add_create_permissions(context, context_id, resource_types):
 def example_resource(context, resource_type):
   handle_example_resource(context, resource_type)
 
-@given('a new "{resource_type}" named "{name}"')
-def named_example_resource(context, resource_type, name, **kwargs):
-  handle_named_example_resource(context, resource_type, name, **kwargs)
+@given('a new "{resource_type}" named "{example_name}" is created from json')
+def named_example_from_json(context, resource_type, example_name):
+  text = handle_template_text(context, context.text)
+  json_obj = json.loads(text)
+  handle_named_example_resource(
+      context, resource_type, example_name, **json_obj)
 
+@given('a new "{resource_type}" named "{example_name}"')
+def named_example_resource(context, resource_type, example_name, **kwargs):
+  handle_named_example_resource(context, resource_type, example_name, **kwargs)
+
+@when('"{name}" is POSTed to its collection')
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
   handle_post_named_example_to_collection_endpoint(
       context, name, expected_status)
+
+@given('"{name}" is in context "{context_id}"')
+def set_context_id_for(context, name, context_id):
+  example = getattr(context, name)
+  example.set('context', {'id': int(context_id)})
 
 @given('HTTP POST of "{name}" to "{url}"')
 def simple_post_of_named(context, name, url):
@@ -123,9 +137,14 @@ def check_resource_equality_for_response(context, resource_type):
     assert original == response, 'for {0}: expected {1}, received {2}'.format(
         k, original, response)
 
+@given('the current user')
+def define_current_user_from_pystring(context):
+  define_current_user(context, context.text.replace("\n", " ").strip())
+
 @given('current user is "{user_json}"')
 def define_current_user(context, user_json):
   import requests
+  user_json = handle_template_text(context, user_json)
   if hasattr(context, 'current_user_json'):
     # logout current user
     response = requests.get(
@@ -181,6 +200,7 @@ def put_example_resource(context, name, expected_status=200):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
+@when('PUT "{resource_name}"')
 @then('PUT of "{resource_name}" is allowed')
 def check_PUT_is_allowed(context, resource_name):
   put_example_resource(context, resource_name)
@@ -212,6 +232,7 @@ def delete_example_resource(context, name, expected_status=200):
   response = delete_resource(context, url, example)
   assert response.status_code == expected_status
 
+@when('DELETE "{resource_name}"')
 @then('DELETE of "{resource_name}" is allowed')
 def check_DELETE_is_allowed(context, resource_name):
   delete_example_resource(context, resource_name, expected_status=200)

@@ -74,7 +74,7 @@
         , $target = $('<div id="' + modal_id + '" class="modal modal-selector fade hide"></div>')
         ;
 
-      $target
+      return $target
         .modal_form({}, $trigger)
         .ggrc_controllers_modal_selector($.extend(
           { $trigger: $trigger },
@@ -230,6 +230,7 @@
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
+              self.element.trigger("relationshipcreated", join);
             //});
           });
         }
@@ -253,6 +254,7 @@
                 if (join_index >= 0) {
                   self.join_list.splice(join_index, 1);
                 }
+                self.element.trigger("relationshipdestroyed", join);
               });
             });
           }
@@ -294,7 +296,7 @@
         join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       // FIXME: context_id must get a real value
-      $.extend(join_params, this.options.extra_join_fields, { context_id: 0 });
+      $.extend(join_params, this.options.extra_join_fields, { context: { id: 0 } });
       return new (this.options.join_model)(join_params);
     },
 
@@ -442,6 +444,30 @@
 
         join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
       }
+      , risk_controls : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: data.related_title_singular,
+        modal_title: "Select " + data.related_title_plural,
+
+        related_model_singular: "Risk",
+        related_table_plural: "risks",
+        related_title_singular: "Risk",
+        related_title_plural: "Risks",
+
+        option_model: CMS.Models.Control,
+        join_model: CMS.Models.RiskControl,
+
+        option_attr: 'directive',
+        option_id_field: 'directive_id',
+        option_type_field: 'directive_type',
+        join_id_field: 'program_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
+      }
     };
     return can.extend(OPTION_SETS[name], {
       join_query : can.deparam(data.join_query)
@@ -510,9 +536,12 @@
           , related_table_plural: $this.data('related-table-plural')
           , related_side: $this.data('related-side')
           , related_model: $this.data('related-model')
+          , object_side: $this.data('object-side')
           , relationship_type: $this.data('relationship-type')
           , join_query: $this.data('join-query')
-        }));
+        })).on("relationshipcreated relationshipdestroyed", function(ev, data) {
+          $this.trigger("modal:" + ev.type, data);
+        });
     });
   });
 
@@ -538,7 +567,10 @@
       e.preventDefault();
 
       // Trigger the controller
-      GGRC.Controllers.ModalSelector.launch($this, options);
+      GGRC.Controllers.ModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
     });
   });
 

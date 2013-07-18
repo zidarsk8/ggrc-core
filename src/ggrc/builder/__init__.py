@@ -9,3 +9,6 @@ produce specific resource state representations for gGRC models as well as
 update/create gGRC model instances from resource state representations.
 """
 from .json import *
+
+class simple_property(property):
+  pass

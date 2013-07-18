@@ -48,7 +48,8 @@
     background-position:-222px -8px;
   }
 }
-.grcicon-admin {
+.grcicon-admin,
+.grcicon-role-color {
   background-position:-102px -32px;
   .active & {
     background-position:-102px -8px;
@@ -138,7 +139,8 @@
     background-position:-200px -32px;
   }
 }
-.grcicon-user {
+.grcicon-user,
+.grcicon-person-color {
   background-position:-6px -32px;
   .active & {
     background-position:-6px -8px;
@@ -231,6 +233,10 @@
     background-position:-6px -56px;
   }
 }
+.grcicon-down {
+  background-position:-102px -56px;
+}
+
 .grcicon-reg-map-white {
   background-position:-6px -80px;
 }
@@ -359,12 +365,12 @@
 
 .widget-showhide {
   a {
-    background-position: -265px -241px;
+    background-position: -241px -241px;
     background-image: image-url("grcicons/icons.png");
     background-repeat: no-repeat;
     @include background-size(296px 344px);
     &.active {
-     background-position: -265px -217px;
+     background-position: -241px -217px;
     }
   }
 }
@@ -420,7 +426,12 @@
 .grcicon-regulation-color { background-position:-78px -296px; }
 .grcicon-directive { background-position:-78px -200px; }
 .grcicon-directive-black { background-position:-78px -176px; }
+.grcicon-event-color { background-position:-102px -176px; }
 .grcicon-directive-color { background-position:-198px -296px; }
+
+.grcicon-objective { background-position:-150px -80px; }
+.grcicon-objective-black { background-position:-150px -56px; }
+.grcicon-objective-color { background-position:-52px -128px; }
 
 .grcicon-section { background-position:-198px -128px; }
 .grcicon-section-black { background-position:-198px -104px; }

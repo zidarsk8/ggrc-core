@@ -15,7 +15,8 @@ can.Control("GGRC.Controllers.Modals", {
 //  BUTTON_VIEW_SAVE_CANCEL_DELETE
 
   , defaults : {
-    content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
+    preload_view : GGRC.mustache_path + "/dashboard/modal_preload.mustache"
+    , content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
     , header_view : GGRC.mustache_path + "/modals/modal_header.mustache"
     , button_view : null
     , model : null    // model class to use when finding or creating new
@@ -29,11 +30,23 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
-    this.options.$header = this.element.find(".modal-header");
-    this.options.$content = this.element.find(".modal-body");
-    this.options.$footer = this.element.find(".modal-footer");
-    this.on();
-    this.fetch_all();
+
+    function after_preload(content) {
+      if(content) {
+        this.element.html(content);
+      }
+      this.options.$header = this.element.find(".modal-header");
+      this.options.$content = this.element.find(".modal-body");
+      this.options.$footer = this.element.find(".modal-footer");
+      this.on();
+      this.fetch_all();
+    }
+
+    if(!this.element.find(".modal-body").length) {
+      can.view(this.options.preload_view, {}, this.proxy(after_preload));
+    } else {
+      after_preload.call(this);
+    }
   }
 
   , fetch_templates : function(dfd) {
@@ -123,6 +136,10 @@ can.Control("GGRC.Controllers.Modals", {
     } else {
       value = item.value;
     }
+
+    if ($elem.is("[null-if-empty]") && value.length == 0)
+      value = null;
+
     if(name.length > 1) {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
@@ -145,7 +162,9 @@ can.Control("GGRC.Controllers.Modals", {
     }).fail(function(xhr, status) {
       el.trigger("ajax:flash", { error : xhr.responseText });
     });
-    this.bindXHRToButton(ajd, el, "Saving, please wait...");
+    this.bindXHRToButton(ajd.done(function(obj) {
+      that.element.trigger("modal:success", obj);
+    }), el, "Saving, please wait...");
   }
 
   , " ajax:flash" : function(el, ev, mesg) {

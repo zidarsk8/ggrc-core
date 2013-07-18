@@ -1,8 +1,10 @@
 -extends "base_objects/show.haml"
 
--block subheader_extras
-  %ul.actions.pull-right
-    %li
-      %a{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': '={instance.kind_singular}', 'data-object-plural': '={instance.kind_plural}', 'data-object-id': 'page' }
-        %i.grcicon-edit
-        %span Edit ={instance.kind_singular}
+-block header
+  %h1{ 'class': "={ model_display_class }" }
+    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}", 'class': "={ model_display_class }" }
+      -if instance.kind_singular == "System"
+        %i.grcicon-system
+      -else
+        %i.grcicon-process
+    =instance.title

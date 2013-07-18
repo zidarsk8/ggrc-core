@@ -186,9 +186,6 @@ ul.tree-structure {
     }
   }
   .role {
-    font-size: $f-small;
-    font-weight: bold;
-    text-transform: uppercase;
     color: $green;
   }
   .progress {
@@ -616,12 +613,6 @@ ul.tree-structure {
       color:$business;
     } 
   }
-/*  .notusednow {
-    .code {
-      color:$compliance;
-    } 
-  }
-*/
   li.risk,
   li.riskyattribute {
     .code {
@@ -630,7 +621,6 @@ ul.tree-structure {
   }
 
   li.control,
-  li.program,
   li.directive,
   li.policy,
   li.contract,
@@ -641,5 +631,58 @@ ul.tree-structure {
       color:$governance;
     } 
   }
+}
 
+ul.tree-structure.event-log {
+  li.program {
+    .item-identifier {
+      span.title {
+        color:$programs;
+      }
+    }
+  }
+  li.control,
+  li.directive,
+  li.policy,
+  li.contract,
+  li.regulation {
+    .item-identifier {
+      span.title {
+        color:$governance;
+      }
+    }
+  }
+  li.process,
+  li.system,
+  li.product,
+  li.orggroup,
+  li.project,
+  li.facility,
+  li.market,
+  li.dataasset {
+    .item-identifier {
+      span.title {
+        color:$business;
+      }
+    }
+  }
+  li.risk,
+  li.riskyattribute {
+    .item-identifier {
+      span.title {
+        color:$risk;
+      }
+    }
+  }
+  li.person,
+  li.role {
+    .item-identifier {
+      i {
+        @include opacity(0.7);
+      }
+      span.title {
+        color:#333;
+      }
+    }
+  }
 }

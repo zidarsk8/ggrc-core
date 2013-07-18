@@ -19,6 +19,8 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Facility           |
       | Market             |
       | Meeting            |
+      | Objective          |
+      | ObjectiveControl   |
       | ObjectDocument     |
       | ObjectPerson       |
       | Option             |
@@ -37,6 +39,7 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |

@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
-# Maintained By: vraj@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 """All gGRC model classes grouped together for convenience."""
 
@@ -10,6 +9,7 @@
 #from .account import Account
 from .categorization import Categorization
 from .category import Category
+from .context import Context
 from .control import Control
 from .control_assessment import ControlAssessment
 from .control_control import ControlControl
@@ -25,6 +25,8 @@ from .market import Market
 from .meeting import Meeting
 from .object_document import ObjectDocument
 from .object_person import ObjectPerson
+from .objective import Objective
+from .objective_control import ObjectiveControl
 from .option import Option
 from .org_group import OrgGroup
 from .pbc_list import PbcList
@@ -44,6 +46,7 @@ from .risk import Risk
 from .risk_risky_attribute import RiskRiskyAttribute
 from .risky_attribute import RiskyAttribute
 from .section import Section
+from .section_objective import SectionObjective
 from .system import System
 from .system_control import SystemControl
 
@@ -59,6 +62,7 @@ from .event import Event
 all_models = [
   Categorization,
   Category,
+  Context,
   Control,
   ControlAssessment,
   ControlControl,
@@ -72,6 +76,8 @@ all_models = [
   Help,
   Market,
   Meeting,
+  Objective,
+  ObjectiveControl,
   ObjectDocument,
   ObjectPerson,
   Option,
@@ -91,6 +97,7 @@ all_models = [
   RiskRiskyAttribute,
   RiskyAttribute,
   Section,
+  SectionObjective,
   System,
   SystemControl,
   SystemSystem,

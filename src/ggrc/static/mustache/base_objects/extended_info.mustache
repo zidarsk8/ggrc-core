@@ -1,0 +1,73 @@
+{{!div class="extended"}}
+  <div class="row-fluid">
+    <div class="span12">
+      <a class="main-title {{constructor.category}} oneline" href="{{viewLink}}">
+        {{title}}
+        <i class="grcicon-goto"></i>
+      </a>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="rtf">
+        <p>
+          {{{firstnonempty description '<i>No description</i>'}}}
+        </p>
+      </div>
+      {{^if_null url}}
+        <a class="url oneline" href="{{url}}">
+          {{url}}
+        </a>
+      {{/if_null}}
+      {{#if_null url}}
+        No URL
+      {{/if_null}}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="info">
+        <strong>Owner:</strong>
+        {{^owner}}
+        <span class="error">
+          Not Assigned
+        </span>
+        {{/owner}}
+        {{#if owner}}
+          {{owner.name}}
+        {{/if}}
+      </div>
+    </div>
+    <div class="span6">
+      <div class="info">
+        <i class="grcicon-control-color"></i>
+        {{controls.length}}
+        &nbsp;&nbsp;
+        <i class="grcicon-process-color"></i>
+        {{processes.length}}
+        &nbsp;&nbsp;
+        <i class="grcicon-system-color"></i>
+        {{systems.length}}
+      </div>
+    </div>
+  </div>
+  <div class="links">
+    <div class="row-fluid">
+      <div class="span6">
+        <a class="secondary" href="{{viewLink}}">
+          View {{constructor.title_singular}}
+        </a>
+      </div>
+      <div class="span6">
+      {{#with_page_object_as 'page_object'}}
+        {{#can_link_to_page_object this}}
+        <a class="primary map-to-page-object" href="javascript://">
+          Map to this {{page_object.constructor.title_singular.toLowerCase}}
+          <i class="grcicon-reg-map"></i>
+        </a>
+        {{/can_link_to_page_object}}
+      {{/with_page_object_as}}
+      </div>
+    </div>
+  </div>
+{{!/div}}

@@ -3,16 +3,25 @@
 -set cycles = instance.cycles
 
 -block widget_title
-  %i.grcicon-audit-white
-  Audit Cycles
+  %i.grcicon-audit
+  Audits
   %span
-    =cycles|length
-
+    (={ cycles|length })
 -block widget_help
   program_cycles
 
 -block widget_id
   audit_cycles_widget
+
+-block widget_buttons
+  .filter
+    .row-fluid
+      .span12
+        .pull-right
+          %a.btn.btn-add{ 'href': "new_flow_cycle_path(program_id => instance.id)", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect' }
+            %i.grcicon-add
+            Audit
+          
 
 -block main
   %ul.tree-structure.simple

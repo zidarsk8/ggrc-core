@@ -594,7 +594,18 @@ Mustache.registerHelper("all", function(type, options) {
 });
 
 Mustache.registerHelper("handle_context", function() {
-  return "<input type='hidden' name='context_id' value='" + this.attr('context_id') + "' numeric />";
+  var context_href = this.attr('context.href')
+    , context_id = this.attr('context.id')
+    ;
+
+  return [
+    "<input type='hidden' name='context.href'" +
+      (context_href ? ("value='" + context_href + "'") : "") +
+      " null-if-empty='null-if-empty' />",
+    "<input type='hidden' name='context.id'" +
+      (context_id ? ("value='" + context_id + "'") : "") +
+      " null-if-empty='null-if-empty' numeric='numeric' />"
+    ].join("\n");
 });
 
 })(this, jQuery, can);
@@ -602,7 +613,7 @@ Mustache.registerHelper("handle_context", function() {
 Mustache.registerHelper("with_page_object_as", function(name, options) {
   if(!options) {
     options = name;
-    name = "page_object"
+    name = "page_object";
   }
   var page_object = GGRC.make_model_instance(GGRC.page_object);
   if(page_object) {
@@ -614,3 +625,43 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     return options.inverse(options.contexts);
   }
 });
+
+Mustache.registerHelper("role_checkbox", function(role, model, operation) {
+  return [
+    '<input type="checkbox" name="permissions."'
+    , operation
+    , '" value="'
+    , model.model_singular
+    , '"'
+    , role.allowed(operation, model) ? ' checked="checked"' : ''
+    , '>'
+  ].join("");
+});
+
+Mustache.registerHelper("private_program", function(modal_title) {
+  return modal_title.indexOf("New ") !=0 ? '' : [
+    '<div class="span6">'
+    , '<label>'
+    , 'Private'
+    , '</label>'
+    , '<input class="input-block-level" name="private" value="private" type="checkbox">'
+    , '</div>'
+  ].join("");
+});
+
+
+Mustache.registerHelper("can_link_to_page_object", function(context, options) {
+  if(!options) {
+    options = context;
+    context = options.contexts ? options.contexts[options.contexts.length - 1] : this;
+  }
+
+  var page_type = GGRC.infer_object_type(GGRC.page_object);
+
+  if(page_type.links_to[context.constructor.model_singular] || ~can.inArray(context.constructor.model_singular, page_type.links_to)) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+

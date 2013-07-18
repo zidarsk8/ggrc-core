@@ -14,11 +14,13 @@
 
 -set widget_help = (self.widget_help()|trim if self.widget_help is defined else None)
 
+-set widget_view_mustache = widget_view_mustache|default('')
+
 -#FIXME: prevent risk view if not allowed
   -if widget_class != 'risk' || current_user.can_manage_risk?
 
 -block widget
-  %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}' }
+  %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}', 'data-widget-view': '{{ widget_view_mustache }}' }
     %header.header
       .row-fluid
         .span8
@@ -38,7 +40,7 @@
                   'data-modal-type' : "helpform",
                   'data-help-slug' : "={widget_id}"
                 }
-                %i.grcicon-help
+                %i.grcicon-help-black
 
     -block widget_buttons
 

@@ -1,6 +1,6 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
+# Created By: dan@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
@@ -15,6 +15,8 @@ class Section(Hierarchical, BusinessObject, db.Model):
   notes = db.Column(db.Text)
   control_sections = db.relationship('ControlSection', backref='section', cascade='all, delete-orphan')
   controls = association_proxy('control_sections', 'control', 'ControlSection')
+  section_objectives = db.relationship('SectionObjective', backref='section')
+  objectives = association_proxy('section_objectives', 'objective', 'SectionObjective')
 
   _publish_attrs = [
       'directive',
@@ -22,12 +24,15 @@ class Section(Hierarchical, BusinessObject, db.Model):
       'notes',
       'control_sections',
       'controls',
+      'section_objectives',
+      'objectives',
       ]
   _update_attrs = [
       'directive',
       'na',
       'notes',
       'controls',
+      'objectives',
       ]
 
   @classmethod
@@ -37,4 +42,5 @@ class Section(Hierarchical, BusinessObject, db.Model):
     query = super(Section, cls).eager_query()
     return query.options(
         orm.joinedload('directive'),
-        orm.subqueryload_all('control_sections.control'))
+        orm.subqueryload_all('control_sections.control'),
+        orm.subqueryload_all('section_objectives.objective'))

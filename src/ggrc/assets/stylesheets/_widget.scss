@@ -1,7 +1,6 @@
 
 // widgets styles
 .widget {
-  margin-bottom: 20px;
   overflow-y:hidden;
   background:$white;
   border:1px solid $widgetBorder;
@@ -15,38 +14,6 @@
         &:hover {
           border-bottom: none;
         }
-      }
-    }
-  }
-  &.governance {
-    .header {
-      background: $governance;
-      .widget-action {
-        background: darken($governance, 7%);
-      }
-    }
-  }
-  &.programs {
-    .header {
-      background: $programs;
-      .widget-action {
-        background: darken($programs, 7%);
-      }
-    }
-  }
-  &.risk {
-    .header {
-      background: $risk;
-      .widget-action {
-        background: darken($risk, 7%);
-      }
-    }
-  }
-  &.business {
-    .header {
-      background: $business;
-      .widget-action {
-        background: darken($business, 7%);
       }
     }
   }
@@ -93,7 +60,7 @@
           &.text-businessprocess,
           &.text-control {
             a {
-              color:$compliance;  
+              color:$governance;
             }
           }
           &.text-risk,
@@ -190,11 +157,11 @@
       }
     }
   }
-  
   .header {
-    background:$defaultWidget;
+    background:$lightGray;
+    border-bottom:1px solid darken($lightGray, 10%);
     @include transition(background-color 0.2s);
-    color:$white;
+    color:$text;
     height: 30px;
     padding-left: 16px;
     &:hover {
@@ -207,8 +174,6 @@
     .widget-action {
       height: 30px;
       width: 30px;
-      background: darken($defaultWidget, 7%);
-      @include box-shadow(inset 0 0 3px rgba(0, 0, 0, 0.5));
       i {
         @include opacity(0.5);
         @include transition(opacity 0.3s ease);
@@ -249,7 +214,7 @@
     h2 {
       font-weight:normal;
       line-height: 28px;
-      color: $white;
+      color: $widgetTitle;
       margin-bottom:0;
       @include oneline();
       span {
@@ -281,11 +246,32 @@
     }
     @include row-fluid-fix();
   }
-  .info {
-    padding:0 6px;
-    color:$text;
-    .rtf {
-      margin:0 20% 10px 0;
+  &.governance {
+    .header {
+      h2 {
+        color: $governance;
+      }
+    }
+  }
+  &.programs {
+    .header {
+      h2 {
+        color: $programs;
+      }
+    }
+  }
+  &.risk {
+    .header {
+      h2 {
+        color: $risk;
+      }
+    }
+  }
+  &.business {
+    .header {
+      h2 {
+        color: $business;
+      }
     }
   }
   .filter {
@@ -453,50 +439,37 @@
       }
     }
   }
-  .info-list {
-    @include reset-list();
-    margin-bottom: 20px;
-    li {
-      padding: 4px 0 2px 7px;
-      &:last-child {
-        border-bottom: none;
+  .info {
+    padding:5px 10px 0 10px;
+    h3 {
+      font-weight:normal;
+      padding-bottom:6px;
+    }
+    a.info-edit {
+      margin-top:3px;
+      float:right;
+      display:block;
+      font-size:11px;
+      font-weight:bold;
+      color:#111;
+      text-transform:uppercase;
+      @include opacity(0.4);
+      @include transition(opacity 0.2s);
+      &:hover {
+        @include opacity(1);
+        text-decoration:none;
       }
-      label {
-        font-weight: normal;
-        text-transform:uppercase;
-        color: $darkGray;
+    }
+    .rtf-block {
+      margin-bottom:10px;
+      p {
+        margin-bottom:10px;
+        line-height:22px;
+        color:$text;
       }
-      .rtf {
-        border:1px solid darken($lightGray,5%);
-        @include border-radius();
-        padding:6px 16px 6px 6px;
-        margin-left: 0;
-        font-size: $f-small !important;
-        ul,
-        ol {
-          margin-top:0;
-          padding-top:0;
-          li {
-            border: none;
-            padding: 0 0 6px 0;
-          }
-        }
-        p.no-data {
-          margin-bottom:0;
-        }
-      }
-      &.float-element {
-        @include clearfix();
-        label {
-          float: left;
-          width: 35%;
-          margin: 0 10px 0 0;
-          color:$text;
-        }
-        span {
-          float: left;
-          width: 60%;
-        }
+      h4.no-data {
+        font-style:italic;
+        color:#999;
       }
     }
   }
@@ -622,7 +595,6 @@
 .widget-add-placeholder {
   background: $popOverHeaderBgnd;
   border: 1px solid $popOverHeaderBorder;
-  @include border-radius($default-border-radius);
   padding: 51px 0 49px 0;
   margin-bottom: 20px;
   text-align: center;

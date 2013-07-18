@@ -330,16 +330,20 @@ select.input-block-level {
 }
 
 // resizible widget functionality
-.widget:hover {
+.widget {
   .ui-resizable-handle {
-    height:12px;
-    border-top:1px solid darken($lightGray,5%);
-    background-color: lighten($lightGray,5%);
+    height:8px;
+    background-color:#fff;
+    border-top:1px solid #aaa;
+    border-bottom:1px solid #aaa;
+    background-image: image-url("bgnds/drag-h.png");
+    @include background-size(30px 2px);
     background-repeat:no-repeat;
-    background-image: image-url("grcicons/icons.png");
-    @include background-size(296px 344px);
-    background-position:50% -157px;
-    @include opacity(0.8);
+    background-position:50% 1px;
+    @include opacity(0.6);
+    &:hover {
+      @include opacity(1);
+    }
   }
 }
 
@@ -443,14 +447,6 @@ input.disabled.pending-ajax{
 }
 
 // additional styles
-li.text-compliance,
-span.text-compliance,
-strong.text-compliance {
-  color:$compliance;
-  a {
-    color:$compliance !important;
-  }
-}
 
 li.text-governance,
 span.text-governance,
@@ -464,17 +460,8 @@ strong.text-governance {
 
 span,
 strong {
-  &.text-compliance {
-    color:$compliance;    
-    a {
-      color:$compliance !important;
-    }
-  }
   &.text-risk {
     color:$risk;    
-  }
-  &.text-governance {
-    color:$governance;    
   }
   &.text-business {
     color:$business;    
@@ -554,4 +541,15 @@ span.no-data {
   }
 }
 
+// container-fluid reset
 
+.container-fluid {
+  padding:0;
+}
+
+// affixed fixes
+.content {
+  &.affixed {
+    margin-top:46px;
+  }
+}

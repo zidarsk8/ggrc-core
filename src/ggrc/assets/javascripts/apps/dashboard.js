@@ -195,10 +195,10 @@ $(function() {
           }).control(CMS.Controllers.ResizeWidgets);
 
     }
-    $(".row-fluid[id][data-resize]").each(bindResizer);//get anything that exists on the page already.
+    $(".column-set[id][data-resize]").each(bindResizer);//get anything that exists on the page already.
 
     //Then listen for new ones
-    $(document.body).on("mouseover", ".row-fluid[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
+    $(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
 
     $(".widget-add-placeholder").cms_controllers_add_widget({
       widget_descriptors : widget_descriptors

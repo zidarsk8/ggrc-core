@@ -28,6 +28,8 @@ Feature: Basic RESTful CRUD Support
       | Meeting            |
       #| ObjectDocument     |
       #| ObjectPerson       |
+      | Objective          |
+      | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
       | PbcList            |
@@ -44,6 +46,7 @@ Feature: Basic RESTful CRUD Support
       | RiskyAttribute     |
       | RiskRiskyAttribute |
       | Section            |
+      | SectionObjective   |
       | System             |
       | SystemSystem       |
       | SystemControl      |

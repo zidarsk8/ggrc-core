@@ -1,0 +1,35 @@
+-extends "layouts/_widget_box.haml"
+
+-block widget_help
+  program_directives
+
+-block widget_id
+  program_directives_widget
+
+-block widget_buttons
+
+-# note - had to modify instance.company_controls to be just company_controls for testing
+
+-block widget_title
+  %i.grcicon-directive
+  -if not company_controls
+    Directives
+    %span.subtitle
+      (Regulations, Contracts, Policies) and Controls
+  -else
+    Controls
+
+-block main
+  .container-fluid
+    .row-fluid
+      %label{for:"file"}
+          %strong
+              File to Upload
+        -#=file_field_tag "upload"
+      %input{"name":'file', "value":"choose file","type":'file'}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        %input{"value":"Upload and Review","class":'btn btn-primary',"type":'submit'}
+        %a{href:"/help/sections_import",target:'_blank',class:"import-help",'data-toggle':'modal-ajax'}
+          View Help
+    -if exception_message is defined
+      -include 'directives/import_errors.haml'

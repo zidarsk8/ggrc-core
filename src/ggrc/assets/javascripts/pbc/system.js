@@ -13,6 +13,7 @@
 can.Model.Cacheable("CMS.Models.System", {
     root_object : "system"
     , root_collection : "systems"
+    , category : "business"
     , root_model : "System"
     , xable_type : "System"
     , findAll : "GET /api/systems"
@@ -116,6 +117,19 @@ can.Model.Cacheable("CMS.Models.System", {
       controls : "CMS.Models.Control.models"
       , sub_systems : "CMS.Models.System.models"
     }
+    , links_to : {
+      "System" : "SystemSystem"
+      , "Process" : "SystemSystem"
+      , "Control" : "SystemControl"
+      , "Product" : {}
+      , "Facility" : {}
+      , "OrgGroup" : {}
+      , "Project" : {}
+      , "DataAsset" : {}
+      , "Program" : {}
+      , "Market" : {}
+      , "Risk" : {}
+      }
 }, {
 
     init : function() {
@@ -173,7 +187,13 @@ CMS.Models.System("CMS.Models.StrictSystem", {
 }, {});
 
 CMS.Models.System("CMS.Models.Process", {
-  findAll : "GET /api/systems?is_biz_process=true"
+  model_plural : "Processes"
+  , table_plural : "processes"
+  , title_plural : "Processes"
+  , model_singular : "Process"
+  , title_singular : "Process"
+  , table_singular : "process"
+  , findAll : "GET /api/systems?is_biz_process=true"
   , create : function(params) {
     params.is_biz_process = true;
     return this._super(params);

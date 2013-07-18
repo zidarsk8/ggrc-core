@@ -36,15 +36,18 @@ dashboard-js-files:
   - models/local_storage.js
   - models/display_prefs.js
   - models/simple_models.js
+  - models/recently_viewed_object.js
   - models/search.js
   - controllers/add_widgets.js
   - controllers/filterable_controller.js
-  - controllers/dashboard_widgets.js
+  - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
+  - controllers/list_view_controller.js
   - controllers/modals_controller.js
   - controllers/modal_selector_controller.js
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
+  - controllers/recently_viewed_controller.js
   - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
@@ -55,6 +58,7 @@ dashboard-js-files:
   - pbc/document.js
   - pbc/person.js
   - pbc/system.js
+  - models/join_models.js
   - apps/dashboard.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js

@@ -8,6 +8,9 @@ from . import settings
 
 # Initialize Flask app
 from flask import Flask
+# Using for import file upload
+from werkzeug import secure_filename
+
 
 app = Flask('ggrc', instance_relative_config=True)
 app.config.from_object(settings)
@@ -47,6 +50,9 @@ ggrc.views.init_all_object_views(app)
 # Initialize configured and default extensions
 from ggrc.fulltext import get_indexer
 ggrc.indexer = get_indexer()
+
+from ggrc.rbac import permissions
+permissions.get_permissions_provider()
 
 if settings.ENABLE_JASMINE:
   # Configure Flask-Jasmine, for dev mode unit testing

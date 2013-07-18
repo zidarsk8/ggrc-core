@@ -4,17 +4,28 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Identifiable, created_at_args
+from .mixins import Base, created_at_args
 
-class Event(Identifiable, db.Model):
+class Event(Base, db.Model):
   __tablename__ = 'events'
 
-  person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable = False)
-  created_at = db.Column(db.DateTime, nullable = False, **created_at_args())
-  http_method = db.Column(db.String, nullable = False)
+  http_method = db.Column(db.Enum(u'POST', u'PUT', u'DELETE'), nullable = False)
   resource_id = db.Column(db.Integer, nullable = False)
   resource_type = db.Column(db.String, nullable = False)
 
-  # Following relationship uses lazy='subquery' as we always need the revisions
-  events = db.relationship('Revision', backref='event', lazy='subquery', cascade='all, delete-orphan') 
-  person = db.relationship('Person')
+  revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
+
+  _publish_attrs = [
+      'http_method',
+      'resource_id',
+      'resource_type',
+      'revisions',
+  ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Event, cls).eager_query().order_by('events.id desc')
+    return query.options(
+        orm.subqueryload('revisions'))

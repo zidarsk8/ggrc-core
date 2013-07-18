@@ -6,14 +6,18 @@
 import datetime
 import ggrc.builder.json
 import hashlib
-import json
 import time
-from flask import url_for, request, current_app
+from blinker import Namespace
+from flask import url_for, request, current_app, session
 from flask.views import View
 from ggrc import db
+from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
+from ggrc.models.context import Context
+from ggrc.models.event import Event
+from ggrc.models.revision import Revision
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -24,42 +28,8 @@ from .attribute_query import AttributeQueryBuilder
 resources.
 """
 
-class DateTimeEncoder(json.JSONEncoder):
-  """Custom JSON Encoder to handle datetime objects
-
-  from:
-     `http://stackoverflow.com/questions/12122007/python-json-encoder-to-support-datetime`_
-  also consider:
-     `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
-  """
-  def default(self, obj):
-    if isinstance(obj, datetime.datetime):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.date):
-      return obj.isoformat()
-    elif isinstance(obj, datetime.timedelta):
-      return (datetime.datetime.min + obj).time().isoformat()
-    else:
-      return super(DateTimeEncoder, self).default(obj)
-
-class UnicodeSafeJsonWrapper(dict):
-  """JSON received via POST has keys as unicode. This makes get work with plain
-  `str` keys.
-  """
-  def __getitem__(self, key):
-    ret = self.get(key)
-    if ret is None:
-      raise KeyError(key)
-    return ret
-
-  def get(self, key, default=None):
-    return super(UnicodeSafeJsonWrapper, self).get(unicode(key), default)
-
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
-
-def as_json(obj, **kwargs):
-  return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
 
 class ModelView(View):
   pk = 'id'
@@ -203,22 +173,36 @@ class Resource(ModelView):
   By default will only support the `application/json` content-type.
   """
 
-  def dispatch_request(self, *args, **kwargs):
-    method = request.method.lower()
+  signals = Namespace()
+  model_posted = signals.signal('Model POSTed',
+    """
+    Indicates that a model object was received via POST and will be committed
+    to the database. The sender in the signal will be the model class of the
+    POSTed resource. The following arguments will be sent along with the
+    signal:
 
-    if method == 'get':
+      :obj: The model instance created from the POSTed JSON.
+      :src: The original POSTed JSON dictionary.
+      :service: The instance of Resource handling the POST request.  
+    """,
+    )
+
+  def dispatch_request(self, *args, **kwargs):
+    method = request.method
+
+    if method == 'GET':
       if self.pk in kwargs and kwargs[self.pk] is not None:
         return self.get(*args, **kwargs)
       else:
         return self.collection_get()
-    elif method == 'post':
+    elif method == 'POST':
       if self.pk in kwargs and kwargs[self.pk] is not None:
         return self.post(*args, **kwargs)
       else:
         return self.collection_post()
-    elif method == 'put':
+    elif method == 'PUT':
       return self.put(*args, **kwargs)
-    elif method == 'delete':
+    elif method == 'DELETE':
       return self.delete(*args, **kwargs)
     else:
       raise NotImplementedError()
@@ -267,6 +251,9 @@ class Resource(ModelView):
           ))
     return None
 
+  def json_update(self, obj, src):
+    ggrc.builder.json.update(obj, src)
+
   def put(self, id):
     obj = self.get_object(id)
     if obj is None:
@@ -286,10 +273,15 @@ class Resource(ModelView):
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
       raise Forbidden()
-    ggrc.builder.json.update(obj, src)
+    new_context = self.get_context_id_from_json(src)
+    if new_context != obj.context_id \
+        and not permissions.is_allowed_update(self.model.__name__, new_context):
+      raise Forbidden()
+    self.json_update(obj, src)
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    self.log_event(db.session, obj)
     db.session.commit()
     obj = self.get_object(id)
     get_indexer().update_record(fts_record_for(obj))
@@ -307,6 +299,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().delete_record(self.url_for(id=id))
     return self.json_success_response(
@@ -327,6 +320,37 @@ class Resource(ModelView):
     return self.json_success_response(
       collection, self.collection_last_modified())
 
+  def json_create(self, obj, src):
+    ggrc.builder.json.create(obj, src)
+
+  def get_context_id_from_json(self, src):
+    context = src.get('context', None)
+    if context:
+      return context.get('id', None)
+    return None
+
+  def personal_context(self):
+    current_user_id = get_current_user_id()
+    context = db.session.query(Context).filter(
+        Context.related_object_id == current_user_id,
+        Context.related_object_type == 'Person',
+        ).first()
+    if not context:
+      context = Context(
+          name='Personal Context for {0}'.format(current_user_id),
+          description='',
+          context_id=1,
+          related_object_id=current_user_id,
+          related_object_type='Person',
+          )
+      db.session.add(context)
+      db.session.commit()
+    return context
+
+  def handle_create(self, obj, src):
+    """Do NOTHING by default"""
+    pass
+
   def collection_post(self):
     if self.request.headers['Content-Type'] != 'application/json':
       return current_app.make_response((
@@ -339,24 +363,51 @@ class Resource(ModelView):
     except KeyError, e:
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
-    if 'context_id' not in src:
-      raise BadRequest('context_id MUST be specified.')
-    if not permissions.is_allowed_create(
-        self.model.__name__, src['context_id']):
-      raise Forbidden()
-    ggrc.builder.json.create(obj, src)
-    #FIXME Fake the modified_by_id until we have that information in session.
+    if 'private' in src:
+      pass
+    elif 'context' not in src:
+      raise BadRequest('context MUST be specified.')
+    else:
+      if not permissions.is_allowed_create(
+          self.model.__name__, self.get_context_id_from_json(src)):
+        raise Forbidden()
+    self.json_create(obj, src)
+    self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    self.log_event(db.session, obj)
     db.session.commit()
     get_indexer().create_record(fts_record_for(obj))
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
 
+  def log_event(self, session, obj):
+    revisions = []
+    new_objects = list(session.new) # Delay creation of revisions as ids are not available
+    http_method = request.method
+    for o in session.dirty:
+      if session.is_modified(o):
+        revision = Revision( o, get_current_user_id(), 'modified', o.to_json())
+        revisions.append(revision)
+    for o in session.deleted:
+      revision = Revision( o, get_current_user_id(), 'deleted', o.to_json())
+      revisions.append(revision)
+    session.flush() # this ensures that ids are available for new objects
+    for o in new_objects:
+      revision = Revision( o, get_current_user_id(), 'created', o.to_json())
+      revisions.append(revision)
+    event = Event(
+      modified_by_id = get_current_user_id(),
+      http_method = http_method,
+      resource_id = obj.id,
+      resource_type = str(obj.__class__.__name__))
+    event.revisions = revisions
+    session.add(event)
+
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
     if model_class:
-      service_class = type(model_class.__name__, (Resource,), {
+      service_class = type(model_class.__name__, (cls,), {
         '_model': model_class,
         })
       import ggrc.services
@@ -380,9 +431,9 @@ class Resource(ModelView):
   def as_json(cls, obj, **kwargs):
     return as_json(obj, **kwargs)
 
-  def object_for_json(self, obj, model_name=None):
+  def object_for_json(self, obj, model_name=None, properties_to_include=None):
     model_name = model_name or self.model._inflector.table_singular
-    json_obj = ggrc.builder.json.publish(obj)
+    json_obj = ggrc.builder.json.publish(obj, properties_to_include or [])
     return { model_name: json_obj }
 
   def get_properties_to_include(self):
@@ -445,3 +496,12 @@ class Resource(ModelView):
     if args:
       return src.get(unicode(attr), *args)
     return src.get(unicode(attr))
+
+class ReadOnlyResource(Resource):
+  def dispatch_request(self, *args, **kwargs):
+    method = request.method
+
+    if method == 'GET':
+      return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
+    else:
+      raise NotImplementedError()

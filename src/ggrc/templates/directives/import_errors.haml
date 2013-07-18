@@ -1,0 +1,14 @@
+-set default_message = "Could not import: verify the file is correctly formatted."
+
+.row-fluid
+  %hr.hr-widget
+
+.row-fluid
+  .span6
+    %h4
+      -if exception_message is defined
+        %b
+          Could not import: verify the file is correctly formatted.
+          =exception_message
+      -else
+        =default_message
