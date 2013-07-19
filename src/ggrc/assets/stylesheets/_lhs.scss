@@ -144,6 +144,10 @@
         .rtf {
           font-size:12px;
           line-height:16px;
+          a {
+            display:inline;
+            padding:0;
+          }
         }
         .links {
           margin-top:6px;
