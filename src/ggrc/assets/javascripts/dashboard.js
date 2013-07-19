@@ -728,5 +728,26 @@ function resize_areas() {
   $(".bar-v").css('height', areaHeight);
 }
 
+jQuery(function($) {
+  $('body').on('click', '.tree-link', function(e) {
+    var $this = $(this)
+      , $additionalInfo = $this.next()
+      , $treeItem = $this.closest(".tree-item")
+      ;
+    if ($this.hasClass("open")) {
+      $additionalInfo.slideUp();
+      $this.removeClass("open");
+      $treeItem.removeClass("tree-item-open");
+    } else {
+      $additionalInfo.slideDown();
+      $this.addClass("open");
+      $treeItem.addClass("tree-item-open");
+    };
+    
+  });
+});
+
+
 jQuery(resize_areas);
 jQuery(window).on("resize", resize_areas);
+

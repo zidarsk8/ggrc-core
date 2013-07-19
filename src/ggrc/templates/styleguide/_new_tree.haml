@@ -1,33 +1,47 @@
-%section#newtree.widget
+%section#newtree.widget.governance
   %section.header
-    %h2
-      New Tree Design
+    .row-fluid
+      .span8
+        %h2
+          %i.grcicon-contract-color
+          Contracts
+          %span
+            (3)
+          \/ New Tree
+      .span4
+        .widget-action.pull-right.widget-showhide
+          %a.active{ 'href': "javascript://" }
+        .widget-action.pull-right.widget-action-help
+            %a{ 'href': "javascript://" }
+              %i.grcicon-help-black
   %section.content
     %ul.new-tree
       %li.tree-item
-        %a{ 'href': '#' }
+        %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10
-              .oneline
+              .item-data
                 .tree-title-area
                   Master Agreement
             .span1
               %i.grcicon-people-warning
             .span1
-              %i.grcicon-section-black
-              6
+              .counter
+                %i.grcicon-section-black
+                6
       %li.tree-item
-        %a{ 'href': 'javascript://' }
+        %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10
-              .oneline
+              .item-data
                 .tree-title-area
                   Art party craft
             .span1
               &nbsp;
             .span1
-              %i.grcicon-section-black
-              6
+              .counter
+                %i.grcicon-section-black
+                2
         .tier-2-info
           .tier-2-info-content
             .row-fluid
@@ -60,47 +74,117 @@
           .inner-tree
             %ul.new-tree-inner
               %li.sub-item
-                %a{ 'href': '#' }
+                %a{ 'href': '#', 'class': 'tree-link' }
                   .row-fluid
                     .span10
-                      .oneline
-                        %i.grcicon-section-color
-                        Hello
+                      .item-data
+                        .tree-title-area
+                          %i.grcicon-section-color
+                          %span.tree-code
+                            80053
+                          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                     .span1
                       &nbsp;
                     .span1
-                      %i.grcicon-reg-map
-                      0
+                      .counter
+                        %i.grcicon-reg-map
+                        0
               %li.sub-item
-                %a{ 'href': '#' }
+                %a{ 'href': '#', 'class': 'tree-link' }
                   .row-fluid
                     .span10
-                      .oneline
-                        %i.grcicon-section-color
-                        London Calling
+                      .item-data
+                        .tree-title-area
+                          %i.grcicon-section-color
+                          %span.tree-code
+                            80053-1
+                          London Calling
                     .span1
                       &nbsp;
                     .span1
-                      %i.grcicon-reg-map
-                      2
-              %li.sub-item.tree-item-add
-                %a{ 'href': '#' }
-                  .row-fluid
-                    .span12
-                      + Section
-
+                      .counter
+                        %i.grcicon-reg-map
+                        2
+                .tier-2-info
+                  .tier-2-info-content
+                    .row-fluid
+                      .span12
+                        .tree-description.short
+                          %p
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        %a{ 'class': 'show-long', 'href': 'javascript://' }
+                          more
+                    .row-fluid
+                      .span6
+                        .tree-info
+                          %strong
+                            Owner:
+                          Manny Rangerburden
+                      .span6
+                        .tree-info
+                          %a{ 'href': '#', 'target': '_blank'}
+                            http://gdrive.googleplex.com/artpartycraft/42387994793827
+                    .tree-actions
+                      .row-fluid
+                        .span6
+                          &nbsp;
+                        .span6
+                          %a{ 'href': '#', 'class': 'pull-right' }
+                            %i.grcicon-edit
+                            Edit
+                  .inner-tree
+                    %ul.new-tree-inner
+                      %li.sub-item
+                        %a{ 'href': '#', 'class': 'tree-link' }
+                          .row-fluid
+                            .span10
+                              .item-data
+                                .tree-title-area
+                                  %i.grcicon-orggroup-color
+                                  Desciples
+                            .span1
+                              &nbsp;
+                            .span1
+                              .counter
+                                %i.grcicon-reg-map
+                                0
+                      %li.sub-item
+                        %a{ 'href': '#', 'class': 'tree-link' }
+                          .row-fluid
+                            .span10
+                              .item-data
+                                .tree-title-area
+                                  %i.grcicon-market-color
+                                  South China Market
+                            .span1
+                              &nbsp;
+                            .span1
+                              .counter
+                                %i.grcicon-reg-map
+                                2
+                      %li.sub-item.tree-item-add
+                        %a{ 'href': '#' }
+                          .row-fluid
+                            .span12
+                              + Object
+                %li.sub-item.tree-item-add
+                  %a{ 'href': '#' }
+                    .row-fluid
+                      .span12
+                        + Section
       %li.tree-item
-        %a{ 'href': '#' }
+        %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10
-              .oneline
+              .item-data
                 .tree-title-area
                   EULA
             .span1
               &nbsp;
             .span1
-              %i.grcicon-section-black
-              0
+              .counter
+                %i.grcicon-section-black
+                0
       %li.tree-item-add
         %a{ 'href': '#' }
           .row-fluid
