@@ -5,6 +5,7 @@
 
 import datetime
 import json
+import ggrc.app
 from behave import given, when, then
 from iso8601 import parse_date
 from sqlalchemy.orm.properties import RelationshipProperty
@@ -23,7 +24,7 @@ def get_json_response(context):
     context.json = context.response.json()
   return context.json
 
-def add_create_permissions(context, context_id, resource_types):
+def add_create_permissions(context, rbac_context_id, resource_types):
   if hasattr(context, 'current_user_data'):
     context.current_user_data.setdefault("permissions", {})
     user_perms = context.current_user_data["permissions"]
@@ -31,9 +32,8 @@ def add_create_permissions(context, context_id, resource_types):
     user_perms.setdefault(permission_type, {})
     for resource_type in resource_types:
       user_perms[permission_type].setdefault(resource_type, [])
-      context_id = int(context_id)
-      if context_id not in user_perms[permission_type][resource_type]:
-        user_perms[permission_type][resource_type].append(context_id)
+      if rbac_context_id not in user_perms[permission_type][resource_type]:
+        user_perms[permission_type][resource_type].append(rbac_context_id)
       context.current_user_json = json.dumps(context.current_user_data)
 
 @given('an example "{resource_type}"')
@@ -168,11 +168,12 @@ def get_related_resource_types(resource_type, resource_types):
           resource_types.add(related_resource_type)
           get_related_resource_types(related_resource_type, resource_types)
 
-@given('current user has create permissions on resource types that "{resource_type}" depends on in context "{context_id}"')
-def add_related_resource_permissions(context, resource_type, context_id):
+@given('current user has create permissions on resource types that "{resource_type}" depends on in context "{rbac_context}"')
+def add_related_resource_permissions(context, resource_type, rbac_context):
   resource_types = set()
   get_related_resource_types(resource_type, resource_types)
-  add_create_permissions(context, context_id, resource_types)
+  rbac_context_id = int(getattr(context, rbac_context).get('id'))
+  add_create_permissions(context, rbac_context_id, resource_types)
 
 @then('POST of "{resource_name}" to its collection is allowed')
 def check_POST_is_allowed(context, resource_name):

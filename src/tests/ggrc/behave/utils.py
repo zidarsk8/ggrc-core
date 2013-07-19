@@ -111,9 +111,9 @@ def handle_post_named_example(context, name, expected_status=201):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
-def post_example(context, resource_type, example, url=None, context_id=None):
-  if context_id is None:
-    context_id = example.get("context_id", None)
+def post_example(context, resource_type, example, url=None, rbac_context=None):
+  if rbac_context is None:
+    rbac_context = example.get("context", None)
   if url is None:
     url = get_service_endpoint_url(context, resource_type)
 
@@ -125,7 +125,7 @@ def post_example(context, resource_type, example, url=None, context_id=None):
       value_resource_factory = factory_for(value_resource_type)
       value_resource = value_resource_factory()
       value_response = post_example(
-          context, value_resource_type, value_resource, context_id=context_id)
+          context, value_resource_type, value_resource, rbac_context=rbac_context)
       # If not a successful creation, then it didn't create the object we need
       if value_response.status_code != 201:
         return value_response
@@ -137,9 +137,9 @@ def post_example(context, resource_type, example, url=None, context_id=None):
         'id': value_data["id"],
         'type': value_resource_type
         }
-  # Assign overriding `context_id`, if specified
-  if context_id is not None:
-    example["context_id"] = context_id
+  # Assign overriding `context`, if specified
+  if rbac_context is not None:
+    example["context"] = rbac_context
 
   headers = {'Content-Type': 'application/json',}
   data = as_json(
