@@ -108,7 +108,11 @@
         //   selected items change -- that list should be Can-ified.
         var list_target = self.options.$trigger.data('list-target');
         if (list_target)
-          $(list_target).tmpl_setitems(self.join_list);
+          $(list_target)
+          .tmpl_setitems(self.join_list)
+          .closest(":has(.grc-badge)")
+          .find(".grc-badge")
+          .text("(" + self.join_list.length + ")");
       });
 
       $.when(

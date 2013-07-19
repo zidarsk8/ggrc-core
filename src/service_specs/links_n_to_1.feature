@@ -31,7 +31,6 @@ Feature: Many resources have links to other resources. This feature will
     | Request           | Response          | request                   | responses                        |
     | System            | Response          | system                    | responses                        |
     | Directive         | Section           | directive                 | sections                         |
-    | System            | Transaction       | system                    | transactions                     |
 
   Scenario Outline:
     Given a new "<parent_type>" named "parent"

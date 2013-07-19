@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .mixins import Base
@@ -10,7 +9,7 @@ from .mixins import Base
 class Request(Base, db.Model):
   __tablename__ = 'requests'
 
-  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'))
+  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False)
   type_id = db.Column(db.Integer)
   pbc_control_code = db.Column(db.String)
   pbc_control_desc = db.Column(db.Text)
@@ -23,7 +22,7 @@ class Request(Base, db.Model):
   status = db.Column(db.String)
   control_assessment_id = db.Column(db.Integer, db.ForeignKey('control_assessments.id'))
   response_due_at = db.Column(db.Date)
-  responses = db.relationship('Response', backref='request')
+  responses = db.relationship('Response', backref='request', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'pbc_list',

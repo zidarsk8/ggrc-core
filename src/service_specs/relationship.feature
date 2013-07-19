@@ -24,7 +24,6 @@ Feature: A Relationship models a relation between two resources. Relationships
 
   Examples:
       | type_a            | type_b           |
-      | Category          | Transaction      |
       | Control           | System           |
       | ControlAssessment | Section          |
       | Cycle             | RiskyAttribute   |
@@ -55,7 +54,6 @@ Feature: A Relationship models a relation between two resources. Relationships
 
   Examples:
       | type_a            | type_b           |
-      | Category          | Transaction      |
       | Control           | System           |
       | ControlAssessment | Section          |
       | Cycle             | RiskyAttribute   |
