@@ -690,10 +690,13 @@ ul.tree-structure.event-log {
 ul.new-tree {
   @include reset-list();
   li.tree-item {
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #ccc;
     line-height:30px;
-    &:last-child {
-      border-color: #fff;
+  }
+  li.tree-item-add {
+    line-height:30px;
+    a {
+      font-weight:bold;
     }
   }
   [class^="grcicon-"] {
@@ -727,6 +730,7 @@ ul.new-tree {
   }
   .tree-actions {
     border-top:1px solid #eee;
+    border-bottom:1px solid #eee;
     font-size:13px;
     a {
       color:$disabled;
@@ -738,4 +742,16 @@ ul.new-tree {
     
   }
 }
+
+ul.new-tree-inner {
+  @include reset-list();
+  li.sub-item {
+    border-bottom:1px solid #eee;
+    line-height:30px;
+    border-left:5px solid #ddd;
+    &:last-child {
+      border-bottom:1px solid #fff;
+    }
+  }
   
+}
