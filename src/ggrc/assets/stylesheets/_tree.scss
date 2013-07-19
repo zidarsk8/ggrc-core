@@ -693,7 +693,11 @@ ul.new-tree {
     border-bottom:1px solid #ccc;
     line-height:30px;
   }
+  .tree-title-area {
+    padding-left:10px;
+  }
   li.tree-item-add {
+    padding-left:10px;
     line-height:30px;
     a {
       font-weight:bold;
@@ -730,7 +734,6 @@ ul.new-tree {
   }
   .tree-actions {
     border-top:1px solid #eee;
-    border-bottom:1px solid #eee;
     font-size:13px;
     a {
       color:$disabled;
@@ -739,19 +742,24 @@ ul.new-tree {
         text-decoration:none;
       }
     }
-    
   }
 }
 
 ul.new-tree-inner {
   @include reset-list();
+  border-top:1px solid #eee;
   li.sub-item {
     border-bottom:1px solid #eee;
-    line-height:30px;
     border-left:5px solid #ddd;
+    padding-left:10px;
+    font-size:13px;
+    line-height:30px;
     &:last-child {
-      border-bottom:1px solid #fff;
+      border-bottom:none;
     }
   }
-  
+}
+
+.tier-2-info-content {
+  padding:0 10px;
 }
