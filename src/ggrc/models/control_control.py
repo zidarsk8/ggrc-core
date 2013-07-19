@@ -10,8 +10,12 @@ from .mixins import Base
 class ControlControl(Base, db.Model):
   __tablename__ = 'control_controls'
 
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
-  implemented_control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
+  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  implemented_control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
+
+  __table_args__ = (
+    db.UniqueConstraint('control_id', 'implemented_control_id'),
+  )
 
   _publish_attrs = [
     'control',

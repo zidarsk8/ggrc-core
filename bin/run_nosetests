@@ -4,4 +4,4 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
 GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development" \
-  behave --format progress service_specs ggrc_basic_permissions/service_specs
+  nosetests tests

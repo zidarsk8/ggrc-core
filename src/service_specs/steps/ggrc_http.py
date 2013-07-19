@@ -5,8 +5,11 @@
 
 import datetime
 import json
+import ggrc.app
 from behave import given, when, then
 from iso8601 import parse_date
+from sqlalchemy.orm.properties import RelationshipProperty
+
 from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
     put_resource, get_resource_table_singular, get_service_endpoint_url,
@@ -20,6 +23,18 @@ def get_json_response(context):
   if not hasattr(context, 'json'):
     context.json = context.response.json()
   return context.json
+
+def add_create_permissions(context, rbac_context_id, resource_types):
+  if hasattr(context, 'current_user_data'):
+    context.current_user_data.setdefault("permissions", {})
+    user_perms = context.current_user_data["permissions"]
+    permission_type = 'create'
+    user_perms.setdefault(permission_type, {})
+    for resource_type in resource_types:
+      user_perms[permission_type].setdefault(resource_type, [])
+      if rbac_context_id not in user_perms[permission_type][resource_type]:
+        user_perms[permission_type][resource_type].append(rbac_context_id)
+      context.current_user_json = json.dumps(context.current_user_data)
 
 @given('an example "{resource_type}"')
 def example_resource(context, resource_type):
@@ -58,19 +73,13 @@ def simple_post_of_named(context, name, url):
           200, response.status_code)
   context.response = response
 
-@given('"{name}" is POSTed to "{url}"')
-def post_named_example(context, name, url, expected_status=201):
-  handle_post_named_example(context, name, url, expected_status)
-
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
-  endpoint_url = get_service_endpoint_url(context, resource_type)
-  post_example_resource(context, resource_type, endpoint_url)
+  post_example_resource(context, resource_type)
 
-@when('the example "{resource_type}" is POSTed to the "{collection}"')
-def post_example_resource(context, resource_type, collection):
+def post_example_resource(context, resource_type, url=None):
   context.response = post_example(
-      context, resource_type, context.example_resource, collection)
+      context, resource_type, context.example_resource, url)
 
 @when('GET of "{url}" as "{name}"')
 def get_resource_and_name_it(context, url, name):
@@ -145,7 +154,26 @@ def define_current_user(context, user_json):
         )
     assert response.status_code == 200, 'Failed to logout!!'
     delattr(context, 'cookies')
-  context.current_user_json = user_json.replace('\\"', '"')
+  context.current_user_data = json.loads(user_json.replace('\\"', '"'))
+  context.current_user_json = json.dumps(context.current_user_data)
+
+def get_related_resource_types(resource_type, resource_types):
+  model = getattr(ggrc.models, resource_type)
+  for attr in ggrc.db.inspect(model).attrs:
+    if isinstance(attr, RelationshipProperty):
+      columns = tuple(attr.local_columns)[0]
+      if not (attr.uselist or columns.primary_key or columns.nullable):
+        related_resource_type = attr.mapper.class_.__name__
+        if related_resource_type not in resource_types:
+          resource_types.add(related_resource_type)
+          get_related_resource_types(related_resource_type, resource_types)
+
+@given('current user has create permissions on resource types that "{resource_type}" depends on in context "{rbac_context}"')
+def add_related_resource_permissions(context, resource_type, rbac_context):
+  resource_types = set()
+  get_related_resource_types(resource_type, resource_types)
+  rbac_context_id = int(getattr(context, rbac_context).get('id'))
+  add_create_permissions(context, rbac_context_id, resource_types)
 
 @then('POST of "{resource_name}" to its collection is allowed')
 def check_POST_is_allowed(context, resource_name):

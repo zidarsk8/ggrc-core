@@ -32,6 +32,8 @@ Feature: RBAC Permissions enforcement for REST API
     """
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context2"
     Then POST of "resource" to its collection is allowed
     Given a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context2"
@@ -72,7 +74,6 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario Outline: GET requires read permission for the context
     Given the current user
@@ -91,6 +92,7 @@ Feature: RBAC Permissions enforcement for REST API
     """
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Given the current user
@@ -144,7 +146,6 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario Outline: PUT requires update permission for the context
     Given the current user
@@ -166,6 +167,7 @@ Feature: RBAC Permissions enforcement for REST API
     """
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Then PUT of "resource" is allowed
@@ -224,7 +226,6 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario Outline: DELETE requires delete permission for the context
     Given the current user
@@ -246,6 +247,7 @@ Feature: RBAC Permissions enforcement for REST API
     """
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
     And "resource" is POSTed to its collection
     Then GET of "resource" is allowed
     Then DELETE of "resource" is forbidden 
@@ -304,7 +306,6 @@ Feature: RBAC Permissions enforcement for REST API
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |
 
   Scenario: Property link objects can be included with __include if the user has read access to the target
     Given the current user
@@ -446,6 +447,8 @@ Feature: RBAC Permissions enforcement for REST API
     And "resource2" property "<property_name>" is "<match_value>"
     And "resource1" link property "context" is "context1"
     And "resource2" link property "context" is "context2"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
+    And current user has create permissions on resource types that "<resource_type>" depends on in context "context2"
     And "resource1" is POSTed to its collection
     And "resource2" is POSTed to its collection
     When Querying "<resource_type>" with "<property_name>=<match_value>"

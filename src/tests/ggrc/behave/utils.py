@@ -9,7 +9,8 @@ from __future__ import absolute_import
 from ggrc.utils import as_json
 import json
 import datetime
-from .factories import factory_for
+from .factories import factory_for, FactoryStubMarker
+import requests
 
 class Example(object):
   """An example resource for use in a behave scenario, by name."""
@@ -51,7 +52,6 @@ def handle_get_resource_and_name_it(context, url, name):
   setattr(context, name, response.json())
 
 def get_resource(context, url):
-  import requests
   headers={'Accept': 'application/json',}
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
@@ -64,7 +64,6 @@ def get_resource(context, url):
   return response
 
 def put_resource(context, url, resource):
-  import requests
   headers={
       'Content-Type': 'application/json',
       'If-Match': resource.response.headers['Etag'],
@@ -99,14 +98,12 @@ def handle_post_named_example_to_collection_endpoint(
   created resource is added to the context as the attribute name given by
   `name`.
   """
-  example = getattr(context, name)
-  url = get_service_endpoint_url(context, example.resource_type)
-  handle_post_named_example(context, name, url, expected_status)
+  handle_post_named_example(context, name, expected_status)
 
-def handle_post_named_example(context, name, url, expected_status=201):
+def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)
   response = post_example(
-      context, example.resource_type, example.value, url)
+      context, example.resource_type, example.value)
   assert response.status_code == expected_status, \
       'Expected status code {0}, received {1}'\
         .format(expected_status, response.status_code)
@@ -114,9 +111,36 @@ def handle_post_named_example(context, name, url, expected_status=201):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
-def post_example(context, resource_type, example, url):
-  #For **some** reason, I can't import this at the module level in a steps file
-  import requests
+def post_example(context, resource_type, example, url=None, rbac_context=None):
+  if rbac_context is None:
+    rbac_context = example.get("context", None)
+  if url is None:
+    url = get_service_endpoint_url(context, resource_type)
+
+  # Find any required FactoryStubMarker and recurse to POST/create
+  # required resources
+  for attr, value in example.items():
+    if isinstance(value, FactoryStubMarker):
+      value_resource_type = value.class_.__name__
+      value_resource_factory = factory_for(value_resource_type)
+      value_resource = value_resource_factory()
+      value_response = post_example(
+          context, value_resource_type, value_resource, rbac_context=rbac_context)
+      # If not a successful creation, then it didn't create the object we need
+      if value_response.status_code != 201:
+        return value_response
+      # Get the value of the first/only (key,value) pair
+      #   (and just assume the root key is correct)
+      value_data = value_response.json().items()[0][1]
+      example[attr] = {
+        'href': value_data["selfLink"],
+        'id': value_data["id"],
+        'type': value_resource_type
+        }
+  # Assign overriding `context`, if specified
+  if rbac_context is not None:
+    example["context"] = rbac_context
+
   headers = {'Content-Type': 'application/json',}
   data = as_json(
       {get_resource_table_singular(resource_type): example})

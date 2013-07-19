@@ -10,8 +10,12 @@ from .mixins import Base
 class ProgramDirective(Base, db.Model):
   __tablename__ = 'program_directives'
 
-  program_id = db.Column(db.Integer, db.ForeignKey('programs.id'))
-  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'))
+  program_id = db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False)
+  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
+
+  __table_args__ = (
+    db.UniqueConstraint('program_id', 'directive_id'),
+  )
 
   _publish_attrs = [
       'program',

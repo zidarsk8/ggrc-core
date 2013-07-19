@@ -53,7 +53,6 @@ from .system_control import SystemControl
 # TODO: Is this used?
 #from .system_section import SystemSection
 from .system_system import SystemSystem
-from .transaction import Transaction
 
 # TODO: Include?
 from .log_event import LogEvent
@@ -102,7 +101,6 @@ all_models = [
   System,
   SystemControl,
   SystemSystem,
-  Transaction,
   LogEvent,
   Revision,
   Event,

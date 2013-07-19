@@ -61,7 +61,6 @@ def all_collections():
     service('systems', models.System),
     service('system_systems', models.SystemSystem),
     service('system_controls', models.SystemControl),
-    service('transactions', models.Transaction),
     ]
 
   for extension in settings.EXTENSIONS:

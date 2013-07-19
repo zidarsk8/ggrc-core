@@ -14,7 +14,7 @@ class Categorization(Base, db.Model):
   __tablename__ = 'categorizations'
 
   category_id = db.Column(
-      db.Integer, db.ForeignKey('categories.id'))
+      db.Integer, db.ForeignKey('categories.id'), nullable=False)
   categorizable_id = db.Column(db.Integer)
   categorizable_type = db.Column(db.String)
 

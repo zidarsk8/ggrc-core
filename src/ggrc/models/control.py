@@ -1,7 +1,7 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: david@reciprocitylabs.com
-# Maintained By: david@reciprocitylabs.com
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
@@ -64,9 +64,9 @@ class Control(
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  system_controls = db.relationship('SystemControl', backref='control')
+  system_controls = db.relationship('SystemControl', backref='control', cascade='all, delete-orphan')
   systems = association_proxy('system_controls', 'system', 'SystemControl')
-  control_sections = db.relationship('ControlSection', backref='control')
+  control_sections = db.relationship('ControlSection', backref='control', cascade='all, delete-orphan')
   sections = association_proxy('control_sections', 'section', 'ControlSection')
   objective_controls = db.relationship('ObjectiveControl', backref='control')
   objectives = association_proxy('objective_controls', 'objective', 'ObjectiveControl')
@@ -74,6 +74,7 @@ class Control(
       'ControlControl',
       foreign_keys='ControlControl.control_id',
       backref='control',
+      cascade='all, delete-orphan',
       )
   implemented_controls = association_proxy(
       'control_controls', 'implemented_control', 'ControlControl')
@@ -81,12 +82,13 @@ class Control(
       'ControlControl',
       foreign_keys='ControlControl.implemented_control_id',
       backref='implemented_control',
+      cascade='all, delete-orphan',
       )
   implementing_controls = association_proxy(
       'implementing_control_controls', 'control', 'ControlControl')
-  control_risks = db.relationship('ControlRisk', backref='control')
+  control_risks = db.relationship('ControlRisk', backref='control', cascade='all, delete-orphan')
   risks = association_proxy('control_risks', 'risk', 'ControlRisk')
-  control_assessments = db.relationship('ControlAssessment', backref='control')
+  control_assessments = db.relationship('ControlAssessment', backref='control', cascade='all, delete-orphan')
 
   # REST properties
   _publish_attrs = [
