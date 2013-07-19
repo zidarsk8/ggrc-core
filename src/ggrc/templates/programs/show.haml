@@ -35,6 +35,7 @@
             -include 'programs/_info.haml'
           -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
             -include 'programs/_main.haml'
+            -include 'programs/_controls.haml'
           -if not instance.company_controls
             -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
               -with widget_title = "Impact/Scope"
