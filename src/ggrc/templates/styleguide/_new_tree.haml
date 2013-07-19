@@ -16,7 +16,7 @@
               %i.grcicon-help-black
   %section.content
     %ul.new-tree
-      %li.tree-item
+      %li.tree-item.governance
         %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10
@@ -29,7 +29,7 @@
               .counter
                 %i.grcicon-section-black
                 6
-      %li.tree-item
+      %li.tree-item.governance
         %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10
@@ -52,28 +52,27 @@
                 %a{ 'class': 'show-long', 'href': 'javascript://' }
                   more
             .row-fluid
-              .span6
+              .span8
                 .tree-info
                   %strong
                     Owner:
                   Manny Rangerburden
-              .span6
+              .span4
+                %a{ 'href': '#', 'class': 'info-action pull-right', 'rel': 'tooltip', 'title': 'Edit Contract', 'data-placement': 'left' }
+                  Edit
+                  %i.grcicon-edit
+            .row-fluid
+              .span8
                 .tree-info
-                  %a{ 'href': '#', 'target': '_blank'}
+                  %a{ 'href': '#', 'target': '_blank',}
                     http://gdrive.googleplex.com/artpartycraft/42387994793827
-            .tree-actions
-              .row-fluid
-                .span6
-                  %a{ 'href': '#' }
-                    View Contract
-                    %i.grcicon-goto
-                .span6
-                  %a{ 'href': '#', 'class': 'pull-right' }
-                    %i.grcicon-edit
-                    Edit
+              .span4
+                %a{ 'href': '#', 'class': 'info-action pull-right', 'rel': 'tooltip', 'title': 'View Contract', 'data-placement': 'left' }
+                  View
+                  %i.grcicon-goto
           .inner-tree
             %ul.new-tree-inner
-              %li.sub-item
+              %li.sub-item.governance
                 %a{ 'href': '#', 'class': 'tree-link' }
                   .row-fluid
                     .span10
@@ -89,7 +88,7 @@
                       .counter
                         %i.grcicon-reg-map
                         0
-              %li.sub-item
+              %li.sub-item.governance
                 %a{ 'href': '#', 'class': 'tree-link' }
                   .row-fluid
                     .span10
@@ -115,26 +114,24 @@
                         %a{ 'class': 'show-long', 'href': 'javascript://' }
                           more
                     .row-fluid
-                      .span6
+                      .span8
                         .tree-info
                           %strong
                             Owner:
                           Manny Rangerburden
-                      .span6
+                      .span4
+                        %a{ 'href': '#', 'class': 'info-action pull-right', 'rel': 'tooltip', 'title': 'Edit Section', 'data-placement': 'left' }
+                          %i.grcicon-edit
+                          Edit
+                    .row-fluid
+                      .span8
                         .tree-info
                           %a{ 'href': '#', 'target': '_blank'}
                             http://gdrive.googleplex.com/artpartycraft/42387994793827
-                    .tree-actions
-                      .row-fluid
-                        .span6
-                          &nbsp;
-                        .span6
-                          %a{ 'href': '#', 'class': 'pull-right' }
-                            %i.grcicon-edit
-                            Edit
+                      .span4
                   .inner-tree
                     %ul.new-tree-inner
-                      %li.sub-item
+                      %li.sub-item.business
                         %a{ 'href': '#', 'class': 'tree-link' }
                           .row-fluid
                             .span10
@@ -145,10 +142,8 @@
                             .span1
                               &nbsp;
                             .span1
-                              .counter
-                                %i.grcicon-reg-map
-                                0
-                      %li.sub-item
+                              &nbsp;
+                      %li.sub-item.business
                         %a{ 'href': '#', 'class': 'tree-link' }
                           .row-fluid
                             .span10
@@ -159,20 +154,45 @@
                             .span1
                               &nbsp;
                             .span1
-                              .counter
-                                %i.grcicon-reg-map
-                                2
-                      %li.sub-item.tree-item-add
-                        %a{ 'href': '#' }
+                              &nbsp;
+                      %li.sub-item.program
+                        %a{ 'href': '#', 'class': 'tree-link' }
                           .row-fluid
-                            .span12
+                            .span10
+                              .item-data
+                                .tree-title-area
+                                  %i.grcicon-program-color
+                                  SOX Compliance
+                            .span1
+                              &nbsp;
+                            .span1
+                              &nbsp;
+                      %li.sub-item.tree-item-add
+                        .row-fluid
+                          .span12
+                            %a{ 'href': 'javascript://', 'class': 'section-add' }
                               + Object
+                            %a{ 'href': 'javascript://', 'class': 'section-create' }
+                              %i.grcicon-reg-map
+                              Map Object
+                            &nbsp;&nbsp;
+                            %a{ 'href': 'javascript://', 'class': 'section-import' }
+                              %i.grcicon-objective-black
+                              Create/Map Control Objective
+                            
                 %li.sub-item.tree-item-add
-                  %a{ 'href': '#' }
-                    .row-fluid
-                      .span12
+                  .row-fluid
+                    .span12
+                      %a{ 'href': 'javascript://', 'class': 'section-add' }
                         + Section
-      %li.tree-item
+                      %a{ 'href': 'javascript://', 'class': 'section-create' }
+                        %i.grcicon-add-black
+                        Create Section
+                      &nbsp;&nbsp;
+                      %a{ 'href': 'javascript://', 'class': 'section-import' }
+                        %i.grcicon-imp-exp
+                        Import Sections
+      %li.tree-item.governance
         %a{ 'href': '#', 'class': 'tree-link' }
           .row-fluid
             .span10

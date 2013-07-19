@@ -710,6 +710,26 @@ ul.new-tree {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
     }
+    &.governance {
+      .item-data {
+        color:$governance;
+      }
+    }
+    &.business {
+      .item-data {
+        color:$business;
+      }
+    }
+    &.risk {
+      .item-data {
+        color:$risk;
+      }
+    }
+    &.program {
+      .item-data {
+        color:$programs;
+      }
+    }
   }
   li.tree-item-add {
     padding-left:20px;
@@ -747,17 +767,6 @@ ul.new-tree {
     @include oneline();
     font-size:13px;
   }
-  .tree-actions {
-    border-top:1px solid #eee;
-    font-size:13px;
-    a {
-      color:$disabled;
-      &:hover {
-        color:$link;
-        text-decoration:none;
-      }
-    }
-  }
 }
 
 ul.new-tree-inner {
@@ -774,6 +783,26 @@ ul.new-tree-inner {
     li.sub-item {
       border-left:8px solid #bbb;
       margin-left:1px;
+    }
+    &.governance {
+      .item-data {
+        color:$governance;
+      }
+    }
+    &.business {
+      .item-data {
+        color:$business;
+      }
+    }
+    &.risk {
+      .item-data {
+        color:$risk;
+      }
+    }
+    &.program {
+      .item-data {
+        color:$programs;
+      }
     }
   }
 }
@@ -796,7 +825,36 @@ ul.new-tree-inner {
   }
 }
 
+.info-action {
+  font-size:11px;
+  text-transform:uppercase;
+  font-weight:bold;
+  color:#111;
+  i.grcicon-edit {
+    margin-top:5px;
+  }
+  @include opacity(0.3);
+  &:hover {
+    @include opacity(0.8);
+    text-decoration:none;
+  }
+}
+
 .counter {
   color:#000;
   @include opacity(0.5);
+}
+
+.section-create,
+.section-import {
+  display:none;
+  i {
+    @include opacity(0.3);
+  }
+  &:hover {
+   text-decoration:none;
+   i {
+     @include opacity(0.6);
+   } 
+  }
 }
