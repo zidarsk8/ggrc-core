@@ -240,6 +240,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
     this.risk_tree_options.child_options[1].create_link = false;
 
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -283,6 +284,8 @@ can.Model.Cacheable("CMS.Models.Project", {
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
+
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -342,6 +345,8 @@ can.Model.Cacheable("CMS.Models.Facility", {
     this.tree_view_options.child_options[1].model = this;
     this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
     this.risk_tree_options.child_options[1].create_link = false;
+
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -408,6 +413,8 @@ can.Model.Cacheable("CMS.Models.Product", {
     this.tree_view_options.child_options[1].model = this;
     this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
     this.risk_tree_options.child_options[1].create_link = false;
+
+    this.validatePresenceOf("title");
   }
 }, {
   attr : function(key, val) {
@@ -479,6 +486,8 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     this.tree_view_options.child_options[1].model = this;
     this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
     this.risk_tree_options.child_options[1].create_link = false;
+
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -522,6 +531,8 @@ can.Model.Cacheable("CMS.Models.Market", {
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
+
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -533,6 +544,10 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   , create : "POST /api/risky_attributes"
   , update : "PUT /api/risky_attributes/{id}"
   , links_to : ["Risk"]
+  , init : function() {
+    this.validatePresenceOf("title");
+    this._super.apply(this, arguments);
+  }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Risk", {
@@ -610,6 +625,8 @@ can.Model.Cacheable("CMS.Models.Risk", {
     $(function() {
       that.tree_view_options.child_options[0].model = CMS.Models.Control;
     });
+
+    this.validatePresenceOf("title");
   }
 }, {});
 
@@ -621,6 +638,10 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , links_to : {
+  }
+  , init : function() {
+    this.validatePresenceOf("title");
+    this._super.apply(this, arguments);
   }
 }, {});
 
