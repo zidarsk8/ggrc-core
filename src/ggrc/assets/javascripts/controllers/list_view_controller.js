@@ -16,41 +16,39 @@ can.Control("GGRC.Controllers.ListView", {
 }, {
 
   init : function() {
-
-    var params = {};
     if(this.options.is_related) {
-      this.options.parent_instance = this.options.parent_instance || GGRC.make_model_instance(GGRC.page_object);
-      var path_tokens = this.options.parent_instance.constructor.table_plural;
+      if (!this.options.parent_instance)
+        this.options.parent_instance = GGRC.make_model_instance(GGRC.page_object);
+      if(!this.options.parent_type)
+        this.options.parent_type = this.options.parent_instance.constructor.shortName;
 
-      if(this.options.parent_type == null) {
-        this.options.parent_type = window.cms_singularize($(document.body).attr("data-page-subtype") || $(document.body).attr("data-page-type") || path_tokens[0]);
-      }
-
-      if(this.options.parent_id == null) {
+      if(this.options.parent_id == null)
         this.options.parent_id = this.options.parent_instance.id;
-      }
-      params[this.options.parent_type + "_id"] = this.options.parent_id;
     } else {
       this.on();  //set up created listener for model
     }
 
     if(this.options.is_related) {
       if(this.options.object_type !== "system_process") {
-        this.options.object_display = this.options.object_route.split("_").map(can.capitalize).join(" ");
+        this.options.object_display =
+          this.options.object_route.split("_").map(can.capitalize).join(" ");
       }
-      this.options.object_type = this.options.object_type.split("_").map(can.capitalize).join("");
-      this.options.parent_display = this.options.parent_type.split("_").map(can.capitalize).join(" ");
-      this.options.parent_type = this.options.parent_display.replace(" " , "");
+      this.options.object_type =
+        this.options.object_type.split("_").map(can.capitalize).join("");
+      this.options.parent_display =
+        this.options.parent_type.split("_").map(can.capitalize).join(" ");
     }
-    this.fetch_list(params);
+    this.fetch_list({});
   }
 
   , fetch_list : function(params) {
     if(this.options.is_related) {
+      // FIXME: This should use 'object_type' and 'other_type', once the server
+      // supports it, e.g. to support dual and symmetric relationships
       this.options.model.findRelated({
-        id : this.options.parent_id
-        , otype : this.options.parent_type
-        , related_model : this.options.object_type
+          source_id : this.options.parent_id
+        , source_type : this.options.parent_type
+        , destination_type : this.options.object_type
       }).done(this.proxy('draw_list'));
     } else {
       this.options.model.findAll(params, this.proxy('draw_list'));
@@ -63,7 +61,9 @@ can.Control("GGRC.Controllers.ListView", {
       this.options.list = list;
     }
     can.view(this.options.list_view, this.options, function(frag) {
-      that.element.html(frag).trigger("updateCount", that.options.list.length);
+      that.element
+        .html(frag)
+        .trigger("updateCount", that.options.list.length);
     });
   }
 

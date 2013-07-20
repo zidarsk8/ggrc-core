@@ -70,6 +70,8 @@ var RELATIONSHIP_TYPES = {
     , "System": ["risk_is_a_threat_to_system"]
 }};
 
+GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
+
 $(function() {
 
   $(".recent").ggrc_controllers_recently_viewed();

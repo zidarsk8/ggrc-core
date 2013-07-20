@@ -30,32 +30,31 @@ can.Control("CMS.Controllers.AddWidget", {
   }
 
   , scrapeRelated : function() {
-    var that = this;
-    this.options.menu_tree = {categories : []};
-    //build the menu from the menu tree.  Build the menu tree if it doesn't exist.
-    var tabs = $(".tab-content .tab-pane");
-    var categories_index = {};
-    tabs.each(function() {
-      var ref = $(this).attr("id")
-      var type = (/related-(.+)-pane/.exec(ref) || ["", ref])[1];
+      var that = this
+        , page_model = GGRC.infer_object_type(GGRC.page_object).shortName
+        , categories_index = {}
+        ;
 
-      type = window.cms_singularize(type);
+      this.options.menu_tree = {categories : []};
 
-      var descriptor = that.options.widget_descriptors[type];
-      if(descriptor) {
-        if(!categories_index[descriptor.object_category]) {
-          categories_index[descriptor.object_category] = {
-            title : can.map(descriptor.object_category.split(" "), can.capitalize).join(" ")
-            , objects : []
-          };
-          that.options.menu_tree.categories.push(categories_index[descriptor.object_category]);
+      can.each(GGRC.RELATIONSHIP_TYPES[page_model], function(value, key, root) {
+        var related_model = CMS.Models[key]
+          , descriptor = that.options.widget_descriptors[related_model.table_singular]
+          ;
+
+        if (descriptor) {
+          if(!categories_index[descriptor.object_category]) {
+            categories_index[descriptor.object_category] = {
+                title : can.map(descriptor.object_category.split(" "), can.capitalize).join(" ")
+              , objects : []
+              };
+            that.options.menu_tree.categories.push(categories_index[descriptor.object_category]);
+          }
+          descriptor.object_display = descriptor.object_display;
+          categories_index[descriptor.object_category].objects.push(descriptor);
         }
-
-        descriptor.object_display = $("a[href='#" + ref + "']").text().replace(/\s*\d+\s*$/, "") || descriptor.object_display;
-        categories_index[descriptor.object_category].objects.push(descriptor);
-      }
-    });
-  }
+      });
+    }
 
   , ".dropdown-menu > * click" : function(el, ev) {
     var descriptor = this.options.widget_descriptors[el.attr("class")];
