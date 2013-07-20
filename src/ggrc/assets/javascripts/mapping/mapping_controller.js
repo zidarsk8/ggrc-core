@@ -20,12 +20,12 @@ function mapunmap(unmap) {
       };
       if(unmap)
         params.u = "1";
-      if(rcontrol) params.control = rcontrol;
-      if(rcontrol === null) params.control = ccontrol;
+      if(rcontrol) params[rcontrol.constructor.root_object] = rcontrol;
+      if(rcontrol === null) params[ccontrol.constructor.root_object] = ccontrol;
       if(section) params.section = section;
 
       var dfd = section ?
-        section.map_control(params)
+        section["map_" + (rcontrol ? rcontrol.constructor.table_singular : ccontrol.constructor.table_singular)](params)
         : rcontrol.map_ccontrol(params);
       dfd.done(can.proxy(this.updateButtons, this));
       return dfd;
@@ -181,7 +181,7 @@ can.Control("CMS.Controllers.Mapping", {
       item = namespace.CMS.Models.Control.model(data);
       cctl.options.observer.list.splice(this.slug_sort_position(item, cctl.options.observer.list), 0, item);
     }
-    var $item = $("[content_id=" + item.content_id + "]");
+    var $item = this.element.find("[data-id=" + item.id + "][data-object-type=" + item.constructor.table_singular + "]");
     var $content = $item.closest(".content");
     $item.find("a").click();
     $content.scrollTop($item.offset().top - $content.offset().top - ($content.height() - $item.height()) / 2)
@@ -290,6 +290,7 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
   defaults : {
     section_model : namespace.CMS.Models.SectionSlug
     , parent_model : namespace.CMS.Models.Program
+    , model : namespace.CMS.Models.Control
     , parent_id : null
     , observer : undefined
     , section : null
@@ -305,6 +306,8 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
       , parent_type : window.cms_singularize(this.options.parent_model.root_object)
       , parent_subtype : can.underscore(this.options.parent_model.shortName).replace("_", " ")
       , parent_id : this.options.parent_id
+      , model : this.options.model
+      , list : this.options.section[this.options.model.table_plural]
     });
 
     can.view("/static/mustache/sections/control_selector.mustache", that.options.observer, function(frag) {
@@ -314,13 +317,17 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
       .cms_controllers_controls({
         list : "/static/mustache/controls/list_selector.mustache"
         , show : "/static/mustache/controls/show_selector.mustache"
+        , model : that.options.model
         , arity : 2})
       .control();
 
       that.options.selected_control_controller = that.element
       .find(".selector-info.control")
       .append($(new Spinner().spin().el).css({"position" : "relative", "left" : 50, "top" : 50, "height": 150, "width": 150}))
-      .cms_controllers_controls({show : "/static/mustache/controls/show_selected_sidebar.mustache", arity : 1})
+      .cms_controllers_controls({
+        show : "/static/mustache/controls/show_selected_sidebar.mustache"
+        , model : that.options.model
+        , arity : 1})
       .control();
 
       that.search_filter(that.options.company_list_controller.find_all_deferred).done(function(d) {
@@ -344,7 +351,7 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
       el = arguments[1];
     }
 
-    if(~can.inArray($(el).data("model"), this.options.section.controls)) {
+    if(~can.inArray($(el).data("model"), this.options.section[this.options.model.root_collection])) {
       $(el).find("input[type=checkbox]").prop("checked", true);
     } else {
       $(el).find("input[type=checkbox]").prop("checked", false);
@@ -358,16 +365,16 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
   , "input.map-control change" : function(el, ev) {
     var that = this
     , control = el.closest("[data-model]").data("model")
-    , is_mapped = !!~can.inArray(control, this.options.section.controls);
+    , is_mapped = !!~can.inArray(control, this.options.section[this.options.model.root_collection]);
 
     if(is_mapped ^ el.prop("checked")) {
       this[is_mapped ? "unmap" : "map"](this.options.section, null, control)
       .done(function() {
-        that.options.section.constructor.bind("updated." + control.content_id, function() {
+        that.options.section.constructor.bind("updated.id_" + control.id, function() {
           setTimeout(function() {
-            that.style_item(that.element.find("[content_id=" + control.content_id + "]").parent());
+            that.style_item(that.element.find("[data-id=" + control.id + "][data-object-type=" + control.constructor.table_singular + "]").parent());
           }, 10);
-          that.options.section.constructor.unbind("." + control.content_id);
+          that.options.section.constructor.unbind(".id_" + control.id);
         });
       });
     }
@@ -478,7 +485,7 @@ CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
   }
 
   , ".jump-to-control click" : function(el, ev) {
-    var $item = this.element.find(".controls-list [content_id=" + el.data("content-id") + "]");
+    var $item = this.element.find(".controls-list [data-id=" + el.closest("[data-id]").data("id") + "]");
     var $content = $item.closest(".content");
     $item.find("a").click();
     $content.scrollTop(0).scrollTop($item.offset().top - $content.offset().top - ($content.height() - $item.height()) / 2);
