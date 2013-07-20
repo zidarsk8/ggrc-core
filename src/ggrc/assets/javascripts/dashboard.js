@@ -699,8 +699,9 @@ jQuery(function($) {
 });
 
 function resize_areas() {
-  var $window, $header, $lhs, $internav, $object_area
-    , areaWidth, areaHeight, affixRight
+  var $window, $header, $lhs, $inner_nav
+    , winWidth, winHeight, affixRight, headerHeight, internavWidth
+    , areaWidth, objectAreaWidth, areaHeight
     ;
 
   $window = $(window);
