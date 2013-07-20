@@ -515,14 +515,6 @@ Mustache.registerHelper("with_line_breaks", function(content) {
     return value;
 });
 
-Mustache.registerHelper("related_count", function() {
-  var objects = 0;
-  can.each(this.list, function(item) {
-    objects += item.related_objects.length;
-  });
-  return objects.toString();
-});
-
 Mustache.registerHelper("show_expander", function() {
   var options = arguments[arguments.length - 1]
   , args = can.makeArray(arguments).slice(0, arguments.length - 1)

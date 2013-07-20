@@ -52,9 +52,6 @@ jQuery(function($) {
     return 0;
   };
 
-  // put the related widget on the related element.
-  $("#related").cms_controllers_related({});
-
   // Display spinners included in initial page load
   $('.spinner').each(function() {
     var spinner = new Spinner({ }).spin();

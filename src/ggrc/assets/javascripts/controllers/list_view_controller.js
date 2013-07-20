@@ -10,7 +10,6 @@ can.Control("GGRC.Controllers.ListView", {
     , object_display : null
     , parent_display : null
     , list_view : "/static/mustache/dashboard/object_list.mustache"
-    , related_list_view : "/static/mustache/base_objects/related_list.mustache"
     //, show_view : "/static/mustache/controls/tree.mustache"
     , tooltip_view : "/static/mustache/dashboard/object_tooltip.mustache"
   }
@@ -20,7 +19,6 @@ can.Control("GGRC.Controllers.ListView", {
 
     var params = {};
     if(this.options.is_related) {
-      this.options.list_view = this.options.related_list_view;
       this.options.parent_instance = this.options.parent_instance || GGRC.make_model_instance(GGRC.page_object);
       var path_tokens = this.options.parent_instance.constructor.table_plural;
 

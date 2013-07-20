@@ -83,7 +83,6 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   #- d3.v2.js
-  - related.js
   - related_graph.js
 
 dashboard-css-files:
@@ -99,4 +98,4 @@ dashboard-js-spec-files:
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js
-  
+
