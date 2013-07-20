@@ -183,6 +183,7 @@ CMS.Models.System("CMS.Models.StrictSystem", {
   , init : function() {
     this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
+    this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});
 
@@ -203,5 +204,6 @@ CMS.Models.System("CMS.Models.Process", {
   , init : function() {
     this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
+    this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {});

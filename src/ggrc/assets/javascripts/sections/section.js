@@ -49,7 +49,10 @@ can.Model.Cacheable("CMS.Models.Section", {
     }
 
   }
-
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("title");
+  }
 }, {
 
   init : function() {

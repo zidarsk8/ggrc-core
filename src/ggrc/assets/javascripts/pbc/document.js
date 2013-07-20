@@ -50,6 +50,11 @@ can.Model.Cacheable("CMS.Models.Document", {
             }
         });
     }
+  , init : function() {
+    this.validatePresenceOf("title");
+    this._super.apply(this, arguments);
+  }
+
 }, {
     init : function () {
         this._super && this._super();
