@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+import json
+
 from ggrc.app import db, app
 from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
@@ -100,18 +102,25 @@ def import_sections(directive_id):
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SectionsConverter, csv_file, directive_id = directive_id, dry_run = dry_run)
-        if converter.import_exception is None:
-          results = converter.final_results
-          dummy_data = results
-          if not dry_run:
-            flash("Import is done.")
-            return redirect('/directives/{}'.format(directive_id))
-          return render_template("directives/import_result_errors.haml",directive_id = directive_id, converter = converter, dummy_data=dummy_data, all_warnings=converter.warnings, all_errors=converter.errors)
-        else:
-          return render_template("directives/import_result_errors.haml", directive_id = directive_id, exception_message = str(converter.import_exception))
+        converter = handle_csv_import(SectionsConverter, csv_file,
+            directive_id = directive_id, dry_run = dry_run)
+        results = converter.final_results
+        if not dry_run:
+          # The textarea here is a custom response for 'remoteipart' to
+          # proxy a JSON response through an iframe.
+          return app.make_response((
+            '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
+              json.dumps({ 'location': '/directives/{0}'.format(directive_id) })),
+            200,
+            [('Content-Type', 'text/html')]))
+
+        return render_template("directives/import_result_errors.haml",
+            directive_id = directive_id, converter = converter,
+            dummy_data=results,
+            all_warnings=converter.warnings, all_errors=converter.errors)
     except ImportException as e:
-      return render_template("directives/import.haml", directive_id = directive_id, exception_message = str(e))
+      return render_template("directives/import_errors.haml",
+            directive_id = directive_id, exception_message = str(e))
 
   return render_template("directives/import.haml", directive_id = directive_id)
 
@@ -123,10 +132,7 @@ def export_sections(directive_id):
 
   if request.method == 'GET':
     return handle_converter_csv_export(directive_id, SectionsConverter)
-
   return redirect('directives/{}'.format(directive_id))
-
-
 
 def _all_views(view_list):
   import ggrc.services
