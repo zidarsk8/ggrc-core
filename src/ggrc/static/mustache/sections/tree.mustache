@@ -3,12 +3,12 @@
     {{#instance}}
     <div class="item-main" {{data 'model'}}>
       {{#start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls}}
+        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
           <div class="openclose active"></div>
         {{/show_expander}}
       {{/start_expanded}}
       {{^start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls}}
+        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
           <div class="openclose"></div>
         {{/show_expander}}
       {{/start_expanded}}
