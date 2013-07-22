@@ -135,42 +135,6 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
   }
 });
 
-can.Model.Join("CMS.Models.SectionObjective", {
-  root_object : "section_objective"
-  , root_collection : "section_objectives"
-  , join_keys : {
-      "section" : CMS.Models.Section
-    , "objective" : CMS.Models.Objective
-    }
-  , findAll: "GET /api/section_objectives"
-  , create: "POST /api/section_objectives"
-  , destroy : "DELETE /api/section_objectives/{id}"
-}, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("section", CMS.Models.get_instance(
-        "Section",
-        this.section_id || (this.section && this.section.id)));
-      this.attr("objective", CMS.Models.get_instance(
-        "Objective",
-        this.objective_id || (this.objective && this.objective.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
-});
-
 can.Model.Join("CMS.Models.SystemControl", {
   root_object : "system_control"
   , root_collection : "system_controls"
