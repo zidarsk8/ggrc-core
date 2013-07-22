@@ -112,6 +112,7 @@ class Control(
       'risks',
       'sections',
       'objectives',
+      'programs',
       'systems',
       'type',
       'verify_frequency',
@@ -122,6 +123,7 @@ class Control(
       PublishOnly('objective_controls'),
       PublishOnly('implementing_control_controls'),
       PublishOnly('system_controls'),
+      PublishOnly('program_controls'),
       ]
 
   @classmethod
