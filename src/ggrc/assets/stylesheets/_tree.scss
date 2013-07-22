@@ -697,7 +697,8 @@ ul.new-tree {
     }
     .row-fluid {
       &:hover {
-        background:lighten(#ff9,5%);
+        background:lighten(#ff9,5%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+        @include background-size(30px 6px);
         .counter {
           @include opacity(1);
         }
