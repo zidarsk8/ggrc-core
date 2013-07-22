@@ -13,7 +13,7 @@ class Event(Base, db.Model):
   resource_id = db.Column(db.Integer, nullable = False)
   resource_type = db.Column(db.String, nullable = False)
 
-  revisions = db.relationship('Revision', backref='event')
+  revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'http_method',

@@ -4,6 +4,7 @@ from ggrc.models import Directive, Section
 from StringIO import StringIO
 from flask import current_app
 from ggrc import db
+from .common import ImportException
 
 
 def handle_csv_import(converter_class, filepath, **options):
@@ -14,16 +15,18 @@ def handle_csv_import(converter_class, filepath, **options):
 
   if options.get('directive_id') and not options.get('directive'):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
+  try:
+    csv_reader = unicode_csv_reader(csv_file.read().splitlines(True))
+    rows = [row for row in csv_reader]
+  except UnicodeDecodeError: # Decode error occurs when a special character symbol is inserted in excel.
+    raise ImportException("Could not import: invalid character encountered, verify the file is correctly formatted.")
 
-  csv_reader = unicode_csv_reader(csv_file.read().splitlines(True))
-  rows = [row for row in csv_reader]
   csv_file.close()
   converter = converter_class.from_rows(rows, **options)
   return converter.do_import(options.get('dry_run', True))
 
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
-  csv_reader = csv.reader(utf_8_encoder(unicode_csv_data),
-                            dialect=dialect, **kwargs)
+  csv_reader = csv.reader(utf_8_encoder(unicode_csv_data), dialect=dialect, **kwargs)
   for row in csv_reader:
     yield [unicode(cell, 'utf-8') for cell in row]
 

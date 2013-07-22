@@ -135,42 +135,6 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
   }
 });
 
-can.Model.Join("CMS.Models.SectionObjective", {
-  root_object : "section_objective"
-  , root_collection : "section_objectives"
-  , join_keys : {
-      "section" : CMS.Models.Section
-    , "objective" : CMS.Models.Objective
-    }
-  , findAll: "GET /api/section_objectives"
-  , create: "POST /api/section_objectives"
-  , destroy : "DELETE /api/section_objectives/{id}"
-}, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("section", CMS.Models.get_instance(
-        "Section",
-        this.section_id || (this.section && this.section.id)));
-      this.attr("objective", CMS.Models.get_instance(
-        "Objective",
-        this.objective_id || (this.objective && this.objective.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
-});
-
 can.Model.Join("CMS.Models.SystemControl", {
   root_object : "system_control"
   , root_collection : "system_controls"
@@ -250,6 +214,73 @@ can.Model.Join("CMS.Models.UserRole", {
   , update : "PUT /api/user_roles/{id}"
   , create : "POST /api/user_roles"
 }, {});
+
+
+can.Model.Join("CMS.Models.ControlSection", {
+  root_collection : "control_sections"
+  , root_object : "control_section"
+  , create : "POST /api/control_sections"
+  , destroy : "DELETE /api/control_sections/{id}"
+  , join_keys : {
+    section : CMS.Models.Section
+    , control : CMS.Models.Control
+  }
+  , init : function() {
+    var that = this;
+    this._super.apply(this, arguments);
+    this.bind("created destroyed", function(ev, inst) {
+      if(that !== inst.constructor) return;
+      var section =
+        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
+        || CMS.Models.Section.findInCacheById(inst.section.id);
+      var control = 
+        CMS.Models.RegControl.findInCacheById(inst.control.id)
+        || CMS.Models.Control.findInCacheById(inst.control.id);
+
+      section && section.refresh();
+      control && control.refresh();
+    });
+  }
+}, {
+  serialize : function(name) {
+    var serial;
+    if(!name) {
+      serial = this._super();
+      serial.section && (serial.section = this.section.stub());
+      serial.control && (serial.control = this.control.stub());
+      return serial;
+    } else {
+      return this._super.apply(this, arguments);
+    }
+  }
+});
+
+can.Model.Join("CMS.Models.SectionObjective", {
+  root_collection : "section_objectives"
+  , root_object : "section_objective"
+  , create : "POST /api/section_objectives"
+  , destroy : "DELETE /api/section_objectives/{id}"
+  , join_keys : {
+    section : CMS.Models.Section
+    , objective : CMS.Models.Objective
+  }
+  , init : function() {
+    var that = this;
+    this._super.apply(this, arguments);
+    this.bind("created destroyed", function(ev, inst) {
+      if(that !== inst.constructor) return;
+      var section =
+        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
+        || CMS.Models.Section.findInCacheById(inst.section.id);
+      var objective = 
+        CMS.Models.Objective.findInCacheById(inst.objective.id);
+
+      section && section.refresh();
+      objective && objective.refresh();
+    });
+  }
+}, {
+});
 
 can.Model.Join("GGRC.Models.DirectiveControl", {
   join_keys : {

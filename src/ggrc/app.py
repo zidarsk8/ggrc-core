@@ -1,9 +1,9 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
 # Maintained By:
 
+import sys
 from . import settings
 
 # Initialize Flask app
@@ -46,6 +46,13 @@ ggrc.services.init_all_services(app)
 # Initialize views
 import ggrc.views
 ggrc.views.init_all_object_views(app)
+
+# Initialize extension blueprints
+for extension in settings.EXTENSIONS:
+  __import__(extension)
+  extension_module = sys.modules[extension]
+  if hasattr(extension_module, 'blueprint'):
+    app.register_blueprint(extension_module.blueprint)
 
 # Initialize configured and default extensions
 from ggrc.fulltext import get_indexer

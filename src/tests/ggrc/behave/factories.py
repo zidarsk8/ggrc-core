@@ -21,6 +21,10 @@ def random_string(prefix=''):
 def random_string_attribute(prefix=''):
   return factory.LazyAttribute(lambda m: random_string(prefix))
 
+class FactoryStubMarker(object):
+  def __init__(self, class_):
+    self.class_ = class_
+
 class FactoryAttributeGenerator(object):
   """Use the SQLAlchemy ORM model to generate factory attributes."""
   @classmethod
@@ -84,7 +88,18 @@ class FactoryAttributeGenerator(object):
     if class_attr.property.uselist:
       return []
     else:
-      return None
+      columns = tuple(class_attr.property.local_columns)
+      # FIXME: ? Doesn't handle multiple local columns, so won't work for
+      #   polymorphic links
+      if columns[0].nullable:
+        # Not a required association, so skip it
+        return None
+      elif columns[0].primary_key:
+        # This is a 'reverse' association, so skip it (primary keys are
+        #   not nullable, but the relationship may still be optional)
+        return None
+      else:
+        return FactoryStubMarker(class_attr.property.mapper.class_)
 
   @classmethod
   def AssociationProxy(cls, attr_name, class_attr):

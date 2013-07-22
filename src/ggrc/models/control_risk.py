@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .mixins import Base
@@ -10,8 +9,12 @@ from .mixins import Base
 class ControlRisk(Base, db.Model):
   __tablename__ = 'control_risks'
 
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
-  risk_id = db.Column(db.Integer, db.ForeignKey('risks.id'))
+  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  risk_id = db.Column(db.Integer, db.ForeignKey('risks.id'), nullable=False)
+
+  __table_args__ = (
+    db.UniqueConstraint('control_id', 'risk_id'),
+  )
 
   _publish_attrs = [
       'control',

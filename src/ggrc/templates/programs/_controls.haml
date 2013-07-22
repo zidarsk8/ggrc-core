@@ -1,0 +1,29 @@
+-extends 'layouts/_widget_box.haml'
+
+-block widget_help
+  program_controls
+
+-block widget_id
+  program_controls_widget
+
+-#block widget_class
+  business
+
+-block widget_title
+  Controls
+
+-block widget_buttons
+  .filter
+    .row-fluid
+      .span6
+        %input.ui-corner-all.widgetsearch-tocontent.clear-value{ 'type': 'text', 'placeholder': 'Search' }
+      .span6
+        .pull-right
+          %a.btn.btn-add{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': 'Control', 'data-object-plural': 'controls' } 
+            %i.grcicon-add
+            Control
+
+-block main
+  #controls.tab-pane
+    %ul.tree-structure
+

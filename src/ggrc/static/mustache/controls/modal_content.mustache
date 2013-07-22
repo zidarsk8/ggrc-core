@@ -88,10 +88,10 @@
         </label>
         <select class="input-block-level" name="kind.id" numeric="numeric">
           <option {{^kind.id}}selected="selected"{{/kind.id}} value="">None</option>
-          <option value="1" {{^if_equals kind.id '1'}}selected="selected"{{/if_equals}}>Reactive</option>
-          <option value="2" {{^if_equals kind.id '2'}}selected="selected"{{/if_equals}}>Administrative</option>
-          <option value="3" {{^if_equals kind.id '3'}}selected="selected"{{/if_equals}}>Detective</option>
-          <option value="4" {{^if_equals kind.id '4'}}selected="selected"{{/if_equals}}>Preventative</option>
+          <option value="1" {{#if_equals kind.id '1'}}selected="selected"{{/if_equals}}>Reactive</option>
+          <option value="2" {{#if_equals kind.id '2'}}selected="selected"{{/if_equals}}>Administrative</option>
+          <option value="3" {{#if_equals kind.id '3'}}selected="selected"{{/if_equals}}>Detective</option>
+          <option value="4" {{#if_equals kind.id '4'}}selected="selected"{{/if_equals}}>Preventative</option>
         </select>
       </div>
       <div class="span3">
@@ -123,9 +123,9 @@
         </label>
         <select class="span12" name="means.id" numeric="numeric">
           <option value="" {{^means.id}}selected="selected"{{/means.id}}>None</option>
-          <option value="5" {{^if_equals means.id '5'}}selected="selected"{{/if_equals}}>Manual</option>
-          <option value="7" {{^if_equals means.id '7'}}selected="selected"{{/if_equals}}>Automated</option>
-          <option value="6" {{^if_equals means.id '6'}}selected="selected"{{/if_equals}}>Manual with Segregation of Duties</option>
+          <option value="5" {{#if_equals means.id '5'}}selected="selected"{{/if_equals}}>Manual</option>
+          <option value="7" {{#if_equals means.id '7'}}selected="selected"{{/if_equals}}>Automated</option>
+          <option value="6" {{#if_equals means.id '6'}}selected="selected"{{/if_equals}}>Manual with Segregation of Duties</option>
         </select>
       </div>
     </div>

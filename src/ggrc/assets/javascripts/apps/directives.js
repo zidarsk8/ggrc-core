@@ -30,12 +30,14 @@ function getPageModel() {
 }
 
 //Note that this also applies to programs
-jQuery(function($) { 
-  $("body").on("click", "a.controllist", function(ev) {
-    var $trigger = $(ev.target);
-    var $section = $trigger.closest("[data-id]");
-    var $dialog = $("#mapping_dialog");
-    var id = $section.data("id")
+jQuery(function($) {
+  $("body").on("click", "a.controllist, a.objectivelist", function(ev) {
+    var $trigger = $(ev.currentTarget)
+    , model = $trigger.is(".objectivelist") ? CMS.Models.Objective : CMS.Models.Control
+    , $section = $trigger.closest("[data-id]")
+    , $dialog = $("#mapping_dialog")
+    , id = $section.data("id");
+
     if(!$dialog.length) {
       $dialog = $('<div id="mapping_dialog" class="modal modal-selector hide"></div>')
         .appendTo(document.body)
@@ -44,45 +46,53 @@ jQuery(function($) {
     $dialog.html($(new Spinner().spin().el).css({"position" : "relative", "left" : 50, "top" : 50, "height": 150, "width": 150}));
     $dialog.modal("show");
 
-    (CMS.Models.SectionSlug.findInCacheById(id) 
-      ? $.when(CMS.Models.SectionSlug.findInCacheById(id)) 
-      : CMS.Models.SectionSlug.findAll())
+    (CMS.Models.SectionSlug.findInCacheById(id)
+      ? $.when(CMS.Models.SectionSlug.findInCacheById(id))
+      : CMS.Models.SectionSlug.findAll({ id : id }))
     .done(function(section) {
       $dialog.cms_controllers_control_mapping_popup({
-        section : $(section).filter(function(i, d) { return d.id == id })[0]
+        section : $(section).filter(function(i, d) { return d.id == id; })[0]
         , parent_model : getPageModel()
         , parent_id : directive_id
+        , model : model
+        , subheader_view : GGRC.mustache_path + "/" + model.table_plural + "/selector_subheader.mustache"
       });
       $(document.body).trigger('kill-all-popovers');
 
       var timeout, oldvals;
-      section.controls.bind("change.mapper", function(ev, attr, how, newVal, oldVal) {
-        if(!~attr.indexOf(".") && how === "add") { // when newval and oldval are correct
-          if(timeout) {
-            can.each(oldvals, function(v) {
-              if(!~can.inArray(v, newVal)) {
-                $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("removeChild", v);
+      can.each({
+        controls: "control"
+        , objectives: "objective"
+      }, function(type, collection) {
+
+        section[collection].bind("change.mapper", function(ev, attr, how, newVal, oldVal) {
+          if(!~attr.indexOf(".") && how === "add") { // when newval and oldval are correct
+            if(timeout) {
+              can.each(oldvals, function(v) {
+                if(!~can.inArray(v, newVal)) {
+                  $section.find(".cms_controllers_tree_view[data-object-type=" + type + "]:first").trigger("removeChild", v);
+                }
+              });
+              clearTimeout(timeout);
+            }
+            can.each(newVal, function(v) {
+              if(!~can.inArray(v, oldVal)) {
+                $section.find(".cms_controllers_tree_view[data-object-type=" + type + "]:first").trigger("newChild", v);
               }
             });
-            clearTimeout(timeout);
+          } else if(!~attr.indexOf(".") && how === "remove") {
+            oldvals = oldVal;
+            timeout = setTimeout(function() {
+              can.each(oldVal, function(v) {
+                $section.find(".cms_controllers_tree_view[data-object-type=" + type + "]:first").trigger("removeChild", v);
+              });
+              timeout = null;
+            }, 100);
           }
-          can.each(newVal, function(v) {
-            if(!~can.inArray(v, oldVal)) {
-              $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("newChild", v);
-            }
-          });
-        } else if(!~attr.indexOf(".") && how === "remove") {
-          oldvals = oldVal;
-          timeout = setTimeout(function() {
-            can.each(oldVal, function(v) {
-              $section.find(".cms_controllers_tree_view[data-object-type=control]:first").trigger("removeChild", v);
-            });
-            timeout = null;
-          }, 100);
-        }
-      });
-      $dialog.one("hide", function() {
-        section.controls.unbind("change.mapper");
+        });
+        $dialog.one("hide", function() {
+          section[collection].unbind("change.mapper");
+        });
       });
     });
   });

@@ -19,6 +19,38 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   }
 });
 
+function get_template_path(url) {
+  var match;
+  match = url.match(/\/static\/mustache\/(.*)\.mustache/);
+  return match && match[1];
+}
+
+// Check if the template is available in "GGRC.Templates", and if so,
+//   short-circuit the request.
+$.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
+  var template_path = get_template_path(options.url),
+      template = GGRC.Templates[template_path];
+
+  if (template) {
+    return {
+      send: function(headers, completeCallback) {
+        function done() {
+          if (template)
+            completeCallback(200, "success", { text: template });
+        }
+        if (options.async)
+          setTimeout(done, 0);
+        else
+          done();
+      },
+
+      abort: function() {
+        template = null;
+      }
+    }
+  }
+});
+
   Mustache.registerHelper("join", function() {
     var prop, context = this, ret, options = arguments[arguments.length - 1];
 
@@ -515,14 +547,6 @@ Mustache.registerHelper("with_line_breaks", function(content) {
     return value;
 });
 
-Mustache.registerHelper("related_count", function() {
-  var objects = 0;
-  can.each(this.list, function(item) {
-    objects += item.related_objects.length;
-  });
-  return objects.toString();
-});
-
 Mustache.registerHelper("show_expander", function() {
   var options = arguments[arguments.length - 1]
   , args = can.makeArray(arguments).slice(0, arguments.length - 1)
@@ -642,9 +666,12 @@ Mustache.registerHelper("private_program", function(modal_title) {
   return modal_title.indexOf("New ") !=0 ? '' : [
     '<div class="span6">'
     , '<label>'
-    , 'Private'
+    , 'Privacy'
+    , '<i class="grcicon-help-black" rel="tooltip" title="Program won\'t be visible to others"></i>'
     , '</label>'
-    , '<input class="input-block-level" name="private" value="private" type="checkbox">'
+    , '<div class="checkbox-area">'
+    , '<input name="private" value="private" type="checkbox"> Private Program'
+    , '</div>'
     , '</div>'
   ].join("");
 });
@@ -665,3 +692,11 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   }
 });
 
+Mustache.registerHelper("iterate", function() {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 2)
+  , options = arguments[arguments.length - 1];
+
+  return can.map(args, function(arg) {
+    return options.fn(options.contexts.concat([{iterator : arg}]));
+  }).join("");
+});

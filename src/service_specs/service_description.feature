@@ -43,4 +43,3 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | System             |
       | SystemSystem       |
       | SystemControl      |
-      | Transaction        |

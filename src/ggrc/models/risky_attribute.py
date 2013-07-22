@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By:
-# Maintained By:
+# Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
 from .associationproxy import association_proxy
@@ -15,7 +14,7 @@ class RiskyAttribute(Documentable, Personable, Timeboxed, BusinessObject, db.Mod
 
   type_string = db.Column(db.String)
   risk_risky_attributes = db.relationship(
-      'RiskRiskyAttribute', backref='risky_attribute')
+      'RiskRiskyAttribute', backref='risky_attribute', cascade='all, delete-orphan')
   risks = association_proxy('risk_risky_attributes', 'risk', 'Risk')
 
   _publish_attrs = [

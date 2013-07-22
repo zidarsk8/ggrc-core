@@ -72,6 +72,9 @@
     .lhs-search {
       display:none;
     }
+    .top-level, .bar-h {
+      visibility:hidden;
+    }
   }
   .lhs-search {
     padding:10px;
@@ -113,7 +116,7 @@
         position:absolute;
         top:-1px;
         right:-422px;
-        z-index:1200;
+        z-index:2000;
         width:400px;
         padding:2px 10px;
         background:#fff;
@@ -342,6 +345,7 @@
   ul.internav {
     border-top:1px solid #ddd;
     @include reset-list();
+    overflow-y:auto;
     &.affix {
       position: fixed;
       top: 81px;

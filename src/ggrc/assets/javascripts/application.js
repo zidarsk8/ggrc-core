@@ -648,14 +648,6 @@ jQuery(function($) {
 });
 
 $(window).load(function(){
-  $('.widget-area').sortable({
-    connectWith: '.widget-area'
-    , placeholder: 'drop-placeholder'
-    , handle : "header, .header"
-    , items : ".widget"
-  });
-  
-  
   // affix setup
   $(window).scroll(function(){
     if($('.header-content').hasClass('affix')) {
