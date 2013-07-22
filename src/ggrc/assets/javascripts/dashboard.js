@@ -726,5 +726,44 @@ function resize_areas() {
   $(".bar-v").css('height', areaHeight);
 }
 
+jQuery(function($) {
+  $('body').on('click', '.tree-link', function(e) {
+    var $this = $(this)
+      , $additionalInfo = $this.next()
+      , $treeItem = $this.closest(".tree-item")
+      ;
+    if ($this.hasClass("open")) {
+      $additionalInfo.slideUp();
+      $this.removeClass("open");
+      $treeItem.removeClass("tree-item-open");
+    } else {
+      $additionalInfo.slideDown();
+      $this.addClass("open");
+      $treeItem.addClass("tree-item-open");
+    };  
+  });
+  
+  $('body').on('mouseover', '.section-add', function(e) {
+    var $this = $(this)
+      , $createLink = $this.closest('div').find('.section-create')
+      , $importLink = $this.closest('div').find('.section-import')
+      ;
+    $this.hide();
+    $createLink.fadeIn();
+    $importLink.fadeIn();
+  });
+  
+  $('body').on('click', '.show-long', function(e) {
+    var $this = $(this)
+      , $descField = $this.closest('.span12').find('.tree-description')
+      ;
+    $this.hide();
+    $descField.removeClass('short');
+  });
+  
+});
+
+
 jQuery(resize_areas);
 jQuery(window).on("resize", resize_areas);
+

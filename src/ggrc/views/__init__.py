@@ -82,7 +82,7 @@ def admin():
 def styleguide():
   """The style guide page
   """
-  return render_template("styleguide.haml")
+  return render_template("styleguide/styleguide.haml")
 
 def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
