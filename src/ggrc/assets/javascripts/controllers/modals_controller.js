@@ -157,7 +157,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
 
-    ajd = instance.save().done(function() {
+    ajd = instance.save().done(function(obj) {
       that.element.trigger("modal:success", obj).modal_form("hide");
     }).fail(function(xhr, status) {
       el.trigger("ajax:flash", { error : xhr.responseText });
