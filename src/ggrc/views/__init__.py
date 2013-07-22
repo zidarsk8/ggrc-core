@@ -97,6 +97,9 @@ def import_sections(directive_id):
   from ggrc.converters.import_helper import handle_csv_import
 
   if request.method == 'POST':
+
+    if 'cancel' in request.form:
+      return import_redirect(directive_id)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -105,24 +108,27 @@ def import_sections(directive_id):
         converter = handle_csv_import(SectionsConverter, csv_file,
             directive_id = directive_id, dry_run = dry_run)
         results = converter.final_results
-        if not dry_run:
-          # The textarea here is a custom response for 'remoteipart' to
-          # proxy a JSON response through an iframe.
-          return app.make_response((
-            '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
-              json.dumps({ 'location': '/directives/{0}'.format(directive_id) })),
-            200,
-            [('Content-Type', 'text/html')]))
-
-        return render_template("directives/import_result_errors.haml",
-            directive_id = directive_id, converter = converter,
-            dummy_data=results,
-            all_warnings=converter.warnings, all_errors=converter.errors)
+        return import_redirect(directive_id) if not dry_run else \
+            render_template("directives/import_result_errors.haml",
+              directive_id = directive_id, converter = converter,
+              dummy_data=results,
+              all_warnings=converter.warnings, all_errors=converter.errors)
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
 
   return render_template("directives/import.haml", directive_id = directive_id)
+
+
+def import_redirect(directive_id):
+  # The textarea here is a custom response for 'remoteipart' to
+  # proxy a JSON response through an iframe.
+  return app.make_response((
+    '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
+      json.dumps({ 'location': '/directives/{0}'.format(directive_id) })),
+    200,
+    [('Content-Type', 'text/html')]))
+
 
 
 @app.route("/directives/<directive_id>/export_sections", methods=['GET', 'POST'])
