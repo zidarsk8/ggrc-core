@@ -64,6 +64,10 @@ can.Model.Cacheable("CMS.Models.Section", {
     delete p.objective;
     return this.map_object(p, section);
   }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("title");
+  }
 }, {
 
   init : function() {
