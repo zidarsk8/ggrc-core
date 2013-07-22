@@ -21,6 +21,8 @@ blueprint = Blueprint(
     'permissions',
     __name__,
     template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/ggrc_basic_permissions',
     )
 
 class CompletePermissionsProvider(object):

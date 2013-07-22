@@ -209,10 +209,10 @@ can.Model.Join("CMS.Models.SystemSystem", {
 
 can.Model.Join("CMS.Models.UserRole", {
   root_object : "user_role"
-  , root_collection : "user_roles"
-  , findAll : "GET /api/user_roles"
-  , update : "PUT /api/user_roles/{id}"
-  , create : "POST /api/user_roles"
+  , root_collection : "users_roles"
+  , findAll : "GET /api/users_roles"
+  , update : "PUT /api/users_roles/{id}"
+  , create : "POST /api/users_roles"
 }, {});
 
 

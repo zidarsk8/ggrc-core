@@ -52,6 +52,7 @@ for extension in settings.EXTENSIONS:
   __import__(extension)
   extension_module = sys.modules[extension]
   if hasattr(extension_module, 'blueprint'):
+    print 'REGISTERING module blueprint:', extension_module
     app.register_blueprint(extension_module.blueprint)
 
 # Initialize configured and default extensions

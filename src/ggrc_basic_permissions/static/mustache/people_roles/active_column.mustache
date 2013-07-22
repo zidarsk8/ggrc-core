@@ -1,0 +1,13 @@
+<div class="selector-info">
+  <h4>
+    <i class="grcicon-user-black"></i>
+    Available Roles ({{joins.length}})
+  </h4>
+  <ul class="linked-people">
+    {{#joins}}
+    <li>
+      <p>{{Object.keys(join)}}</p>
+    </li>
+    {{/joins}}
+  </ul>
+</div>

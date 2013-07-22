@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 """Manage "static" assets
 
@@ -38,10 +37,20 @@ import webassets.updater
 environment.updater = webassets.updater.TimestampUpdater()
 
 # Read asset listing from YAML file
-import os, yaml
-assets_yaml_path = os.path.join(settings.MODULE_DIR, 'assets', 'assets.yaml')
-with open(assets_yaml_path) as f:
-  asset_paths = yaml.load(f.read())
+import os, yaml, imp
+assets_yamls = [os.path.join(settings.MODULE_DIR, 'assets', 'assets.yaml'),]
+module_load_paths = [settings.MODULE_DIR,]
+for extension in settings.EXTENSIONS:
+  file, pathname, description = imp.find_module(extension)
+  module_load_paths.append(pathname)
+  p = os.path.join(pathname, 'assets', 'assets.yaml')
+  if os.path.exists(p):
+    assets_yamls.append(p)
+asset_paths = {}
+for assets_yaml_path in assets_yamls:
+  with open(assets_yaml_path) as f:
+    for k,v in yaml.load(f.read()).items():
+      asset_paths.setdefault(k, []).extend(v)
 
 if not settings.AUTOBUILD_ASSETS:
   environment.auto_build = False
@@ -49,15 +58,20 @@ if not settings.AUTOBUILD_ASSETS:
 environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
 
-environment.load_path = [
-  'assets/javascripts',
-  'assets/vendor/javascripts',
-  'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
-  'assets/vendor/remoteipart/vendor/assets/javascripts',
-  'assets/stylesheets',
-  'assets/vendor/stylesheets',
-  'assets/js_specs',
-  ]
+environment.load_path = []
+for module_load_path in module_load_paths:
+  environment.load_path.extend([
+    os.path.join(module_load_path, 'assets/javascripts'),
+    os.path.join(module_load_path, 'assets/vendor/javascripts'),
+    os.path.join(
+      module_load_path,
+      'assets/vendor/bootstrap-sass/vendor/assets/javascripts'),
+    os.path.join(
+      module_load_path, 'assets/vendor/remoteipart/vendor/assets/javascripts'),
+    os.path.join(module_load_path, 'assets/stylesheets'),
+    os.path.join(module_load_path, 'assets/vendor/stylesheets'),
+    os.path.join(module_load_path, 'assets/js_specs'),
+    ])
 
 environment.register("dashboard-js", webassets.Bundle(
   *asset_paths['dashboard-js-files'],
