@@ -64,6 +64,8 @@ class Control(
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
+  program_controls = db.relationship('ProgramControl', backref='control', cascade='all, delete-orphan')
+  programs = association_proxy('program_controls', 'program', 'ProgramControl')
   system_controls = db.relationship('SystemControl', backref='control', cascade='all, delete-orphan')
   systems = association_proxy('system_controls', 'system', 'SystemControl')
   control_sections = db.relationship('ControlSection', backref='control', cascade='all, delete-orphan')

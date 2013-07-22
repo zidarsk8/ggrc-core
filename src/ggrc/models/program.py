@@ -8,6 +8,7 @@ from .associationproxy import association_proxy
 from .mixins import BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
+from .reflection import PublishOnly
 
 class Program(Documentable, Personable, BusinessObject, Timeboxed, db.Model):
   __tablename__ = 'programs'
@@ -21,13 +22,21 @@ class Program(Documentable, Personable, BusinessObject, Timeboxed, db.Model):
       ]
 
   kind = db.Column(db.String)
-  program_directives = db.relationship('ProgramDirective', backref='program', cascade='all, delete-orphan')
+  program_controls = db.relationship(
+      'ProgramControl', backref='program', cascade='all, delete-orphan')
+  controls = association_proxy(
+      'program_controls', 'control', 'ProgramControl')
+  program_directives = db.relationship(
+      'ProgramDirective', backref='program', cascade='all, delete-orphan')
   directives = association_proxy(
       'program_directives', 'directive', 'ProgramDirective')
-  cycles = db.relationship('Cycle', backref='program', cascade='all, delete-orphan')
+  cycles = db.relationship(
+      'Cycle', backref='program', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'kind',
+      PublishOnly('program_controls'),
+      'controls',
       'program_directives',
       'directives',
       'cycles',
