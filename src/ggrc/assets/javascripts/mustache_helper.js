@@ -692,3 +692,11 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   }
 });
 
+Mustache.registerHelper("iterate", function() {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 2)
+  , options = arguments[arguments.length - 1];
+
+  return can.map(args, function(arg) {
+    return options.fn(options.contexts.concat([{iterator : arg}]));
+  }).join("");
+});

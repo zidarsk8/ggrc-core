@@ -70,7 +70,7 @@ class BaseConverter(object):
 
   def import_metadata(self):
     if len(self.rows) < 5:
-      self.errors.append("There must be at least 5 input lines")
+      self.errors.append("Could not import: verify the file is correctly formatted.")
       raise ImportException("Import Error: There must be at least 5 input lines")
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
     values = self.read_values(headers, self.rows.pop(0))
@@ -81,6 +81,7 @@ class BaseConverter(object):
 
   def read_values(self, headers, row):
     attrs = dict(zip(headers, row))
+    attrs.pop(None, None) # None key could have been inserted in extreme edge case
     return attrs
 
   def get_header_for_column(self, column_name):
@@ -99,6 +100,7 @@ class BaseConverter(object):
         continue
       elif not (heading in import_map):
         ignored_colums.append(heading)
+        keys.append(None) # Placeholder None to prevent position problems when headers are zipped with values
         continue
       else:
         keys.append(import_map[heading])
@@ -110,7 +112,8 @@ class BaseConverter(object):
 
     missing_columns = import_map.values()
     for element in keys:
-      missing_columns.remove(element)
+      if element is not None:
+        missing_columns.remove(element)
 
     if len(missing_columns):
       missing_headers = [self.get_header_for_column(temp) for temp in missing_columns if temp is not None]
