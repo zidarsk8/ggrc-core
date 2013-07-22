@@ -49,8 +49,34 @@ if not settings.AUTOBUILD_ASSETS:
 environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
 
+from webassets.filter.jst import JSTemplateFilter
+class MustacheFilter(JSTemplateFilter):
+  """
+  Populate GGRC.Templates from list of mustache templates
+    * mostly copies webassets.filter.jst.JST
+  """
+
+  name = 'mustache'
+  options = {
+      'namespace': 'GGRC.Templates'
+      }
+
+  def process_templates(self, out, hunks, **kwargs):
+    namespace = self.namespace or 'GGRC.Templates'
+
+    out.write("{namespace} = {namespace} || {};\n"
+        .format('{}', namespace=namespace))
+
+    for name, hunk in self.iter_templates_with_base(hunks):
+      contents = hunk.data().replace('\n', '\\n').replace("'", r"\'")
+      out.write("{namespace}['{name}']"
+          .format(namespace=namespace, name=name))
+      out.write("= '{template}';\n"
+          .format(template=contents))
+
 environment.load_path = [
   'assets/javascripts',
+  'assets/mustache',
   'assets/vendor/javascripts',
   'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
   'assets/vendor/remoteipart/vendor/assets/javascripts',
@@ -63,6 +89,11 @@ environment.register("dashboard-js", webassets.Bundle(
   *asset_paths['dashboard-js-files'],
   #filters='jsmin',
   output='dashboard-%(version)s.js'))
+
+environment.register("dashboard-js-templates", webassets.Bundle(
+  *asset_paths['dashboard-js-template-files'],
+  filters=MustacheFilter,
+  output='dashboard-templates-%(version)s.js'))
 
 environment.register("dashboard-css", webassets.Bundle(
   *asset_paths['dashboard-css-files'],

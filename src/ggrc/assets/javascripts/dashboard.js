@@ -52,9 +52,6 @@ jQuery(function($) {
     return 0;
   };
 
-  // put the related widget on the related element.
-  $("#related").cms_controllers_related({});
-
   // Display spinners included in initial page load
   $('.spinner').each(function() {
     var spinner = new Spinner({ }).spin();
@@ -702,8 +699,9 @@ jQuery(function($) {
 });
 
 function resize_areas() {
-  var $window, $header, $lhs, $internav, $object_area
-    , areaWidth, areaHeight, affixRight
+  var $window, $header, $lhs, $inner_nav
+    , winWidth, winHeight, affixRight, headerHeight, internavWidth
+    , areaWidth, objectAreaWidth, areaHeight
     ;
 
   $window = $(window);

@@ -5,23 +5,11 @@
 
 -block header
   %h1.programs
-    -if instance.company_controls
-      .grcobject.governance{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Program" }
-        %i.grcicon-control
-    -else
-      .grcobject.programs{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Program" }
-        %i.grcicon-program
+    .grcobject.programs{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Program" }
+      %i.grcicon-program
     %span
       %strong Program:
     =instance.title
-
--block subheader_extras
-  %ul.actions.pull-right
-    -if instance.company_controls
-      %li
-        %a{ 'href': "#", 'class': "disabled"}
-          %i.grcicon-reg-map
-          %span Consolidate Controls
 
 -block main
   .clearfix
@@ -31,24 +19,16 @@
     .object-area
       #columns.column-set{ 'data-resize': "true" }
         #middle-column.widget-area
-          -with widget_class = 'programs', widget_view_mustache = '/programs/info.mustache'
+          -with widget_class = 'programs'
             -include 'programs/_info.haml'
-          -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
+          -with widget_class = 'programs'
             -include 'programs/_main.haml'
-          -if not instance.company_controls
-            -with widget_class = 'widget-tabs widget-tabs-horizontal related business'
-              -with widget_title = "Impact/Scope"
-                -include 'shared/_related.haml'
-          -if instance.company_controls
-            -with widget_class = 'widget-tabs widget-tabs-horizontal programs'
-              -include 'programs/_linked_programs.haml'
-          -if not instance.company_controls
-            -with widget_class = 'programs'
-              -include 'programs/_audit_cycles.haml'
+            -include 'programs/_controls.haml'
+          -with widget_class = 'programs'
+            -include 'programs/_audit_cycles.haml'
           -with widget_class = 'related business'
-            -include 'programs/_more_info.haml'
-          -if not instance.company_controls
-            -include 'shared/_add_widget_section.haml'
+            -include 'base_objects/_more_info.haml'
+          -include 'shared/_add_widget_section.haml'
           -for extension in controller.extension_content(instance)
             -include extension
 

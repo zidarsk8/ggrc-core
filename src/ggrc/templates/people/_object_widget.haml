@@ -1,0 +1,26 @@
+-extends 'layouts/_widget_box.haml'
+
+-block widget_title
+  People
+  %span
+    (={ instance.object_people|length })
+
+-#if not model
+  -set model = controller.model
+
+-block widget_help
+  people
+  -#=model._inflector.table_singular + "_people"
+
+-block widget_id
+  people_widget
+  -#=model._inflector.model_singular + "_people_widget"
+
+-block widget_actions
+  .widget-action.pull-right
+    %a.pull-right{ 'href': 'javascript://', 'data-toggle': 'modal-selector', 'data-modal-selector-options': 'object_people', 'data-list-target': '#personList', 'data-modal-class': 'modal-wide', 'rel': 'tooltip', 'data-placement': 'left', 'title': 'Link People' }
+      %i.grcicon-link
+
+-block main
+  %ul.tree-structure.simple
+    -include 'people/_object_list.haml'
