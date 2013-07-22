@@ -173,13 +173,13 @@ var dashboard_menu = {categories : [
       , widget_descriptors.data_asset
       , widget_descriptors.market
     ]
-  }, {
+  }/*, {
     title : "Risk"
     , objects: [
       widget_descriptors.risky_attribute
       , widget_descriptors.risk
     ]
-  }
+  }*/
 ]};
 
 $(function() {
