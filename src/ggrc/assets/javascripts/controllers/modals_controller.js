@@ -158,13 +158,11 @@ can.Control("GGRC.Controllers.Modals", {
     can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
 
     ajd = instance.save().done(function() {
-      that.element.modal_form("hide");
+      that.element.trigger("modal:success", obj).modal_form("hide");
     }).fail(function(xhr, status) {
       el.trigger("ajax:flash", { error : xhr.responseText });
     });
-    this.bindXHRToButton(ajd.done(function(obj) {
-      that.element.trigger("modal:success", obj);
-    }), el, "Saving, please wait...");
+    this.bindXHRToButton(ajd, el, "Saving, please wait...");
   }
 
   , " ajax:flash" : function(el, ev, mesg) {

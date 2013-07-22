@@ -1,7 +1,7 @@
 <div class="modal-header">
   <h2>
-    Map Controls to <small>{{section.slug}}</small>
-    <i class="grcicon-section"></i><i class="grcicon-reg-map-white"></i><i class="grcicon-control"></i>
+    Map {{model.title_plural}} to <small>{{section.slug}}</small>
+    <i class="grcicon-section"></i><i class="grcicon-reg-map-white"></i><i class="grcicon-{{model.table_singular}}"></i>
   </h2>
 </div>
 
@@ -17,19 +17,19 @@
             <a class="btn btn-mini search-reset" href="javascript://">
               <i class="grcicon-x-grey"></i>
             </a>
-            <input class="input-block-level widgetsearch-tocontent clear-value" placeholder="Search controls" type="text" />
+            <input class="input-block-level widgetsearch-tocontent clear-value" placeholder="Search {{model.title_plural.toLowerCase}}" type="text" />
           </div>
         </div>
         <div class="span5 checkbox-filter">
           <input type="checkbox" id="control-type-filter" class="control-type-filter inline pull-right" checked="checked"/>
-          <label class="inline pull-right" for="control-type-filter">Controls for this {{parent_subtype}} only:</label>
+          <label class="inline pull-right" for="control-type-filter">{{model.title_plural}} for this {{parent_subtype}} only:</label>
         </div>
       </div>
       <div class="span3">
         <div class="pull-right">
-          <a class="btn btn-add" data-dirty="#controls, #combo" href="/controls/new?{{parent_type}}_id={{parent_id}}" data-modal-class="modal-wide" data-toggle="modal-ajax-form" rel="tooltip" data-original-title="Create New Control">
+          <a class="btn btn-add" data-dirty="#controls, #combo" href="/controls/new?{{parent_type}}_id={{parent_id}}" data-modal-class="modal-wide" data-toggle="modal-ajax-form" rel="tooltip" data-original-title="Create New {{model.title_singular}}">
             <i class="grcicon-add"></i>
-            Control
+            {{model.title_singular}}
           </a>
         </div>
       </div>
@@ -50,13 +50,13 @@
             {{{description}}}
           </div>
           <h5>
-            Already Mapped Controls ({{controls.length}})
+            Already Mapped {{model.title_plural}} ({{list.length}})
           </h5>
-          {{#if controls.length}}
+          {{#if list.length}}
             <ul class="linked-controls">
-              {{#controls}}
-              <li>
-                <a href="javascript://" class="jump-to-control" data-content-id="{{content_id}}">
+              {{#list}}
+              <li data-model="true" data-id="{{id}}" {{data 'model'}} data-object-type="{{constructor.table_singular}}">
+                <a href="javascript://" class="jump-to-control">
                   {{#with this}}
                     {{! careful to avoid using the section's title or slug here, especially when the controls haven't loaded yet }}
                     <span>{{title}}</span>
@@ -64,16 +64,14 @@
                   {{/with}}
                 </a>
               </li>
-              {{/controls}}
+              {{/list}}
             </ul>
           {{else}}
             <ul class="linked-controls">
               <li class="not-applicable">
-                <input type="checkbox" id="section_na" {{#if na}}checked="checked"{{/if}}>
-                <strong>Controls are not applicable (N/A)</strong>
+                <strong>No {{model.title_plural.toLowerCase}} are currently mapped</strong>
               </li>
             </ul>
-            
           {{/if}}
         </div>
       </div>

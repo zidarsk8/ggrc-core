@@ -1,5 +1,5 @@
   <div class="content">
-  	{{#model}}
+  	{{#instance}}
     <div>
       <span class="title">
         <strong>{{title}}</strong>
@@ -11,8 +11,8 @@
         {{{with_line_breaks description}}}
       </div>
     </div>
-    {{/model}}
-    {{^model}}
+    {{/instance}}
+    {{^instance}}
     	Nothing selected
-    {{/model}}
+    {{/instance}}
   </div>
