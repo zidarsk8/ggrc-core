@@ -59,7 +59,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 
   , draw_widget : function(frag, prefs) {
 
-    this.element.html(frag);
+    this.element.html(frag[0]);
+    this.element.trigger("widgets_updated");
 
     var content = this.element;
     if(prefs[0].getCollapsed(window.getPageToken(), this.element.attr("id"))) {
@@ -112,6 +113,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   }
 
   , " updateCount" : function(el, ev, count) {
-    this.element.find(".header .object_count").html(count);
+    this.element.find(".header .object_count").html("(" + count + ")");
+    this.element.trigger("widgets_updated");
   }
 });

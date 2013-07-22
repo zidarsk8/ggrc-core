@@ -14,11 +14,18 @@ can.Control("CMS.Controllers.AddWidget", {
     , menu_view : GGRC.mustache_path + "/add_widget_menu.mustache"
     , minimum_widget_height : 100
     , is_related : false
+    , parent_controller : null
   }
 }, {
   
   init : function() {
     var that = this;
+
+    can.each(this.options.widget_descriptors, function(descriptor, name) {
+      that.options.widget_descriptors[name] =
+        that.make_descriptor_from_model_descriptor(that.options.widget_descriptors[name]);
+    });
+
     if(!this.options.menu_tree) {
       this.options.is_related = true
       this.scrapeRelated();
@@ -28,6 +35,20 @@ can.Control("CMS.Controllers.AddWidget", {
       that.element.find(".dropdown-menu").html(frag).find(".divider:last").remove();
     });
   }
+
+  , make_descriptor_from_model_descriptor: function(descriptor) {
+      if (descriptor.widget_id || !descriptor.model)
+        return descriptor
+
+      return {
+        content_controller: GGRC.Controllers.ListView,
+        content_controller_options: descriptor,
+        widget_id: descriptor.model.table_singular,
+        widget_name: descriptor.model.title_plural,
+        widget_icon: descriptor.model.table_singular,
+        object_category: descriptor.model.category || descriptor.object_category
+      }
+    }
 
   , scrapeRelated : function() {
       var that = this
@@ -50,7 +71,6 @@ can.Control("CMS.Controllers.AddWidget", {
               };
             that.options.menu_tree.categories.push(categories_index[descriptor.object_category]);
           }
-          descriptor.object_display = descriptor.object_display;
           categories_index[descriptor.object_category].objects.push(descriptor);
         }
       });
@@ -85,23 +105,22 @@ can.Control("CMS.Controllers.AddWidget", {
   }
 
   , addWidgetByDescriptor : function(descriptor) {
-    var that = this;
-    if(descriptor && !$("#" + descriptor.object_type + "_widget").length) {
-      $("<section class='widget'>")
-      .insertBefore(that.element)
-      .cms_controllers_dashboard_widgets({
-        content_controller : GGRC.Controllers.ListView
-        , content_controller_options : $.extend(descriptor, { is_related : this.options.is_related })
-        , widget_id : descriptor.model.table_singular
-        , widget_name : descriptor.model.title_plural
-        , widget_icon : descriptor.model.table_singular
-        , model : descriptor.model
-        , object_category : descriptor.model.category || descriptor.object_category })
-      .trigger("sortreceive");
+      if (this.options.parent_controller) {
+        // FIXME: This ought not change the persistent descriptor object!
+        // FIXME: This must change before single page app can be accomplished
+        descriptor.content_controller_options.is_related = this.options.is_related;
+
+        this.options.parent_controller
+          .add_dashboard_widget_from_descriptor(descriptor)
+      }
     }
-  }
 
   , addWidgetByName : function(widget_name) {
-    this.addWidgetByDescriptor(this.options.widget_descriptors[widget_name]);
+      var descriptor = this.options.widget_descriptors[widget_name];
+      if (!descriptor)
+        // FIXME: This happens when previously-existing widgets no longer exist,
+        //   but only the first time (then DisplayPrefs are overwritten correctly).
+        return;
+      this.addWidgetByDescriptor(descriptor);
   }
 });

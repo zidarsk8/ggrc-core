@@ -11,8 +11,7 @@
 (function(can, $) {
 can.Control("CMS.Controllers.SortableWidgets", {
   defaults : {
-    sortable_token : "sorts"
-    , page_token : null
+      page_token : null
   }
 
   , init : function(el, opts) {
@@ -25,7 +24,7 @@ can.Control("CMS.Controllers.SortableWidgets", {
     });
   }
 }, {
-  
+
   init : function() {
     this.options.page_token = window.getPageToken();
 
@@ -57,48 +56,70 @@ can.Control("CMS.Controllers.SortableWidgets", {
       firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
     }
 
-    this.element.sortable().sortable("refresh");
-    can.each(this.element.data("ui-sortable").items, function(v) {
-      var $widget = v.item;
-      $("<li>")
-      .append(
-        $("<a>")
-        .attr("href", "#" + $widget.attr("id"))
-          .append(
-            $("<div class='oneline'>")
-              .text($widget.find(".header").text())))
-      .appendTo(".inner-nav .internav");
-    });
-    setTimeout(function() {
-      $(document.body).scrollTop(0).scrollspy().scrollspy("refresh");
-    }, 10);
+    this.sortable().sortable("refresh");
+    // FIXME: Is `this.is_initialized` necessary anymore?
     this.is_initialized = true;
     this.force_add_widget_bottom();
   }
+
+  , sortable: function() {
+      return this.element.sortable({
+          connectWith: '.widget-area'
+        , placeholder: 'drop-placeholder'
+        , handle : "header, .header"
+        , items : ".widget"
+      });
+    }
 
   , " sortremove" : "update_event"
 
   , " sortupdate" : "force_add_widget_bottom"
   , " sortreceive" : "force_add_widget_bottom"
   , force_add_widget_bottom : function(el, ev, data) {
-    if(this.is_initialized) {
-      var $add_box = this.element.find(".cms_controllers_add_widget")
-      , $parent = $add_box.parent();
-      if($add_box.is(":not(:last-child)")) {
-        $add_box.detach().appendTo($parent);
+      // This doesn't seem necessary...
+      if(this.is_initialized) {
+        var $add_box = this.element.find(".cms_controllers_add_widget")
+          , $parent = $add_box.parent();
+        if($add_box.is(":not(:last-child)")) {
+          $add_box.detach().appendTo($parent);
+        }
       }
+      this.sortable().sortable("refresh");
+      this.update_event(el, ev, data);
     }
-    this.element.sortable().sortable("refresh");
-    this.update_event(el, ev, data);
-  }
 
   , update_event : function(el, ev, data) {
-    if(this.is_initialized) {
-      this.options.sort.replace(this.element.sortable("toArray"));
-      this.options.model.save();
+      if(this.is_initialized) {
+        this.options.sort.replace(this.element.sortable("toArray"));
+        this.options.model.save()
+        this.element.trigger("widgets_updated");
+      }
     }
-  }
 
+  , " apply_widget_sort": function(el, ev, widget_ids) {
+      this.apply_widget_sort(widget_ids);
+    }
+
+  , apply_widget_sort: function(widget_ids) {
+      var $container = this.element
+        , $prev = null
+        ;
+
+      can.each(widget_ids, function(id) {
+        var $elem = $container.find(id)
+          ;
+
+        if ($elem) {
+          if ($prev)
+            $prev.after($elem);
+          else
+            $container.prepend($elem);
+          $prev = $elem;
+        }
+      });
+
+      this.update_event();
+    }
 });
 
 })(this.can, this.can.$);
