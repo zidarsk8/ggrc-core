@@ -19,6 +19,38 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   }
 });
 
+function get_template_path(url) {
+  var match;
+  match = url.match(/\/static\/mustache\/(.*)\.mustache/);
+  return match && match[1];
+}
+
+// Check if the template is available in "GGRC.Templates", and if so,
+//   short-circuit the request.
+$.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
+  var template_path = get_template_path(options.url),
+      template = GGRC.Templates[template_path];
+
+  if (template) {
+    return {
+      send: function(headers, completeCallback) {
+        function done() {
+          if (template)
+            completeCallback(200, "success", { text: template });
+        }
+        if (options.async)
+          setTimeout(done, 0);
+        else
+          done();
+      },
+
+      abort: function() {
+        template = null;
+      }
+    }
+  }
+});
+
   Mustache.registerHelper("join", function() {
     var prop, context = this, ret, options = arguments[arguments.length - 1];
 

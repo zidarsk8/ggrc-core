@@ -85,6 +85,9 @@ dashboard-js-files:
   #- d3.v2.js
   - related_graph.js
 
+dashboard-js-template-files:
+  - programs/info.mustache
+
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
   - dashboard.css
