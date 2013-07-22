@@ -687,6 +687,8 @@ ul.tree-structure.event-log {
   }
 }
 
+// New Tree
+
 ul.new-tree {
   @include reset-list();
   a.tree-link {
@@ -771,18 +773,17 @@ ul.new-tree {
 
 ul.new-tree-inner {
   @include reset-list();
-  border-top:1px solid #eee;
+  margin-bottom:20px;
   li.sub-item {
-    border-bottom:1px solid #eee;
-    border-left:8px solid #ddd;
+    margin-left:20px;
+    margin-right:20px;
+    border-bottom:1px solid #ddd;
+    border-left:1px solid #ddd;
+    border-right:1px solid #ddd;
     font-size:13px;
     line-height:30px;
-    &:last-child {
-      border-bottom:none;
-    }
-    li.sub-item {
-      border-left:8px solid #bbb;
-      margin-left:1px;
+    &:first-child {
+      border-top:1px solid #ddd;
     }
     &.governance {
       .item-data {
@@ -856,5 +857,18 @@ ul.new-tree-inner {
    i {
      @include opacity(0.6);
    } 
+  }
+}
+
+.inner-tree {
+  h6 {
+    @include border-radius(4px 4px 0 0);
+    background:#ddd;
+    color:#666;
+    padding-left:20px;
+    margin-top:10px;
+    margin-left:20px;
+    margin-right:20px;
+    line-height:24px;
   }
 }
