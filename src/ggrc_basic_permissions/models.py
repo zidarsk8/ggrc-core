@@ -37,13 +37,14 @@ class Role(Base, Described, db.Model):
   _publish_attrs = ['name', 'permissions']
 
 class UserRole(Base, db.Model):
-  __tablename__ = 'users_roles'
+  __tablename__ = 'user_roles'
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
-  user_email = db.Column(db.String(128), nullable=False)
   role = db.relationship('Role')
+  person_id = db.Column(db.Integer(), db.ForeignKey('people.id'), nullable=False)
+  person = db.relationship('Person')
 
-  _publish_attrs = ['role', 'user_email',]
+  _publish_attrs = ['role', 'person']
 
   @classmethod
   def role_assignments_for(cls, context):
@@ -52,7 +53,7 @@ class UserRole(Base, db.Model):
         .filter(UserRole.context_id == context_id)
     assignments_by_user = {}
     for assignment in all_assignments:
-        assignments_by_user.setdefault(assignment.user_email, [])\
+        assignments_by_user.setdefault(assignment.person.email, [])\
             .append(assignment.role)
     print 'role_assignments_for', assignments_by_user
     return assignments_by_user
