@@ -1,17 +1,7 @@
 {{#list}}
-  <li class="section" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
+  <li class="sub-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true" {{data 'model'}}>
     {{#instance}}
-    <div class="item-main" {{data 'model'}}>
-      {{#start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
-          <div class="openclose active"></div>
-        {{/show_expander}}
-      {{/start_expanded}}
-      {{^start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
-          <div class="openclose"></div>
-        {{/show_expander}}
-      {{/start_expanded}}
+    <div class="item-main">
       <div class="item-title">
         <div class="row-fluid">
           <div class="span8">
@@ -118,3 +108,23 @@
     {{/if}}
   </li>
 {{/list}}
+
+<li class="sub-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+      <a href="javascript://" class="section-add">
+        + Section
+      </a>
+      <a href="javascript://" class="section-create">
+        <i class="grcicon-add-black"></i>
+        Create Section
+      </a>
+      &nbsp;
+      &nbsp;
+      <a href="javascript://" class="section-import">
+        <i class="grcicon-imp-exp"></i>
+        Import Sections
+      </a>
+    </div>
+  </div>
+</li>

@@ -5,18 +5,6 @@
   background:$white;
   border:1px solid $widgetBorder;
   @include transition(box-shadow 0.2s,border-color 0.2s);
-  ul.tree-structure {
-    li {
-      &:hover {
-        border-bottom: 1px solid $gray;
-      }
-      &:last-child {
-        &:hover {
-          border-bottom: none;
-        }
-      }
-    }
-  }
   &.widget-tabs {
     &.widget-tabs-horizontal {
       .content {
