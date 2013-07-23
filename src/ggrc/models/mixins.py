@@ -4,8 +4,11 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from ggrc import settings, db
+from sqlalchemy import event
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.session import Session
+from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -166,6 +169,35 @@ class Slugged(Base):
   _update_attrs = ['title']
   _create_attrs = _publish_attrs
   _fulltext_attrs = ['slug', 'title']
+
+  NO_SLUG_SET = "__NO_SLUG_SET__"
+
+  @classmethod
+  def generate_slug_for(cls, obj):
+    id = obj.id if hasattr(obj, 'id') else uuid1()
+    obj.slug = "{0} {1}".format(obj.__class__.__name__, id)
+
+  @classmethod
+  def ensure_slug_before_flush(cls, session, flush_context, instances):
+    """Set the slug to a default string so we don't run afoul of the NOT NULL
+    constraint.
+    """
+    for o in session.new:
+      if isinstance(o, Slugged) and (o.slug is None or o.slug == ''):
+        o.slug = cls.NO_SLUG_SET
+
+  @classmethod
+  def ensure_slug_after_flush_postexec(cls, session, flush_context):
+    """Replace the placeholder slug with a real slug that will be set on the
+    next flush/commit.
+    """
+    for o in session.identity_map.values():
+      if isinstance(o, Slugged) and o.slug == cls.NO_SLUG_SET:
+        cls.generate_slug_for(o)
+
+event.listen(Session, 'before_flush', Slugged.ensure_slug_before_flush)
+event.listen(
+  Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 class BusinessObject(Slugged, Described, Hyperlinked):
   pass
