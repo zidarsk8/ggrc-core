@@ -243,7 +243,8 @@ def upgradeall():
     upgrade(module_name, 'head')
 
 def downgradeall(drop_versions_table=False):
-  for module_name in all_extensions():
+  for module_name in reversed(all_extensions()):
+    print("Downgrading {}".format(module_name))
     downgrade(module_name, 'base', drop_versions_table=drop_versions_table)
 
 def main(args):
