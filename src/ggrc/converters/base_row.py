@@ -116,7 +116,7 @@ class BaseRowConverter(object):
       self.attrs[key] =  self.handlers[key].export()
     else:
       handle_result = self.handlers[key].do_import(self.attrs.get(key))
-      self.add_after_save_hook(self.handlers[key])
+      #self.add_after_save_hook(self.handlers[key])
       return handle_result
 
   def handle_text_or_html(self, key, **options):

@@ -71,7 +71,7 @@ class BaseConverter(object):
   def import_metadata(self):
     if len(self.rows) < 5:
       self.errors.append("Could not import: verify the file is correctly formatted.")
-      raise ImportException("Import Error: There must be at least 5 input lines")
+      raise ImportException("Could not import: verify the file is correctly formatted.")
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
     values = self.read_values(headers, self.rows.pop(0))
     self.import_slug = values.get('slug')
@@ -131,26 +131,24 @@ class BaseConverter(object):
     return not len(string) or string.isspace()
 
   def do_import(self, dry_run = True):
+    self.import_metadata()
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0))
+    row_attrs = self.read_objects(object_headers, self.rows)
 
-    try:
-      self.import_metadata()
-      object_headers = self.read_headers(self.object_map, self.rows.pop(0))
-      row_attrs = self.read_objects(object_headers, self.rows)
+    for index, row_attrs in enumerate(row_attrs):
+      row = self.row_converter(self, row_attrs, index)
+      row.setup()
+      self.final_results.append(row.reify())
+      self.objects.append(row)
 
-      for index, row_attrs in enumerate(row_attrs):
-        row = self.row_converter(self, row_attrs, index)
-        row.setup()
-        self.final_results.append(row.reify())
-        self.objects.append(row)
+    if not dry_run:
+      self.save_import()
 
-      if not dry_run:
-        self.save_import()
+    return self
 
-      return self
-
-    except ImportException as e:
-      self.import_exception = e
-      return self
+    #except ImportException as e:
+     # self.import_exception = e
+      #return self
 
   def save_import(self):
     db_session = db.session
@@ -168,7 +166,6 @@ class BaseConverter(object):
     return attrs_collection
 
   def validate_metadata(self, attrs):
-    print 'validating metadata'
     if self.options.get('directive'):
       self.validate_metadata_type(attrs, self.directive().kind)
       self.validate_code(attrs)
