@@ -170,8 +170,6 @@ class Slugged(Base):
   _create_attrs = _publish_attrs
   _fulltext_attrs = ['slug', 'title']
 
-  NO_SLUG_SET = "__NO_SLUG_SET__"
-
   @classmethod
   def generate_slug_for(cls, obj):
     id = obj.id if hasattr(obj, 'id') else uuid1()
@@ -184,7 +182,8 @@ class Slugged(Base):
     """
     for o in session.new:
       if isinstance(o, Slugged) and (o.slug is None or o.slug == ''):
-        o.slug = cls.NO_SLUG_SET
+        o.slug = uuid1()
+        o._replace_slug = True
 
   @classmethod
   def ensure_slug_after_flush_postexec(cls, session, flush_context):
@@ -192,8 +191,9 @@ class Slugged(Base):
     next flush/commit.
     """
     for o in session.identity_map.values():
-      if isinstance(o, Slugged) and o.slug == cls.NO_SLUG_SET:
+      if isinstance(o, Slugged) and hasattr(o, '_replace_slug'):
         cls.generate_slug_for(o)
+        delattr(o, '_replace_slug')
 
 event.listen(Session, 'before_flush', Slugged.ensure_slug_before_flush)
 event.listen(
