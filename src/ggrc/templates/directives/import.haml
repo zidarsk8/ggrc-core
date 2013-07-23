@@ -28,9 +28,10 @@
 
 -block main
   .container-fluid
-    %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True,"remote":True,'data-type':'html','data-update-target':'#results-container'}
+    %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'} 
       #columns.row-fluid{ 'data-resize': "true" }
         #left_column.span6.widget-area
       -include 'directives/_import.haml'
       -if converter is defined
         -include 'directives/import_result_errors.haml'
+      #results-container

@@ -31,7 +31,7 @@
 -block body
   -# FIXME: Fix page_type_attributes, etc
   -#{ page_type_attributes, :class => "#{has_feature?(:BETA) ? 'BETA' : ''}" }
-  %body{ 'data-target': '.inner-nav', 'data-spy': 'scroll' }
+  %body{ 'data-target': '.inner-nav', 'data-spy': 'scroll', 'data-offset': '81' }
 
     %header.header.main
       .header-bar
@@ -84,9 +84,6 @@
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
                         Logout
-
-    -block subheader_plus
-
     .clearfix
       .lhs-holder
         .affix-holder{ 'data-spy': 'affix', 'data-offset-top': '1' }
@@ -117,8 +114,8 @@
                 =search_result('Product', 'products', 'business')
                 =search_result('DataAsset', 'data assets', 'business')
                 =search_result('Market', 'markets', 'business')
-              %h2.risk Risk Management
-              %ul.top-level
+              -#%h2.risk Risk Management
+              -#%ul.top-level
                 =search_result('Risk', 'risks', 'risk')
                 =search_result('RiskyAttribute', 'risky attributes', 'risk')
             .bar-h

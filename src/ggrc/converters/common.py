@@ -11,7 +11,6 @@ def prepare_slug(slug):
 
 class ImportException(Exception):
   def __init__(self, message):
-    print "CREATION OF EXCEPTION!"
     self.message = message
 
   def __str__(self):

@@ -1,7 +1,7 @@
-  {{#model}}
+  {{#instance}}
   <div class="selector-info" style="margin-left:-5%">
     <h4>
-      <i class="grcicon-control-color"></i>
+      <i class="grcicon-{{model.model_singular.toLowerCase}}-color"></i>
       {{title}}
     </h4>
     <p class="code compliance">{{slug}}</p>
@@ -13,10 +13,10 @@
       {{/if}}
     </div>
   </div>
-  {{/model}}
-  {{#unless model}}
+  {{/instance}}
+  {{#unless instance}}
   <div class="no-content">
-    <h4>NO CONTROL IS SELECTED</h4>
-    <p>Choose one of the controls from the list.</p>
+    <h4>NO {{model.title_singular.toUpperCase}} IS SELECTED</h4>
+    <p>Choose one of the {{model.title_plural.toLowerCase}} from the list.</p>
   </div>
   {{/unless}}

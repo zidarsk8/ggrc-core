@@ -3,12 +3,12 @@
     {{#instance}}
     <div class="item-main" {{data 'model'}}>
       {{#start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls}}
+        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
           <div class="openclose active"></div>
         {{/show_expander}}
       {{/start_expanded}}
       {{^start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls}}
+        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
           <div class="openclose"></div>
         {{/show_expander}}
       {{/start_expanded}}
@@ -71,24 +71,27 @@
                 {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right controllist' rel='tooltip' title='Map Controls to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-control-color'></i></a><i class='grcicon-control-color'></i>Mapped Controls</h3></div></div>"}}}
                 <i class="grcicon-control-color"></i>
                 
-                {{#na}}
-                  {{#with list}}
-                    {{#if length}}
-                      <span>{{length}}</span>
-                    {{else}} 
-                      <small class="warning">N/A</small>
-                    {{/if}}
-                  {{/with}}
-                {{/na}}
-                {{^na}}
-                  {{#with list}}
-                    {{#if length}} 
-                      <span>{{length}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                  {{/with}}
-                {{/na}}  
+                {{#with list}}
+                  {{#if length}} 
+                    <span>{{length}}</span>
+                  {{else}}
+                    <strong class="error">0</strong>
+                  {{/if}}
+                {{/with}}
+              </a>
+              {{/pack}}
+              {{#pack list=objectives na=na id=id}}
+              <a class="controls-count objectivelist btn btn-control"  data-content="{{render '/static/mustache/objectives/list_popover.mustache'}}" data-placement="right" data-popover-trigger="sticky-hover" href="javascript://">
+                {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right objectivelist' rel='tooltip' title='Map Objectives to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-objective-color'></i></a><i class='grcicon-objective-color'></i>Mapped Objectives</h3></div></div>"}}}
+                <i class="grcicon-objective-color"></i>
+                
+                {{#with list}}
+                  {{#if length}} 
+                    <span>{{length}}</span>
+                  {{else}}
+                    <strong class="error">0</strong>
+                  {{/if}}
+                {{/with}}
               </a>
               {{/pack}}
             </div>
