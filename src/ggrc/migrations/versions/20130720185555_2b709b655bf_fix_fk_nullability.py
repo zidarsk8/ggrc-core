@@ -84,7 +84,57 @@ def drop_explicit_index(table, column, referred_table, constraint_name):
     op.drop_index('ix_' + column, table)
     op.create_foreign_key(constraint_name, table, referred_table, [column], ['id'])
 
+def delete_duplicate_rows(table, columns):
+    """Find duplicate rows based on `columns`, and remove all but the first
+    """
+    sql_template = '''
+      DELETE t1.* FROM {table} AS t1
+        INNER JOIN
+          (SELECT id, {comma_columns} FROM {table}
+            GROUP BY {comma_columns} HAVING COUNT(*) > 1)
+          AS t2
+          ON ({join_condition})
+        WHERE t1.id != t2.id
+    '''
+    comma_columns = ", ".join(columns)
+    join_condition=" AND ".join(
+        ['t1.{column} = t2.{column}'.format(column=c) for c in columns])
+    op.execute(sql_template.format(
+        table=table, comma_columns=comma_columns, join_condition=join_condition))
+
+def delete_rows_with_null_column(table, column):
+    op.execute(
+        'DELETE FROM {table} WHERE {column} IS NULL'.format(
+            table=table, column=column))
+
+def delete_rows_with_broken_foreign_keys(table, column, referred_table):
+    """
+    Remove rows with failing foreign key relationships
+    * assumes the `referred_table` column is `id`
+
+    Note: This is not sufficient if the `referred_table` is also the `table`
+      of another foreign key, but that isn't the case in this migration.
+    """
+    op.execute(
+        'DELETE FROM {table} WHERE {column} NOT IN (SELECT id FROM {referred_table})'.format(
+            table=table, column=column, referred_table=referred_table))
+
 def upgrade():
+    op.execute('SET FOREIGN_KEY_CHECKS = 0')
+    # Before adding NOT NULL constraint, remove invalid rows.
+    for table, column in NOT_NULL_COLS:
+        delete_rows_with_null_column(table, column)
+
+    # Before applying UNIQUE constraint, remove duplicate rows.
+    for table, columns in UNIQUE_CONSTRAINTS:
+        delete_duplicate_rows(table, columns)
+
+    # These FOREIGN KEY constraints existed before, but because we disabled
+    #   FOREIGN_KEY_CHECKS, we may have broken constraints.
+    for table, column, referred_table, constraint_name in EXPLICIT_INDEXES:
+        delete_rows_with_broken_foreign_keys(table, column, referred_table)
+    op.execute('SET FOREIGN_KEY_CHECKS = 1')
+
     for table, column in NOT_NULL_COLS:
         op.alter_column(table, column, nullable=False, existing_type = sa.INTEGER)
     for table, column, referred_table, constraint_name in EXPLICIT_INDEXES:
