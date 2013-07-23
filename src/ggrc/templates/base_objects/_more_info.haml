@@ -1,22 +1,2 @@
--extends 'layouts/_widget_box.haml'
--if not model
-  -set model = controller.model
-
--block widget_title
-  References
-  %span
-    (={ instance.object_documents|length })
-  , People
-  %span
-    (={ instance.object_people|length })
-
--block widget_help
-  =model._inflector.table_singular + "_more_info"
-
--block widget_id
-  =model._inflector.model_singular + "_more_info_widget"
-
--block main
-  %ul.tree-structure.simple
-    -include 'documents/_object_list.haml'
-    -include 'people/_object_list.haml'
+-include 'documents/_object_widget.haml'
+-include 'people/_object_widget.haml'

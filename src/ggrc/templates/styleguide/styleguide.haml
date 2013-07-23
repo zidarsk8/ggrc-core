@@ -1,0 +1,53 @@
+-#
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By:
+-# Maintained By:
+-#
+-extends 'layouts/dashboard.haml'
+-set title = 'GRC: Style Guide'
+
+//%link(rel='stylesheet' type='text/css' href='styleguide.css')
+
+-block header
+  %h1
+    Visual &amp; Syntax Style Guide
+
+-block page_help
+ Nope.
+
+-block subheader_plus
+  %a.navbarplus.pull-right{ 'href': '#comingsoonModal', 'data-toggle': 'modal' }
+
+-block main
+  .clearfix
+    .inner-nav
+      %ul.nav{ 'class': 'internav', 'data-spy': 'affix', 'data-offset-top': '1' }
+    .object-area
+      .column-set{ 'data-resize': "true" }
+        .widget-area
+          -include 'styleguide/_new_tree.haml'
+          -include 'styleguide/_code.haml'
+          -include 'styleguide/_nesting.haml'
+          -include 'styleguide/_headings.haml'
+          -# NO LONGER USED include 'styleguide/_breadcrumbs.haml'
+          -include 'styleguide/_modals.haml'
+          -include 'styleguide/_objects.haml'
+          -include 'styleguide/_icons.haml'
+          -include 'styleguide/_buttons.haml'
+          -include 'styleguide/_progressbars.haml'
+          -include 'styleguide/_helpers.haml'
+          -#include 'styleguide/_popovers.haml'
+          -#DEPRECATED
+          -#include 'styleguide/_list.haml'
+          -#include 'styleguide/_actions.haml'
+          -#include 'styleguide/_widgets.haml'
+  -#MODALS
+  -include 'styleguide/modals/_object_mapper.haml'
+  -include 'styleguide/modals/_empty_help.haml'
+  -include 'styleguide/modals/_help.haml'
+  -include 'styleguide/modals/_mapper.haml'
+  -include 'styleguide/modals/_mapper_na.haml'
+  -include 'styleguide/modals/_base_object_create.haml'
+  -include 'styleguide/modals/_people_selector.haml'
+  -include 'styleguide/modals/_role_edit.haml'

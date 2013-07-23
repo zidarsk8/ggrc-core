@@ -1,0 +1,31 @@
+%section#breadcrumbs.widget
+  %section.header
+    %h2
+      Breadcrumbs
+  %section.content{ 'style': 'padding:10px 20px' }
+    .real-example
+      %ul.breadcrumbs
+        %li
+          %a
+            Root link
+        %li
+          %a
+            Second link
+        %li
+          %a
+            Third link
+    %p
+      %strong
+        Example:
+    %textarea
+      %ul.breadcrumbs
+        %li
+          %a
+            Breadcrumb
+        %li
+          %a
+            Breadcrumb inner
+    %p
+      %span.label.label-info
+        Note!
+      &nbsp; Do not put class on last %li element. It is solved from CSS.

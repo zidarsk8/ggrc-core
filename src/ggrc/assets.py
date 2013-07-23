@@ -59,24 +59,58 @@ environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
 
 environment.load_path = []
-for module_load_path in module_load_paths:
-  environment.load_path.extend([
-    os.path.join(module_load_path, 'assets/javascripts'),
-    os.path.join(module_load_path, 'assets/vendor/javascripts'),
-    os.path.join(
-      module_load_path,
-      'assets/vendor/bootstrap-sass/vendor/assets/javascripts'),
-    os.path.join(
-      module_load_path, 'assets/vendor/remoteipart/vendor/assets/javascripts'),
-    os.path.join(module_load_path, 'assets/stylesheets'),
-    os.path.join(module_load_path, 'assets/vendor/stylesheets'),
-    os.path.join(module_load_path, 'assets/js_specs'),
-    ])
+
+_per_module_load_suffixes = [
+  'assets/javascripts',
+  'assets/mustache',
+  'assets/vendor/javascripts',
+  'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
+  'assets/vendor/remoteipart/vendor/assets/javascripts',
+  'assets/stylesheets',
+  'assets/vendor/stylesheets',
+  'assets/js_specs',
+  ]
+
+for module_load_base in module_load_paths:
+  module_load_paths = [
+      os.path.join(module_load_base, load_suffix)
+        for load_suffix in _per_module_load_suffixes]
+  environment.load_path.extend(module_load_paths)
+
+from webassets.filter.jst import JSTemplateFilter
+class MustacheFilter(JSTemplateFilter):
+  """
+  Populate GGRC.Templates from list of mustache templates
+    * mostly copies webassets.filter.jst.JST
+  """
+
+  name = 'mustache'
+  options = {
+      'namespace': 'GGRC.Templates'
+      }
+
+  def process_templates(self, out, hunks, **kwargs):
+    namespace = self.namespace or 'GGRC.Templates'
+
+    out.write("{namespace} = {namespace} || {};\n"
+        .format('{}', namespace=namespace))
+
+    for name, hunk in self.iter_templates_with_base(hunks):
+      contents = hunk.data().replace('\n', '\\n').replace("'", r"\'")
+      out.write("{namespace}['{name}']"
+          .format(namespace=namespace, name=name))
+      out.write("= '{template}';\n"
+          .format(template=contents))
 
 environment.register("dashboard-js", webassets.Bundle(
   *asset_paths['dashboard-js-files'],
   #filters='jsmin',
   output='dashboard-%(version)s.js'))
+
+environment.register("dashboard-js-templates", webassets.Bundle(
+  *asset_paths['dashboard-js-template-files'],
+  filters=MustacheFilter,
+  output='dashboard-templates-%(version)s.js'))
 
 environment.register("dashboard-css", webassets.Bundle(
   *asset_paths['dashboard-css-files'],

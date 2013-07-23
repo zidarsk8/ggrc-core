@@ -173,13 +173,13 @@ var dashboard_menu = {categories : [
       , widget_descriptors.data_asset
       , widget_descriptors.market
     ]
-  }, {
+  }/*, {
     title : "Risk"
     , objects: [
       widget_descriptors.risky_attribute
       , widget_descriptors.risk
     ]
-  }
+  }*/
 ]};
 
 $(function() {
@@ -200,18 +200,24 @@ $(function() {
     //Then listen for new ones
     $(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
 
+    var $area = $('.area').first()
+      , dashboard_controller = $area
+        .cms_controllers_dashboard({})
+        .control(CMS.Controllers.Dashboard)
+
     $(".widget-add-placeholder").cms_controllers_add_widget({
-      widget_descriptors : widget_descriptors
+        parent_controller : dashboard_controller
+      , widget_descriptors : widget_descriptors
       , menu_tree : (/dashboard/.test(window.location) ? dashboard_menu : null)
       , minimum_widget_height : 100
     });
-    
+
     function bindSortable(ev) {
         can.getObject("Instances", CMS.Controllers.SortableWidgets, true)[this.id] = 
          $(this)
           .cms_controllers_sortable_widgets({
             model : data[0]
-          }).control(CMS.Controllers.SortableWidgets);    
+          }).control(CMS.Controllers.SortableWidgets);
     }
     $(".widget-area").each(bindSortable);//get anything that exists on the page already.
     //we will need to consider whether to look for late-added ones later.
