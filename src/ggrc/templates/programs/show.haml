@@ -14,7 +14,10 @@
 -block main
   .clearfix
     .inner-nav
-      %ul.nav{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
+      .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
+        %ul.nav{ 'class': "internav ={ model_display_class }" }
+        %a{ 'class': "add-nav-item", 'href': '#' }
+          + Add...
 
     .object-area
       #columns.column-set{ 'data-resize': "true" }
