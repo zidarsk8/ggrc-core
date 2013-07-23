@@ -1,5 +1,5 @@
 // widget tree structure
-
+/*
 h3.tab-title {
   line-height:36px;
   background:$lightGray;
@@ -302,7 +302,6 @@ ul.tree-structure {
       }
     }
     textarea {
-      /*max-height: 50px;*/
       display: block;
     }
     .cancel-link {
@@ -686,7 +685,7 @@ ul.tree-structure.event-log {
     }
   }
 }
-
+*/
 // New Tree
 
 ul.new-tree {
@@ -745,6 +744,8 @@ ul.new-tree {
     margin-top:7px;
   }
   .tree-description {
+    line-height:18px;
+    font-size:13px;
     &.short {
       height:36px;
       overflow:hidden;
