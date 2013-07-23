@@ -32,6 +32,10 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "slug" : this.slug || ""
     , "description" : this.description || ""
   }
+  , init : function() {
+    this.validatePresenceOf("title");
+    this._super.apply(this, arguments);
+  }
 }
 , {
 // prototype properties

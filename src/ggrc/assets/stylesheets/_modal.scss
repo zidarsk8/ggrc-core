@@ -40,7 +40,7 @@
           font-size:$f-small;
         }
         background:#f3f3f3;
-        padding:6px 6px 0 10px;
+        padding:6px;
         border-bottom:1px solid #ccc; 
         border-left:1px solid lighten($gray,20%);
         border-right:1px solid lighten($gray,20%);
@@ -138,19 +138,19 @@
             a:hover {
               text-decoration:none;
             }
-			.address {
-				color:$gray;
-				font-size:$f-regular;
-			}
+      .address {
+        color:$gray;
+        font-size:$f-regular;
+      }
           }
         }
       }
       .selector-info {
-		.pull-right {
-			.btn {
-				margin-left:4px;
-			}
-		}
+    .pull-right {
+      .btn {
+        margin-left:4px;
+      }
+    }
         &.selector-info-left {
           margin-right:-10%;
         }
@@ -162,11 +162,18 @@
         padding:10px;
         .rtf {
           overflow:auto;
-          height:200px;
+          height:240px;
           border:1px solid #ddd;
           background:#fff;
           padding:10px;
-          font-size:$f-small;
+          font-size:12px;
+          p {
+            line-height:16px;
+          }
+          li {
+            line-height:16px;
+          }
+
         }
         .no-content {
           padding-top:160px;
@@ -193,6 +200,7 @@
   .modal-filter {
     background:#e0e0e0;
     border-bottom:1px solid #ccc;
+    height:36px;
     input {
       border: 1px solid $popOverBorder;
       background-image: image-url("grcicons/icons.png");
@@ -202,30 +210,25 @@
       padding-left: 40px;
       margin-top:8px;
     }
-    .checkbox-filter {
-      label {
-        margin-right:5px;
-        margin-top:15px;
-      }
-      input {
-        margin-top:18px;
-      }
-    }
     select {
-      margin-top:8px;
+      margin-top:4px;
+      margin-bottom:0;
     }
     .btn-add {
-      margin-top:8px;
-      margin-right:8px;
+      margin-top:4px;
+      margin-right:4px;
     }
-    .modal-search {
-      position:relative;
-      .btn-mini {
-        position:absolute;
-        padding:0;
-        right:4px;
-        top:4px;
-      }
+  }
+  .modal-search {
+    position:relative;
+    input {
+      margin-bottom:0;
+    }
+    .btn-mini {
+      position:absolute;
+      padding:0;
+      right:4px;
+      top:4px;
     }
   }
   .modal-header {
@@ -610,4 +613,11 @@ a.show-hidden-fields {
 
 .checkbox-area {
 	padding:6px 0 16px 0;
+}
+
+.owner,
+.object-url {
+  @include oneline();
+  margin-bottom:10px;
+  font-size:12px;
 }

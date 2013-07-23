@@ -72,6 +72,9 @@
     .lhs-search {
       display:none;
     }
+    .top-level, .bar-h {
+      visibility:hidden;
+    }
   }
   .lhs-search {
     padding:10px;
@@ -144,6 +147,10 @@
         .rtf {
           font-size:12px;
           line-height:16px;
+          a {
+            display:inline;
+            padding:0;
+          }
         }
         .links {
           margin-top:6px;

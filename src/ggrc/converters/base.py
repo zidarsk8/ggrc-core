@@ -70,8 +70,8 @@ class BaseConverter(object):
 
   def import_metadata(self):
     if len(self.rows) < 5:
-      self.errors.append("There must be at least 5 input lines")
-      raise ImportException("Import Error: There must be at least 5 input lines")
+      self.errors.append("Could not import: verify the file is correctly formatted.")
+      raise ImportException("Could not import: verify the file is correctly formatted.")
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
     values = self.read_values(headers, self.rows.pop(0))
     self.import_slug = values.get('slug')
@@ -81,6 +81,7 @@ class BaseConverter(object):
 
   def read_values(self, headers, row):
     attrs = dict(zip(headers, row))
+    attrs.pop(None, None) # None key could have been inserted in extreme edge case
     return attrs
 
   def get_header_for_column(self, column_name):
@@ -99,6 +100,7 @@ class BaseConverter(object):
         continue
       elif not (heading in import_map):
         ignored_colums.append(heading)
+        keys.append(None) # Placeholder None to prevent position problems when headers are zipped with values
         continue
       else:
         keys.append(import_map[heading])
@@ -110,7 +112,8 @@ class BaseConverter(object):
 
     missing_columns = import_map.values()
     for element in keys:
-      missing_columns.remove(element)
+      if element is not None:
+        missing_columns.remove(element)
 
     if len(missing_columns):
       missing_headers = [self.get_header_for_column(temp) for temp in missing_columns if temp is not None]
@@ -128,26 +131,24 @@ class BaseConverter(object):
     return not len(string) or string.isspace()
 
   def do_import(self, dry_run = True):
+    self.import_metadata()
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0))
+    row_attrs = self.read_objects(object_headers, self.rows)
 
-    try:
-      self.import_metadata()
-      object_headers = self.read_headers(self.object_map, self.rows.pop(0))
-      row_attrs = self.read_objects(object_headers, self.rows)
+    for index, row_attrs in enumerate(row_attrs):
+      row = self.row_converter(self, row_attrs, index)
+      row.setup()
+      self.final_results.append(row.reify())
+      self.objects.append(row)
 
-      for index, row_attrs in enumerate(row_attrs):
-        row = self.row_converter(self, row_attrs, index)
-        row.setup()
-        self.final_results.append(row.reify())
-        self.objects.append(row)
+    if not dry_run:
+      self.save_import()
 
-      if not dry_run:
-        self.save_import()
+    return self
 
-      return self
-
-    except ImportException as e:
-      self.import_exception = e
-      return self
+    #except ImportException as e:
+     # self.import_exception = e
+      #return self
 
   def save_import(self):
     db_session = db.session
@@ -165,7 +166,6 @@ class BaseConverter(object):
     return attrs_collection
 
   def validate_metadata(self, attrs):
-    print 'validating metadata'
     if self.options.get('directive'):
       self.validate_metadata_type(attrs, self.directive().kind)
       self.validate_code(attrs)

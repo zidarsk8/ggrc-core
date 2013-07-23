@@ -157,27 +157,17 @@
           {{ controls_progressbar(instance.controls) }}
     -elif object == 'control'
       -set directive_programs = []
-      -set cc_programs = []
       -for section in instance.sections
         -for directive in section.directives
           -for program in directive.programs
             -if program.kind == "Directive" and program not in directive_programs
               -set noop = directive_programs.append(program)
-            -if program.kind == "Company Controls" and program not in cc_programs
-              -set noop = cc_programs.append(program)
       .row-fluid
         .span6
           %h4
             Directive Programs
           %i.grcicon-program-color
           =directive_programs|length
-          -# TODO : Find out what the control->program mapping is. 
-        .span6
-          %h4
-            Company Control Programs
-          %i.grcicon-company_controls-color
-          =cc_programs|length
-          -#TODO : Same as above
     -elif object == 'dataasset' or object == 'market' or object == 'facility' or object == 'product' or object == 'project' or object == 'orggroup'
       .row-fluid
         -#TODO : Make sure Controls and Programs counters are valid

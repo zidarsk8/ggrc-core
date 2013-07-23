@@ -61,19 +61,20 @@
     , draw_list : function(list) {
       if(list) {
         this.list = list;
-      } 
-        this.options.observer.attr({list : this.list, show : this.options.show });
-        var x = can.view(this.options.list, this.options.observer);
-        this.element.html(x);
+      }
+      this.options.observer.attr({list : this.list, show : this.options.show, model : this.options.model });
+      var x = can.view(this.options.list, this.options.observer);
+      this.element.html(x);
     }
     , fetch_one : function(id) {
       this.options.model.findOne({ id : (id || this.options.id) }, this.proxy("draw_one"));
     }
     , draw_one : function(control) {
-      if(typeof this.options.observer.model !== "undefined") {
-        this.options.observer.attr("model", control);
+      if(typeof this.options.observer.instance !== "undefined") {
+        this.options.observer.attr("instance", control);
       } else {
-        this.options.observer.attr("model", control);
+        this.options.observer.attr("model", this.options.model);
+        this.options.observer.attr("instance", control);
         var v = can.view(this.options.show, this.options.observer);
         this.element.html(v);
       }

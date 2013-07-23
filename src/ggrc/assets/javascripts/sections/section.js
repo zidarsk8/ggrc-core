@@ -23,16 +23,16 @@ can.Model.Cacheable("CMS.Models.Section", {
   , defaults : {
     children : []
   }
-  , map_control : function(params, section) {
-    var control_section_ids, joins;
+  , map_object : function(params, section) {
+    var join_ids, joins;
 
     if(params.u) {
-      control_section_ids = can.map(params.control.control_sections, function(v) {
+      join_ids = can.map(params.object[params.join_model.root_collection], function(v) {
         return v.id;
       });
 
-      joins = can.map(section.control_sections, function(sc) {
-        return ~can.inArray(sc.id, control_section_ids) ? sc : undefined;
+      joins = can.map(section[params.join_model.root_collection], function(sc) {
+        return ~can.inArray(sc.id, join_ids) ? sc : undefined;
       });
 
       return $.when.apply($, can.map(joins, function(join) {
@@ -41,15 +41,33 @@ can.Model.Cacheable("CMS.Models.Section", {
         });
       }));
     } else {
-      return new CMS.Models.ControlSection({
+      var j = new params.join_model({
         section : section.stub()
-        , control : params.control.stub()
         , context : { id : params.context_id }
-      }).save();
+      });
+      j.attr(params.object.constructor.root_object, params.object.stub());
+      return j.save();
     }
 
   }
-
+  , map_control : function(params, section) {
+    var p = $.extend({}, params);
+    p.object = p.control;
+    p.join_model = CMS.Models.ControlSection;
+    delete p.control;
+    return this.map_object(p, section);
+  }
+  , map_objective : function(params, section) {
+    var p = $.extend({}, params);
+    p.object = p.objective;
+    p.join_model = CMS.Models.SectionObjective;
+    delete p.objective;
+    return this.map_object(p, section);
+  }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("title");
+  }
 }, {
 
   init : function() {
@@ -77,6 +95,11 @@ can.Model.Cacheable("CMS.Models.Section", {
       can.extend({}, params, { section : this })
       , this);
   }
+  , map_objective : function(params) {
+    return this.constructor.map_objective(
+      can.extend({}, params, { section : this })
+      , this);
+  }
 
 });
 
@@ -85,6 +108,8 @@ CMS.Models.Section("CMS.Models.SectionSlug", {
     children : "CMS.Models.SectionSlug.models"
     , controls : "CMS.Models.Control.models"
     , control_sections : "CMS.Models.ControlSection.models"
+    , objectives : "CMS.Models.Objective.models"
+    , section_objectives : "CMS.Models.SectionObjective.models"
   }
   ,  findAll : function(params) {
     function filter_out(original, predicate) {
@@ -135,6 +160,10 @@ CMS.Models.Section("CMS.Models.SectionSlug", {
   , tree_view_options : {
     list_view : "/static/mustache/sections/tree.mustache"
     , child_options : [{
+      model : CMS.Models.Objective
+      , property : "objectives"
+      , list_view : "/static/mustache/objectives/tree.mustache"
+    }, {
       model : CMS.Models.Control
       , property : "controls"
       , list_view : "/static/mustache/controls/tree.mustache"
@@ -145,13 +174,14 @@ CMS.Models.Section("CMS.Models.SectionSlug", {
   }
   , defaults : {
     controls : []
+    , objectives : []
     , title : ""
     , slug : ""
     , description : ""
   }
   , init : function() {
     this._super.apply(this, arguments);
-    this.tree_view_options.child_options[1].model = this;
+    this.tree_view_options.child_options[2].model = this;
     this.bind("created updated", function(ev, inst) {
       can.each(this.attributes, function(v, key) {
         (inst.key instanceof can.Observe.List) && inst.key.replace(inst.key); //force redraw in places
@@ -160,37 +190,3 @@ CMS.Models.Section("CMS.Models.SectionSlug", {
   }
 }, {});
 
-can.Model.Cacheable("CMS.Models.ControlSection", {
-  root_collection : "control_sections"
-  , root_object : "control_section"
-  , create : "POST /api/control_sections"
-  , destroy : "DELETE /api/control_sections/{id}"
-  , init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this.bind("created destroyed", function(ev, inst) {
-      if(that !== inst.constructor) return;
-      var section =
-        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
-        || CMS.Models.Section.findInCacheById(inst.section.id);
-      var control = 
-        CMS.Models.RegControl.findInCacheById(inst.control.id)
-        || CMS.Models.Control.findInCacheById(inst.control.id);
-
-      section && section.refresh();
-      control && control.refresh();
-    });
-  }
-}, {
-  serialize : function(name) {
-    var serial;
-    if(!name) {
-      serial = this._super();
-      serial.section && (serial.section = this.section.stub());
-      serial.control && (serial.control = this.control.stub());
-      return serial;
-    } else {
-      return this._super.apply(this, arguments);
-    }
-  }
-});

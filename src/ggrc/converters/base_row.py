@@ -115,15 +115,15 @@ class BaseRowConverter(object):
     if self.options.get('export'):
       self.attrs[key] =  self.handlers[key].export()
     else:
-      self.handlers[key].do_import(self.attrs.get(key))
-      self.add_after_save_hook(self.handlers[key])
+      handle_result = self.handlers[key].do_import(self.attrs.get(key))
+      #self.add_after_save_hook(self.handlers[key])
+      return handle_result
 
   def handle_text_or_html(self, key, **options):
-    self.handle(key, TextOrHtmlColumnHandler, **options)
+    return self.handle(key, TextOrHtmlColumnHandler, **options)
 
   def handle_raw_attr(self, key, **options):
-    self.handle(key, ColumnHandler, **options)
-    pass
+    return self.handle(key, ColumnHandler, **options)
 
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
@@ -175,7 +175,7 @@ class ColumnHandler(object):
   def do_import(self, content):
     self.original = content
     if not self.options.get('no_import'):
-      self.go_import(content)
+      return self.go_import(content)
 
   def go_import(self, content):
     if content:
@@ -184,6 +184,8 @@ class ColumnHandler(object):
       if data:
         self.value = data
         self.set_attr(data)
+      return data
+    return ''
 
   def set_attr(self, value):
     self.importer.set_attr(self.key, value)
@@ -215,6 +217,7 @@ class SlugColumnHandler(ColumnHandler):
       self.validate(content)
     else:
       self.add_warning('Code will be autofilled')
+    return content
 
 class DateColumnHandler(ColumnHandler):
 
@@ -235,8 +238,8 @@ class DateColumnHandler(ColumnHandler):
 
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
-      else: return ''
-
+      else:
+        return ''
     except ValueError as e:
       self.warnings.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
 
