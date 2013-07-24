@@ -1,23 +1,24 @@
 {{#list}}
-  <li class="sub-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true" {{data 'model'}}>
-    {{#instance}}
-
+  {{!FIXME: class in the line below needs to be either sub-item or tree-item: }}
+  {{! If top-tree level => tree-item }}
+  {{! If any other level => sub-item }}
+  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true" {{data 'model'}}>
       <a href="javascript://" class="tree-link">
         <div class="row-fluid">
           <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-section-color"></i>
-                <span class="tree-code">{{slug}}</span>
-                {{title}}
+                <span class="tree-code">{{instance.slug}}</span>
+                {{instance.title}}
               </div>
             </div>
           </div>
           <div class="span1">
             <div class="counter">
-              {{#pack list=controls na=na id=id}}
+              {{#pack list=instance.controls na=na id=id}}
                 <span class="controls-count controllist"  data-content="{{render '/static/mustache/controls/list_popover.mustache'}}" data-placement="left" data-popover-trigger="sticky-hover" href="javascript://">
-                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right controllist' rel='tooltip' title='Map Controls to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-control-color'></i></a><i class='grcicon-control-color'></i>Mapped Controls</h3></div></div>"}}}
+                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{instance.id}' class='btn btn-mini pull-right controllist' rel='tooltip' title='Map Controls to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-control-color'></i></a><i class='grcicon-control-color'></i>Mapped Controls</h3></div></div>"}}}
                   <i class="grcicon-control-black"></i>
                   {{#with list}}
                     {{#if length}} 
@@ -32,9 +33,9 @@
           </div>
           <div class="span1">
             <div class="counter">
-              {{#pack list=objectives na=na id=id}}
+              {{#pack list=instance.objectives na=na id=id}}
                 <span class="controls-count objectivelist"  data-content="{{render '/static/mustache/objectives/list_popover.mustache'}}" data-placement="left" data-popover-trigger="sticky-hover" href="javascript://">
-                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right objectivelist' rel='tooltip' title='Map Objectives to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-objective-color'></i></a><i class='grcicon-objective-color'></i>Mapped Objectives</h3></div></div>"}}}
+                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{instance.id}' class='btn btn-mini pull-right objectivelist' rel='tooltip' title='Map Objectives to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-objective-color'></i></a><i class='grcicon-objective-color'></i>Mapped Objectives</h3></div></div>"}}}
                   <i class="grcicon-objective-black"></i>
                   {{#with list}}
                     {{#if length}} 
@@ -54,10 +55,10 @@
           <div class="row-fluid">
             <div class="span12">
               <div class="tree-description short">
-                {{^description}}
+                {{^instance.description}}
                   <p><i>No description</i></p>
-                {{/description}}
-                {{{description}}}
+                {{/instance.description}}
+                {{{instance.description}}}
               </div>
               <a href="javascript://" class="show-long">more</a>
             </div>
@@ -88,23 +89,23 @@
             </div>
           </div>
         </div>
+
+        {{#if draw_children}}
+          {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+            <div class="inner-tree">
+              <h6>Sections</h6>
+              {{#child_options}}
+                <ul class="new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              {{/child_options}}
+            </div>
+          {{/if_null}}
+        {{/if}}
+
       </div>
-     
-    {{/instance}}
-    
-    {{#if draw_children}}
-      {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-        <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
-          {{#child_options}}
-            <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-          {{/child_options}}
-        </div>
-      {{/if_null}}
-    {{/if}}
   </li>
 {{/list}}
 
-<li class="sub-item tree-item-add">
+<li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
       <a href="javascript://" class="section-add">

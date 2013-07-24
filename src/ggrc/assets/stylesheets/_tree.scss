@@ -773,46 +773,50 @@ ul.new-tree {
   }
 }
 
-ul.new-tree-inner {
-  @include reset-list();
-  margin-bottom:20px;
-  li.sub-item {
-    margin-left:20px;
-    margin-right:20px;
-    border-bottom:1px solid #ddd;
-    border-left:1px solid #ccc;
-    border-right:1px solid #ccc;
-    font-size:13px;
-    line-height:30px;
-    &:first-child {
-      border-top:1px solid #ddd;
-    }
-    &:last-child {
-      border-bottom:1px solid #ccc;
-    }
+.inner-tree {
+  ul.new-tree {
+    @include reset-list();
+    margin-bottom:20px;
+    li.tree-item {
+      margin-left:20px;
+      margin-right:20px;
+      border-bottom:1px solid #ddd;
+      border-left:1px solid #ccc;
+      border-right:1px solid #ccc;
+      font-size:13px;
+      line-height:30px;
+      &:first-child {
+        border-top:1px solid #ddd;
+      }
+      &:last-child {
+        border-bottom:1px solid #ccc;
+      }
 
-    &.governance {
-      .item-data {
-        color:$governance;
+      &.governance {
+        .item-data {
+          color:$governance;
+        }
       }
-    }
-    &.business {
-      .item-data {
-        color:$business;
+      &.business {
+        .item-data {
+          color:$business;
+        }
       }
-    }
-    &.risk {
-      .item-data {
-        color:$risk;
+      &.risk {
+        .item-data {
+          color:$risk;
+        }
       }
-    }
-    &.program {
-      .item-data {
-        color:$programs;
+      &.program {
+        .item-data {
+          color:$programs;
+        }
       }
     }
   }
 }
+
+
 .tier-2-info {
   display:none;
 }
