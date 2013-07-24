@@ -712,17 +712,34 @@ ul.new-tree {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
     }
-    &.governance {
+    &.governance,
+    &.control,
+    &.objective,
+    &.contract,
+    &.policy,
+    &.regulation
+      {
       .item-data {
         color:$governance;
       }
     }
-    &.business {
+    &.business,
+    &.process,
+    &.system,
+    &.orggroup,
+    &.project,
+    &.facility,
+    &.product,
+    &.dataasset,
+    &.market
+    {
       .item-data {
         color:$business;
       }
     }
-    &.risk {
+    &.risk,
+    &.riskyattribute
+    {
       .item-data {
         color:$risk;
       }
