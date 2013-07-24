@@ -1,25 +1,53 @@
 {{#list}}
-<li class="category" data-object-id="{{instance.id}}" data-object-type="category" data-object-meta-type="category" {{^instance.descendant_controls}}style="display:none"{{/instance.descendant_controls}}>
-  {{#instance}}
-  <div class="item-main" {{data 'model'}}>
-    {{#show_expander draw_children children "||" draw_children controls}}
-      <div class="openclose {{#if start_expanded}}active{{/if}}"></div>
-    {{/show_expander}}    
-    <div class="item-title">
-      <div class="row-fluid">
-        {{name}}
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="category" data-object-meta-type="category" {{^instance.descendant_controls}}style="display:none"{{/instance.descendant_controls}}>
+
+    <div class="item-main" {{data 'model'}}>
+      <a href="javascript://" class="openclose">
+        <div class="row-fluid">
+          <div class="span10">
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{instance.name}}
+              </div>
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              &nbsp;
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        {{#if draw_children}}
+          {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+            <div class="inner-tree">
+              {{#child_options}}
+                <h6>{{model.title_plural}} ({{list.length}})</h6>
+                <ul class="tree-structure new-tree" data-object-type="{{ model.shortName }}" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              {{/child_options}}
+            </div>
+          {{/if_null}}
+        {{/if}}
+        
       </div>
     </div>
-  </div>
-  {{/instance}}
-  {{#if draw_children}}
-  {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-  <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
-    {{#child_options}}
-    <ul class="tree-structure new-tree" data-object-type="{{ model.shortName }}" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-    {{/child_options}}
-  </div>
-  {{/if_null}}
-  {{/if}}
-</li>
+  </li>
 {{/list}}
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+      <a href="javascript://">
+        + Category
+      </a>
+    </div>
+  </div>
+</li>
