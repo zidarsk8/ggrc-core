@@ -138,7 +138,7 @@ can.Control("CMS.Controllers.TreeView", {
     var parent = can.reduce(this.options.list, function(a, b) {
       switch(true) {
         case !!a : return a;
-        case b.instance === instance: return b;
+        case b.instance === instance || b.instance === instance.instance : return b;
         default: return null;
       }
     }, null);

@@ -727,22 +727,23 @@ function resize_areas() {
 }
 
 jQuery(function($) {
-  $('body').on('click', '.tree-link', function(e) {
+  /*
+  $('body').on('click', '.openclose', function(e) {
     var $this = $(this)
       , $additionalInfo = $this.next()
       , $treeItem = $this.closest(".tree-item")
       ;
-    if ($this.hasClass("open")) {
+    if ($this.hasClass("active")) {
       $additionalInfo.slideUp();
-      $this.removeClass("open");
+      $this.removeClass("active");
       $treeItem.removeClass("tree-item-open");
     } else {
       $additionalInfo.slideDown();
-      $this.addClass("open");
+      $this.addClass("active");
       $treeItem.addClass("tree-item-open");
     };  
   });
-  
+  */
   $('body').on('mouseover', '.section-add', function(e) {
     var $this = $(this)
       , $createLink = $this.closest('div').find('.section-create')
