@@ -3,7 +3,9 @@
     <div class="span3">
       <div class="deny-buttons">
         <a class="btn" data-dismiss="modal-reset" href="#">Cancel</a>
+        {{^new_object_form}}
         <a class="btn btn-danger" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-form-target="refresh" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">Delete</a>
+        {{/new_object_form}}
       </div>
     </div>
     <div class="span6">
