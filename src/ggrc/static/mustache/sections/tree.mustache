@@ -15,34 +15,28 @@
           <div class="span1">
             <div class="counter">
               {{#pack list=instance.controls na=na id=id}}
-                <span class="controls-count controllist"  data-content="{{render '/static/mustache/controls/list_popover.mustache'}}" data-placement="left" data-popover-trigger="sticky-hover" href="javascript://">
-                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{instance.id}' class='btn btn-mini pull-right controllist' rel='tooltip' title='Map Controls to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-control-color'></i></a><i class='grcicon-control-color'></i>Mapped Controls</h3></div></div>"}}}
-                  <i class="grcicon-control-black"></i>
-                  {{#with list}}
-                    {{#if length}} 
-                      <span>{{length}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                  {{/with}}
-                </span>
+                <i class="grcicon-control-black"></i>
+                {{#with list}}
+                  {{#if length}} 
+                    <span>{{length}}</span>
+                  {{else}}
+                    <strong class="error">0</strong>
+                  {{/if}}
+                {{/with}}
               {{/pack}}
             </div>
           </div>
           <div class="span1">
             <div class="counter">
               {{#pack list=instance.objectives na=na id=id}}
-                <span class="controls-count objectivelist"  data-content="{{render '/static/mustache/objectives/list_popover.mustache'}}" data-placement="left" data-popover-trigger="sticky-hover" href="javascript://">
-                  {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{instance.id}' class='btn btn-mini pull-right objectivelist' rel='tooltip' title='Map Objectives to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-objective-color'></i></a><i class='grcicon-objective-color'></i>Mapped Objectives</h3></div></div>"}}}
-                  <i class="grcicon-objective-black"></i>
-                  {{#with list}}
-                    {{#if length}} 
-                      <span>{{length}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                  {{/with}}
-                </span>
+                <i class="grcicon-objective-black"></i>
+                {{#with list}}
+                  {{#if length}} 
+                    <span>{{length}}</span>
+                  {{else}}
+                    <strong class="error">0</strong>
+                  {{/if}}
+                {{/with}}
               {{/pack}}
             </div>
           </div>
