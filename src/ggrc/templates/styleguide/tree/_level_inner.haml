@@ -1,20 +1,20 @@
 .inner-tree
   %h6
     Sections
-  %ul.new-tree-inner
-    %li.sub-item.governance
+  %ul.new-tree
+    %li.tree-item.governance
       -include 'styleguide/tree/_title_area.haml'
       .tier-2-info
         -include 'styleguide/tree/_tier_2.haml'
         -# this is the same .inner-tree as before, but I couldn't re-include it
         .inner-tree
           %h6 Mapped Objects
-          %ul.new-tree-inner
-            %li.sub-item.business
+          %ul.new-tree
+            %li.tree-item.business
               -include 'styleguide/tree/_title_area.haml'
               .tier-2-info
                 -include 'styleguide/tree/_tier_2.haml'
-            %li.sub-item.tree-item-add
+            %li.tree-item.tree-item-add
               .row-fluid
                 .span12
                   %a{ 'href': 'javascript://', 'class': 'section-add' }
@@ -27,7 +27,7 @@
                     %i.grcicon-objective-black
                     Create/Map Control Objective
                   
-      %li.sub-item.tree-item-add
+      %li.tree-item.tree-item-add
         .row-fluid
           .span12
             %a{ 'href': 'javascript://', 'class': 'section-add' }

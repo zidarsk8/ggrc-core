@@ -75,7 +75,7 @@
           <div class="inner-tree">
             <h6>Sections ({{instance.sections.length}})</h6>
             {{#child_options}}
-              <ul class="new-tree-inner" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")._data) }}></ul>
+              <ul class="new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")._data) }}></ul>
             {{/child_options}}
           </div>
         {{/if_null}}
