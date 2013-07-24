@@ -24,6 +24,7 @@ def main():
       return os.path.join(
           os.path.abspath(os.path.dirname(os.path.dirname(ggrc.__file__))),
           'service_specs')
+
     def get_ggrc_steps_path(self):
       base_dir = self.get_ggrc_base_path()
       if self.path_in_args(base_dir):
@@ -36,8 +37,12 @@ def main():
       return path
 
     def load_step_definitions(self, extra_step_paths=[]):
+      # Ensure that src/service_specs/steps is in step paths
       ggrc_steps_path = self.get_ggrc_steps_path()
-      extra_step_paths = [] if ggrc_steps_path is None else [ggrc_steps_path]
+      if ggrc_steps_path is not None \
+          and ggrc_steps_path != os.path.join(self.base_dir, 'steps'):
+        extra_step_paths = list(extra_step_paths)
+        extra_step_paths.append(ggrc_steps_path)
       print 'extra_step_paths', extra_step_paths
       super(GGRCRunner, self).load_step_definitions(
           extra_step_paths=extra_step_paths)
