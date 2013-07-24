@@ -3,7 +3,7 @@
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span10">
+          <div class="span9">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-section-color"></i>
@@ -11,6 +11,11 @@
                 {{instance.title}}
               </div>
             </div>
+          </div>
+          <div class="span1">
+            {{^instance.owner}}
+              <i class="grcicon-people-warning"></i>
+            {{/instance.owner}}
           </div>
           <div class="span1">
             <div class="counter">
@@ -60,7 +65,14 @@
           <div class="span8">
             <div class="tree-info">
               <strong>Owner:</strong>
-              Manny Rangerburden
+              {{^instance.owner}}
+                <span class="error">
+                  Not Assigned
+                </span>
+              {{/instance.owner}}
+              {{#if instance.owner}}
+                {{instance.owner.name}}
+              {{/if}}
             </div>
           </div>
           <div class="span4">
@@ -75,9 +87,15 @@
         <div class="row-fluid">
           <div class="span8">
             <div class="tree-info">
-              <a href="http://gdrive.googleplex.com/artpartycraft/42387994793827" target="blank">
-                http://gdrive.googleplex.com/artpartycraft/42387994793827
-              </a>
+              <strong>URL:</strong>
+              {{^if_null instance.url}}
+                <a class="url" href="{{instance.url}}">
+                  {{instance.url}}
+                </a>
+              {{/if_null}}
+              {{#if_null instance.url}}
+                <i>No URL</i>
+              {{/if_null}}
             </div>
           </div>
         </div>
