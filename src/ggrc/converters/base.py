@@ -2,10 +2,10 @@ import csv
 from .common import *
 from ggrc import db
 from flask import redirect, flash
+
 class BaseConverter(object):
 
   def __init__(self, rows_or_objects, **options):
-
     self.options = options.copy()
     if self.options.get('export'):
       self.objects = rows_or_objects
@@ -20,7 +20,8 @@ class BaseConverter(object):
     self.final_results = []
     self.import_exception = None
     self.import_slug = None
-    self.create_metadata_map()
+    if self.__class__.__name__ == 'SectionsConverter':
+      self.create_metadata_map() # Map will vary based on Directive kind
 
   def results(self):
     return self.objects
@@ -134,11 +135,10 @@ class BaseConverter(object):
     self.import_metadata()
     object_headers = self.read_headers(self.object_map, self.rows.pop(0))
     row_attrs = self.read_objects(object_headers, self.rows)
-
     for index, row_attrs in enumerate(row_attrs):
       row = self.row_converter(self, row_attrs, index)
       row.setup()
-      self.final_results.append(row.reify())
+      row.reify()
       self.objects.append(row)
 
     if not dry_run:
@@ -189,13 +189,16 @@ class BaseConverter(object):
       row.reify()
       if row:
         self.rows.append(row.attrs)
-
     row_header_map = self.object_map
     for row in self.rows:
       csv_row = []
       for key in row_header_map.keys():
-        field = row_header_map.get(key)
-        csv_row.append(row[field])
+        field = row_header_map[key]
+        # FIXME: There should be no need to do this string checking once all
+        # the control import code is ported over
+        field_val = row.get(field, '')
+        field_val = field_val if isinstance(field_val, basestring) else ''
+        csv_row.append(field_val)
       csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 
   def metadata_map(self):
