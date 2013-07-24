@@ -13,39 +13,50 @@ def main():
   import behave.runner
 
   class GGRCRunner(behave.runner.Runner):
-    def path_in_args(self, path):
-      for arg in sys.argv:
-        if not arg.startswith('-') and \
-            os.path.abspath(arg) == path:
-          return True
-      return False
+    def find_steps_paths_from_path(self, path):
+      steps_dirs = []
+      root_dir = behave.runner.path_getrootdir(path)
+
+      while True:
+        if os.path.isdir(os.path.join(path, 'steps')):
+          steps_dirs.append(os.path.join(path, 'steps'))
+        if path == root_dir:
+          break
+        path = os.path.dirname(path)
+
+      return steps_dirs
+
+    def find_steps_paths_from_paths(self, paths):
+      steps_dirs = []
+      # `self.config.paths` contains all paths passed on the command line
+      for path in self.config.paths:
+        # We use 'abspath' to normalize trailing '/' and avoid duplicates
+        path = os.path.abspath(path)
+        steps_dirs.extend(self.find_steps_paths_from_path(path))
+      return steps_dirs
 
     def get_ggrc_base_path(self):
       return os.path.join(
           os.path.abspath(os.path.dirname(os.path.dirname(ggrc.__file__))),
           'service_specs')
 
-    def get_ggrc_steps_path(self):
-      base_dir = self.get_ggrc_base_path()
-      if self.path_in_args(base_dir):
-        return None
-      # add to sys.path so that the utils and other test helper modules can
-      # be found
-      path = os.path.join(base_dir, 'steps')
-      sys.path.append(path)
-      print 'sys.path', sys.path
-      return path
-
     def load_step_definitions(self, extra_step_paths=[]):
-      # Ensure that src/service_specs/steps is in step paths
-      ggrc_steps_path = self.get_ggrc_steps_path()
-      if ggrc_steps_path is not None \
-          and ggrc_steps_path != os.path.join(self.base_dir, 'steps'):
-        extra_step_paths = list(extra_step_paths)
-        extra_step_paths.append(ggrc_steps_path)
-      print 'extra_step_paths', extra_step_paths
-      super(GGRCRunner, self).load_step_definitions(
-          extra_step_paths=extra_step_paths)
+      steps_dirs = self.find_steps_paths_from_paths(self.config.paths)
+      steps_dirs = set(steps_dirs)
+
+      # Add /src/service_specs/steps always
+      steps_dirs.add(os.path.join(self.get_ggrc_base_path(), 'steps'))
+
+      # Remove the path that `behave` *always* adds
+      implicit_steps_path = os.path.join(self.base_dir, 'steps')
+      steps_dirs.remove(implicit_steps_path)
+
+      # Ensure we don't duplicate anything and only append to `extra_step_paths`
+      steps_dirs.difference_update(
+          [os.path.abspath(path) for path in extra_step_paths])
+
+      return super(GGRCRunner, self).load_step_definitions(
+          extra_step_paths=extra_step_paths + list(steps_dirs))
 
     def load_hooks(self, filename=None):
       filename = filename or \
