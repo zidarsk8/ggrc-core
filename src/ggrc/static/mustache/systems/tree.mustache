@@ -1,43 +1,20 @@
 {{#list}}
-<li class="{{system_or_process}}" data-object-id="{{instance.id}}" data-id="{{instance.id}}" data-object-meta-type="system" data-object-type="{{instance.system_or_process}}">
+<li class="tree-item business" data-object-id="{{instance.id}}" data-id="{{instance.id}}" data-object-meta-type="system" data-object-type="{{instance.system_or_process}}">
   {{#instance}}
   <div class="item-main" data-model="true" {{data 'model'}}>
-    {{#draw_children}}
-        <div class="openclose {{#if start_expanded}}active{{/if}}"></div>
-    {{/draw_children}}
     <div class="item-title">
       <div class="row-fluid">
         <div class="span8">
         <div class="oneline expand-on-hover">
-          <i class="grcicon-system-color"></i>
           <span class="title">
             {{title}}
           </span>
-          <span class="code">
-            {{slug}}
-          </span>
-          <span class="description-inline">
-            
-            <i class="description-inline">
-              {{{firstnonempty description_inline ''}}}
-            </i>
-          </span>
         </div>
         <div class="description{{^description}} inhover no-description{{/description}}">
-          <!-- no notes
-          {{#notes}}
-          <div class="note">
-            {{{notes}}}
-          </div>
-          {{/notes}}
-          -->
-          <div class="rtf">{{{firstnonempty description '<i>No description.</i>'}}}</div>
+          <div class="rtf">{{{firstnonempty description '<p><i>No description.</i></p>'}}}</div>
         </div>
       </div>
       <div class="span1">
-        <a class="view-more" href="javascript://">
-          view
-        </a>
       </div>
       </div>
       <div class="item-actions">
