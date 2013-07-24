@@ -690,8 +690,8 @@ ul.tree-structure.event-log {
 
 ul.new-tree {
   @include reset-list();
-  a.tree-link {
-    &.open {
+  a.openclose {
+    &.active {
       font-weight:bold;
     }
     .row-fluid {
@@ -790,27 +790,6 @@ ul.new-tree {
       }
       &:last-child {
         border-bottom:1px solid #ccc;
-      }
-
-      &.governance {
-        .item-data {
-          color:$governance;
-        }
-      }
-      &.business {
-        .item-data {
-          color:$business;
-        }
-      }
-      &.risk {
-        .item-data {
-          color:$risk;
-        }
-      }
-      &.program {
-        .item-data {
-          color:$programs;
-        }
       }
     }
   }

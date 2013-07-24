@@ -642,9 +642,11 @@ jQuery(function($) {
     });
 
     return this;
+    
   }
-
+  
   $.fn.openclose = openclose;
+  
 });
 
 $(window).load(function(){
