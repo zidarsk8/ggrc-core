@@ -74,180 +74,12 @@
         , $target = $('<div id="' + modal_id + '" class="modal modal-selector fade hide"></div>')
         ;
 
-      $target
+      return $target
         .modal_form({}, $trigger)
         .ggrc_controllers_modal_selector($.extend(
           { $trigger: $trigger },
           options
         ));
-    }
-
-    , OPTION_SETS: {
-      object_documents: function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/documents/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/documents/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/documents/option_detail.mustache",
-
-          new_object_title: "Document",
-          modal_title: "Select References",
-
-          related_model_singular: "Document",
-          related_table_plural: "documents",
-          related_title_singular: "Document",
-          related_title_plural: "Documents",
-
-          option_model: CMS.Models.Document,
-
-          join_model: CMS.Models.ObjectDocument,
-          option_attr: 'document',
-          join_attr: 'documentable',
-          option_id_field: 'document_id',
-          option_type_field: null,
-          join_id_field: 'documentable_id',
-          join_type_field: 'documentable_type',
-
-          join_object: get_page_object(),
-        }
-      }
-
-      , object_people: function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/people/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/people/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/people/option_detail.mustache",
-
-          new_object_title: "Person",
-          modal_title: "Select People",
-
-          related_model_singular: "Person",
-          related_table_plural: "people",
-          related_title_singular: "Person",
-          related_title_plural: "People",
-
-          option_model: CMS.Models.Person,
-
-          join_model: CMS.Models.ObjectPerson,
-          option_attr: 'person',
-          join_attr: 'personable',
-          option_id_field: 'person_id',
-          option_type_field: null,
-          join_id_field: 'personable_id',
-          join_type_field: 'personable_type',
-
-          join_object: get_page_object(),
-        }
-      }
-
-      , system_systems: function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-          new_object_title: "System",
-          modal_title: "Select Systems",
-
-          related_model_singular: "System",
-          related_table_plural: "systems",
-          related_title_singular: "System",
-          related_title_plural: "Systems",
-
-          option_model: CMS.Models.System,
-
-          join_model: CMS.Models.SystemSystem,
-          option_attr: 'child',
-          join_attr: 'parent',
-          option_id_field: 'child_id',
-          option_type_field: null,
-          join_id_field: 'parent_id',
-          join_type_field: null,
-
-          join_object: CMS.Models.System.findInCacheById(data.join_object_id)
-        }
-      }
-
-      , system_controls: function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-          new_object_title: "Control",
-          modal_title: "Select Controls",
-
-          related_model_singular: "Control",
-          related_table_plural: "controls",
-          related_title_singular: "Control",
-          related_title_plural: "Controls",
-
-          option_model: CMS.Models.Control,
-
-          join_model: CMS.Models.SystemControl,
-          option_attr: 'control',
-          join_attr: 'system',
-          option_id_field: 'control_id',
-          option_type_field: null,
-          join_id_field: 'system_id',
-          join_type_field: null,
-
-          join_object: CMS.Models.System.findInCacheById(data.join_object_id)
-        }
-      }
-
-      , program_directives : function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-          new_object_title: data.related_title_singular,
-          modal_title: "Select " + data.related_title_plural,
-
-          related_model_singular: "Directive",
-          related_table_plural: "directives",
-          related_title_singular: "System",
-          related_title_plural: "Systems",
-
-          option_model: CMS.Models[data.child_meta_type],
-          join_model: CMS.Models.ProgramDirective,
-
-          option_attr: 'directive',
-          option_id_field: 'directive_id',
-          option_type_field: 'directive_type',
-          join_id_field: 'program_id',
-          join_type_field: null,
-
-          join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
-        }
-      }
-
-      , risk_controls : function() {
-        return {
-          option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-          active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-          option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-          new_object_title: data.related_title_singular,
-          modal_title: "Select " + data.related_title_plural,
-
-          related_model_singular: "Risk",
-          related_table_plural: "risks",
-          related_title_singular: "Risk",
-          related_title_plural: "Risks",
-
-          option_model: CMS.Models.Control,
-          join_model: CMS.Models.RiskControl,
-
-          option_attr: 'directive',
-          option_id_field: 'directive_id',
-          option_type_field: 'directive_type',
-          join_id_field: 'program_id',
-          join_type_field: null,
-
-          join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
-        }
-      }
     }
   }, {
     init: function() {
@@ -402,6 +234,7 @@
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
+              self.element.trigger("relationshipcreated", join);
             //});
           });
         }
@@ -425,6 +258,7 @@
                 if (join_index >= 0) {
                   self.join_list.splice(join_index, 1);
                 }
+                self.element.trigger("relationshipdestroyed", join);
               });
             });
           }
@@ -476,7 +310,8 @@
 
     get_join_object_type: function() {
       return this.options.join_object.constructor.getRootModelName();
-    }
+    },
+
   });
 
   function get_page_object() {
@@ -485,7 +320,160 @@
 
   function get_option_set(name, data) {
     // Construct options for Person and Reference selectors
-    return can.extend(GGRC.Controllers.ModalSelector.OPTION_SETS[name](), {
+    var OPTION_SETS = {
+      object_documents: {
+        option_column_view: GGRC.mustache_path + "/documents/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/documents/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/documents/option_detail.mustache",
+
+        new_object_title: "Document",
+        modal_title: "Select References",
+
+        related_model_singular: "Document",
+        related_table_plural: "documents",
+        related_title_singular: "Document",
+        related_title_plural: "Documents",
+
+        option_model: CMS.Models.Document,
+
+        join_model: CMS.Models.ObjectDocument,
+        option_attr: 'document',
+        join_attr: 'documentable',
+        option_id_field: 'document_id',
+        option_type_field: null,
+        join_id_field: 'documentable_id',
+        join_type_field: 'documentable_type',
+
+        join_object: get_page_object(),
+      },
+
+      object_people: {
+        option_column_view: GGRC.mustache_path + "/people/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/people/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/people/option_detail.mustache",
+
+        new_object_title: "Person",
+        modal_title: "Select People",
+
+        related_model_singular: "Person",
+        related_table_plural: "people",
+        related_title_singular: "Person",
+        related_title_plural: "People",
+
+        option_model: CMS.Models.Person,
+
+        join_model: CMS.Models.ObjectPerson,
+        option_attr: 'person',
+        join_attr: 'personable',
+        option_id_field: 'person_id',
+        option_type_field: null,
+        join_id_field: 'personable_id',
+        join_type_field: 'personable_type',
+
+        join_object: get_page_object(),
+      },
+
+      system_systems: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "System",
+        modal_title: "Select Systems",
+
+        related_model_singular: "System",
+        related_table_plural: "systems",
+        related_title_singular: "System",
+        related_title_plural: "Systems",
+
+        option_model: CMS.Models.System,
+
+        join_model: CMS.Models.SystemSystem,
+        option_attr: 'child',
+        join_attr: 'parent',
+        option_id_field: 'child_id',
+        option_type_field: null,
+        join_id_field: 'parent_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.System.findInCacheById(data.join_object_id)
+      },
+
+      system_controls: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Control",
+        modal_title: "Select Controls",
+
+        related_model_singular: "Control",
+        related_table_plural: "controls",
+        related_title_singular: "Control",
+        related_title_plural: "Controls",
+
+        option_model: CMS.Models.Control,
+
+        join_model: CMS.Models.SystemControl,
+        option_attr: 'control',
+        join_attr: 'system',
+        option_id_field: 'control_id',
+        option_type_field: null,
+        join_id_field: 'system_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.System.findInCacheById(data.join_object_id)
+      }
+      , program_directives : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: data.related_title_singular,
+        modal_title: "Select " + data.related_title_plural,
+
+        related_model_singular: "Directive",
+        related_table_plural: "directives",
+        related_title_singular: "System",
+        related_title_plural: "Systems",
+
+        option_model: CMS.Models[data.child_meta_type],
+        join_model: CMS.Models.ProgramDirective,
+
+        option_attr: 'directive',
+        option_id_field: 'directive_id',
+        option_type_field: 'directive_type',
+        join_id_field: 'program_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
+      }
+      , risk_controls : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: data.related_title_singular,
+        modal_title: "Select " + data.related_title_plural,
+
+        related_model_singular: "Risk",
+        related_table_plural: "risks",
+        related_title_singular: "Risk",
+        related_title_plural: "Risks",
+
+        option_model: CMS.Models.Control,
+        join_model: CMS.Models.RiskControl,
+
+        option_attr: 'directive',
+        option_id_field: 'directive_id',
+        option_type_field: 'directive_type',
+        join_id_field: 'program_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
+      }
+    };
+    return can.extend(OPTION_SETS[name], {
       join_query : can.deparam(data.join_query)
     });
   }
@@ -555,7 +543,9 @@
           , object_side: $this.data('object-side')
           , relationship_type: $this.data('relationship-type')
           , join_query: $this.data('join-query')
-        }));
+        })).on("relationshipcreated relationshipdestroyed", function(ev, data) {
+          $this.trigger("modal:" + ev.type, data);
+        });
     });
   });
 
@@ -581,7 +571,10 @@
       e.preventDefault();
 
       // Trigger the controller
-      GGRC.Controllers.ModalSelector.launch($this, options);
+      GGRC.Controllers.ModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
     });
   });
 

@@ -2,7 +2,7 @@
   <div class="row-fluid">
     <div class="span6">
       <h4>
-        Search Results ({{ options.length }})
+        Search Results ({{ objects.length }})
       </h4>
     </div>
     <div class="span6">
@@ -14,23 +14,21 @@
 </div>
 <div class="selector-list">
   <ul class="tree-structure simple">
-    {{#options}}
-    <li class="control" {{ data 'option' }} data-id="{{ id }}">
+    {{#objects}}
+    <li class="control" {{ data 'object' }} data-id="{{ id }}">
       <div class="item-main">
         <div class="item-title">
           <div class="row-fluid">
             <div class="span11">
               <div class="oneline">
                 <span class="title">{{name}}</span>
+                <span class="address">{{email}}</span>
               </div>
-            </div>
-            <div class="span1">
-              <input type="checkbox" rel="tooltip" title="map">
             </div>
           </div>
         </div>
       </div>
     </li>
-    {{/options}}
+    {{/objects}}
   </ul>
 </div>
