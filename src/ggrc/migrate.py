@@ -10,6 +10,7 @@ from alembic.config import Config, CommandLine
 from alembic.environment import EnvironmentContext
 from alembic.script import ScriptDirectory
 from ggrc import settings
+import ggrc.app
 from ggrc.extensions import get_extension_module, get_extension_modules
 
 class ExtensionPackageEnv(object):
