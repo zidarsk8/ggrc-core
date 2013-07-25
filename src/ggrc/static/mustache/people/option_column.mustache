@@ -12,26 +12,31 @@
     </div>
   </div>
 </div>
+
 <div class="selector-list">
-  <ul class="tree-structure simple">
+  <ul class="new-tree">
     {{#options}}
-    <li class="control" {{ data 'option' }} data-id="{{ id }}">
-      <div class="item-main">
-        <div class="item-title">
-          <div class="row-fluid">
-            <div class="span11">
-              <div class="oneline">
-                <span class="title">{{name}}</span>
-                <span class="address">{{email}}</span>
+      <li class="tree-item business" {{ data 'option' }} data-id="{{ id }}">
+        <div class="item-main">
+          <div class="simple-link">
+            <div class="row-fluid">
+              <div class="span11">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    {{name}}
+                    <span class="url-link">
+                      {{email}}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="span1">
-              <input type="checkbox" rel="tooltip" title="map">
+              <div class="span1">
+                <input type="checkbox" rel="tooltip" title="map">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </li>
+      </li>
     {{/options}}
   </ul>
 </div>
