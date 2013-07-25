@@ -179,9 +179,6 @@ $(function() {
 
   });
 
-  $(document.body).on("click", ".top-level li.accordion-group a", function(ev) {
-    $(this).toggleClass("active");
-  });
 });
 
 })(this, jQuery);

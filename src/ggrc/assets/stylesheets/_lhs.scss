@@ -342,10 +342,7 @@
   width:200px;
   float:left;
   min-height:600px;
-  ul.internav {
-    border-top:1px solid #ddd;
-    @include reset-list();
-    overflow-y:auto;
+  .object-nav {
     &.affix {
       position: fixed;
       top: 81px;
@@ -353,6 +350,19 @@
       width:200px;
       height:100%;
     }
+    a.add-nav-item {
+      display:block;
+      border-bottom:1px solid #ddd;
+      line-height:30px;
+      font-size:12px;
+      font-weight:bold;
+      padding-left:20px;
+    }
+  }
+  ul.internav {
+    border-top:1px solid #ddd;
+    @include reset-list();
+    overflow-y:auto;
     a {
       padding-left:20px;
       display:block;
