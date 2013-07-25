@@ -55,7 +55,8 @@
 -block main
   .clearfix
     .inner-nav
-      %ul.nav{ 'class': "internav ={ model_display_class }", 'data-spy': 'affix', 'data-offset-top': '1' }
+      .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
+        %ul.nav{ 'class': "internav ={ model_display_class }" }
     .object-area
       #columns.column-set{ 'data-resize': "true" }
         #left_column.widget-area
