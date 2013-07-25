@@ -73,7 +73,7 @@
 
       var href = $trigger.attr('data-href') || $trigger.attr('href')
         , modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '')
-        , $target = $('<div id="' + modal_id + '" class="modal modal-selector fade hide"></div>')
+        , $target = $('<div id="' + modal_id + '" class="modal modal-selector hide"></div>')
         ;
 
       $target.modal_form({}, $trigger);
@@ -232,13 +232,13 @@
       });
     },
 
-    " hide": function(el, ev) {
+    /*" hide": function(el, ev) {
       // FIXME: This should only happen if there has been a change.
       //   - (actually, the "Related Widget" should just be Can-ified instead)
       var list_target = this.options.$trigger.data('list-target');
       if (list_target === "refresh" && this._data_changed)
         setTimeout(can.proxy(window.location.reload, window.location), 10);
-    },
+    },*/
 
     select_object: function(el) {
       el.closest('.object_column').find('li').removeClass('selected');
@@ -261,7 +261,7 @@
 
       // FIXME: This is to trigger a page refresh only when data has changed
       //   - currently only used for the Related widget (see the " hide" event)
-      this._data_changed = true;
+      //this._data_changed = true;
 
       if (el.is(':checked')) {
         // First, check if join instance already exists

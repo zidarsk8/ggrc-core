@@ -71,15 +71,12 @@
 
       var href = $trigger.attr('data-href') || $trigger.attr('href')
         , modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '')
-        , $target = $('<div id="' + modal_id + '" class="modal modal-selector fade hide"></div>')
+        , $target = $('<div id="' + modal_id + '" class="modal modal-selector hide"></div>')
         ;
 
-      return $target
-        .modal_form({}, $trigger)
-        .ggrc_controllers_modal_selector($.extend(
-          { $trigger: $trigger },
-          options
-        ));
+      $target.modal_form({}, $trigger);
+      this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
+      return $target;
     }
   }, {
     init: function() {
@@ -134,20 +131,18 @@
       }
       $.extend(join_query, this.options.extra_join_fields);
 
-      // FIXME: Do this better
-      cache_buster = { _: Date.now() }
       return $.when(
         this.options.option_model.findAll(
-          $.extend({}, this.option_query, cache_buster),
+          $.extend({}, this.option_query),
           function(options) {
             self.option_list.replace(options)
           }),
         this.options.join_model.findAll(
-          $.extend({}, join_query, cache_buster),
+          $.extend({}, join_query),
           function(joins) {
-            can.each(joins, function(join) {
-              join.attr('_removed', false);
-            });
+            //can.each(joins, function(join) {
+            //  join.attr('_removed', false);
+            //});
             self.join_list.replace(joins);
           })
         );
@@ -162,7 +157,7 @@
         options: this.option_list,
         joins: this.join_list,
         actives: this.active_list,
-        selected: null,
+        selected_option: null,
       }, this.options));
 
       can.view(
@@ -210,7 +205,7 @@
         $(this).removeClass('selected');
       });
       el.addClass('selected');
-      this.context.attr('selected', option);
+      this.context.attr('selected_option', option);
     },
 
     ".option_column li input[type='checkbox'] change": function(el, ev) {
@@ -227,7 +222,7 @@
         // First, check if join instance already exists
         if (join) {
           // Ensure '_removed' attribute is false
-          join.attr('_removed', false);
+          //join.attr('_removed', false);
         } else {
           // Otherwise, create it
           join = this.get_new_join(option.id, option.constructor.getRootModelName());
@@ -300,7 +295,7 @@
         join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       // FIXME: context_id must get a real value
-      $.extend(join_params, this.options.extra_join_fields, { context: { id: 0 } });
+      $.extend(join_params, this.options.extra_join_fields, { context: { id: null } });
       return new (this.options.join_model)(join_params);
     },
 
