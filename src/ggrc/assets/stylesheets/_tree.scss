@@ -158,6 +158,12 @@ ul.new-tree {
       font-size:13px;
       color:#777;
     }
+    .not-mapped {
+      font-size:13px;
+      font-weight:bold;
+      color:$error;
+    }
+
     .event-time {
       font-size:13px;
       color:#777;
