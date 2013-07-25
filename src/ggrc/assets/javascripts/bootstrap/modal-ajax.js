@@ -148,19 +148,32 @@
     },
 
     'deleteform': function($target, $trigger, option) {
-      var $proxy_target = $trigger.closest('.modal');
-      $target.modal_form(option, $trigger);
+      var form_target = $trigger.data('form-target')
+      , model = CMS.Models[$trigger.attr("data-object-singular")]
+      , instance;
+      if($trigger.attr('data-object-id') === "page") {
+        instance = GGRC.make_model_instance(GGRC.page_object);
+      } else {
+        instance = model.findInCacheById($trigger.attr('data-object-id'));
+      }
 
-      $target.on('ajax:json', function(e, data, xhr) {
-        if (data.errors) {
+      $target
+      .modal_form(option, $trigger)
+      .ggrc_controllers_delete({
+        new_object_form : false
+        , button_view : GGRC.mustache_path + "/modals/delete_cancel_buttons.mustache"
+        , model : model
+        , instance : instance
+        , modal_title : "Delete " + $trigger.attr("data-object-singular")
+        , content_view : GGRC.mustache_path + "/base_objects/confirm_delete.mustache" 
+      });
+
+      $target.on('modal:success', function(e, data) {
+        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
+          window.location.assign('/dashboard');
         } else {
+          $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
-          if ($proxy_target.length > 0) {
-            $proxy_target.trigger('delete-object', [data, xhr]);
-            $proxy_target.modal_form('hide');
-          } else {
-            window.location.assign(xhr.getResponseHeader('location'));
-          }
         }
       });
     },
@@ -179,7 +192,7 @@
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
         new_object_form : !$trigger.attr('data-object-id')
-        , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+        , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
         , modal_title : (instance ? "Edit " : "New ") + $trigger.attr("data-object-singular")

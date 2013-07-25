@@ -13,7 +13,8 @@ from .relationships import RelatedObjectResults
 from . import filters
 from flask import request, redirect, url_for, flash
 from ggrc.converters.common import ImportException
-
+from ggrc.converters.sections import SectionsConverter
+from ggrc.converters.controls import ControlsConverter
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
@@ -90,6 +91,34 @@ def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
 
+@app.route("/directives/<directive_id>/import_controls", methods=['GET', 'POST'])
+def import_controls(directive_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.controls import ControlsConverter
+  from ggrc.converters.import_helper import handle_csv_import
+
+  if request.method == 'POST':
+    if 'cancel' in request.form:
+      return import_redirect(directive_id)
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        converter = handle_csv_import(ControlsConverter, csv_file,
+          directive_id = directive_id, dry_run = dry_run,)
+
+        if dry_run:
+          return render_template("directives/import_controls_result.haml",directive_id = directive_id,
+          converter = converter, results=converter.objects, heading_map = converter.object_map)
+        else:
+          return import_redirect(directive_id)
+    except ImportException as e:
+      return render_template("directives/import_errors.haml",
+            directive_id = directive_id, exception_message = str(e))
+
+  return render_template("directives/import.haml", directive_id = directive_id)
+
 @app.route("/directives/<directive_id>/import_sections", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
@@ -106,13 +135,13 @@ def import_sections(directive_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(SectionsConverter, csv_file,
-            directive_id = directive_id, dry_run = dry_run)
-        results = converter.final_results
-        return import_redirect(directive_id) if not dry_run else \
-            render_template("directives/import_result_errors.haml",
-              directive_id = directive_id, converter = converter,
-              dummy_data=results,
-              all_warnings=converter.warnings, all_errors=converter.errors)
+          directive_id = directive_id, dry_run = dry_run,)
+
+        if dry_run:
+          return render_template("directives/import_result.haml",directive_id = directive_id,
+          converter = converter, results=converter.objects, heading_map = converter.object_map)
+        else:
+          return import_redirect(directive_id)
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -138,6 +167,15 @@ def export_sections(directive_id):
 
   if request.method == 'GET':
     return handle_converter_csv_export(directive_id, SectionsConverter)
+  return redirect('directives/{}'.format(directive_id))
+
+@app.route("/directives/<directive_id>/export_controls", methods=['GET', 'POST'])
+def export_controls(directive_id):
+  from ggrc.converters.controls import ControlsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+
+  if request.method == 'GET':
+    return handle_converter_csv_export(directive_id, ControlsConverter)
   return redirect('directives/{}'.format(directive_id))
 
 def _all_views(view_list):

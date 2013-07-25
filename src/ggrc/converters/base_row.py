@@ -1,5 +1,5 @@
 from .common import *
-from ggrc.models.control import Control
+from ggrc.models.all_models import *
 
 base_errors = []
 errors = {}
@@ -110,14 +110,8 @@ class BaseRowConverter(object):
       else:
         raise ImportException
 
-  def handle(self, key, handler_class, **options):
-    self.handlers[key] = handler_class(self, key, **options)
-    if self.options.get('export'):
-      self.attrs[key] =  self.handlers[key].export()
-    else:
-      handle_result = self.handlers[key].do_import(self.attrs.get(key))
-      #self.add_after_save_hook(self.handlers[key])
-      return handle_result
+  def handle_boolean(self, key, **options):
+    return self.handle(key, BooleanColumnHandler, **options)
 
   def handle_text_or_html(self, key, **options):
     return self.handle(key, TextOrHtmlColumnHandler, **options)
@@ -128,11 +122,26 @@ class BaseRowConverter(object):
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
 
+  def handle_option(self, key, **options):
+    self.handle(key, OptionColumnHandler, **options)
+
   def find_by_slug(self, slug):
     return self.model_class.query.filter_by(slug=str(slug)).first()
 
   def set_attr(self, name, value):
     setattr(self.obj, name, value)
+
+  def get_attr(self, name):
+    return getattr(self.obj, name, '') or ''
+
+  def handle(self, key, handler_class, **options):
+    self.handlers[key] = handler_class(self, key, **options)
+    if self.options.get('export'):
+      self.attrs[key] =  self.handlers[key].export()
+    else:
+      handle_result = self.handlers[key].do_import(self.attrs.get(key))
+      #self.add_after_save_hook(self.handlers[key])
+      return handle_result
 
 class ColumnHandler(object):
 
@@ -154,7 +163,7 @@ class ColumnHandler(object):
   def add_warning(self, message):
     self.warnings.append(message)
 
-  def has_errors(self):
+  def has_error(self):
     return any(self.errors) or self.importer.errors.get(self.key) or self.importer.obj.errors.get(self.key)
 
   def has_warnings(self):
@@ -202,7 +211,7 @@ class TextOrHtmlColumnHandler(ColumnHandler):
       if not isinstance(value, unicode):
         value = value.encode('utf-8')
         value = unicode(value, 'utf-8')
-    return value if value else ''
+    return value or ''
 
 class SlugColumnHandler(ColumnHandler):
 
@@ -218,6 +227,17 @@ class SlugColumnHandler(ColumnHandler):
     else:
       self.add_warning('Code will be autofilled')
     return content
+
+class OptionColumnHandler(ColumnHandler):
+  def parse_item(self, value):
+    pass
+
+class BooleanColumnHandler(ColumnHandler):
+  def parse_item(self, value):
+    truthy_values = options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
+    if value:
+      return value.lower() in truthy_values
+    return None
 
 class DateColumnHandler(ColumnHandler):
 
@@ -237,6 +257,7 @@ class DateColumnHandler(ColumnHandler):
         raise ValueError("Error parsing the date string")
 
       if date_result:
+        import ipdb; ipdb.set_trace() ### XXX BREAKPOINT
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
       else:
         return ''
@@ -250,8 +271,8 @@ class DateColumnHandler(ColumnHandler):
       return getattr(self.importer.obj, self.key) if self.importer.obj else ''
 
   def export(self):
-    date_result = getattr(self.importer.obj, self.key)
-    return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
+    date_result = getattr(self.importer.obj, self.key, '')
+    return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day) if date_result else ''
 
 class LinksHandler(ColumnHandler):
 
@@ -360,5 +381,36 @@ class LinkControlsHandler(LinksHandler):
 
   def create_item(data):
     pass
+
+class LinkCategoriesHandler(LinksHandler):
+  model_class = Category
+
+  def parse_item(self, data):
+    return { 'name':data }
+
+
+class LinkDocumentsHandler(LinksHandler):
+  model_class = Document
+
+  def parse_item(self, value):
+    pass
+
+class LinkPeopleHandler(LinksHandler):
+  model_class = Person
+
+  def parse_item(self, value):
+    pass
+
+class LinkSystemsHandler(LinksHandler):
+  model_class = System
+
+  def parse_item(self, value):
+    pass
+
+class LinkRelationshipsHandler(LinksHandler):
+
+  def parse_item(self, value):
+    pass
+
 
 

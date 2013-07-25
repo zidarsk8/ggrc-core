@@ -1,7 +1,6 @@
 from .base import *
 
 from ggrc.models import Directive, Section
-from .import_helper import *
 from .base_row import *
 from collections import OrderedDict
 
@@ -24,7 +23,6 @@ class SectionRowConverter(BaseRowConverter):
     notes = self.handle_text_or_html('notes')
     self.handle('controls', LinkControlsHandler)
     title = self.handle_raw_attr('title')
-    return [slug,title, description, notes]
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):
@@ -51,21 +49,21 @@ class SectionsConverter(BaseConverter):
     ('Audit Frequency', 'audit_frequency'),
     ('Audit Duration','audit_duration'),
     ('Version' ,'version')
-    ])
+  ])
 
   object_export_order = [
     'slug', 'title', 'description', 'notes',
     'controls', 'created_at', 'updated_at'
-    ]
+  ]
 
   object_map = OrderedDict([
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
-    ('Section Notes' , 'notes'),
+    ('Abstract' , 'notes'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')
-    ])
+  ])
 
   row_converter = SectionRowConverter
 
@@ -84,8 +82,4 @@ class SectionsConverter(BaseConverter):
     yield []
     yield []
     yield self.object_map.keys()
-
-  @classmethod
-  def start_import(cls, filepath, **options):
-    return handle_csv_import(cls, filepath, **options)
 

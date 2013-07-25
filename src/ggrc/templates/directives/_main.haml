@@ -31,10 +31,16 @@
               %li
                 %a{ 'href': "/directives/={instance.id}/import_sections" }
                   Import Sections
+              %li
+                %a{ 'href': "/directives/={instance.id}/import_controls" }
+                  Import Controls
               %li.divider
               %li
                 %a{ 'href': "/directives/={instance.id}/export_sections" }
                   Export Sections
+              %li
+                %a{ 'href': "/directives/={instance.id}/export_controls" }
+                  Export Controls
 
           %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
             %i.grcicon-add
