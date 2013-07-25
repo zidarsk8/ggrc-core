@@ -121,16 +121,17 @@
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
+
       <a href="javascript://" class="section-add">
         + Section
       </a>
-      <a href="javascript://" class="section-create">
+      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections">
         <i class="grcicon-add-black"></i>
         Create Section
       </a>
       &nbsp;
       &nbsp;
-      <a href="javascript://" class="section-import">
+      <a href="/directives/{{instance.id}}/import_sections" class="section-import">
         <i class="grcicon-imp-exp"></i>
         Import Sections
       </a>

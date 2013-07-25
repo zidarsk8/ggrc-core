@@ -737,5 +737,5 @@ can.reduce ||
             || $(document.body).data("page-type") 
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
-
+// hello
 })(window.jQuery);

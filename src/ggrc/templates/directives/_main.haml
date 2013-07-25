@@ -36,9 +36,6 @@
                 %a{ 'href': "/directives/={instance.id}/export_sections" }
                   Export Sections
 
-          %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#regulations, #combo', 'data-route' : "regulations", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : "Create New #{section_meta_kind|title}", 'data-object-singular' : 'Section', 'data-object-plural' : 'sections' }
-            %i.grcicon-add
-            =section_meta_kind|title
           %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
             %i.grcicon-add
             Control
@@ -53,11 +50,6 @@
         %a{ 'href' : '#controls', 'data-toggle' : 'tab' }
           %i.grcicon-control-color 
           Controls
-    .action-items
-      %a.expandAll.btn.btn-mini{'href' : "#", 'rel' : "tooltip", 'title' : "Expand all"}
-        %i.grcicon-wide-black
-      %a.shrinkAll.btn.btn-mini{'href' : "#", 'rel' : "tooltip", 'title' : "Collapse all"}
-        %i.grcicon-normal-black
 
     .tab-content
       #sections.tab-pane

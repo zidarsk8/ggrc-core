@@ -125,25 +125,6 @@
           top: 13px !important;
           left: 465px !important;
         }
-        ul.tree-structure {
-          li {
-            cursor:pointer;
-            &:last-child {
-             border-bottom:1px solid $lightGray; 
-            }
-            &.selected {
-             background:lighten(#c8edfc,5%);
-             border-bottom:1px solid darken(#c8edfc,5%); 
-            }
-            a:hover {
-              text-decoration:none;
-            }
-      .address {
-        color:$gray;
-        font-size:$f-regular;
-      }
-          }
-        }
       }
       .selector-info {
     .pull-right {
@@ -565,11 +546,6 @@
 
 
 .modal-section {
-  ul.tree-structure {
-    .item-title {
-      margin-left:0;
-    }
-  }
   padding-bottom:10px;
   @include default-border-bottom();
   &:hover {
