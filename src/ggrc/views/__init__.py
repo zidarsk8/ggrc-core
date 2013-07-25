@@ -15,7 +15,7 @@ from flask import request, redirect, url_for, flash, session
 from ggrc.converters.common import ImportException
 from ggrc.converters.sections import SectionsConverter
 from ggrc.converters.controls import ControlsConverter
-from ggrc.models import Directive, Section
+
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
