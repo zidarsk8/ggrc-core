@@ -10,6 +10,47 @@
 //= require controls/control
 //= require controls/category
 
+var RefreshQueue = function() {
+  var refresh_types_ids = {}
+    , refresh_types_models = {}
+    ;
+
+  return {
+    enqueue: function(obj, force) {
+      var model = obj.constructor
+        , model_name = model.shortName
+        ;
+
+      if (force || !obj.selfLink) {
+        refresh_types_models[model_name] = model;
+        refresh_types_ids[model_name] = refresh_types_ids[model_name] || [];
+        if (refresh_types_ids[model_name].indexOf(obj.id) == -1)
+          refresh_types_ids[model_name].push(obj.id);
+      }
+    },
+
+    trigger: function() {
+      var dfds = []
+        , this_refresh_types_ids = refresh_types_ids
+        , this_refresh_types_models = refresh_types_models
+        ;
+
+      refresh_types_ids = {};
+      refresh_types_models = {};
+
+      can.each(this_refresh_types_ids, function(ids, model_name) {
+        var model = this_refresh_types_models[model_name];
+        dfds.push(model.findAll({ id__in: ids.join(",") }));
+      });
+
+      if (dfds.length > 0)
+        return $.when.apply($, dfds);
+      else
+        return (new $.Deferred()).resolve()
+    }
+  }
+};
+
 (function(can, $) {
 
 if(!/^\/programs\/\d+/.test(window.location.pathname))
