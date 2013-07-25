@@ -182,7 +182,7 @@ class Slugged(Base):
     """
     for o in session.new:
       if isinstance(o, Slugged) and (o.slug is None or o.slug == ''):
-        o.slug = uuid1()
+        o.slug = str(uuid1())
         o._replace_slug = True
 
   @classmethod
