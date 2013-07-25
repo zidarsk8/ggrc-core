@@ -15,6 +15,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     , widget_name : ""
     , widget_icon : ""
     , widget_view : "/static/mustache/dashboard/object_widget.mustache"
+    , widget_guard : null
     , show_filter : false
     , object_category : null //e.g. "governance"
     , content_selector : ".content"

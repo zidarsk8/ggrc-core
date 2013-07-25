@@ -227,10 +227,10 @@ can.Model.Join("CMS.Models.UserRole", {
       typeof _super === "function" && _super.call(this);
       this.attr("person", CMS.Models.get_instance(
         "Person",
-        this.person_id || (this.person && this.person.id)));
+        this.person_id || (this.person && this.person.id), this.person));
       this.attr("role", CMS.Models.get_instance(
         "Role",
-        this.role_id || (this.role && this.role.id)));
+        this.role_id || (this.role && this.role.id), this.role));
 
       this.each(function(value, name) {
         if (value === null)

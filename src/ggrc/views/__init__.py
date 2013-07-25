@@ -11,18 +11,22 @@ from werkzeug.exceptions import Forbidden
 from .tooltip import TooltipView
 from .relationships import RelatedObjectResults
 from . import filters
-from flask import request, redirect, url_for, flash
+from flask import request, redirect, url_for, flash, session
 from ggrc.converters.common import ImportException
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
+def get_permissions_json():
+  return json.dumps(session['permissions'])
+
 @app.context_processor
 def base_context():
   from ggrc.models import get_model
   return dict(
       get_model=get_model,
+      permissions_json=get_permissions_json,
       )
 
 from flask import render_template

@@ -50,7 +50,7 @@ asset_paths = {}
 for assets_yaml_path in assets_yamls:
   with open(assets_yaml_path) as f:
     for k,v in yaml.load(f.read()).items():
-      asset_paths.setdefault(k, []).extend(v)
+      asset_paths.setdefault(k, []).extend(v or [])
 
 if not settings.AUTOBUILD_ASSETS:
   environment.auto_build = False

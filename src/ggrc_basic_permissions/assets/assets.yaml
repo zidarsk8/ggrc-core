@@ -2,3 +2,10 @@
 dashboard-js-files:
   - controllers/contributions.js
 
+dashboard-js-template-files:
+  #- people_roles/authorizations_by_person_list.mustache
+  #- people_roles/authorizations_modal_actions.mustache
+  #- people_roles/base_modal.mustache
+  #- people_roles/object_column.mustache
+  #- people_roles/object_detail.mustache
+  #- people_roles/option_column.mustache
