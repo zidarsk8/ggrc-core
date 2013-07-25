@@ -169,12 +169,11 @@
       });
 
       $target.on('modal:success', function(e, data) {
-        if($trigger.attr('data-object-id') === "page") {
+        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
           window.location.assign('/dashboard');
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
-          window.location.assign('/dashboard');
         }
       });
     },
