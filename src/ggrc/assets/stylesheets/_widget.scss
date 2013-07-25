@@ -10,9 +10,6 @@
       .content {
         overflow-y: auto;
       }
-      .tab-content {
-        padding: 9px;
-      }
       .nav-tabs {
         padding-left: 10px;
         margin-right: 0;
@@ -90,12 +87,9 @@
     .tabs-left {
       padding-bottom: 26px;
     }
-    .tab-content {
-      padding-top: 10px;
-    }
     .nav-tabs {
       background: $lightGray;
-      margin-right: 7px;
+      margin-right: 0;
       padding: 9px 0 0 2px;
       border: none;
       margin-bottom: 0;

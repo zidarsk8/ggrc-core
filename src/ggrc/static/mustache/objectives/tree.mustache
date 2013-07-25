@@ -1,5 +1,4 @@
 {{#list}}
-
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="objective">
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
@@ -12,9 +11,11 @@
             </div>
           </div>
           <div class="span1">
-            {{^instance.owner}}
-              <i class="grcicon-people-warning"></i>
-            {{/instance.owner}}
+            <div class="counter">
+              {{^instance.owner}}
+                <i class="grcicon-people-warning"></i>
+              {{/instance.owner}}
+            </div>
           </div>
           <div class="span1">
             <div class="counter">
@@ -69,10 +70,12 @@
               {{/if_null}}
             </div>
           </div>
-          <a href="{{instance.viewLink}}" class="info-action pull-right" rel="tooltip" title="View Objective" data-placement="left">
-            <i class="grcicon-goto"></i>
-            View
-          </a>
+          <div class="span4">
+            <a href="{{instance.viewLink}}" class="info-action pull-right" rel="tooltip" title="View Objective" data-placement="left">
+              <i class="grcicon-goto"></i>
+              View
+            </a>
+          </div>
         </div>
       </div>
     </div>
