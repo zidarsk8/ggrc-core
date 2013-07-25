@@ -18,15 +18,11 @@
     %i.grciconlarge-dashboard
     Dashboard
 
--block main
-  #columns.column-set{ 'data-resize': "true" }
-    #left_column.widget-area
-      -with widget_class = 'widget-tabs'
-        -include 'dashboard/_governance.haml'
-        -include 'dashboard/_business_objects.haml'
-        -include 'dashboard/_programs.haml'
-        -#FIXME: Restrict 'risk' visibility
-        -#  e.g., if current_user.can_manage_risk()
-        -include 'dashboard/_risk.haml'
-      -include 'shared/_add_widget_section.haml'
-    -#right_column
+-block widget_area
+  -with widget_class = 'widget-tabs'
+    -include 'dashboard/_governance.haml'
+    -include 'dashboard/_business_objects.haml'
+    -include 'dashboard/_programs.haml'
+    -#FIXME: Restrict 'risk' visibility
+    -#  e.g., if current_user.can_manage_risk()
+    -#include 'dashboard/_risk.haml'

@@ -44,21 +44,11 @@
         &nbsp;
     =instance.title
 
--block main
-  .clearfix
-    .inner-nav
-      .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
-        %ul.nav{ 'class': "internav ={ model_display_class }" }
-        %a{ 'class': "add-nav-item", 'href': '#' }
-          + Add...
-    .object-area
-      #show_columns.column-set{ 'data-resize': "true" }
-        #middle_column.widget-area
-          -with widget_class = model_display_class
-            -include 'base_objects/_info.haml'
-            -include 'base_objects/_main.haml'
-          -#with widget_class = 'risk'
-            -include 'base_objects/_risks.haml'
-          -with widget_class = model_display_class
-            -include 'base_objects/_more_info.haml'
-          -include 'shared/_add_widget_section.haml'
+-block widget_area
+  -with widget_class = model_display_class
+    -include 'base_objects/_info.haml'
+    -include 'base_objects/_main.haml'
+  -#with widget_class = 'risk'
+    -include 'base_objects/_risks.haml'
+  -with widget_class = model_display_class
+    -include 'base_objects/_more_info.haml'

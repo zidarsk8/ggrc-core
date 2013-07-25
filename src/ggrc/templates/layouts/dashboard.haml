@@ -148,6 +148,15 @@
                   -value.each do |message|
                     %p=message
           -block main
+            .clearfix
+              .inner-nav
+                .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
+                  %ul.nav{ 'class': "internav ={ model_display_class }" }
+                  -include 'shared/_add_widget_section.haml'
+              .object-area
+                #show_columns.column-set{ 'data-resize': "true" }
+                  #middle_column.widget-area
+                    -block widget_area
         %section.footer
           .row-fluid
             .span12
