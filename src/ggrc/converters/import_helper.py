@@ -5,7 +5,8 @@ from StringIO import StringIO
 from flask import current_app
 from ggrc import db
 from .common import ImportException
-
+from ggrc.converters.sections import SectionsConverter
+from ggrc.converters.controls import ControlsConverter
 
 def handle_csv_import(converter_class, filepath, **options):
   rows = []
@@ -42,7 +43,10 @@ def handle_converter_csv_export(directive_id, converter_class, **options):
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   options['directive'] = directive
   filename = "{}.csv".format(directive.slug)
-  objects = directive.sections
+  if converter_class is SectionsConverter:
+    objects = directive.sections
+  elif converter_class is ControlsConverter:
+    objects = directive.controls
 
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
   status_code = 200

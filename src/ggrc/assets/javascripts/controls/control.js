@@ -15,6 +15,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   , category : "governance"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
+  , destroy : "DELETE /api/controls/{id}"
   , attributes : {
     object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"

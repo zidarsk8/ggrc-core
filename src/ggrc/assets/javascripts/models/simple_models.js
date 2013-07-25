@@ -16,6 +16,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , findAll : "/api/programs?kind=Directive"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
+  , destroy : "DELETE /api/programs/{id}"
   , links_to : {
     "Regulation" : "ProgramDirective"
     , "Policy" : "ProgramDirective"
@@ -46,6 +47,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , findAll : "/api/directives"
   , create : "POST /api/directives"
   , update : "PUT /api/directives/{id}"
+  , destroy : "DELETE /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.SectionSlug.models"
     //, program : "CMS.Models.Program.model"
@@ -190,6 +192,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , findAll : "/api/org_groups"
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
+  , destroy : "DELETE /api/org_groups/{id}"
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -251,6 +254,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , findAll : "/api/projects"
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
+  , destroy : "DELETE /api/projects/{id}"
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -296,6 +300,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , findAll : "/api/facilities"
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
+  , destroy : "DELETE /api/facilities/{id}"
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -357,6 +362,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , findAll : "/api/products"
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
+  , destroy : "DELETE /api/products/{id}"
   , attributes : {
     type : "CMS.Models.Option.model"
   }
@@ -437,6 +443,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , findAll : "/api/data_assets"
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
+  , destroy : "DELETE /api/data_assets/{id}"
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -498,6 +505,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , findAll : "/api/markets"
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
+  , destroy : "DELETE /api/markets/{id}"
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -543,6 +551,7 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   , findAll : "/api/risky_attributes"
   , create : "POST /api/risky_attributes"
   , update : "PUT /api/risky_attributes/{id}"
+  , destroy : "DELETE /api/risky_attributes/{id}"
   , links_to : ["Risk"]
   , init : function() {
     this.validatePresenceOf("title");
@@ -583,6 +592,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , update : "PUT /api/risks/{id}"
+  , destroy : "DELETE /api/risks/{id}"
   , create : function(params) {
     params.trigger = params.risk_trigger;
     return $.ajax({
@@ -637,6 +647,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , findAll : "/api/objectives"
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
+  , destroy : "DELETE /api/objectives/{id}"
   , links_to : {
   }
   , init : function() {
@@ -650,6 +661,7 @@ can.Model.Cacheable("CMS.Models.Help", {
   , root_collection : "helps"
   , findAll : "GET /api/help"
   , update : "PUT /api/help/{id}"
+  , destroy : "DELETE /api/help/{id}"
   , create : "POST /api/help"
 }, {});
 
@@ -664,6 +676,7 @@ can.Model.Cacheable("CMS.Models.Role", {
   , root_collection : "roles"
   , findAll : "GET /api/roles"
   , update : "PUT /api/roles/{id}"
+  , destroy : "DELETE /api/roles/{id}"
   , create : "POST /api/roles"
 }, {});
 

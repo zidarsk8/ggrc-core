@@ -17,6 +17,7 @@ can.Model.Cacheable("CMS.Models.Person", {
    , findOne : "GET /api/people/{id}"
    , create : "POST /api/people"
    , update : "PUT /api/people/{id}"
+   , destroy : "DELETE /api/people/{id}"
     , search : function(request, response) {
         return $.ajax({
             type : "get"

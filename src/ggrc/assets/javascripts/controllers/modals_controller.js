@@ -12,7 +12,7 @@ can.Control("GGRC.Controllers.Modals", {
   , BUTTON_VIEW_CLOSE : GGRC.mustache_path + "/modals/close_buttons.mustache"
 //  BUTTON_VIEW_SAVE
   , BUTTON_VIEW_SAVE_CANCEL : GGRC.mustache_path + "/modals/save_cancel_buttons.mustache"
-//  BUTTON_VIEW_SAVE_CANCEL_DELETE
+  , BUTTON_VIEW_SAVE_CANCEL_DELETE : GGRC.mustache_path + "/modals/save_cancel_delete_buttons.mustache"
 
   , defaults : {
     preload_view : GGRC.mustache_path + "/dashboard/modal_preload.mustache"
