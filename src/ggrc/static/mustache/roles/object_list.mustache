@@ -1,19 +1,27 @@
 {{! dashboard object listing}}
-<ul class="tree-structure simple single-row-tabs">
-{{#list}}
-  <li data-model="true" {{data 'model'}} class="{{object_type}}"> 
-    <a>
-      {{{withattr "href" "{viewLink}"}}}
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="item-identifier">
-            <span class="title">
-              {{name}}
-            </span>
+<ul class="tree-structure new-tree">
+  {{#list}}
+    <li class="tree-item {{object_type}}" data-model="true" {{data 'model'}}> 
+      <a class="simple-link" href="{{viewLink}}">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{name}}
+              </div>
+            </div>
           </div>
         </div>
+      </a>
+    </li>
+  {{/list}}
+  <li class="tree-item tree-item-add">
+    <div class="row-fluid">
+      <div class="span12">
+        <a href="javascript://">
+          + Role
+        </a>
       </div>
-    </a>
+    </div>
   </li>
-{{/list}}
 </ul>

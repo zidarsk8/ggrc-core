@@ -704,6 +704,17 @@ ul.new-tree {
       }
     }
   }
+  a.simple-link {
+    .row-fluid {
+      &:hover {
+        background:lighten(#ff9,5%);
+        .tree-title-area {
+          font-weight:bold;
+        }
+      }
+    }
+  }
+  
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:30px;
