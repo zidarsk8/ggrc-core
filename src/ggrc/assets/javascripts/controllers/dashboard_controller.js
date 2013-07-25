@@ -9,18 +9,78 @@
 
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
-        widget_descriptors: null
+        model_descriptors: null
+      , menu_tree_spec: null
+      //  widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
+      //
     }
 
 }, {
     init: function(options) {
+      this.init_widget_descriptors();
+      if (!this.options.menu_tree)
+        this.init_menu_tree();
       if (!this.inner_nav_controller)
-        this.inner_nav_controller = new CMS.Controllers.InnerNav(
-          $(".inner-nav .internav"), { dashboard_controller: this });
-
+        this.init_inner_nav();
       this.update_inner_nav();
+      if (!this.add_widget_controller)
+        this.init_add_widget();
+      if (!this.widget_area_controller)
+        this.init_widget_area();
+    }
+
+  , init_widget_area: function() {
+      this.widget_area_controller = new CMS.Controllers.SortableWidgets(
+          this.element.find('.widget-area'), {
+              dashboard_controller: this
+          });
+    }
+
+  , init_inner_nav: function() {
+      this.inner_nav_controller = new CMS.Controllers.InnerNav(
+          this.element.find('.internav'), {
+              dashboard_controller: this
+          });
+    }
+
+  , init_add_widget: function() {
+      this.add_widget_controller = new CMS.Controllers.AddWidget(
+          this.element.find('.add-nav-item'), {
+              dashboard_controller : this
+            //, widget_descriptors : this.options.widget_descriptors
+            , menu_tree : this.options.menu_tree
+          });
+      }
+
+  , init_widget_descriptors: function() {
+      var that = this;
+
+      this.options.widget_descriptors = this.options.widget_descriptors || {};
+
+      can.each(this.options.model_descriptors, function(descriptor, key) {
+        that.options.widget_descriptors[key] =
+          that.make_list_view_descriptor_from_model_descriptor(descriptor);
+      });
+    }
+
+  , init_menu_tree: function() {
+      var that = this
+        , menu_tree = { categories: [] };
+
+      can.each(this.options.menu_tree_spec, function(category) {
+        var objects = can.map(category.objects, function(widget_name) {
+          return that.options.widget_descriptors[widget_name];
+        });
+
+        menu_tree.categories.push({
+            title: category.title
+          , objects: objects
+        });
+      });
+
+      this.options.menu_tree = menu_tree;
     }
 
   , " widgets_updated" : "update_inner_nav"
@@ -68,6 +128,13 @@ can.Control("CMS.Controllers.Dashboard", {
       // Create widget in container?
       //return this.options.widget_container[0].add_widget(descriptor);
 
+      // FIXME: This should be in some Widget superclass
+      if (descriptor.widget_guard && !descriptor.widget_guard())
+        return;
+
+      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0)
+        return;
+
       var $element = $("<section class='widget'>")
         , control = new descriptor.controller(
             $element, descriptor.controller_options)
@@ -93,6 +160,94 @@ can.Control("CMS.Controllers.Dashboard", {
         controller: CMS.Controllers.DashboardWidgets,
         controller_options: descriptor
       });
+    }
+
+  , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
+      return {
+        content_controller: GGRC.Controllers.ListView,
+        content_controller_options: descriptor,
+        widget_id: descriptor.model.table_singular,
+        widget_name: descriptor.model.title_plural,
+        widget_icon: descriptor.model.table_singular,
+        object_category: descriptor.model.category || descriptor.object_category
+      }
+    }
+});
+
+
+CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
+
+}, {
+    init: function() {
+      this.options.model = GGRC.infer_object_type(this.options.instance);
+      this._super();
+      this.init_related_widgets();
+    }
+
+  , init_related_widgets: function() {
+      var that = this
+        , model_name = this.options.instance.constructor.shortName
+        , relationships = GGRC.RELATIONSHIP_TYPES[model_name]
+        ;
+
+      can.each(relationships, function(value, key) {
+        var related_model = CMS.Models[key]
+          , descriptor = that.options.widget_descriptors[related_model.table_singular]
+          ;
+
+        that.add_dashboard_widget_from_descriptor(descriptor);
+      });
+    }
+
+  , init_widget_descriptors: function() {
+      var that = this;
+
+      this.options.widget_descriptors = this.options.widget_descriptors || {};
+
+      can.each(this.options.model_descriptors, function(descriptor, key) {
+        that.options.widget_descriptors[key] =
+          that.make_related_descriptor_from_model_descriptor(descriptor);
+      });
+    }
+
+  , make_related_descriptor_from_model_descriptor: function(descriptor) {
+      descriptor = this.make_list_view_descriptor_from_model_descriptor(descriptor);
+      descriptor = $.extend({}, descriptor);
+      descriptor.content_controller_options =
+        $.extend({}, descriptor.content_controller_options);
+      descriptor.content_controller_options.is_related = true;
+      return descriptor;
+    }
+
+  , init_menu_tree: function() {
+      var that = this
+        , widget_descriptors = this.options.widget_descriptors
+        , model_name = this.options.instance.constructor.shortName
+        , categories_index = {}
+        , menu_tree = { categories : [] }
+        ;
+
+      can.each(GGRC.RELATIONSHIP_TYPES[model_name], function(value, key) {
+        var related_model = CMS.Models[key]
+          , descriptor = widget_descriptors[related_model.table_singular]
+          , category = null
+          ;
+
+        if (descriptor) {
+          category = descriptor.object_category;
+
+          if (!categories_index[category]) {
+            categories_index[category] = {
+                title : can.map(category.split(" "), can.capitalize).join(" ")
+              , objects : []
+              };
+            menu_tree.categories.push(categories_index[category]);
+          }
+          categories_index[category].objects.push(descriptor);
+        }
+      });
+
+      this.options.menu_tree = menu_tree;
     }
 });
 

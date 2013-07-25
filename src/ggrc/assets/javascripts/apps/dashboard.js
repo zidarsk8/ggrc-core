@@ -15,7 +15,7 @@
 
 (function(namespace, $) {
 
-var widget_descriptors = {
+var model_descriptors = {
   "program" : {
     model : CMS.Models.Program
     , object_type : "program"
@@ -152,35 +152,25 @@ var widget_descriptors = {
   }
 };
 
-var dashboard_menu = {categories : [
-  {
-    title : "Governance / Compliance"
-    , objects: [
-      widget_descriptors.regulation
-      , widget_descriptors.policy
-      , widget_descriptors.contract
-      , widget_descriptors.control
-    ]
-  }, {
-    title : "Asset / Business"
-    , objects: [
-      widget_descriptors.system
-      , widget_descriptors.process
-      , widget_descriptors.org_group
-      , widget_descriptors.project
-      , widget_descriptors.facility
-      , widget_descriptors.product
-      , widget_descriptors.data_asset
-      , widget_descriptors.market
-    ]
-  }/*, {
-    title : "Risk"
-    , objects: [
-      widget_descriptors.risky_attribute
-      , widget_descriptors.risk
-    ]
+dashboard_menu_spec = [
+  { title : "Governance / Compliance"
+  , objects: [ "regulation", "policy", "contract", "control" ]
+  },
+  { title : "Asset / Business"
+  , objects: [ "system", "process", "org_group", "project"
+             , "facility", "product", "data_asset", "market" ]
+  },
+  /*{ title : "Risk"
+  , objects: [ "risky_attributes", "risk" ]
   }*/
-]};
+]
+
+//function make_admin_menu(widget_descriptors) {
+var admin_menu_spec = [
+  { title : "Admin"
+  , objects: [ "roles", "events", "people" ]
+  }
+]
 
 $(function() {
 
@@ -201,18 +191,35 @@ $(function() {
     $(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
 
     var $area = $('.area').first()
-      , dashboard_controller = $area
-        .cms_controllers_dashboard({})
-        .control(CMS.Controllers.Dashboard)
+      ;
 
-    $(".widget-add-placeholder").cms_controllers_add_widget({
+    if (/\w+\/\d+/.test(window.location)) {
+      $area.cms_controllers_page_object({
+          model_descriptors: model_descriptors
+        , instance: GGRC.make_model_instance(GGRC.page_object)
+        });
+    } else if (/dashboard/.test(window.location)) {
+      $area.cms_controllers_dashboard({
+          model_descriptors: model_descriptors
+        , menu_tree_spec: dashboard_menu_spec
+        })
+    } else if (/admin/.test(window.location)) {
+      $area.cms_controllers_dashboard({
+          model_descriptors: model_descriptors
+        , menu_tree_spec: admin_menu_spec
+      });
+    } else {
+      console.error("Where are you?!");
+    }
+
+    /*$(".widget-add-placeholder").cms_controllers_add_widget({
         parent_controller : dashboard_controller
       , widget_descriptors : widget_descriptors
       , menu_tree : (/dashboard/.test(window.location) ? dashboard_menu : null)
       , minimum_widget_height : 100
-    });
+    });*/
 
-    function bindSortable(ev) {
+    /*function bindSortable(ev) {
         can.getObject("Instances", CMS.Controllers.SortableWidgets, true)[this.id] = 
          $(this)
           .cms_controllers_sortable_widgets({
@@ -221,6 +228,7 @@ $(function() {
     }
     $(".widget-area").each(bindSortable);//get anything that exists on the page already.
     //we will need to consider whether to look for late-added ones later.
+    */
   });
 
 

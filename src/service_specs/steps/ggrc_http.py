@@ -13,7 +13,7 @@ from sqlalchemy.orm.properties import RelationshipProperty
 from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
     put_resource, get_resource_table_singular, get_service_endpoint_url,
-    handle_get_resource_and_name_it,
+    get_resource, handle_get_resource_and_name_it,
     handle_post_named_example_to_collection_endpoint,
     handle_post_named_example, post_example, handle_get_example_resource,
     handle_template_text,
@@ -191,6 +191,23 @@ def check_GET_is_allowed(context, resource_name):
 @then('GET of "{resource_name}" is forbidden')
 def check_GET_is_forbidden(context, resource_name):
   get_example_resource(context, resource_name, expected_status=403)
+
+@given('a user with email "{email}" as "{resource_name}"')
+def get_or_post_with_email(context, email, resource_name):
+  resource = None
+  response = get_resource(context, "/api/people?email={0}".format(email))
+  if response.status_code == 200:
+    collection = response.json()['people_collection']['people']
+    if len(collection) > 0:
+      resource = collection[0]
+  if resource is None:
+    response = post_example(context, "Person",
+        { "email": email, "context": { "id": None } })
+    if response.status_code == 201:
+      resource = response.json()['person']
+  assert resource is not None, \
+    'Failed to find or create a person with email: {email}'.format(email=email)
+  setattr(context, resource_name, resource)
 
 def put_example_resource(context, name, expected_status=200):
   example = getattr(context, name)

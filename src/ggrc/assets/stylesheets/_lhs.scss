@@ -350,7 +350,8 @@
       width:200px;
       height:100%;
     }
-    a.add-nav-item {
+    .add-nav-item {
+      position:absolute;
       display:block;
       border-bottom:1px solid #ddd;
       line-height:30px;

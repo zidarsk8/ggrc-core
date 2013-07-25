@@ -12,30 +12,34 @@ can.Control("CMS.Controllers.AddWidget", {
     widget_descriptors : null
     , menu_tree : null
     , menu_view : GGRC.mustache_path + "/add_widget_menu.mustache"
+    //, dropdown_view: '/static/mustache/add_widget_section.mustache'
     , minimum_widget_height : 100
     , is_related : false
-    , parent_controller : null
+    //, parent_controller : null
   }
 }, {
-  
+
   init : function() {
     var that = this;
 
-    can.each(this.options.widget_descriptors, function(descriptor, name) {
+    /*can.each(this.options.widget_descriptors, function(descriptor, name) {
       that.options.widget_descriptors[name] =
         that.make_descriptor_from_model_descriptor(that.options.widget_descriptors[name]);
-    });
+    });*/
 
-    if(!this.options.menu_tree) {
+    /*if(!this.options.menu_tree) {
       this.options.is_related = true
-      this.scrapeRelated();
-    }
+      //this.scrapeRelated();
+    }*/
 
     can.view(this.options.menu_view, this.options.menu_tree, function(frag) {
-      that.element.find(".dropdown-menu").html(frag).find(".divider:last").remove();
+      that.element
+        .find(".dropdown-menu")
+        .html(frag)
+        .find(".divider:last").remove();
     });
   }
-
+/*
   , make_descriptor_from_model_descriptor: function(descriptor) {
       if (descriptor.widget_id || !descriptor.model)
         return descriptor
@@ -60,7 +64,7 @@ can.Control("CMS.Controllers.AddWidget", {
 
       can.each(GGRC.RELATIONSHIP_TYPES[page_model], function(value, key, root) {
         var related_model = CMS.Models[key]
-          , descriptor = that.options.widget_descriptors[related_model.table_singular]
+          , descriptor = that.options.dashboard_controller.options.widget_descriptors[related_model.table_singular]
           ;
 
         if (descriptor) {
@@ -74,14 +78,14 @@ can.Control("CMS.Controllers.AddWidget", {
           categories_index[descriptor.object_category].objects.push(descriptor);
         }
       });
-    }
+    }*/
 
   , ".dropdown-menu > * click" : function(el, ev) {
-    var descriptor = this.options.widget_descriptors[el.attr("class")];
+    var descriptor = this.options.dashboard_controller.options.widget_descriptors[el.attr("class")];
     this.addWidgetByDescriptor(descriptor);
   }
 
-  , ".dropdown-toggle click" : function() {
+  /*, ".dropdown-toggle click" : function() {
       setTimeout(this.proxy("repositionMenu"), 10);
     }
   , "{window} resize" : "repositionMenu"
@@ -102,21 +106,21 @@ can.Control("CMS.Controllers.AddWidget", {
         , "bottom" : $(".dropdown-menu:visible").css("bottom", -window.scrollY - 443 + this.element.find(".dropdown-toggle").offset().top - this.element.find(".dropdown-toggle").height() ) 
       })
     }
-  }
+  }*/
 
   , addWidgetByDescriptor : function(descriptor) {
-      if (this.options.parent_controller) {
+      if (this.options.dashboard_controller) {
         // FIXME: This ought not change the persistent descriptor object!
         // FIXME: This must change before single page app can be accomplished
-        descriptor.content_controller_options.is_related = this.options.is_related;
+        //descriptor.content_controller_options.is_related = this.options.is_related;
 
-        this.options.parent_controller
+        this.options.dashboard_controller
           .add_dashboard_widget_from_descriptor(descriptor)
       }
     }
 
   , addWidgetByName : function(widget_name) {
-      var descriptor = this.options.widget_descriptors[widget_name];
+      var descriptor = this.options.dashboard_controller.options.widget_descriptors[widget_name];
       if (!descriptor)
         // FIXME: This happens when previously-existing widgets no longer exist,
         //   but only the first time (then DisplayPrefs are overwritten correctly).

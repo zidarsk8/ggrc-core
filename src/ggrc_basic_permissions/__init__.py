@@ -6,7 +6,6 @@
 import datetime
 from flask import session, Blueprint
 from ggrc import db, settings
-from ggrc.app import app
 from ggrc.login import get_current_user
 from ggrc.models.context import Context
 from ggrc.models.program import Program
@@ -21,6 +20,8 @@ blueprint = Blueprint(
     'permissions',
     __name__,
     template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/ggrc_basic_permissions',
     )
 
 class CompletePermissionsProvider(object):
@@ -49,12 +50,13 @@ class CompletePermissionsProvider(object):
     elif user is not None:
       permissions = {}
       user_roles = db.session.query(UserRole).filter(
-          UserRole.user_email==user.email).all()
+          UserRole.person_id==user.id).all()
       for user_role in user_roles:
-        for action, resource_types in user_role.role.permissions.items():
-          for resource_type in resource_types:
-            permissions.setdefault(action, {}).setdefault(resource_type, [])\
-                .append(user_role.context_id)
+        if isinstance(user_role.role.permissions, dict):
+          for action, resource_types in user_role.role.permissions.items():
+            for resource_type in resource_types:
+              permissions.setdefault(action, {}).setdefault(resource_type, [])\
+                  .append(user_role.context_id)
       #grab personal context
       personal_context = db.session.query(Context).filter(
           Context.related_object_id == user.id,
@@ -81,7 +83,7 @@ def all_collections():
   """The list of all collections provided by this extension."""
   return [
       service('roles', Role),
-      service('users_roles', UserRole),
+      service('user_roles', UserRole),
       ]
 
 @Resource.model_posted.connect_via(Program)
@@ -104,11 +106,11 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
     # add a user_roles mapping assigning the user creating the program
     # the ProgramOwner role in the program's context.
-    current_user_email = get_current_user().email
+    current_user_id = get_current_user().id
     program_owner_role = db.session.query(Role)\
         .filter(Role.name == 'ProgramOwner').first()
     user_role = UserRole(
-        user_email=current_user_email,
+        person=get_current_user(),
         role=program_owner_role,
         context=context,
         )
@@ -120,12 +122,12 @@ def handle_program_post(sender, obj=None, src=None, service=None):
         .filter(Role.name == 'RoleReader').first()
     role_reader_for_user = db.session.query(UserRole)\
         .join(Role, UserRole.role == role_reader_role)\
-        .filter(UserRole.user_email == current_user_email \
+        .filter(UserRole.person_id == current_user_id\
             and Role.name == 'RoleReader')\
         .first()
     if not role_reader_for_user:
       role_reader_for_user = UserRole(
-          user_email=current_user_email,
+          person_id=current_user_id,
           role=role_reader_role,
           context_id=1,
           )
@@ -137,14 +139,15 @@ def contribute_to_program_view(sender, obj=None, context=None):
   print 'contribute_to_program_view', obj
   print session['permissions']
   if obj.context_id != None and \
-      permissions.is_allowed_read(Role, 1) and \
-      permissions.is_allowed_read(UserRole, obj.context_id) and \
-      permissions.is_allowed_create(UserRole, obj.context_id) and \
-      permissions.is_allowed_update(UserRole, obj.context_id) and \
-      permissions.is_allowed_delete(UserRole, obj.context_id):
+      permissions.is_allowed_read('Role', 1) and \
+      permissions.is_allowed_read('UserRole', obj.context_id) and \
+      permissions.is_allowed_create('UserRole', obj.context_id) and \
+      permissions.is_allowed_update('UserRole', obj.context_id) and \
+      permissions.is_allowed_delete('UserRole', obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 
+from ggrc.app import app
 @app.context_processor
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for,}

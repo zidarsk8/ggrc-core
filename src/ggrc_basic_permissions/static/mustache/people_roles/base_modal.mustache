@@ -34,16 +34,18 @@
     </div>
     <div class="modal-content">
       <div class="row-fluid">
-        <div class="span3 detail_column">
-          {{#selected_option}}
-            {{{ renderLive option_detail_view }}}
-          {{/selected_option}}
+        <div class="span4 object_column">
+          {{{ renderLive object_column_view }}}
         </div>
-        <div class="span4 option_column">
-          {{{ renderLive option_column_view }}}
+        <div class="span3 object_detail_column">
+          {{#selected_object}}
+            {{{ renderLive object_detail_view }}}
+          {{/selected_object}}
         </div>
-        <div class="span5 active_column" style="margin-left:0; width:42.17094%">
-          {{{ renderLive active_column_view }}}
+        <div class="span5" style="margin-left:0; width:42.17094%">
+          <div class="option_column">
+            {{{ renderLive option_column_view }}}
+          </div>
         </div>
       </div>
     </div>

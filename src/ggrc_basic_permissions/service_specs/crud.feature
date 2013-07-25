@@ -114,14 +114,18 @@ Feature: Role CRUD
       """
     And "role" is POSTed to its collection
     Then GET of "role" is allowed
-    Given a new "ggrc_basic_permissions.models.UserRole" named "user_role" is created from json
+    Given a user with email "another.admin@example.com" as "person"
+    And a new "ggrc_basic_permissions.models.UserRole" named "user_role" is created from json
       """
       {
         "role": {
           "id": {{context.role.value['role']['id']}},
           "type": "Role"
         },
-        "user_email": "another.admin@example.com",
+        "person": {
+          "id": {{context.person['id']}},
+          "type": "Person"
+        },
         "context": {
           "id": 1,
           "type": "Context"

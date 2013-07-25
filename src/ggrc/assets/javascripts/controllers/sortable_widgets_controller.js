@@ -43,11 +43,9 @@ can.Control("CMS.Controllers.SortableWidgets", {
       firstchild || (firstchild = $("#" + id));
       var $widget = $("#" + id).detach();
       if(!$widget.length) {
-        var ctl = that.element.find(".cms_controllers_add_widget").control(CMS.Controllers.AddWidget);
-        if(ctl) {
-          ctl.addWidgetByName(id.substr(0, id.indexOf("_widget")));
-          $widget = $("#" + id).detach();
-        }
+        that.options.dashboard_controller.add_widget_controller.addWidgetByName(
+          id.substr(0, id.indexOf("_widget")));
+        $widget = $("#" + id);
       }
       $widget.appendTo(that.element);
       //add this widget to the inner nav list
@@ -59,7 +57,7 @@ can.Control("CMS.Controllers.SortableWidgets", {
     this.sortable().sortable("refresh");
     // FIXME: Is `this.is_initialized` necessary anymore?
     this.is_initialized = true;
-    this.force_add_widget_bottom();
+    //this.force_add_widget_bottom();
   }
 
   , sortable: function() {
@@ -72,7 +70,9 @@ can.Control("CMS.Controllers.SortableWidgets", {
     }
 
   , " sortremove" : "update_event"
-
+  , " sortupdate" : "update_event"
+  , " sortreceive": "update_event"
+/*
   , " sortupdate" : "force_add_widget_bottom"
   , " sortreceive" : "force_add_widget_bottom"
   , force_add_widget_bottom : function(el, ev, data) {
@@ -84,12 +84,12 @@ can.Control("CMS.Controllers.SortableWidgets", {
           $add_box.detach().appendTo($parent);
         }
       }
-      this.sortable().sortable("refresh");
       this.update_event(el, ev, data);
-    }
+    }*/
 
   , update_event : function(el, ev, data) {
       if(this.is_initialized) {
+        this.sortable().sortable("refresh");
         this.options.sort.replace(this.element.sortable("toArray"));
         this.options.model.save()
         this.element.trigger("widgets_updated");

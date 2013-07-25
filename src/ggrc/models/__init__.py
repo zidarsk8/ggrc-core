@@ -41,8 +41,6 @@ def drop_db_with_migrations(quiet=False):
   downgradeall(drop_versions_table=True)
   if quiet:
     logging.disable(logging.NOTSET)
-  db.drop_all()
-  db.session.commit()
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
     db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
 

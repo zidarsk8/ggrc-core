@@ -1,0 +1,34 @@
+<div class="search-title">
+  <div class="row-fluid">
+    <div class="span6">
+      <h4>
+        Search Results ({{ objects.length }})
+      </h4>
+    </div>
+    <div class="span6">
+      <div class="guide">
+        &nbsp;
+      </div>
+    </div>
+  </div>
+</div>
+<div class="selector-list">
+  <ul class="tree-structure simple">
+    {{#objects}}
+    <li class="control" {{ data 'object' }} data-id="{{ id }}">
+      <div class="item-main">
+        <div class="item-title">
+          <div class="row-fluid">
+            <div class="span11">
+              <div class="oneline">
+                <span class="title">{{name}}</span>
+                <span class="address">{{email}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    {{/objects}}
+  </ul>
+</div>
