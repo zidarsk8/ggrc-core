@@ -16,15 +16,15 @@ class ControlRowConverter(BaseRowConverter):
       self.obj.directive = self.importer.options.get('directive')
 
   def reify(self):
-    slug = self.handle('slug', SlugColumnHandler)
+    self.handle('slug', SlugColumnHandler)
     self.handle_date('start_date')
     self.handle_date('stop_date')
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
-    description = self.handle_text_or_html('description')
+    self.handle_text_or_html('description')
     self.handle_text_or_html('documentation_description')
 
-    title = self.handle_raw_attr('title')
+    self.handle_raw_attr('title')
     self.handle_raw_attr('url')
 
     self.handle_option('kind', role = 'control_kind')

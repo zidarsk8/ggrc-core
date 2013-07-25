@@ -10,17 +10,10 @@
   .breadcrumbs-holder
     %ul.breadcrumbs
       %li
-        %a{ 'href': '={ url_for("dashboard") }' }
-          Dashboard
+        %a{ 'href': '/admin' }
+          Admin
       %li
-        -if directive_id is defined and directive_id != ""
-          %a{ 'href': '/directives/={directive_id}' }
-            Directive
-        -else
-          %a{ 'href': '/dashboard' }
-            Directive
-
-      %li import
+        Import {{import_kind}}
 
   %h1.dashboard-title
     %i.grciconlarge-dashboard
@@ -31,5 +24,5 @@
     %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'} 
       #columns.row-fluid{ 'data-resize': "true" }
         #left_column.span6.widget-area
-      -include 'directives/_import.haml'
+      -include 'systems/_import.haml'
       #results-container

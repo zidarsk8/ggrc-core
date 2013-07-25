@@ -6,7 +6,7 @@
       -for a in column_names
         -if a in header_overrides
           %th
-            {{header_override[a]}}
+            {{header_overrides[a]}}
         -else
           %th
             {{converter.get_header_for_column(a)}}

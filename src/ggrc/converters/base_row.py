@@ -234,7 +234,7 @@ class OptionColumnHandler(ColumnHandler):
 
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
-    truthy_values = options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
+    truthy_values = self.options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
     if value:
       return value.lower() in truthy_values
     return None
@@ -411,6 +411,4 @@ class LinkRelationshipsHandler(LinksHandler):
 
   def parse_item(self, value):
     pass
-
-
 
