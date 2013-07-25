@@ -13,51 +13,34 @@
 -block widget_id
   audit_cycles_widget
 
--block widget_buttons
-  .filter
-    .row-fluid
-      .span12
-        .pull-right
-          %a.btn.btn-add{ 'href': "new_flow_cycle_path(program_id => instance.id)", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect' }
-            %i.grcicon-add
-            Audit
-          
-
 -block main
   %ul.tree-structure.new-tree
     -for cycle in cycles
-      %li
+      %li.tree-item.program
         .item-main
-          .item-title
+          %div{ 'class': 'simple-link' }
             .row-fluid
-              .span9
-                %a.custom-popover-trigger{
-                    'href': 'flow_cycle_path(cycle)',
-                    'data-popover-href': '={ url_for("CycleTooltipView", id=cycle.id) }',
-                    'data-popover-trigger': 'sticky-hover' }
-                  .oneline
-                    %span.title
-                      -if cycle.complete
-                        %span.completed
-                          =cycle.title
-                      -else
-                        =cycle.title
-                    %span.additional-info
-                      -if cycle.complete
-                        %span.completed
-                          completed
-                      -else
-                        -# FIXME: Implement 'days_ago_in_words' filter
-                        -#if cycle.start_at == Time.zone.now.to_date
-                          today
-                        -#elif cycle.start_at < Time.zone.now.to_date
-                          ={ cycle.start_at|days_ago_in_words } ago
-                        -#else
-                          starting in: ={ cycle.start_at|days_ago_in_words  }
-                        -# FIXME: Implement 'strftime' filter
-                        -#if cycle.end_at
-                          &nbsp;&nbsp;&nbsp;
-                          ends on: ={ cycle.end_at|strftime("%m/%d/%y") }
-              .span2
-                .objects-count
-
+              .span12
+                .item-data
+                  .tree-title-area
+                    =cycle.title
+                    -if cycle.complete
+                      %span.completed
+                        completed
+                    -else
+                      -# FIXME: Implement 'days_ago_in_words' filter
+                      -#if cycle.start_at == Time.zone.now.to_date
+                        today
+                      -#elif cycle.start_at < Time.zone.now.to_date
+                        ={ cycle.start_at|days_ago_in_words } ago
+                      -#else
+                        starting in: ={ cycle.start_at|days_ago_in_words  }
+                      -# FIXME: Implement 'strftime' filter
+                      -#if cycle.end_at
+                        &nbsp;&nbsp;&nbsp;
+                        ends on: ={ cycle.end_at|strftime("%m/%d/%y") }
+    %li.tree-item-add
+      %a{ 'href': "new_flow_cycle_path(program_id => instance.id)", 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect' }
+        .row-fluid
+          .span12
+            + Audit
