@@ -1,14 +1,14 @@
 """Person.email must be unique
 
 Revision ID: 2bf7c04016c9
-Revises: 2b709b655bf
+Revises: d3af6d071ef
 Create Date: 2013-07-24 02:16:06.282258
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '2bf7c04016c9'
-down_revision = '2b709b655bf'
+down_revision = 'd3af6d071ef'
 
 from alembic import op
 import sqlalchemy as sa
