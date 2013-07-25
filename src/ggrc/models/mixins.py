@@ -173,7 +173,7 @@ class Slugged(Base):
   @classmethod
   def generate_slug_for(cls, obj):
     id = obj.id if hasattr(obj, 'id') else uuid1()
-    obj.slug = "{0} {1}".format(obj.__class__.__name__, id)
+    obj.slug = "{0}-{1}".format(obj.__class__.__name__.upper(), id)
 
   @classmethod
   def ensure_slug_before_flush(cls, session, flush_context, instances):

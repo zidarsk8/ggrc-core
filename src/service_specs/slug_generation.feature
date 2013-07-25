@@ -9,7 +9,7 @@ Feature: Slugs should be generated when not provided
     And "slugged_resource" is POSTED to its collection
     When GET of the resource "slugged_resource"
     Then evaluate "context.slugged_resource.get('slug') is not None"
-    And evaluate "context.slugged_resource.get('slug').startswith('<resource_type>')"
+    And evaluate "context.slugged_resource.get('slug').startswith('<resource_type>'.upper())"
 
   Examples:
       | resource_type  |
