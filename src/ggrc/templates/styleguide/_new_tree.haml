@@ -3,11 +3,7 @@
     .row-fluid
       .span8
         %h2
-          %i.grcicon-contract-color
-          Contracts
-          %span
-            (3)
-          \/ New Tree
+          New Tree Example
       .span4
         .widget-action.pull-right.widget-showhide
           %a.active{ 'href': "javascript://" }
@@ -17,32 +13,34 @@
   %section.content
     %ul.new-tree
       %li.tree-item.governance
-        %a{ 'href': '#', 'class': 'tree-link' }
-          .row-fluid
-            .span10
-              .item-data
-                .tree-title-area
-                  Master Agreement
-            .span1
-              %i.grcicon-people-warning
-            .span1
-              .counter
-                %i.grcicon-section-black
-                6
+        .item-main
+          %a{ 'href': '#', 'class': 'openclose' }
+            .row-fluid
+              .span10
+                .item-data
+                  .tree-title-area
+                    Master Agreement
+              .span1
+                %i.grcicon-people-warning
+              .span1
+                .counter
+                  %i.grcicon-section-black
+                  6
       %li.tree-item.governance
-        %a{ 'href': '#', 'class': 'tree-link' }
-          .row-fluid
-            .span10
-              .item-data
-                .tree-title-area
-                  Art party craft
-            .span1
-              &nbsp;
-            .span1
-              .counter
-                %i.grcicon-section-black
-                2
-        .tier-2-info
+        .item-main
+          %a{ 'href': '#', 'class': 'openclose' }
+            .row-fluid
+              .span10
+                .item-data
+                  .tree-title-area
+                    Art party craft
+              .span1
+                &nbsp;
+              .span1
+                .counter
+                  %i.grcicon-section-black
+                  2
+        .tier-2-info.item-content
           .tier-2-info-content
             .row-fluid
               .span12
@@ -73,40 +71,42 @@
           .inner-tree
             %h6
               Sections
-            %ul.new-tree-inner
-              %li.sub-item.governance
-                %a{ 'href': '#', 'class': 'tree-link' }
-                  .row-fluid
-                    .span10
-                      .item-data
-                        .tree-title-area
-                          %i.grcicon-section-color
-                          %span.tree-code
-                            80053
-                          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    .span1
-                      &nbsp;
-                    .span1
-                      .counter
-                        %i.grcicon-reg-map
-                        0
-              %li.sub-item.governance
-                %a{ 'href': '#', 'class': 'tree-link' }
-                  .row-fluid
-                    .span10
-                      .item-data
-                        .tree-title-area
-                          %i.grcicon-section-color
-                          %span.tree-code
-                            80053-1
-                          London Calling
-                    .span1
-                      &nbsp;
-                    .span1
-                      .counter
-                        %i.grcicon-reg-map
-                        2
-                .tier-2-info
+            %ul.new-tree
+              %li.tree-item.governance
+                .item-main
+                  %a{ 'href': '#', 'class': 'openclose' }
+                    .row-fluid
+                      .span10
+                        .item-data
+                          .tree-title-area
+                            %i.grcicon-section-color
+                            %span.tree-code
+                              80053
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                      .span1
+                        &nbsp;
+                      .span1
+                        .counter
+                          %i.grcicon-reg-map
+                          0
+              %li.tree-item.governance
+                .item-main
+                  %a{ 'href': '#', 'class': 'openclose' }
+                    .row-fluid
+                      .span10
+                        .item-data
+                          .tree-title-area
+                            %i.grcicon-section-color
+                            %span.tree-code
+                              80053-1
+                            London Calling
+                      .span1
+                        &nbsp;
+                      .span1
+                        .counter
+                          %i.grcicon-reg-map
+                          2
+                .tier-2-info.item-content
                   .tier-2-info-content
                     .row-fluid
                       .span12
@@ -133,44 +133,47 @@
                       .span4
                   .inner-tree
                     %h6 Mapped Objects
-                    %ul.new-tree-inner
-                      %li.sub-item.business
-                        %a{ 'href': '#', 'class': 'tree-link' }
-                          .row-fluid
-                            .span10
-                              .item-data
-                                .tree-title-area
-                                  %i.grcicon-orggroup-color
-                                  Desciples
-                            .span1
-                              &nbsp;
-                            .span1
-                              &nbsp;
-                      %li.sub-item.business
-                        %a{ 'href': '#', 'class': 'tree-link' }
-                          .row-fluid
-                            .span10
-                              .item-data
-                                .tree-title-area
-                                  %i.grcicon-market-color
-                                  South China Market
-                            .span1
-                              &nbsp;
-                            .span1
-                              &nbsp;
-                      %li.sub-item.program
-                        %a{ 'href': '#', 'class': 'tree-link' }
-                          .row-fluid
-                            .span10
-                              .item-data
-                                .tree-title-area
-                                  %i.grcicon-program-color
-                                  SOX Compliance
-                            .span1
-                              &nbsp;
-                            .span1
-                              &nbsp;
-                      %li.sub-item.tree-item-add
+                    %ul.new-tree
+                      %li.tree-item.business
+                        .item-main
+                          %a{ 'href': '#', 'class': 'openclose' }
+                            .row-fluid
+                              .span10
+                                .item-data
+                                  .tree-title-area
+                                    %i.grcicon-orggroup-color
+                                    Desciples
+                              .span1
+                                &nbsp;
+                              .span1
+                                &nbsp;
+                      %li.tree-item.business
+                        .item-main
+                          %a{ 'href': '#', 'class': 'openclose' }
+                            .row-fluid
+                              .span10
+                                .item-data
+                                  .tree-title-area
+                                    %i.grcicon-market-color
+                                    South China Market
+                              .span1
+                                &nbsp;
+                              .span1
+                                &nbsp;
+                      %li.tree-item.program
+                        .item-main
+                          %a{ 'href': '#', 'class': 'openclose' }
+                            .row-fluid
+                              .span10
+                                .item-data
+                                  .tree-title-area
+                                    %i.grcicon-program-color
+                                    SOX Compliance
+                              .span1
+                                &nbsp;
+                              .span1
+                                &nbsp;
+                      %li.tree-item.tree-item-add
                         .row-fluid
                           .span12
                             %a{ 'href': 'javascript://', 'class': 'section-add' }
@@ -183,7 +186,7 @@
                               %i.grcicon-objective-black
                               Create/Map Control Objective
                             
-                %li.sub-item.tree-item-add
+                %li.tree-item.tree-item-add
                   .row-fluid
                     .span12
                       %a{ 'href': 'javascript://', 'class': 'section-add' }
@@ -196,18 +199,19 @@
                         %i.grcicon-imp-exp
                         Import Sections
       %li.tree-item.governance
-        %a{ 'href': '#', 'class': 'tree-link' }
-          .row-fluid
-            .span10
-              .item-data
-                .tree-title-area
-                  EULA
-            .span1
-              &nbsp;
-            .span1
-              .counter
-                %i.grcicon-section-black
-                0
+        .item-main
+          %a{ 'href': '#', 'class': 'openclose' }
+            .row-fluid
+              .span10
+                .item-data
+                  .tree-title-area
+                    EULA
+              .span1
+                &nbsp;
+              .span1
+                .counter
+                  %i.grcicon-section-black
+                  0
       %li.tree-item-add
         %a{ 'href': '#' }
           .row-fluid

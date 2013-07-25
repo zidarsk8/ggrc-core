@@ -1,76 +1,28 @@
 {{#list}}
-  <li class="section" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
-    {{#instance}}
+  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
     <div class="item-main" {{data 'model'}}>
-      {{#start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
-          <div class="openclose active"></div>
-        {{/show_expander}}
-      {{/start_expanded}}
-      {{^start_expanded}}
-        {{#show_expander draw_children children "||" draw_children controls "||" draw_children objectives}}
-          <div class="openclose"></div>
-        {{/show_expander}}
-      {{/start_expanded}}
-      <div class="item-title">
+      <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span8">
-            <div class="oneline expandable">
-              <i class="grcicon-section-color"></i>
-              <span class="title">
-                {{title}}
-              </span>
-              <span class="code">
-                {{slug}}
-              </span>
-              <span class="description-inline">
-                {{{firstnonempty description_inline ''}}}
-              </span>
-              {{#notes}}
-                <i class="grcicon-comment"></i>
-              {{/notes}}
-            </div>
-            <div class="description inhover {{^description}}no-description{{/description}}">
-              {{^description}}
-                <i>No description</i>
-              {{/description}}
-              <div class="note">
-                {{#notes}}
-                  <div class="note-content">
-                    {{#edit_sections}}
-                      <a class="edit-notes" href="javascript://">
-                        <i class="grcicon-edit"></i>
-                      </a>
-                    {{/edit_sections}}
-                    <strong>Abstract</strong>
-                    <div class="rtf">
-                      {{{notes}}}
-                    </div>
-                  </div>
-                {{/notes}}
-                {{^notes}}
-                  {{#edit_sections}}
-                    <a class="note-trigger" href="javascript://">
-                      + Add Abstract
-                    </a>
-                  {{/edit_sections}}
-                {{/notes}}
+          <div class="span9">
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-section-color"></i>
+                <span class="tree-code">{{instance.slug}}</span>
+                {{instance.title}}
               </div>
-              {{{description}}}
             </div>
           </div>
           <div class="span1">
-            <a class="view-more" href="javascript://">
-              view
-            </a>
+            <div class="counter">
+              {{^instance.owner}}
+                <i class="grcicon-people-warning"></i>
+              {{/instance.owner}}
+            </div>
           </div>
-          <div class="span2">
-            <div class="objects-count">
-              {{#pack list=controls na=na id=id}}
-              <a class="controls-count controllist btn btn-control"  data-content="{{render '/static/mustache/controls/list_popover.mustache'}}" data-placement="right" data-popover-trigger="sticky-hover" href="javascript://">
-                {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right controllist' rel='tooltip' title='Map Controls to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-control-color'></i></a><i class='grcicon-control-color'></i>Mapped Controls</h3></div></div>"}}}
-                <i class="grcicon-control-color"></i>
-                
+          <div class="span1">
+            <div class="counter">
+              {{#pack list=instance.controls na=na id=id}}
+                <i class="grcicon-control-black"></i>
                 {{#with list}}
                   {{#if length}} 
                     <span>{{length}}</span>
@@ -78,13 +30,13 @@
                     <strong class="error">0</strong>
                   {{/if}}
                 {{/with}}
-              </a>
               {{/pack}}
-              {{#pack list=objectives na=na id=id}}
-              <a class="controls-count objectivelist btn btn-control"  data-content="{{render '/static/mustache/objectives/list_popover.mustache'}}" data-placement="right" data-popover-trigger="sticky-hover" href="javascript://">
-                {{{withattr 'data-original-title' "<div class='row-fluid'><div class='span12'><h3><a href='javascript://' data-id='{id}' class='btn btn-mini pull-right objectivelist' rel='tooltip' title='Map Objectives to Section'><i class='grcicon-section-color'></i><i class='grcicon-reg-map'></i><i class='grcicon-objective-color'></i></a><i class='grcicon-objective-color'></i>Mapped Objectives</h3></div></div>"}}}
-                <i class="grcicon-objective-color"></i>
-                
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              {{#pack list=instance.objectives na=na id=id}}
+                <i class="grcicon-objective-black"></i>
                 {{#with list}}
                   {{#if length}} 
                     <span>{{length}}</span>
@@ -92,29 +44,97 @@
                     <strong class="error">0</strong>
                   {{/if}}
                 {{/with}}
-              </a>
               {{/pack}}
             </div>
           </div>
         </div>
-        <div class="item-actions">
-          {{#edit_sections}}
-            <a class="btn btn-mini pull-right edit-object" data-modal-reset="reset" data-toggle="modal-ajax-form" href="/sections/{{id}}/edit" rel="tooltip" style="margin-left:6px" data-original-title="Edit Section">
-              <i class="grcicon-edit"></i>
-            </a>
-          {{/edit_sections}}
+      </a>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="tree-description short">
+              {{^instance.description}}
+                <p><i>No description</i></p>
+              {{/instance.description}}
+              {{{instance.description}}}
+            </div>
+            <a href="javascript://" class="show-long">more</a>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span8">
+            <div class="tree-info">
+              <strong>Owner:</strong>
+              {{^instance.owner}}
+                <span class="error">
+                  Not Assigned
+                </span>
+              {{/instance.owner}}
+              {{#if instance.owner}}
+                {{instance.owner.name}}
+              {{/if}}
+            </div>
+          </div>
+          <div class="span4">
+            {{#edit_sections}}
+              <a href="#" class="info-action pull-right" rel="tooltip" title="Edit Section" data-placement="left">
+                <i class="grcicon-edit"></i>
+                Edit
+              </a>
+            {{/edit_sections}}
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span8">
+            <div class="tree-info">
+              <strong>URL:</strong>
+              {{^if_null instance.url}}
+                <a class="url" href="{{instance.url}}">
+                  {{instance.url}}
+                </a>
+              {{/if_null}}
+              {{#if_null instance.url}}
+                <i>No URL</i>
+              {{/if_null}}
+            </div>
+          </div>
         </div>
       </div>
+
+      {{#if draw_children}}
+        {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+          <div class="inner-tree">
+            {{#child_options}}
+              <h6>{{model.title_plural}} ({{list.length}})</h6>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options}}
+          </div>
+        {{/if_null}}
+      {{/if}}
+
     </div>
-    {{/instance}}
-    {{#if draw_children}}
-    {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-    <div class="item-content" {{#start_expanded}}style="display: block;"{{/start_expanded}}>
-      {{#child_options}}
-      <ul class="tree-structure" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-      {{/child_options}}
-    </div>
-    {{/if_null}}
-    {{/if}}
   </li>
 {{/list}}
+
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <a href="javascript://" class="section-add">
+        + Section
+      </a>
+      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections">
+        <i class="grcicon-add-black"></i>
+        Create Section
+      </a>
+      &nbsp;
+      &nbsp;
+      <a href="/directives/{{instance.id}}/import_sections" class="section-import">
+        <i class="grcicon-imp-exp"></i>
+        Import Sections
+      </a>
+    </div>
+  </div>
+</li>

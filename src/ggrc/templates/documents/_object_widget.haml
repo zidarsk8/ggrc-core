@@ -16,11 +16,5 @@
   documents_widget
   -#=model._inflector.model_singular + "_documents_widget"
 
--block widget_actions
-  .widget-action.pull-right
-    %a.pull-right{ 'href': 'javascript://', 'data-toggle': 'modal-selector', 'data-modal-selector-options': 'object_documents', 'data-list-target': '#referenceList', 'data-modal-class': 'modal-wide', 'rel': 'tooltip', 'data-placement': 'left', 'title': 'Link References' }
-      %i.grcicon-link
-
 -block main
-  %ul.tree-structure.simple
-    -include 'documents/_object_list.haml'
+  -include 'documents/_object_list.haml'
