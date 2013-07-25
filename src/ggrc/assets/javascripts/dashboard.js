@@ -727,22 +727,7 @@ function resize_areas() {
 }
 
 jQuery(function($) {
-  $('body').on('click', '.tree-link', function(e) {
-    var $this = $(this)
-      , $additionalInfo = $this.next()
-      , $treeItem = $this.closest(".tree-item")
-      ;
-    if ($this.hasClass("open")) {
-      $additionalInfo.slideUp();
-      $this.removeClass("open");
-      $treeItem.removeClass("tree-item-open");
-    } else {
-      $additionalInfo.slideDown();
-      $this.addClass("open");
-      $treeItem.addClass("tree-item-open");
-    };  
-  });
-  
+
   $('body').on('mouseover', '.section-add', function(e) {
     var $this = $(this)
       , $createLink = $this.closest('div').find('.section-create')

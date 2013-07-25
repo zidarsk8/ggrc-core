@@ -42,12 +42,6 @@ span.tiny-title {
   color:$text;
 }
 
-ul.tree-structure.pbc {
-  .openclose {
-    margin-top:8px;
-  }
-}
-
 .requests {
   .item-title {
     color:$text;
@@ -495,12 +489,6 @@ ul.tree-structure {
       background-position:-128px -56px;
       &.active {
         background-position:-104px -56px;
-      }
-      &.openclose-request {
-        background-position:-198px -56px;
-        &.active {
-          background-position:-222px -56px; 
-        }
       }
     }
     .ca-fields {

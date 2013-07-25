@@ -7,7 +7,6 @@
 [class^="grcicon-"],
 [class^="icon-"],
 .showhide,
-.openclose,
 .widget-showhide {
   display: inline-block;
   width: 20px;
@@ -211,9 +210,6 @@
 }
 .grcicon-imp-exp {
   background-position:-54px -56px;
-  .active & {
-    background-position:-54px -80px;
-  }
 }
 .grcicon-imp-exp-white {
   background-position:-54px -80px;
@@ -227,7 +223,8 @@
 .grcicon-export-white {
   background-position:-6px -128px;
 }
-.grcicon-reg-map {
+.grcicon-reg-map,
+.grcicon-relationship-color {
   background-position:-6px -56px;
   .active & {
     background-position:-6px -56px;
@@ -275,7 +272,8 @@
 .grcicon-ok {
   background-position:-54px -104px;
 }
-.grcicon-document {
+.grcicon-document,
+.grcicon-objectdocument-color {
   background-position:-6px -176px;
 }
 .grcicon-populationsample {
@@ -332,8 +330,7 @@
   background-position:-8px -40px;
 }
 
-.showhide,
-.openclose {
+.showhide {
   background-position:-198px -56px;
   cursor:pointer;
   @include opacity(0.5);
@@ -427,7 +424,9 @@
 .grcicon-directive { background-position:-78px -200px; }
 .grcicon-directive-black { background-position:-78px -176px; }
 .grcicon-event-color { background-position:-102px -176px; }
-.grcicon-directive-color { background-position:-198px -296px; }
+
+.grcicon-directive-color,
+.grcicon-programdirective-color { background-position:-198px -296px; }
 
 .grcicon-objective { background-position:-150px -80px; }
 .grcicon-objective-black { background-position:-150px -56px; }
@@ -476,6 +475,7 @@
 .grcicon-control { background-position:-150px -248px }
 .grcicon-control-black { background-position:-150px -224px; }
 .grcicon-control-color { background-position:-30px -320px; }
+.grcicon-systemcontrol-color { background-position:-30px -320px; }
 .grcicon-control-danger { background-position:-150px -320px }
 .grcicon-company_controls { background-position:-150px -248px }
 .grcicon-company_controls-black { background-position:-150px -224px; }
