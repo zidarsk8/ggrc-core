@@ -20,8 +20,12 @@ class BaseConverter(object):
     self.final_results = []
     self.import_exception = None
     self.import_slug = None
+
+    # Meta/object map changes (slightly) based on kind: section/control, system/process, etc....
     if self.__class__.__name__ == 'SectionsConverter':
-      self.create_metadata_map() # Map will vary based on Directive kind
+      self.create_metadata_map()
+    elif self.__class__.__name__ == 'SystemsConverter' and options.get('is_biz_process'):
+      self.create_object_map()
 
   def results(self):
     return self.objects

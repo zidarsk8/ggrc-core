@@ -16,6 +16,7 @@ def handle_csv_import(converter_class, filepath, **options):
 
   if options.get('directive_id') and not options.get('directive'):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
+
   try:
     csv_reader = unicode_csv_reader(csv_file.read().splitlines(True))
     rows = [row for row in csv_reader]
@@ -35,19 +36,7 @@ def utf_8_encoder(unicode_csv_data):
   for line in unicode_csv_data:
     yield line.encode('utf-8')
 
-def handle_csv_export(filename):
-  pass
-
-def handle_converter_csv_export(directive_id, converter_class, **options):
-  options['export'] = True
-  directive = Directive.query.filter_by(id=int(directive_id)).first()
-  options['directive'] = directive
-  filename = "{}.csv".format(directive.slug)
-  if converter_class is SectionsConverter:
-    objects = directive.sections
-  elif converter_class is ControlsConverter:
-    objects = directive.controls
-
+def handle_converter_csv_export(filename, objects, converter_class, **options):
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
   status_code = 200
 
