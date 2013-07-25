@@ -120,7 +120,7 @@
           });
           delete params._removedKeys;
           can.extend(data, params);
-          var item = this.model(data);
+          var item = this.model({}).attr(data);
 
           window.localStorage.setItem(key, JSON.stringify(item.serialize()));
           def.resolve(item);
