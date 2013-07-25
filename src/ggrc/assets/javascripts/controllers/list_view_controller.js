@@ -176,9 +176,7 @@ can.Control("GGRC.Controllers.ListView", {
     var that = this;
     if(list) {
       this.options.list = list;
-      /*this.options.list.bind("change", function() {
-        that.element.trigger("updateCount", that.options.list.length);
-      });*/
+      this.options.list.bind("change", this.proxy("update_count"));
     }
     can.view(this.options.list_view, this.options, function(frag) {
       that.element
@@ -188,7 +186,7 @@ can.Control("GGRC.Controllers.ListView", {
   }
 
   , update_count: function() {
-      this.element.trigger("updateCount", that.options.list.length);
+      this.element.trigger("updateCount", this.options.list.length);
     }
 
   , "{list} change": "update_count"

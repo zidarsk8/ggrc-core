@@ -702,7 +702,7 @@ CMS.Models.get_link_type = function(instance, attr) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
       type = model.getRootModelName();
-    else
+    else if (instance[attr])
       type = instance[attr].type;
   }
   return type;
