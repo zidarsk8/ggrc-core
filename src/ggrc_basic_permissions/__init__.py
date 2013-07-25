@@ -52,10 +52,11 @@ class CompletePermissionsProvider(object):
       user_roles = db.session.query(UserRole).filter(
           UserRole.person_id==user.id).all()
       for user_role in user_roles:
-        for action, resource_types in user_role.role.permissions.items():
-          for resource_type in resource_types:
-            permissions.setdefault(action, {}).setdefault(resource_type, [])\
-                .append(user_role.context_id)
+        if isinstance(user_role.role.permissions, dict):
+          for action, resource_types in user_role.role.permissions.items():
+            for resource_type in resource_types:
+              permissions.setdefault(action, {}).setdefault(resource_type, [])\
+                  .append(user_role.context_id)
       #grab personal context
       personal_context = db.session.query(Context).filter(
           Context.related_object_id == user.id,
@@ -138,11 +139,11 @@ def contribute_to_program_view(sender, obj=None, context=None):
   print 'contribute_to_program_view', obj
   print session['permissions']
   if obj.context_id != None and \
-      permissions.is_allowed_read(Role, 1) and \
-      permissions.is_allowed_read(UserRole, obj.context_id) and \
-      permissions.is_allowed_create(UserRole, obj.context_id) and \
-      permissions.is_allowed_update(UserRole, obj.context_id) and \
-      permissions.is_allowed_delete(UserRole, obj.context_id):
+      permissions.is_allowed_read('Role', 1) and \
+      permissions.is_allowed_read('UserRole', obj.context_id) and \
+      permissions.is_allowed_create('UserRole', obj.context_id) and \
+      permissions.is_allowed_update('UserRole', obj.context_id) and \
+      permissions.is_allowed_delete('UserRole', obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 
