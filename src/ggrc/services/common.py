@@ -8,6 +8,7 @@ import ggrc.builder.json
 import hashlib
 import time
 from blinker import Namespace
+from exceptions import TypeError
 from flask import url_for, request, current_app, session
 from flask.views import View
 from ggrc import db

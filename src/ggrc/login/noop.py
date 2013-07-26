@@ -16,15 +16,19 @@ def get_user():
     email = json_user.get('email', 'user@example.com')
     name = json_user.get('name', 'Example User')
     permissions = json_user.get('permissions', None)
+    header_override = permissions is not None
+    session['permissions_header_asserted'] = True
   else:
     email = 'user@example.com'
     name = 'Example User'
     permissions = None
+    header_override = False
   user = find_or_create_user_by_email(
     email=email,
     name=name)
-  if permissions is not None:
-    session['permissions'] = permissions
+  session['permissions'] = permissions
+  if header_override and permissions is not None:
+    session['permissions']['__header_override'] = True
   return user
 
 def login():

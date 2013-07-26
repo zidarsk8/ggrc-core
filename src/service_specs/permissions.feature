@@ -489,7 +489,7 @@ Feature: RBAC Permissions enforcement for REST API
       | resource_type | property_name | match_value         |
       | Category      | name          | category1           |
       | Category      | scope_id      | 3                   |
-      | Help          | slug          | foo                 |
+      | Help          | title         | foo                 |
       | Program       | start_date    | 2013-06-03T00:00:00 |
       | Cycle         | start_at      | 2013-06-03          |
 
