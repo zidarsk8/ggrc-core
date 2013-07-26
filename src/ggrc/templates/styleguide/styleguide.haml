@@ -22,9 +22,10 @@
 -block main
   .clearfix
     .inner-nav
-      %ul.nav{ 'class': 'internav', 'data-spy': 'affix', 'data-offset-top': '1' }
+      .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
+        %ul.nav{ 'class': "internav ={ model_display_class }" }
     .object-area
-      .column-set{ 'data-resize': "true" }
+      #show_columns.column-set{ 'data-resize': "true" }
         .widget-area
           -include 'styleguide/_new_tree.haml'
           -include 'styleguide/_new_tree_contracts.haml'

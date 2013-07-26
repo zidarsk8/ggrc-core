@@ -2,7 +2,7 @@
   <div class="row-fluid">
     <div class="span6">
       <h4>
-        Search Results ({{ options.length }})
+        Roles ({{ options.length }})
       </h4>
     </div>
     <div class="span6">
@@ -13,15 +13,17 @@
   </div>
 </div>
 <div class="selector-list">
-  <ul class="tree-structure simple">
+  <ul class="new-tree">
     {{#options}}
-    <li class="control" {{ data 'option' }} data-id="{{ id }}">
+    <li class="tree-item program" {{ data 'option' }} data-id="{{ id }}">
       <div class="item-main">
-        <div class="item-title">
+        <div class="simple-link">
           <div class="row-fluid">
             <div class="span11">
-              <div class="oneline">
-                <span class="title">{{name}}</span>
+              <div class="item-data">
+                <div class="tree-title-area">
+                  {{name}}
+                </div>
               </div>
             </div>
             <div class="span1">

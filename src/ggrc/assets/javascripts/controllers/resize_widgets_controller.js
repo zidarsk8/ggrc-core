@@ -216,7 +216,10 @@ can.Control("CMS.Controllers.ResizeWidgets", {
             var sh = page_heights.attr($(grandchild).attr("id"));
             that.set_widget_height(grandchild, sh);
           } else {
-            // missing a height.  redistribute evenly but don't increase the size of anythng.
+            that.ensure_minimum(grandchild);
+
+            // Removed due to slowness until we optimize
+            /*// missing a height.  redistribute evenly but don't increase the size of anythng.
             var visible_ht = Math.floor($(window).height() - $(child).offset().top) - 10
             , split_ht = visible_ht / $gcs.length  // If you divided the visible height evenly, this is what each would get
             , col_ht = $(child).height();
@@ -236,7 +239,7 @@ can.Control("CMS.Controllers.ResizeWidgets", {
             });
             //Since we've had to readjust some heights, size each widget to the new height and save to the model
             dirty = true;
-            return false;
+            return false;*/
           }
         }
       });
@@ -731,6 +734,7 @@ can.Control("CMS.Controllers.ResizeWidgets", {
       }, 1);
     }
     that.options.model.setCollapsed(that.options.page_token, $section.attr("id"), collapse);
+    this.options.model.save();
   }
 
 });
