@@ -59,6 +59,8 @@
       join_model: null,
       join_query: {},
       join_object: null,
+      join_object_id: null,
+      join_object_type: null,
 
       modal_title: null,
       option_list_title: null,
@@ -300,11 +302,11 @@
     },
 
     get_join_object_id: function() {
-      return this.options.join_object.id;
+      return this.options.join_object_id || this.options.join_object.id;
     },
 
     get_join_object_type: function() {
-      return this.options.join_object.constructor.getRootModelName();
+      return this.options.join_object_type || this.options.join_object.constructor.getRootModelName();
     },
 
   });
@@ -509,7 +511,12 @@
     options.join_id_field = data.related_side + "_id";
     options.join_type_field = data.related_side + "_type";
 
-    options.join_object = get_page_object();
+    if (data.join_object_id && data.join_object_type) {
+      options.join_object_id = data.join_object_id;
+      options.join_object_type = data.join_object_type;
+    } else {
+      options.join_object = get_page_object();
+    }
 
     options.extra_join_fields = {
       relationship_type_id: data.relationship_type
@@ -535,6 +542,8 @@
           , related_table_plural: $this.data('related-table-plural')
           , related_side: $this.data('related-side')
           , related_model: $this.data('related-model')
+          , join_object_id: $this.data('join-object-id')
+          , join_object_type: $this.data('join-object-type')
           , object_side: $this.data('object-side')
           , relationship_type: $this.data('relationship-type')
           , join_query: $this.data('join-query')
