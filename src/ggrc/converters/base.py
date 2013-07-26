@@ -150,16 +150,11 @@ class BaseConverter(object):
 
     return self
 
-    #except ImportException as e:
-     # self.import_exception = e
-      #return self
-
   def save_import(self):
     db_session = db.session
     for row_converter in self.objects:
-      row_converter.save_object(db_session, **self.options)
+      row_converter.save(db_session, **self.options)
     db_session.commit()
-
 
   def read_objects(self, headers, rows):
     attrs_collection = []
