@@ -89,6 +89,8 @@ can.Control("CMS.Controllers.TreeView", {
     this.options.attr("original_list", list);
     this.options.attr("list", []);
     this.on();
+    refresh_queue = new RefreshQueue();
+
     can.each(list, function(v, i) {
       if(!(v instanceof can.Observe.TreeOptions)) {
         v = new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
@@ -98,13 +100,12 @@ can.Control("CMS.Controllers.TreeView", {
       }
       that.options.list.push(v);
       if(!v.instance.selfLink) {
-        can.Observe.startBatch();
-        v.instance.refresh().done(function() {
-          can.Observe.stopBatch();
-        });
+        refresh_queue.enqueue(v.instance);
       }
     });
-    can.Observe.stopBatch();
+    refresh_queue.trigger().then(function() {
+      can.Observe.stopBatch();
+    });
     can.view(this.options.list_view, this.options, function(frag) {
       GGRC.queue_event(function() {
         that.element && that.element.html(frag);

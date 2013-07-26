@@ -106,6 +106,30 @@
           {{#child_options}}
             <h6>Systems/Processes</h6>
             <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            <ul class="new-tree">
+              <li class="tree-item tree-item-add">
+                <a
+                  href="javascript://"
+                  rel="tooltip"
+                  data-placement="left"
+                  data-toggle="modal-relationship-selector"
+                  data-modal-class="modal-wide"
+                  data-modal-reset="reset"
+                  data-original-title="Link {{model.title_singular.toLowerCase}} to this object"
+                  data-related-model="{{model.model_singular}}"
+                  data-related-title-singular="{{model.title_singular}}"
+                  data-related-title-plural="{{model.title_plural}}"
+                  data-related-side="{{related_side}}"
+                  data-related-table-plural="{{model.table_plural}}"
+                  data-related-model-singular="{{model.model_singular}}"
+                  data-relationship-type="{{find_params.relationship_type_id}}"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.constructor.shortName}}"
+                  data-tab-target="#related-objects-{{find_params.relationship_type_id}}">
+                  + {{model.title_singular}}
+                </a>
+              </li>
+            </ul>
           {{/child_options}}
         </div>
       {{/if_null}}
@@ -114,12 +138,3 @@
   </div>
 </li>
 {{/list}}
-<li class="tree-item tree-item-add">
-  <div class="row-fluid">
-    <div class="span12">
-      <a href="javascript://">
-        + System/Process
-      </a>
-    </div>
-  </div>
-</li>
