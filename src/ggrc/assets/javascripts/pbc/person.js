@@ -51,6 +51,9 @@ can.Model.Cacheable("CMS.Models.Person", {
             that.removeAttr(name);
         });
     }
+  , display_name : function() {
+    return this.email;
+  }
 });
 
 

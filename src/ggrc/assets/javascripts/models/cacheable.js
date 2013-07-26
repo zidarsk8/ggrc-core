@@ -349,6 +349,9 @@ can.Model("can.Model.Cacheable", {
     });
     return serial;
   }
+  , display_name : function() {
+    return this.title || this.name;
+  }
 });
 
 can.Observe.prototype.stub = function() {
