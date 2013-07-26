@@ -1,34 +1,31 @@
 <div class="search-title">
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span12">
       <h4>
-        Search Results ({{ objects.length }})
+        Users ({{ objects.length }})
       </h4>
-    </div>
-    <div class="span6">
-      <div class="guide">
-        &nbsp;
-      </div>
     </div>
   </div>
 </div>
 <div class="selector-list">
-  <ul class="tree-structure simple">
+  <ul class="new-tree">
     {{#objects}}
-    <li class="control" {{ data 'object' }} data-id="{{ id }}">
-      <div class="item-main">
-        <div class="item-title">
-          <div class="row-fluid">
-            <div class="span11">
-              <div class="oneline">
-                <span class="title">{{name}}</span>
-                <span class="address">{{email}}</span>
+      <li class="tree-item business" {{ data 'object' }} data-id="{{ id }}">
+        <div class="item-main">
+          <div class="simple-link">
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    {{name}}
+                    <span class="url-link">{{email}}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </li>
+      </li>
     {{/objects}}
   </ul>
 </div>
