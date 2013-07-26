@@ -14,7 +14,7 @@
         <div class="span3">
           &nbsp;
         </div>
-        <div class="span6">
+        <div class="span5">
           <div class="modal-search">
             <a class="btn btn-mini search-reset" href="#">
               <i class="grcicon-x-grey"></i>
@@ -22,7 +22,7 @@
             <input class="input-block-level" placeholder="Search {{related_title_plural}}" type="text">
           </div>
         </div>
-        <div class="span3">
+        <div class="span4">
           <div class="pull-right">
             <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}">
               <i class="grcicon-add"></i>
@@ -34,15 +34,15 @@
     </div>
     <div class="modal-content">
       <div class="row-fluid">
-        <div class="span4 object_column">
-          {{{ renderLive object_column_view }}}
-        </div>
         <div class="span3 object_detail_column">
           {{#selected_object}}
             {{{ renderLive object_detail_view }}}
           {{/selected_object}}
         </div>
-        <div class="span5" style="margin-left:0; width:42.17094%">
+        <div class="span5 object_column">
+          {{{ renderLive object_column_view }}}
+        </div>
+        <div class="span4" style="margin-left:2px; width:406px;">
           <div class="option_column">
             {{{ renderLive option_column_view }}}
           </div>
