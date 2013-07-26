@@ -5,8 +5,7 @@
     .inner-nav
       .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
         %ul.nav{ 'class': "internav ={ model_display_class }" }
-        %a{ 'class': "add-nav-item", 'href': '#' }
-          + Add...
+        -include 'shared/_add_widget_section.haml'
 
     .object-area
       #show_columns.column-set{ 'data-resize': "true" }
