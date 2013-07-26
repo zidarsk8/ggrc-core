@@ -209,7 +209,7 @@ $(function() {
         , menu_tree_spec: admin_menu_spec
       });
     } else {
-      console.error("Where are you?!");
+      $area.cms_controllers_dashboard({ model_descriptors: [] });
     }
 
     /*$(".widget-add-placeholder").cms_controllers_add_widget({
