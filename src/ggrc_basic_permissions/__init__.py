@@ -62,7 +62,7 @@ class UserPermissions(DefaultUserPermissions):
           .filter(UserRole.person_id==get_current_user().id)\
           .order_by(UserRole.updated_at.desc())\
           .first()
-      if current_most_recent_role_ts[0] > session['permissions']['__ts']:
+      if current_most_recent_role_ts[0] > session['permissions__ts']:
         self.load_permissions()
 
   def load_permissions(self):
@@ -86,9 +86,9 @@ class UserPermissions(DefaultUserPermissions):
           .order_by(UserRole.updated_at.desc())\
           .all()
       if len(user_roles) > 0:
-        session['permissions']['__ts'] = user_roles[0].updated_at
+        session['permissions__ts'] = user_roles[0].updated_at
       else:
-        session['permissions']['__ts'] = None
+        session['permissions__ts'] = None
       for user_role in user_roles:
         if isinstance(user_role.role.permissions, dict):
           for action, resource_types in user_role.role.permissions.items():
@@ -116,7 +116,7 @@ class UserPermissions(DefaultUserPermissions):
           }
     else:
       session['permissions'] = {}
-      session['permissions']['__ts'] = None
+      session['permissions__ts'] = None
 
 def all_collections():
   """The list of all collections provided by this extension."""
