@@ -28,6 +28,7 @@ ul.new-tree {
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:30px;
+    min-height:31px;
     background:#fafafa;
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
@@ -174,7 +175,6 @@ ul.new-tree {
       font-weight:bold;
       color:$error;
     }
-
     .event-time {
       font-size:13px;
       color:#777;
