@@ -98,6 +98,7 @@ def allowed_file(filename):
 
 @app.route("/directives/<directive_id>/import_controls", methods=['GET', 'POST'])
 def import_controls(directive_id):
+  import ipdb; ipdb.set_trace() ### XXX BREAKPOINT
   from werkzeug import secure_filename
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
@@ -110,6 +111,7 @@ def import_controls(directive_id):
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
+        import ipdb; ipdb.set_trace() ### XXX BREAKPOINT
         converter = handle_csv_import(ControlsConverter, csv_file,
           directive_id = directive_id, dry_run = dry_run,)
 

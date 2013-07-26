@@ -203,7 +203,7 @@ class ColumnHandler(object):
     self.importer.set_attr(self.key, value)
 
   def export(self):
-    return getattr(self.importer.obj, self.key)
+    return getattr(self.importer.obj, self.key, '')
 
 
 class TextOrHtmlColumnHandler(ColumnHandler):
