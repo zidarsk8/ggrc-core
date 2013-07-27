@@ -179,7 +179,7 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 
 }, {
     init: function() {
-      this.options.model = GGRC.infer_object_type(this.options.instance);
+      this.options.model = this.options.instance.constructor;
       this._super();
       this.init_related_widgets();
     }
