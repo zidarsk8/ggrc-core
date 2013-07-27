@@ -255,6 +255,10 @@ can.Model.Join("CMS.Models.ControlSection", {
     section : CMS.Models.Section
     , control : CMS.Models.Control
   }
+  , attributes : {
+    section : "CMS.Models.Section.model"
+    , control : "CMS.Models.Control.model"
+  }
   , init : function() {
     var that = this;
     this._super.apply(this, arguments);
