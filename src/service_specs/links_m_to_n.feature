@@ -43,3 +43,16 @@ Feature: Many resources type pairs reference each other M x N relations. This
       | Objective | controls             | Control   | objectives            |
       | Objective | sections             | Section   | objectives            |
       | System    | sub_systems          | System    | super_systems         |
+
+  Scenario Outline: Update of M x N relationships
+    Given a new "<source>" named "source_a"
+    And a new "<dest>" named "dest_b"
+    And "dest_b" is POSTed to its collection
+    And "dest_b" is added to links property "<link_property>" of "source_a"
+    And "source_a" is POSTed to its collection
+    When GET of the resource "source_a"
+    Then PUT of "source_a" is allowed
+
+   Examples: m-by-n link Resources
+      | source    | link_property      | dest    |
+      | Directive | programs             | Program |
