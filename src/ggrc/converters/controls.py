@@ -83,12 +83,16 @@ class ControlsConverter(BaseConverter):
 
   row_converter = ControlRowConverter
 
+  def validate_metadata(self, attrs):
+    self.validate_metadata_type(attrs, "Controls")
+    self.validate_code(attrs)
+
   def directive(self):
     return self.options['directive']
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield [self.directive().kind, self.directive().slug]
+    yield ['Controls', self.directive().slug]
     yield[]
     yield[]
     yield self.object_map.keys()

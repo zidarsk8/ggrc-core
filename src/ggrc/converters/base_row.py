@@ -54,7 +54,7 @@ class BaseRowConverter(object):
   def setup(self):
     pass
 
-  #FIXME: changed_attributes on rails side needs to be converted
+  #TODO: changed_attributes on rails side needs to be converted
   def changed_attributes(self):
     pass
 
@@ -98,14 +98,9 @@ class BaseRowConverter(object):
     if hook: self.after_save_hooks.append(hook)
     if funct and callable(funct): self.after_save_hooks.append(funct)
 
-  def responds_to_after_save(hook):
-    if hasattr(hook, 'after_save'):
-      return callable(getattr(hook, 'after_save'))
-    return False
-
   def run_after_save_hooks(self, obj):
     for hook in self.after_save_hooks:
-      if responds_to_after_save(hook):
+      if self.responds_to_after_save(hook):
         hook.after_save(obj)
       elif callable(hook):
         hook(obj)
@@ -113,6 +108,11 @@ class BaseRowConverter(object):
         self.hook(obj)
       else:
         raise ImportException
+
+  def responds_to_after_save(self, hook):
+    if hasattr(hook, 'after_save'):
+      return callable(getattr(hook, 'after_save'))
+    return False
 
   def handle_boolean(self, key, **options):
     return self.handle(key, BooleanColumnHandler, **options)
@@ -166,7 +166,7 @@ class ColumnHandler(object):
   def add_warning(self, message):
     self.warnings.append(message)
 
-  def has_error(self):
+  def has_errors(self):
     return any(self.errors) or self.importer.errors.get(self.key) or self.importer.obj.errors.get(self.key)
 
   def has_warnings(self):
@@ -260,7 +260,6 @@ class DateColumnHandler(ColumnHandler):
         raise ValueError("Error parsing the date string")
 
       if date_result:
-        import ipdb; ipdb.set_trace() ### XXX BREAKPOINT
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
       else:
         return ''
@@ -342,11 +341,9 @@ class LinksHandler(ColumnHandler):
   def get_existing_items(self):
     return getattr(self.importer.obj, self.options.get('association'),[])
 
-
-
   def go_import(self, content):
     content = content or ""
-    if self.importer.get('export') or not self.importer.obj.id:
+    if self.importer.options.get('export') or not self.importer.obj.id:
       self.pre_existing_links = []
     else:
       self.pre_existing_links = self.get_existing_items()

@@ -147,7 +147,6 @@ class BaseConverter(object):
 
     if not dry_run:
       self.save_import()
-
     return self
 
   def save_import(self):
@@ -193,8 +192,6 @@ class BaseConverter(object):
       csv_row = []
       for key in row_header_map.keys():
         field = row_header_map[key]
-        # FIXME: There should be no need to do this string checking once all
-        # the control import code is ported over
         field_val = row.get(field, '')
         field_val = field_val if isinstance(field_val, basestring) else ''
         csv_row.append(field_val)

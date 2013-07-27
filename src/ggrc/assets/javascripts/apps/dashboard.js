@@ -193,7 +193,7 @@ $(function() {
     var $area = $('.area').first()
       ;
 
-    if (/\w+\/\d+/.test(window.location)) {
+    if (/\w+\/\d+($|\?|\#)/.test(window.location)) {
       $area.cms_controllers_page_object({
           model_descriptors: model_descriptors
         , instance: GGRC.make_model_instance(GGRC.page_object)
