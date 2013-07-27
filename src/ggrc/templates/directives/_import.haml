@@ -8,16 +8,9 @@
 
 -block widget_buttons
 
--# note - had to modify instance.company_controls to be just company_controls for testing
-
 -block widget_title
   %i.grcicon-directive
-  -if not company_controls
-    Directives
-    %span.subtitle
-      (Regulations, Contracts, Policies) and Controls
-  -else
-    Controls
+  Import {{import_kind}}
 
 -block main
   .container-fluid

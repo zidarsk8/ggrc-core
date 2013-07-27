@@ -14,7 +14,6 @@ from . import filters
 from flask import request, redirect, url_for, flash, session
 from ggrc.converters.common import ImportException
 from ggrc.converters.sections import SectionsConverter
-from ggrc.converters.controls import ControlsConverter
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -110,12 +109,15 @@ def import_controls(directive_id):
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(ControlsConverter, csv_file,
-          directive_id = directive_id, dry_run = dry_run,)
-
+        options = {}
+        options['directive_id'] = directive_id
+        options['dry_run'] = dry_run
+        converter = handle_csv_import(ControlsConverter, csv_file, **options)
         if dry_run:
-          return render_template("directives/import_controls_result.haml",directive_id = directive_id,
-          converter = converter, results=converter.objects, heading_map = converter.object_map)
+          options['converter'] = converter
+          options['results'] = converter.objects
+          options['heading_map'] = converter.object_map
+          return render_template("directives/import_controls_result.haml", **options)
         else:
           return import_redirect("/directives/{}".format(directive_id))
     except ImportException as e:
@@ -140,7 +142,7 @@ def import_sections(directive_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(SectionsConverter, csv_file,
-          directive_id = directive_id, dry_run = dry_run,)
+          directive_id = directive_id, dry_run = dry_run)
 
         if dry_run:
           return render_template("directives/import_result.haml",directive_id = directive_id,
@@ -177,7 +179,7 @@ def import_systems():
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
 
-  return render_template("systems/import.haml")
+  return render_template("systems/import.haml", import_kind = 'Systems')
 
 def import_redirect(location):
   # The textarea here is a custom response for 'remoteipart' to

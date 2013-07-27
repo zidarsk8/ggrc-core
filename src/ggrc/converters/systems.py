@@ -13,16 +13,16 @@ class SystemRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
-    self.handle('controls', LinkControlsHandler)
-    self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
-    self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
-    self.handle('documents', LinkDocumentsHandler)
-    self.handle('sub_systems', LinkSystemsHandler, is_biz_process = False)
-    self.handle('sub_processes', LinkSystemsHandler, association = 'sub_systems',
-                is_biz_process = True)
-    self.handle_option('network_zone')
-    self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
-                relationship_type_id = 'org_group_is_responsible_for_system')
+    #self.handle('controls', LinkControlsHandler)
+    #self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
+    #self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
+    #self.handle('documents', LinkDocumentsHandler)
+    #self.handle('sub_systems', LinkSystemsHandler, is_biz_process = False)
+    #self.handle('sub_processes', LinkSystemsHandler, association = 'sub_systems',
+                #is_biz_process = True)
+    #self.handle_option('network_zone')
+    #self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
+    #            relationship_type_id = 'org_group_is_responsible_for_system')
     self.handle_date('start_date')
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
