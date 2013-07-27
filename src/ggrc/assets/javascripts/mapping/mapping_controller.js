@@ -37,7 +37,7 @@ can.Control("CMS.Controllers.Mapping", {
   //static
   cache : {}
   , defaults : {
-    section_model : namespace.CMS.Models.SectionSlug
+    section_model : namespace.CMS.Models.Section
   }
 }, {
   init : function() {
@@ -288,7 +288,7 @@ can.Control("CMS.Controllers.MappingWidgets", {}, {
   //---------------------------------------------------------------
 CMS.Controllers.Mapping("CMS.Controllers.ControlMappingPopup", {
   defaults : {
-    section_model : namespace.CMS.Models.SectionSlug
+    section_model : namespace.CMS.Models.Section
     , parent_model : namespace.CMS.Models.Program
     , model : namespace.CMS.Models.Control
     , parent_id : null

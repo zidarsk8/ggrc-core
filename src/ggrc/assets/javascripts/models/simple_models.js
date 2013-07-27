@@ -49,7 +49,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , update : "PUT /api/directives/{id}"
   , destroy : "DELETE /api/directives/{id}"
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
+    sections : "CMS.Models.Section.models"
     //, program : "CMS.Models.Program.model"
   }
   , serialize : {
@@ -125,7 +125,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     kind : "Regulation"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
+    sections : "CMS.Models.Section.models"
     //, program : "CMS.Models.Program.model"
   }
   , serialize : {
@@ -149,7 +149,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     kind : "Company Policy"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
+    sections : "CMS.Models.Section.models"
     //, program : "CMS.Models.Program.model"
   }
   , serialize : {
@@ -173,7 +173,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
     kind : "Contract"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
+    sections : "CMS.Models.Section.models"
     //, program : "CMS.Models.Program.model"
   }
   , serialize : {

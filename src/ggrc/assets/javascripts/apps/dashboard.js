@@ -145,7 +145,7 @@ var model_descriptors = {
     , widget_view : "/static/mustache/systems/object_widget.mustache"
   }
   , "sectionslug" : {
-    model : CMS.Models.SectionSlug
+    model : CMS.Models.Section
     , object_type : "section"
     , object_route : "sections"
     , object_category : "governance"
