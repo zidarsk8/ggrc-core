@@ -39,6 +39,7 @@ can.Model.Cacheable("CMS.Models.System", {
         , type : "put"
       });
     }
+    , destroy : "DELETE /api/systems/{id}"
     , search : function(request, response) {
         return $.ajax({
             type : "get"
