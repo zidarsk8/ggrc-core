@@ -104,16 +104,17 @@ if (!/\/directives\b/.test(window.location.pathname))
 
 $(function() {
   var spin_opts = { position : "absolute", top : 100, left : 100, height : 50, width : 50};
+  var $controls_tree, uncategorized;
 
-    CMS.Controllers.DirectiveRoutes.Instances = {
-      Control : $(document.body).cms_controllers_directive_routes({}).control(CMS.Controllers.DirectiveRoutes)};
+  CMS.Controllers.DirectiveRoutes.Instances = {
+    Control : $(document.body).cms_controllers_directive_routes({}).control(CMS.Controllers.DirectiveRoutes)};
 
-  var $controls_tree = $("#controls .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
+  $controls_tree = $("#controls .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
   $.when(
     CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ directive_id : directive_id })
   ).done(function(cats, ctls) {
-    var uncategorized = cats[cats.length - 1]
+    uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
     can.each(ctls, function(c) {
@@ -151,12 +152,25 @@ $(function() {
     });
   });
 
-  $(document.body).on("modal:success", "a[href^='/controls/new']", function(ev, data) {
-    var c = new CMS.Models.Control(data);
-    $("a[href='#controls']").click();
-      can.each(c.category_ids.length ? c.category_ids : [-1], function(catid) {
-        $controls_tree.find("[data-object-id=" + catid + "] > .item-content > ul[data-object-type=control]").trigger("newChild", c);
-      });
+  $("#sections").on("modal:success", "a[data-toggle=modal-ajax-form][data-object-singular=Control], a[data-toggle=modal-ajax-form][data-object-singular=Objective]", function(ev, data) {
+    //var c = new CMS.Models.Control(data);
+    var $object = $(this)
+    , section = $object
+      .closest('[data-object-meta-type=section]').find('[data-model]').first()
+      .data("model")
+    , params = { context : GGRC.make_model_instance(GGRC.page_object).context };
+    params[data.constructor.table_singular] = data;
+
+    if(data instanceof CMS.Models.Control) {
+      //TODO uncomment when categorizations are restored to controls
+      // can.each(data.categorizations.length ? data.categorizations : [uncategorized], function(catid) {
+      //   $controls_tree.find("[data-object-id=" + catid + "] > .item-content > ul[data-object-type=control]").trigger("newChild", data);
+      // });
+    }
+
+    section["map_" + data.constructor.table_singular](params).done(function(){
+      $object.trigger("newChild", data);
+    });
   });
 
   $(document.body).on("modal:success", "a[href^='/sections'][href$='/edit']", function(ev, data) {

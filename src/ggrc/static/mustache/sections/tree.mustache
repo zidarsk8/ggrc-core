@@ -1,6 +1,6 @@
 {{#list}}
-  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
-    <div class="item-main" {{data 'model'}}>
+  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section">
+    <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
           <div class="span9">
