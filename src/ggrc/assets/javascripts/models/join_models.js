@@ -255,13 +255,17 @@ can.Model.Join("CMS.Models.ControlSection", {
     section : CMS.Models.Section
     , control : CMS.Models.Control
   }
+  , attributes : {
+    section : "CMS.Models.Section.model"
+    , control : "CMS.Models.Control.model"
+  }
   , init : function() {
     var that = this;
     this._super.apply(this, arguments);
     this.bind("created destroyed", function(ev, inst) {
       if(that !== inst.constructor) return;
       var section =
-        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
+        CMS.Models.Section.findInCacheById(inst.section.id)
         || CMS.Models.Section.findInCacheById(inst.section.id);
       var control = 
         CMS.Models.RegControl.findInCacheById(inst.control.id)
@@ -300,7 +304,7 @@ can.Model.Join("CMS.Models.SectionObjective", {
     this.bind("created destroyed", function(ev, inst) {
       if(that !== inst.constructor) return;
       var section =
-        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
+        CMS.Models.Section.findInCacheById(inst.section.id)
         || CMS.Models.Section.findInCacheById(inst.section.id);
       var objective = 
         CMS.Models.Objective.findInCacheById(inst.objective.id);

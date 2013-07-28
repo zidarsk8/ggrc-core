@@ -282,7 +282,7 @@ $(function() {
       , list : d
       , list_view : "/static/mustache/directives/tree.mustache"
       , child_options : [{
-        model : CMS.Models.SectionSlug
+        model : CMS.Models.Section
         , parent_find_param : "directive.id"
         , find_params : { "parent_id__null" : true }
       }]

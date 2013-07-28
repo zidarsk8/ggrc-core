@@ -19,9 +19,90 @@ can.Model.Cacheable("CMS.Models.Section", {
   , update : "PUT /api/sections/{id}"
   , attributes : {
     children : "CMS.Models.Section.models"
+    , controls : "CMS.Models.Control.models"
+    , objectives : "CMS.Models.Objective.models"
+    , control_sections : "CMS.Models.ControlSection.models"
+    , section_objectives : "CMS.Models.SectionObjective.models"
+  }
+  , tree_view_options : {
+    list_view : "/static/mustache/sections/tree.mustache"
+    , child_options : [{
+      model : CMS.Models.Objective
+      , property : "objectives"
+      , list_view : "/static/mustache/objectives/tree.mustache"
+    }, {
+      model : CMS.Models.Control
+      , property : "controls"
+      , list_view : "/static/mustache/controls/tree.mustache"
+    }, {
+      model : CMS.Models.Section
+      , property : "children"
+    }]
   }
   , defaults : {
     children : []
+    , controls : []
+    , objectives : []
+    , title : ""
+    , slug : ""
+    , description : ""
+  }
+  , findTree : function(params) {
+    function filter_out(original, predicate) {
+      var target = [];
+      for(var i = original.length - 1; i >= 0; i--) {
+        if(predicate(original[i])) {
+          target.unshift(original.splice(i, 1)[0]);
+        }
+      }
+      return target;
+    }
+
+    function treeify(list, directive_id, pid) {
+      var ret = filter_out(list, function(s) { 
+        return (!s.parent && !pid) || (s.parent.id == pid && (!directive_id || (s.directive && s.directive.id === directive_id)));
+      });
+      can.$(ret).each(function() {
+        this.children = treeify(list, this.directive ? this.directive.id : null, this.id);
+      });
+      return ret;
+    }
+
+    return this.findAll(params).then(
+        function(list, xhr) {
+          var current;
+          can.$(list).each(function(i, s) {
+            can.extend(s, s.section);
+            delete s.section;
+          });
+          var roots = treeify(list); //empties the list if all roots (no parent in list) are actually roots (null parent id)
+          // for(var i = 0; i < roots.length; i++)
+          //   list.push(roots[i]);
+          function findRoot(i, v) {
+            // find a pseudo-root whose parent wasn't in the returned sections
+            if(can.$(list).filter(function(j, c) { return c !== v && v.parent && c.id === v.parent.id && ((!c.directive && !v.directive) || (c.directive && v.directive && c.directive.id === v.directive.id)) }).length < 1) {
+              current = v;
+              list.splice(i, 1); //remove current from list
+              return false;
+            }
+          }
+          while(list.length > 0) {
+            can.$(list).each(findRoot);
+            current.attr ? current.attr("children", treeify(list, current.id)) : (children = treeify(list, current.id));
+            roots.push(current);
+          }
+          return roots;
+        });
+  }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.tree_view_options.child_options[2].model = this;
+    this.validatePresenceOf("title");
+    this.bind("created updated", function(ev, inst) {
+      can.each(this.attributes, function(v, key) {
+        (inst.key instanceof can.Observe.List) && inst.key.replace(inst.key); //force redraw in places
+      });
+    });
   }
   , map_object : function(params, section) {
     var join_ids, joins;
@@ -64,10 +145,6 @@ can.Model.Cacheable("CMS.Models.Section", {
     delete p.objective;
     return this.map_object(p, section);
   }
-  , init : function() {
-    this._super.apply(this, arguments);
-    this.validatePresenceOf("title");
-  }
 }, {
 
   init : function() {
@@ -102,91 +179,4 @@ can.Model.Cacheable("CMS.Models.Section", {
   }
 
 });
-
-CMS.Models.Section("CMS.Models.SectionSlug", {
-  attributes : {
-    children : "CMS.Models.SectionSlug.models"
-    , controls : "CMS.Models.Control.models"
-    , control_sections : "CMS.Models.ControlSection.models"
-    , objectives : "CMS.Models.Objective.models"
-    , section_objectives : "CMS.Models.SectionObjective.models"
-  }
-  ,  findAll : function(params) {
-    function filter_out(original, predicate) {
-      var target = [];
-      for(var i = original.length - 1; i >= 0; i--) {
-        if(predicate(original[i])) {
-          target.unshift(original.splice(i, 1)[0]);
-        }
-      }
-      return target;
-    }
-
-    function treeify(list, directive_id, pid) {
-      var ret = filter_out(list, function(s) { 
-        return (!s.parent && !pid) || (s.parent.id == pid && (!directive_id || (s.directive && s.directive.id === directive_id)));
-      });
-      can.$(ret).each(function() {
-        this.children = treeify(list, this.directive ? this.directive.id : null, this.id);
-      });
-      return ret;
-    }
-
-    return this._super(params).pipe(
-        function(list, xhr) {
-          var current;
-          can.$(list).each(function(i, s) {
-            can.extend(s, s.section);
-            delete s.section;
-          });
-          var roots = treeify(list); //empties the list if all roots (no parent in list) are actually roots (null parent id)
-          // for(var i = 0; i < roots.length; i++)
-          //   list.push(roots[i]);
-          while(list.length > 0) {
-            can.$(list).each(function(i, v) {
-              // find a pseudo-root whose parent wasn't in the returned sections
-              if(can.$(list).filter(function(j, c) { return c !== v && v.parent && c.id === v.parent.id && ((!c.directive && !v.directive) || (c.directive && v.directive && c.directive.id === v.directive.id)) }).length < 1) {
-                current = v;
-                list.splice(i, 1); //remove current from list
-                return false;
-              }
-            });
-            current.attr ? current.attr("children", treeify(list, current.id)) : (children = treeify(list, current.id));
-            roots.push(current);
-          }
-          return roots;
-        });
-  }
-  , tree_view_options : {
-    list_view : "/static/mustache/sections/tree.mustache"
-    , child_options : [{
-      model : CMS.Models.Objective
-      , property : "objectives"
-      , list_view : "/static/mustache/objectives/tree.mustache"
-    }, {
-      model : CMS.Models.Control
-      , property : "controls"
-      , list_view : "/static/mustache/controls/tree.mustache"
-    }, {
-      model : CMS.Models.SectionSlug
-      , property : "children"
-    }]
-  }
-  , defaults : {
-    controls : []
-    , objectives : []
-    , title : ""
-    , slug : ""
-    , description : ""
-  }
-  , init : function() {
-    this._super.apply(this, arguments);
-    this.tree_view_options.child_options[2].model = this;
-    this.bind("created updated", function(ev, inst) {
-      can.each(this.attributes, function(v, key) {
-        (inst.key instanceof can.Observe.List) && inst.key.replace(inst.key); //force redraw in places
-      });
-    });
-  }
-}, {});
 

@@ -22,8 +22,9 @@ can.Model.Cacheable("CMS.Models.Control", {
     //, implementing_controls : "CMS.Models.Control.models"
     , control_sections : "CMS.Models.ControlSection.models"
     //, implemented_controls : "CMS.Models.Control.models"
-    //, directive : "CMS.Models.Directive.model"
-    //, sections : "CMS.Models.SectionSlug.models"
+    , directive : "CMS.Models.Directive.model"
+    , sections : "CMS.Models.Section.models"
+    , programs : "CMS.Models.Program.models"
   }
   , links_to : {"Section" : "ControlSection", "Regulation" : "DirectiveControl", "Policy" : "DirectiveControl", "Contract" : "DirectiveControl", "Risk" : {}}
   , defaults : {
