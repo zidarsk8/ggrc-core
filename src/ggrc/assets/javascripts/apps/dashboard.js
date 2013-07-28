@@ -202,6 +202,7 @@ $(function() {
       $area.cms_controllers_dashboard({
           model_descriptors: model_descriptors
         , menu_tree_spec: dashboard_menu_spec
+        , default_widgets: ['program']
         })
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({
