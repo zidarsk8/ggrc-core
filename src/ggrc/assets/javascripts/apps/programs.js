@@ -135,7 +135,10 @@ function collated_user_roles_by_person(user_roles) {
   }
 
   function remove_user_role(user_role) {
-    var roles, role_index;
+    var roles, role_index
+      , person_index_to_remove = null
+      ;
+
     can.each(person_roles, function(data, index) {
       if (user_role.person.id == data.person.id) {
         roles = person_roles.attr(index).attr('roles');
@@ -143,10 +146,12 @@ function collated_user_roles_by_person(user_roles) {
         if (role_index > -1) {
           roles.splice(role_index, 1);
           if (roles.length == 0)
-            person_roles.splice(index, 1);
+            person_index_to_remove = index;
         }
       }
     });
+    if (person_index_to_remove)
+      person_roles.splice(person_index_to_remove, 1);
   }
 
   CMS.Models.UserRole.bind("created", function(ev, user_role) {
