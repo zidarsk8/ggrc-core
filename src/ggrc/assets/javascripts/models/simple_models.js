@@ -688,12 +688,11 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model = CMS.Models[object_type]
     , params = {}
+    , instance = null
     ;
 
   if (!model)
     return null;
-
-  params.id = object_id;
 
   if (!!params_or_object) {
     if ($.isFunction(params_or_object.serialize))
@@ -702,7 +701,15 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
       $.extend(params, params_or_object || {});
   }
 
-  return model.findInCacheById(object_id) || new model(params)
+  instance = model.findInCacheById(object_id);
+  if (!instance) {
+    if (params.selfLink) {
+      params.id = object_id;
+      instance = new model(params);
+    } else
+      instance = new model({ id: object_id });
+  }
+  return instance;
 };
 
 CMS.Models.get_link_type = function(instance, attr) {

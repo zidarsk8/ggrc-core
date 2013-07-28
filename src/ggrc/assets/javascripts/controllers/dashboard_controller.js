@@ -142,11 +142,12 @@ can.Control("CMS.Controllers.Dashboard", {
       // Create widget in container?
       //return this.options.widget_container[0].add_widget(descriptor);
 
-      // FIXME: This should be in some Widget superclass
-      if (descriptor.widget_guard && !descriptor.widget_guard())
+      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0)
         return;
 
-      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0)
+      // FIXME: This should be in some Widget superclass
+      if (descriptor.controller_options.widget_guard
+          && !descriptor.controller_options.widget_guard())
         return;
 
       var $element = $("<section class='widget'>")

@@ -9,28 +9,15 @@
 
 can.Control("CMS.Controllers.AddWidget", {
   defaults : {
-    widget_descriptors : null
+      dashboard_controller : null
     , menu_tree : null
     , menu_view : GGRC.mustache_path + "/add_widget_menu.mustache"
     //, dropdown_view: '/static/mustache/add_widget_section.mustache'
-    , minimum_widget_height : 100
-    , is_related : false
-    //, parent_controller : null
   }
 }, {
 
   init : function() {
     var that = this;
-
-    /*can.each(this.options.widget_descriptors, function(descriptor, name) {
-      that.options.widget_descriptors[name] =
-        that.make_descriptor_from_model_descriptor(that.options.widget_descriptors[name]);
-    });*/
-
-    /*if(!this.options.menu_tree) {
-      this.options.is_related = true
-      //this.scrapeRelated();
-    }*/
 
     can.view(this.options.menu_view, this.options.menu_tree, function(frag) {
       that.element
@@ -39,50 +26,10 @@ can.Control("CMS.Controllers.AddWidget", {
         .find(".divider:last").remove();
     });
   }
-/*
-  , make_descriptor_from_model_descriptor: function(descriptor) {
-      if (descriptor.widget_id || !descriptor.model)
-        return descriptor
-
-      return {
-        content_controller: GGRC.Controllers.ListView,
-        content_controller_options: descriptor,
-        widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.model.title_plural,
-        widget_icon: descriptor.model.table_singular,
-        object_category: descriptor.model.category || descriptor.object_category
-      }
-    }
-
-  , scrapeRelated : function() {
-      var that = this
-        , page_model = GGRC.infer_object_type(GGRC.page_object).shortName
-        , categories_index = {}
-        ;
-
-      this.options.menu_tree = {categories : []};
-
-      can.each(GGRC.RELATIONSHIP_TYPES[page_model], function(value, key, root) {
-        var related_model = CMS.Models[key]
-          , descriptor = that.options.dashboard_controller.options.widget_descriptors[related_model.table_singular]
-          ;
-
-        if (descriptor) {
-          if(!categories_index[descriptor.object_category]) {
-            categories_index[descriptor.object_category] = {
-                title : can.map(descriptor.object_category.split(" "), can.capitalize).join(" ")
-              , objects : []
-              };
-            that.options.menu_tree.categories.push(categories_index[descriptor.object_category]);
-          }
-          categories_index[descriptor.object_category].objects.push(descriptor);
-        }
-      });
-    }*/
 
   , ".dropdown-menu > * click" : function(el, ev) {
-    var descriptor = this.options.dashboard_controller.options.widget_descriptors[el.attr("class")];
-    this.addWidgetByDescriptor(descriptor);
+    this.options.dashboard_controller
+      .add_dashboard_widget_from_name(el.attr("class"))
   }
 
   /*, ".dropdown-toggle click" : function() {
@@ -107,24 +54,4 @@ can.Control("CMS.Controllers.AddWidget", {
       })
     }
   }*/
-
-  , addWidgetByDescriptor : function(descriptor) {
-      if (this.options.dashboard_controller) {
-        // FIXME: This ought not change the persistent descriptor object!
-        // FIXME: This must change before single page app can be accomplished
-        //descriptor.content_controller_options.is_related = this.options.is_related;
-
-        this.options.dashboard_controller
-          .add_dashboard_widget_from_descriptor(descriptor)
-      }
-    }
-
-  , addWidgetByName : function(widget_name) {
-      var descriptor = this.options.dashboard_controller.options.widget_descriptors[widget_name];
-      if (!descriptor)
-        // FIXME: This happens when previously-existing widgets no longer exist,
-        //   but only the first time (then DisplayPrefs are overwritten correctly).
-        return;
-      this.addWidgetByDescriptor(descriptor);
-  }
 });

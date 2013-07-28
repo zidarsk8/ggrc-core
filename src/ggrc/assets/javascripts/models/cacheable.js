@@ -239,7 +239,7 @@ can.Model("can.Model.Cacheable", {
           //   m[key].splice(j, i - j);
           // }
         } else if(m[key] instanceof can.Model) {
-          m[key].constructor.model(params[key]);
+          m[key].constructor.model(params[key] || {});
         } else {
           m.attr(key, p);
         }
