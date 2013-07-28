@@ -5,6 +5,7 @@
 
 import datetime
 from flask import session, Blueprint
+import sqlalchemy.orm
 from ggrc import db, settings
 from ggrc.login import get_current_user
 from ggrc.models.context import Context
@@ -82,6 +83,7 @@ class UserPermissions(DefaultUserPermissions):
     elif user is not None:
       session['permissions'] = {}
       user_roles = db.session.query(UserRole)\
+          .options(sqlalchemy.orm.subqueryload('role'))\
           .filter(UserRole.person_id==user.id)\
           .order_by(UserRole.updated_at.desc())\
           .all()
@@ -176,7 +178,9 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     # force a reload of permissions
     #del session['permissions']
 
-@BaseObjectView.extension_contributions.connect_via(Program)
+# Removed because this is now handled purely client-side, but kept
+# here as a reference for the next one.
+#@BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
   if obj.context_id != None and \
       permissions.is_allowed_read('Role', 1) and \
