@@ -678,6 +678,14 @@ can.Model.Cacheable("CMS.Models.Role", {
   , update : "PUT /api/roles/{id}"
   , destroy : "DELETE /api/roles/{id}"
   , create : "POST /api/roles"
+  , defaults : {
+      permissions: {
+          read: []
+        , update: []
+        , create: []
+        , "delete": []
+      }
+    }
 }, {});
 
 CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
