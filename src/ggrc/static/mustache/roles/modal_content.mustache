@@ -5,64 +5,122 @@
   <div class="row-fluid">
     <div class="span6">
       <label>
-        Name
+        Role Name
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Enter Name"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Enter Role Name"></i>
       </label>
-      <input class="input-block-level" placeholder="Enter Name" name="name" type="text" value="{{name}}">
+      <input class="input-block-level" placeholder="Enter Role Name" name="name" type="text" value="{{name}}">
     </div>
-  </div>
-  <div class="row-fluid">
     <div class="span6">
       <label>
        Description 
-        <i class="grcicon-help-black" rel="tooltip" title="Enter Description"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Describe a program in a few sentences"></i>
       </label>
       <div class="wysiwyg-area">
         <textarea id="role_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
       </div>
     </div>
-    <div class="span6">
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <br/>
       <label>
-       Assigned Users
-        <i class="grcicon-help-black" rel="tooltip" title="Hold CTRL (CMD) to select multiple users"></i>
+        Role-specific Privileges for Program Dependent Objects
+        <i class="grcicon-help-black" rel="tooltip" title="Priveleges for all private program objects"></i>
       </label>
-      <select multiple="multiple" class="multiple-selector input-block-level">
-        <option>John Locke</option>
-        <option selected>Epicurus</option>
-        <option>Zeno of Citium</option>
-        <option>Avicenna</option>
-        <option selected>Thomas Aquinas</option>
-        <option>Confucius</option>
-        <option>Rene Descartes</option>
-        <option>Paul of Tarsus</option>
-        <option>Plato</option>
-        <option>Aristotle</option>
-      </select>
+      <div class="checkbox-area">
+        {{#permission_checkbox "view" "__ALL__"}}{{/permission_checkbox}}
+        {{#permission_checkbox "modify" "__ALL__"}}{{/permission_checkbox}}
+      </div>
     </div>
   </div>
   <div class="row-fluid">
-    <div class="span6">
-      <label>
-        Context
-        <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Choose Context"></i>
-      </label>
-      <select disabled class="input-block-level">
-        <option>Program</option>
-      </select>
-    </div>
-    <div class="span6">
-      <label>
-        Permissions
-        <i class="grcicon-help-black" rel="tooltip" title="Choose permissions for a role"></i>
-      </label>
-      <div class="checkbox-area">
-        <input type="checkbox" checked="checked"> View
-        &nbsp;&nbsp;
-        <input type="checkbox" checked="checked"> Modify
+    <div class="span12">
+      <div class="expand-link">
+        <a href="javascript://" class="show-hidden-fields">
+          <span class="out">
+            <i class="grcicon-show"></i>
+            Show
+          </span>
+          <span class="in">
+            <i class="grcicon-hide"></i>
+            Hide
+          </span>
+          Advanced
+        </a>
       </div>
     </div>
+  </div>
+  <div class="hidden-fields-area" style="display:none">
+    <div class="row-fluid">
+      <div class="span2">
+        <label>Program Info</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "Program"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "Program"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>Audits</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "Cycle"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "Cycle"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>Controls</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "ProgramControl"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "ProgramControl"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>Directives</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "ProgramDirective"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "ProgramDirective"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>Documents</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "ObjectDocument"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "ObjectDocument"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>People</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "ObjectPerson"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "ObjectPerson"}}{{/permission_checkbox}}
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span2">
+        <label>References</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "Relationship"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "Relationship"}}{{/permission_checkbox}}
+        </div>
+      </div>
+      <div class="span2">
+        <label>User Roles</label>
+        <div class="checkbox-area">
+          {{#permission_checkbox "view" "UserRole"}}{{/permission_checkbox}}
+          <br/>
+          {{#permission_checkbox "modify" "UserRole"}}{{/permission_checkbox}}
+        </div>
+      </div>
+    </div>
+  </div>
 </form>
 {{/instance}}
 {{!/div}}
