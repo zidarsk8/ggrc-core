@@ -78,15 +78,37 @@
           </div>
         </div>
       </div>
+
+      {{#if draw_children}}
+        {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+          <div class="inner-tree">
+            {{#child_options}}
+              <h6>{{model.title_plural}}</h6>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options}}
+          </div>
+        {{/if_null}}
+      {{/if}}
+
     </div>
   </li>
 {{/list}}
-<li class="tree-item tree-item-add">
-  <div class="row-fluid">
-    <div class="span12">
-      <a href="javascript://">
-        + Control Objective
-      </a>
-    </div>
-  </div>
-</li>
+</ul>
+<ul class="new-tree">
+  <li class="tree-item tree-item-add">
+    <a
+      href="javascript://"
+      rel="tooltip"
+      data-placement="left"
+      data-toggle="modal-selector"
+      data-modal-selector-options="section_objectives"
+      data-modal-class="modal-wide"
+      xdata-modal-reset="reset"
+      data-original-title="Link {{model.title_singular.toLowerCase}} to this object"
+      xdata-join-object="lookup-tree"
+      data-join-object-id="{{parent.instance.id}}"
+      data-join-object-type="{{parent.instance.constructor.shortName}}">
+      + {{model.title_singular}}
+    </a>
+  </li>
+</ul>

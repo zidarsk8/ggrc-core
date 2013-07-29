@@ -24,6 +24,62 @@ can.Model.Cacheable("can.Model.Join", {
       return null;
     }
   }
+
+  , init_join_object_with_type: function(attr) {
+      var object_id = this[attr + "_id"] || (this[attr] || {}).id
+        , object_type = this[attr + "_type"] || (this[attr] || {}).type
+        ;
+
+      if (object_id && object_type)
+        this.attr(attr, CMS.Models.get_instance(
+              object_type
+            , object_id
+            , this[attr]
+            ) || this[attr]);
+    }
+
+  , init_join_object: function(attr, model_name) {
+      var object_id = this[attr + "_id"] || (this[attr] || {}).id;
+
+      if (object_id)
+        this.attr(attr, CMS.Models.get_instance(
+              model_name
+            , object_id
+            , this[attr]
+            ) || this[attr]);
+    }
+
+  , init_join_objects: function() {
+      var that = this
+        ;
+
+      can.each(this.constructor.join_keys, function(model, attr) {
+        if (model === CMS.Models.Cacheable)
+          that.init_join_object_with_type(attr);
+        else
+          that.init_join_object(attr, model.shortName);
+      });
+    }
+
+  , init_object: function() {
+      var that = this;
+      this.init_join_objects();
+
+      this.each(function(value, name) {
+        if (value === null)
+          that.removeAttr(name);
+      });
+    }
+
+  , setup_reinit: function(init_super) {
+      function reinit() {
+        typeof init_super === "function" && init_super.call(this);
+        this.init_object();
+      }
+
+      this.bind("created", can.proxy(reinit, this));
+      reinit.call(this);
+    }
 });
 
 can.Model.Join("CMS.Models.Relationship", {
@@ -62,6 +118,54 @@ can.Model.Join("CMS.Models.Relationship", {
 
     reinit.call(this);
   }
+});
+
+can.Model.Join("CMS.Models.ObjectSection", {
+    root_object: "object_section"
+  , root_collection: "object_sections"
+  , join_keys : {
+      "section" : can.Model.Section
+    , "sectionable" : can.Model.Cacheable
+  }
+  , findAll: "GET /api/object_sections"
+  , create: "POST /api/object_sections"
+  , destroy: "DELETE /api/object_sections/{id}"
+}, {
+    init: function() {
+      this.setup_reinit(this._super);
+    }
+});
+
+can.Model.Join("CMS.Models.ObjectControl", {
+    root_object: "object_control"
+  , root_collection: "object_controls"
+  , join_keys : {
+      "control" : can.Model.Control
+    , "controllable" : can.Model.Cacheable
+  }
+  , findAll: "GET /api/object_controls"
+  , create: "POST /api/object_controls"
+  , destroy: "DELETE /api/object_controls/{id}"
+}, {
+    init: function() {
+      this.setup_reinit(this._super);
+    }
+});
+
+can.Model.Join("CMS.Models.ObjectObjective", {
+    root_object: "object_objective"
+  , root_collection: "object_objectives"
+  , join_keys : {
+      "objective" : can.Model.Objective
+    , "objectiveable" : can.Model.Cacheable
+  }
+  , findAll: "GET /api/object_objectives"
+  , create: "POST /api/object_objectives"
+  , destroy: "DELETE /api/object_objectives/{id}"
+}, {
+    init: function() {
+      this.setup_reinit(this._super);
+    }
 });
 
 can.Model.Join("CMS.Models.ProgramDirective", {
@@ -292,13 +396,18 @@ can.Model.Join("CMS.Models.ControlSection", {
 can.Model.Join("CMS.Models.SectionObjective", {
   root_collection : "section_objectives"
   , root_object : "section_objective"
+  , findAll : "GET /api/section_objectives"
   , create : "POST /api/section_objectives"
   , destroy : "DELETE /api/section_objectives/{id}"
   , join_keys : {
-    section : CMS.Models.Section
+      section : CMS.Models.Section
     , objective : CMS.Models.Objective
   }
-  , init : function() {
+  , attributes : {
+      section : "CMS.Models.Section.model"
+    , objective : "CMS.Models.Objective.model"
+  }
+  /*, init : function() {
     var that = this;
     this._super.apply(this, arguments);
     this.bind("created destroyed", function(ev, inst) {
@@ -312,8 +421,22 @@ can.Model.Join("CMS.Models.SectionObjective", {
       section && section.refresh();
       objective && objective.refresh();
     });
-  }
+  }*/
 }, {
+    init: function() {
+      this.setup_reinit(this._super);
+    }
+  , serialize : function(name) {
+    var serial;
+    if(!name) {
+      serial = this._super();
+      serial.section && (serial.section = this.section.stub());
+      serial.objective && (serial.objective = this.objective.stub());
+      return serial;
+    } else {
+      return this._super.apply(this, arguments);
+    }
+  }
 });
 
 can.Model.Join("GGRC.Models.DirectiveControl", {

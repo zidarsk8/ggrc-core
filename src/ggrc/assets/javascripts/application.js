@@ -127,6 +127,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "section_objective" : CMS.Models.SectionObjective
       , "role" : CMS.Models.Role
     };
 

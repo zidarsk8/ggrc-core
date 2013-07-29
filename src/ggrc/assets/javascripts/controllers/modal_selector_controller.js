@@ -445,6 +445,32 @@
 
         join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
       }
+
+      , section_objectives : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Objective",
+        modal_title: "Select Objectives",
+
+        related_model_singular: "Objective",
+        related_table_plural: "objectives",
+        related_title_singular: "Control Objective",
+        related_title_plural: "Control Objectives",
+
+        option_model: CMS.Models.Objective,
+        join_model: CMS.Models.SectionObjective,
+
+        option_attr: 'objective',
+        option_id_field: 'objective_id',
+        //option_type_field: 'objective_type',
+        join_id_field: 'section_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
+      }
+
       , risk_controls : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",

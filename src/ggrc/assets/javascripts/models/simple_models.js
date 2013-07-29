@@ -644,11 +644,14 @@ can.Model.Cacheable("CMS.Models.Objective", {
   root_object : "objective"
   , root_collection : "objectives"
   , category : "governance"
-  , findAll : "/api/objectives"
+  , title_singular : "Control Objective"
+  , title_plural : "Control Objectives"
+  , findAll : "GET /api/objectives"
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
   , links_to : {
+      "Section" : "SectionObjective"
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -694,6 +697,9 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   if (!model)
     return null;
 
+  if (!object_id)
+    return null;
+
   if (!!params_or_object) {
     if ($.isFunction(params_or_object.serialize))
       $.extend(params, params_or_object.serialize());
@@ -707,7 +713,10 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
       params.id = object_id;
       instance = new model(params);
     } else
-      instance = new model({ id: object_id });
+      instance = new model({
+          id: object_id
+        , href: (params_or_object || {}).href
+        });
   }
   return instance;
 };

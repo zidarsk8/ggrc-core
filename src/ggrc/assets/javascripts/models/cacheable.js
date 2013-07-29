@@ -286,7 +286,8 @@ can.Model("can.Model.Cacheable", {
     }
 
     var cache = can.getObject("cache", this.constructor, true);
-    cache[this.id] = this;
+    if (this.id)
+      cache[this.id] = this;
 
     var that = this;
     this.attr("computed_errors", can.compute(function() {
