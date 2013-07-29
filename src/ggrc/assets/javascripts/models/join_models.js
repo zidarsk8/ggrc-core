@@ -213,7 +213,37 @@ can.Model.Join("CMS.Models.UserRole", {
   , findAll : "GET /api/user_roles"
   , update : "PUT /api/user_roles/{id}"
   , create : "POST /api/user_roles"
-}, {});
+  , destroy : "DELETE /api/user_roles/{id}"
+  , join_keys : {
+      person : CMS.Models.Person
+    , role : CMS.Models.Role
+  }
+}, {
+  init : function() {
+    var _super = this._super;
+    function reinit() {
+      var that = this;
+
+      typeof _super === "function" && _super.call(this);
+      this.attr("person", CMS.Models.get_instance(
+        "Person",
+        this.person_id || (this.person && this.person.id), this.person));
+      this.attr("role", CMS.Models.get_instance(
+        "Role",
+        this.role_id || (this.role && this.role.id), this.role));
+
+      this.each(function(value, name) {
+        if (value === null)
+        that.removeAttr(name);
+      });
+    }
+
+    this.bind("created", can.proxy(reinit, this));
+
+    reinit.call(this);
+  }
+
+});
 
 
 can.Model.Join("CMS.Models.ControlSection", {

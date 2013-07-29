@@ -6,7 +6,6 @@
 import datetime
 from flask import session, Blueprint
 from ggrc import db, settings
-from ggrc.app import app
 from ggrc.login import get_current_user
 from ggrc.models.context import Context
 from ggrc.models.program import Program
@@ -21,6 +20,8 @@ blueprint = Blueprint(
     'permissions',
     __name__,
     template_folder='templates',
+    static_folder='static',
+    static_url_path='/static/ggrc_basic_permissions',
     )
 
 class CompletePermissionsProvider(object):
@@ -28,18 +29,50 @@ class CompletePermissionsProvider(object):
     pass
 
   def permissions_for(self, user):
-    if 'permissions' not in session:
-      self.add_permissions_to_session(user)
-    return DefaultUserPermissions()
+    return UserPermissions()
 
   def handle_admin_user(self, user):
     pass
 
-  def add_permissions_to_session(self, user):
-    if user is not None \
+class UserPermissions(DefaultUserPermissions):
+  def _is_allowed(self, permission):
+    self.check_permissions()
+    return super(UserPermissions, self)._is_allowed(permission)
+
+  def _get_contexts_for(self, action, resource_type):
+    self.check_permissions()
+    return super(UserPermissions, self)\
+        ._get_contexts_for(action, resource_type)
+
+  def check_permissions(self):
+    if 'permissions' not in session:
+      self.load_permissions()
+    elif session['permissions'] is None\
+        and 'permissions_header_asserted' not in session:
+      pass
+    elif session['permissions'] is not None\
+        and '__header_override' in session['permissions']:
+      pass
+    elif session['permissions'] is None\
+        or '__user' not in session['permissions']\
+        or session['permissions']['__user'] != get_current_user().email:
+      self.load_permissions()
+    else:
+      current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
+          .filter(UserRole.person_id==get_current_user().id)\
+          .order_by(UserRole.updated_at.desc())\
+          .first()
+      if current_most_recent_role_ts[0] > session['permissions__ts']:
+        self.load_permissions()
+
+  def load_permissions(self):
+    user = get_current_user()
+    session['permissions'] = {}
+    session['permissions']['__user'] = user.email
+    if user is not None\
         and hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
         and user.email in settings.BOOTSTRAP_ADMIN_USERS:
-      permissions = {
+      session['permissions'] = {
           DefaultUserPermissions.ADMIN_PERMISSION.action: {
             DefaultUserPermissions.ADMIN_PERMISSION.resource_type: [
               DefaultUserPermissions.ADMIN_PERMISSION.context_id,
@@ -47,14 +80,22 @@ class CompletePermissionsProvider(object):
             },
           }
     elif user is not None:
-      permissions = {}
-      user_roles = db.session.query(UserRole).filter(
-          UserRole.user_email==user.email).all()
+      session['permissions'] = {}
+      user_roles = db.session.query(UserRole)\
+          .filter(UserRole.person_id==user.id)\
+          .order_by(UserRole.updated_at.desc())\
+          .all()
+      if len(user_roles) > 0:
+        session['permissions__ts'] = user_roles[0].updated_at
+      else:
+        session['permissions__ts'] = None
       for user_role in user_roles:
-        for action, resource_types in user_role.role.permissions.items():
-          for resource_type in resource_types:
-            permissions.setdefault(action, {}).setdefault(resource_type, [])\
-                .append(user_role.context_id)
+        if isinstance(user_role.role.permissions, dict):
+          for action, resource_types in user_role.role.permissions.items():
+            for resource_type in resource_types:
+              session['permissions'].setdefault(action, {})\
+                  .setdefault(resource_type, [])\
+                  .append(user_role.context_id)
       #grab personal context
       personal_context = db.session.query(Context).filter(
           Context.related_object_id == user.id,
@@ -70,18 +111,18 @@ class CompletePermissionsProvider(object):
             )
         db.session.add(personal_context)
         db.session.commit()
-      permissions['__GGRC_ADMIN__'] = {
+      session['permissions']['__GGRC_ADMIN__'] = {
           '__GGRC_ALL__': [personal_context.id,],
           }
     else:
-      permissions = {}
-    session['permissions'] = permissions
+      session['permissions'] = {}
+      session['permissions__ts'] = None
 
 def all_collections():
   """The list of all collections provided by this extension."""
   return [
       service('roles', Role),
-      service('users_roles', UserRole),
+      service('user_roles', UserRole),
       ]
 
 @Resource.model_posted.connect_via(Program)
@@ -104,11 +145,11 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
     # add a user_roles mapping assigning the user creating the program
     # the ProgramOwner role in the program's context.
-    current_user_email = get_current_user().email
+    current_user_id = get_current_user().id
     program_owner_role = db.session.query(Role)\
         .filter(Role.name == 'ProgramOwner').first()
     user_role = UserRole(
-        user_email=current_user_email,
+        person=get_current_user(),
         role=program_owner_role,
         context=context,
         )
@@ -120,31 +161,33 @@ def handle_program_post(sender, obj=None, src=None, service=None):
         .filter(Role.name == 'RoleReader').first()
     role_reader_for_user = db.session.query(UserRole)\
         .join(Role, UserRole.role == role_reader_role)\
-        .filter(UserRole.user_email == current_user_email \
+        .filter(UserRole.person_id == current_user_id\
             and Role.name == 'RoleReader')\
         .first()
     if not role_reader_for_user:
       role_reader_for_user = UserRole(
-          user_email=current_user_email,
+          person_id=current_user_id,
           role=role_reader_role,
           context_id=1,
           )
       db.session.add(role_reader_for_user)
       db.session.flush()
+    
+    # force a reload of permissions
+    #del session['permissions']
 
 @BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
-  print 'contribute_to_program_view', obj
-  print session['permissions']
   if obj.context_id != None and \
-      permissions.is_allowed_read(Role, 1) and \
-      permissions.is_allowed_read(UserRole, obj.context_id) and \
-      permissions.is_allowed_create(UserRole, obj.context_id) and \
-      permissions.is_allowed_update(UserRole, obj.context_id) and \
-      permissions.is_allowed_delete(UserRole, obj.context_id):
+      permissions.is_allowed_read('Role', 1) and \
+      permissions.is_allowed_read('UserRole', obj.context_id) and \
+      permissions.is_allowed_create('UserRole', obj.context_id) and \
+      permissions.is_allowed_update('UserRole', obj.context_id) and \
+      permissions.is_allowed_delete('UserRole', obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 
+from ggrc.app import app
 @app.context_processor
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for,}

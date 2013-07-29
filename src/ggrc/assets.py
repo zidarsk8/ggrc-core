@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 """Manage "static" assets
 
@@ -38,16 +37,45 @@ import webassets.updater
 environment.updater = webassets.updater.TimestampUpdater()
 
 # Read asset listing from YAML file
-import os, yaml
-assets_yaml_path = os.path.join(settings.MODULE_DIR, 'assets', 'assets.yaml')
-with open(assets_yaml_path) as f:
-  asset_paths = yaml.load(f.read())
+import os, yaml, imp
+assets_yamls = [os.path.join(settings.MODULE_DIR, 'assets', 'assets.yaml'),]
+module_load_paths = [settings.MODULE_DIR,]
+for extension in settings.EXTENSIONS:
+  file, pathname, description = imp.find_module(extension)
+  module_load_paths.append(pathname)
+  p = os.path.join(pathname, 'assets', 'assets.yaml')
+  if os.path.exists(p):
+    assets_yamls.append(p)
+asset_paths = {}
+for assets_yaml_path in assets_yamls:
+  with open(assets_yaml_path) as f:
+    for k,v in yaml.load(f.read()).items():
+      asset_paths.setdefault(k, []).extend(v or [])
 
 if not settings.AUTOBUILD_ASSETS:
   environment.auto_build = False
 
 environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
+
+environment.load_path = []
+
+_per_module_load_suffixes = [
+  'assets/javascripts',
+  'assets/mustache',
+  'assets/vendor/javascripts',
+  'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
+  'assets/vendor/remoteipart/vendor/assets/javascripts',
+  'assets/stylesheets',
+  'assets/vendor/stylesheets',
+  'assets/js_specs',
+  ]
+
+for module_load_base in module_load_paths:
+  module_load_paths = [
+      os.path.join(module_load_base, load_suffix)
+        for load_suffix in _per_module_load_suffixes]
+  environment.load_path.extend(module_load_paths)
 
 from webassets.filter.jst import JSTemplateFilter
 class MustacheFilter(JSTemplateFilter):
@@ -73,17 +101,6 @@ class MustacheFilter(JSTemplateFilter):
           .format(namespace=namespace, name=name))
       out.write("= '{template}';\n"
           .format(template=contents))
-
-environment.load_path = [
-  'assets/javascripts',
-  'assets/mustache',
-  'assets/vendor/javascripts',
-  'assets/vendor/bootstrap-sass/vendor/assets/javascripts',
-  'assets/vendor/remoteipart/vendor/assets/javascripts',
-  'assets/stylesheets',
-  'assets/vendor/stylesheets',
-  'assets/js_specs',
-  ]
 
 environment.register("dashboard-js", webassets.Bundle(
   *asset_paths['dashboard-js-files'],

@@ -350,13 +350,25 @@
       width:200px;
       height:100%;
     }
-    a.add-nav-item {
+    .add-nav-item {
+      position:relative;
       display:block;
       border-bottom:1px solid #ddd;
-      line-height:30px;
-      font-size:12px;
-      font-weight:bold;
-      padding-left:20px;
+      a.dropdown-toggle {
+        padding-left:20px;
+        display:block;
+        line-height:30px;
+        font-size:12px;
+        font-weight:bold;
+      }
+      ul.dropdown-menu {
+        padding:10px;
+        width:240px;
+        font-size:12px;
+        li.title {
+          font-weight:bold;
+        }
+      }
     }
   }
   ul.internav {

@@ -105,7 +105,12 @@ can.Model("can.Model.Cacheable", {
 
     var _refresh = this.makeFindOne({ type : "get", url : "{href}" });
     this.refresh = function(params) {
-      return _refresh.call(this, {href : params.selfLink || params.href});
+      var href = params.selfLink || params.href;
+
+      if (href)
+        return _refresh.call(this, {href : params.selfLink || params.href});
+      else
+        return (new can.Deferred()).reject();
     };
 
     var that = this;
@@ -302,8 +307,12 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function() {
+    var href = this.selfLink || this.href;
+
+    if (!href)
+      return (new can.Deferred()).reject();
     return $.ajax({
-      url : this.selfLink || this.href
+      url : href
       , type : "get"
       , dataType : "json"
     })
@@ -340,6 +349,9 @@ can.Model("can.Model.Cacheable", {
     });
     return serial;
   }
+  , display_name : function() {
+    return this.title || this.name;
+  }
 });
 
 can.Observe.prototype.stub = function() {
@@ -349,6 +361,9 @@ can.Observe.prototype.stub = function() {
     type = this.constructor.getRootModelName();
   else
     type = this.type;
+
+  if (!this.id)
+    return null;
 
   return {
     id : this.id,

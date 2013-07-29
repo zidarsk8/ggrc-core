@@ -1,0 +1,31 @@
+<div class="search-title">
+  <div class="row-fluid">
+    <div class="span12">
+      <h4>
+        Users ({{ objects.length }})
+      </h4>
+    </div>
+  </div>
+</div>
+<div class="selector-list">
+  <ul class="new-tree">
+    {{#objects}}
+      <li class="tree-item business" {{ data 'object' }} data-id="{{ id }}">
+        <div class="item-main">
+          <div class="simple-link">
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    {{name}}
+                    <span class="url-link">{{email}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    {{/objects}}
+  </ul>
+</div>

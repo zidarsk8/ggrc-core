@@ -20,8 +20,12 @@ class BaseConverter(object):
     self.final_results = []
     self.import_exception = None
     self.import_slug = None
+
+    # Meta/object map changes (slightly) based on kind: section/control, system/process, etc....
     if self.__class__.__name__ == 'SectionsConverter':
-      self.create_metadata_map() # Map will vary based on Directive kind
+      self.create_metadata_map()
+    elif self.__class__.__name__ == 'SystemsConverter' and options.get('is_biz_process'):
+      self.create_object_map()
 
   def results(self):
     return self.objects
@@ -143,19 +147,13 @@ class BaseConverter(object):
 
     if not dry_run:
       self.save_import()
-
     return self
-
-    #except ImportException as e:
-     # self.import_exception = e
-      #return self
 
   def save_import(self):
     db_session = db.session
     for row_converter in self.objects:
-      row_converter.save_object(db_session, **self.options)
+      row_converter.save(db_session, **self.options)
     db_session.commit()
-
 
   def read_objects(self, headers, rows):
     attrs_collection = []
@@ -194,8 +192,6 @@ class BaseConverter(object):
       csv_row = []
       for key in row_header_map.keys():
         field = row_header_map[key]
-        # FIXME: There should be no need to do this string checking once all
-        # the control import code is ported over
         field_val = row.get(field, '')
         field_val = field_val if isinstance(field_val, basestring) else ''
         csv_row.append(field_val)

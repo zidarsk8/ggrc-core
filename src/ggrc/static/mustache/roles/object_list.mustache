@@ -4,11 +4,18 @@
     <li class="tree-item {{object_type}}" data-model="true" {{data 'model'}}> 
       <a class="simple-link" href="{{viewLink}}">
         <div class="row-fluid">
-          <div class="span12">
+          <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
                 {{name}}
               </div>
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              <a data-object-plural="roles" data-object-singular="Role" data-object-id="{{id}}" data-form-target="refresh" data-modal-class="modal-wide" data-placement="left" data-toggle="role-modal" href="javascript://" rel="tooltip" title="Edit">
+                <i class="grcicon-edit"></i>
+              </a>
             </div>
           </div>
         </div>

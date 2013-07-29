@@ -8,6 +8,7 @@ import ggrc.builder.json
 import hashlib
 import time
 from blinker import Namespace
+from exceptions import TypeError
 from flask import url_for, request, current_app, session
 from flask.views import View
 from ggrc import db
@@ -326,7 +327,11 @@ class Resource(ModelView):
   def get_context_id_from_json(self, src):
     context = src.get('context', None)
     if context:
-      return context.get('id', None)
+      context_id = context.get('id', None)
+      try:
+        return int(context_id)
+      except (ValueError, TypeError):
+        return None
     return None
 
   def personal_context(self):

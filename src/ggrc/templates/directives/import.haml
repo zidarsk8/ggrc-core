@@ -18,13 +18,13 @@
             Directive
         -else
           %a{ 'href': '/dashboard' }
-            Directive
+            Dashboard
 
-      %li import
+      %li Import {{import_kind}}
 
   %h1.dashboard-title
     %i.grciconlarge-dashboard
-    Import Sections
+    Import {{import_kind}}
 
 -block main
   .container-fluid

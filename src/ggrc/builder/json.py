@@ -103,7 +103,18 @@ class UpdateAttrHandler(object):
       class_attr = getattr(obj.__class__, attr_name)
       method = getattr(cls, class_attr.__class__.__name__)
       value = method(obj, json_obj, attr_name, class_attr)
-    setattr(obj, attr_name, value)
+    if isinstance(value, (set, list)):
+      # SQLAlchemy instrumentation botches up if we replace entire collections
+      # It works if we update them with changes
+      new_set = set(value)
+      old_set = set(getattr(obj, attr_name))
+      coll_attr = getattr(obj, attr_name)
+      for item in new_set - old_set:
+        coll_attr.append(item)
+      for item in old_set - new_set:
+        coll_attr.remove(item)
+    else:
+      setattr(obj, attr_name, value)
 
   @classmethod
   def InstrumentedAttribute(cls, obj, json_obj, attr_name, class_attr):

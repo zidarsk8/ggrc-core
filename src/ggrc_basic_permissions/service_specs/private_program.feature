@@ -37,6 +37,7 @@ Feature: Private Programs
     And "private_program" property "private" is literal "True"
     And "private_program" is POSTed to its collection
     Then GET of "private_program" is allowed
+    Given a user with email "example.user2@example.com" as "person"
     Given existing Role named "ProgramReader"
     And a new "ggrc_basic_permissions.models.UserRole" named "role_assignment" is created from json
     """
@@ -45,19 +46,22 @@ Feature: Private Programs
         "id": {{context.ProgramReader.value['role']['id']}},
         "type": "Role"
         },
-      "user_email": "example.user1@example.com",
+      "person": {
+        "id": {{context.person['id']}},
+        "type": "Person"
+      },
       "context": {
         "id": {{context.private_program.value['program']['context']['id']}},
         "type": "Context"
         }
     }
     """
-    Given "role_assignment" is POSTed to its collection
-    Given the current user
+    And "role_assignment" is POSTed to its collection
+    And the current user
       """
-      { "email": "example.user1@example.com", "name": "Example User1" }
+      { "email": "example.user2@example.com", "name": "Example User1" }
       """
     Then GET of "private_program" is allowed
     Then PUT of "private_program" is forbidden
     Then DELETE of "private_program" is forbidden
-    
+

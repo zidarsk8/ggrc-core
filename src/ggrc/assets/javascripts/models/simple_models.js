@@ -678,6 +678,14 @@ can.Model.Cacheable("CMS.Models.Role", {
   , update : "PUT /api/roles/{id}"
   , destroy : "DELETE /api/roles/{id}"
   , create : "POST /api/roles"
+  , defaults : {
+      permissions: {
+          read: []
+        , update: []
+        , create: []
+        , "delete": []
+      }
+    }
 }, {});
 
 CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
@@ -715,7 +723,7 @@ CMS.Models.get_link_type = function(instance, attr) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
       type = model.getRootModelName();
-    else
+    else if (instance[attr])
       type = instance[attr].type;
   }
   return type;

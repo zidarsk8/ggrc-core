@@ -34,16 +34,20 @@
       background:#f3f3f3;
       position:relative;
       .search-title {
+        background:#f3f3f3;
+        padding:6px 6px 0 6px;
+        border-bottom:1px solid #ccc; 
+        border-left:1px solid lighten($gray,20%);
+        border-right:1px solid lighten($gray,20%);
         .guide {
           text-align:right;
           padding-top:1px;
           font-size:$f-small;
         }
-        background:#f3f3f3;
-        padding:6px;
-        border-bottom:1px solid #ccc; 
-        border-left:1px solid lighten($gray,20%);
-        border-right:1px solid lighten($gray,20%);
+        h4 {
+          font-size:13px;
+          padding-left:10px;
+        }
       }
       .linked-controls {
         background:$white;
@@ -127,11 +131,11 @@
         }
       }
       .selector-info {
-    .pull-right {
-      .btn {
-        margin-left:4px;
-      }
-    }
+        .pull-right {
+          .btn {
+            margin-left:4px;
+          }
+        }
         &.selector-info-left {
           margin-right:-10%;
         }
@@ -161,8 +165,20 @@
           h4, p {
             color:#666;
             text-align:center;
+          } 
+        }
+        .selector-person-info {
+          background:#fff;
+          @include border-radius();
+          border:1px solid #ddd;
+          min-height:50px;
+          padding:10px;
+          h3 {
+            font-weight:normal;
           }
-          
+          h4 {
+            font-weight:normal;
+          }
         }
       }
     }
@@ -189,7 +205,7 @@
       @include background-size(296px 344px);
       background-position:-259px -195px;
       padding-left: 40px;
-      margin-top:8px;
+      margin-top:4px;
     }
     select {
       margin-top:4px;
