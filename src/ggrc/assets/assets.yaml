@@ -81,6 +81,7 @@ dashboard-js-files:
   - apps/systems.js
   - apps/business_objects.js
   - sections/notes_controller.js
+  - roles/roles_modal_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
