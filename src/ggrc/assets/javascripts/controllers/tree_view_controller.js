@@ -152,6 +152,7 @@ can.Control("CMS.Controllers.TreeView", {
     el.trigger("expand");
   }
 
+  // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   , add_child_lists : function(list) {
     var that = this;
     if(that.options.draw_children) {
@@ -164,6 +165,7 @@ can.Control("CMS.Controllers.TreeView", {
     }
   }
 
+  // add all child options to one TreeViewOptions object
   , add_child_lists_to_child : function(item) {
     var that = this;
     if(!item.child_options)
@@ -184,7 +186,7 @@ can.Control("CMS.Controllers.TreeView", {
   , add_child_list : function(item, data) {
     //var $subtree = $("<ul class='tree-structure'>").appendTo(el);
     //var model = $(el).closest("[data-model]").data("model");
-    data.attr({ start_expanded : false });
+    data.attr({ start_expanded : false, parent : item });
     var find_params;
     if(data.property) {
       find_params = item.instance[data.property];
@@ -209,37 +211,37 @@ can.Control("CMS.Controllers.TreeView", {
     // $subtree.cms_controllers_tree_view(opts);
   }
 
+  // There is no check for parentage anymore.  When this event is triggered, it needs to be triggered
+  // at the appropriate level of the tree.
   , " newChild" : function(el, ev, data) {
     var that = this;
-    var model;
-    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
-      model = new can.Observe.TreeOptions({
-        instance : data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data)
-      });
-      this.add_child_lists([model]);
-      this.options.list.push(model);
-      setTimeout(function() {
-        $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
-      }, 10);
-      ev.stopPropagation();
-    }
+    var model = new can.Observe.TreeOptions({
+      instance : data instanceof this.options.model
+        ? data
+        : new this.options.model(data.serialize ? data.serialize() : data)
+    });
+    this.add_child_lists([model]);
+    this.options.list.push(model);
+    setTimeout(function() {
+      $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
+    }, 10);
+    ev.stopPropagation();
   }
   , " removeChild" : function(el, ev, data) {
     var that = this;
-    var model;
-    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
-      model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
-      that.options.list.replace(
-        can.map(
-          this.options.list
-          , function(v, i) {
-            if(v.instance.id !== model.id) {
-              return v;
-            }
-          })
-      );
-      ev.stopPropagation();
-    }
+    var model = data instanceof this.options.model
+      ? data
+      : new this.options.model(data.serialize ? data.serialize() : data);
+    that.options.list.replace(
+      can.map(
+        this.options.list
+        , function(v, i) {
+          if(v.instance.id !== model.id) {
+            return v;
+          }
+        })
+    );
+    ev.stopPropagation();
   }
 
   , ".edit-object modal:success" : function(el, ev, data) {
