@@ -7,22 +7,16 @@
   dashboard
 
 -block header
-  .breadcrumbs-holder
-    %ul.breadcrumbs
-      %li
-        %a{ 'href': '/admin' }
-          Admin
-      %li
-        Import {{import_kind}}
-
-  %h1.dashboard-title
-    %i.grciconlarge-dashboard
-    Import {{import_kind}}
+  %h1.business
+    .grcobject.business
+      %i.grcicon-imp-exp-white
+      Import {{import_kind}}
 
 -block main
-  .container-fluid
-    %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'} 
-      #columns.row-fluid{ 'data-resize': "true" }
-        #left_column.span6.widget-area
-      -include 'systems/_import.haml'
-      #results-container
+  .clearfix
+    .object-area
+      #show_columns.column-set
+        #middle_column.widget-area
+          %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'} 
+            -include 'systems/_import.haml'
+            #results-container    
