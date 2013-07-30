@@ -200,6 +200,8 @@ can.Model("can.Model.Cacheable", {
         }
     }
     if(m = this.findInCacheById(params.id)) {
+      if(m === params)
+        return m;
       if(!m.selfLink) {
         //we are fleshing out a stub, which is much like creating an object new.
         //But we don't want to trigger every change event on the new object's props.
@@ -322,6 +324,13 @@ can.Model("can.Model.Cacheable", {
       d.updated();
     });
   }
+  , attr : function() {
+    if(arguments.length < 1) {
+      return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
+    } else {
+      return this._super.apply(this, arguments);
+    }
+  }
   , serialize : function() {
     var that = this, serial = {};
     if(arguments.length) {
@@ -344,6 +353,10 @@ can.Model("can.Model.Cacheable", {
         }
       } else if(val && typeof val.save === "function") {
         serial[name] = val.stub();
+      } else if(typeof val === "object" && val != null && val.length != null) {
+        serial[name] = can.map(val, function(v) {
+          return typeof v.save === "function" ? v.stub() : (v.serialize ? v.serialize() : v);
+        });
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
       }
