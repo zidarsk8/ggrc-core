@@ -1,3 +1,16 @@
+.import-interface {
+  padding:16px;
+  h3 {
+    font-weight:normal;
+    padding-bottom:16px;
+  }
+  .import-buttons {
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid #ddd;
+  }
+}
+
 #results-container {
   font-weight: bold;
   font-size: $f-small;
@@ -80,7 +93,7 @@
   }
 }
 .import {
-  input[type="file"] {
-    width: 30%;
-  }
+  //input[type="file"] {
+  //  width: 30%;
+  //}
 }
