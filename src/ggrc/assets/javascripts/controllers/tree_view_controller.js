@@ -10,6 +10,7 @@
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
+    , parent : null
     , children_drawn : false
   }
 }, {

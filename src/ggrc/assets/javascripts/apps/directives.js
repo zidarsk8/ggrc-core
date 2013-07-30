@@ -140,7 +140,7 @@ $(function() {
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
 
-  CMS.Models.Section.findTree({ directive_id : directive_id, "parent_id__null" : true })
+  CMS.Models.Section.findTree({ directive_id : directive_id })
   .done(function(s) {
 
     $sections_tree.cms_controllers_tree_view({
