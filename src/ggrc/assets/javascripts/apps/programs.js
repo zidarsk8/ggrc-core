@@ -198,6 +198,7 @@ program_widget_descriptors = {
   authorizations: {
       widget_id: "authorizations"
     , widget_name: "Authorizations"
+    , widget_icon: "authorization"
     , widget_guard: should_show_authorizations
     , extra_widget_actions_view: '/static/ggrc_basic_permissions/mustache/people_roles/authorizations_modal_actions.mustache'
     , content_controller: GGRC.Controllers.ListView

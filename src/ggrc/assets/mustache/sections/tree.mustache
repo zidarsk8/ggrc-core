@@ -3,20 +3,13 @@
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span9">
+          <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-section-color"></i>
                 <span class="tree-code">{{instance.slug}}</span>
                 {{instance.title}}{{#parent}}, child of {{instance.title}}{{/parent}}
               </div>
-            </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
-              {{^instance.owner}}
-                <i class="grcicon-people-warning"></i>
-              {{/instance.owner}}
             </div>
           </div>
           <div class="span1">
@@ -65,17 +58,6 @@
         </div>
         <div class="row-fluid">
           <div class="span8">
-            <div class="tree-info">
-              <strong>Owner:</strong>
-              {{^instance.owner}}
-                <span class="error">
-                  Not Assigned
-                </span>
-              {{/instance.owner}}
-              {{#if instance.owner}}
-                {{instance.owner.name}}
-              {{/if}}
-            </div>
           </div>
           <div class="span4">
             {{#edit_sections}}
@@ -84,21 +66,6 @@
                 Edit
               </a>
             {{/edit_sections}}
-          </div>
-        </div>
-        <div class="row-fluid">
-          <div class="span8">
-            <div class="tree-info">
-              <strong>URL:</strong>
-              {{^if_null instance.url}}
-                <a class="url" href="{{instance.url}}">
-                  {{instance.url}}
-                </a>
-              {{/if_null}}
-              {{#if_null instance.url}}
-                <i>No URL</i>
-              {{/if_null}}
-            </div>
           </div>
         </div>
       </div>
