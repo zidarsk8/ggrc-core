@@ -8,7 +8,7 @@
               <div class="tree-title-area">
                 <i class="grcicon-section-color"></i>
                 <span class="tree-code">{{instance.slug}}</span>
-                {{instance.title}}, child of {{parent.instance.title}}
+                {{instance.title}}{{#parent}}, child of {{instance.title}}{{/parent}}
               </div>
             </div>
           </div>
