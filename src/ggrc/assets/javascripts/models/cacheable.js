@@ -185,6 +185,9 @@ can.Model("can.Model.Cacheable", {
   , model : function(params) {
     var m, that = this;
     var obj_name = this.root_object;
+    if(!params) {
+      return params;
+    }
     if(typeof obj_name !== "undefined" && params[obj_name]) {
         for(var i in params[obj_name]) {
           if(params[obj_name].hasOwnProperty(i)) {
