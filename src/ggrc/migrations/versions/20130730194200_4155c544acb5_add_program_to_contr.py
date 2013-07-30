@@ -1,14 +1,14 @@
 """Add program to control mappings
 
 Revision ID: 4155c544acb5
-Revises: 1b4c52e33cc6
+Revises: 2bf7c04016c9
 Create Date: 2013-07-22 22:54:08.000779
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '4155c544acb5'
-down_revision = '1b4c52e33cc6'
+down_revision = '2bf7c04016c9'
 
 from alembic import op
 import sqlalchemy as sa
