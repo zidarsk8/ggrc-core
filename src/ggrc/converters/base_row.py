@@ -246,15 +246,13 @@ class DateColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
     try:
+      from datetime import datetime
       date_result = None
       if isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%m/%d/%Y")
       elif isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%m/%d/%y")
       elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%y/%m/%d")
       else:
         raise ValueError("Error parsing the date string")
@@ -332,7 +330,7 @@ class LinksHandler(ColumnHandler):
     details = []
     for index in self.link_values.keys:
       #obj = self.link_objects[index]
-      #object_errors = obj.errors.fulltext
+      #object_errors = obj.errors.fulltext:
       details.append([self.link_status[index], self.link_objects[index],
                       self.link_values[index], self.link_errors[index],
                       self.link_warnings[index]])
@@ -354,7 +352,7 @@ class LinksHandler(ColumnHandler):
       data = self.parse_item(value)
       if not data: next
 
-      linked_object = find_existing_item(data)
+      linked_object = self.find_existing_item(data)
 
       if not linked_object:
         # New object
@@ -363,7 +361,7 @@ class LinksHandler(ColumnHandler):
           self.add_created_link(linked_object)
       else:
         if linked_object in self.pre_existing_links:
-          # Existing object iwth existing relationship
+          # Existing object with existing relationship
           self.add_existing_link(linked_object)
         else:
           # Existing object with a new relationship
@@ -376,7 +374,7 @@ class LinksHandler(ColumnHandler):
     model_class = model_class.upper()
     return model_class
 
-  # add model class method
+  #TODO: add model class method -> Perhaps return '' (or None)?
 
   def get_where_params(self, data):
     return dict({'slug': data.get('slug')}.items() + self.options.get(
@@ -412,66 +410,59 @@ class LinksHandler(ColumnHandler):
     non_flat = [clean_list(line.split(',')) if line[0] == '[' else line for line in lines]
     return unpack_list(non_flat)
 
-  #def find_existing_item(data)
-    #where_params = get_where_params(data)
-    #model_class.where(where_params).first
-  #end
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    self.model_class.query.filter_by(**where_params).first()
 
-  #def create_item(data)
-    #where_params = get_where_params(data)
-    #object = @importer.importer.find_object(model_class, where_params)
-    #if !object
-      #create_params = get_create_params(data)
-      #object = model_class.new(create_params)
-      #@importer.importer.add_object(model_class, where_params, object)
-    #end
-    #create_item_warnings(object, data)
-    #object
-  #end
+  def create_item(self, data):
+    where_params = self.get_where_params(data)
+    obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
+    if not obj:
+      create_params = self.get_create_params(data)
+      obj = self.model_class(create_params)
+      self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
+    self.create_item_warnings(obj, data)
+    return obj
 
-  #def create_item_warnings(object, data)
-    #add_link_warning("\"#{data[:slug]}\" will be created")
-  #end
+  def create_item_warnings(self, obj, data):
+    self.add_link_warning("'{0}' will be created".format(data.get('slug')))
 
-  #def get_existing_items
-    #@importer.object.send(options[:association])
-  #end
+  def get_existing_items(self):
+    return getattr(self.importer.obj, self.options.get('association'), None)
 
-  #def export
-    #join_rendered_items(get_existing_items.map { |item| render_item(item) })
-  #end
+  def export(self):
+    return self.join_rendered_items([self.render_item(item) for item in self.get_existing_items()])
 
-  #def join_rendered_items(items)
-    #items.join("\n")
-  #end
+  def join_rendered_items(self, items):
+    return "\n".join(items)
 
-  #def render_item(item)
-    #return item.slug
-  #end
+  def render_item(self, item):
+    return item.slug
 
-  #def save_linked_objects
-    #success = true
-    #created_links.each do |link_object|
-      #success = link_object.save && success
-    #end
-    #success
-  #end
+  def save_linked_objects(self):
+    success = True
+    for link_object in self.created_links:
+      success = self.save_link_obj(link_object, db.session) and success
+    return success
 
-  #def after_save(object)
-    #if options[:append_only]
-      ## Save old links plus new links
-      #if save_linked_objects
-        #new_objects = created_links - get_existing_items
-        #object.send("#{options[:association]}") << new_objects
-      #else
-        #add_error("Failed to save necessary objects")
-      #end
-    #else
-      ## Overwrite with only imported links
-      #object.send("#{options[:]}=", imported_links)
-    #end
-  #end
-#end
+  # TODO: Save a linked object in the event of it being created on import
+  def save_link_obj(self, link_obj, db_session):
+    return True
+
+  def after_save(self, obj):
+    if self.options.get('append_only'):
+      #Save old links plus new links
+      if save_linked_objects():
+        #new_objects = self.created_links - self.get_existing_items()
+        updated_total = self.created_links() + self.get_existing_items()
+        if hasattr(self.obj, self.options.get('association')):
+          setattr(self.obj, self.options.get('association'), updated_total)
+      else:
+        self.add_error("Failed to save necessary objects")
+    else:
+      # Overwrite with only imported links
+      if hasattr(self.obj, self.options.get('association')):
+        setattr(self.obj, self.options.get('association'), self.imported_links())
 
 class LinkControlsHandler(LinksHandler):
 
