@@ -23,7 +23,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Contract" : "ProgramDirective"
     , "System" : {}
     , "Process" : {}
-    //, "Control" 
+    , "Control" : "ProgramControl"
     , "Product" : {}
     , "Facility" : {}
     , "OrgGroup" : {}

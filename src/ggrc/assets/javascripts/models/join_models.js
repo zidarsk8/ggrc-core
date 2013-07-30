@@ -5,6 +5,29 @@ can.Model.Cacheable("can.Model.Join", {
   , setup : function() {
     this._super.apply(this, arguments);
   }
+  , init : function() {
+    this._super && this._super.apply(this, arguments);
+    //this.reinit();
+    if(this === can.Model.Join) {
+      this.bind("created.reinit destroyed.reinit", can.proxy(this, "reinit"));
+    }
+  }
+  , reinit : function(ev, data) {
+    can.each(data.constructor.join_keys, function(cls, attr_name) {
+      var attr_val = data[attr_name];
+      data.attr(attr_name, CMS.Models.get_instance(
+        attr_val && attr_val.constructor.model_singular ? attr_val.constructor.model_singular : cls.model_singular
+        , data[attr_name + "_id"] || (attr_val && attr_val.id)
+        ));
+
+      data[attr_name] && data[attr_name].refresh();
+    });
+
+    data.each(function(value, name) {
+      if (value === null)
+      data.removeAttr(name);
+    });
+  }
 }, {
   getOtherSide : function(obj) {
     var that = this;
@@ -37,30 +60,23 @@ can.Model.Join("CMS.Models.Relationship", {
   , create: "POST /api/relationships"
   , destroy: "DELETE /api/relationships/{id}"
 }, {
-  init: function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
+  reinit: function() {
+    var that = this;
 
-      typeof _super === "function" && _super.call(this);
-      this.attr("source", CMS.Models.get_instance(
-        this.source_type || this.source.type
-        , this.source_id || this.source.id
-        , this.source) || this.source);
-      this.attr("destination", CMS.Models.get_instance(
-        this.destination_type || this.destination.type
-        , this.destination_id || this.destination.id
-        , this.destination) || this.destination);
+    typeof this._super_init === "function" && this._super_init.call(this);
+    this.attr("source", CMS.Models.get_instance(
+      this.source_type || this.source.type
+      , this.source_id || this.source.id
+      , this.source) || this.source);
+    this.attr("destination", CMS.Models.get_instance(
+      this.destination_type || this.destination.type
+      , this.destination_id || this.destination.id
+      , this.destination) || this.destination);
 
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
+    this.each(function(value, name) {
+      if (value === null)
+      that.removeAttr(name);
+    });
   }
 });
 
@@ -74,29 +90,6 @@ can.Model.Join("CMS.Models.ProgramDirective", {
   , create: "POST /api/program_directives"
   , destroy : "DELETE /api/program_directives/{id}"
 }, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("program", CMS.Models.get_instance(
-        "Program",
-        this.program_id || (this.program && this.program.id)));
-      this.attr("directive", CMS.Models.get_instance(
-        (this.directive ? this.directive.type : "Directive"),
-        this.directive_id || (this.directive && this.directive.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
 });
 
 can.Model.Join("CMS.Models.ObjectiveControl", {
@@ -110,29 +103,6 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
   , create: "POST /api/objective_controls"
   , destroy : "DELETE /api/objective_controls/{id}"
 }, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("objective", CMS.Models.get_instance(
-        "Objective",
-        this.objective_id || (this.objective && this.objective.id)));
-      this.attr("control", CMS.Models.get_instance(
-        "Control",
-        this.control_id || (this.control && this.control.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
 });
 
 can.Model.Join("CMS.Models.SystemControl", {
@@ -146,29 +116,6 @@ can.Model.Join("CMS.Models.SystemControl", {
   , create: "POST /api/system_controls"
   , destroy : "DELETE /api/system_controls/{id}"
 }, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("system", CMS.Models.get_instance(
-        "System",
-        this.system_id || (this.system && this.system.id)));
-      this.attr("control", CMS.Models.get_instance(
-        "Control",
-        this.control_id || (this.control && this.control.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
 });
 
 can.Model.Join("CMS.Models.SystemSystem", {
@@ -182,29 +129,6 @@ can.Model.Join("CMS.Models.SystemSystem", {
   , create: "POST /api/system_systems"
   , destroy : "DELETE /api/system_systems/{id}"
 }, {
-  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("parent", CMS.Models.get_instance(
-        "System",
-        this.parent_id || (this.parent && this.parent.id)));
-      this.attr("child", CMS.Models.get_instance(
-        "System",
-        this.child_id || (this.child && this.child.id)));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }
 });
 
 can.Model.Join("CMS.Models.UserRole", {
@@ -255,22 +179,6 @@ can.Model.Join("CMS.Models.ControlSection", {
     section : CMS.Models.Section
     , control : CMS.Models.Control
   }
-  , init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this.bind("created destroyed", function(ev, inst) {
-      if(that !== inst.constructor) return;
-      var section =
-        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
-        || CMS.Models.Section.findInCacheById(inst.section.id);
-      var control = 
-        CMS.Models.RegControl.findInCacheById(inst.control.id)
-        || CMS.Models.Control.findInCacheById(inst.control.id);
-
-      section && section.refresh();
-      control && control.refresh();
-    });
-  }
 }, {
   serialize : function(name) {
     var serial;
@@ -293,21 +201,6 @@ can.Model.Join("CMS.Models.SectionObjective", {
   , join_keys : {
     section : CMS.Models.Section
     , objective : CMS.Models.Objective
-  }
-  , init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this.bind("created destroyed", function(ev, inst) {
-      if(that !== inst.constructor) return;
-      var section =
-        CMS.Models.SectionSlug.findInCacheById(inst.section.id)
-        || CMS.Models.Section.findInCacheById(inst.section.id);
-      var objective = 
-        CMS.Models.Objective.findInCacheById(inst.objective.id);
-
-      section && section.refresh();
-      objective && objective.refresh();
-    });
   }
 }, {
 });
@@ -332,6 +225,19 @@ can.Model.Join("GGRC.Models.DirectiveControl", {
   , destroy : function(params) {
     throw "ERROR : DirectiveControl is not yet implemented";
   }
+}, {
+
+});
+
+can.Model.Join("GGRC.Models.ProgramControl", {
+  root_collection : "program_controls"
+  , root_object : "program_control"
+  , join_keys : {
+    "program" : CMS.Models.Program
+    , "control" : CMS.Models.Control
+  }
+  , create : "POST /api/program_controls"
+  , destroy : "DELETE /api/program_controls"
 }, {
 
 });
