@@ -5,14 +5,13 @@
 -block widget_title
   ="{0}s".format(section_meta_kind|title)
   %span=instance.sections.count
-  and Controls
 
 
 -block widget_help
-  directive_controls
+  directive_main
 
 -block widget_id
-  directive_controls_widget
+  directive_main_widget
 
 -block widget_buttons
   .filter
@@ -31,35 +30,14 @@
               %li
                 %a{ 'href': "/directives/={instance.id}/import_sections" }
                   Import Sections
-              %li
-                %a{ 'href': "/directives/={instance.id}/import_controls" }
-                  Import Controls
               %li.divider
               %li
                 %a{ 'href': "/directives/={instance.id}/export_sections" }
                   Export Sections
-              %li
-                %a{ 'href': "/directives/={instance.id}/export_controls" }
-                  Export Controls
 
           %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
             %i.grcicon-add
             Control
 -block main
-  .tabbable
-    %ul.nav.nav-tabs
-      %li.text-governance.active
-        %a{ 'href' : '#sections', 'data-toggle' : 'tab' }
-          %i{ 'class' : "grcicon-={section_meta_kind}-color" }
-          ="{0}s".format(section_meta_kind|title)
-      %li.text-governance
-        %a{ 'href' : '#controls', 'data-toggle' : 'tab' }
-          %i.grcicon-control-color 
-          Controls
-
-    .tab-content
-      #sections.tab-pane
-        %ul.tree-structure.new-tree
-      #controls.tab-pane
-        %ul.tree-structure.new-tree
-
+  #sections.tab-pane
+    %ul.tree-structure.new-tree
