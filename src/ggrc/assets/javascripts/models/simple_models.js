@@ -653,6 +653,12 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , links_to : {
       "Section" : "SectionObjective"
   }
+  , attributes : {
+    sections : "CMS.Models.Section.models"
+    , section_objectives : "CMS.Models.SectionObjective.models"
+    , controls : "CMS.Models.Control.models"
+    , objective_controls : "CMS.Models.ObjectiveControls.models"
+  }
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);

@@ -18,7 +18,8 @@ can.Model.Cacheable("CMS.Models.Section", {
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , attributes : {
-    children : "CMS.Models.Section.models"
+    parent : "CMS.Models.Section.model"
+    , children : "CMS.Models.Section.models"
     , controls : "CMS.Models.Control.models"
     , objectives : "CMS.Models.Objective.models"
     , control_sections : "CMS.Models.ControlSection.models"
