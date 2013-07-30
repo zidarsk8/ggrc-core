@@ -700,3 +700,11 @@ Mustache.registerHelper("iterate", function() {
     return options.fn(options.contexts.concat([{iterator : arg}]));
   }).join("");
 });
+
+Mustache.registerHelper("is_private", function(options) {
+  var context_id = this.attr('context.id');
+  if (context_id != undefined && context_id != null) {
+    return options.fn(this);
+  }
+  return options.inverse(this);
+});
