@@ -2,6 +2,8 @@
 -set model = instance.__class__
 
 -block widget_title
+  %i.grcicon-info
+  =model._inflector.title_singular
   Info
 
 -block widget_help
