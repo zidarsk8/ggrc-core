@@ -5,6 +5,7 @@
 
 from collections import namedtuple
 from flask import session
+from flask.ext.login import current_user
 from .user_permissions import UserPermissions
 
 Permission = namedtuple('Permission', 'action resource_type context_id')

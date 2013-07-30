@@ -77,10 +77,12 @@ class ModelView(View):
         query = query.filter(filter)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
-      if contexts is not None:
+      if contexts is not None and len(contexts) > 0:
         query = query.filter(or_(
           self.model.context_id.in_(contexts),
           self.model.context_id == None))
+      else:
+        query = query.filter(self.model.context_id == None)
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
