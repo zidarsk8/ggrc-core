@@ -79,6 +79,11 @@ can.Model.Cacheable("can.Model.Join", {
 
       this.bind("created", can.proxy(reinit, this));
       reinit.call(this);
+      this.bind("destroyed", function(ev) {
+        can.each(ev.target.constructor.join_keys, function(cls, key) {
+          ev.target[key].refresh();
+        });
+      });
     }
 });
 
