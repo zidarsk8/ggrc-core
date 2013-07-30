@@ -18,61 +18,58 @@
 -block widget_buttons
   .filter
     .row-fluid
-      .span6
-        %input.ui-corner-all.widgetsearch-tocontent.clear-value{ 'type': 'text', 'placeholder': 'Search' }
-      .span6
+      .span12
         .pull-right
-            .btn-group.left-dropdown.button-space
-              %a{ 'data-toggle': "dropdown", 'href': "#", 'class': "btn btn-add dropdown-toggle", 'rel': "tooltip", 'title': "Add/Remove Directives" }
-                %i.grcicon-link-white
-                Directives
-              %ul.dropdown-menu
-
-                %li.add-new-item
-                  %a{ 'data-modal-reset': 'reset',
-                   'data-toggle': "modal-selector", 
-                   'href': "javascript://", 
-                   'data-modal-class': 'modal-wide', 
-                   'data-related-title-singular': 'Regulation',
-                   'data-related-title-plural' : 'Regulations',
-                   'data-modal-selector-options' : 'program_directives',
-                   'data-join-object-type' : "Directive",
-                   'data-join-object-id' : "={instance.id}", 
-                   'data-child-meta-type': 'Regulation', 
-                   'data-child-property': 'directive_id',
-                    'data-join-query' : "directive.kind__in=Regulation"}
-                    %i.grcicon-regulation-color
-                    Regulation
-                %li.add-new-item
-                  %a{ 'data-modal-reset': 'reset',
-                   'data-toggle': "modal-selector", 
-                   'href': "javascript://", 
-                   'data-modal-class': 'modal-wide', 
-                   'data-related-title-singular': 'Contract',
-                   'data-related-title-plural' : 'Contracts',
-                   'data-modal-selector-options' : 'program_directives',
-                   'data-join-object-id' : "={instance.id}", 
-                   'data-join-object-type' : "Directive",
-                   'data-child-meta-type': 'Contract', 
-                   'data-child-property': 'directive_id',
-                    'data-join-query' : "directive.kind__in=Contract" }
-                    %i.grcicon-contract-color
-                    Contract
-                %li.add-new-item
-                  %a{ 'data-modal-reset': 'reset',
-                   'data-toggle': "modal-selector", 
-                   'href': "javascript://", 
-                   'data-modal-class': 'modal-wide', 
-                   'data-related-title-singular': 'Policy',
-                   'data-related-title-plural' : 'Policies',
-                   'data-modal-selector-options' : 'program_directives',
-                   'data-join-object-id' : "={instance.id}", 
-                   'data-join-object-type' : "Directive",
-                   'data-child-meta-type': 'Policy', 
-                   'data-child-property': 'directive_id',
-                    'data-join-query' : "directive.kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy" }
-                    %i.grcicon-policy-color
-                    Policy
+          .btn-group.left-dropdown.button-space
+            %a{ 'data-toggle': "dropdown", 'href': "#", 'class': "btn btn-add dropdown-toggle", 'rel': "tooltip", 'title': "Add/Remove Directives" }
+              %i.grcicon-link-white
+              Directives
+            %ul.dropdown-menu
+              %li.add-new-item
+                %a{ 'data-modal-reset': 'reset',
+                 'data-toggle': "modal-selector", 
+                 'href': "javascript://", 
+                 'data-modal-class': 'modal-wide', 
+                 'data-related-title-singular': 'Regulation',
+                 'data-related-title-plural' : 'Regulations',
+                 'data-modal-selector-options' : 'program_directives',
+                 'data-join-object-type' : "Directive",
+                 'data-join-object-id' : "={instance.id}", 
+                 'data-child-meta-type': 'Regulation', 
+                 'data-child-property': 'directive_id',
+                  'data-join-query' : "directive.kind__in=Regulation"}
+                  %i.grcicon-regulation-color
+                  Regulation
+              %li.add-new-item
+                %a{ 'data-modal-reset': 'reset',
+                 'data-toggle': "modal-selector", 
+                 'href': "javascript://", 
+                 'data-modal-class': 'modal-wide', 
+                 'data-related-title-singular': 'Contract',
+                 'data-related-title-plural' : 'Contracts',
+                 'data-modal-selector-options' : 'program_directives',
+                 'data-join-object-id' : "={instance.id}", 
+                 'data-join-object-type' : "Directive",
+                 'data-child-meta-type': 'Contract', 
+                 'data-child-property': 'directive_id',
+                  'data-join-query' : "directive.kind__in=Contract" }
+                  %i.grcicon-contract-color
+                  Contract
+              %li.add-new-item
+                %a{ 'data-modal-reset': 'reset',
+                 'data-toggle': "modal-selector", 
+                 'href': "javascript://", 
+                 'data-modal-class': 'modal-wide', 
+                 'data-related-title-singular': 'Policy',
+                 'data-related-title-plural' : 'Policies',
+                 'data-modal-selector-options' : 'program_directives',
+                 'data-join-object-id' : "={instance.id}", 
+                 'data-join-object-type' : "Directive",
+                 'data-child-meta-type': 'Policy', 
+                 'data-child-property': 'directive_id',
+                  'data-join-query' : "directive.kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy" }
+                  %i.grcicon-policy-color
+                  Policy
 
 -block main
   #directives
