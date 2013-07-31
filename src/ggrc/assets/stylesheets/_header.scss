@@ -272,9 +272,13 @@
   z-index: 1001;
   h1 {
     line-height: 36px;
-    padding-top:5px;
-    margin-bottom:-5px;
     padding-left:20px;
+    padding:5px 5px 5px 20px;
+    span.private {
+      i {
+        margin-top:11px;
+      }
+    }
   }
   &.affix {
     position: fixed;
@@ -285,11 +289,6 @@
     @include box-shadow(0 3px 6px -1px rgba(0, 0, 0, 0.2));
     .breadcrumbs {
       display: none;
-    }
-    h1 {
-      line-height: 36px;
-      padding-top:5px;
-      margin-bottom:5px;
     }
   }
   .btn-group {
