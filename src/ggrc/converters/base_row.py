@@ -14,7 +14,33 @@ def add_error(key, message = None):
 def add_warning(key, message = None):
   warnings.setdefault(key, []).append(message)
 
-# BaseRowConverter is the super class for SectionsRowConverter
+def unpack_list(vals):
+  result = []
+  for ele in vals:
+    if isinstance(ele, list):
+      for inner in ele: result.append(inner)
+    else:
+      result.append(ele)
+  return result
+
+def clean_list(vals):
+  result = []
+  for res in vals:
+    if '[' in res and  ']' in res:
+      result.append(res[1:-1].strip())
+    elif '[' in res:
+      result.append(res[1:].strip())
+    elif ']' in res:
+      result.append(res[:-1].strip())
+    else:
+      result.append(res.strip())
+  return result
+
+def split_cell(value):
+  lines = [val.strip() for val in value.splitlines() if val]
+  non_flat = [clean_list(line.split(',')) if line[0] == '[' else line for line in lines]
+  return unpack_list(non_flat)
+
 class BaseRowConverter(object):
 
   def __init__(self, importer, object_or_attrs, index, **options):
@@ -173,7 +199,7 @@ class ColumnHandler(object):
     return any(self.warnings) or self.importer.warnings.get(self.key)
 
   def display(self):
-    return getattr(self.importer.obj, key)
+    return getattr(self.importer.obj, self.key, '')
 
   def after_save(self, obj):
     pass
@@ -328,12 +354,12 @@ class LinksHandler(ColumnHandler):
 
   def links_with_details(self):
     details = []
-    for index in self.link_values.keys:
+    for index in self.link_values.keys():
       #obj = self.link_objects[index]
       #object_errors = obj.errors.fulltext:
-      details.append([self.link_status[index], self.link_objects[index],
-                      self.link_values[index], self.link_errors[index],
-                      self.link_warnings[index]])
+      details.append([self.link_status.get(index,''), self.link_objects.get(index,''),
+                      self.link_values.get(index,''), self.link_errors.get(index,''),
+                      self.link_warnings.get(index,'')])
     return details
 
   def get_existing_items(self):
@@ -346,7 +372,7 @@ class LinksHandler(ColumnHandler):
     else:
       self.pre_existing_links = self.get_existing_items()
 
-    for i, value in enumerate(self.split_cell(content)):
+    for i, value in enumerate(split_cell(content)):
       self.link_index = i
       self.link_values[self.link_index] = value
       data = self.parse_item(value)
@@ -383,36 +409,10 @@ class LinksHandler(ColumnHandler):
   def get_create_params(self,data):
     return data
 
-  def clean_list(vals):
-    result = []
-    for res in vals:
-      if '[' in res and  ']' in res:
-        result.append(res[1:-1].strip())
-      elif '[' in res:
-        result.append(res[1:].strip())
-      elif ']' in res:
-        result.append(res[:-1].strip())
-      else:
-        result.append(res.strip())
-    return result
-
-  def unpack_list(vals):
-    result = []
-    for ele in vals:
-      if isinstance(ele, list):
-        for inner in ele: result.append(inner)
-      else:
-        result.append(ele)
-    return result
-
-  def split_cell(self, value):
-    lines = [val.strip() for val in value.split('\n') if val]
-    non_flat = [clean_list(line.split(',')) if line[0] == '[' else line for line in lines]
-    return unpack_list(non_flat)
-
   def find_existing_item(self, data):
     where_params = self.get_where_params(data)
-    self.model_class.query.filter_by(**where_params).first()
+    model_class = getattr(self.__class__, 'model_class', None) or self.model_class
+    return model_class.query.filter_by(**where_params).first()
 
   def create_item(self, data):
     where_params = self.get_where_params(data)
@@ -441,7 +441,7 @@ class LinksHandler(ColumnHandler):
 
   def save_linked_objects(self):
     success = True
-    for link_object in self.created_links:
+    for link_object in self.created_links():
       success = self.save_link_obj(link_object, db.session) and success
     return success
 
@@ -451,18 +451,19 @@ class LinksHandler(ColumnHandler):
 
   def after_save(self, obj):
     if self.options.get('append_only'):
-      #Save old links plus new links
-      if save_linked_objects():
+      # Save old links plus new links
+      if self.save_linked_objects():
         #new_objects = self.created_links - self.get_existing_items()
-        updated_total = self.created_links() + self.get_existing_items()
-        if hasattr(self.obj, self.options.get('association')):
-          setattr(self.obj, self.options.get('association'), updated_total)
+        #updated_total = self.created_links() + self.get_existing_items()
+        if hasattr(obj, self.options.get('association')):
+          target_attr = getattr(obj, self.options['association'])
+          target_attr.extend([item for item in self.created_links() if item not in self.get_existing_items()])
       else:
         self.add_error("Failed to save necessary objects")
     else:
       # Overwrite with only imported links
-      if hasattr(self.obj, self.options.get('association')):
-        setattr(self.obj, self.options.get('association'), self.imported_links())
+      if hasattr(obj, self.options.get('association')):
+        setattr(obj, self.options.get('association'), self.imported_links())
 
 class LinkControlsHandler(LinksHandler):
 
@@ -471,8 +472,8 @@ class LinkControlsHandler(LinksHandler):
   def parse_item(self, data):
     return {'slug' : data.upper()}
 
-  def create_item(data):
-    pass
+  def create_item(self, data):
+    return None
 
 class LinkCategoriesHandler(LinksHandler):
   model_class = Category

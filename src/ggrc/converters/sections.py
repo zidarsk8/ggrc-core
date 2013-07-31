@@ -61,7 +61,7 @@ class SectionsConverter(BaseConverter):
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
     ('Abstract' , 'notes'),
-    ('Controls', 'controls')
+    ('Controls', 'controls'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')
   ])
