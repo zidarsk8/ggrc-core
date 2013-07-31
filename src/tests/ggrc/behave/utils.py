@@ -111,39 +111,10 @@ def handle_post_named_example(context, name, expected_status=201):
     example = Example(example.resource_type, response.json())
     setattr(context, name, example)
 
-def post_example(context, resource_type, example, url=None, rbac_context=None):
-  if rbac_context is None:
-    rbac_context = example.get("context", None)
+def post_to_endpoint(context, endpoint, data, url=None):
   if url is None:
-    url = get_service_endpoint_url(context, resource_type)
-
-  # Find any required FactoryStubMarker and recurse to POST/create
-  # required resources
-  for attr, value in example.items():
-    if isinstance(value, FactoryStubMarker):
-      value_resource_type = value.class_.__name__
-      value_resource_factory = factory_for(value_resource_type)
-      value_resource = value_resource_factory()
-      value_response = post_example(
-          context, value_resource_type, value_resource, rbac_context=rbac_context)
-      # If not a successful creation, then it didn't create the object we need
-      if value_response.status_code != 201:
-        return value_response
-      # Get the value of the first/only (key,value) pair
-      #   (and just assume the root key is correct)
-      value_data = value_response.json().items()[0][1]
-      example[attr] = {
-        'href': value_data["selfLink"],
-        'id': value_data["id"],
-        'type': value_resource_type
-        }
-  # Assign overriding `context`, if specified
-  if rbac_context is not None:
-    example["context"] = rbac_context
-
+    url = get_service_endpoint_url(context, endpoint)
   headers = {'Content-Type': 'application/json',}
-  data = as_json(
-      {get_resource_table_singular(resource_type): example})
   response = requests.post(
       context.base_url+url,
       data=data,
@@ -172,6 +143,38 @@ def post_example(context, resource_type, example, url=None, rbac_context=None):
         )
   context.cookies = response.cookies
   return response
+
+def post_example(context, resource_type, example, url=None, rbac_context=None):
+  if rbac_context is None:
+    rbac_context = example.get("context", None)
+
+  # Find any required FactoryStubMarker and recurse to POST/create
+  # required resources
+  for attr, value in example.items():
+    if isinstance(value, FactoryStubMarker):
+      value_resource_type = value.class_.__name__
+      value_resource_factory = factory_for(value_resource_type)
+      value_resource = value_resource_factory()
+      value_response = post_example(
+          context, value_resource_type, value_resource, rbac_context=rbac_context)
+      # If not a successful creation, then it didn't create the object we need
+      if value_response.status_code != 201:
+        return value_response
+      # Get the value of the first/only (key,value) pair
+      #   (and just assume the root key is correct)
+      value_data = value_response.json().items()[0][1]
+      example[attr] = {
+        'href': value_data["selfLink"],
+        'id': value_data["id"],
+        'type': value_resource_type
+        }
+  # Assign overriding `context`, if specified
+  if rbac_context is not None:
+    example["context"] = rbac_context
+
+  data = as_json(
+      {get_resource_table_singular(resource_type): example})
+  return post_to_endpoint(context, resource_type, data, url)
 
 def resource_type_string(resource_type):
   if type(resource_type) in [str,unicode]:

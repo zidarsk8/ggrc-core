@@ -55,9 +55,6 @@ from .system_control import SystemControl
 #from .system_section import SystemSection
 from .system_system import SystemSystem
 
-# TODO: Include?
-from .log_event import LogEvent
-
 from .revision import Revision
 from .event import Event
 all_models = [
@@ -103,7 +100,6 @@ all_models = [
   System,
   SystemControl,
   SystemSystem,
-  LogEvent,
   Revision,
   Event,
   ]

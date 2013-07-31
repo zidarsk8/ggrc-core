@@ -15,8 +15,8 @@ from tests.ggrc.behave.utils import (
     put_resource, get_resource_table_singular, get_service_endpoint_url,
     get_resource, handle_get_resource_and_name_it,
     handle_post_named_example_to_collection_endpoint, post_example,
-    handle_get_example_resource, handle_template_text,
-    check_for_resource_in_collection
+    handle_get_example_resource, handle_template_text, post_to_endpoint,
+    check_for_resource_in_collection,
     )
 
 def get_json_response(context):
@@ -86,6 +86,11 @@ def simple_post_of_named(context, name, url):
       'Expected status code {0}, received {1}'.format(
           200, response.status_code)
   context.response = response
+
+@given('HTTP POST to endpoint "{endpoint}"')
+def post_to_named_endpoint(context, endpoint):
+  text = handle_template_text(context, context.text)
+  context.response = post_to_endpoint(context, endpoint, text)
 
 @when('the example "{resource_type}" is POSTed to its collection')
 def post_example_resource_to_its_collection(context, resource_type):
