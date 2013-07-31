@@ -108,8 +108,10 @@ $(function() {
     CMS.Controllers.DirectiveRoutes.Instances = {
       Control : $(document.body).cms_controllers_directive_routes({}).control(CMS.Controllers.DirectiveRoutes)};
 
-  var $controls_tree = $("#controls .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
-  $.when(
+  var $controls_tree = $("#controls .tree-structure").append(
+    $(new Spinner().spin().el).css(spin_opts));
+
+  /*$.when(
     CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ directive_id : directive_id })
   ).done(function(cats, ctls) {
@@ -136,7 +138,19 @@ $(function() {
       model : CMS.Models.Category
       , list : cats
     });
-  });
+  });*/
+
+  CMS.Models.Control
+    .findAll({ directive_id : directive_id })
+    .done(function(s) {
+      $controls_tree.cms_controllers_tree_view({
+          model : CMS.Models.Control
+        //, edit_sections : true
+        , list : s
+        , list_view : "/static/mustache/controls/tree.mustache"
+        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+      });
+    });
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
 
