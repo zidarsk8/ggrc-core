@@ -102,7 +102,7 @@ jQuery(function($) {
 });
 
 
-if (!/\/directives\b/.test(window.location.pathname))
+if (!/\/directives\/\d+($|\?|#)/.test(window.location.pathname))
   return;
 
 $(function() {
