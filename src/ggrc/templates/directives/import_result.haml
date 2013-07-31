@@ -1,5 +1,5 @@
--set width_pcts = [10 ,30, 35, 35]
--set column_names = ["slug", "title", "description", "notes"]
+-set width_pcts = [10, 20, 25, 25, 30]
+-set column_names = ["slug", "title", "description", "notes", "controls"]
 -set header_overrides = {}
 -set all_errors = converter.errors
 -set all_warnings = converter.warnings
@@ -23,7 +23,6 @@
           %p.label-error
             =all_errors[loop.index0]
       %br
-
       -if all_warnings|length > 0
         -for i in all_warnings
           %p.label-warning

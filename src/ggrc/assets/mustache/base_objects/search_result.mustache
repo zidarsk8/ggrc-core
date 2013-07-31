@@ -8,7 +8,9 @@
         </span>
       </div>
       <div class="span1">
-        &nbsp;
+        {{#is_private}}
+          <i class="grcicon-private" rel="tooltip" title="Private"></i>
+        {{/is_private}}
       </div>
       <div class="span1">
       {{^people}}

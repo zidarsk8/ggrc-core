@@ -220,35 +220,55 @@ $(function() {
   var $controls_tree = $("#controls .tree-structure").append(
     $(new Spinner().spin().el).css(spin_opts));
 
-  /*$.when(
+  $.when(
     CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ "directive.program_directives.program_id" : program_id })
+    , CMS.Models.Control.findAll({ "program_controls.program_id" : program_id })
   ).done(function(cats, ctls) {
     var uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
-    can.each(ctls, function(c) {
-      uncat_cache[c.id] = ctl_cache[c.id] = c;
-    });
-    function link_controls(c) {
-      //empty out the category controls that aren't part of the program
-      c.controls.replace(can.map(c.controls, function(ctl) {
-        delete uncat_cache[c.id];
-        return ctl_cache[c.id];
-      }));
-      can.each(c.children, link_controls);
-    }
-    can.each(cats, link_controls);
-    can.each(Object.keys(uncat_cache), function(cid) {
-        uncategorized.controls.push(uncat_cache[cid]);
+    // can.each(ctls, function(c) {
+    //   uncat_cache[c.id] = ctl_cache[c.id] = c;
+    // });
+    // function link_controls(c) {
+    //   //empty out the category controls that aren't part of the program
+    //   c.controls.replace(can.map(c.controls, function(ctl) {
+    //     delete uncat_cache[c.id];
+    //     return ctl_cache[c.id];
+    //   }));
+    //   can.each(c.children, link_controls);
+    // }
+    // can.each(cats, link_controls);
+    // can.each(Object.keys(uncat_cache), function(cid) {
+    //     uncategorized.controls.push(uncat_cache[cid]);
+    // });
+
+    // $controls_tree.cms_controllers_tree_view({
+    //   model : CMS.Models.Category
+    //   , list : cats
+    // });
+
+    var page_model = GGRC.make_model_instance(GGRC.page_object)
+    , combined_ctls = new CMS.Models.Control.List(can.unique(can.map(ctls, function(c) { return c; }).concat(can.map(page_model.controls, function(c) { return c; }))));
+
+    $controls_tree.parent().ggrc_controllers_list_view({
+      model : CMS.Models.Control
+      , list : combined_ctls
+      , list_loader : function() {
+        return $.when(combined_ctls);
+      }
     });
 
-    $controls_tree.cms_controllers_tree_view({
-      model : CMS.Models.Category
-      , list : cats
+    page_model.controls.bind("change", function() {
+      combined_ctls.replace(
+        can.unique(
+          can.map(ctls, function(c) { return c; })
+          .concat(can.map(page_model.controls, function(c) { return c; }))
+      ));
     });
-  });*/
-
+  });
+  /*
   CMS.Models.Control
     .findAll({ "directive.program_directives.program_id" : program_id })
     .done(function(s) {
@@ -260,6 +280,7 @@ $(function() {
         , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       });
     });
+  */
 
   var $objectives_tree = $("#objectives .tree-structure").append(
     $(new Spinner().spin().el).css(spin_opts));

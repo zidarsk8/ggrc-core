@@ -22,5 +22,5 @@
                 -set parity = "even" if (loop.index % 2 == 0) else "odd"
                 %tr{class:"={parity}"}
                   -for col_name in column_names
-                    -set cellvalue = result.get_attr(col_name)
+                    -set cellvalue = result[col_name]
                     -include "directives/_import_cell.haml"

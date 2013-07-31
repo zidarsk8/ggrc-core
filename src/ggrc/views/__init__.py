@@ -119,6 +119,8 @@ def import_controls(directive_id):
           options['heading_map'] = converter.object_map
           return render_template("directives/import_controls_result.haml", **options)
         else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/directives/{}".format(directive_id))
     except ImportException as e:
       return render_template("directives/import_errors.haml",
@@ -148,6 +150,8 @@ def import_sections(directive_id):
           return render_template("directives/import_result.haml",directive_id = directive_id,
           converter = converter, results=converter.objects, heading_map = converter.object_map)
         else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/directives/{}".format(directive_id))
     except ImportException as e:
       return render_template("directives/import_errors.haml",
@@ -175,6 +179,8 @@ def import_systems():
           return render_template("systems/import_result.haml",
             converter = converter, results=converter.objects, heading_map=converter.object_map)
         else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
@@ -208,6 +214,8 @@ def import_processes():
           return render_template("systems/import_result.haml",
             converter = converter, results=converter.objects, heading_map=converter.object_map)
         else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} process{}'.format(count, 'es' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))

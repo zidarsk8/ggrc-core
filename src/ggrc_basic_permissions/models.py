@@ -28,7 +28,12 @@ class Role(Base, Described, db.Model):
 
   @simple_property
   def permissions(self):
-    return json.loads(self.permissions_json)
+    permissions = json.loads(self.permissions_json)
+    # make sure not to omit actions
+    for action in ['create', 'read', 'update', 'delete']:
+      if action not in permissions:
+        permissions[action] = []
+    return permissions
 
   @permissions.setter
   def permissions(self, value):
