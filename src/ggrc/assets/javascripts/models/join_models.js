@@ -9,27 +9,37 @@ can.Model.Cacheable("can.Model.Join", {
     this._super && this._super.apply(this, arguments);
     //this.reinit();
     if(this === can.Model.Join) {
-      this.bind("created.reinit destroyed.reinit", can.proxy(this, "reinit"));
+      this.bind("created.reinit destroyed.reinit", function(ev, instance) {
+        instance.reinit();
+        //can.proxy(this, "reinit"));
+      });
     }
   }
-  , reinit : function(ev, data) {
-    can.each(data.constructor.join_keys, function(cls, attr_name) {
-      var attr_val = data[attr_name];
-      data.attr(attr_name, CMS.Models.get_instance(
+}, {
+    init : function() {
+      this._super && this._super.apply(this, arguments);
+      this.reinit();
+    }
+  , reinit : function() {//ev, data) {
+      var self = this
+        ;
+
+    can.each(this.constructor.join_keys, function(cls, attr_name) {
+      var attr_val = self[attr_name];
+      self.attr(attr_name, CMS.Models.get_instance(
         attr_val && attr_val.constructor.model_singular ? attr_val.constructor.model_singular : cls.model_singular
-        , data[attr_name + "_id"] || (attr_val && attr_val.id)
+        , self[attr_name + "_id"] || (attr_val && attr_val.id)
         ));
 
-      data[attr_name] && data[attr_name].refresh();
+      self[attr_name] && self[attr_name].refresh();
     });
 
-    data.each(function(value, name) {
+    this.each(function(value, name) {
       if (value === null)
-      data.removeAttr(name);
+      self.removeAttr(name);
     });
   }
-}, {
-  getOtherSide : function(obj) {
+  , getOtherSide : function(obj) {
     var that = this;
     var keys = $.extend({}, this.constructor.join_keys);
     can.each(keys, function(cls, key) {
@@ -124,7 +134,7 @@ can.Model.Join("CMS.Models.Relationship", {
   reinit: function() {
     var that = this;
 
-    typeof this._super_init === "function" && this._super_init.call(this);
+    //typeof this._super_init === "function" && this._super_init.call(this);
     this.attr("source", CMS.Models.get_instance(
       this.source_type || this.source.type
       , this.source_id || this.source.id

@@ -95,7 +95,7 @@
           can.map(self.join_list, function(join) {
             return new can.Observe({
               option: CMS.Models.get_instance(
-                self.options.option_model || CMS.Models.get_link_type(join, self.options.option_attr),
+                self.options.option_model.shortName || CMS.Models.get_link_type(join, self.options.option_attr),
                 join[self.options.option_id_field] || join[self.options.option_attr].id)
             , join: join
             });
@@ -292,7 +292,7 @@
       join_params[this.options.option_attr].id = option_id;
       //join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
-        join_params[this.options.option_attr].type = option_id;
+        join_params[this.options.option_attr].type = option_type;
         //join_params[this.options.option_type_field] = option_type;
       }
       join_params[this.options.join_attr] = {}
@@ -463,13 +463,15 @@
 
         related_model_singular: "Objective",
         related_table_plural: "objectives",
-        related_title_singular: "Control Objective",
-        related_title_plural: "Control Objectives",
+        related_title_singular: "Objective",
+        related_title_plural: "Objectives",
 
+        object_model: CMS.Models.Section,
         option_model: CMS.Models.Objective,
         join_model: CMS.Models.SectionObjective,
 
         option_attr: 'objective',
+        join_attr: 'section',
         option_id_field: 'objective_id',
         //option_type_field: 'objective_type',
         join_id_field: 'section_id',
@@ -494,10 +496,11 @@
         option_model: CMS.Models.Control,
         join_model: CMS.Models.RiskControl,
 
-        option_attr: 'directive',
-        option_id_field: 'directive_id',
-        option_type_field: 'directive_type',
-        join_id_field: 'program_id',
+        option_attr: 'control',
+        join_attr: 'risk',
+        option_id_field: 'control_id',
+        option_type_field: 'control_type',
+        join_id_field: 'risk_id',
         join_type_field: null,
 
         join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
@@ -549,11 +552,15 @@
       options.join_object_type = data.join_object_type;
     } else {
       options.join_object = get_page_object();
+      options.join_object_id = options.join_object.id;
+      options.join_object_type = options.join_object_type;
     }
 
     options.extra_join_fields = {
       relationship_type_id: data.relationship_type
     };
+
+    options.extra_join_fields[options.option_type_field] = options.option_model.shortName;
 
 
     return options;

@@ -93,22 +93,20 @@
     </div>
   </li>
 {{/list}}
-</ul>
-<ul class="new-tree">
-  <li class="tree-item tree-item-add">
-    <a
-      href="javascript://"
-      rel="tooltip"
-      data-placement="left"
-      data-toggle="modal-selector"
-      data-modal-selector-options="section_objectives"
-      data-modal-class="modal-wide"
-      xdata-modal-reset="reset"
-      data-original-title="Link {{model.title_singular.toLowerCase}} to this object"
-      xdata-join-object="lookup-tree"
-      data-join-object-id="{{parent.instance.id}}"
-      data-join-object-type="{{parent.instance.constructor.shortName}}">
-      + {{model.title_singular}}
-    </a>
-  </li>
-</ul>
+<li class="tree-item tree-item-add">
+  {{{!modal_selector model=model parent=parent}}}
+  <a
+    href="javascript://"
+    rel="tooltip"
+    data-placement="left"
+    data-toggle="modal-selector"
+    data-modal-selector-options="section_objectives"
+    data-modal-class="modal-wide"
+    xdata-modal-reset="reset"
+    data-original-title="Link {{model.title_singular.toLowerCase}} to this object"
+    xdata-join-object="lookup-tree"
+    data-join-object-id="{{parent_instance.id}}"
+    data-join-object-type="{{parent_instance.constructor.shortName}}">
+    + {{model.title_singular}}
+  </a>
+</li>
