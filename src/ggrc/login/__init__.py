@@ -44,7 +44,7 @@ def get_current_user():
 
 def get_current_user_id():
   user = get_current_user()
-  if user:
+  if user is not None and not user.is_anonymous():
     return user.id
   else:
     return None

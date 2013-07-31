@@ -10,6 +10,7 @@
   =model._inflector.table_singular + "_widget_help"
 
 -block widget_title
+  %i{ 'class': 'grcicon-={ model._inflector.table_singular }-color' }
   =model._inflector.title_singular
 
 -block main

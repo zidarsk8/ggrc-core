@@ -67,12 +67,16 @@ class TestResource(TestCase):
     updated_at = unicode(model.updated_at.strftime(format))
     created_at = unicode(model.created_at.strftime(format))
     return {
-        u'id': model.id,
+        u'id': int(model.id),
         u'selfLink': unicode(URL_MOCK_RESOURCE.format(model.id)),
-        u'modified_by_id': model.modified_by_id,
+        u'modified_by': int(model.modified_by) \
+            if model.modified_by is not None else None,
+        u'modified_by_id': int(model.modified_by_id),
         u'updated_at': updated_at,
         u'created_at': created_at,
-        u'context_id': model.context_id,
+        u'context': \
+            { u'id': model.context_id, } \
+                if model.context_id is not None else None,
         u'foo': (unicode(model.foo) if model.foo else None),
         }
 
@@ -165,7 +169,7 @@ class TestResource(TestCase):
 
   def test_collection_post_successful(self):
     data = json.dumps(
-        { 'services_test_mock_model': { 'foo': 'bar', 'context_id': None} })
+        { 'services_test_mock_model': { 'foo': 'bar', 'context': None} })
     response = self.client.post(
         URL_MOCK_COLLECTION, 
         content_type='application/json',

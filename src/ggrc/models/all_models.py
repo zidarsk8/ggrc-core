@@ -34,6 +34,7 @@ from .person import Person
 from .population_sample import PopulationSample
 from .product import Product
 from .program import Program
+from .program_control import ProgramControl
 from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
@@ -87,6 +88,7 @@ all_models = [
   PopulationSample,
   Product,
   Program,
+  ProgramControl,
   ProgramDirective,
   Project,
   Relationship,

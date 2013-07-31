@@ -171,8 +171,8 @@ $(function() {
         })
         .one("modal:success", triggerFlash);
     } else {
-      params[page_model.root_object + "_id"] = page_instance.id;
-      params[inst.constructor.root_object + "_id"] = inst.id;
+      params[page_model.root_object] = { id : page_instance.id };
+      params[inst.constructor.root_object] = { id : inst.id };
       params.context = page_instance.context || { id : null };
       new link(params).save().done(triggerFlash);
     }

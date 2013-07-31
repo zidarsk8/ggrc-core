@@ -55,9 +55,10 @@ class UserPermissions(DefaultUserPermissions):
       pass
     elif session['permissions'] is None\
         or '__user' not in session['permissions']\
-        or session['permissions']['__user'] != get_current_user().email:
+        or session['permissions']['__user'] != \
+            self.get_email_for(get_current_user()):
       self.load_permissions()
-    else:
+    elif 'permission__ts' in session and not get_current_user().is_anonymous():
       current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
           .filter(UserRole.person_id==get_current_user().id)\
           .order_by(UserRole.updated_at.desc())\
@@ -65,13 +66,19 @@ class UserPermissions(DefaultUserPermissions):
       if current_most_recent_role_ts[0] > session['permissions__ts']:
         self.load_permissions()
 
+  def get_email_for(self, user):
+    return user.email if hasattr(user, 'email') else 'ANONYMOUS'
+
   def load_permissions(self):
     user = get_current_user()
+    email = self.get_email_for(user)
     session['permissions'] = {}
-    session['permissions']['__user'] = user.email
-    if user is not None\
-        and hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
-        and user.email in settings.BOOTSTRAP_ADMIN_USERS:
+    session['permissions']['__user'] = email
+    if user is None or user.is_anonymous():
+      session['permissions'] = {}
+      session['permissions__ts'] = None
+    elif hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
+        and email in settings.BOOTSTRAP_ADMIN_USERS:
       session['permissions'] = {
           DefaultUserPermissions.ADMIN_PERMISSION.action: {
             DefaultUserPermissions.ADMIN_PERMISSION.resource_type: [
@@ -79,7 +86,7 @@ class UserPermissions(DefaultUserPermissions):
               ],
             },
           }
-    elif user is not None:
+    else:
       session['permissions'] = {}
       user_roles = db.session.query(UserRole)\
           .filter(UserRole.person_id==user.id)\
@@ -114,9 +121,6 @@ class UserPermissions(DefaultUserPermissions):
       session['permissions']['__GGRC_ADMIN__'] = {
           '__GGRC_ALL__': [personal_context.id,],
           }
-    else:
-      session['permissions'] = {}
-      session['permissions__ts'] = None
 
 def all_collections():
   """The list of all collections provided by this extension."""

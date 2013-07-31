@@ -10,14 +10,13 @@
   business
 
 -block widget_title
+  %i.grcicon-control-color
   Controls
 
 -block widget_buttons
   .filter
     .row-fluid
-      .span6
-        %input.ui-corner-all.widgetsearch-tocontent.clear-value{ 'type': 'text', 'placeholder': 'Search' }
-      .span6
+      .span12
         .pull-right
           %a.btn.btn-add{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'refresh', 'data-modal-class': 'modal-wide', 'data-object-singular': 'Control', 'data-object-plural': 'controls' } 
             %i.grcicon-add
