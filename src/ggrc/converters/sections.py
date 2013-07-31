@@ -21,7 +21,7 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_date('updated_at', no_import = True)
     self.handle_text_or_html('description')
     self.handle_text_or_html('notes')
-    #self.handle('controls', LinkControlsHandler)
+    self.handle('controls', LinkControlsHandler)
     self.handle_raw_attr('title')
 
   def save_object(self, db_session, **options):
@@ -61,6 +61,7 @@ class SectionsConverter(BaseConverter):
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
     ('Abstract' , 'notes'),
+    ('Controls', 'controls'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')
   ])

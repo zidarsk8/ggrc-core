@@ -120,6 +120,10 @@ class BaseConverter(object):
       if element is not None:
         missing_columns.remove(element)
 
+    # Created and Updated column headers should not thrown warnings on import
+    # because they are not used
+    missing_columns = [column for column in missing_columns if column != 'created_at' and column != 'updated_at']
+
     if len(missing_columns):
       missing_headers = [self.get_header_for_column(temp) for temp in missing_columns if temp is not None]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
