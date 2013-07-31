@@ -60,6 +60,7 @@ class Documentable(object):
         'ObjectDocument',
         primaryjoin=joinstr,
         backref='{0}_documentable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [

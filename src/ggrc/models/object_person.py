@@ -61,6 +61,7 @@ class Personable(object):
         'ObjectPerson',
         primaryjoin=joinstr,
         backref='{0}_personable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [
