@@ -1,14 +1,14 @@
 """Create ObjectObjective, ObjectSection, ObjectControl
 
 Revision ID: 3a5ff1d71b9f
-Revises: 4155c544acb5
+Revises: 5459dba4c5e9
 Create Date: 2013-07-28 03:00:07.564393
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '3a5ff1d71b9f'
-down_revision = '4155c544acb5'
+down_revision = '5459dba4c5e9'
 
 from alembic import op
 import sqlalchemy as sa
