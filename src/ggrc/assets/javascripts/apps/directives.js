@@ -10,7 +10,7 @@
 //= require models/simple_models
 (function(namespace, $) {
 
-var directive_id = namespace.location.pathname.substr(window.location.pathname.lastIndexOf("/") + 1);
+var page_model, directive_id;
 
 function getPageModel() {
   if($(document.body).attr("data-page-type") === "directives") { 
@@ -31,6 +31,9 @@ function getPageModel() {
 
 //Note that this also applies to programs
 jQuery(function($) {
+  page_model = GGRC.make_model_instance(GGRC.page_object);
+  directive_id = (page_model || {}).id;
+
   $("body").on("click", "a.controllist, a.objectivelist", function(ev) {
     var $trigger = $(ev.currentTarget)
     , model = $trigger.is(".objectivelist") ? CMS.Models.Objective : CMS.Models.Control
@@ -116,26 +119,35 @@ $(function() {
     var uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
-    can.each(ctls, function(c) {
-      uncat_cache[c.id] = ctl_cache[c.id] = c;
-    });
-    function link_controls(c) {
-      //empty out the category controls that aren't part of the program
-      c.controls.replace(can.map(c.controls, function(ctl) {
-        delete uncat_cache[c.id];
-        return ctl_cache[c.id];
-      }));
-      can.each(c.children, link_controls);
-    }
-    can.each(cats, link_controls);
-    can.each(Object.keys(uncat_cache), function(cid) {
-        uncategorized.controls.push(uncat_cache[cid]);
+    // can.each(ctls, function(c) {
+    //   uncat_cache[c.id] = ctl_cache[c.id] = c;
+    // });
+    // function link_controls(c) {
+    //   //empty out the category controls that aren't part of the program
+    //   c.controls.replace(can.map(c.controls, function(ctl) {
+    //     delete uncat_cache[c.id];
+    //     return ctl_cache[c.id];
+    //   }));
+    //   can.each(c.children, link_controls);
+    // }
+    // can.each(cats, link_controls);
+    // can.each(Object.keys(uncat_cache), function(cid) {
+    //     uncategorized.controls.push(uncat_cache[cid]);
+    // });
+
+    // $controls_tree.cms_controllers_tree_view({
+    //   model : CMS.Models.Category
+    //   , list : cats
+    // });
+
+    $controls_tree.parent().ggrc_controllers_list_view({
+      model : CMS.Models.Control
+      , list: page_model.controls
+      , list_loader : function() {
+        return $.when(page_model.controls);
+      }
     });
 
-    $controls_tree.cms_controllers_tree_view({
-      model : CMS.Models.Category
-      , list : cats
-    });
   });
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));

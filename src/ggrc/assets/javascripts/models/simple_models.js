@@ -17,6 +17,9 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
+  , attributes : {
+    controls : "CMS.Models.Control.models"
+  }
   , links_to : {
     "Regulation" : "ProgramDirective"
     , "Policy" : "ProgramDirective"
