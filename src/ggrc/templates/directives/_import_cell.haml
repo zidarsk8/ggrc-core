@@ -12,7 +12,10 @@
   -# set values to test
 
   -set cell = result[col_name]
-  -if cell.__class__.__name__ == "LinkDocumentsHandler"
+  -set cell_handler = cell.__class__.__name__
+  -set cell_handler_base = cell.__class__.__base__.__name__
+
+  -if cell_handler == "LinkDocumentsHandler"
     -set first = True
     -for all_details in cell.links_with_details()
       -set status = all_details[0]
@@ -37,7 +40,7 @@
       -else
         ={value}
 
-  -elif "LinksHandler" == cell.__class__.__base__.__name__
+  -elif "LinksHandler" == cell_handler_base
     -set first = True
     -for all_details in cell.links_with_details()
       -set status = all_details[0]
