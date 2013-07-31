@@ -65,3 +65,22 @@ Feature: Private Programs
     Then PUT of "private_program" is forbidden
     Then DELETE of "private_program" is forbidden
 
+  Scenario: Admin users can see the private programs created by other, non-admin, users.
+    Given the current user
+      """
+      { "email": "secretive.user@example.com", "name": "Secretive User" }
+      """
+    Given a new "Program" named "private_program"
+    And "private_program" property "private" is literal "True"
+    And "private_program" is POSTed to its collection
+    When GET of the resource "private_program"
+    Given the current user
+      """
+      { "email": "example.admin@example.com", "name": "Jo Admin",
+        "permissions": {
+          "__GGRC_ADMIN__": { "__GGRC_ALL__": [0] }
+        }
+      }
+      """
+    When Get of "Program" collection
+    Then "private_program" is in collection

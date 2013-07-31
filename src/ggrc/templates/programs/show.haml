@@ -10,6 +10,9 @@
     %span
       %strong Program:
     =instance.title
+    -if instance.context_id != None
+      %span
+        %i.grcicon-private{ 'rel': 'tooltip', 'title': 'Private' }
 
 -block widget_area
   -with widget_class = 'programs'

@@ -11,49 +11,56 @@
 
   -# set values to test
 
-  -set cell = ""
-  -set status = "created"
-
-  -if cell == "LinkDocumentsHandler"
-    %hr
+  -set cell = result[col_name]
+  -if cell.__class__.__name__ == "LinkDocumentsHandler"
     -set first = True
-    -if first
-      -set first = False
-    -else
-      %hr
+    -for all_details in cell.links_with_details()
+      -set status = all_details[0]
+      -set document = all_details[1]
+      -set value = all_details[2]
+      -set errors = all_details[3]
+      -set warnings = all_details[4]
 
-    -if status == "created"
-      %span
-       =cellvalue
-    -elif status == "existing"
-      =cellvalue
-    -else
-      =cellvalue
+      -if first
+        -set first = False
+      -else
+        %hr
 
-    -if status == "created"
-      %span
-        %a{href:"document.link",rel:"tooltip",title:"document.link"}
-    -elif status == "existing"
-      %a{href:"document.link",rel:"tooltip",title:"document.link"}
-    -else
+      -if status == "created"
+        %span
+          New link:
+        %a{href:'{{document.link}}',rel:"tooltip",title:'{{document.link}}'}
+          ={document.title or document.link}
+      -elif status == "existing"
+        %a{href:'{{document.link}}',rel:"tooltip",title:'{{document.link}}'}
+          ={document.title or document.link}
+      -else
+        ={value}
 
-  -elif cell == "LinkHandler"
+  -elif "LinksHandler" == cell.__class__.__base__.__name__
     -set first = True
-    -if first
-      -set first = False
-    -else
-      %hr
+    -for all_details in cell.links_with_details()
+      -set status = all_details[0]
+      -set object = all_details[1]
+      -set value = all_details[2]
+      -set errors = all_details[3]
+      -set warnings = all_details[4]
 
-    -if status == "created"
-      %span
-      -#display cell new link
-    -elif status == "existing"
-      display cell existing link
-    -else
-      =value
+      -if first
+        -set first = False
+      -else
+        %hr
+
+      -if status == "created"
+        %span
+          New link:
+        ={cell.display_link(object)} 
+      -elif status == "existing"
+        ={cell.display_link(object)}
+      -else
+        ={value}
 
   -elif cell == "TextOrHtmlColumnHandler"
-    text or html
-
+    ={cell.display()}
   -else
-    =cellvalue
+    {{cell.display()}}

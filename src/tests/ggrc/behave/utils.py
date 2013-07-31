@@ -207,3 +207,23 @@ def handle_template_text(context, src):
     return template.render(context=context)
   return src
 
+def check_for_resource_in_collection(
+    context, collection_name, resource_name, expected):
+  resource = getattr(context, resource_name)
+  collection = getattr(context, collection_name)
+  root = collection.keys()[0]
+  from ggrc import models
+  model_class = getattr(models, resource.resource_type)
+  entry_list = collection[root][model_class.__tablename__]
+  result_pairs = set([(o[u'id'], o[u'selfLink']) for o in entry_list])
+  check_pair = (resource.get(u'id'), resource.get(u'selfLink'))
+  if expected:
+    assert check_pair in result_pairs, \
+        'Expected to find {0} in results {1}'.format(
+            check_pair, result_pairs)
+  else:
+    assert check_pair not in result_pairs, \
+        'Expected not to find {0} in results {1}'.format(
+            check_pair, result_pairs)
+
+
