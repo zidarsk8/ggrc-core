@@ -81,7 +81,7 @@ class ModelView(View):
         query = query.filter(or_(
           self.model.context_id.in_(contexts),
           self.model.context_id == None))
-      else:
+      elif contexts is not None:
         query = query.filter(self.model.context_id == None)
       for j in joinlist:
         j_class = j.property.mapper.class_

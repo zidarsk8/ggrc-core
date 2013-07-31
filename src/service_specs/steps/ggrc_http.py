@@ -14,9 +14,9 @@ from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
     put_resource, get_resource_table_singular, get_service_endpoint_url,
     get_resource, handle_get_resource_and_name_it,
-    handle_post_named_example_to_collection_endpoint,
-    handle_post_named_example, post_example, handle_get_example_resource,
-    handle_template_text,
+    handle_post_named_example_to_collection_endpoint, post_example,
+    handle_get_example_resource, handle_template_text,
+    check_for_resource_in_collection
     )
 
 def get_json_response(context):
@@ -50,6 +50,20 @@ def named_example_from_json(context, resource_type, example_name):
 @given('a new "{resource_type}" named "{example_name}"')
 def named_example_resource(context, resource_type, example_name, **kwargs):
   handle_named_example_resource(context, resource_type, example_name, **kwargs)
+
+@given('GET of "{typename}" collection')
+@when('GET of "{typename}" collection')
+def get_collection_for(context, typename):
+  handle_get_resource_and_name_it(
+      context,
+      get_service_endpoint_url(context, typename),
+      'collectionresource',
+      )
+
+@then('"{resource_name}" is in collection')
+def check_resource_in_collection(context, resource_name):
+  check_for_resource_in_collection(
+      context, 'collectionresource', resource_name, True)
 
 @when('"{name}" is POSTed to its collection')
 @given('"{name}" is POSTed to its collection')

@@ -6,6 +6,7 @@
 from behave import then, when
 from tests.ggrc.behave.utils import (
     get_resource, get_service_endpoint_url, handle_get_resource_and_name_it,
+    check_for_resource_in_collection,
     )
 
 @when('Querying "{resource_type}" with "{querystring}"')
@@ -29,32 +30,15 @@ def query_resource_collection_with_literal(
   query_resource_collection(
       context, resource_type, '{0}={1}'.format(property_path, value))
 
-def check_for_resource_in_queryresult(context, resource_name, expected):
-  resource = getattr(context, resource_name)
-  queryresult = context.queryresultcollection
-  root = queryresult.keys()[0]
-  from ggrc import models
-  model_class = getattr(models, resource.resource_type)
-  entry_list = queryresult[root][model_class.__tablename__]
-  result_pairs = set([(o[u'id'], o[u'selfLink']) for o in entry_list])
-  check_pair = (resource.get(u'id'), resource.get(u'selfLink'))
-  if expected:
-    assert check_pair in result_pairs, \
-        'Expected to find {0} in results {1}'.format(
-            check_pair, result_pairs)
-  else:
-    assert check_pair not in result_pairs, \
-        'Expected not to find {0} in results {1}'.format(
-            check_pair, result_pairs)
-
-
 @then('"{resource_name}" is in query result')
 def check_resource_in_queryresult(context, resource_name):
-  check_for_resource_in_queryresult(context, resource_name, True)
+  check_for_resource_in_collection(
+      context, 'queryresultcollection', resource_name, True)
 
 @then('"{resource_name}" is not in query result')
 def check_resource_not_in_queryresult(context, resource_name):
-  check_for_resource_in_queryresult(context, resource_name, False)
+  check_for_resource_in_collection(
+      context, 'queryresultcollection', resource_name, False)
 
 @then('query result selfLink query string is "{expected_querystring}"')
 def check_query_selfLink(context, expected_querystring):
