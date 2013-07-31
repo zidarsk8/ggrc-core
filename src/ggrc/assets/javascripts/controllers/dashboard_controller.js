@@ -301,6 +301,7 @@ can.Control("CMS.Controllers.InnerNav", {
         var $widget = $(widget_element);
         widget_list.push({
             selector: "#" + $widget.attr("id")
+          , internav_icon: $widget.find(".header h2 i").attr("class")
           , internav_display: $widget.find(".header").text()
           });
       });
