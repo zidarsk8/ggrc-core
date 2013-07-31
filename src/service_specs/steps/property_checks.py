@@ -137,6 +137,12 @@ def check_property_value(context, property_name, resource_name, expected):
   actual = resource.get(property_name)
   assert expected == actual, 'Expected {}, found {}'.format(expected, actual)
 
+@then ('the revisions for the latest event contains "{action}" and "{resource_type}"')
+def check_latest_event(context, action, resource_type):
+  resource = getattr(context, "events")
+  revisions = [(revision['action'], revision['resource_type']) for revision in resource['events_collection']['events'][0]['revisions']]
+  assert (action, resource_type) in revisions, 'Expected ({}, {}) to be in {}'.format(action, resource_type, revisions)
+
 @then('evaluate "{expression}"')
 def evaluate_expression(context, expression):
   assert eval(expression) == True

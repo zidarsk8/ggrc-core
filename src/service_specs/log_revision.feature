@@ -16,11 +16,17 @@ Feature: Log events and revisions
   Scenario: Event and revision on DELETE
     Given a new "Program" named "example_program"
     And "example_program" is POSTed to its collection
+    And a new "Directive" named "example_directive"
+    And "example_directive" is POSTed to its collection
+    And a new "ProgramDirective" named "example_program_directive"
+    And "example_program_directive" link property "directive" is "example_directive"
+    And "example_program_directive" link property "program" is "example_program"
+    And "example_program_directive" is POSTed to its collection
     When GET of the resource "example_program"
     And DELETE "example_program"
-    And GET of "/api/events" as "events"
-    Then the value of the "events_collection.events.0.resource_type" property of the "events" is Program
-    And the value of the "events_collection.events.0.http_method" property of the "events" is DELETE  
+    And GET of "/api/events?__include=revisions" as "events"
+    Then the revisions for the latest event contains "deleted" and "Program"
+    And the revisions for the latest event contains "deleted" and "ProgramDirective"
 
   Scenario: Event and revision on PUT
     Given a new "Program" named "example_program"
