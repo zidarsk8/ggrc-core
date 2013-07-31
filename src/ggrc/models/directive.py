@@ -25,8 +25,7 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
   kind = db.Column(db.String)
   sections = db.relationship(
       'Section', backref='directive', order_by='Section.slug', cascade='all, delete-orphan')
-  controls = db.relationship(
-      'Control', backref='directive', order_by='Control.slug', cascade='all, delete-orphan')
+  controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')
   program_directives = db.relationship('ProgramDirective', backref='directive', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_directives', 'program', 'ProgramDirective')

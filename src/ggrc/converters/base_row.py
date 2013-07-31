@@ -14,7 +14,33 @@ def add_error(key, message = None):
 def add_warning(key, message = None):
   warnings.setdefault(key, []).append(message)
 
-# BaseRowConverter is the super class for SectionsRowConverter
+def unpack_list(vals):
+  result = []
+  for ele in vals:
+    if isinstance(ele, list):
+      for inner in ele: result.append(inner)
+    else:
+      result.append(ele)
+  return result
+
+def clean_list(vals):
+  result = []
+  for res in vals:
+    if '[' in res and  ']' in res:
+      result.append(res[1:-1].strip())
+    elif '[' in res:
+      result.append(res[1:].strip())
+    elif ']' in res:
+      result.append(res[:-1].strip())
+    else:
+      result.append(res.strip())
+  return result
+
+def split_cell(value):
+  lines = [val.strip() for val in value.splitlines() if val]
+  non_flat = [clean_list(line.split(',')) if line[0] == '[' else line for line in lines]
+  return unpack_list(non_flat)
+
 class BaseRowConverter(object):
 
   def __init__(self, importer, object_or_attrs, index, **options):
@@ -173,7 +199,7 @@ class ColumnHandler(object):
     return any(self.warnings) or self.importer.warnings.get(self.key)
 
   def display(self):
-    return getattr(self.importer.obj, key)
+    return getattr(self.importer.obj, self.key, '')
 
   def after_save(self, obj):
     pass
@@ -246,15 +272,13 @@ class DateColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
     try:
+      from datetime import datetime
       date_result = None
       if isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%m/%d/%Y")
       elif isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%m/%d/%y")
       elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
-        from datetime import datetime
         date_result = datetime.strptime(value, "%y/%m/%d")
       else:
         raise ValueError("Error parsing the date string")
@@ -330,12 +354,12 @@ class LinksHandler(ColumnHandler):
 
   def links_with_details(self):
     details = []
-    for index in self.link_values.keys:
+    for index in self.link_values.keys():
       #obj = self.link_objects[index]
-      #object_errors = obj.errors.fulltext
-      details.append([self.link_status[index], self.link_objects[index],
-                      self.link_values[index], self.link_errors[index],
-                      self.link_warnings[index]])
+      #object_errors = obj.errors.fulltext:
+      details.append([self.link_status.get(index,''), self.link_objects.get(index,''),
+                      self.link_values.get(index,''), self.link_errors.get(index,''),
+                      self.link_warnings.get(index,'')])
     return details
 
   def get_existing_items(self):
@@ -348,13 +372,13 @@ class LinksHandler(ColumnHandler):
     else:
       self.pre_existing_links = self.get_existing_items()
 
-    for i, value in enumerate(self.split_cell(content)):
+    for i, value in enumerate(split_cell(content)):
       self.link_index = i
       self.link_values[self.link_index] = value
       data = self.parse_item(value)
       if not data: next
 
-      linked_object = find_existing_item(data)
+      linked_object = self.find_existing_item(data)
 
       if not linked_object:
         # New object
@@ -363,7 +387,7 @@ class LinksHandler(ColumnHandler):
           self.add_created_link(linked_object)
       else:
         if linked_object in self.pre_existing_links:
-          # Existing object iwth existing relationship
+          # Existing object with existing relationship
           self.add_existing_link(linked_object)
         else:
           # Existing object with a new relationship
@@ -376,7 +400,7 @@ class LinksHandler(ColumnHandler):
     model_class = model_class.upper()
     return model_class
 
-  # add model class method
+  #TODO: add model class method -> Perhaps return '' (or None)?
 
   def get_where_params(self, data):
     return dict({'slug': data.get('slug')}.items() + self.options.get(
@@ -385,93 +409,61 @@ class LinksHandler(ColumnHandler):
   def get_create_params(self,data):
     return data
 
-  def clean_list(vals):
-    result = []
-    for res in vals:
-      if '[' in res and  ']' in res:
-        result.append(res[1:-1].strip())
-      elif '[' in res:
-        result.append(res[1:].strip())
-      elif ']' in res:
-        result.append(res[:-1].strip())
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = getattr(self.__class__, 'model_class', None) or self.model_class
+    return model_class.query.filter_by(**where_params).first()
+
+  def create_item(self, data):
+    where_params = self.get_where_params(data)
+    obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
+    if not obj:
+      create_params = self.get_create_params(data)
+      obj = self.model_class(create_params)
+      self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
+    self.create_item_warnings(obj, data)
+    return obj
+
+  def create_item_warnings(self, obj, data):
+    self.add_link_warning("'{0}' will be created".format(data.get('slug')))
+
+  def get_existing_items(self):
+    return getattr(self.importer.obj, self.options.get('association'), None)
+
+  def export(self):
+    return self.join_rendered_items([self.render_item(item) for item in self.get_existing_items()])
+
+  def join_rendered_items(self, items):
+    return "\n".join(items)
+
+  def render_item(self, item):
+    return item.slug
+
+  def save_linked_objects(self):
+    success = True
+    for link_object in self.created_links():
+      success = self.save_link_obj(link_object, db.session) and success
+    return success
+
+  # TODO: Save a linked object in the event of it being created on import
+  def save_link_obj(self, link_obj, db_session):
+    return True
+
+  def after_save(self, obj):
+    if self.options.get('append_only'):
+      # Save old links plus new links
+      if self.save_linked_objects():
+        #new_objects = self.created_links - self.get_existing_items()
+        #updated_total = self.created_links() + self.get_existing_items()
+        if hasattr(obj, self.options.get('association')):
+          target_attr = getattr(obj, self.options['association'])
+          target_attr.extend([item for item in self.created_links() if item not in self.get_existing_items()])
       else:
-        result.append(res.strip())
-    return result
-
-  def unpack_list(vals):
-    result = []
-    for ele in vals:
-      if isinstance(ele, list):
-        for inner in ele: result.append(inner)
-      else:
-        result.append(ele)
-    return result
-
-  def split_cell(self, value):
-    lines = [val.strip() for val in value.split('\n') if val]
-    non_flat = [clean_list(line.split(',')) if line[0] == '[' else line for line in lines]
-    return unpack_list(non_flat)
-
-  #def find_existing_item(data)
-    #where_params = get_where_params(data)
-    #model_class.where(where_params).first
-  #end
-
-  #def create_item(data)
-    #where_params = get_where_params(data)
-    #object = @importer.importer.find_object(model_class, where_params)
-    #if !object
-      #create_params = get_create_params(data)
-      #object = model_class.new(create_params)
-      #@importer.importer.add_object(model_class, where_params, object)
-    #end
-    #create_item_warnings(object, data)
-    #object
-  #end
-
-  #def create_item_warnings(object, data)
-    #add_link_warning("\"#{data[:slug]}\" will be created")
-  #end
-
-  #def get_existing_items
-    #@importer.object.send(options[:association])
-  #end
-
-  #def export
-    #join_rendered_items(get_existing_items.map { |item| render_item(item) })
-  #end
-
-  #def join_rendered_items(items)
-    #items.join("\n")
-  #end
-
-  #def render_item(item)
-    #return item.slug
-  #end
-
-  #def save_linked_objects
-    #success = true
-    #created_links.each do |link_object|
-      #success = link_object.save && success
-    #end
-    #success
-  #end
-
-  #def after_save(object)
-    #if options[:append_only]
-      ## Save old links plus new links
-      #if save_linked_objects
-        #new_objects = created_links - get_existing_items
-        #object.send("#{options[:association]}") << new_objects
-      #else
-        #add_error("Failed to save necessary objects")
-      #end
-    #else
-      ## Overwrite with only imported links
-      #object.send("#{options[:]}=", imported_links)
-    #end
-  #end
-#end
+        self.add_error("Failed to save necessary objects")
+    else:
+      # Overwrite with only imported links
+      if hasattr(obj, self.options.get('association')):
+        setattr(obj, self.options.get('association'), self.imported_links())
 
 class LinkControlsHandler(LinksHandler):
 
@@ -480,8 +472,8 @@ class LinkControlsHandler(LinksHandler):
   def parse_item(self, data):
     return {'slug' : data.upper()}
 
-  def create_item(data):
-    pass
+  def create_item(self, data):
+    return None
 
 class LinkCategoriesHandler(LinksHandler):
   model_class = Category
