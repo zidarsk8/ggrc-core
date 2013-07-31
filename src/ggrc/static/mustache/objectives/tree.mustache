@@ -93,6 +93,7 @@
     </div>
   </li>
 {{/list}}
+{{#if_equals parent_instance.constructor.shortName "Section"}}
 <li class="tree-item tree-item-add">
   {{{!modal_selector model=model parent=parent}}}
   <a
@@ -110,3 +111,4 @@
     + {{model.title_singular}}
   </a>
 </li>
+{{/if_equals}}

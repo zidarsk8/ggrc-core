@@ -261,6 +261,21 @@ $(function() {
       });
     });
 
+  var $objectives_tree = $("#objectives .tree-structure").append(
+    $(new Spinner().spin().el).css(spin_opts));
+
+  CMS.Models.Objective
+    .findAll({ "section_objectives.section.directive.program_directives.program_id" : program_id })
+    .done(function(s) {
+      $objectives_tree.cms_controllers_tree_view({
+          model : CMS.Models.Objective
+        //, edit_sections : true
+        , list : s
+        , list_view : "/static/mustache/objectives/tree.mustache"
+        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+      });
+    });
+
   var directives_by_type = {
     regulation : []
     , contract : []

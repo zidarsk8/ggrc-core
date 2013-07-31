@@ -650,6 +650,12 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , create_link : true
+    , draw_children : false
+    , start_expanded : false
+    }
   , links_to : {
       "Section" : "SectionObjective"
   }
