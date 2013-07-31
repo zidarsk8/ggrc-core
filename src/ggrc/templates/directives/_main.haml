@@ -1,5 +1,5 @@
--extends "programs/_main.haml"
--#sections = directive.sections.includes(:controls => :implementing_controls)
+-extends "layouts/_widget_box.haml"
+
 -set section_meta_kind = "clause" if instance.kind == "Contract" else "section"
 
 -block widget_title
@@ -13,31 +13,6 @@
 -block widget_id
   directive_main_widget
 
--block widget_buttons
-  .filter
-    .row-fluid
-      .span6
-        -#%input.ui-corner-all.widgetsearch.clear-value(type='text' placeholder='Search')
-      .span6
-        .pull-right
-          .btn-group.pull-left{ 'style': 'margin-right:4px;' }
-            %a.btn.btn-add.dropdown-toggle{ 'href': '#', 'data-toggle': 'dropdown'}
-              %i.grcicon-imp-exp-white
-              %span Import/Export
-              %span.caret
-            %ul.dropdown-menu
-              %li.divider
-              %li
-                %a{ 'href': "/directives/={instance.id}/import_sections" }
-                  Import Sections
-              %li.divider
-              %li
-                %a{ 'href': "/directives/={instance.id}/export_sections" }
-                  Export Sections
-
-          %a.btn.btn-add{ 'href' : 'javascript://', 'data-toggle' : 'modal-ajax-form', 'data-modal-reset' : 'reset', 'data-dirty' : '#category_controls, #combo', 'data-route' : "category_controls", 'data-modal-class' : 'modal-wide', 'rel' : 'tooltip', 'title' : 'Create New Control', 'data-object-singular' : 'Control', 'data-object-plural' : 'controls' }
-            %i.grcicon-add
-            Control
 -block main
   #sections.tab-pane
     %ul.tree-structure.new-tree

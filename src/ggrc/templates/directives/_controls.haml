@@ -1,20 +1,17 @@
 -extends 'layouts/_widget_box.haml'
 
 -block widget_help
-  program_directives
+  directive_controls
 
 -block widget_id
-  program_directives_widget
+  directive_controls_widget
 
 -#block widget_class
   business
 
 -block widget_title
-  %i.grcicon-directive-color
-  Directives
-  %span.subtitle
-      (Regulations, Contracts, Policies)
+  Controls
 
 -block main
-  #directives
+  #controls.tab-pane
     %ul.tree-structure.new-tree

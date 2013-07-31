@@ -148,6 +148,7 @@ $(function() {
       , edit_sections : true
       , list : s
       , list_view : "/static/mustache/sections/tree.mustache"
+      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
     });
   });
 

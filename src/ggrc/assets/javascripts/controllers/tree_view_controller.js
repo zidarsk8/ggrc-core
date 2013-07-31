@@ -64,6 +64,9 @@ can.Control("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     this.element.uniqueId();
+    // Allow parent_instance even when there is no parent tree
+    if (!this.options.parent_instance && this.options.parent)
+      this.options.parent_instance = this.options.parent.instance;
     this.options.list ? this.draw_list() : this.fetch_list();
     this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
     this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
