@@ -396,10 +396,26 @@
         font-size:11px;
       }
     }
+    i {
+      margin-top:6px;
+      margin-right:6px;
+      @include opacity(0.3);
+    }
+    li:hover {
+      a {
+        i {
+          @include opacity(1);
+        }
+      }
+
+    }
     li.active {
       a {
         background-color:#333;
         color:#fff;
+        i {
+          @include opacity(1);
+        }
       }
     }
     &.business {
