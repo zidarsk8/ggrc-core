@@ -1,12 +1,31 @@
-#results-container {
-  font-weight: bold;
-  font-size: $f-small;
-  .well {
-    overflow: hidden !important;
+.import-interface {
+  padding:16px;
+  h3 {
+    font-weight:normal;
+    padding-bottom:16px;
   }
-  h4 {
-    font-weight: bold;
-    margin-bottom: 10px;
+  .import-buttons {
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid #ddd;
+  }
+}
+
+.results-table {
+  padding:16px;
+  h2 {
+    font-size:24px;
+    font-weight:normal;
+  }
+  h3 {
+    font-size:18px;
+    font-weight:normal;
+    margin-bottom:16px;
+  }
+  .import-actions {
+    margin-top:12px;
+    border-top:1px solid #ddd;
+    padding-top:20px;
   }
   .label-error {
     @include border-radius($default-border-radius);
@@ -23,6 +42,7 @@
     padding: 5px 10px;
   }
   .ggrc-table {
+    font-size:12px;
     th {
       text-align: left;
       padding: 4px;
@@ -78,9 +98,5 @@
       margin-bottom: 0;
     }
   }
-}
-.import {
-  input[type="file"] {
-    width: 30%;
-  }
+
 }

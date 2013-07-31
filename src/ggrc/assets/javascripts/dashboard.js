@@ -720,6 +720,7 @@ function resize_areas() {
   areaHeight = winHeight - headerHeight;
 
   $(".area").css("width", areaWidth);
+  $(".area .header-content").css("left", affixRight + 8);
   $(".object-area").css("width", objectAreaWidth);
 
   $(".affix-holder").css('height', areaHeight);

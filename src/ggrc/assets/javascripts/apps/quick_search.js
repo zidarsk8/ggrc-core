@@ -117,6 +117,12 @@ $(function() {
   $(document.body).on("click", ".bar-v", function(ev) {
     $("#lhs").toggleClass("lhs-closed");
     resize_areas();
+    if ( $("#lhs").hasClass("lhs-closed") ) {
+      $(".header-content.affix").css("left","48px");
+    } else {
+      $(".header-content.affix").css("left","248px");
+    }
+    
   });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
