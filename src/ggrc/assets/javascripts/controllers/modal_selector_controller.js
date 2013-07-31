@@ -95,7 +95,7 @@
           can.map(self.join_list, function(join) {
             return new can.Observe({
               option: CMS.Models.get_instance(
-                CMS.Models.get_link_type(join, self.options.option_attr),
+                self.options.option_model || CMS.Models.get_link_type(join, self.options.option_attr),
                 join[self.options.option_id_field] || join[self.options.option_attr].id)
             , join: join
             });
@@ -288,13 +288,19 @@
 
     get_new_join: function(option_id, option_type) {
       var join_params = {};
-      join_params[this.options.option_id_field] = option_id;
+      join_params[this.options.option_attr] = {}
+      join_params[this.options.option_attr].id = option_id;
+      //join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
-        join_params[this.options.option_type_field] = option_type;
+        join_params[this.options.option_attr].type = option_id;
+        //join_params[this.options.option_type_field] = option_type;
       }
-      join_params[this.options.join_id_field] = this.get_join_object_id();
+      join_params[this.options.join_attr] = {}
+      join_params[this.options.join_attr].id = this.get_join_object_id();
+      //join_params[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
-        join_params[this.options.join_type_field] = this.get_join_object_type();
+        join_params[this.options.join_attr].type = this.get_join_object_type();
+        //join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       // FIXME: context_id must get a real value
       $.extend(join_params, this.options.extra_join_fields, { context: { id: null } });
@@ -438,6 +444,7 @@
         join_model: CMS.Models.ProgramDirective,
 
         option_attr: 'directive',
+        join_attr: 'program',
         option_id_field: 'directive_id',
         option_type_field: 'directive_type',
         join_id_field: 'program_id',

@@ -280,6 +280,7 @@ $(function() {
 
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.Directive
+      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list : d
       , list_view : "/static/mustache/directives/tree.mustache"
       , child_options : [{
