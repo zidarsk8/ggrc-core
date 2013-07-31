@@ -16,15 +16,19 @@ $(function() {
   var object_class = GGRC.infer_object_type(GGRC.page_object);
   var object = GGRC.make_model_instance(GGRC.page_object);
 
+  can.view(GGRC.mustache_path + "/people/list.mustache", {list : GGRC.page_object.people}, function(frag) {
+    $("#people_widget").find("section.content").html(frag);
+  });
+
   if(!~can.inArray(
     object_class
     , [CMS.Models.OrgGroup
-    , CMS.Models.Project
-    , CMS.Models.Product
-    , CMS.Models.DataAsset
-    , CMS.Models.Facility
-    , CMS.Models.Market
-    , CMS.Models.Risk]))
+      , CMS.Models.Project
+      , CMS.Models.Product
+      , CMS.Models.DataAsset
+      , CMS.Models.Facility
+      , CMS.Models.Market
+      , CMS.Models.Risk]))
     return;
 
   var $top_tree = $("#" + object_class.root_object + "_widget .tree-structure").cms_controllers_tree_view({
