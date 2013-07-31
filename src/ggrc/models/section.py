@@ -13,10 +13,16 @@ class Section(Hierarchical, BusinessObject, db.Model):
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
   na = db.Column(db.Boolean, default=False, nullable=False)
   notes = db.Column(db.Text)
-  control_sections = db.relationship('ControlSection', backref='section', cascade='all, delete-orphan')
-  controls = association_proxy('control_sections', 'control', 'ControlSection')
-  section_objectives = db.relationship('SectionObjective', backref='section')
-  objectives = association_proxy('section_objectives', 'objective', 'SectionObjective')
+  control_sections = db.relationship(
+      'ControlSection', backref='section', cascade='all, delete-orphan')
+  controls = association_proxy(
+      'control_sections', 'control', 'ControlSection')
+  section_objectives = db.relationship(
+      'SectionObjective', backref='section')
+  objectives = association_proxy(
+      'section_objectives', 'objective', 'SectionObjective')
+  object_sections = db.relationship(
+      'ObjectSection', backref='section', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'directive',
@@ -26,6 +32,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
       'controls',
       'section_objectives',
       'objectives',
+      'object_sections',
       ]
   _update_attrs = [
       'directive',
@@ -33,6 +40,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
       'notes',
       'controls',
       'objectives',
+      'object_sections',
       ]
 
   @classmethod
@@ -43,4 +51,5 @@ class Section(Hierarchical, BusinessObject, db.Model):
     return query.options(
         orm.joinedload('directive'),
         orm.subqueryload_all('control_sections.control'),
-        orm.subqueryload_all('section_objectives.objective'))
+        orm.subqueryload_all('section_objectives.objective'),
+        orm.subqueryload('object_sections'))

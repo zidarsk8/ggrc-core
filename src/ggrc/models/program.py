@@ -7,10 +7,13 @@ from ggrc import db
 from .associationproxy import association_proxy
 from .mixins import BusinessObject, Timeboxed
 from .object_document import Documentable
+from .object_objective import Objectiveable
 from .object_person import Personable
 from .reflection import PublishOnly
 
-class Program(Documentable, Personable, BusinessObject, Timeboxed, db.Model):
+class Program(
+    Documentable, Personable, Objectiveable,
+    BusinessObject, Timeboxed, db.Model):
   __tablename__ = 'programs'
 
   KINDS = [
