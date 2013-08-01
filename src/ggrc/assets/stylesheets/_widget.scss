@@ -404,8 +404,14 @@
       }
     }
   }
-  &:hover {
+  &.widget-active {
     @include box-shadow(0 0 12px $gray);
+    .header {
+      background:#444;
+      h2 {
+        color:$white;
+      }
+    }
   }
   .related-button {
     li {
