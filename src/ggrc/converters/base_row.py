@@ -129,7 +129,7 @@ class BaseRowConverter(object):
 
   def responds_to_after_save(self, hook):
     if hasattr(hook, 'after_save'):
-      return callable(getattr(hook, 'after_save'))
+      return callable(getattr(hook, 'after_save', None))
     return False
 
   def handle_boolean(self, key, **options):
@@ -223,7 +223,6 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
-
 class TextOrHtmlColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
@@ -286,7 +285,7 @@ class DateColumnHandler(ColumnHandler):
     if self.has_errors():
       return self.original
     else:
-      return getattr(self.importer.obj, self.key) or ''
+      return getattr(self.importer.obj, self.key, '') or ''
 
   def export(self):
     date_result = getattr(self.importer.obj, self.key, '')

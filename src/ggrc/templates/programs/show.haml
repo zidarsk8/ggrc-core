@@ -21,10 +21,10 @@
     -include 'programs/_main.haml'
   -with widget_class = 'governance'
     -include 'programs/_controls.haml'
+    -include 'programs/_objectives.haml'
   -#with widget_class = 'programs'
     -#include 'programs/_audit_cycles.haml'
   -with widget_class = 'related programs'
     -include 'base_objects/_more_info.haml'
   -for extension in controller.extension_content(instance)
     -include extension
-

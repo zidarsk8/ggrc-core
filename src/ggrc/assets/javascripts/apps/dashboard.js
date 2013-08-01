@@ -145,7 +145,7 @@ var model_descriptors = {
     , widget_view : "/static/mustache/systems/object_widget.mustache"
   }
   , "sectionslug" : {
-    model : CMS.Models.SectionSlug
+    model : CMS.Models.Section
     , object_type : "section"
     , object_route : "sections"
     , object_category : "governance"
@@ -202,6 +202,7 @@ $(function() {
       $area.cms_controllers_dashboard({
           model_descriptors: model_descriptors
         , menu_tree_spec: dashboard_menu_spec
+        , default_widgets: ['program']
         })
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({

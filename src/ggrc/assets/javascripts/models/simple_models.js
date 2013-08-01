@@ -52,8 +52,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , update : "PUT /api/directives/{id}"
   , destroy : "DELETE /api/directives/{id}"
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
-    //, program : "CMS.Models.Program.model"
+    sections : "CMS.Models.Section.models"
+    , program : "CMS.Models.Program.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -128,8 +128,8 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     kind : "Regulation"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
-    //, program : "CMS.Models.Program.model"
+    sections : "CMS.Models.Section.models"
+    , program : "CMS.Models.Program.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -152,8 +152,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     kind : "Company Policy"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
-    //, program : "CMS.Models.Program.model"
+    sections : "CMS.Models.Section.models"
+    , program : "CMS.Models.Program.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -176,8 +176,8 @@ CMS.Models.Directive("CMS.Models.Contract", {
     kind : "Contract"
   }
   , attributes : {
-    sections : "CMS.Models.SectionSlug.models"
-    //, program : "CMS.Models.Program.model"
+    sections : "CMS.Models.Section.models"
+    , program : "CMS.Models.Program.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -647,17 +647,62 @@ can.Model.Cacheable("CMS.Models.Objective", {
   root_object : "objective"
   , root_collection : "objectives"
   , category : "governance"
-  , findAll : "/api/objectives"
+  , title_singular : "Objective"
+  , title_plural : "Objectives"
+  , findAll : "GET /api/objectives"
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , create_link : true
+    , draw_children : true
+    , start_expanded : false
+    , child_options : [{
+      model : can.Model.Cacheable
+      , property : "business_objects"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }]
+  }
   , links_to : {
+      "Section" : "SectionObjective"
+  }
+  , attributes : {
+      sections : "CMS.Models.Section.models"
+    , section_objectives : "CMS.Models.SectionObjective.models"
+    , controls : "CMS.Models.Control.models"
+    , objective_controls : "CMS.Models.ObjectiveControls.models"
+  }
+  , defaults : {
+    object_objectives : []
   }
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
-}, {});
+}, {
+  init : function() {
+    var that = this;
+    this.attr("business_objects", can.compute(function() {
+      var objs = [], q = new RefreshQueue();
+      can.Observe.startBatch();
+      that.attr("object_objectives").each(function(oc, i) {
+        if(!oc.selfLink) {
+          q.enqueue(oc);
+          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
+        } else {
+          objs.push(oc.objectiveable);
+        }
+      });
+      q.trigger().done(function() {
+        can.Observe.stopBatch();
+      });
+      return objs;
+    }));
+
+  }
+});
 
 can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
@@ -697,14 +742,22 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
 };
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
-  var model = CMS.Models[object_type]
-    , params = {}
-    ;
+  var model, params = {}, instance = null;
+
+  if(typeof object_type === "object") {
+    //assume we only passed in params_or_object
+    params_or_object = object_type;
+    object_type = params_or_object.type;
+    object_id = params_or_object.id;
+  }
+
+  model = CMS.Models[object_type]
 
   if (!model)
     return null;
 
-  params.id = object_id;
+  if (!object_id)
+    return null;
 
   if (!!params_or_object) {
     if ($.isFunction(params_or_object.serialize))
@@ -713,7 +766,18 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
       $.extend(params, params_or_object || {});
   }
 
-  return model.findInCacheById(object_id) || new model(params)
+  instance = model.findInCacheById(object_id);
+  if (!instance) {
+    if (params.selfLink) {
+      params.id = object_id;
+      instance = new model(params);
+    } else
+      instance = new model({
+          id: object_id
+        , href: (params_or_object || {}).href
+        });
+  }
+  return instance;
 };
 
 CMS.Models.get_link_type = function(instance, attr) {

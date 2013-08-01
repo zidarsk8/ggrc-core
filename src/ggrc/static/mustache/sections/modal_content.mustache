@@ -1,62 +1,83 @@
 {{!div class="modal-body"}}
+
 {{#instance}}
 <form action="javascript://">
   {{{ handle_context }}}
   <div class="row-fluid">
-    <div class="span2">
-      {{#with_page_object_as "page_object"}}
-      <label for="section-directive_id">Regulation</label>
-      <input id="directive.id" name="directive.id" type="hidden" value="{{page_object.id}}">
-      {{page_object.slug}}
-      <span class="help-inline">
-      </span>
-      {{/with_page_object_as}}
+    <div class="span6">
+      <label>
+        Title
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Enter Title"></i>
+      </label>
+      <input id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
     </div>
-    <div class="span3">
-      <label for="section-code">Code (autofill)</label>
-      <input class="span12" id="section-code" name="slug" placeholder="SECTION-XXXX" type="text" value="{{slug}}">
-      <span class="help-inline">
-      </span>
-
+    {{#with_page_object_as "page_object"}}
+      <div class="span6">
+        <label>
+          Directive
+          <i class="grcicon-help-black" rel="tooltip" title="Contract, Policy or Regulation Code"></i>
+        </label>
+        <input id="directive.id" name="directive.id" type="hidden" value="{{page_object.id}}">
+        <p class="modal-value">
+          {{page_object.title}}
+        </p>
+      </div>
+    {{/with_page_object_as}}
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <label>
+        Text of Section/Clause
+        <i class="grcicon-help-black" rel="tooltip" title="Enter text of section or clause"></i>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of section or clause">{{{description}}}</textarea>
+      </div>
     </div>
   </div>
   <div class="row-fluid">
     <div class="span12">
-      <label for="section-title">Title</label>
-      <input class="span12" id="section-title" name="title" placeholder="Title" type="text" value="{{title}}">
-      <span class="help-inline">
-      </span>
-
+      <div class="expand-link">
+        <a class="show-hidden-fields" href="javascript://">
+          <span class="out">
+            <i class="grcicon-show"></i>
+            Show 
+          </span>
+          <span class="in">
+            <i class="grcicon-hide"></i>
+            Hide
+          </span>
+          Advanced
+          <span class="hidden-fields out">
+            Code, Abstract
+          </span>
+        </a>
+      </div>
     </div>
   </div>
-  <div class="row-fluid">
-    <label for="section-description">Text of Section:</label>
-  </div>
-  <div class="row-fluid" control-group="">
-    <div class="span12 wysiwyg-area">
-      <textarea class="span12 double wysihtml5" id="section-description" name="description" rows="4" placeholder="">{{{description}}}</textarea>
+  <div class="hidden-fields-area" style="display:none">
+    <div class="row-fluid">
+      <div class="span3">
+        <label>
+          Code
+          <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
+        </label>
+        <input id="section-code" class="input-block-level" name="slug" placeholder="SECTION-XXX" type="text" value="{{slug}}">
+      </div>
     </div>
-
     <div class="row-fluid">
       <div class="span12">
-        <label for="section-url">URL for this section (optional)</label>
-        <input class="span12" id="section-link" name="url" placeholder="http://" type="text" value="{{url}}">
-        <span class="help-inline">
-        </span>
-
-      </div>
-    </div>
-    <div class="row-fluid">
-      <label for="section-notes">Abstract</label>
-    </div>
-    <div class="row-fluid" control-group="">
-      <div class="span12 wysiwyg-area ui-resizable" id="ui-id-3">
-        <textarea class="span12 double wysihtml5" id="section-notes" name="notes" rows="4" placeholder="">{{{notes}}}</textarea>
-
-        <div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div></div>
+        <label>
+          Abstract
+          <i class="grcicon-help-black" rel="tooltip" title="Section/Clause content in short"></i>
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="section-notes" class="span12 double wysihtml5" name="notes" placeholder="Describe content of a section/clause in short">{{{notes}}}</textarea>
+        </div>
       </div>
     </div>
   </div>
-{{/instance}}
 </form>
+{{/instance}}
 {{!/div}}

@@ -135,7 +135,10 @@ function collated_user_roles_by_person(user_roles) {
   }
 
   function remove_user_role(user_role) {
-    var roles, role_index;
+    var roles, role_index
+      , person_index_to_remove = null
+      ;
+
     can.each(person_roles, function(data, index) {
       if (user_role.person.id == data.person.id) {
         roles = person_roles.attr(index).attr('roles');
@@ -143,10 +146,12 @@ function collated_user_roles_by_person(user_roles) {
         if (role_index > -1) {
           roles.splice(role_index, 1);
           if (roles.length == 0)
-            person_roles.splice(index, 1);
+            person_index_to_remove = index;
         }
       }
     });
+    if (person_index_to_remove)
+      person_roles.splice(person_index_to_remove, 1);
   }
 
   CMS.Models.UserRole.bind("created", function(ev, user_role) {
@@ -218,6 +223,7 @@ $(function() {
   $.when(
     CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ "directive.program_directives.program_id" : program_id })
+    , CMS.Models.Control.findAll({ "program_controls.program_id" : program_id })
   ).done(function(cats, ctls) {
     var uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
@@ -262,6 +268,34 @@ $(function() {
       ));
     });
   });
+  /*
+  CMS.Models.Control
+    .findAll({ "directive.program_directives.program_id" : program_id })
+    .done(function(s) {
+      $controls_tree.cms_controllers_tree_view({
+          model : CMS.Models.Control
+        //, edit_sections : true
+        , list : s
+        , list_view : "/static/mustache/controls/tree.mustache"
+        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+      });
+    });
+  */
+
+  var $objectives_tree = $("#objectives .tree-structure").append(
+    $(new Spinner().spin().el).css(spin_opts));
+
+  CMS.Models.Objective
+    .findAll({ "section_objectives.section.directive.program_directives.program_id" : program_id })
+    .done(function(s) {
+      $objectives_tree.cms_controllers_tree_view({
+          model : CMS.Models.Objective
+        //, edit_sections : true
+        , list : s
+        , list_view : "/static/mustache/objectives/tree.mustache"
+        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+      });
+    });
 
   var directives_by_type = {
     regulation : []
@@ -294,10 +328,11 @@ $(function() {
 
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.Directive
+      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list : d
       , list_view : "/static/mustache/directives/tree.mustache"
       , child_options : [{
-        model : CMS.Models.SectionSlug
+        model : CMS.Models.Section
         , parent_find_param : "directive.id"
         , find_params : { "parent_id__null" : true }
       }]

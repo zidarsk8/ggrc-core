@@ -23,8 +23,11 @@ from .facility import Facility
 from .help import Help
 from .market import Market
 from .meeting import Meeting
+from .object_control import ObjectControl
 from .object_document import ObjectDocument
+from .object_objective import ObjectObjective
 from .object_person import ObjectPerson
+from .object_section import ObjectSection
 from .objective import Objective
 from .objective_control import ObjectiveControl
 from .option import Option
@@ -76,8 +79,11 @@ all_models = [
   Meeting,
   Objective,
   ObjectiveControl,
+  ObjectControl,
   ObjectDocument,
+  ObjectObjective,
   ObjectPerson,
+  ObjectSection,
   Option,
   OrgGroup,
   PbcList,

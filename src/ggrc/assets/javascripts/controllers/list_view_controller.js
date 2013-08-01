@@ -176,7 +176,7 @@ can.Control("GGRC.Controllers.ListView", {
     var that = this;
     if(list) {
       this.options.list = list;
-      this.options.list.bind("change", this.proxy("update_count"));
+      this.on();
     }
     can.view(this.options.list_view, this.options, function(frag) {
       that.element

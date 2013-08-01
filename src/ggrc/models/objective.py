@@ -14,10 +14,16 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
 
   notes = db.Column(db.Text)
-  section_objectives = db.relationship('SectionObjective', backref='objective')
-  sections = association_proxy('section_objectives', 'section', 'SectionObjective')
-  objective_controls = db.relationship('ObjectiveControl', backref='objective')
-  controls = association_proxy('objective_controls', 'control', 'ObjectiveControl')
+  section_objectives = db.relationship(
+      'SectionObjective', backref='objective')
+  sections = association_proxy(
+      'section_objectives', 'section', 'SectionObjective')
+  objective_controls = db.relationship(
+      'ObjectiveControl', backref='objective')
+  controls = association_proxy(
+      'objective_controls', 'control', 'ObjectiveControl')
+  object_objectives = db.relationship(
+      'ObjectObjective', backref='objective', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'notes',
@@ -25,6 +31,7 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
       'sections',
       PublishOnly('objective_controls'),
       'controls',
+      'object_objectives',
       ]
 
   @classmethod
@@ -34,4 +41,5 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
     query = super(Objective, cls).eager_query()
     return query.options(
         orm.subqueryload_all('section_objectives.section'),
-        orm.subqueryload_all('objective_controls.control'))
+        orm.subqueryload_all('objective_controls.control'),
+        orm.subqueryload_all('object_objectives'))

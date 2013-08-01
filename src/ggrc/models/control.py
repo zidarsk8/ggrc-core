@@ -64,14 +64,22 @@ class Control(
       primaryjoin='and_(foreign(Control.verify_frequency_id) == Option.id, '\
                   'Option.role == "verify_frequency")',
       uselist=False)
-  program_controls = db.relationship('ProgramControl', backref='control', cascade='all, delete-orphan')
-  programs = association_proxy('program_controls', 'program', 'ProgramControl')
-  system_controls = db.relationship('SystemControl', backref='control', cascade='all, delete-orphan')
-  systems = association_proxy('system_controls', 'system', 'SystemControl')
-  control_sections = db.relationship('ControlSection', backref='control', cascade='all, delete-orphan')
-  sections = association_proxy('control_sections', 'section', 'ControlSection')
-  objective_controls = db.relationship('ObjectiveControl', backref='control')
-  objectives = association_proxy('objective_controls', 'objective', 'ObjectiveControl')
+  program_controls = db.relationship(
+      'ProgramControl', backref='control', cascade='all, delete-orphan')
+  programs = association_proxy(
+      'program_controls', 'program', 'ProgramControl')
+  system_controls = db.relationship(
+      'SystemControl', backref='control', cascade='all, delete-orphan')
+  systems = association_proxy(
+      'system_controls', 'system', 'SystemControl')
+  control_sections = db.relationship(
+      'ControlSection', backref='control', cascade='all, delete-orphan')
+  sections = association_proxy(
+      'control_sections', 'section', 'ControlSection')
+  objective_controls = db.relationship(
+      'ObjectiveControl', backref='control')
+  objectives = association_proxy(
+      'objective_controls', 'objective', 'ObjectiveControl')
   control_controls = db.relationship(
       'ControlControl',
       foreign_keys='ControlControl.control_id',
@@ -88,9 +96,13 @@ class Control(
       )
   implementing_controls = association_proxy(
       'implementing_control_controls', 'control', 'ControlControl')
-  control_risks = db.relationship('ControlRisk', backref='control', cascade='all, delete-orphan')
+  control_risks = db.relationship(
+      'ControlRisk', backref='control', cascade='all, delete-orphan')
   risks = association_proxy('control_risks', 'risk', 'ControlRisk')
-  control_assessments = db.relationship('ControlAssessment', backref='control', cascade='all, delete-orphan')
+  control_assessments = db.relationship(
+      'ControlAssessment', backref='control', cascade='all, delete-orphan')
+  object_controls = db.relationship(
+      'ObjectControl', backref='control', cascade='all, delete-orphan')
 
   # REST properties
   _publish_attrs = [
@@ -124,6 +136,7 @@ class Control(
       PublishOnly('implementing_control_controls'),
       PublishOnly('system_controls'),
       PublishOnly('program_controls'),
+      'object_controls',
       ]
 
   @classmethod
@@ -143,4 +156,5 @@ class Control(
         orm.subqueryload_all('control_controls.implemented_control'),
         orm.subqueryload_all('implementing_control_controls.control'),
         orm.subqueryload_all('control_risks.risk'),
-        orm.subqueryload_all('control_assessments'))
+        orm.subqueryload_all('control_assessments'),
+        orm.subqueryload('object_controls'))

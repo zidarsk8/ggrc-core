@@ -371,6 +371,39 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
   return exec();
 });
 
+Mustache.registerHelper("if_match", function(val1, val2, options) {
+  var that = this, _val1, _val2;
+  function exec() {
+    var re = new RegExp(_val2);
+    if(re.test(_val1)) return options.fn(that);
+    else return options.inverse(that);
+  }
+    if(typeof val1 === "function") {
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+    if(typeof val2 === "function") {
+      if(val2.isComputed) {
+        val2.bind("change", function(ev, newVal, oldVal) {
+          _val2 = newVal;
+          exec();
+        });
+      }
+      _val2 = val2.call(this);
+    } else {
+      _val2 = val2;
+    }
+
+  return exec();
+});
+
 Mustache.registerHelper("if_null", function(val1, options) {
   var that = this, _val1;
   function exec() {

@@ -1,26 +1,25 @@
 {{#list}}
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="control">
-    {{#instance}}
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
           <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
-                {{#title}}
-                  {{title}}
-                {{/title}}
-                {{^title}}
-                  {{{firstnonempty description_inline ''}}}
-                {{/title}}
+                {{#if instance.title}}
+                  {{instance.title}}
+                {{/if}}
+                {{^instance.title}}
+                  {{{firstnonempty instance.description_inline ''}}}
+                {{/instance.title}}
               </div>
             </div>
           </div>
           <div class="span1">
             <div class="counter">
-              {{^owner}}
+              {{^instance.owner}}
                 <i class="grcicon-people-warning"></i>
-              {{/owner}}
+              {{/instance.owner}}
             </div>
           </div>
           <div class="span1">
@@ -45,13 +44,13 @@
           <div class="span8">
             <div class="tree-info">
               <strong>Owner:</strong>
-              {{^owner}}
+              {{^instance.owner}}
                 <span class="error">
                   Not Assigned
                 </span>
-              {{/owner}}
-              {{#if owner}}
-                {{owner.name}}
+              {{/instance.owner}}
+              {{#if instance.owner}}
+                {{instance.owner.name}}
               {{/if}}
             </div>
           </div>
@@ -62,34 +61,64 @@
           <div class="span8">
             <div class="tree-info">
               <strong>URL:</strong>
-              {{^if_null url}}
-                <a class="url" href="{{url}}">
-                  {{url}}
+              {{^if_null instance.url}}
+                <a class="url" href="{{instance.url}}">
+                  {{instance.url}}
                 </a>
               {{/if_null}}
-              {{#if_null url}}
+              {{#if_null instance.url}}
                 <i>No URL</i>
               {{/if_null}}
             </div>
           </div>
           <div class="span4">
-            <a href="/controls/{{id}}" class="info-action pull-right" rel="tooltip" title="View Control" data-placement="left">
+            <a href="/controls/{{instance.id}}" class="info-action pull-right" rel="tooltip" title="View Control" data-placement="left">
               <i class="grcicon-goto"></i>
               View
             </a>
           </div>
         </div>
       </div>
+
+      {{#if draw_children}}
+        {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+          <div class="inner-tree">
+            {{#child_options}}
+              <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options}}
+          </div>
+        {{/if_null}}
+      {{/if}}
+
     </div>
-    {{/instance}}
   </li>
 {{/list}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
-      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#category_controls, #combo" data-route="category_controls" data-modal-class="modal-wide" data-object-singular="Control" data-object-plural="controls">
+
+      <a href="javascript://" class="section-add">
         + Control
       </a>
+      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections">
+        <i class="grcicon-add-black"></i>
+        Create Control
+      </a>
+      &nbsp;
+      &nbsp;
+      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
+        <a href="/directives/{{parent_instance.id}}/import_controls" class="section-import">
+          <i class="grcicon-imp-exp"></i>
+          Import Controls
+        </a>
+        &nbsp;
+        &nbsp;
+        <a href="/directives/{{parent_instance.id}}/export_controls" class="section-import">
+          <i class="grcicon-imp-exp"></i>
+          Export Controls
+        </a>
+      {{/if_match}}
     </div>
   </div>
 </li>

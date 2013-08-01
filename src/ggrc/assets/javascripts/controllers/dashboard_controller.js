@@ -29,6 +29,7 @@ can.Control("CMS.Controllers.Dashboard", {
         this.init_add_widget();
       if (!this.widget_area_controller)
         this.init_widget_area();
+      this.init_default_widgets();
     }
 
   , init_widget_area: function() {
@@ -83,6 +84,18 @@ can.Control("CMS.Controllers.Dashboard", {
       this.options.menu_tree = menu_tree;
     }
 
+  , init_default_widgets: function() {
+      var that = this
+        ;
+
+      can.each(this.options.default_widgets, function(name) {
+        var descriptor = that.options.widget_descriptors[name]
+          ;
+
+        that.add_dashboard_widget_from_descriptor(descriptor);
+      });
+    }
+
   , " widgets_updated" : "update_inner_nav"
 
   , " inner_nav_sort_updated": function(el, ev, widget_ids) {
@@ -121,18 +134,20 @@ can.Control("CMS.Controllers.Dashboard", {
       // Construct the final descriptor from one or more arguments
       can.each(arguments, function(name_or_descriptor) {
         if (typeof(name_or_descriptor) === "string")
-          name_or_descriptor = that.widget_descriptors[name_or_descriptor];
+          name_or_descriptor =
+            that.options.widget_descriptors[name_or_descriptor];
         $.extend(descriptor, name_or_descriptor || {});
       });
 
       // Create widget in container?
       //return this.options.widget_container[0].add_widget(descriptor);
 
-      // FIXME: This should be in some Widget superclass
-      if (descriptor.widget_guard && !descriptor.widget_guard())
+      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0)
         return;
 
-      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0)
+      // FIXME: This should be in some Widget superclass
+      if (descriptor.controller_options.widget_guard
+          && !descriptor.controller_options.widget_guard())
         return;
 
       var $element = $("<section class='widget'>")
@@ -146,7 +161,11 @@ can.Control("CMS.Controllers.Dashboard", {
         , $last_widget = $container.find('section.widget').last()
         ;
 
-      $last_widget.after($element);
+      if ($last_widget.length > 0)
+        $last_widget.after($element);
+      else
+        $container.append($element);
+
       $element
         .trigger("sortreceive")
         .trigger("section_created")
@@ -155,12 +174,21 @@ can.Control("CMS.Controllers.Dashboard", {
       return control;
     }
 
-  , add_dashboard_widget_from_descriptor: function (descriptor) {
+  , add_dashboard_widget_from_descriptor: function(descriptor) {
       return this.add_widget_from_descriptor({
         controller: CMS.Controllers.DashboardWidgets,
-        controller_options: descriptor
+        controller_options: $.extend(descriptor, { dashboard_controller: this })
       });
     }
+
+  , add_dashboard_widget_from_name: function(name) {
+      var descriptor = this.options.widget_descriptors[name];
+      if (!descriptor)
+        console.debug("Unknown descriptor: ", name);
+      else
+        return this.add_dashboard_widget_from_descriptor(descriptor);
+    }
+
 
   , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
       return {

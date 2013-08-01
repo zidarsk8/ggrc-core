@@ -43,16 +43,18 @@ can.Control("CMS.Controllers.SortableWidgets", {
       firstchild || (firstchild = $("#" + id));
       var $widget = $("#" + id).detach();
       if(!$widget.length) {
-        that.options.dashboard_controller.add_widget_controller.addWidgetByName(
+        that.options.dashboard_controller.add_dashboard_widget_from_name(
           id.substr(0, id.indexOf("_widget")));
         $widget = $("#" + id);
       }
-      $widget.appendTo(that.element);
+      $widget.css("display", "none").appendTo(that.element);
       //add this widget to the inner nav list
     });
-    if(firstchild) {
-      firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
-    }
+    this.apply_widget_sort(this_sort);
+    this.element.find('section').css("display", "block").trigger('min_size');
+    //if(firstchild) {
+    //  firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
+    //}
 
     this.sortable().sortable("refresh");
     // FIXME: Is `this.is_initialized` necessary anymore?

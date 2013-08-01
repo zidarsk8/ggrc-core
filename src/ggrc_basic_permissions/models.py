@@ -63,3 +63,11 @@ class UserRole(Base, db.Model):
     print 'role_assignments_for', assignments_by_user
     return assignments_by_user
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(UserRole, cls).eager_query()
+    return query.options(
+        orm.subqueryload('role'),
+        orm.subqueryload('person'))

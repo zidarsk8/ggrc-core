@@ -95,7 +95,7 @@
           can.map(self.join_list, function(join) {
             return new can.Observe({
               option: CMS.Models.get_instance(
-                CMS.Models.get_link_type(join, self.options.option_attr),
+                self.options.option_model.shortName || CMS.Models.get_link_type(join, self.options.option_attr),
                 join[self.options.option_id_field] || join[self.options.option_attr].id)
             , join: join
             });
@@ -288,13 +288,19 @@
 
     get_new_join: function(option_id, option_type) {
       var join_params = {};
-      join_params[this.options.option_id_field] = option_id;
+      join_params[this.options.option_attr] = {}
+      join_params[this.options.option_attr].id = option_id;
+      //join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
-        join_params[this.options.option_type_field] = option_type;
+        join_params[this.options.option_attr].type = option_type;
+        //join_params[this.options.option_type_field] = option_type;
       }
-      join_params[this.options.join_id_field] = this.get_join_object_id();
+      join_params[this.options.join_attr] = {}
+      join_params[this.options.join_attr].id = this.get_join_object_id();
+      //join_params[this.options.join_id_field] = this.get_join_object_id();
       if (this.options.join_type_field) {
-        join_params[this.options.join_type_field] = this.get_join_object_type();
+        join_params[this.options.join_attr].type = this.get_join_object_type();
+        //join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       // FIXME: context_id must get a real value
       $.extend(join_params, this.options.extra_join_fields, { context: { id: null } });
@@ -438,6 +444,7 @@
         join_model: CMS.Models.ProgramDirective,
 
         option_attr: 'directive',
+        join_attr: 'program',
         option_id_field: 'directive_id',
         option_type_field: 'directive_type',
         join_id_field: 'program_id',
@@ -445,6 +452,34 @@
 
         join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
       }
+
+      , section_objectives : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Objective",
+        modal_title: "Select Objectives",
+
+        related_model_singular: "Objective",
+        related_table_plural: "objectives",
+        related_title_singular: "Objective",
+        related_title_plural: "Objectives",
+
+        object_model: CMS.Models.Section,
+        option_model: CMS.Models.Objective,
+        join_model: CMS.Models.SectionObjective,
+
+        option_attr: 'objective',
+        join_attr: 'section',
+        option_id_field: 'objective_id',
+        //option_type_field: 'objective_type',
+        join_id_field: 'section_id',
+        join_type_field: null,
+
+        join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
+      }
+
       , risk_controls : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -461,10 +496,11 @@
         option_model: CMS.Models.Control,
         join_model: CMS.Models.RiskControl,
 
-        option_attr: 'directive',
-        option_id_field: 'directive_id',
-        option_type_field: 'directive_type',
-        join_id_field: 'program_id',
+        option_attr: 'control',
+        join_attr: 'risk',
+        option_id_field: 'control_id',
+        option_type_field: 'control_type',
+        join_id_field: 'risk_id',
         join_type_field: null,
 
         join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
@@ -516,11 +552,15 @@
       options.join_object_type = data.join_object_type;
     } else {
       options.join_object = get_page_object();
+      options.join_object_id = options.join_object.id;
+      options.join_object_type = options.join_object_type;
     }
 
     options.extra_join_fields = {
       relationship_type_id: data.relationship_type
     };
+
+    options.extra_join_fields[options.option_type_field] = options.option_model.shortName;
 
 
     return options;
@@ -576,6 +616,324 @@
 
       // Trigger the controller
       GGRC.Controllers.ModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
+    });
+  });
+
+
+  can.Control("GGRC.Controllers.MultitypeModalSelector", {
+      defaults: {
+          option_type_menu: null
+        , option_descriptors: null
+        , base_modal_view: "/static/mustache/selectors/multitype_base_modal.mustache"
+        , object_detail_view: "/static/mustache/selectors/multitype_object_detail.mustache"
+        , option_type: null
+        , option_model: null
+        , object_model: null
+        , join_model: null
+      }
+    , launch: function($trigger, options) {
+        // Extract parameters from data attributes
+
+        var href = $trigger.attr('data-href') || $trigger.attr('href')
+          , modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '')
+          , $target = $('<div id="' + modal_id + '" class="modal modal-selector hide"></div>')
+          ;
+
+        $target.modal_form({}, $trigger);
+        this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
+        return $target;
+      }
+  }, {
+      init: function() {
+        this.object_list = new can.Observe.List();
+        this.option_list = new can.Observe.List();
+        this.join_list = new can.Observe.List();
+        this.active_list = new can.Observe.List();
+
+        this.init_menu();
+        this.init_context();
+        this.set_option_descriptor(this.options.default_option_descriptor);
+        this.init_bindings();
+        this.init_view();
+        this.init_data()
+      }
+
+    , init_menu: function() {
+        var menu;
+
+        if (!this.options.option_type_menu) {
+          menu = [
+            { category: "Assets/Business"
+            , items: []
+            }];
+          menu[0].items = can.map(this.options.option_descriptors, function(descriptor) {
+            return {
+                model_name: descriptor.model.shortName
+              , model_display: descriptor.model.title_plural
+            };
+          });
+
+          this.options.option_type_menu = menu;
+        }
+      }
+
+    , init_bindings: function() {
+      }
+
+    , init_view: function() {
+        var self = this
+          , deferred = $.Deferred()
+          ;
+
+        can.view(
+          this.options.base_modal_view,
+          this.context,
+          function(frag) {
+            $(self.element).html(frag);
+            deferred.resolve();
+          });
+
+        // Start listening for events
+        this.on();
+
+        return deferred;
+      }
+
+    , init_data: function() {
+        return $.when(
+          this.refresh_option_list()
+        );
+      }
+
+    , init_context: function() {
+        if (!this.context) {
+          this.context = new can.Observe($.extend({
+            objects: this.object_list,
+            options: this.option_list,
+            joins: this.join_list,
+            actives: this.active_list,
+            selected_object: null,
+            selected_option_type: null,
+            selected_option: null,
+          }, this.options));
+        }
+        return this.context;
+      }
+
+    , refresh_option_list: function() {
+        var self = this
+          ;
+
+        return this.options.option_model.findAll(
+          $.extend({}, this.option_query),
+          function(options) {
+            self.option_list.replace(options)
+          });
+      }
+
+    , set_option_descriptor: function(option_type) {
+        var descriptor = this.options.option_descriptors[option_type]
+          ;
+
+        can.Model.startBatch();
+
+        this.context.attr('selected_option_type', option_type);
+        this.context.attr('option_column_view', descriptor.column_view);
+        this.context.attr('option_detail_view', descriptor.detail_view);
+        this.context.attr('option_descriptor', descriptor);
+        this.context.attr('selected_option', null);
+        this.options.option_model = descriptor.model;
+
+        this.refresh_option_list().always(function() {
+          can.Model.stopBatch();
+        });
+      }
+
+    , on_select_option_type: function(el, ev) {
+        this.set_option_descriptor($(el).val());
+      }
+
+    , "select.option-type-selector change": "on_select_option_type"
+
+    , "{selected_object_type} change": "refresh_option_list"
+
+    , ".option_column li click": "on_select_option"
+
+    , on_select_option: function(el) {
+        el.closest('.option_column').find('li').removeClass('selected');
+        el.addClass('selected');
+        this.context.attr('selected_option', el.data('option'));
+      }
+
+    , ".map-button click": "on_map"
+
+    , on_map: function(el, ev) {
+        var that = this
+          ;
+
+        this.create_join()
+          .done(function() {
+            $(that.element).modal_form('hide');
+          })
+          .fail(function() {
+            //alert("Fail");
+          });
+      }
+
+    , create_join: function() {
+        if (this.context.selected_option) {
+          join = this.context.option_descriptor.get_new_join(
+              this.context.selected_object, this.context.selected_option, null);
+          //join = this.get_new_join(this.context.selected_option);
+          return join.save();
+        } else {
+          return (new $.Deferred()).reject();
+        }
+      }
+  });
+
+  ModalOptionDescriptor = can.Construct({
+      model : "DataAsset"
+    , model_display : "Data Assets"
+    , join_model : "ObjectObjective"
+    , join_option_attr : "objectiveable"
+    , column_view : GGRC.mustache_path + "/selectors/option_column.mustache"
+    , detail_view : GGRC.mustache_path + "/selectors/multitype_option_detail.mustache"
+
+    , from_join_model: function(join_model, join_option_attr, model, options) {
+        join_model = this.get_model(join_model);
+        model = this.get_model(model);
+
+        // The 'object_attr' is the join key that is *not* the 'option_attr'
+        join_object_attr = can.map(join_model.join_keys, function(v, k) {
+          if (k !== join_option_attr)
+            return k;
+        })[0];
+
+        // Detect polymorphic join attrs
+        if (this.model === can.Model.Cacheable)
+          console.error("Polymorphic joins must have explicit target models");
+
+        return this({
+            join_model: join_model
+          , join_model_name: join_model.shortName
+          , join_option_attr: join_option_attr
+          , join_object_attr: join_object_attr
+          , model: model
+          , model_display: model.title_plural
+        }, {});
+      }
+
+    , get_model: function(model) {
+        if (model.shortName)
+          return model;
+        else if (CMS.Models[model])
+          return CMS.Models[model];
+        else
+          console.error("Unknown model: ", model);
+      }
+
+    , get_new_join: function(object, option, context_id) {
+        var join_params = {};
+
+        join_params[this.join_option_attr] = {};
+        join_params[this.join_option_attr].id = option.id;
+        join_params[this.join_option_attr].type = option.constructor.getRootModelName();
+        join_params[this.join_object_attr] = {};
+        join_params[this.join_object_attr].id = object.id;
+        join_params[this.join_object_attr].type = object.constructor.getRootModelName();
+        join_params.context = { id: context_id };
+        return new (this.join_model)(join_params);
+      }
+  }, {});
+
+  function make_join_model_modal_option_descriptors(join_model, join_option_attr, models) {
+    var descriptors = {};
+    if (!(models instanceof Array))
+      models = [models];
+
+    can.each(models, function(model) {
+      var descriptor = ModalOptionDescriptor.from_join_model(
+        join_model, join_option_attr, model);
+      descriptors[descriptor.model.shortName] = descriptor;
+    });
+    return descriptors;
+  }
+
+  var join_descriptors = {
+      "Section": {
+        object_model: "Section"
+      , default_option_descriptor: "DataAsset"
+      , option_descriptors: $.extend({},
+            make_join_model_modal_option_descriptors(
+              "ObjectSection", "sectionable",
+              [
+                "DataAsset", "Facility", "Market", "OrgGroup",
+                "Process", "Product", "Project", "System"
+              ])
+          )
+      }
+
+    , "Control": {
+        object_model: "Control"
+      , default_option_descriptor: "DataAsset"
+      , option_descriptors: $.extend({},
+            make_join_model_modal_option_descriptors(
+              "ObjectControl", "controllable",
+              [
+                "DataAsset", "Facility", "Market", "OrgGroup",
+                "Process", "Product", "Project", "System"
+              ])
+          )
+      }
+
+    , "Objective": {
+        object_model: "Objective"
+      , default_option_descriptor: "DataAsset"
+      , option_descriptors: $.extend({},
+            make_join_model_modal_option_descriptors(
+              "ObjectObjective", "objectiveable",
+              [
+                "DataAsset", "Facility", "Market", "OrgGroup",
+                "Process", "Product", "Project", "System"
+              ])
+          )
+      }
+    }
+
+  function get_multitype_option_set(name, data) {
+    return $.extend({}, join_descriptors[name]);
+  }
+
+  $(function() {
+    $('body').on('click', '[data-toggle="multitype-modal-selector"]', function(e) {
+      var $this = $(this)
+        , options
+        , data_set = can.extend({}, $this.data())
+        ;
+
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
+      //if (typeof(options) === "string")
+      options = get_multitype_option_set(
+        data_set.join_object_type, data_set);
+      //  );
+
+      //options = $.extend({}, join_descriptors.objective_objects);
+      options.selected_object = CMS.Models.get_instance(
+          data_set.join_object_type, data_set.join_object_id);
+
+      e.preventDefault();
+
+      // Trigger the controller
+      GGRC.Controllers.MultitypeModalSelector.launch($this, options)
       .on("relationshipcreated relationshipdestroyed", function(ev, data) {
         $this.trigger("modal:" + ev.type, data);
       });
