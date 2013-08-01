@@ -653,11 +653,31 @@
         this.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
 
+        this.init_menu();
         this.init_context();
         this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
         this.init_data()
+      }
+
+    , init_menu: function() {
+        var menu;
+
+        if (!this.options.option_type_menu) {
+          menu = [
+            { category: "Assets/Business"
+            , items: []
+            }];
+          menu[0].items = can.map(this.options.option_descriptors, function(descriptor) {
+            return {
+                model_name: descriptor.model.shortName
+              , model_display: descriptor.model.title_plural
+            };
+          });
+
+          this.options.option_type_menu = menu;
+        }
       }
 
     , init_bindings: function() {
@@ -844,54 +864,54 @@
   }
 
   var join_descriptors = {
-      section_objects: {
+      "Section": {
+        object_model: "Section"
+      , default_option_descriptor: "DataAsset"
+      , option_descriptors: $.extend({},
+            make_join_model_modal_option_descriptors(
+              "ObjectSection", "sectionable",
+              [
+                "DataAsset", "Facility", "Market", "OrgGroup",
+                "Process", "Product", "Project", "System"
+              ])
+          )
       }
 
-    , objective_objects: {
-        model: "ObjectObjective"
-      , object_model: "Objective"
-      , join_model: "ObjectObjective"
-
+    , "Control": {
+        object_model: "Control"
       , default_option_descriptor: "DataAsset"
-      , option_type_menu: [
-            { category: "Assets/Business"
-            , items: [
-                { model_name: "DataAsset", model_display: "Data Assets" }
-              , { model_name: "Facility", model_display: "Facilities" }
-              , { model_name: "Market", model_display: "Markets" }
-              , { model_name: "OrgGroup", model_display: "Org Groups" }
-              , { model_name: "Process", model_display: "Processes" }
-              , { model_name: "Product", model_display: "Products" }
-              , { model_name: "Project", model_display: "Projects" }
-              , { model_name: "System", model_display: "Systems" }
-              ]
-            }
-          , { category: "Governance"
-            , items: [
-                { model_name: "Section", model_display: "Sections" }
-              , { model_name: "Control", model_display: "Controls" }
-              ]
-            }
-          ]
-      , option_descriptors: $.extend(
+      , option_descriptors: $.extend({},
+            make_join_model_modal_option_descriptors(
+              "ObjectControl", "controllable",
+              [
+                "DataAsset", "Facility", "Market", "OrgGroup",
+                "Process", "Product", "Project", "System"
+              ])
+          )
+      }
+
+    , "Objective": {
+        object_model: "Objective"
+      , default_option_descriptor: "DataAsset"
+      , option_descriptors: $.extend({},
             make_join_model_modal_option_descriptors(
               "ObjectObjective", "objectiveable",
               [
                 "DataAsset", "Facility", "Market", "OrgGroup",
                 "Process", "Product", "Project", "System"
               ])
-          , make_join_model_modal_option_descriptors(
-              "SectionObjective", "section", ["Section"])
-          , make_join_model_modal_option_descriptors(
-              "ObjectiveControl", "control", ["Control"])
           )
       }
     }
 
+  function get_multitype_option_set(name, data) {
+    return $.extend({}, join_descriptors[name]);
+  }
+
   $(function() {
     $('body').on('click', '[data-toggle="multitype-modal-selector"]', function(e) {
       var $this = $(this)
-        , options = $this.data('modal-selector-options')
+        , options
         , data_set = can.extend({}, $this.data())
         ;
 
@@ -901,13 +921,12 @@
           delete data_set[k];
       });
 
-      /*if (typeof(options) === "string")
-        options = get_option_set(
-          options
-          , data_set
-        );*/
+      //if (typeof(options) === "string")
+      options = get_multitype_option_set(
+        data_set.join_object_type, data_set);
+      //  );
 
-      options = $.extend({}, join_descriptors.objective_objects);
+      //options = $.extend({}, join_descriptors.objective_objects);
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
 

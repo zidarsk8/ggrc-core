@@ -38,6 +38,19 @@ can.Model.Cacheable("CMS.Models.Section", {
     }, {
       model : CMS.Models.Section
       , property : "children"
+    }, {
+        model : null
+      , list_title : "Objects"
+      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
+      , list_loader : function(object) {
+          return CMS.Models.ObjectSection
+            .findAll({section_id: object.id})
+            .then(function(linked_objects) {
+              return can.map(linked_objects, function(join) {
+                return join.sectionable;
+              });
+            });
+        }
     }]
   }
   , defaults : {

@@ -660,6 +660,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , start_expanded : false
     , child_options : [{
         model : null
+      , list_title : "Objects"
       , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
       , list_loader : function(objective) {
           return CMS.Models.ObjectObjective

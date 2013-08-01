@@ -83,7 +83,7 @@
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
             {{#child_options}}
-              <h6>Objects</h6>
+              <h6>{{firstnonempty list_title model.title_plural}} ({{list.length}})</h6>
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
@@ -103,9 +103,7 @@
     data-toggle="modal-selector"
     data-modal-selector-options="section_objectives"
     data-modal-class="modal-wide"
-    xdata-modal-reset="reset"
     data-original-title="Link {{model.title_singular.toLowerCase}} to this object"
-    xdata-join-object="lookup-tree"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.constructor.shortName}}">
     + {{model.title_singular}}
