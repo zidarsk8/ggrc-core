@@ -1,19 +1,6 @@
 from .common import *
 from ggrc.models.all_models import *
 
-base_errors = []
-errors = {}
-base_warnings = []
-warnings = {}
-base_messages = []
-messages = {}
-
-def add_error(key, message = None):
-  errors.setdefault(key, []).append(message)
-
-def add_warning(key, message = None):
-  warnings.setdefault(key, []).append(message)
-
 def unpack_list(vals):
   result = []
   for ele in vals:
@@ -56,26 +43,29 @@ class BaseRowConverter(object):
 
     self.handlers = {}
     self.after_save_hooks = []
+    self.errors = {}
+    self.warnings = {}
+    self.messages = {}
 
   def errors_for(self, key):
     error_messages = []
     if self.handlers.get(key) and self.handlers[key].errors:
       error_messages += self.handlers[key].errors
-    error_messages += errors.get(key, []) + (self.obj.errors.get(key,[]) if self.obj else [])
+    error_messages += self.errors.get(key, [])
     return error_messages
 
   def warnings_for(self, key):
     warning_messages = []
     if self.handlers.get(key) and self.handlers[key].warnings:
       warning_messages  += self.handlers[key].warnings
-    warning_messages += errors.get(key, []) + (self.obj.errors.get(key,[]) if self.obj else [])
+    warning_messages += self.errors.get(key, [])
     return warning_messages
 
   def has_errors(self):
-    return any(errors) or any([val.errors for val in self.handlers.values()])
+    return any(self.errors) or any([val.errors for val in self.handlers.values()])
 
   def has_warnings(self):
-    return any(warnings) or any([val.warnings for val in self.handlers.values()])
+    return any(self.warnings) or any([val.warnings for val in self.handlers.values()])
 
   def setup(self):
     pass
@@ -85,7 +75,8 @@ class BaseRowConverter(object):
     pass
 
   def __getitem__(self, key):
-    return self.handlers[key]
+    # Return generic handler if requested one is unavailable
+    return self.handlers.get(key, ColumnHandler(self,''))
 
   def setup(self):
     if self.options.get('export'):
@@ -96,6 +87,7 @@ class BaseRowConverter(object):
 
   def setup_export(self):
     self.attrs['slug'] = self.obj.slug
+    self.options['export'] = True
 
   def clean_attrs(self):
     for k in self.attrs:
@@ -193,13 +185,13 @@ class ColumnHandler(object):
     self.warnings.append(message)
 
   def has_errors(self):
-    return any(self.errors) or self.importer.errors.get(self.key) or self.importer.obj.errors.get(self.key)
+    return any(self.errors) or self.importer.errors.get(self.key)
 
   def has_warnings(self):
     return any(self.warnings) or self.importer.warnings.get(self.key)
 
   def display(self):
-    return getattr(self.importer.obj, self.key, '')
+    return getattr(self.importer.obj, str(self.key), '')
 
   def after_save(self, obj):
     pass
@@ -294,7 +286,7 @@ class DateColumnHandler(ColumnHandler):
     if self.has_errors():
       return self.original
     else:
-      return getattr(self.importer.obj, self.key) if self.importer.obj else ''
+      return getattr(self.importer.obj, self.key) or ''
 
   def export(self):
     date_result = getattr(self.importer.obj, self.key, '')
@@ -331,10 +323,10 @@ class LinksHandler(ColumnHandler):
     self.link_objects[self.link_index] = obj
 
   def has_errors(self):
-    return any(self.errors) or any(self.link_errors.values)
+    return any(self.errors) or any(self.link_errors.values())
 
   def has_warnings(self):
-    return any(self.warnings) or any(self.link_warnings.values)
+    return any(self.warnings) or any(self.link_warnings.values())
 
   def imported_links(self):
     keys = self.link_objects.keys()
@@ -355,8 +347,6 @@ class LinksHandler(ColumnHandler):
   def links_with_details(self):
     details = []
     for index in self.link_values.keys():
-      #obj = self.link_objects[index]
-      #object_errors = obj.errors.fulltext:
       details.append([self.link_status.get(index,''), self.link_objects.get(index,''),
                       self.link_values.get(index,''), self.link_errors.get(index,''),
                       self.link_warnings.get(index,'')])
@@ -434,7 +424,7 @@ class LinksHandler(ColumnHandler):
     return self.join_rendered_items([self.render_item(item) for item in self.get_existing_items()])
 
   def join_rendered_items(self, items):
-    return "\n".join(items)
+    return "\r\n".join(items)
 
   def render_item(self, item):
     return item.slug
