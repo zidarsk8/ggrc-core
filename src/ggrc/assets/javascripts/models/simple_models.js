@@ -674,34 +674,33 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
   }
+  , defaults : {
+    object_objectives : []
+  }
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
 }, {
   init : function() {
+    var that = this;
     this.attr("business_objects", can.compute(function() {
-      var objs = [];
+      var objs = [], q = new RefreshQueue();
+      can.Observe.startBatch();
       that.attr("object_objectives").each(function(oc, i) {
         if(!oc.selfLink) {
-          can.Observe.startBatch();
-          oc.refresh().then(function() {
-            oc.objectiveable.refresh().always(function() {
-              can.Observe.stopBatch();
-            });
-          }, function() {
-            can.Observe.stopBatch();
-          });
+          q.enqueue(oc);
           objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else if(!oc.objectiveable || !oc.objectiveable.selfLink) {
-          oc.objectiveable.refresh();
-          objs.push(oc.objectiveable);
         } else {
           objs.push(oc.objectiveable);
         }
       });
+      q.trigger().done(function() {
+        can.Observe.stopBatch();
+      });
       return objs;
-    }));    
+    }));
+
   }
 });
 

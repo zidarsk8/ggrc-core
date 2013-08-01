@@ -114,7 +114,9 @@ can.Control("CMS.Controllers.TreeView", {
     if(!this.element)
       return;  //controller has been destroyed
     can.Observe.startBatch();
-    this.options.attr("original_list", list);
+    if(!this.options.original_list) {
+      this.options.attr("original_list", list);
+    }
     this.options.attr("list", []);
     this.on();
     refresh_queue = new RefreshQueue();
@@ -159,6 +161,12 @@ can.Control("CMS.Controllers.TreeView", {
         }
       }
     });
+  }
+  , "{original_list} change" : function(list, ev, newVals, index) {
+    var that = this;
+    if(list.isComputed) {
+      this.draw_list(list());
+    }
   }
 
   , ".item-main expand" : function(el, ev) {

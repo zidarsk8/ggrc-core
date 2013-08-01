@@ -83,27 +83,22 @@ can.Model.Cacheable("CMS.Models.Control", {
     });
     this._super();
     this.attr("business_objects", can.compute(function() {
-      var objs = [];
+      var objs = [], q = new RefreshQueue();
+      can.Observe.startBatch();
       that.attr("object_controls").each(function(oc, i) {
         if(!oc.selfLink) {
-          can.Observe.startBatch();
-          oc.refresh().then(function() {
-            oc.controllable.refresh().always(function() {
-              can.Observe.stopBatch();
-            });
-          }, function() {
-            can.Observe.stopBatch();
-          });
+          q.enqueue(oc);
           objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else if(!oc.controllable || !oc.controllable.selfLink) {
-          oc.controllable.refresh();
-          objs.push(oc.controllable);
         } else {
           objs.push(oc.controllable);
         }
       });
+      q.trigger().done(function() {
+        can.Observe.stopBatch();
+      });
       return objs;
     }));
+
   }
 
   , bind_section : function(section) {

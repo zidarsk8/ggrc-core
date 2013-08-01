@@ -24,6 +24,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     , objectives : "CMS.Models.Objective.models"
     , control_sections : "CMS.Models.ControlSection.models"
     , section_objectives : "CMS.Models.SectionObjective.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
   }
   , tree_view_options : {
     list_view : "/static/mustache/sections/tree.mustache"
@@ -43,25 +44,13 @@ can.Model.Cacheable("CMS.Models.Section", {
     }, {
       model : CMS.Models.Section
       , property : "children"
-    }, {
-        model : null
-      , list_title : "Objects"
-      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
-      , list_loader : function(object) {
-          return CMS.Models.ObjectSection
-            .findAll({section_id: object.id})
-            .then(function(linked_objects) {
-              return can.map(linked_objects, function(join) {
-                return join.sectionable;
-              });
-            });
-        }
     }]
   }
   , defaults : {
     children : []
     , controls : []
     , objectives : []
+    , object_sections : []
     , title : ""
     , slug : ""
     , description : ""
@@ -115,7 +104,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   }
   , init : function() {
     this._super.apply(this, arguments);
-    this.tree_view_options.child_options[2].model = this;
+    this.tree_view_options.child_options[3].model = this;
     this.validatePresenceOf("title");
     this.bind("created updated", function(ev, inst) {
       can.each(this.attributes, function(v, key) {
@@ -185,24 +174,30 @@ can.Model.Cacheable("CMS.Models.Section", {
       return that.attr("descendant_sections")().length;
     }));
     this.attr("business_objects", can.compute(function() {
-      var objs = [];
+      var objs = []
+      , q = new RefreshQueue()
+      , refreshes = {};
+
+      can.Observe.startBatch();
       that.attr("object_sections").each(function(oc, i) {
         if(!oc.selfLink) {
-          can.Observe.startBatch();
-          oc.refresh().then(function() {
-            oc.sectionable.refresh().always(function() {
-              can.Observe.stopBatch();
-            });
-          }, function() {
-            can.Observe.stopBatch();
-          });
-          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else if(!oc.sectionable || !oc.sectionable.selfLink) {
-          oc.sectionable.refresh();
-          objs.push(oc.sectionable);
+          q.enqueue(oc);
+          refreshes[oc.id] = i;
+          objs.push(new can.Model.Cacheable({ selfLink : "/", id : oc.id }));
         } else {
           objs.push(oc.sectionable);
         }
+      });
+      q.trigger().done(function(ocs) {
+        if(ocs && ocs.length) {
+          can.each(ocs, function(oc) {
+            objs.splice(refreshes[oc.id], 1, oc.sectionable);
+          });
+          setTimeout(function() {
+            that.object_sections.replace(that.object_sections.serialize()); //force listeners
+          }, 10);
+        }
+        can.Observe.stopBatch();
       });
       return objs;
     }));
