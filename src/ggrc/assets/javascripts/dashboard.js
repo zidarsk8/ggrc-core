@@ -746,6 +746,48 @@ jQuery(function($) {
     $this.hide();
     $descField.removeClass('short');
   });
+
+  // activate widget from object nav
+  
+  $('body').on('mouseover', 'ul.internav li a', function(e) {
+    var $this = $(this)
+    ,   $widgetID = $this.attr("href") 
+    ,   $targetWidget = $($widgetID)
+    ;
+
+    if( ! $targetWidget.hasClass("widget-active") ) {
+      $targetWidget.addClass("widget-active");
+    }
+  });  
+
+  $('body').on('mouseout', 'ul.internav li a', function(e) {
+    var $this = $(this)
+    ,   $widgetID = $this.attr("href") 
+    ,   $targetWidget = $($widgetID)
+    ;
+    
+    if( $targetWidget.hasClass("widget-active") ) {
+      $targetWidget.removeClass("widget-active");
+    }
+  });  
+
+  $('body').on('mouseover', '.widget', function(e) {
+    var $this = $(this)
+    ;
+    if( ! $this.hasClass("widget-active") ) {
+      $this.addClass("widget-active");
+    }
+  });  
+
+  $('body').on('mouseout', '.widget', function(e) {
+    var $this = $(this)
+    ;
+    if( $this.hasClass("widget-active") ) {
+      $this.removeClass("widget-active");
+    }
+  });  
+
+  
   
 });
 
