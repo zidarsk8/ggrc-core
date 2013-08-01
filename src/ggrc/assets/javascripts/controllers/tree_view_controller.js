@@ -68,16 +68,40 @@ can.Control("CMS.Controllers.TreeView", {
     if (!this.options.parent_instance && this.options.parent)
       this.options.parent_instance = this.options.parent.instance;
     this.options.list ? this.draw_list() : this.fetch_list();
-    this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
-    this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
+
+    var object_type = can.underscore(
+          this.options.model ? this.options.model.shortName : "Object")
+      , object_meta_type = can.underscore(window.cms_singularize(
+          this.options.model ? this.options.model.root_object : "Object"))
+      ;
+    this.element
+      .attr("data-object-type", object_type)
+      .data("object-type", object_type);
+    this.element
+      .attr("data-object-meta-type", object_meta_type)
+      .data("object-meta-type", object_meta_type);
   }
+
   , fetch_list : function() {
     if(can.isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr("id", this.options.parent ? this.options.parent.id : undefined);
     }
-    this.find_all_deferred = this.options.model[this.options.find_function || (this.options.single_object ? "findOne" : "findAll")](
-      this.options.find_params.serialize()
-    ).done(this.proxy("draw_list"));
+
+    var find_function;
+
+    if (this.options.list_loader) {
+      this.find_all_deferred =
+        this.options.list_loader(this.options.parent_instance);
+    } else {
+      if (this.options.find_function)
+        find_function = this.options.find_function;
+      else
+        find_function = this.options.single_object ? "findOne" : "findAll";
+      this.find_all_deferred = this.options.model[find_function](
+          this.options.find_params.serialize());
+    }
+
+    this.find_all_deferred.done(this.proxy("draw_list"));
   }
   , draw_list : function(list) {
     var that = this;

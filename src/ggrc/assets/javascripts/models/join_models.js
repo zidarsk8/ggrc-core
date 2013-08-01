@@ -24,7 +24,8 @@ can.Model.Cacheable("can.Model.Join", {
       var self = this
         ;
 
-    can.each(this.constructor.join_keys, function(cls, attr_name) {
+      this.init_join_objects();
+/*    can.each(this.constructor.join_keys, function(cls, attr_name) {
       var attr_val = self[attr_name];
       self.attr(attr_name, CMS.Models.get_instance(
         attr_val && attr_val.constructor.model_singular ? attr_val.constructor.model_singular : cls.model_singular
@@ -32,7 +33,7 @@ can.Model.Cacheable("can.Model.Join", {
         ));
 
       self[attr_name] && self[attr_name].refresh();
-    });
+    });*/
 
     this.each(function(value, name) {
       if (value === null)
@@ -58,7 +59,7 @@ can.Model.Cacheable("can.Model.Join", {
     }
   }
 
-  /*, init_join_object_with_type: function(attr) {
+  , init_join_object_with_type: function(attr) {
       var object_id = this[attr + "_id"] || (this[attr] || {}).id
         , object_type = this[attr + "_type"] || (this[attr] || {}).type
         ;
@@ -87,13 +88,13 @@ can.Model.Cacheable("can.Model.Join", {
         ;
 
       can.each(this.constructor.join_keys, function(model, attr) {
-        if (model === CMS.Models.Cacheable)
+        if (model === can.Model.Cacheable)
           that.init_join_object_with_type(attr);
         else
           that.init_join_object(attr, model.shortName);
       });
     }
-
+/*
   , init_object: function() {
       var that = this;
       this.init_join_objects();
@@ -155,7 +156,7 @@ can.Model.Join("CMS.Models.ObjectSection", {
     root_object: "object_section"
   , root_collection: "object_sections"
   , join_keys : {
-      "section" : can.Model.Section
+      "section" : CMS.Models.Section
     , "sectionable" : can.Model.Cacheable
   }
   , findAll: "GET /api/object_sections"
@@ -171,7 +172,7 @@ can.Model.Join("CMS.Models.ObjectControl", {
     root_object: "object_control"
   , root_collection: "object_controls"
   , join_keys : {
-      "control" : can.Model.Control
+      "control" : CMS.Models.Control
     , "controllable" : can.Model.Cacheable
   }
   , findAll: "GET /api/object_controls"
@@ -187,7 +188,7 @@ can.Model.Join("CMS.Models.ObjectObjective", {
     root_object: "object_objective"
   , root_collection: "object_objectives"
   , join_keys : {
-      "objective" : can.Model.Objective
+      "objective" : CMS.Models.Objective
     , "objectiveable" : can.Model.Cacheable
   }
   , findAll: "GET /api/object_objectives"
