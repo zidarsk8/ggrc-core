@@ -697,7 +697,7 @@ jQuery(function($) {
     }
   });
 });
-
+/*
 function resize_areas() {
   var $window, $header, $lhs, $inner_nav
     , winWidth, winHeight, affixRight, headerHeight, internavWidth
@@ -726,7 +726,7 @@ function resize_areas() {
   $(".affix-holder").css('height', areaHeight);
   $(".bar-v").css('height', areaHeight);
 }
-
+*/
 jQuery(function($) {
 
   $('body').on('mouseover', '.section-add', function(e) {
@@ -792,6 +792,6 @@ jQuery(function($) {
 });
 
 
-jQuery(resize_areas);
-jQuery(window).on("resize", resize_areas);
+//jQuery(resize_areas);
+//jQuery(window).on("resize", resize_areas);
 
