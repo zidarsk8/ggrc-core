@@ -656,14 +656,27 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/objectives/tree.mustache"
     , create_link : true
-    , draw_children : false
+    , draw_children : true
     , start_expanded : false
+    , child_options : [{
+        model : null
+      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
+      , list_loader : function(objective) {
+          return CMS.Models.ObjectObjective
+            .findAll({objective_id: objective.id})
+            .then(function(object_objectives) {
+              return can.map(object_objectives, function(join) {
+                return join.objectiveable;
+              });
+            });
+        }
+      }]
     }
   , links_to : {
       "Section" : "SectionObjective"
   }
   , attributes : {
-    sections : "CMS.Models.Section.models"
+      sections : "CMS.Models.Section.models"
     , section_objectives : "CMS.Models.SectionObjective.models"
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
