@@ -1,0 +1,95 @@
+{{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
+    <div class="modal-header">
+      <div class="pull-right">
+        <a class="btn btn-mini" href="#" data-dismiss="modal">
+          <i class="grcicon-x-grey"></i>
+        </a>
+      </div>
+      <h2>
+        Map Object {{! modal_title }}
+      </h2>
+    </div>
+    <div class="modal-filter">
+      <div class="row-fluid">
+        <div class="span3">
+          &nbsp;
+        </div>
+        <div class="span6">
+          {{#if option_type_menu}}
+          <select class="input-block-level option-type-selector">
+            <option value="DataAsset" label="Data Assets"></option>
+            {{#option_type_menu}}
+              <optgroup label="{{category}}">
+                {{#items}}
+                <option value="{{model_name}}" label="{{model_display}}"></option>
+                {{/items}}
+              </optgroup>
+            {{/option_type_menu}}
+          </select>
+          {{/if}}
+        </div>
+        <div class="span3">
+          &nbsp;
+          {{#selected_option_type}}
+          <div class="pull-right">
+            <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}">
+              <i class="grcicon-add"></i>
+              {{ new_object_title }}
+            </a>
+          </div>
+          {{/selected_option_type}}
+        </div>
+      </div>
+    </div>
+    <div class="modal-content">
+      <div class="row-fluid">
+        <div class="span3">
+          {{#selected_object}}
+            {{{ renderLive object_detail_view }}}
+          {{/selected_object}}
+        </div>
+        <div class="span6 option_column" {{data 'options'}}>
+          {{#if null}}
+          <div class="search-title">
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="modal-search">
+                  <a class="btn btn-mini search-reset" href="#">
+                    <i class="grcicon-x-grey"></i>
+                  </a>
+                  <input class="input-block-level" placeholder="Search..." type="text">
+                </div>
+              </div>
+            </div>
+          </div>
+          {{/if}}
+          {{#if option_column_view}}
+            {{{ renderLive option_column_view }}}
+          {{/if}}
+        </div>
+        <div class="span3 active_column">
+          {{#selected_option}}
+            {{{ renderLive option_detail_view }}}
+          {{/selected_option}}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="deny-buttons">
+            <a class="btn btn-primary" data-dismiss="modal" href="javascript://">
+              Cancel
+            </a>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="confirm-buttons">
+            <a class="btn btn-primary preventdoubleclick {{^if selected_option}}disabled {{/if}}map-button" href="javascript://">
+              Map
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+{{!</div>}}
