@@ -10,11 +10,9 @@
   <p>
     <img src="/static/images/sample/profile100.jpg" alt="">
   </p>}}
-  <h4>
+  <h4 class="oneline">
+    <i class="grcicon-{{constructor.table_singular}}-color"></i>
     {{ title }}
-    <br>
-    {{ link }}
-    <br>
     {{!<small>
       Google, inc
     </small>
@@ -24,4 +22,19 @@
       ernestmandel@gmail.com
     </a>}}
   </h4>
+  <div class="rtf">
+    {{{description}}}
+  </div>
+  <div class="owner">
+    <strong>Owner:</strong>
+    {{#if owner}}
+    {{owner}}
+    {{/if}}
+  </div>
+  <div class="object-url">
+    <strong>URL:</strong>
+    {{#if url}}
+    <a href="{{url}}" target-"_blank">{{url}}</a>
+    {{/if}}
+  </div>
 </div>
