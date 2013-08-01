@@ -28,6 +28,11 @@ can.Model.Cacheable("CMS.Models.Section", {
   , tree_view_options : {
     list_view : "/static/mustache/sections/tree.mustache"
     , child_options : [{
+      model : can.Model.Cacheable
+      , property : "business_objects"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }, {
       model : CMS.Models.Objective
       , property : "objectives"
       , list_view : "/static/mustache/objectives/tree.mustache"
@@ -178,6 +183,28 @@ can.Model.Cacheable("CMS.Models.Section", {
     }));
     this.attr("descendant_sections_count", can.compute(function() {
       return that.attr("descendant_sections")().length;
+    }));
+    this.attr("business_objects", can.compute(function() {
+      var objs = [];
+      that.attr("object_sections").each(function(oc, i) {
+        if(!oc.selfLink) {
+          can.Observe.startBatch();
+          oc.refresh().then(function() {
+            oc.sectionable.refresh().always(function() {
+              can.Observe.stopBatch();
+            });
+          }, function() {
+            can.Observe.stopBatch();
+          });
+          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
+        } else if(!oc.sectionable || !oc.sectionable.selfLink) {
+          oc.sectionable.refresh();
+          objs.push(oc.sectionable);
+        } else {
+          objs.push(oc.sectionable);
+        }
+      });
+      return objs;
     }));
   }
 

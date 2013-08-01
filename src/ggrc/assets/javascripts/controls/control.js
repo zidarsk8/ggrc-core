@@ -25,6 +25,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , directive : "CMS.Models.Directive.model"
     , sections : "CMS.Models.Section.models"
     , programs : "CMS.Models.Program.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
   }
   , tree_view_options : {
       list_view : "/static/mustache/controls/tree.mustache"
@@ -54,9 +55,19 @@ can.Model.Cacheable("CMS.Models.Control", {
   , defaults : {
     "type" : {id : 1}
     , "selected" : false
-    , "title" : this.title || ""
-    , "slug" : this.slug || ""
-    , "description" : this.description || ""
+    , "title" : ""
+    , "slug" : ""
+    , "description" : ""
+    , object_controls : []
+  }
+  , tree_view_options : {
+    draw_children : true
+    , child_options : [{
+      model : can.Model.Cacheable
+      , property : "business_objects"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }]
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -66,20 +77,33 @@ can.Model.Cacheable("CMS.Models.Control", {
 , {
 // prototype properties
   init : function() {
-        // This block now covered in the Cacheable model
-    // if(this.control) {
-    //  var attrs = this.control._attrs();
-    //  for(var i in attrs) {
-    //    if(attrs.hasOwnProperty(i)) {
-    //      this.attr(i, this.control[i]);
-    //    }
-    //  }
-    //  this.removeAttr("control");
-    // }
+    var that = this;
     this.attr({
       "content_id" : Math.floor(Math.random() * 10000000)
     });
     this._super();
+    this.attr("business_objects", can.compute(function() {
+      var objs = [];
+      that.attr("object_controls").each(function(oc, i) {
+        if(!oc.selfLink) {
+          can.Observe.startBatch();
+          oc.refresh().then(function() {
+            oc.controllable.refresh().always(function() {
+              can.Observe.stopBatch();
+            });
+          }, function() {
+            can.Observe.stopBatch();
+          });
+          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
+        } else if(!oc.controllable || !oc.controllable.selfLink) {
+          oc.controllable.refresh();
+          objs.push(oc.controllable);
+        } else {
+          objs.push(oc.controllable);
+        }
+      });
+      return objs;
+    }));
   }
 
   , bind_section : function(section) {

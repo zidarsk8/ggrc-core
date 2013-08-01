@@ -176,6 +176,10 @@ can.Model.Join("CMS.Models.ObjectControl", {
       "control" : CMS.Models.Control
     , "controllable" : can.Model.Cacheable
   }
+  , attributes : {
+    control : "CMS.Models.Control.model"
+    , controllable : "CMS.Models.get_instance"
+  }
   , findAll: "GET /api/object_controls"
   , create: "POST /api/object_controls"
   , destroy: "DELETE /api/object_controls/{id}"

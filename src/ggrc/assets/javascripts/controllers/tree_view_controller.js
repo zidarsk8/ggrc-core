@@ -218,7 +218,10 @@ can.Control("CMS.Controllers.TreeView", {
     var find_params;
     if(data.property) {
       find_params = item.instance[data.property];
-      if(find_params && find_params.length) {
+      if(find_params && find_params.isComputed) {
+        data.attr("original_list", find_params);
+        find_params = find_params();
+      } else if(find_params && find_params.length) {
         find_params = find_params.slice(0);
       }
       data.attr("list", find_params);

@@ -36,7 +36,15 @@ var makeFindRelated = function(thistype, othertype) {
 
 can.Model("can.Model.Cacheable", {
 
-  findOne : "GET {href}"
+  root_object : ""
+  , root_collection : ""
+  , model_singular : ""
+  , model_plural : ""
+  , table_singular : ""
+  , table_plural : ""
+  , title_singular : ""
+  , title_plural : ""
+  , findOne : "GET {href}"
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
     if(this.fullName === "can.Model.Cacheable") {

@@ -659,20 +659,12 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , draw_children : true
     , start_expanded : false
     , child_options : [{
-        model : null
-      , list_title : "Objects"
-      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
-      , list_loader : function(objective) {
-          return CMS.Models.ObjectObjective
-            .findAll({objective_id: objective.id})
-            .then(function(object_objectives) {
-              return can.map(object_objectives, function(join) {
-                return join.objectiveable;
-              });
-            });
-        }
-      }]
-    }
+      model : can.Model.Cacheable
+      , property : "business_objects"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }]
+  }
   , links_to : {
       "Section" : "SectionObjective"
   }
@@ -686,7 +678,32 @@ can.Model.Cacheable("CMS.Models.Objective", {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
-}, {});
+}, {
+  init : function() {
+    this.attr("business_objects", can.compute(function() {
+      var objs = [];
+      that.attr("object_objectives").each(function(oc, i) {
+        if(!oc.selfLink) {
+          can.Observe.startBatch();
+          oc.refresh().then(function() {
+            oc.objectiveable.refresh().always(function() {
+              can.Observe.stopBatch();
+            });
+          }, function() {
+            can.Observe.stopBatch();
+          });
+          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
+        } else if(!oc.objectiveable || !oc.objectiveable.selfLink) {
+          oc.objectiveable.refresh();
+          objs.push(oc.objectiveable);
+        } else {
+          objs.push(oc.objectiveable);
+        }
+      });
+      return objs;
+    }));    
+  }
+});
 
 can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
@@ -726,10 +743,16 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
 };
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
-  var model = CMS.Models[object_type]
-    , params = {}
-    , instance = null
-    ;
+  var model, params = {}, instance = null;
+
+  if(typeof object_type === "object") {
+    //assume we only passed in params_or_object
+    params_or_object = object_type;
+    object_type = params_or_object.type;
+    object_id = params_or_object.id;
+  }
+
+  model = CMS.Models[object_type]
 
   if (!model)
     return null;
