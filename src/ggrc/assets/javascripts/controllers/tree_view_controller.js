@@ -10,6 +10,7 @@
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
+    , parent : null
     , children_drawn : false
   }
 }, {
@@ -63,17 +64,44 @@ can.Control("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     this.element.uniqueId();
+    // Allow parent_instance even when there is no parent tree
+    if (!this.options.parent_instance && this.options.parent)
+      this.options.parent_instance = this.options.parent.instance;
     this.options.list ? this.draw_list() : this.fetch_list();
-    this.element.attr("data-object-type", can.underscore(this.options.model.shortName)).data("object-type", can.underscore(this.options.model.shortName));
-    this.element.attr("data-object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object))).data("object-meta-type", can.underscore(window.cms_singularize(this.options.model.root_object)));
+
+    var object_type = can.underscore(
+          this.options.model ? this.options.model.shortName : "Object")
+      , object_meta_type = can.underscore(window.cms_singularize(
+          this.options.model ? this.options.model.root_object : "Object"))
+      ;
+    this.element
+      .attr("data-object-type", object_type)
+      .data("object-type", object_type);
+    this.element
+      .attr("data-object-meta-type", object_meta_type)
+      .data("object-meta-type", object_meta_type);
   }
+
   , fetch_list : function() {
     if(can.isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr("id", this.options.parent ? this.options.parent.id : undefined);
     }
-    this.find_all_deferred = this.options.model[this.options.find_function || (this.options.single_object ? "findOne" : "findAll")](
-      this.options.find_params.serialize()
-    ).done(this.proxy("draw_list"));
+
+    var find_function;
+
+    if (this.options.list_loader) {
+      this.find_all_deferred =
+        this.options.list_loader(this.options.parent_instance);
+    } else {
+      if (this.options.find_function)
+        find_function = this.options.find_function;
+      else
+        find_function = this.options.single_object ? "findOne" : "findAll";
+      this.find_all_deferred = this.options.model[find_function](
+          this.options.find_params.serialize());
+    }
+
+    this.find_all_deferred.done(this.proxy("draw_list"));
   }
   , draw_list : function(list) {
     var that = this;
@@ -86,7 +114,9 @@ can.Control("CMS.Controllers.TreeView", {
     if(!this.element)
       return;  //controller has been destroyed
     can.Observe.startBatch();
-    this.options.attr("original_list", list);
+    if(!this.options.original_list) {
+      this.options.attr("original_list", list);
+    }
     this.options.attr("list", []);
     this.on();
     refresh_queue = new RefreshQueue();
@@ -132,6 +162,12 @@ can.Control("CMS.Controllers.TreeView", {
       }
     });
   }
+  , "{original_list} change" : function(list, ev, newVals, index) {
+    var that = this;
+    if(list.isComputed) {
+      this.draw_list(list());
+    }
+  }
 
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
@@ -152,6 +188,7 @@ can.Control("CMS.Controllers.TreeView", {
     el.trigger("expand");
   }
 
+  // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   , add_child_lists : function(list) {
     var that = this;
     if(that.options.draw_children) {
@@ -164,6 +201,7 @@ can.Control("CMS.Controllers.TreeView", {
     }
   }
 
+  // add all child options to one TreeViewOptions object
   , add_child_lists_to_child : function(item) {
     var that = this;
     if(!item.child_options)
@@ -184,11 +222,14 @@ can.Control("CMS.Controllers.TreeView", {
   , add_child_list : function(item, data) {
     //var $subtree = $("<ul class='tree-structure'>").appendTo(el);
     //var model = $(el).closest("[data-model]").data("model");
-    data.attr({ start_expanded : false });
+    data.attr({ start_expanded : false, parent : item });
     var find_params;
     if(data.property) {
       find_params = item.instance[data.property];
-      if(find_params && find_params.length) {
+      if(find_params && find_params.isComputed) {
+        data.attr("original_list", find_params);
+        find_params = find_params();
+      } else if(find_params && find_params.length) {
         find_params = find_params.slice(0);
       }
       data.attr("list", find_params);
@@ -209,37 +250,37 @@ can.Control("CMS.Controllers.TreeView", {
     // $subtree.cms_controllers_tree_view(opts);
   }
 
+  // There is no check for parentage anymore.  When this event is triggered, it needs to be triggered
+  // at the appropriate level of the tree.
   , " newChild" : function(el, ev, data) {
     var that = this;
-    var model;
-    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
-      model = new can.Observe.TreeOptions({
-        instance : data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data)
-      });
-      this.add_child_lists([model]);
-      this.options.list.push(model);
-      setTimeout(function() {
-        $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
-      }, 10);
-      ev.stopPropagation();
-    }
+    var model = new can.Observe.TreeOptions({
+      instance : data instanceof this.options.model
+        ? data
+        : new this.options.model(data.serialize ? data.serialize() : data)
+    });
+    this.add_child_lists([model]);
+    this.options.list.push(model);
+    setTimeout(function() {
+      $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
+    }, 10);
+    ev.stopPropagation();
   }
   , " removeChild" : function(el, ev, data) {
     var that = this;
-    var model;
-    if(!this.options.parent || (this.options.parent.id === data.parent.id)) { // '==' just because null vs. undefined sometimes happens here
-      model = data instanceof this.options.model ? data : new this.options.model(data.serialize ? data.serialize() : data);
-      that.options.list.replace(
-        can.map(
-          this.options.list
-          , function(v, i) {
-            if(v.instance.id !== model.id) {
-              return v;
-            }
-          })
-      );
-      ev.stopPropagation();
-    }
+    var model = data instanceof this.options.model
+      ? data
+      : new this.options.model(data.serialize ? data.serialize() : data);
+    that.options.list.replace(
+      can.map(
+        this.options.list
+        , function(v, i) {
+          if(v.instance.id !== model.id) {
+            return v;
+          }
+        })
+    );
+    ev.stopPropagation();
   }
 
   , ".edit-object modal:success" : function(el, ev, data) {

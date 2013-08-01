@@ -6,8 +6,13 @@
 
 from ggrc import db
 from .mixins import BusinessObject, Timeboxed
+from .object_control import Controllable
 from .object_document import Documentable
+from .object_objective import Objectiveable
 from .object_person import Personable
+from .object_section import Sectionable
 
-class DataAsset(Personable, Documentable, Timeboxed, BusinessObject, db.Model):
+class DataAsset(
+    Personable, Documentable, Objectiveable, Controllable, Sectionable,
+    Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'data_assets'

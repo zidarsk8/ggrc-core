@@ -22,8 +22,27 @@ can.Model.Cacheable("CMS.Models.Control", {
     //, implementing_controls : "CMS.Models.Control.models"
     , control_sections : "CMS.Models.ControlSection.models"
     //, implemented_controls : "CMS.Models.Control.models"
-    //, directive : "CMS.Models.Directive.model"
-    //, sections : "CMS.Models.SectionSlug.models"
+    , directive : "CMS.Models.Directive.model"
+    , sections : "CMS.Models.Section.models"
+    , programs : "CMS.Models.Program.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+  }
+  , tree_view_options : {
+      list_view : "/static/mustache/controls/tree.mustache"
+    , child_options : [{
+        model : null
+      , list_title : "Objects"
+      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
+      , list_loader : function(object) {
+          return CMS.Models.ObjectControl
+            .findAll({control_id: object.id})
+            .then(function(linked_objects) {
+              return can.map(linked_objects, function(join) {
+                return join.controllable;
+              });
+            });
+        }
+    }]
   }
   , links_to : {
     "Section" : "ControlSection"
@@ -36,9 +55,19 @@ can.Model.Cacheable("CMS.Models.Control", {
   , defaults : {
     "type" : {id : 1}
     , "selected" : false
-    , "title" : this.title || ""
-    , "slug" : this.slug || ""
-    , "description" : this.description || ""
+    , "title" : ""
+    , "slug" : ""
+    , "description" : ""
+    , object_controls : []
+  }
+  , tree_view_options : {
+    draw_children : true
+    , child_options : [{
+      model : can.Model.Cacheable
+      , property : "business_objects"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }]
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -48,20 +77,28 @@ can.Model.Cacheable("CMS.Models.Control", {
 , {
 // prototype properties
   init : function() {
-        // This block now covered in the Cacheable model
-    // if(this.control) {
-    //  var attrs = this.control._attrs();
-    //  for(var i in attrs) {
-    //    if(attrs.hasOwnProperty(i)) {
-    //      this.attr(i, this.control[i]);
-    //    }
-    //  }
-    //  this.removeAttr("control");
-    // }
+    var that = this;
     this.attr({
       "content_id" : Math.floor(Math.random() * 10000000)
     });
     this._super();
+    this.attr("business_objects", can.compute(function() {
+      var objs = [], q = new RefreshQueue();
+      can.Observe.startBatch();
+      that.attr("object_controls").each(function(oc, i) {
+        if(!oc.selfLink) {
+          q.enqueue(oc);
+          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
+        } else {
+          objs.push(oc.controllable);
+        }
+      });
+      q.trigger().done(function() {
+        can.Observe.stopBatch();
+      });
+      return objs;
+    }));
+
   }
 
   , bind_section : function(section) {
