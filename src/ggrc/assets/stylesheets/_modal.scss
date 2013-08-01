@@ -613,3 +613,12 @@ a.show-hidden-fields {
   margin-bottom:10px;
   font-size:12px;
 }
+
+p.modal-value {
+  @include oneline();
+  margin:0;
+  padding:0;
+  font-weight:bold;
+  color:$governance;
+  line-height:28px;
+}
