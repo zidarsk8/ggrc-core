@@ -166,8 +166,6 @@ class Slugged(Base):
 
   # REST properties
   _publish_attrs = ['slug', 'title']
-  _update_attrs = ['title']
-  _create_attrs = _publish_attrs
   _fulltext_attrs = ['slug', 'title']
 
   @classmethod
