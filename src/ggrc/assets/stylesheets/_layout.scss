@@ -23,23 +23,9 @@
   color: $darkGray;
 }
 
-// content style
-.content {
-  //padding-top: 20px;
-  //background: $white image-url('bgnd-content.png') repeat-x 0 0;
-  h2 {
-    margin-bottom: 20px;
-  }
-  &.affix {
-    margin-top: 30px;
-  }
-}
-
-
-
-
 .lhs-holder {
   position:fixed;
+  z-index:3000;
   top:30px;
   left:0;
   width:248px;
@@ -74,17 +60,3 @@
 .footer {
   margin-top:500px;
 }
-
-
-
-
-
-/*
--#.fixed-area
-  .fixed-lhs{ 'style': 'background:aqua' }
-  .fixed-main
-    .fixed-header{ 'style': 'background:#444' }
-    .fixed-area{ 'style': 'background:red' }
-      .fixed-object-nav{ 'style': 'background:green' }
-      .fixed-content{ 'style': 'background:navy' }
-*/
