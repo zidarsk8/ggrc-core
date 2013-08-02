@@ -37,6 +37,14 @@ class Categorization(Base, db.Model):
       ]
   _update_attrs = []
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Categorization, cls).eager_query()
+    return query.options(
+        orm.subqueryload('category'))
+
 class Categorizable(object):
   """Subclasses **MUST** provide a declared_attr method that defines the
   relationship and association_proxy. For example:

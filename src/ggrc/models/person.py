@@ -43,3 +43,12 @@ class Person(Base, db.Model):
 
   def get_id(self):
     return unicode(self.id)
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Person, cls).eager_query()
+    return query.options(
+        orm.joinedload('language'),
+        orm.subqueryload('object_people'))
