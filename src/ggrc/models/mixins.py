@@ -85,6 +85,28 @@ class ChangeTracked(object):
     return query.options(
         orm.subqueryload('modified_by'))
 
+class Relatable(object):
+  @declared_attr
+  def related_sources(cls):
+    joinstr = 'and_(remote(Relationship.destination_id) == {type}.id, '\
+                    'remote(Relationship.destination_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.destination_id',
+        cascade = 'all, delete-orphan')
+  @declared_attr
+  def related_destinations(cls):
+    joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
+                    'remote(Relationship.source_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.source_id',
+        cascade = 'all, delete-orphan')
+
 class Described(object):
   description = db.Column(db.Text)
 
@@ -145,7 +167,7 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-class Base(ChangeTracked, Identifiable, ContextRBAC):
+class Base(ChangeTracked, Identifiable, Relatable, ContextRBAC):
   """Several of the models use the same mixins. This class covers that common
   case.
   """
