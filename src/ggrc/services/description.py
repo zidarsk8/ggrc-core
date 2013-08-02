@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 import json
-from flask import request
+from flask import request, current_app
 from flask.views import MethodView
 
 """RESTful service discovery API for gGRC services."""
@@ -31,7 +31,7 @@ class ServiceDescription(MethodView):
           }
     endpoints['search'] = { 'href': '/search' }
     endpoints['log_event'] = {'href': '/api/log_events' }
-    return json.dumps({
+    return self.json_success_response({
         'service_description': {
           'name': 'gGRC-Core',
           'endpoints': endpoints,
@@ -43,3 +43,14 @@ class ServiceDescription(MethodView):
           #'documentationLink': '',
           },
         })
+
+  def json_success_response(
+      self, response_object, status=200):
+    headers = [
+        #('Last-Modified', self.http_timestamp(last_modified)),
+        #('Etag', self.etag(response_object)),
+        ('Content-Type', 'application/json'),
+        #('Location', self.url_for())
+        ]
+    return current_app.make_response(
+      (json.dumps(response_object), status, headers))
