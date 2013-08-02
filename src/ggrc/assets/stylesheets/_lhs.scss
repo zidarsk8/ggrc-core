@@ -28,11 +28,14 @@
   }
 }
 
+.lhs-holder {
+  @include gradient-horizontal(#fff,#e1e1e1);
+}
+
 .lhs {
   position:relative;
   width:240px;
   margin-right: 8px;
-  @include gradient-horizontal(#fff,#e1e1e1);
   &.affix {
     position: fixed;
     top: 30px;
@@ -377,23 +380,16 @@
     }
     li:hover {
       a {
-        i {
-          @include opacity(1);
-        }
-      }
-
-    }
-    li.active {
-      a {
-        background-color:#333;
+        background-color:#444;
         color:#fff;
         i {
           @include opacity(1);
         }
       }
     }
+    
     &.business {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$business;
@@ -401,7 +397,7 @@
       }
     }
     &.governance {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$governance;
@@ -409,7 +405,7 @@
       }
     }
     &.risk {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$risk;
@@ -417,7 +413,7 @@
       }
     }
     &.program {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$programs;
