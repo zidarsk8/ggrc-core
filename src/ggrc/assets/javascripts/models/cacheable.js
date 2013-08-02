@@ -320,13 +320,14 @@ can.Model("can.Model.Cacheable", {
     }
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
-  , refresh : function() {
+  , refresh : function(params) {
     var href = this.selfLink || this.href;
 
     if (!href)
       return (new can.Deferred()).reject();
     return $.ajax({
       url : href
+      , params : params
       , type : "get"
       , dataType : "json"
     })

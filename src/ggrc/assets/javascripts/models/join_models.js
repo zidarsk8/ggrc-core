@@ -10,9 +10,17 @@ can.Model.Cacheable("can.Model.Join", {
     //this.reinit();
     if(this === can.Model.Join) {
       this.bind("created.reinit destroyed.reinit", function(ev, instance) {
-        if (instance instanceof can.Model.Join)
+        if (instance instanceof can.Model.Join) {
           instance.reinit();
         //can.proxy(this, "reinit"));
+
+          can.each(instance.constructor.join_keys, function(cls, key) {
+            var obj =
+              cls.findInCacheById(instance[key].id);
+
+            obj && obj.refresh();
+          });
+        }
       });
     }
   }

@@ -173,34 +173,33 @@ can.Model.Cacheable("CMS.Models.Section", {
     this.attr("descendant_sections_count", can.compute(function() {
       return that.attr("descendant_sections")().length;
     }));
-    this.attr("business_objects", can.compute(function() {
-      var objs = []
-      , q = new RefreshQueue()
-      , refreshes = {};
-
-      can.Observe.startBatch();
-      that.attr("object_sections").each(function(oc, i) {
-        if(!oc.selfLink) {
-          q.enqueue(oc);
-          refreshes[oc.id] = i;
-          objs.push(new can.Model.Cacheable({ selfLink : "/", id : oc.id }));
-        } else {
-          objs.push(oc.sectionable);
-        }
-      });
-      q.trigger().done(function(ocs) {
-        if(ocs && ocs.length) {
-          can.each(ocs, function(oc) {
-            objs.splice(refreshes[oc.id], 1, oc.sectionable);
-          });
-          setTimeout(function() {
-            that.object_sections.replace(that.object_sections.serialize()); //force listeners
-          }, 10);
-        }
-        can.Observe.stopBatch();
-      });
-      return objs;
-    }));
+    this.attr("business_objects", new can.Model.List(
+      can.map(
+        this.object_sections,
+        function(os) {return os.sectionable || new can.Model({ selfLink : "/" }); }
+      )
+    ));
+    this.object_sections.bind("change", function(ev, attr, how) {
+      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+        that.business_objects.replace(
+          can.map(
+            that.object_sections,
+            function(os, i) {
+              if(os.sectionable) {
+                return os.sectionable;
+              } else {
+                os.refresh({ "__include" : "sectionable" }).done(function(d) {
+                  that.business_objects.attr(i, d.sectionable);
+                  //can.Observe.stopBatch();
+                }).fail(function() {
+                  //can.Observe.stopBatch();
+                });
+                return new can.Model({ selfLink : "/"});
+              }
+          })
+        );
+      }
+    });
   }
 
   , map_control : function(params) {
