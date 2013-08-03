@@ -673,6 +673,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , section_objectives : "CMS.Models.SectionObjective.models"
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
+    , object_objectives: "CMS.Models.ObjectObjective.models"
   }
   , defaults : {
     object_objectives : []

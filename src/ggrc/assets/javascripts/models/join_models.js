@@ -164,7 +164,7 @@ can.Model.Join("CMS.Models.ObjectSection", {
     section : "CMS.Models.Section.model"
     , sectionable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_sections?__includes=sectionable"
+  , findAll: "GET /api/object_sections?__include=sectionable"
   , create: "POST /api/object_sections"
   , destroy: "DELETE /api/object_sections/{id}"
 }, {
@@ -184,7 +184,7 @@ can.Model.Join("CMS.Models.ObjectControl", {
     control : "CMS.Models.Control.model"
     , controllable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_controls?__includes=controllable"
+  , findAll: "GET /api/object_controls?__include=controllable"
   , create: "POST /api/object_controls"
   , destroy: "DELETE /api/object_controls/{id}"
 }, {
@@ -204,7 +204,7 @@ can.Model.Join("CMS.Models.ObjectObjective", {
     objective : "CMS.Models.Objective.model"
     , objectiveable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_objectives?__includes=objectiveable"
+  , findAll: "GET /api/object_objectives?__include=objectiveable"
   , create: "POST /api/object_objectives"
   , destroy: "DELETE /api/object_objectives/{id}"
 }, {
