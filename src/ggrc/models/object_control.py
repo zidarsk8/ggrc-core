@@ -50,6 +50,9 @@ class ObjectControl(Base, Timeboxed, db.Model):
     return query.options(
         orm.subqueryload('control'))
 
+  def _display_name(self):
+    return self.controllable.display_name + '<->' + self.control.display_name
+
 class Controllable(object):
   @declared_attr
   def object_controls(cls):

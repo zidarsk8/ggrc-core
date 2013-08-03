@@ -44,3 +44,6 @@ class ControlAssessment(Base, db.Model):
         orm.joinedload('pbc_list'),
         orm.joinedload('control'),
         orm.subqueryload('requests'))
+
+  def _display_name(self):
+    return self.pbc_list.display_name + '<->' + self.control.display_name

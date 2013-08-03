@@ -50,6 +50,9 @@ class ObjectSection(Base, Timeboxed, db.Model):
     return query.options(
         orm.subqueryload('section'))
 
+  def _display_name(self):
+    return self.sectionable.display_name + '<->' + self.section.display_name
+
 class Sectionable(object):
   @declared_attr
   def object_sections(cls):

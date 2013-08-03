@@ -52,3 +52,6 @@ class Person(Base, db.Model):
     return query.options(
         orm.joinedload('language'),
         orm.subqueryload('object_people'))
+
+  def _display_name(self):
+    return self.email

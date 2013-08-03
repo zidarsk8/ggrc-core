@@ -38,14 +38,14 @@ def log_event(session, obj = None):
   current_user = get_current_user_id()
   for o in session.dirty:
     if session.is_modified(o):
-      revision = Revision( o, current_user, 'modified', o.to_json())
+      revision = Revision(o, current_user, 'modified', o.to_json())
       revisions.append(revision)
   for o in session.deleted:
-    revision = Revision( o, current_user, 'deleted', o.to_json())
+    revision = Revision(o, current_user, 'deleted', o.to_json())
     revisions.append(revision)
   session.flush() # this ensures that ids are available for new objects
   for o in new_objects:
-    revision = Revision( o, current_user, 'created', o.to_json())
+    revision = Revision(o, current_user, 'created', o.to_json())
     revisions.append(revision)
   if obj is None:
     resource_id = 0

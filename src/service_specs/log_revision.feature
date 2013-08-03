@@ -16,10 +16,10 @@ Feature: Log events and revisions
   Scenario: Event and revision on DELETE
     Given a new "Program" named "example_program"
     And "example_program" is POSTed to its collection
-    And a new "Directive" named "example_directive"
-    And "example_directive" is POSTed to its collection
+    And a new "Regulation" named "example_regulation"
+    And "example_regulation" is POSTed to its collection
     And a new "ProgramDirective" named "example_program_directive"
-    And "example_program_directive" link property "directive" is "example_directive"
+    And "example_program_directive" link property "directive" is "example_regulation"
     And "example_program_directive" link property "program" is "example_program"
     And "example_program_directive" is POSTed to its collection
     When GET of the resource "example_program"

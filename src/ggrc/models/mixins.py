@@ -10,6 +10,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import Session
 from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
+from .reflection import PublishOnly
+from .computed_property import computed_property
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -199,7 +201,16 @@ class Base(ChangeTracked, Relatable, ContextRBAC, Identifiable):
     d = {}
     for column in self.__table__.columns:
       d[column.name] = getattr(self, column.name)
+    d['display_name'] = self.display_name
     return d
+
+  @computed_property
+  def display_name(self):
+    return self._display_name()
+
+  def _display_name(self):
+    return getattr(self, "title", None) or getattr(self, "name", "")
+
 
 class Slugged(Base):
   """Several classes make use of the common mixins and additional are
