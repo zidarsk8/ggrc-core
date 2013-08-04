@@ -69,16 +69,23 @@ can.Model.Cacheable("can.Model.Join", {
   }
 
   , init_join_object_with_type: function(attr) {
+      if(this[attr] instanceof can.Model) {
+        return;
+      }
+
       var object_id = this[attr + "_id"] || (this[attr] || {}).id
         , object_type = this[attr + "_type"] || (this[attr] || {}).type
         ;
 
-      if (object_id && object_type)
+      if (object_id && object_type && typeof object_type === "string") {
         this.attr(attr, CMS.Models.get_instance(
               object_type
             , object_id
             , this[attr]
             ) || this[attr]);
+      } else if(object_id) {
+        this.attr(attr, CMS.Models.get_instance(this[attr]));
+      }
     }
 
   , init_join_object: function(attr, model_name) {

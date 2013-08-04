@@ -367,7 +367,7 @@ can.Model("can.Model.Cacheable", {
         serial[name] = val.stub();
       } else if(typeof val === "object" && val != null && val.length != null) {
         serial[name] = can.map(val, function(v) {
-          return typeof v.save === "function" ? v.stub() : (v.serialize ? v.serialize() : v);
+          return (v && typeof v.save === "function") ? v.stub() : (v.serialize ? v.serialize() : v);
         });
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
