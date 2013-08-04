@@ -6,7 +6,7 @@
 from ggrc import db
 from ggrc.models.all_models import all_models
 from ggrc.rbac import permissions
-from sqlalchemy import event
+from sqlalchemy import event, and_, or_, text
 from sqlalchemy.schema import DDL
 from .sql import SqlIndexer
 
@@ -31,55 +31,56 @@ event.listen(
 class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
-  def _get_type_clause(self):
-    type_clauses =[]
-    for model in all_models:
-      clause = 'type = "{0}"'.format(model.__name__)
-      type_permissions = permissions.read_contexts_for(model.__name__)
+  def _get_type_query(self, types=None):
+    model_names = [model.__name__ for model in all_models]
+    if types is not None:
+      model_names = [m for m in model_names if m in types]
+
+    type_queries = []
+    for model_name in model_names:
+      type_query = None
+      type_permissions = permissions.read_contexts_for(model_name)
       if type_permissions is None:
-        # can read in all contexts
-        type_clauses.append('({0})'.format(clause))
+        type_query = (MysqlRecordProperty.type == model_name)
       elif type_permissions:
-        # can read in limited contexts
-        clause = '{0} and context_id in ({1})'.format(
-            clause,
-            ','.join(['{0}'.format(id) for id in type_permissions]))
-        type_clauses.append('({0})'.format(clause))
+        type_query = and_(
+            MysqlRecordProperty.type == model_name,
+            MysqlRecordProperty.context_id.in_(type_permissions))
       else:
-        # else, can't read in any context, don't add a clause for it
-        pass
-    type_clauses_str = ' or '.join(type_clauses) 
-    if len(type_clauses) > 1:
-      type_clauses_str = '({0})'.format(type_clauses_str)
+        type_query = False
+      type_queries.append(type_query)
 
-    # Include 'NULL' context for all types
-    type_clauses_str = '(context_id IS NULL or {0})'.format(type_clauses_str)
+    return and_(
+        MysqlRecordProperty.type.in_(model_names),
+        or_(
+          MysqlRecordProperty.context_id == None,
+          *type_queries))
 
-    return type_clauses_str
-
-  def filter_by_terms(self, query, terms, type_clauses_str='1'):
+  def _get_filter_query(self, terms):
     if not terms:
-      return query.filter(type_clauses_str)
+      return True
+    # FIXME: Temporary (slow) fix for words shorter than MySQL default limit
+    elif len(terms) < 4:
+      return MysqlRecordProperty.content.contains(terms)
     else:
-      return query.filter(
-        '(match (content) against (:terms)) and {0}'.format(type_clauses_str))\
-            .params(terms=terms)
+      return MysqlRecordProperty.content.match(terms)
 
-  def search(self, terms):
-    type_clauses_str = self._get_type_clause()
-    return self.filter_by_terms(
-        db.session.query(self.record_type), terms, type_clauses_str).all()
+  def search(self, terms, types=None):
+    type_query = self._get_type_query(types)
+    query = self._get_type_query(types)
+    query = and_(query, self._get_filter_query(terms))
+    return db.session.query(self.record_type).filter(query)
 
-  def counts(self, terms, group_by_type=True):
+  def counts(self, terms, group_by_type=True, types=None):
     from sqlalchemy import func, distinct
-    type_clauses_str = self._get_type_clause()
 
     query = db.session.query(
         self.record_type.type, func.count(distinct(self.record_type.key)))
-    if group_by_type:
-      query = query.group_by(self.record_type.type)
-
-    return self.filter_by_terms(query, terms, type_clauses_str).all()
+    query = query.filter(self._get_type_query(types))
+    query = query.filter(self._get_filter_query(terms))
+    query = query.group_by(self.record_type.type)
+    # FIXME: Is this needed for correct group_by/count-distinct behavior?
+    #query = query.order_by(self.record_type.type, self.record_type.key)
+    return query.all()
 
 Indexer = MysqlIndexer
-
