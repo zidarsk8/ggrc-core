@@ -30,18 +30,8 @@ can.Model.Cacheable("CMS.Models.Control", {
   , tree_view_options : {
       list_view : "/static/mustache/controls/tree.mustache"
     , child_options : [{
-        model : null
-      , list_title : "Objects"
+        model : can.Model.Cacheable
       , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
-      , list_loader : function(object) {
-          return CMS.Models.ObjectControl
-            .findAll({control_id: object.id})
-            .then(function(linked_objects) {
-              return can.map(linked_objects, function(join) {
-                return join.controllable;
-              });
-            });
-        }
     }]
   }
   , links_to : {

@@ -685,6 +685,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
 }, {
   init : function() {
     var that = this;
+    this._super.apply(this, arguments);
     this.attr("business_objects", new can.Model.List(
       can.map(
         this.object_objectives,
