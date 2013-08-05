@@ -68,6 +68,7 @@ class Controllable(object):
         'ObjectControl',
         primaryjoin=joinstr,
         backref='{0}_controllable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [
