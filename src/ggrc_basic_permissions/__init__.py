@@ -87,8 +87,10 @@ class UserPermissions(DefaultUserPermissions):
               ],
             },
           }
+      session['permissions']['__user'] = email
     else:
       session['permissions'] = {}
+      session['permissions']['__user'] = email
       user_roles = db.session.query(UserRole)\
           .options(sqlalchemy.orm.subqueryload('role'))\
           .filter(UserRole.person_id==user.id)\
