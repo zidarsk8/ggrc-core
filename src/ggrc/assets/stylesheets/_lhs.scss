@@ -1,8 +1,3 @@
-.lhs, 
-.area,
-.rhs {
-	float:left;
-}
 
 .area {
   border-right:5px solid #444;
@@ -34,22 +29,13 @@
 }
 
 .lhs-holder {
-  min-height:100px;
-  float:left;
-}
-.affix-holder {
-  &.affix {
-    position: fixed;
-    top: 30px;
-    z-index: 900;
-  }
+  @include gradient-horizontal(#fff,#e1e1e1);
 }
 
 .lhs {
   position:relative;
   width:240px;
   margin-right: 8px;
-  @include gradient-horizontal(#fff,#e1e1e1);
   &.affix {
     position: fixed;
     top: 30px;
@@ -92,7 +78,7 @@
 }
 
 .lhs-nav {
-  &.emphesized { // special case for programs
+  &.emphasized { // special case for programs
    ul {
      margin-bottom:0;
    } 
@@ -112,77 +98,6 @@
     }
     li {
       position:relative;
-      .extended {
-        position:absolute;
-        top:-1px;
-        right:-422px;
-        z-index:2000;
-        width:400px;
-        padding:2px 10px;
-        background:#fff;
-        border:1px solid #ddd;
-        &.fade {
-          @include opacity(0);
-          display : none;
-        }
-        &.in {
-          @include opacity(0.95);
-          display : block;
-        }
-        span.error {
-          font-size:12px;
-          font-weight:normal;
-          color:#e00;
-        }
-        a.main-title {
-          i {
-            @include opacity(0.5);
-          }
-          &:hover {
-            i {
-              @include opacity(1);
-            }
-            text-decoration:none;
-          }
-        }
-        .rtf {
-          font-size:12px;
-          line-height:16px;
-          a {
-            display:inline;
-            padding:0;
-          }
-        }
-        .links {
-          margin-top:6px;
-          [class*="span"] {
-            min-height:24px;
-          }
-          border-top:1px solid #ccc;
-          font-size:12px;
-          .primary {
-            float:right;
-          }
-          .secondary {
-            color:#999;
-          }
-        }
-        .info {
-          font-size:12px;
-        }
-        a {
-          padding-left:0;
-          &:hover {
-            text-decoration:underline;
-            background:none;
-          }
-          &.url {
-            font-size:12px;
-            color:#369;
-            margin-bottom:6px;
-          }
-        }
-      }
       font-size:14px;
       line-height:24px;
       i {
@@ -340,17 +255,7 @@
 // INNER NAV
 
 .inner-nav {
-  width:200px;
-  float:left;
-  min-height:600px;
   .object-nav {
-    &.affix {
-      position: fixed;
-      top: 81px;
-      z-index: 2;
-      width:200px;
-      height:100%;
-    }
     .add-nav-item {
       position:relative;
       display:block;
@@ -404,23 +309,16 @@
     }
     li:hover {
       a {
-        i {
-          @include opacity(1);
-        }
-      }
-
-    }
-    li.active {
-      a {
-        background-color:#333;
+        background-color:#444;
         color:#fff;
         i {
           @include opacity(1);
         }
       }
     }
+    
     &.business {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$business;
@@ -428,7 +326,7 @@
       }
     }
     &.governance {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$governance;
@@ -436,7 +334,7 @@
       }
     }
     &.risk {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$risk;
@@ -444,7 +342,7 @@
       }
     }
     &.program {
-      li.active {
+      li:hover {
         a {
           color:#fff;
           background-color:$programs;
@@ -455,7 +353,74 @@
   }
 }
 
-.object-area {
-  float:left;
+.extended-info {
+  position:absolute;
+  top:-1px;
+  right:-422px;
+  z-index:2000;
+  width:400px;
+  padding:2px 10px;
+  background:#fff;
+  border:1px solid #ddd;
+  &.fade {
+    @include opacity(0);
+    display : none;
+  }
+  &.in {
+    @include opacity(0.95);
+    display : block;
+  }
+  span.error {
+    font-size:12px;
+    font-weight:normal;
+    color:#e00;
+  }
+  a.main-title {
+    i {
+      @include opacity(0.5);
+    }
+    &:hover {
+      i {
+        @include opacity(1);
+      }
+      text-decoration:none;
+    }
+  }
+  .rtf {
+    font-size:12px;
+    line-height:16px;
+    a {
+      display:inline;
+      padding:0;
+    }
+  }
+  .links {
+    margin-top:6px;
+    [class*="span"] {
+      min-height:24px;
+    }
+    border-top:1px solid #ccc;
+    font-size:12px;
+    .primary {
+      float:right;
+    }
+    .secondary {
+      color:#999;
+    }
+  }
+  .info {
+    font-size:12px;
+  }
+  a {
+    padding-left:0;
+    &:hover {
+      text-decoration:underline;
+      background:none;
+    }
+    &.url {
+      font-size:12px;
+      color:#369;
+      margin-bottom:6px;
+    }
+  }
 }
-

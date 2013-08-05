@@ -185,10 +185,10 @@ $(function() {
           }).control(CMS.Controllers.ResizeWidgets);
 
     }
-    $(".column-set[id][data-resize]").each(bindResizer);//get anything that exists on the page already.
+    //$(".column-set[id][data-resize]").each(bindResizer);//get anything that exists on the page already.
 
     //Then listen for new ones
-    $(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
+    //$(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
 
     var $area = $('.area').first()
       ;

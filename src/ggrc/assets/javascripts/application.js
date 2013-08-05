@@ -518,6 +518,8 @@ jQuery(document).ready(function($) {
 
   $.fn.oneline = oneline;
 
+  /* Deprecated quick search functionality
+   *
   // Open quick find
   $('body').on('focus', '.quick-search-holder input', function() {
     var $this = $(this)
@@ -573,6 +575,7 @@ jQuery(document).ready(function($) {
       $('.quick-search').trigger('close');
     }
   });
+  */
 
   // Close other popovers when one is shown
   $('body').on('show.popover', function(e) {

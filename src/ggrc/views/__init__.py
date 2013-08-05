@@ -67,13 +67,14 @@ def admin_reindex():
   from ggrc.models import all_models
   from ggrc.app import db
 
-  models = set(all_models.all_models) - set([all_models.LogEvent])
+  models = all_models.all_models
   for model in models:
     for instance in model.query.all():
       indexer.create_record(fts_record_for(instance), False)
   db.session.commit()
 
-  return redirect(url_for('admin'))
+  return app.make_response((
+    'success', 200, [('Content-Type', 'text/html')]))
 
 @app.route("/admin")
 @login_required

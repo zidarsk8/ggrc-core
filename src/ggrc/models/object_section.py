@@ -68,6 +68,7 @@ class Sectionable(object):
         'ObjectSection',
         primaryjoin=joinstr,
         backref='{0}_sectionable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [
