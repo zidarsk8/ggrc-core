@@ -23,14 +23,41 @@
   color: $darkGray;
 }
 
-// content style
-.content {
-  //padding-top: 20px;
-  //background: $white image-url('bgnd-content.png') repeat-x 0 0;
-  h2 {
-    margin-bottom: 20px;
-  }
-  &.affix {
-    margin-top: 30px;
-  }
+.lhs-holder {
+  position:fixed;
+  top:30px;
+  left:0;
+  width:248px;
+  height:500px;
+  overflow-y:auto;
+}
+.area {
+  margin-left:248px;
+}
+.header-content {
+  height:50px;
+  line-height:50px;
+  position:fixed;
+  top:30px;
+  width:100%;
+}
+.inner-nav {
+  width:200px;
+  height:445px;
+  position:fixed;
+  top:85px;
+  overflow-y:auto;
+}
+.object-area {
+  position:fixed;
+  top:85px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  margin-left:200px;
+  height:445px;
+}
+
+.footer {
+  margin-top:500px;
+  overflow:hidden;
 }

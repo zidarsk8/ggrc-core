@@ -1,6 +1,7 @@
 
 // widgets styles
 .widget {
+  width:100%;
   overflow-y:hidden;
   background:$white;
   border:1px solid $widgetBorder;
@@ -234,11 +235,27 @@
         color: $governance;
       }
     }
+    &.widget-active {
+      .header {
+        background-color:$governance;
+        h2 {
+          color: $white;
+        }
+      }
+    }
   }
   &.programs {
     .header {
       h2 {
         color: $programs;
+      }
+    }
+    &.widget-active {
+      .header {
+        background-color:$programs;
+        h2 {
+          color: $white;
+        }
       }
     }
   }
@@ -248,11 +265,27 @@
         color: $risk;
       }
     }
+    &.widget-active {
+      .header {
+        background-color:$risk;
+        h2 {
+          color: $white;
+        }
+      }
+    }
   }
   &.business {
     .header {
       h2 {
         color: $business;
+      }
+    }
+    &.widget-active {
+      .header {
+        background-color:$business;
+        h2 {
+          color: $white;
+        }
       }
     }
   }
