@@ -23,6 +23,7 @@ from ggrc.rbac import permissions
 from sqlalchemy import or_
 from werkzeug.exceptions import BadRequest, Forbidden
 from wsgiref.handlers import format_date_time
+from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
@@ -144,10 +145,24 @@ class ModelView(View):
     return url + querystring
 
   @classmethod
+  def base_url_for(cls, _memoized_base_url={}):
+    if cls not in _memoized_base_url:
+      _memoized_base_url[cls] = url_for(cls.endpoint_name())
+    return _memoized_base_url[cls]
+
+  @classmethod
   def url_for(cls, *args, **kwargs):
-    if args and isinstance(args[0], db.Model):
-      return url_for(cls.endpoint_name(), *args[1:], id=args[0].id, **kwargs)
-    return url_for(cls.endpoint_name(), *args, **kwargs)
+    url = cls.base_url_for()
+    if len(args) > 0:
+      arg = args[0]
+      id = arg if not isinstance(arg, db.Model) else arg.id
+      url = url + '/' + str(id)
+    if 'id' in kwargs:
+      url = url + '/' + str(kwargs['id'])
+      del kwargs['id']
+    if len(kwargs) > 0:
+      url = url + '?' + urlencode(kwargs)
+    return url
 
   @classmethod
   def decorate_view_func(cls, view_func, decorators):
