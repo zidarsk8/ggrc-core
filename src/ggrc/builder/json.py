@@ -262,36 +262,55 @@ class Builder(AttributeInfo):
     attr_value = getattr(obj, attr_name)
     if attr_value:
       return self.generate_link_object_for(attr_value, inclusions, include)
-    return None
+    else:
+      return None
 
   def publish_association_proxy(
       self, obj, attr_name, class_attr, inclusions, include):
     if include:
-      return self.publish_link_collection(
-          obj, attr_name, inclusions, include)
-    join_objects = getattr(obj, class_attr.local_attr.key)
-    if isinstance(class_attr.remote_attr, property):
-      target_name = class_attr.value_attr + '_id'
-      target_type = class_attr.value_attr + '_type'
+      return self.publish_link_collection(obj, attr_name, inclusions, include)
     else:
-      target_name = list(class_attr.remote_attr.property.local_columns)[0].key
-      target_type = class_attr.remote_attr.property.mapper.class_.__name__
-    return [self.generate_link_object_for_foreign_key(
-          getattr(o, target_name), target_type) for o in join_objects]
+      join_objects = getattr(obj, class_attr.local_attr.key)
+      if isinstance(class_attr.remote_attr, property):
+        target_name = class_attr.value_attr + '_id'
+        target_type = class_attr.value_attr + '_type'
+      else:
+        target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+        target_type = class_attr.remote_attr.property.mapper.class_.__name__
+      return [self.generate_link_object_for_foreign_key(
+            getattr(o, target_name), target_type) for o in join_objects]
+
+  def publish_relationship(
+      self, obj, attr_name, class_attr, inclusions, include):
+    uselist = class_attr.property.uselist
+    if uselist:
+      return self.publish_link_collection(obj, attr_name, inclusions, include)
+    elif include or class_attr.property.backref:
+      return self.publish_link(obj, attr_name, inclusions, include)
+    else:
+      target_type = class_attr.property.mapper.class_.__name__
+      target_name = list(class_attr.property.local_columns)[0].key
+      attr_value = getattr(obj, target_name)
+      if attr_value is not None:
+        return self.generate_link_object_for_foreign_key(
+            attr_value, target_type)
+      else:
+        return None
 
   def publish_attr(self, obj, attr_name, inclusions, include):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
-      #return self.publish_link_collection(obj, attr_name, inclusions, include)
       return self.publish_association_proxy(
           obj, attr_name, class_attr, inclusions, include)
     elif isinstance(class_attr, InstrumentedAttribute) and \
          isinstance(class_attr.property, RelationshipProperty):
-      if class_attr.property.uselist:
-        return self.publish_link_collection(
-            obj, attr_name, inclusions, include)
-      else:
-        return self.publish_link(obj, attr_name, inclusions, include)
+      return self.publish_relationship(
+          obj, attr_name, class_attr, inclusions, include)
+      #if class_attr.property.uselist:
+        #return self.publish_link_collection(
+            #obj, attr_name, inclusions, include)
+      #else:
+        #return self.publish_link(obj, attr_name, inclusions, include)
     elif class_attr.__class__.__name__ == 'property':
       return self.publish_link(obj, attr_name, inclusions, include)
     else:

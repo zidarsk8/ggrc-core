@@ -13,7 +13,6 @@ Feature: Basic RESTful CRUD Support
 
   Examples: Resources
       | resource_type      |
-      #| Categorization     |
       | Category           |
       | Control            |
       | ControlAssessment  |
@@ -39,7 +38,7 @@ Feature: Basic RESTful CRUD Support
       | Project            |
       | Program            |
       | ProgramDirective   |
-      #| Relationship       |
+      | Relationship       |
       | Request            |
       | Response           |
       | Risk               |
