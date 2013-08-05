@@ -116,14 +116,23 @@ $(function() {
   $(document.body).on("click", ".quick-search:not(:has(.cms_controllers_quick_search)), section.widget-tabs:not(:has(.cms_controllers_quick_search))", bindQuickSearch);
 
   $(document.body).on("click", ".bar-v", function(ev) {
-    $("#lhs").toggleClass("lhs-closed");
-    resize_areas();
-    if ( $("#lhs").hasClass("lhs-closed") ) {
-      $(".header-content.affix").css("left","48px");
+    
+    var $lhs = $("#lhs")
+    ,   $lhsHolder = $(".lhs-holder")
+    ,   $area = $(".area")
+    ;
+    
+    if( $lhs.hasClass("lhs-closed") ) {
+      $lhs.removeClass("lhs-closed");
+      $lhsHolder.css("width","248px");
+      $area.css("margin-left","248px");
     } else {
-      $(".header-content.affix").css("left","248px");
+      $lhs.addClass("lhs-closed");
+      $lhsHolder.css("width","48px");
+      $area.css("margin-left","48px");
     }
     
+    resize_areas();  
   });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
