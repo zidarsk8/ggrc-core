@@ -78,7 +78,8 @@
 
     // Manually call jquery-ujs remote call so that it can setup form and settings as usual,
     // and trigger the `ajax:beforeSend` callback to which remotipart binds functionality.
-    $.rails.handleRemote(form);
+    
+    $.rails.handleRemote(form)
     return false;
   });
 
