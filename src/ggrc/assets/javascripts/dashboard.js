@@ -698,34 +698,55 @@ jQuery(function($) {
   });
 });
 
+
 function resize_areas() {
-  var $window, $header, $lhs, $inner_nav
-    , winWidth, winHeight, affixRight, headerHeight, internavWidth
-    , areaWidth, objectAreaWidth, areaHeight
+  
+  var $window
+  ,   $lhs
+  ,   $lhsHolder
+  ,   $area
+  ,   $header
+  ,   $footer
+  ,   $innerNav
+  ,   $objectArea
+  ,   winHeight
+  ,   winWidth
+  ,   objectWidth
+  ,   headerWidth
+  ,   lhsWidth
+  ,   footerMargin
+  ,   internavHeight
+  ;
+  
+  $window = $(window);
+  $lhs = $(".lhs-holder, .lhs");
+  $lhsHolder = $(".lhs-holder");
+  $footer = $(".footer");
+  $header = $(".header-content");
+  $innerNav = $(".inner-nav");
+  $objectArea = $(".object-area");
+  $area = $(".area");
+
+  winHeight = $window.height();
+  winWidth = $window.width();
+  lhsHeight = winHeight - 70;
+  footerMargin = lhsHeight;
+  internavHeight = lhsHeight - 55;
+  lhsWidth = $lhsHolder.width();
+  objectWidth = winWidth - $lhsHolder.width() - $innerNav.width();
+  headerWidth = winWidth - $lhsHolder.width();
+
+  $lhs.css("height",lhsHeight);
+  $footer.css("margin-top",footerMargin);
+  $innerNav.css("height",internavHeight);
+  $header.css("width",headerWidth);
+  $objectArea
+    .css("height",internavHeight)
+    .css("width",objectWidth)
     ;
 
-  $window = $(window);
-  $header = $('header.main');
-  $lhs = $('#lhs');
-  $inner_nav = $('.area .inner-nav');
-
-  winWidth = $window.width();
-  winHeight = $window.height();
-  affixRight = $lhs.offset().left + $lhs.width();
-  headerHeight = $header.height();
-  internavWidth = ($inner_nav.length > 0 ? $inner_nav.width() : 0);
-
-  areaWidth = winWidth - affixRight - 8 - 5; // bar=8px, border-right=5px
-  objectAreaWidth = areaWidth - internavWidth;
-  areaHeight = winHeight - headerHeight;
-
-  $(".area").css("width", areaWidth);
-  $(".area .header-content").css("left", affixRight + 8);
-  $(".object-area").css("width", objectAreaWidth);
-
-  $(".affix-holder").css('height', areaHeight);
-  $(".bar-v").css('height', areaHeight);
 }
+
 
 jQuery(function($) {
 

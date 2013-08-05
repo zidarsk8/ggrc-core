@@ -84,111 +84,112 @@
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
                         Logout
-    .clearfix
-      .lhs-holder
-        .affix-holder{ 'data-spy': 'affix', 'data-offset-top': '1' }
-          #lhs.lhs.accordion
-            .bar-v
-            -#NEW LHS
-            .lhs-search
-              %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
-            .lhs-bg
-            .lhs-nav.emphesized
-              %ul.top-level
-                =search_result('Program', 'programs', 'programs')   
-            .lhs-nav
-              %h2.governance Governance
-              %ul.top-level
-                =search_result('Control', 'controls', 'governance')
-                =search_result('Objective', 'objectives', 'governance')
-                =search_result('Contract', 'contracts', 'governance')
-                =search_result('Policy', 'policies', 'governance')
-                =search_result('Regulation', 'regulations', 'governance')
-              %h2.business Assets/Business
-              %ul.top-level
-                =search_result('Process', 'processes', 'business')
-                =search_result('System', 'systems', 'business')
-                =search_result('OrgGroup', 'org groups', 'business')
-                =search_result('Project', 'projects', 'business')
-                =search_result('Facility', 'facilities', 'business')
-                =search_result('Product', 'products', 'business')
-                =search_result('DataAsset', 'data assets', 'business')
-                =search_result('Market', 'markets', 'business')
-              -#%h2.risk Risk Management
-              -#%ul.top-level
-                =search_result('Risk', 'risks', 'risk')
-                =search_result('RiskyAttribute', 'risky attributes', 'risk')
-            .bar-h
-            -#.lhs-nav
-              -#%h2 My Work
-            -#.bar-h
-            .lhs-nav.recent
-              %h2 Recently Viewed
-              %ul.top-level
 
-            .bar-h
-      .area{ 'class': '={ model_display_class }' }
-        .header-content{ 'data-spy': 'affix', 'data-offset-top': '1' }
-          .row-fluid
-            .span9
-              -block header
-            .span3
-              -block subheader_extras
+    .area{ 'class': '={ model_display_class }' }
+      .header-content
+        .row-fluid
+          .span9
+            -block header
+          .span3
+            -block subheader_extras
 
-        %section.content
-          .flash
-            -with messages = get_flashed_messages(with_categories=True)
-              -if messages
-                -for category, message in messages
-                  %div{ 'class': "{{category}}" }
-                    %a.close{'href': "#", 'data-dismiss': "alert" }
-                      x
-                    %p
-                      {{message}}
-            -#FIXME: Flash messages
-            -#flash.each do |type, value|
-              -value = [value] unless value.is_a?(Array)
-              -value = value.map(:presence).compact
-              -if value.size > 0
-                %div{ 'class': type }
-                  %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                    &times;
-                  -value.each do |message|
-                    %p=message
-          -block main
-            .clearfix
-              .inner-nav
-                .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
-                  %ul.nav{ 'class': "internav ={ model_display_class }" }
-                  -include 'shared/_add_widget_section.haml'
-              .object-area
-                #show_columns.column-set{ 'data-resize': "true" }
-                  #middle_column.widget-area
-                    -block widget_area
-        %section.footer
-          .row-fluid
-            .span12
-              %ul.bottom-nav.pull-left
-                -#FIXME: demo mode?
-                -#%li
-                  -if controller_name == 'design'
-                    -path = dashboard_path
-                  -else
-                    -path = request.fullpath
-                  -path = path.gsub(/BETA=[^&]*&?/, '').sub(/[?&]$/, '')
-                  -path += path.include?('?') ? '&' : '?'
-                  -if has_feature? 'BETA'
-                    %a.demo-hide{ 'href': "#{path}BETA=0" }
-                      Hide Demo
-                  -else
-                    %a.demo-show{ 'href': "#{path}BETA=1" }
-                      Show Demo
-              %p
-                -#FIXME: Copyright footer
-                -#=CMS_CONFIG['COMPANY']
-                Confidential.
-                Copyright &copy;
-                -#=Time.now.year
-                =config.get('COMPANY')
-                Version
-                =config.get('VERSION')
+      %section.content
+        .flash
+          -with messages = get_flashed_messages(with_categories=True)
+            -if messages
+              -for category, message in messages
+                %div{ 'class': "{{category}}" }
+                  %a.close{'href': "#", 'data-dismiss': "alert" }
+                    x
+                  %p
+                    {{message}}
+          -#FIXME: Flash messages
+          -#flash.each do |type, value|
+            -value = [value] unless value.is_a?(Array)
+            -value = value.map(:presence).compact
+            -if value.size > 0
+              %div{ 'class': type }
+                %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                  &times;
+                -value.each do |message|
+                  %p=message
+        -block main
+          .clearfix
+            .inner-nav
+              .object-nav
+                %ul.nav{ 'class': "internav ={ model_display_class }" }
+                -include 'shared/_add_widget_section.haml'
+            .object-area
+              #show_columns.column-set{ 'data-resize': "true" }
+                #middle_column.widget-area
+                  -block widget_area
+    %section.footer
+      .row-fluid
+        .span12
+          %ul.bottom-nav.pull-left
+            -#FIXME: demo mode?
+            -#%li
+              -if controller_name == 'design'
+                -path = dashboard_path
+              -else
+                -path = request.fullpath
+              -path = path.gsub(/BETA=[^&]*&?/, '').sub(/[?&]$/, '')
+              -path += path.include?('?') ? '&' : '?'
+              -if has_feature? 'BETA'
+                %a.demo-hide{ 'href': "#{path}BETA=0" }
+                  Hide Demo
+              -else
+                %a.demo-show{ 'href': "#{path}BETA=1" }
+                  Show Demo
+          %p
+            -#FIXME: Copyright footer
+            -#=CMS_CONFIG['COMPANY']
+            Confidential.
+            Copyright &copy;
+            -#=Time.now.year
+            =config.get('COMPANY')
+            Version
+            =config.get('VERSION')
+
+    .lhs-holder
+      .affix-holder
+        #lhs.lhs.accordion
+          .bar-v
+          -#NEW LHS
+          .lhs-search
+            %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Search...' }
+          .lhs-bg
+          .lhs-nav.emphesized
+            %ul.top-level
+              =search_result('Program', 'programs', 'programs')   
+          .lhs-nav
+            %h2.governance Governance
+            %ul.top-level
+              =search_result('Control', 'controls', 'governance')
+              =search_result('Objective', 'objectives', 'governance')
+              =search_result('Contract', 'contracts', 'governance')
+              =search_result('Policy', 'policies', 'governance')
+              =search_result('Regulation', 'regulations', 'governance')
+            %h2.business Assets/Business
+            %ul.top-level
+              =search_result('Process', 'processes', 'business')
+              =search_result('System', 'systems', 'business')
+              =search_result('OrgGroup', 'org groups', 'business')
+              =search_result('Project', 'projects', 'business')
+              =search_result('Facility', 'facilities', 'business')
+              =search_result('Product', 'products', 'business')
+              =search_result('DataAsset', 'data assets', 'business')
+              =search_result('Market', 'markets', 'business')
+            -#%h2.risk Risk Management
+            -#%ul.top-level
+              =search_result('Risk', 'risks', 'risk')
+              =search_result('RiskyAttribute', 'risky attributes', 'risk')
+          .bar-h
+          -#.lhs-nav
+            -#%h2 My Work
+          -#.bar-h
+          .lhs-nav.recent
+            %h2 Recently Viewed
+            %ul.top-level
+
+          .bar-h

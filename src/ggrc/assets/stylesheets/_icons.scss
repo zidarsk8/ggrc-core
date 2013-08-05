@@ -537,6 +537,7 @@ i.short {
   .grcicon-section-color { background-position:-198px -104px; }
   .grcicon-clause-color { background-position:-198px -104px; }
   .grcicon-event-color { background-position:-102px -176px; }
+  .grcicon-program-color { background-position:-102px -104px; }
 
   li {
     &.active,
@@ -557,7 +558,7 @@ i.short {
       .grcicon-process-color { background-position:-102px -248px }
       .grcicon-product-color { background-position:-270px -128px; }
       .grcicon-project-color { background-position:-54px -248px; }
-      .grcicon-system-color { background-position:-126px -248px }
+      .grcicon-system-color { background-position:-126px -224px; }
       .grcicon-contract-color { background-position:-126px -128px; }
       .grcicon-policy-color { background-position:-150px -128px; }
       .grcicon-regulation-color { background-position:-174px -128px; }
@@ -568,6 +569,7 @@ i.short {
       .grcicon-section-color { background-position:-198px -128px; }
       .grcicon-clause-color { background-position:-198px -128px; }
       .grcicon-event-color { background-position:-198px -56px; }
+      .grcicon-program-color { background-position:-102px -128px; }
     }
   }
 }
@@ -606,7 +608,7 @@ i.short {
       .grcicon-event-color { background-position:-198px -56px; }
       .grcicon-help-black { background-position:-78px -32px; }
       .grcicon-x-grey { background-position:-174px -176px; }
-      
+      .grcicon-program-color { background-position:-102px -128px; }
       .widget-showhide {
         a {
           background-position: -265px -241px;
