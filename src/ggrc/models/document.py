@@ -71,3 +71,18 @@ class Document(Base, db.Model):
       'year',
       'language',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Document, cls).eager_query()
+    return query.options(
+        orm.joinedload('type'),
+        orm.joinedload('kind'),
+        orm.joinedload('year'),
+        orm.joinedload('language'),
+        orm.subqueryload('object_documents'),
+        orm.subqueryload('population_worksheets_documented'),
+        orm.subqueryload('sample_worksheets_documented'),
+        orm.subqueryload('sample_evidences_documented'));

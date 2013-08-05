@@ -156,5 +156,6 @@ class Control(
         orm.subqueryload_all('control_controls.implemented_control'),
         orm.subqueryload_all('implementing_control_controls.control'),
         orm.subqueryload_all('control_risks.risk'),
+        orm.subqueryload_all('program_controls.program'),
         orm.subqueryload_all('control_assessments'),
         orm.subqueryload('object_controls'))
