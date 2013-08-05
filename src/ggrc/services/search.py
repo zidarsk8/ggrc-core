@@ -23,15 +23,20 @@ def search():
   should_just_count = request.args.get('counts_only', '')
   should_just_count = should_just_count.lower() == 'true'
 
-  if should_just_count:
-    return do_counts(terms)
-  if should_group_by_type:
-    return group_by_type_search(terms)
-  return basic_search(terms)
+  types = request.args.get('types', '');
+  types = [t.strip() for t in types.split(',') if len(t.strip()) > 0]
+  if len(types) == 0:
+    types = None
 
-def do_counts(terms):
+  if should_just_count:
+    return do_counts(terms, types)
+  if should_group_by_type:
+    return group_by_type_search(terms, types)
+  return basic_search(terms, types)
+
+def do_counts(terms, types=None):
   indexer = get_indexer()
-  results = indexer.counts(terms)
+  results = indexer.counts(terms, types=types)
 
   return current_app.make_response((
     json.dumps({ 'results': {
@@ -43,9 +48,9 @@ def do_counts(terms):
     [('Content-Type', 'application/json')],
     ))
 
-def do_search(terms, list_for_type):
+def do_search(terms, list_for_type, types=None):
   indexer = get_indexer()
-  results = indexer.search(terms)
+  results = indexer.search(terms, types=types)
   seen_results = {}
 
   for result in results:
@@ -72,15 +77,15 @@ def make_search_result(entries):
     [('Content-Type', 'application/json')],
     ))
 
-def basic_search(terms):
+def basic_search(terms, types=None):
   entries = []
   list_for_type = lambda t: entries
-  do_search(terms, list_for_type)
+  do_search(terms, list_for_type, types)
   return make_search_result(entries)
 
-def group_by_type_search(terms):
+def group_by_type_search(terms, types=None):
   entries = {}
   list_for_type = \
       lambda t: entries[t] if t in entries else entries.setdefault(t, [])
-  do_search(terms, list_for_type)
+  do_search(terms, list_for_type, types)
   return make_search_result(entries)

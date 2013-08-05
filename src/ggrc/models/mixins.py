@@ -96,6 +96,7 @@ class Relatable(object):
         primaryjoin=joinstr,
         foreign_keys = 'Relationship.destination_id',
         cascade = 'all, delete-orphan')
+
   @declared_attr
   def related_destinations(cls):
     joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
@@ -106,6 +107,20 @@ class Relatable(object):
         primaryjoin=joinstr,
         foreign_keys = 'Relationship.source_id',
         cascade = 'all, delete-orphan')
+
+  #_publish_attrs = [
+  #    'related_sources',
+  #    'related_destinations'
+  #    ]
+
+  #@classmethod
+  #def eager_query(cls):
+  #  from sqlalchemy import orm
+
+  #  query = super(Relatable, cls).eager_query()
+  #  return query.options(
+  #      orm.subqueryload('related_sources'),
+  #      orm.subqueryload('related_destinations'))
 
 class Described(object):
   description = db.Column(db.Text)
@@ -167,7 +182,15 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-class Base(ChangeTracked, Identifiable, Relatable, ContextRBAC):
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ContextRBAC, cls).eager_query()
+    return query.options(
+        orm.subqueryload('context'))
+
+class Base(ChangeTracked, Relatable, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
   case.
   """

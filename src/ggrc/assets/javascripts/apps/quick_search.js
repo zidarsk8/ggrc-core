@@ -75,6 +75,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 $(function() {
 
   $(".recent").ggrc_controllers_recently_viewed();
+  $("#lhs").cms_controllers_lhn_tooltips();
 
   function bindQuickSearch(ev, opts) {
 
@@ -102,7 +103,7 @@ $(function() {
   $(".lhs").each(function() {
     bindQuickSearch.call(this, {}, {
       list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
-      , tooltip_view : GGRC.mustache_path + "/base_objects/extended_info.mustache"
+      //, tooltip_view : GGRC.mustache_path + "/base_objects/extended_info.mustache"
       , spin : false
       , tab_selector : 'ul.top-level > li > a'
       // , tab_href_attr : [ "href", "data-tab-href" ]

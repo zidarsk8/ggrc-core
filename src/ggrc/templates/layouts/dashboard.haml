@@ -22,7 +22,6 @@
         (
         %span.item-count> ...
         )
-    .extended.fade
     %ul.sub-level.collapse{ 'id' : '={ type_plural|underscore }_sub_level'}
 -endmacro
 
@@ -123,6 +122,7 @@
               #show_columns.column-set{ 'data-resize': "true" }
                 #middle_column.widget-area
                   -block widget_area
+
     %section.footer
       .row-fluid
         .span12

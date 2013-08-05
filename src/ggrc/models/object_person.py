@@ -43,6 +43,15 @@ class ObjectPerson(Base, Timeboxed, db.Model):
       'personable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectPerson, cls).eager_query()
+    return query.options(
+        orm.subqueryload_all('person'))
+
+
 class Personable(object):
   @declared_attr
   def object_people(cls):
@@ -74,4 +83,5 @@ class Personable(object):
     from sqlalchemy import orm
 
     query = super(Personable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_people.person'))
+    return query.options(
+        orm.subqueryload_all('object_people.person'))

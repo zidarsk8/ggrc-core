@@ -42,6 +42,14 @@ class ObjectSection(Base, Timeboxed, db.Model):
       'sectionable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectSection, cls).eager_query()
+    return query.options(
+        orm.subqueryload('section'))
+
 class Sectionable(object):
   @declared_attr
   def object_sections(cls):
