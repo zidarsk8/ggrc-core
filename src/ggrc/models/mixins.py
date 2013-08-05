@@ -145,7 +145,15 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-class Base(ChangeTracked, Identifiable, ContextRBAC):
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ContextRBAC, cls).eager_query()
+    return query.options(
+        orm.subqueryload('context'))
+
+class Base(ContextRBAC, ChangeTracked, Identifiable):
   """Several of the models use the same mixins. This class covers that common
   case.
   """

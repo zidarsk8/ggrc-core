@@ -29,3 +29,14 @@ class Response(Documentable, Personable, Base, db.Model):
       'meetings',
       'population_sample',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Response, cls).eager_query()
+    return query.options(
+        orm.joinedload('request'),
+        orm.joinedload('system'),
+        orm.subqueryload('meetings'),
+        orm.subqueryload('population_sample'))

@@ -6,6 +6,7 @@
 from ggrc import db
 from .associationproxy import association_proxy
 from .mixins import BusinessObject, Hierarchical
+from .reflection import PublishOnly
 
 class Section(Hierarchical, BusinessObject, db.Model):
   __tablename__ = 'sections'
@@ -28,20 +29,20 @@ class Section(Hierarchical, BusinessObject, db.Model):
       'directive',
       'na',
       'notes',
-      'control_sections',
+      PublishOnly('control_sections'),
       'controls',
-      'section_objectives',
+      PublishOnly('section_objectives'),
       'objectives',
       'object_sections',
       ]
-  _update_attrs = [
-      'directive',
-      'na',
-      'notes',
-      'controls',
-      'objectives',
-      'object_sections',
-      ]
+  #_update_attrs = [
+  #    'directive',
+  #    'na',
+  #    'notes',
+  #    'controls',
+  #    'objectives',
+  #    'object_sections',
+  #    ]
 
   @classmethod
   def eager_query(cls):
@@ -49,7 +50,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
 
     query = super(Section, cls).eager_query()
     return query.options(
-        orm.joinedload('directive'),
+        orm.subqueryload('directive'),
         orm.subqueryload_all('control_sections.control'),
         orm.subqueryload_all('section_objectives.objective'),
         orm.subqueryload('object_sections'))

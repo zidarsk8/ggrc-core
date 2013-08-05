@@ -23,3 +23,14 @@ class PopulationSample(Base, db.Model):
       'sample_worksheet_document',
       'sample_evidence_document',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(PopulationSample, cls).eager_query()
+    return query.options(
+        orm.subqueryload('response'),
+        orm.subqueryload('population_document'),
+        orm.subqueryload('sample_worksheet_document'),
+        orm.subqueryload('sample_evidence_document'))
