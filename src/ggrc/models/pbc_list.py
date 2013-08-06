@@ -18,3 +18,13 @@ class PbcList(Base, db.Model):
       'requests',
       'control_assessments',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(PbcList, cls).eager_query()
+    return query.options(
+        orm.joinedload('audit_cycle'),
+        orm.subqueryload('requests'),
+        orm.subqueryload('control_assessments'))

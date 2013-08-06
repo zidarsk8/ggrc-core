@@ -130,7 +130,7 @@ class BaseRowConverter(object):
 
   def responds_to_after_save(self, hook):
     if hasattr(hook, 'after_save'):
-      return callable(getattr(hook, 'after_save'))
+      return callable(getattr(hook, 'after_save', None))
     return False
 
   def handle_boolean(self, key, **options):
@@ -224,7 +224,6 @@ class ColumnHandler(object):
 
   def export(self):
     return getattr(self.importer.obj, self.key, '')
-
 
 class TextOrHtmlColumnHandler(ColumnHandler):
 

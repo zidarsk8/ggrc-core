@@ -85,6 +85,43 @@ class ChangeTracked(object):
     return query.options(
         orm.subqueryload('modified_by'))
 
+class Relatable(object):
+  @declared_attr
+  def related_sources(cls):
+    joinstr = 'and_(remote(Relationship.destination_id) == {type}.id, '\
+                    'remote(Relationship.destination_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.destination_id',
+        cascade = 'all, delete-orphan')
+
+  @declared_attr
+  def related_destinations(cls):
+    joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
+                    'remote(Relationship.source_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.source_id',
+        cascade = 'all, delete-orphan')
+
+  #_publish_attrs = [
+  #    'related_sources',
+  #    'related_destinations'
+  #    ]
+
+  #@classmethod
+  #def eager_query(cls):
+  #  from sqlalchemy import orm
+
+  #  query = super(Relatable, cls).eager_query()
+  #  return query.options(
+  #      orm.subqueryload('related_sources'),
+  #      orm.subqueryload('related_destinations'))
+
 class Described(object):
   description = db.Column(db.Text)
 
@@ -145,7 +182,15 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-class Base(ChangeTracked, Identifiable, ContextRBAC):
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ContextRBAC, cls).eager_query()
+    return query.options(
+        orm.subqueryload('context'))
+
+class Base(ChangeTracked, Relatable, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
   case.
   """

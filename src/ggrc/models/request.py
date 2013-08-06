@@ -40,3 +40,13 @@ class Request(Base, db.Model):
       'response_due_at',
       'responses',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Request, cls).eager_query()
+    return query.options(
+        orm.joinedload('pbc_list'),
+        orm.joinedload('control_assessment'),
+        orm.subqueryload('responses'))

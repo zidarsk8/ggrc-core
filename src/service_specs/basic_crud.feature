@@ -20,7 +20,10 @@ Feature: Basic RESTful CRUD Support
       | ControlRisk        |
       | Cycle              |
       | DataAsset          |
-      | Directive          |
+      #| Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
@@ -47,7 +50,9 @@ Feature: Basic RESTful CRUD Support
       | RiskRiskyAttribute |
       | Section            |
       | SectionObjective   |
+      #| SystemOrProcess    |
       | System             |
+      | Process            |
       | SystemSystem       |
       | SystemControl      |
 

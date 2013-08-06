@@ -42,6 +42,14 @@ class ObjectSection(Base, Timeboxed, db.Model):
       'sectionable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectSection, cls).eager_query()
+    return query.options(
+        orm.subqueryload('section'))
+
 class Sectionable(object):
   @declared_attr
   def object_sections(cls):
@@ -60,6 +68,7 @@ class Sectionable(object):
         'ObjectSection',
         primaryjoin=joinstr,
         backref='{0}_sectionable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [

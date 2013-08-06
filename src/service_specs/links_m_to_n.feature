@@ -37,12 +37,18 @@ Feature: Many resources type pairs reference each other M x N relations. This
       | Control   | sections             | Section   | controls              |
       | Control   | implemented_controls | Control   | implementing_controls |
       | Control   | risks                | Risk      | controls              |
-      | Directive | programs             | Program   | directives            |
+      #| Directive | programs             | Program   | directives            |
+      | Contract  | programs             | Program   | directives            |
+      | Policy    | programs             | Program   | directives            |
+      | Regulation| programs             | Program   | directives            |
       | Control   | objectives           | Objective | controls              |
       | Section   | objectives           | Objective | sections              |
       | Objective | controls             | Control   | objectives            |
       | Objective | sections             | Section   | objectives            |
       | System    | sub_systems          | System    | super_systems         |
+      | System    | sub_systems          | Process   | super_systems         |
+      | Process   | sub_systems          | System    | super_systems         |
+      | Process   | sub_systems          | Process   | super_systems         |
 
   Scenario Outline: Update of M x N relationships
     Given a new "<source>" named "source_a"
@@ -55,4 +61,7 @@ Feature: Many resources type pairs reference each other M x N relations. This
 
    Examples: m-by-n link Resources
       | source    | link_property      | dest    |
-      | Directive | programs             | Program |
+      #| Directive | programs             | Program |
+      | Contract   | programs             | Program |
+      | Policy     | programs             | Program |
+      | Regulation | programs             | Program |

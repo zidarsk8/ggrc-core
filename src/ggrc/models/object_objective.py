@@ -42,6 +42,14 @@ class ObjectObjective(Base, Timeboxed, db.Model):
       'objectiveable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectObjective, cls).eager_query()
+    return query.options(
+        orm.subqueryload('objective'))
+
 class Objectiveable(object):
   @declared_attr
   def object_objectives(cls):
@@ -60,6 +68,7 @@ class Objectiveable(object):
         'ObjectObjective',
         primaryjoin=joinstr,
         backref='{0}_objectiveable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [

@@ -33,7 +33,6 @@
 CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   defaults : {
     list_view : GGRC.mustache_path + "/dashboard/object_list.mustache"
-    , tooltip_view : GGRC.mustache_path + "/dashboard/object_tooltip.mustache"
     , spin : true
     , tab_selector : 'ul.nav-tabs:first > li > a'
     , tab_href_attr : [ "href", "data-tab-href" ]
@@ -75,7 +74,6 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
           , all_items: new model.List()
           , filtered_items: new model.List()
           , observer: that.options.observer
-          , tooltip_view : that.options.tooltip_view
           , model : model
         });
 
@@ -194,45 +192,301 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       .closest("a").attr("data-object-plural", plural.split(" ").join("_").toLowerCase())
       .attr("data-object-singular", singular.replace(" ", ""));
   }
+});
 
-  , ".show-extended mouseover" : function(el, ev) {
-    var $allext = this.element.find(".extended, .show-extended")
-    , $extended = el.closest(":has(.extended)").find(".extended:first")
-    , instance = el.closest("[data-model]").data("model") || el.closest(":data(model)").data("model")
-    , that = this;
-
-    if(!$extended.hasClass("in") || this.fade_out_timeout) {
-      clearTimeout(this.fade_in_timeout);
-      clearTimeout(that.fade_out_timeout);
-      that.fade_in_timeout = setTimeout(function() {
-        can.view(that.options.tooltip_view, instance, function(frag) {
-          $allext.removeClass("in");
-          that.fade_in_timeout = null;
-          $extended.html(frag).addClass("in").css("top", el.offset().top - el.closest(".accordion-group").offset().top).data("model", instance);
-          el.addClass("in");
-        });
-      }, 300);
+can.Control("CMS.Controllers.LHN_Search", {
+    defaults : {
+        list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
+      , list_selector: 'ul.top-level > li'
+      , model_attr_selector: null
+      , model_attr: 'data-model-name'
+      , count_selector: '.item-count'
+      , list_content_selector: 'ul'
+      , limit : 6
+      , observer : null
     }
+}, {
+    init: function() {
+      this.init_object_lists();
+      this.init_list_views();
+      this.run_search("");
+    }
+
+  , "{list_selector} {list_content_selector} show": "on_show_list"
+
+  , on_show_list: function(el, ev) {
+      var $list = $(el).closest(this.get_lists())
+        , model_name = this.get_list_model($list)
+        ;
+
+      setTimeout(this.proxy("refresh_visible_lists"), 20);
+    }
+
+  , "{observer} value" : function(el, ev, newval) {
+      this.run_search(newval);
+      //this.element.trigger('kill-all-popovers');
+    }
+
+  , ".view-more click" : function(el, ev) {
+      var self = this
+        , $list = $(el).closest(this.get_lists())
+        , model_name = this.get_list_model($list)
+        , visible_list = this.options.visible_lists[model_name]
+        , results_list = this.options.results_lists[model_name]
+        ;
+
+      visible_list.replace(results_list.slice(0, visible_list.length * 2));
   }
 
-  , ".extended mouseover" : function(el, ev) {
-    clearTimeout(this.fade_out_timeout);
-    this.fade_out_timeout = null;
-  }
+  , init_object_lists: function() {
+      var self = this;
+      if (!this.options.results_lists)
+        this.options.results_lists = {};
+      if (!this.options.visible_lists)
+        this.options.visible_lists = {};
 
-  , ".show-extended, .extended mouseleave" : function(el, ev) {
-    var $extended = this.element.find(".extended.in")
-    , that = this;
-    this.fade_out_timeout = setTimeout(function() {
-      if(!$(ev.relatedTarget).is(".show-extended.in, .extended.in, .show-extended.in *, .extended.in *")) {
-        clearTimeout(that.fade_in_timeout);
-        that.fade_out_timeout = null;
-        el.removeClass("in");
-        $extended.removeClass("in");
+      can.each(this.get_lists(), function($list) {
+        var model_name;
+        $list = $($list);
+        model_name = self.get_list_model($list);
+        self.options.results_lists[model_name] = new can.Observe.List();
+        self.options.visible_lists[model_name] = new can.Observe.List();
+      });
+    }
+
+  , init_list_views: function() {
+      var self = this;
+      can.each(this.get_lists(), function($list) {
+        var model_name;
+        $list = $($list);
+        model_name = self.get_list_model($list);
+
+        var context = {
+            model: CMS.Models[model_name]
+          , list: self.options.visible_lists[model_name]
+        };
+
+        can.view(self.options.list_view, context, function(frag, xhr) {
+          $list.find(self.options.list_content_selector).html(frag);
+        });
+      });
+    }
+
+  , get_list_model: function($list) {
+      $list = $($list);
+      if (this.options.model_attr_selector)
+        $list = $list.find(this.options.model_attr_selector).first();
+      return $list.attr(this.options.model_attr);
+    }
+
+  , display_counts: function(search_result) {
+      var self = this;
+      can.each(this.get_lists(), function($list) {
+        var model_name, count;
+        $list = $($list);
+        model_name = self.get_list_model($list);
+        if (model_name) {
+          count = search_result.getCountFor(model_name);
+
+          if (!isNaN(parseInt(count))) {
+            $list
+              .find(self.options.count_selector)
+              .text(count);
+          }
+        }
+      });
+    }
+
+  , display_lists: function(search_result) {
+      var self = this
+        , models;
+      models = can.map(this.get_visible_lists(), this.proxy("get_list_model"));
+      can.each(models, function(model_name) {
+        var results;
+        results = search_result.getResultsForType(model_name);
+        refresh_queue = new RefreshQueue();
+        can.each(results, can.proxy(refresh_queue, "enqueue"));
+        refresh_queue.trigger().then(function(_) {
+          self.options.results_lists[model_name].replace(results);
+          self.options.visible_lists[model_name].replace(
+            self.options.results_lists[model_name]
+              .slice(0, self.options.limit));
+        });
+      });
+    }
+
+  , refresh_counts: function() {
+      var models;
+      models = can.map(this.get_lists(), this.proxy("get_list_model"));
+
+      // Retrieve and display counts
+      GGRC.Models.Search.counts_for_types(this.current_term, models)
+        .then(this.proxy("display_counts"));
+    }
+
+  , refresh_visible_lists: function() {
+      var self = this
+        , lists = this.get_visible_lists()
+        , models = can.map(lists, this.proxy("get_list_model"))
+        ;
+
+      models = can.map(models, function(model_name) {
+        if (self.options.loaded_lists.indexOf(model_name) == -1)
+          return model_name;
+      });
+
+      if (models.length > 0) {
+        // Register that the lists are loaded
+        can.each(models, function(model_name) {
+          self.options.loaded_lists.push(model_name);
+        });
+
+        GGRC.Models.Search.search_for_types(this.current_term, models)
+          .then(this.proxy("display_lists"));
       }
-    }, 300);
-  }
+    }
 
+  , run_search: function(term) {
+      var self = this;
+      if (term !== this.current_term) {
+        // Clear current result lists
+        can.each(this.options.results_lists, function(list) {
+          list.replace([]);
+        });
+        can.each(this.options.visible_lists, function(list) {
+          list.replace([]);
+        });
+        this.options.loaded_lists = [];
+
+        this.current_term = term;
+        this.refresh_counts();
+        // Retrieve and display results for visible lists
+        this.refresh_visible_lists();
+      }
+    }
+
+  , get_lists: function() {
+      return $.makeArray(
+          this.element.find(this.options.list_selector));
+    }
+
+  , get_visible_lists: function() {
+      var self = this;
+      return can.map(this.get_lists(), function($list) {
+        $list = $($list);
+        if ($list.find(self.options.list_content_selector).hasClass('in'))
+          return $list;
+      });
+    }
+});
+
+
+can.Control("CMS.Controllers.LHN_Tooltips", {
+    defaults : {
+        tooltip_view: GGRC.mustache_path + "/base_objects/extended_info.mustache"
+      , trigger_selector: ".show-extended"
+      , fade_in_delay: 300
+      , fade_out_delay: 300
+    }
+}, {
+    init: function() {
+      if (!this.options.$extended) {
+        this.options.$extended = $('#extended-info');
+        if (this.options.$extended.length < 1)
+          this.options.$extended =
+            $('<div id="extended-info" class="extended-info hide" />')
+              .appendTo('body');
+      }
+      if (!this.options.$lhs)
+        this.options.$lhs = $('#lhs');
+      // Renew event listening, since we assigned $extended, $lhs
+      this.on();
+    }
+
+  // Tooltip / popover handling
+  , "{trigger_selector} mouseenter": "on_mouseenter"
+  , "{trigger_selector} mouseleave": "on_mouseleave"
+  , "{$extended} mouseleave": "on_mouseleave"
+  , "{$extended} mouseenter": "on_tooltip_mouseenter"
+
+  , on_mouseenter: function(el, ev) {
+      var instance = el.closest("[data-model]").data("model")
+                      || el.closest(":data(model)").data("model")
+        , delay = this.options.fade_in_delay
+        ;
+
+      if (this.options.$extended.data('model') !== instance) {
+        clearTimeout(this.fade_in_timeout);
+        // If tooltip is already showing, show new content without delay
+        if (this.options.$extended.hasClass('in'))
+          delay = 0;
+        this.fade_in_timeout = setTimeout(
+            this.proxy('on_fade_in_timeout', el, instance), delay);
+        clearTimeout(this.fade_out_timeout);
+        this.fade_out_timeout = null;
+      } else if (this.fade_out_timeout) {
+        clearTimeout(this.fade_out_timeout);
+        this.fade_out_timeout = null;
+      }
+    }
+
+  , ensure_tooltip_visibility: function() {
+      var offset = this.options.$extended.offset().top
+        , height = this.options.$extended.height()
+        // "- 24" compensates for the Chrome URL display when hovering a link
+        , window_height = $(window).height() - 24
+        , new_offset
+        ;
+
+      if (offset + height > window_height) {
+        if (height > window_height)
+          new_offset = 0;
+        else
+          new_offset = window_height - height;
+        this.options.$extended.css({ top: new_offset });
+      }
+    }
+
+  , on_fade_in_timeout: function(el, instance) {
+      var self = this;
+      this.fade_in_timeout = null;
+      can.view(this.options.tooltip_view, instance, function(frag) {
+        self.options.$extended
+          .html(frag)
+          .addClass('in')
+          .removeClass('hide')
+          .css({ top: el.offset().top, left: self.options.$lhs.width() })
+          .data('model', instance);
+        self.ensure_tooltip_visibility();
+      });
+    }
+
+  , on_tooltip_mouseenter: function() {
+      clearTimeout(this.fade_out_timeout);
+      this.fade_out_timeout = null;
+    }
+
+  , on_fade_out_timeout: function() {
+      clearTimeout(this.fade_in_timeout);
+      this.fade_in_timeout = null;
+      this.fade_out_timeout = null;
+      this.options.$extended
+        .removeClass('in')
+        .addClass('hide')
+        .data('model', null);
+    }
+
+  , on_mouseleave: function(el, ev) {
+      // Cancel fade_in, if we haven't displayed yet
+      clearTimeout(this.fade_in_timeout);
+      this.fade_in_timeout = null;
+
+      clearTimeout(this.fade_out_timeout);
+      this.fade_out_timeout =
+        setTimeout(
+            this.proxy("on_fade_out_timeout"),
+            this.options.fade_out_delay);
+    }
 });
 
 })(this.can, this.can.$);

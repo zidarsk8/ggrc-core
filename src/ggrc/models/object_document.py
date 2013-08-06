@@ -42,6 +42,14 @@ class ObjectDocument(Base, Timeboxed, db.Model):
       'documentable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectDocument, cls).eager_query()
+    return query.options(
+        orm.subqueryload('document'))
+
 class Documentable(object):
   @declared_attr
   def object_documents(cls):
@@ -60,6 +68,7 @@ class Documentable(object):
         'ObjectDocument',
         primaryjoin=joinstr,
         backref='{0}_documentable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [

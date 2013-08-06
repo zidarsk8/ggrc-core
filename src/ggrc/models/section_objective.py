@@ -16,3 +16,12 @@ class SectionObjective(Base, db.Model):
       'section',
       'objective',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(SectionObjective, cls).eager_query()
+    return query.options(
+        orm.subqueryload('section'),
+        orm.subqueryload('objective'))

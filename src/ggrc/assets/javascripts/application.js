@@ -95,7 +95,7 @@ jQuery.extend(GGRC, {
   infer_object_type : function(data) {
     var decision_tree = {
       "program" : CMS.Models.Program
-      , "directive" : {
+      /*, "directive" : {
         _discriminator: function(data) {
           var model_i, model;
           models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
@@ -107,21 +107,26 @@ jQuery.extend(GGRC, {
           }
           throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
         }
-      }
+      }*/
+      , "contract" : CMS.Models.Contract
+      , "policy" : CMS.Models.Policy
+      , "regulation" : CMS.Models.Regulation
       , "org_group" : CMS.Models.OrgGroup
       , "project" : CMS.Models.Project
       , "facility" : CMS.Models.Facility
       , "product" : CMS.Models.Product
       , "data_asset" : CMS.Models.DataAsset
       , "market" : CMS.Models.Market
-      , "system" : {
+      , "system_or_process" : {
         _discriminator: function(data) {
           if (data.is_biz_process)
             return CMS.Models.Process;
           else
-            return CMS.Models.StrictSystem;
+            return CMS.Models.System;
         }
       }
+      , "system" : CMS.Models.System
+      , "process" : CMS.Models.Process
       , "control" : CMS.Models.Control
       , "objective" : CMS.Models.Objective
       , "risky_attribute" : CMS.Models.RiskyAttribute
@@ -518,6 +523,8 @@ jQuery(document).ready(function($) {
 
   $.fn.oneline = oneline;
 
+  /* Deprecated quick search functionality
+   *
   // Open quick find
   $('body').on('focus', '.quick-search-holder input', function() {
     var $this = $(this)
@@ -573,6 +580,7 @@ jQuery(document).ready(function($) {
       $('.quick-search').trigger('close');
     }
   });
+  */
 
   // Close other popovers when one is shown
   $('body').on('show.popover', function(e) {
