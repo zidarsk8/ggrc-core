@@ -130,6 +130,22 @@ $(function() {
     resize_areas();  
   });
 
+  $(document.body).on("click", ".lhs-closed", function(ev) {
+    
+    var $lhs = $(this)
+    ,   $lhsHolder = $(".lhs-holder")
+    ,   $area = $(".area")
+    ;
+    
+    $lhs.removeClass("lhs-closed");
+    $lhsHolder.css("width","248px");
+    $area.css("margin-left","248px");
+    
+    resize_areas();  
+  });
+
+
+
   $(document.body).on("click", ".map-to-page-object", function(ev) {
     var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
     , page_model = GGRC.infer_object_type(GGRC.page_object)

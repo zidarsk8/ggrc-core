@@ -52,6 +52,7 @@
   }
   &.lhs-closed {
     margin-left:-200px;
+    cursor:pointer;
     .lhs-bg {
       display:block;
     }
@@ -235,6 +236,7 @@
   right: -8px;
   top:0;
   height:100%;
+  z-index:100;
   width:6px;
   background-color:#ddd;
   border-left:1px solid #aaa;
@@ -393,6 +395,11 @@
       display:inline;
       padding:0;
     }
+  }
+  .code {
+    font-size:11px;
+    font-style:italic;
+    color:#777;
   }
   .links {
     margin-top:6px;
