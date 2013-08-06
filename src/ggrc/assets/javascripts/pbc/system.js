@@ -14,50 +14,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     root_object : "system_or_process"
     , root_collection : "systems_or_processes"
     , category : "business"
-    //, root_model : "System"
-    //, xable_type : "System"
     , findAll : "GET /api/systems_or_processes"
-    //, create : "POST /api/systems"
-    /*, update : function(id, params) {
-      var data = this.process_args(
-          params['system']
-          , ["notes"
-            , "description"
-            , "infrastructure"
-            , "is_biz_process"
-            , "network_zone_id"
-            , "slug"
-            , "start_date"
-            , "stop_date"
-            , "title"
-            , "type_id"
-            , "url"
-            , "version"]);
-      return $.ajax({
-        url : "/api/systems/" + id
-        , data : params
-        , type : "put"
-      });
-    }
-    , destroy : "DELETE /api/systems/{id}"
-    */
-    /*, search : function(request, response) {
-        return $.ajax({
-            type : "get"
-            , url : "/systems.json"
-            , dataType : "json"
-            , data : {s : request.term}
-            , success : function(data) {
-                response($.map( data, function( item ) {
-                  var system_or_process = item.system.is_biz_process ? 'Process' : 'System';
-                  return {
-                    label: item.system.slug + ' ' + item.system.title + ' (' + system_or_process + ')',
-                    value: item.system.id
-                  };
-                }));
-            }
-        });
-    }*/
     , init : function() {
         this._super && this._super();
         this.bind_object_star_events();
@@ -185,7 +142,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
 CMS.Models.SystemOrProcess("CMS.Models.System", {
     root_object : "system"
   , root_collection : "systems"
-  , findAll : "GET /api/systems" //?is_biz_process=false"
+  , findAll : "GET /api/systems"
   , create : "POST /api/systems"
   , update : "PUT /api/systems/{id}"
   , destroy : "DELETE /api/systems/{id}"
@@ -213,15 +170,10 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , model_singular : "Process"
   , title_singular : "Process"
   , table_singular : "process"
-  , findAll : "GET /api/processes" //?is_biz_process=true"
+  , findAll : "GET /api/processes"
   , create : "POST /api/processes"
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
-  /*, create : function(params) {
-    params.is_biz_process = true;
-    return this._super(params);
-  }*/
-
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , init : function() {
     this._super && this._super();

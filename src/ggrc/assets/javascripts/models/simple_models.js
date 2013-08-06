@@ -48,9 +48,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
-  //, create : "POST /api/directives"
-  //, update : "PUT /api/directives/{id}"
-  //, destroy : "DELETE /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
@@ -64,32 +61,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , defaults : {
     sections : []
   }
-  /*, model : function(attrs) {
-    if(!attrs[this.root_object]) {
-      attrs = { directive : attrs };
-    }
-    var kind;
-    try {
-      kind = GGRC.infer_object_type(attrs);
-    } catch(e) {
-      console.warn("infer_object_type threw an error on Directive stub (likely no 'kind')");
-      kind = CMS.Models.Directive;
-    }
-    var m = this.findInCacheById(attrs.directive.id);
-    if(!m || m.constructor === CMS.Models.Directive) {
-      //We accidentally created a Directive or haven't created a subtype yet.
-      if(m) {
-        delete CMS.Models.Directive.cache[m.id];
-        m = this._super.call(kind, $.extend(m.serialize(), attrs));
-      } else {
-        m = this._super.call(kind, attrs);
-      }
-      this.cache[m.id] = m;
-    } else {
-      m = this._super.apply(this, arguments);
-    }
-    return m;
-  }*/
   , init : function() {
     this.validatePresenceOf("title");
     //this.validateInclusionOf("kind", this.meta_kinds);
@@ -126,7 +97,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , model_singular : "Regulation"
   , title_singular : "Regulation"
   , table_singular : "regulation"
-  //, findAll : "/api/directives?kind=Regulation"
   , findAll : "GET /api/regulations"
   , create : "POST /api/regulations"
   , update : "PUT /api/regulations/{id}"
@@ -156,7 +126,6 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , model_singular : "Policy"
   , title_singular : "Policy"
   , table_singular : "policy"
-  //, findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
   , findAll : "GET /api/policies"
   , create : "POST /api/policies"
   , update : "PUT /api/policies/{id}"
@@ -187,7 +156,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , model_singular : "Contract"
   , title_singular : "Contract"
   , table_singular : "contract"
-  //, findAll : "/api/directives?kind=Contract"
   , findAll : "GET /api/contracts"
   , create : "POST /api/contracts"
   , update : "PUT /api/contracts/{id}"

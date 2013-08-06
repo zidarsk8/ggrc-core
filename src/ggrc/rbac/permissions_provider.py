@@ -19,12 +19,13 @@ _contributing_resource_types = {}
 def get_contributing_resource_types(resource_type):
   resource_types = _contributing_resource_types.get(resource_type, None)
   if resource_types is None:
-    resource_model = get_model(resource_type)
-    resource_manager = resource_model._sa_class_manager
     resource_types = [resource_type]
-    resource_types.extend(
-        manager.class_.__name__ for manager in
-          resource_manager.subclass_managers(True))
+    resource_model = get_model(resource_type)
+    if resource_model:
+      resource_manager = resource_model._sa_class_manager
+      resource_types.extend(
+          manager.class_.__name__ for manager in
+            resource_manager.subclass_managers(True))
     _contributing_resource_types[resource_type] = resource_types
   return resource_types
 

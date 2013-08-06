@@ -176,14 +176,14 @@ class ProgramFactory(ModelFactory):
   MODEL = models.Program
   kind = FuzzyChoice(['Directive', 'Company Controls'])
 
-#class DirectiveFactory(ModelFactory):
-#  MODEL = models.Directive
-#  kind = FuzzyChoice(['Company Policy'])
+class ContractFactory(ModelFactory):
+  MODEL = models.Contract
+  kind = FuzzyChoice(MODEL.valid_kinds)
 
-#class SystemFactory(ModelFactory):
-#  MODEL = models.System
-#  is_biz_process = False
+class PolicyFactory(ModelFactory):
+  MODEL = models.Policy
+  kind = FuzzyChoice(MODEL.valid_kinds)
 
-#class ProcessFactory(ModelFactory):
-#  MODEL = models.Process
-#  is_biz_process = True
+class RegulationFactory(ModelFactory):
+  MODEL = models.Regulation
+  kind = FuzzyChoice(MODEL.valid_kinds)

@@ -107,18 +107,6 @@ $(function() {
     bindQuickSearch.call(this, {}, {});
   });//get anything that exists on the page already.
 
-  /*$(".lhs").each(function() {
-    bindQuickSearch.call(this, {}, {
-      list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
-      //, tooltip_view : GGRC.mustache_path + "/base_objects/extended_info.mustache"
-      , spin : false
-      , tab_selector : 'ul.top-level > li > a'
-      // , tab_href_attr : [ "href", "data-tab-href" ]
-      , tab_target_attr : "href"
-      // , tab_model_attr : [ "data-model", "data-object-singular" ]
-      , limit : 6
-    });
-  });*/
   //Then listen for new ones
   $(document.body).on("click", ".quick-search:not(:has(.cms_controllers_quick_search)), section.widget-tabs:not(:has(.cms_controllers_quick_search))", bindQuickSearch);
 

@@ -100,18 +100,6 @@ class SystemOrProcess(
       'super_systems',
       ]
 
-  #def kind_model(self):
-  #  return Process if self.is_biz_process else System
-
-  #_kind_plural = 'systems'
-  #@property
-  #def kind_plural(self):
-  #  return self.kind_model()._kind_plural
-
-  #@property
-  #def kind_singular(self):
-  #  return self.kind_model().__name__
-
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
@@ -134,7 +122,6 @@ class System(
       'polymorphic_identity': False
       }
   _table_plural = 'systems'
-  #_kind_plural = 'systems'
 
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):
@@ -149,7 +136,6 @@ class Process(
       'polymorphic_identity': True
       }
   _table_plural = 'processes'
-  #_kind_plural = 'processes'
 
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):

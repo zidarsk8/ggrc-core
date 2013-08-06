@@ -61,30 +61,10 @@ class Directive(Timeboxed, BusinessObject, db.Model):
       'version',
       ]
 
-  #@validates('kind')
+  @validates('kind')
   def validate_kind(self, key, value):
-    if type(self) is Directive:
-      assert self._model_for_kind(value) is not None
-    else:
-      assert value in self.valid_kinds
+    assert value in self.valid_kinds
     return value
-
-  #def kind_model(self):
-  #  return self._model_for_kind(self.kind)
-
-  #@classmethod
-  #def _model_for_kind(cls, kind):
-  #  for model in (Policy, Regulation, Contract):
-  #    if kind in model.valid_kinds:
-  #      return model
-
-  #@property
-  #def kind_plural(self):
-  #  return self.kind_model()._kind_plural
-
-  #@property
-  #def kind_singular(self):
-  #  return self.kind_model().__name__
 
   @classmethod
   def eager_query(cls):
@@ -103,10 +83,11 @@ class Policy(Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
       }
-  _kind_plural = 'policies'
   _table_plural = 'policies'
-  #valid_kinds = ('Policy',)
-  valid_kinds = ("Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy")
+  valid_kinds = (
+      "Company Policy", "Org Group Policy", "Data Asset Policy",
+      "Product Policy", "Contract-Related Policy", "Company Controls Policy"
+      )
 
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
@@ -116,7 +97,6 @@ class Regulation(Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
       }
-  _kind_plural = 'regulations'
   _table_plural = 'regulations'
   valid_kinds = ("Regulation",)
 
@@ -128,7 +108,6 @@ class Contract(Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
       }
-  #_kind_plural = 'contracts'
   _table_plural = 'contracts'
   valid_kinds = ("Contract",)
 
