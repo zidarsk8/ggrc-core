@@ -52,7 +52,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Reference URL, Scope, Organization
+            Code, Scope, Organization, Privacy
           </span>
         </a>
       </div>
@@ -69,20 +69,13 @@
       </div>
       <div class="span6">
         <label>
-          Reference URL
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Reference URL"></i>
-        </label>
-        <input class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span6">
-        <label>
           Organization
           <i class="grcicon-help-black" rel="tooltip" title="Enter Organization"></i>
         </label>
         <input class="input-block-level" name="org_name" placeholder="Enter Organization" type="text" value="{{org_name}}">
       </div>
+    </div>
+    <div class="row-fluid">
       <div class="span6">
         <label>
           Program Scope
@@ -90,8 +83,6 @@
         </label>
         <input class="input-block-level" name="scope" placeholder="Enter Scope" type="text" value="{{scope}}">
       </div>
-    </div>
-    <div class="row-fluid">
       {{#private_program modal_title}}{{/private_program}}
     </div>
   </div>
