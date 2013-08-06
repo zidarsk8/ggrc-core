@@ -102,7 +102,7 @@ jQuery(function($) {
 });
 
 
-if (!/\/directives\/\d+($|\?|#)/.test(window.location.pathname))
+if (!/\/(?:directives|contracts|policies|regulations)\/\d+($|\?|#)/.test(window.location.pathname))
   return;
 
 $(function() {

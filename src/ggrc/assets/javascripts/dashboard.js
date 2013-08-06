@@ -700,7 +700,6 @@ jQuery(function($) {
 
 
 function resize_areas() {
-  
   var $window
   ,   $lhs
   ,   $lhsHolder
@@ -733,14 +732,16 @@ function resize_areas() {
   footerMargin = lhsHeight;
   internavHeight = lhsHeight - 55;
   lhsWidth = $lhsHolder.width();
-  objectWidth = winWidth - $lhsHolder.width() - $innerNav.width();
-  headerWidth = winWidth - $lhsHolder.width();
+  internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
+  objectWidth = winWidth - lhsWidth - internavWidth;
+  headerWidth = winWidth - lhsWidth;
 
   $lhs.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
   $header.css("width",headerWidth);
   $objectArea
+    .css("margin-left",internavWidth)
     .css("height",internavHeight)
     .css("width",objectWidth)
     ;

@@ -11,12 +11,25 @@ can.Model("GGRC.Models.Search", {
   , search : function(str, params) {
     return this.findOne($.extend({q : str}, params));
   }
+  , search_for_types : function(str, types, params) {
+    return this.findOne($.extend({q : str, types : types.join(",") }, params));
+  }
+  , counts : function(str, params) {
+    return this.findOne($.extend({q : str, counts_only : true}, params));
+  }
+  , counts_for_types : function(str, types, params) {
+    return this.findOne(
+      $.extend({q: str, types: types.join(","), counts_only: true }, params));
+  }
   , init : function() {
     this._super && this._super.apply(this, arguments);
     var _findOne = this.findOne;
     this.findOne = function() {
       return _findOne.apply(this, arguments).then(function(data) {
-        data.attr("entries", data.results.entries);
+        if (data.results.entries)
+          data.attr("entries", data.results.entries);
+        if (data.results.counts)
+          data.attr("counts", data.results.counts);
         data.removeAttr("results");
         return data;
       });
@@ -45,4 +58,30 @@ can.Model("GGRC.Models.Search", {
     });
   }
 
+  , getResultsForType : function(model_name) {
+      var model = CMS.Models[model_name]
+        , entries;
+
+      if (this.entries instanceof Array)
+        entries = this.entries[model_name] || [];
+      else
+        entries = can.map(this.entries, function(v) {
+          if (v.type == model_name)
+            return v;
+        });
+
+      return can.map(entries, function(stub) {
+        return new model({ id: stub.id });
+      });
+  }
+
+  , getCountFor : function(type) {
+      if (type && type.shortName)
+        type = type.shortName;
+
+      if (!this.counts[type])
+        return 0;
+      else
+        return this.counts[type];
+  }
 });

@@ -153,6 +153,15 @@ def post_example(context, resource_type, example, url=None, rbac_context=None):
   for attr, value in example.items():
     if isinstance(value, FactoryStubMarker):
       value_resource_type = value.class_.__name__
+
+      # If the resource has subclasses, then it is abstract, so use one of
+      #   its subclasses
+      value_resource_subtypes = [
+          manager.class_.__name__ for manager in
+            value.class_._sa_class_manager.subclass_managers(True)]
+      if len(value_resource_subtypes) > 0:
+        value_resource_type = value_resource_subtypes[0]
+
       value_resource_factory = factory_for(value_resource_type)
       value_resource = value_resource_factory()
       value_response = post_example(

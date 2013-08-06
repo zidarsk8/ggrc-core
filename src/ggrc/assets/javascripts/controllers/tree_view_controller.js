@@ -32,7 +32,7 @@ can.Control("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
-    , start_expanded : true
+    , start_expanded : false //true
     , draw_children : true
     , find_function : null
     , options_property : "tree_view_options"
@@ -154,13 +154,14 @@ can.Control("CMS.Controllers.TreeView", {
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
-    can.each(oldVals, function(oldVal) {
-      for(var i = that.options.list.length - 1; i >= 0; i--) {
-        if(that.options.list[i].instance === oldVal) {
-          that.options.list.splice(i, 1);
-        }
-      }
-    });
+    // can.each(oldVals, function(oldVal) {
+    //   for(var i = that.options.list.length - 1; i >= 0; i--) {
+    //     if(that.options.list[i].instance === oldVal) {
+    //       that.options.list.splice(i, 1);
+    //     }
+    //   }
+    // });
+    this.options.list.splice(index, oldVals.length);
   }
   , "{original_list} change" : function(list, ev, newVals, index) {
     var that = this;
@@ -168,6 +169,9 @@ can.Control("CMS.Controllers.TreeView", {
       this.draw_list(list());
     }
   }
+  // , "{original_list} set" : function(list, ev, newVal, index) {
+  //   this.options.list[index].attr("instance", newVal);
+  // }
 
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
@@ -230,6 +234,7 @@ can.Control("CMS.Controllers.TreeView", {
         data.attr("original_list", find_params);
         find_params = find_params();
       } else if(find_params && find_params.length) {
+        data.attr("original_list", find_params);
         find_params = find_params.slice(0);
       }
       data.attr("list", find_params);
@@ -281,6 +286,12 @@ can.Control("CMS.Controllers.TreeView", {
         })
     );
     ev.stopPropagation();
+  }
+
+  , " click" : function() {
+    if(~this.element.text().indexOf("@@!!@@")) {
+      this.draw_list();
+    }
   }
 
   , ".edit-object modal:success" : function(el, ev, data) {
