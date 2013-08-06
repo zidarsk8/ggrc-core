@@ -279,7 +279,7 @@ can.Model("can.Model.Cacheable", {
       , parent_find_param : "destination_id"
     }, {
       model : null
-      , start_expanded : true
+      , start_expanded : false
       , draw_children : true
     }]
   }

@@ -32,7 +32,7 @@ can.Control("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
-    , start_expanded : true
+    , start_expanded : false //true
     , draw_children : true
     , find_function : null
     , options_property : "tree_view_options"
