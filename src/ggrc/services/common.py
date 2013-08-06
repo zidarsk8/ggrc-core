@@ -304,7 +304,7 @@ class Resource(ModelView):
     db.session.delete(obj)
     self.log_event(db.session, obj)
     db.session.commit()
-    get_indexer().delete_record(self.url_for(id=id))
+    get_indexer().delete_record(id, self.model.__name__)
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj))
 
