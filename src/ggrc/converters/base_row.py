@@ -501,7 +501,7 @@ class LinkCategoriesHandler(LinksHandler):
     if len(items) > 1:
       self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
     else:
-      return items[0]
+      return items[0] if items else None
 
   def create_item(self, data):
     self.add_link_warning('Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
