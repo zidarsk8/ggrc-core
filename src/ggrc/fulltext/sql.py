@@ -24,9 +24,10 @@ class SqlIndexer(Indexer):
     self.delete_record(record.key, commit=False)
     self.create_record(record, commit=commit)
 
-  def delete_record(self, key, commit=True):
+  def delete_record(self, key, type, commit=True):
     db.session.query(self.record_type).filter(\
-        self.record_type.key == key).delete()
+        self.record_type.key == key,
+        self.record_type.type == type).delete()
     if commit:
       db.session.commit()
 
