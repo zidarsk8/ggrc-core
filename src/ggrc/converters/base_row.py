@@ -57,7 +57,7 @@ class BaseRowConverter(object):
 
   def warnings_for(self, key):
     warning_messages = []
-    if self.handlers.get(key) and self.handlers[key].warnings:
+    if self.handlers.get(key) and self.handlers[key].has_warnings():
       warning_messages  += self.handlers[key].warnings
     warning_messages += self.errors.get(key, [])
     return warning_messages
@@ -103,8 +103,8 @@ class BaseRowConverter(object):
       self.obj = self.model_class()
     else:
       self.obj = self.find_by_slug(slug)
-      self.obj = self.obj if self.obj else self.importer.find_object(self.model_class, slug)
-      self.obj = self.obj if self.obj else self.model_class()
+      self.obj = self.obj or self.importer.find_object(self.model_class, slug)
+      self.obj = self.obj or self.model_class()
       self.obj.slug = slug
     self.importer.add_object(self.model_class, slug, self.obj)
     return self.obj
@@ -192,7 +192,8 @@ class ColumnHandler(object):
     return any(self.warnings) or self.importer.warnings.get(self.key)
 
   def display(self):
-    return getattr(self.importer.obj, str(self.key), '')
+    value = getattr(self.importer.obj, self.key, '') or ''
+    return value if value != 'null' else '' # Some columns returning null strings - should show as ''
 
   def after_save(self, obj):
     pass
@@ -262,6 +263,12 @@ class OptionColumnHandler(ColumnHandler):
             self.options.get('role'), value.lower()))
       return option
 
+  def display(self):
+    if self.has_errors():
+      return self.original
+    else:
+      return self.value.title
+
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
     truthy_values = self.options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
@@ -295,7 +302,7 @@ class DateColumnHandler(ColumnHandler):
     if self.has_errors():
       return self.original
     else:
-      return self.value or getattr(self.importer.obj, self.key) or ''
+      return self.value or getattr(self.importer.obj, self.key, '') or ''
 
   def export(self):
     date_result = getattr(self.importer.obj, self.key, '')
@@ -303,12 +310,13 @@ class DateColumnHandler(ColumnHandler):
 
 class LinksHandler(ColumnHandler):
 
+  model_class = None
+
   def __init__(self, importer, key, **options):
     options['association'] = str(key) if not options.get('association') else options['association']
     options['append_only'] = options.get('append_only', True)
     super(LinksHandler, self).__init__(importer, key, **options)
 
-    self.model_class = None
     self.pre_existing_links = None
     self.link_status = {}
     self.link_objects = {}
@@ -418,7 +426,9 @@ class LinksHandler(ColumnHandler):
     obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
     if not obj:
       create_params = self.get_create_params(data)
-      obj = self.model_class(create_params)
+      obj = self.model_class()
+      if create_params.get('slug'):
+        obj.slug = create_params['slug']
       self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
     self.create_item_warnings(obj, data)
     return obj
@@ -472,6 +482,7 @@ class LinkControlsHandler(LinksHandler):
     return {'slug' : data.upper()}
 
   def create_item(self, data):
+    self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
 class LinkCategoriesHandler(LinksHandler):
@@ -485,7 +496,7 @@ class LinkCategoriesHandler(LinksHandler):
     return {'name' : data.get('name'), 'scope_id' : self.options.get('scope_id')}
 
   def find_existing_item(self, data):
-    items = model_class.query.filter_by(scope_id = self.options.get('scope_id'), name = data.get('name') ).all()
+    items = self.model_class.query.filter_by(scope_id = self.options.get('scope_id'), name = data.get('name') ).all()
 
     if len(items) > 1:
       self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
@@ -570,10 +581,19 @@ class LinkPeopleHandler(LinksHandler):
     return objects
 
   def after_save(self, obj):
-    pass
+    db_session = db.session
+    for linked_object in self.created_links():
+      db_session.add(linked_object)
+      object_person = ObjectPerson()
+      object_person.personable = self.importer.obj
+      object_person.person = linked_object
+      db_session.add(object_person)
 
   def render_item(self, item):
     return item.email
+
+  def display_link(self, obj):
+    return obj.email
 
 class LinkSystemsHandler(LinksHandler):
   from ggrc.models.all_models import System
@@ -585,9 +605,22 @@ class LinkSystemsHandler(LinksHandler):
   def find_existing_item(self, data):
     system = System.query.filter_by(slug = data.get('slug')).first()
     if not system:
-      sys_type = "Processes" if self.options.get('is_biz_process') else "System"
-      self.add_link_warning("That code is used by a System, and will not be linked.")
-    pass
+      sys_type = "Process" if self.options.get('is_biz_process') else "System"
+      self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
+    else:
+      if self.options.get('is_biz_process') and not system.is_biz_process:
+        self.add_link_warning("That code is used by a System, and will not be linked")
+      elif not self.options.get('is_biz_process') and system.is_biz_process:
+        self.add_link_warning('That code is used by a Process, and will not be linked')
+      else:
+        return system
+
+  def get_existing_items(self):
+    where_params = { 'is_biz_process' : self.options.get('is_biz_process') or False }
+    return System.query.filter_by(**where_params).all()
+
+  def create_item(self, data):
+    return None
 
 class LinkRelationshipsHandler(LinksHandler):
 
