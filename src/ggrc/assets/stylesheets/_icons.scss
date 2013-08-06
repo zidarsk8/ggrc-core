@@ -47,12 +47,16 @@
     background-position:-222px -8px;
   }
 }
-.grcicon-admin,
 .grcicon-admin-black,
 .grcicon-authorization-color,
 .grcicon-role-color {
   background-position:-102px -8px;
 }
+
+.grcicon-admin {
+  background-position:-6px -32px;
+}
+
 .grcicon-dashboard {
   background-position:-30px -32px;
   .active & {
