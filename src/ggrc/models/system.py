@@ -126,7 +126,6 @@ class System(
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):
     return False
-    assert value, "System.is_biz_process *must* be False"
 
 
 class Process(
@@ -140,4 +139,3 @@ class Process(
   @validates('is_biz_process')
   def validates_is_biz_process(self, key, value):
     return True
-    assert not value, "Process.is_biz_process *must* be True"
