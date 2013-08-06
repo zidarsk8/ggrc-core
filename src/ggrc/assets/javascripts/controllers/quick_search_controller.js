@@ -207,9 +207,23 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 }, {
     init: function() {
+      var self = this;
+
       this.init_object_lists();
       this.init_list_views();
       this.run_search("");
+
+      can.Model.Cacheable.bind("created", function(ev, instance) {
+        var visible_model_names =
+              can.map(self.get_visible_lists(), self.proxy("get_list_model"))
+          , model_name = instance.constructor.shortName
+          ;
+
+        if(visible_model_names.indexOf(model_name) > -1) {
+          self.options.visible_lists[model_name].unshift(instance);
+          self.options.results_lists[model_name].unshift(instance);
+        }
+      });
     }
 
   , "{list_selector} {list_content_selector} show": "on_show_list"
