@@ -689,7 +689,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , section_objectives : "CMS.Models.SectionObjective.models"
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
-    , object_objectives: "CMS.Models.ObjectObjective.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
   }
   , defaults : {
     object_objectives : []
@@ -701,22 +701,34 @@ can.Model.Cacheable("CMS.Models.Objective", {
 }, {
   init : function() {
     var that = this;
-    this.attr("business_objects", can.compute(function() {
-      var objs = [], q = new RefreshQueue();
-      can.Observe.startBatch();
-      that.attr("object_objectives").each(function(oc, i) {
-        if(!oc.selfLink) {
-          q.enqueue(oc);
-          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else {
-          objs.push(oc.objectiveable);
-        }
-      });
-      q.trigger().done(function() {
-        can.Observe.stopBatch();
-      });
-      return objs;
-    }));
+    this._super.apply(this, arguments);
+    this.attr("business_objects", new can.Model.List(
+      can.map(
+        this.object_objectives,
+        function(os) {return os.objectiveable || new can.Model({ selfLink : "/" }); }
+      )
+    ));
+    this.object_objectives.bind("change", function(ev, attr, how) {
+      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+        that.business_objects.replace(
+          can.map(
+            that.object_objectives,
+            function(os, i) {
+              if(os.objectiveable) {
+                return os.objectiveable;
+              } else {
+                os.refresh({ "__include" : "objectiveable" }).done(function(d) {
+                  that.business_objects.attr(i, d.objectiveable);
+                  //can.Observe.stopBatch();
+                }).fail(function() {
+                  //can.Observe.stopBatch();
+                });
+                return new can.Model({ selfLink : "/"});
+              }
+          })
+        );
+      }
+    });
 
   }
 });
@@ -764,11 +776,17 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   if(typeof object_type === "object") {
     //assume we only passed in params_or_object
     params_or_object = object_type;
-    object_type = params_or_object.type;
+    object_type = params_or_object.type
+      || can.map(
+          window.cms_singularize(
+            /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
+          ).split("_")
+          , can.capitalize
+        ).join("");
     object_id = params_or_object.id;
   }
 
-  model = CMS.Models[object_type]
+  model = CMS.Models[object_type];
 
   if (!model)
     return null;
