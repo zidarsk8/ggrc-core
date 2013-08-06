@@ -138,12 +138,12 @@ can.Model.Join("CMS.Models.Relationship", {
 
     //typeof this._super_init === "function" && this._super_init.call(this);
     this.attr("source", CMS.Models.get_instance(
-      this.source_type || this.source.type
-      , this.source_id || this.source.id
+      this.source_type || (this.source && this.source.type)
+      , this.source_id || (this.source && this.source.id)
       , this.source) || this.source);
     this.attr("destination", CMS.Models.get_instance(
-      this.destination_type || this.destination.type
-      , this.destination_id || this.destination.id
+      this.destination_type || (this.destination && this.destination.type)
+      , this.destination_id || (this.destination && this.destination.id)
       , this.destination) || this.destination);
 
     this.each(function(value, name) {

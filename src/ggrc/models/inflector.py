@@ -5,10 +5,16 @@
 
 import re
 
+def with_model_override(func):
+  model_property_name = "_{0}".format(func.__name__)
+  def wrapped(self):
+    return getattr(self.model, model_property_name, func(self))
+  return wrapped
+
 class ModelInflector(object):
   def __new__(cls, model):
     try:
-      return _inflectors[cls]
+      return _inflectors[model]
     except KeyError:
       inflector = super(ModelInflector, cls).__new__(cls, model)
       _inflectors[model] = inflector
@@ -31,6 +37,10 @@ class ModelInflector(object):
       }
 
   @property
+  def table_name(self):
+    return self.model.__tablename__
+
+  @property
   def model_singular(self):
     return self.model.__name__
 
@@ -43,8 +53,9 @@ class ModelInflector(object):
     return self.underscore_from_camelcase(self.model_singular)
 
   @property
+  @with_model_override
   def table_plural(self):
-    return self.model.__tablename__
+    return self.table_name
 
   @property
   def human_singular(self):
@@ -60,7 +71,7 @@ class ModelInflector(object):
 
   @property
   def title_plural(self):
-    return self.model.__tablename__.replace('_', ' ').title()
+    return self.table_plural.replace('_', ' ').title()
 
   # Helpers
   @classmethod
@@ -87,7 +98,7 @@ class ModelInflectorDescriptor(object):
 
   def __get__(self, obj, cls):
     model_inflector = getattr(cls, self.cache_attribute, None)
-    if model_inflector is None:
+    if model_inflector is None or model_inflector.model is not cls:
       model_inflector = ModelInflector(cls)
       setattr(cls, self.cache_attribute, model_inflector)
     return model_inflector
@@ -101,6 +112,14 @@ _inflection_to_model = {}
 
 def register_inflections(inflector):
   for mode, value in inflector.all_inflections().items():
+    if value in _inflection_to_model \
+        and _inflection_to_model[value] is not inflector.model:
+      print("Overriding inflection:\n"
+            "    {0} => {1}\n"
+            "  with\n"
+            "    {2} => {3}".format(
+              value, _inflection_to_model[value],
+              value, inflector.model))
     _inflection_to_model[value] = inflector.model
 
 def get_model(s):

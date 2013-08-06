@@ -10,16 +10,16 @@
 //= require pbc/document
 //= require pbc/person
 
-can.Model.Cacheable("CMS.Models.System", {
-    root_object : "system"
-    , root_collection : "systems"
+can.Model.Cacheable("CMS.Models.SystemOrProcess", {
+    root_object : "system_or_process"
+    , root_collection : "systems_or_processes"
     , category : "business"
-    , root_model : "System"
-    , xable_type : "System"
-    , findAll : "GET /api/systems"
-    , create : "POST /api/systems"
-    , update : function(id, params) {
-      /*var data = this.process_args(
+    //, root_model : "System"
+    //, xable_type : "System"
+    , findAll : "GET /api/systems_or_processes"
+    //, create : "POST /api/systems"
+    /*, update : function(id, params) {
+      var data = this.process_args(
           params['system']
           , ["notes"
             , "description"
@@ -32,7 +32,7 @@ can.Model.Cacheable("CMS.Models.System", {
             , "title"
             , "type_id"
             , "url"
-            , "version"]);*/
+            , "version"]);
       return $.ajax({
         url : "/api/systems/" + id
         , data : params
@@ -40,7 +40,8 @@ can.Model.Cacheable("CMS.Models.System", {
       });
     }
     , destroy : "DELETE /api/systems/{id}"
-    , search : function(request, response) {
+    */
+    /*, search : function(request, response) {
         return $.ajax({
             type : "get"
             , url : "/systems.json"
@@ -56,10 +57,45 @@ can.Model.Cacheable("CMS.Models.System", {
                 }));
             }
         });
-    }
+    }*/
     , init : function() {
         this._super && this._super();
+        this.bind_object_star_events();
+        this.tree_view_options.child_options[1].model = CMS.Models.SystemOrProcess;
+        this.risk_tree_options.child_options[1].list_view = "/static/mustache/systems/tree.mustache";
+        this.risk_tree_options.child_options[1].parent_find_param = "super_system_systems.parent_id";
+        this.risk_tree_options.child_options[1].link_buttons = true;
+
+        this.validatePresenceOf("title");
+        this.validateFormatOf("network_zone", /[0-9]*/);
+    }
+    , tree_view_options : {
+      list_view : "/static/mustache/systems/tree.mustache"
+      , link_buttons : true
+      , child_options : [{
+        model : CMS.Models.Control
+        , list_view : "/static/mustache/controls/tree.mustache"
+        , parent_find_param : "system_controls.system_id"
+        , link_buttons : true
+        , draw_children : false
+      },{
+        model : null ///filled in after init.
+        , list_view : "/static/mustache/systems/tree.mustache"
+        , parent_find_param : "super_system_systems.parent_id"
+        , link_buttons: true
+      }]
+    }
+    , attributes : {
+      controls : "CMS.Models.Control.models"
+      , sub_systems : "CMS.Models.System.models"
+    }
+    , serialize : {
+    }
+    , bind_object_star_events: function() {
         var that = this;
+
+        if (this !== CMS.Models.SystemOrProcess)
+          return;
 
         CMS.Models.ObjectPerson.bind("created", function(ev, obj_person) {
             var sys = that.findInCacheById(obj_person.xable_id); //"this" is Cacheable.  WTF?
@@ -89,34 +125,6 @@ can.Model.Cacheable("CMS.Models.System", {
                 sys.removeElementFromChildList("documents", obj_doc.document);
             }
         });
-        this.tree_view_options.child_options[1].model = CMS.Models.System;
-        this.risk_tree_options.child_options[1].list_view = "/static/mustache/systems/tree.mustache";
-        this.risk_tree_options.child_options[1].parent_find_param = "super_system_systems.parent_id";
-        this.risk_tree_options.child_options[1].link_buttons = true;
-
-
-        this.validatePresenceOf("title");
-        this.validateFormatOf("network_zone", /[0-9]*/);
-    }
-    , tree_view_options : {
-      list_view : "/static/mustache/systems/tree.mustache"
-      , link_buttons : true
-      , child_options : [{
-        model : CMS.Models.Control
-        , list_view : "/static/mustache/controls/tree.mustache"
-        , parent_find_param : "system_controls.system_id"
-        , link_buttons : true
-        , draw_children : false
-      },{
-        model : null ///filled in after init.
-        , list_view : "/static/mustache/systems/tree.mustache"
-        , parent_find_param : "super_system_systems.parent_id"
-        , link_buttons: true
-      }]
-    }
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , sub_systems : "CMS.Models.System.models"
     }
     , links_to : {
       "System" : "SystemSystem"
@@ -174,37 +182,56 @@ can.Model.Cacheable("CMS.Models.System", {
     }
 });
 
-CMS.Models.System("CMS.Models.StrictSystem", {
-  findAll : "GET /api/systems?is_biz_process=false"
-  , create : function(params) {
-    params.is_biz_process = false;
-    return this._super(params);
-  }
-  , cache : can.getObject("cache", CMS.Models.System, true)
+CMS.Models.SystemOrProcess("CMS.Models.System", {
+    root_object : "system"
+  , root_collection : "systems"
+  , findAll : "GET /api/systems" //?is_biz_process=false"
+  , create : "POST /api/systems"
+  , update : "PUT /api/systems/{id}"
+  , destroy : "DELETE /api/systems/{id}"
+
+  , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , init : function() {
-    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this._super && this._super();
+    this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
-}, {});
+}, {
+    init : function() {
+      this._super && this._super();
+      this.attr('is_biz_process', false);
+    }
+});
 
-CMS.Models.System("CMS.Models.Process", {
-  model_plural : "Processes"
+CMS.Models.SystemOrProcess("CMS.Models.Process", {
+    root_object : "process"
+  , root_collection : "processes"
+  , model_plural : "Processes"
   , table_plural : "processes"
   , title_plural : "Processes"
   , model_singular : "Process"
   , title_singular : "Process"
   , table_singular : "process"
-  , findAll : "GET /api/systems?is_biz_process=true"
-  , create : function(params) {
+  , findAll : "GET /api/processes" //?is_biz_process=true"
+  , create : "POST /api/processes"
+  , update : "PUT /api/processes/{id}"
+  , destroy : "DELETE /api/processes/{id}"
+  /*, create : function(params) {
     params.is_biz_process = true;
     return this._super(params);
-  }
+  }*/
 
-  , cache : can.getObject("cache", CMS.Models.System, true)
+  , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , init : function() {
-    this.tree_view_options = $.extend({}, CMS.Models.System.tree_view_options);
+    this._super && this._super();
+    this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
-}, {});
+}, {
+    init : function() {
+      this._super && this._super();
+      this.attr('is_biz_process', true);
+    }
+});

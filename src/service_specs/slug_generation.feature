@@ -15,7 +15,10 @@ Feature: Slugs should be generated when not provided
       | resource_type  |
       | Control        |
       | DataAsset      |
-      | Directive      |
+      #| Directive      |
+      | Contract       |
+      | Policy         |
+      | Regulation     |
       | Facility       |
       | Help           |
       | Market         |
@@ -31,16 +34,19 @@ Feature: Slugs should be generated when not provided
 
   Scenario Outline: A Slugged resource is POSTed with a slug and that slug is preserved.
     Given a new "<resource_type>" named "slugged_resource"
-    And "slugged_resource" property "slug" is "What a slug!"
+    And "slugged_resource" property "slug" is "SLUG-FOR-<resource_type>"
     And "slugged_resource" is POSTed to its collection
     When GET of the resource "slugged_resource"
-    Then evaluate "context.slugged_resource.get('slug') == 'What a slug!'"
+    Then evaluate "context.slugged_resource.get('slug') == 'SLUG-FOR-<resource_type>'"
 
   Examples:
       | resource_type  |
       | Control        |
       | DataAsset      |
-      | Directive      |
+      #| Directive      |
+      | Contract       |
+      | Policy         |
+      | Regulation     |
       | Facility       |
       | Help           |
       | Market         |

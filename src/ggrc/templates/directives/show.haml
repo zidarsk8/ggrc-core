@@ -1,9 +1,9 @@
 -extends "base_objects/show.haml"
 
--block page_help scoped
+-#block page_help scoped
   =instance.kind|underscore
 
--block header
+-#block header
   %h1{ 'class': "={ model_display_class }" }
     .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "#{model_title}", 'class': "={ model_display_class }" }
       -if instance.kind_singular == "Contract"
@@ -16,7 +16,7 @@
         &nbsp;
     =instance.title
 
--block main
+-#block main
   .clearfix
     .inner-nav
       .object-nav{ 'data-spy': 'affix', 'data-offset-top': '1' }
@@ -26,10 +26,12 @@
     .object-area
       #show_columns.column-set{ 'data-resize': "true" }
         #middle_column.widget-area
-          -with widget_class = 'governance'
-            -include 'base_objects/_info.haml'
-          -with widget_class = 'governance'
-            -include "directives/_main.haml"
-            -include "directives/_controls.haml"
-          -with widget_class = 'related governance'
-            -include 'base_objects/_more_info.haml'
+
+-block widget_area
+  -with widget_class = 'governance'
+    -include 'base_objects/_info.haml'
+  -with widget_class = 'governance'
+    -include "directives/_main.haml"
+    -include "directives/_controls.haml"
+  -with widget_class = 'related governance'
+    -include 'base_objects/_more_info.haml'

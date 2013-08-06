@@ -48,9 +48,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
-  , create : "POST /api/directives"
-  , update : "PUT /api/directives/{id}"
-  , destroy : "DELETE /api/directives/{id}"
+  //, create : "POST /api/directives"
+  //, update : "PUT /api/directives/{id}"
+  //, destroy : "DELETE /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
@@ -63,7 +63,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , defaults : {
     sections : []
   }
-  , model : function(attrs) {
+  /*, model : function(attrs) {
     if(!attrs[this.root_object]) {
       attrs = { directive : attrs };
     }
@@ -88,10 +88,10 @@ can.Model.Cacheable("CMS.Models.Directive", {
       m = this._super.apply(this, arguments);
     }
     return m;
-  }
+  }*/
   , init : function() {
     this.validatePresenceOf("title");
-    this.validateInclusionOf("kind", this.meta_kinds);
+    //this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }
   , meta_kinds : []
@@ -117,13 +117,18 @@ can.Model.Cacheable("CMS.Models.Directive", {
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
-  model_plural : "Regulations"
+  root_object : "regulation"
+  , root_collection : "regulations"
+  , model_plural : "Regulations"
   , table_plural : "regulations"
   , title_plural : "Regulations"
   , model_singular : "Regulation"
   , title_singular : "Regulation"
   , table_singular : "regulation"
-  , findAll : "/api/directives?kind=Regulation"
+  //, findAll : "/api/directives?kind=Regulation"
+  , findAll : "GET /api/regulations"
+  , create : "POST /api/regulations"
+  , update : "PUT /api/regulations/{id}"
   , defaults : {
     kind : "Regulation"
   }
@@ -141,13 +146,19 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Policy", {
-  model_plural : "Policies"
+  root_object : "policy"
+  , root_collection : "regulations"
+  , model_plural : "Policies"
   , table_plural : "policies"
   , title_plural : "Policies"
   , model_singular : "Policy"
   , title_singular : "Policy"
   , table_singular : "policy"
-  , findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
+  //, findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
+  , findAll : "GET /api/policies"
+  , create : "POST /api/policies"
+  , update : "PUT /api/policies/{id}"
+  , destroy : "DELETE /api/policies/{id}"
   , defaults : {
     kind : "Company Policy"
   }
@@ -165,13 +176,18 @@ CMS.Models.Directive("CMS.Models.Policy", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Contract", {
-  model_plural : "Contracts"
+  root_object : "contract"
+  , root_collection : "contracts"
+  , model_plural : "Contracts"
   , table_plural : "contracts"
   , title_plural : "Contracts"
   , model_singular : "Contract"
   , title_singular : "Contract"
   , table_singular : "contract"
-  , findAll : "/api/directives?kind=Contract"
+  //, findAll : "/api/directives?kind=Contract"
+  , findAll : "GET /api/contracts"
+  , create : "POST /api/contracts"
+  , update : "PUT /api/contracts/{id}"
   , defaults : {
     kind : "Contract"
   }
@@ -201,7 +217,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "OrgGroup"
         , relationship_type_id : "org_group_has_process"
       }
@@ -263,7 +279,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Project"
         , relationship_type_id : "project_has_process"
       }
@@ -309,7 +325,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Facility"
         , relationship_type_id : "facility_has_process"
       }
@@ -377,7 +393,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Product"
         , relationship_type_id : "product_has_process"
       }
@@ -452,7 +468,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "DataAsset"
         , relationship_type_id : "data_asset_has_process"
       }
@@ -514,7 +530,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Market"
         , relationship_type_id : "market_has_process"
       }

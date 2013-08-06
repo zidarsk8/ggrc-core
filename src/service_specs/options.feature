@@ -18,8 +18,8 @@ Feature: Options relationships
       | control_kind     | Control       | kind             |
       | control_means    | Control       | means            |
       | verify_frequency | Control       | verify_frequency |
-      | audit_frequency  | Directive     | audit_frequency  |
-      | audit_duration   | Directive     | audit_duration   |
+      | audit_frequency  | Regulation    | audit_frequency  |
+      | audit_duration   | Regulation    | audit_duration   |
       | document_type    | Document      | type             |
       | reference_type   | Document      | kind             |
       | document_year    | Document      | year             |

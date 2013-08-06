@@ -5,6 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from .associationproxy import association_proxy
 from .mixins import BusinessObject, Timeboxed
 from .categorization import Categorizable
@@ -22,9 +23,10 @@ class SystemCategorized(Categorizable):
     return cls._categorizations(
         'categorizations', 'categories', CATEGORY_SYSTEM_TYPE_ID)
 
-class System(
-    Documentable, Personable, Objectiveable, Controllable, Sectionable,
+class SystemOrProcess(
     Timeboxed, SystemCategorized, BusinessObject, db.Model):
+  # Override model_inflector
+  _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
 
   infrastructure = db.Column(db.Boolean)
@@ -52,16 +54,20 @@ class System(
       'super_system_systems', 'parent', 'SystemSystem')
   type = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(System.type_id) == Option.id, '\
+      primaryjoin='and_(foreign(SystemOrProcess.type_id) == Option.id, '\
                        'Option.role == "system_type")',
       uselist=False,
       )
   network_zone = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(System.network_zone_id) == Option.id, '\
+      primaryjoin='and_(foreign(SystemOrProcess.network_zone_id) == Option.id, '\
                        'Option.role == "network_zone")',
       uselist=False,
       )
+
+  __mapper_args__ = {
+      'polymorphic_on': is_biz_process
+      }
 
   # REST properties
   _publish_attrs = [
@@ -82,7 +88,7 @@ class System(
       ]
   _update_attrs = [
       'infrastructure',
-      'is_biz_process',
+      #'is_biz_process',
       'type',
       'version',
       'notes',
@@ -94,23 +100,23 @@ class System(
       'super_systems',
       ]
 
-  def kind_model(self):
-    return Process if self.is_biz_process else System
+  #def kind_model(self):
+  #  return Process if self.is_biz_process else System
 
-  _kind_plural = 'systems'
-  @property
-  def kind_plural(self):
-    return self.kind_model()._kind_plural
+  #_kind_plural = 'systems'
+  #@property
+  #def kind_plural(self):
+  #  return self.kind_model()._kind_plural
 
-  @property
-  def kind_singular(self):
-    return self.kind_model().__name__
+  #@property
+  #def kind_singular(self):
+  #  return self.kind_model().__name__
 
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
-    query = super(System, cls).eager_query()
+    query = super(SystemOrProcess, cls).eager_query()
     return query.options(
         orm.joinedload('type'),
         orm.joinedload('network_zone'),
@@ -119,5 +125,33 @@ class System(
         orm.subqueryload_all('sub_system_systems.child'),
         orm.subqueryload_all('super_system_systems.parent'))
 
-class Process(System):
-  _kind_plural = 'processes'
+
+# Not 'Controllable', since system_controls is used instead
+class System(
+    Documentable, Personable, Objectiveable, Sectionable,
+    SystemOrProcess):
+  __mapper_args__ = {
+      'polymorphic_identity': False
+      }
+  _table_plural = 'systems'
+  #_kind_plural = 'systems'
+
+  @validates('is_biz_process')
+  def validates_is_biz_process(self, key, value):
+    return False
+    assert value, "System.is_biz_process *must* be False"
+
+
+class Process(
+    Documentable, Personable, Objectiveable, Sectionable,
+    SystemOrProcess):
+  __mapper_args__ = {
+      'polymorphic_identity': True
+      }
+  _table_plural = 'processes'
+  #_kind_plural = 'processes'
+
+  @validates('is_biz_process')
+  def validates_is_biz_process(self, key, value):
+    return True
+    assert not value, "Process.is_biz_process *must* be True"

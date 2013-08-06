@@ -176,6 +176,14 @@ class ProgramFactory(ModelFactory):
   MODEL = models.Program
   kind = FuzzyChoice(['Directive', 'Company Controls'])
 
-class DirectiveFactory(ModelFactory):
-  MODEL = models.Directive
-  kind = FuzzyChoice(['Company Policy'])
+#class DirectiveFactory(ModelFactory):
+#  MODEL = models.Directive
+#  kind = FuzzyChoice(['Company Policy'])
+
+#class SystemFactory(ModelFactory):
+#  MODEL = models.System
+#  is_biz_process = False
+
+#class ProcessFactory(ModelFactory):
+#  MODEL = models.Process
+#  is_biz_process = True
