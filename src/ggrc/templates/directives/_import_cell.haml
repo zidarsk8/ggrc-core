@@ -1,19 +1,18 @@
+-set cell = result[col_name]
+-set cell_handler = cell.__class__.__name__
+-set cell_handler_base = cell.__class__.__base__.__name__
+-set td_class = ''
+-if not cell
+  -set td_class = ''
+-elif cell.has_errors()
+  -set td_class = 'member-failure'
+-elif cell.has_warnings()
+  -set td_class = 'member-warning'
+-else
+  -set td_class = ''
 
--# This HAML file renders an individual cell based up type
--#   LinkDocuments, Link, Textor HTML or everything else
+%td{ 'class': "{{td_class}}" }
 
--#column_name = column_name.to_sym
--#cell = result[column_name]
-
--#td_class = cell.nil? ? '' : (cell.has_errors? ? 'member-failure' : (cell.has_warnings? ? 'member-warning' : '' ))
-
-%td{ 'class': '' }
-
-  -# set values to test
-
-  -set cell = result[col_name]
-  -set cell_handler = cell.__class__.__name__
-  -set cell_handler_base = cell.__class__.__base__.__name__
 
   -if cell_handler == "LinkDocumentsHandler"
     -set first = True
@@ -40,6 +39,11 @@
       -else
         ={value}
 
+      .help-inline 
+        ={", ".join(errors)}
+      .help-inline-warning 
+        ={", ".join(warnings)}
+
   -elif "LinksHandler" == cell_handler_base
     -set first = True
     -for all_details in cell.links_with_details()
@@ -63,7 +67,23 @@
       -else
         ={value}
 
+      .help-inline 
+        ={", ".join(errors)}
+      .help-inline-warning 
+        ={", ".join(warnings)}
+
   -elif cell == "TextOrHtmlColumnHandler"
     ={cell.display()}
   -else
     {{cell.display()}}
+
+  -if result.errors_for(col_name)
+    .help-inline
+      -for message in result.errors_for(col_name)
+        ={message}
+        %br
+  -if result.warnings_for(col_name)
+    .help-inline-warning
+      -for message in result.warnings_for(col_name)
+        ={message}
+        %br
