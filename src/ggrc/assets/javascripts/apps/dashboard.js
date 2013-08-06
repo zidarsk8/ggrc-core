@@ -181,7 +181,7 @@ $(function() {
          $(this)
           .cms_controllers_resize_widgets({
             model : data[0]
-            , minimum_widget_height : (/dashboard/.test(window.location) ? 97 : 167)
+            //, minimum_widget_height : (/dashboard/.test(window.location) ? 97 : 167)
           }).control(CMS.Controllers.ResizeWidgets);
 
     }
