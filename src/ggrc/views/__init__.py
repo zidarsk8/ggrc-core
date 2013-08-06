@@ -67,7 +67,9 @@ def admin_reindex():
   from ggrc.models import all_models
   from ggrc.app import db
 
-  models = all_models.all_models
+  # Find all models then remove base classes
+  models = set(all_models.all_models) -\
+      set([all_models.Directive, all_models.SystemOrProcess])
   for model in models:
     for instance in model.query.all():
       indexer.create_record(fts_record_for(instance), False)
