@@ -15,6 +15,9 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Cycle              |
       | DataAsset          |
       | Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Market             |
@@ -40,6 +43,8 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | RiskRiskyAttribute |
       | Section            |
       | SectionObjective   |
+      | SystemOrProcess    |
       | System             |
+      | Process            |
       | SystemSystem       |
       | SystemControl      |

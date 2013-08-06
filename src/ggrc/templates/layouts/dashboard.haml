@@ -6,15 +6,8 @@
 -#
 -extends 'layouts/base.haml'
 
--macro dropup_create_new(type, type_plural, type_model=None)
-  -set type_model = type_model or type|nospace
-  %li
-    %a{ 'href': 'javascript://', 'data-toggle': 'modal-ajax-form', 'data-modal-reset': 'reset', 'data-form-target': 'redirect', 'data-modal-class': 'modal-wide', 'data-object-singular' : '={type_model}', 'data-object-plural' : '={type_plural}' }
-      {{ type }}
--endmacro
-
 -macro search_result(type, type_plural, li_class='')
-  %li{ 'class': ['{{ li_class }}', 'accordion-group'] }
+  %li{ 'class': ['{{ li_class }}', 'accordion-group'], 'data-model-name': '={type}' }
     %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-toggle' : "collapse", 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
       {{ type_plural|title }}

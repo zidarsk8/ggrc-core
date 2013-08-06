@@ -17,7 +17,7 @@ from .control_risk import ControlRisk
 from .control_section import ControlSection
 from .cycle import Cycle
 from .data_asset import DataAsset
-from .directive import Directive
+from .directive import Directive, Regulation, Policy, Contract
 from .document import Document
 from .facility import Facility
 from .help import Help
@@ -51,7 +51,7 @@ from .risk_risky_attribute import RiskRiskyAttribute
 from .risky_attribute import RiskyAttribute
 from .section import Section
 from .section_objective import SectionObjective
-from .system import System
+from .system import SystemOrProcess, System, Process
 from .system_control import SystemControl
 
 # TODO: Is this used?
@@ -72,6 +72,9 @@ all_models = [
   Cycle,
   DataAsset,
   Directive,
+    Contract,
+    Policy,
+    Regulation,
   Document,
   Facility,
   Help,
@@ -103,7 +106,9 @@ all_models = [
   RiskyAttribute,
   Section,
   SectionObjective,
-  System,
+  SystemOrProcess,
+    System,
+    Process,
   SystemControl,
   SystemSystem,
   Revision,

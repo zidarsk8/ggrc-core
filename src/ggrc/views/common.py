@@ -52,12 +52,16 @@ class BaseObjectView(ModelView):
           })
       }
 
+  def get_model_template_paths_for_object(self, obj):
+    # Generate lookup paths for templates based on inheritance
+    return [
+      self.model_template.format(model_plural=model._inflector.table_plural)
+        for model in self.model.mro() if hasattr(model, '__table__')]
+
   def render_template_for_object(self, obj):
     context = self.get_context_for_object(obj)
-    template_paths = [
-      self.model_template.format(model_plural=self.model._inflector.table_plural),
-      self.base_template
-      ]
+    template_paths =\
+      self.get_model_template_paths_for_object(obj) + [self.base_template]
     return render_template(template_paths, **context)
 
 
