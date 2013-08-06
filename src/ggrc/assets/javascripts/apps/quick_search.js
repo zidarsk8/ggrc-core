@@ -77,6 +77,13 @@ $(function() {
   $(".recent").ggrc_controllers_recently_viewed();
   $("#lhs").cms_controllers_lhn_tooltips();
 
+  var obs = new can.Observe();
+  $("#lhs").bind("keypress", "input.widgetsearch", function(ev) {
+    if(ev.which === 13)
+      obs.attr("value", $(ev.target).val());
+  });
+  $("#lhs").cms_controllers_lhn_search({ observer: obs });
+
   function bindQuickSearch(ev, opts) {
 
     var $qs = $(this).uniqueId();
@@ -100,7 +107,7 @@ $(function() {
     bindQuickSearch.call(this, {}, {});
   });//get anything that exists on the page already.
 
-  $(".lhs").each(function() {
+  /*$(".lhs").each(function() {
     bindQuickSearch.call(this, {}, {
       list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
       //, tooltip_view : GGRC.mustache_path + "/base_objects/extended_info.mustache"
@@ -111,7 +118,7 @@ $(function() {
       // , tab_model_attr : [ "data-model", "data-object-singular" ]
       , limit : 6
     });
-  });
+  });*/
   //Then listen for new ones
   $(document.body).on("click", ".quick-search:not(:has(.cms_controllers_quick_search)), section.widget-tabs:not(:has(.cms_controllers_quick_search))", bindQuickSearch);
 
