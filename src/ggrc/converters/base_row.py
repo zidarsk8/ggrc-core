@@ -13,15 +13,18 @@ def unpack_list(vals):
 
 def clean_list(vals):
   result = []
-  for res in vals:
-    if '[' in res and  ']' in res:
-      result.append(res[1:-1].strip())
-    elif '[' in res:
-      result.append(res[1:].strip())
-    elif ']' in res:
-      result.append(res[:-1].strip())
-    else:
-      result.append(res.strip())
+  if ',' in vals and len(vals) > 1:
+    for res in vals:
+      if '[' in res and  ']' in res:
+        result.append(res[1:-1].strip())
+      elif '[' in res:
+        result.append(res[1:].strip())
+      elif ']' in res:
+        result.append(res[:-1].strip())
+      else:
+        result.append(res.strip())
+  else:
+    result.append(vals[0].strip())
   return result
 
 def split_cell(value):
@@ -193,7 +196,7 @@ class ColumnHandler(object):
 
   def display(self):
     value = getattr(self.importer.obj, self.key, '') or ''
-    return value if value != 'null' else '' # Some columns returning null strings - should show as ''
+    return value if value != 'null' else ''
 
   def after_save(self, obj):
     pass
@@ -267,7 +270,7 @@ class OptionColumnHandler(ColumnHandler):
     if self.has_errors():
       return self.original
     else:
-      return self.value.title
+      return self.value.title if self.value else ''
 
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
@@ -407,8 +410,6 @@ class LinksHandler(ColumnHandler):
     model_class = model_class.upper()
     return model_class
 
-  #TODO: add model class method -> Perhaps return '' (or None)?
-
   def get_where_params(self, data):
     return dict({'slug': data.get('slug')}.items() + self.options.get(
                 'extra_model_where_params', []))
@@ -419,18 +420,25 @@ class LinksHandler(ColumnHandler):
   def find_existing_item(self, data):
     where_params = self.get_where_params(data)
     model_class = getattr(self.__class__, 'model_class', None) or self.model_class
-    return model_class.query.filter_by(**where_params).first()
+    return model_class.query.filter_by(**where_params).first() if where_params else None
+
+  def create_with_params(self, model_class, **create_params):
+    obj = model_class()
+    for param in create_params.keys():
+      if hasattr(obj, param): setattr(obj, param, create_params[param])
+    return obj
 
   def create_item(self, data):
     where_params = self.get_where_params(data)
     obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
-    if not obj:
+    if not obj and data:
       create_params = self.get_create_params(data)
-      obj = self.model_class()
-      if create_params.get('slug'):
-        obj.slug = create_params['slug']
+      obj = self.create_with_params(self.model_class, **create_params)
       self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
-    self.create_item_warnings(obj, data)
+
+    if data:
+      self.create_item_warnings(obj, data)
+
     return obj
 
   def create_item_warnings(self, obj, data):
@@ -517,20 +525,26 @@ class LinkDocumentsHandler(LinksHandler):
   import re
   model_class = Document
 
+  def is_valid_url(self, url_string):
+    from urlparse import urlparse
+    pieces = urlparse(url_string)
+    valid_schemes = ['http', 'https']
+    return (all([pieces.scheme, pieces.netloc]) and pieces.scheme in valid_schemes)
+
   def parse_item(self, value):
     data = {}
     if value[0] == '[':
       prog = re.compile(r'^\[([^\s]+)(?:\s+([^\]]*))?\]([^$]*)$')
       result = prog.match(value.strip())
-      if result:
+      if result and self.is_valid_url(result.group(1)):
         data = { 'link': result.group(1), 'title': result.group(2), 'description': result.group(3)}
       else:
-        self.add_link_error('Invalid format: use "[www.yoururl.com Document] Title"')
-    else:
+        self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
+    elif self.is_valid_url(value):
       data = { 'link' : value.strip() }
+    else:
+      self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
 
-    #TODO: Add link validation here later on
-    data['link'] = data['link'].strip()
     return data
 
   def get_where_params(self, data):
@@ -547,10 +561,11 @@ class LinkPeopleHandler(LinksHandler):
   from ggrc.models.all_models import ObjectPerson
   model_class = Person
   import re
+  EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
   def parse_item(self, value):
     data = {}
-    if value[0] == '[':
+    if len(value) and value[0] == '[':
       prog = re.compile(r'^\[([\w\d-]+@[^\s\]]+)(?:\s+([^\]]+))?\]([^$]*)$')
       match = prog.match(value)
       if match:
@@ -561,13 +576,16 @@ class LinkPeopleHandler(LinksHandler):
       data = { 'email' : value }
 
     if data:
-      return data #TODO: Provide email validation here
+      if data.get('email') and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
+        self.add_link_warning("This email address is invalid and will not be linked")
+      else:
+        return data
 
   def get_where_params(self, data):
-    return { 'email' : data.get('email') }
+    return { 'email' : data.get('email') } if data else {}
 
   def get_create_params(self, data):
-    return {'email' : data.get('email'), 'name' : data.get('name') }
+    return {'email' : data.get('email'), 'name' : data.get('name', '') } if data else {}
 
   def create_item_warnings(self, obj, data):
     self.add_link_warning('"{}" will be created'.format(data.get('email')))
@@ -593,7 +611,12 @@ class LinkPeopleHandler(LinksHandler):
     return item.email
 
   def display_link(self, obj):
-    return obj.email
+    if obj.name and obj.email:
+      return "{} <{}>".format(obj.name, obj.email)
+    elif obj.name:
+      return obj.name
+    else:
+      return obj.email
 
 class LinkSystemsHandler(LinksHandler):
   from ggrc.models.all_models import System
