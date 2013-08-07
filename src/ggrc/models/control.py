@@ -147,6 +147,7 @@ class Control(
     from sqlalchemy import orm
     query = super(Control, cls).eager_query()
     return query.options(
+        orm.joinedload('directive'),
         orm.joinedload('control_assessments'),
         orm.joinedload('control_controls'),
         orm.joinedload('implementing_control_controls'),

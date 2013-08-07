@@ -111,4 +111,3 @@ class Categorizable(object):
               categories_alias.scope_id == cls._categorization_scopes()[r]))
     loads = [orm.contains_eager(r, alias=categorizations_alias) for r in cls._categorization_attrs()]
     return query.options(*loads)
-    return query

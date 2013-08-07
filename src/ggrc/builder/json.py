@@ -311,11 +311,6 @@ class Builder(AttributeInfo):
          isinstance(class_attr.property, RelationshipProperty):
       return self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include)
-      #if class_attr.property.uselist:
-        #return self.publish_link_collection(
-            #obj, attr_name, inclusions, include)
-      #else:
-        #return self.publish_link(obj, attr_name, inclusions, include)
     elif class_attr.__class__.__name__ == 'property':
       return self.publish_link(obj, attr_name, inclusions, include)
     else:

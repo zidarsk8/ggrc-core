@@ -47,8 +47,9 @@ class Identifiable(object):
 
   @classmethod
   def eager_query(cls):
+    mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
-        db.undefer_group(cls.__name__+'_complete'),
+        db.undefer_group(mapper_class.__name__+'_complete'),
         )
 
 def created_at_args():
@@ -89,7 +90,9 @@ class ChangeTracked(object):
     return db.relationship(
         'Person',
         primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
-        foreign_keys='{0}.modified_by_id'.format(cls.__name__))
+        foreign_keys='{0}.modified_by_id'.format(cls.__name__),
+        uselist=False,
+        )
   #TODO Add a transaction id, this will be handy for generating etags
   #and for tracking the changes made to several resources together.
   #transaction_id = db.Column(db.Integer)

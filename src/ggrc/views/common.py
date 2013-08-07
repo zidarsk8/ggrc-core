@@ -5,7 +5,7 @@
 
 import ggrc.builder
 from blinker import Namespace
-from flask import request, render_template, current_app
+from flask import request, render_template, current_app, url_for
 from ggrc.rbac import permissions
 from ggrc.services.common import ModelView, as_json
 from werkzeug.exceptions import Forbidden
@@ -103,7 +103,7 @@ class BaseObjectView(ModelView):
         (BaseObjectView,),
         {
           '_model': model_class,
-          'base_url_for': classmethod(lambda cls: cls_name),
+          'base_url_for': classmethod(lambda cls: url),
         })
       import ggrc.views
       setattr(ggrc.views, model_class.__name__, view_class)

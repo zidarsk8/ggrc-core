@@ -9,7 +9,7 @@ from .mixins import deferred, Base, Described
 class Option(Base, Described, db.Model):
   __tablename__ = 'options'
 
-  role = deferred(db.Column(db.String), 'Option')
+  role = db.Column(db.String)
   title = deferred(db.Column(db.String), 'Option')
   required = deferred(db.Column(db.Boolean), 'Option')
 

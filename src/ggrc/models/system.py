@@ -29,16 +29,16 @@ class SystemOrProcess(
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
 
-  infrastructure = deferred(db.Column(db.Boolean), 'System')
+  infrastructure = deferred(db.Column(db.Boolean), 'SystemOrProcess')
   # TODO: unused?
-  owner_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'System')
+  owner_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'SystemOrProcess')
   is_biz_process = db.Column(db.Boolean, default=False)
   # TODO: handle option
-  type_id = deferred(db.Column(db.Integer), 'System')
-  version = deferred(db.Column(db.String), 'System')
-  notes = deferred(db.Column(db.Text), 'System')
+  type_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
+  version = deferred(db.Column(db.String), 'SystemOrProcess')
+  notes = deferred(db.Column(db.Text), 'SystemOrProcess')
   # TODO: handle option
-  network_zone_id = deferred(db.Column(db.Integer), 'System')
+  network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
 
   system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
   controls = association_proxy('system_controls', 'control', 'SystemControl')
@@ -109,10 +109,10 @@ class SystemOrProcess(
     return query.options(
         orm.joinedload('type'),
         orm.joinedload('network_zone'),
-        orm.subqueryload('responses'),
-        orm.subqueryload_all('system_controls.control'),
-        orm.subqueryload_all('sub_system_systems.child'),
-        orm.subqueryload_all('super_system_systems.parent'))
+        orm.joinedload('responses'),
+        orm.joinedload_all('system_controls.control'),
+        orm.joinedload_all('sub_system_systems.child'),
+        orm.joinedload_all('super_system_systems.parent'))
 
 
 # Not 'Controllable', since system_controls is used instead
