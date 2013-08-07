@@ -100,6 +100,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , findAll : "GET /api/regulations"
   , create : "POST /api/regulations"
   , update : "PUT /api/regulations/{id}"
+  , destroy : "DELETE /api/regulations/{id}"
   , defaults : {
     kind : "Regulation"
   }
@@ -159,6 +160,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , findAll : "GET /api/contracts"
   , create : "POST /api/contracts"
   , update : "PUT /api/contracts/{id}"
+  , destroy : "DELETE /api/contracts/{id}"
   , defaults : {
     kind : "Contract"
   }
