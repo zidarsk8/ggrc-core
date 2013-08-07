@@ -2,59 +2,60 @@
   Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   Created By: david@reciprocitylabs.com
-  Maintained By: david@reciprocitylabs.com
+  Maintained By: vraj@reciprocitylabs.com
 
 
-.. _ActivityLogResource:
+.. _EventLogResource:
 
 *********************
-Activity Log Resource
+Event Log Resource
 *********************
 
-An activity log resource represents changes made to GGRC resources resulting
-from an atomic HTTP POST, PUT, or DELETE request. The activity log resource
+An event log resource represents changes made to GGRC resources resulting
+from an atomic HTTP POST, PUT, or DELETE request. The event log resource
 is intended to provide a feed of events that occur in GGRC for display to
 users.
 
-An activity log resource has a media type of ``application/json`` and is an
-object containing an :ref:`ActivityLog` object.
+An event log resource has a media type of ``application/json`` and is an
+object containing an :ref:`EventLog` object.
 
 Example
 =======
 
 .. sourcecode:: javascript
 
-   {
-     "activitylog": {
-       "selfLink": "/api/activitylog",
-       "entries": [
-         {
-           "selfLink": "/api/activitylog/1000",
-           "http_method": "PUT",
-           "resourceLink": "/api/programs/12",
-           "resource_id": "12",
-           "resource_type": "Program",
-           "timestamp": "2013-05-30T17:14:00Z",
-           "userid": "david@reciprocitylabs.com",
-           "revisions": [
-             {
-               "selfLink": "/api/program_directives/56/revisions/3333",
-               "resourceLink": "/api/program_directives/56",
-               "contentLink": "/api/program_directives/revisions/3333/content",
-               "previousLink": null,
-               "timestamp": "2013-05-30T17:14:00Z",
-               "modifiedBy": "david@reciprocitylabs.com",
-               "action": "created",
-               "activityLink": "/api/activitylog/1000",
-               "summary": "david@reciprocitylabs.com added Directive 56 to Program 12."
-             }
-           ]
-         }
-       ]
-     }
-   }
+    {
+        "events_collection": {
+            "selfLink": "/api/events",
+            "events": [
+                {
+                    "selfLink": "/api/events/6",
+                    "http_method": "POST",
+                    "modified_by": {
+                        "href": "/api/people/79",
+                        "type": "Person",
+                        "id": 79
+                    },
+                    "resource_id": 1457,
+                    "created_at": "2013-07-29T14:51:52",
+                    "updated_at": "2013-07-29T14:51:52",
+                    "resource_type": "Section",
+                    "context": null,
+                    "id": 6,
+                    "revisions": [
+                        {
+                            "href": "/api/revisions/6",
+                            "type": "Revision",
+                            "id": 6
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 
-Activity Log Content
+
+Event Log Content
 ====================
 
 .. list-table::
@@ -66,12 +67,12 @@ Activity Log Content
      - Description
    * - ``activitylog``
      - object
-     - Root property for the activity log resource, an :ref:`ActivityLog`
+     - Root property for the event log resource, an :ref:`EventLog`
        object.
 
-.. _ActivityLog:
+.. _EventLog:
 
-ActivityLog
+EventLog
 ===========
 
 .. list-table::

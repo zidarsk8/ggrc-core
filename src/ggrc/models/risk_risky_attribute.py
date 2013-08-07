@@ -29,3 +29,6 @@ class RiskRiskyAttribute(Base, db.Model):
     return query.options(
         orm.subqueryload('risk'),
         orm.subqueryload('risky_attribute'))
+
+  def _display_name(self):
+    return self.risky_attribute.display_name + '<->' + self.risk.display_name

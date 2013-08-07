@@ -30,3 +30,6 @@ class ProgramControl(Base, db.Model):
     return query.options(
         orm.subqueryload('program'),
         orm.subqueryload('control'))
+
+  def _display_name(self):
+    return self.control.display_name + '<->' + self.program.display_name

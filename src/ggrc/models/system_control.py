@@ -36,3 +36,6 @@ class SystemControl(Base, db.Model):
         orm.joinedload('cycle'),
         orm.subqueryload('system'),
         orm.subqueryload('control'))
+
+  def _display_name(self):
+    return self.control.display_name + '<->' + self.system.display_name

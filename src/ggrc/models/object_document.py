@@ -50,6 +50,9 @@ class ObjectDocument(Base, Timeboxed, db.Model):
     return query.options(
         orm.subqueryload('document'))
 
+  def _display_name(self):
+    return self.documentable.display_name + '<->' + self.document.display_name
+
 class Documentable(object):
   @declared_attr
   def object_documents(cls):
