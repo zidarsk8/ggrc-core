@@ -1,12 +1,12 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .categorization import Categorizable
 from .object_control import Controllable
 from .object_document import Documentable
@@ -27,16 +27,17 @@ class System(
     Timeboxed, SystemCategorized, BusinessObject, db.Model):
   __tablename__ = 'systems'
 
-  infrastructure = db.Column(db.Boolean)
+  infrastructure = deferred(db.Column(db.Boolean), 'System')
   # TODO: unused?
-  owner_id = db.Column(db.Integer, db.ForeignKey('people.id'))
-  is_biz_process = db.Column(db.Boolean, default=False)
+  owner_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'System')
+  is_biz_process = deferred(db.Column(db.Boolean, default=False), 'System')
   # TODO: handle option
-  type_id = db.Column(db.Integer)
-  version = db.Column(db.String)
-  notes = db.Column(db.Text)
+  type_id = deferred(db.Column(db.Integer), 'System')
+  version = deferred(db.Column(db.String), 'System')
+  notes = deferred(db.Column(db.Text), 'System')
   # TODO: handle option
-  network_zone_id = db.Column(db.Integer)
+  network_zone_id = deferred(db.Column(db.Integer), 'System')
+
   system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
   controls = association_proxy('system_controls', 'control', 'SystemControl')
   responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')

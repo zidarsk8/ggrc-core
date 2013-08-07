@@ -6,14 +6,14 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import Base, Timeboxed
+from .mixins import deferred, Base, Timeboxed
 from .reflection import PublishOnly
 
 class ObjectDocument(Base, Timeboxed, db.Model):
   __tablename__ = 'object_documents'
 
-  role = db.Column(db.String)
-  notes = db.Column(db.Text)
+  role = deferred(db.Column(db.String), 'ObjectDocument')
+  notes = deferred(db.Column(db.Text), 'ObjectDocument')
   document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
 
   # TODO: Polymorphic relationship
@@ -81,4 +81,5 @@ class Documentable(object):
     from sqlalchemy import orm
 
     query = super(Documentable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_documents.document'))
+    #return query.options(orm.subqueryload_all('object_documents'))
+    return query.options(orm.joinedload('object_documents'))

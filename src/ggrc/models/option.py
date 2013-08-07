@@ -1,18 +1,17 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base, Described
+from .mixins import deferred, Base, Described
 
 class Option(Base, Described, db.Model):
   __tablename__ = 'options'
 
-  role = db.Column(db.String)
-  title = db.Column(db.String)
-  required = db.Column(db.Boolean)
+  role = deferred(db.Column(db.String), 'Option')
+  title = deferred(db.Column(db.String), 'Option')
+  required = deferred(db.Column(db.Boolean), 'Option')
 
   _publish_attrs = [
       'role',

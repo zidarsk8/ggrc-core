@@ -7,7 +7,9 @@ from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from .associationproxy import association_proxy
 from .categorization import Categorizable
-from .mixins import Slugged, Described, Hierarchical, Hyperlinked, Timeboxed
+from .mixins import (
+    deferred, Slugged, Described, Hierarchical, Hyperlinked, Timeboxed,
+    )
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
@@ -32,18 +34,20 @@ class Control(
     Described, Hierarchical, Hyperlinked, Timeboxed, Slugged, db.Model):
   __tablename__ = 'controls'
 
-  company_control = db.Column(db.Boolean)
-  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'))
-  type_id = db.Column(db.Integer)
-  kind_id = db.Column(db.Integer)
-  means_id = db.Column(db.Integer)
-  version = db.Column(db.String)
-  documentation_description = db.Column(db.Text)
-  verify_frequency_id = db.Column(db.Integer)
-  fraud_related = db.Column(db.Boolean)
-  key_control = db.Column(db.Boolean)
-  active = db.Column(db.Boolean)
-  notes = db.Column(db.Text)
+  company_control = deferred(db.Column(db.Boolean), 'Control')
+  directive_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('directives.id')), 'Control')
+  type_id = deferred(db.Column(db.Integer), 'Control')
+  kind_id = deferred(db.Column(db.Integer), 'Control')
+  means_id = deferred(db.Column(db.Integer), 'Control')
+  version = deferred(db.Column(db.String), 'Control')
+  documentation_description = deferred(db.Column(db.Text), 'Control')
+  verify_frequency_id = deferred(db.Column(db.Integer), 'Control')
+  fraud_related = deferred(db.Column(db.Boolean), 'Control')
+  key_control = deferred(db.Column(db.Boolean), 'Control')
+  active = deferred(db.Column(db.Boolean), 'Control')
+  notes = deferred(db.Column(db.Text), 'Control')
+
   type = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Control.type_id) == Option.id, '\
@@ -107,7 +111,6 @@ class Control(
   # REST properties
   _publish_attrs = [
       'active',
-      # FIXME: add these in once eager-loading works correctly
       #'categories',
       #'assertions',
       'company_control',
@@ -142,20 +145,15 @@ class Control(
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
-
     query = super(Control, cls).eager_query()
     return query.options(
-        orm.joinedload('directive'),
-        orm.joinedload('type'),
-        orm.joinedload('kind'),
-        orm.joinedload('means'),
-        orm.joinedload('verify_frequency'),
-        orm.subqueryload_all('system_controls.system'),
-        orm.subqueryload_all('control_sections.section'),
-        orm.subqueryload_all('objective_controls.objective'),
-        orm.subqueryload_all('control_controls.implemented_control'),
-        orm.subqueryload_all('implementing_control_controls.control'),
-        orm.subqueryload_all('control_risks.risk'),
-        orm.subqueryload_all('program_controls.program'),
-        orm.subqueryload_all('control_assessments'),
-        orm.subqueryload('object_controls'))
+        orm.joinedload('control_assessments'),
+        orm.joinedload('control_controls'),
+        orm.joinedload('implementing_control_controls'),
+        orm.joinedload('control_risks'),
+        orm.joinedload('control_sections'),
+        orm.joinedload('objective_controls'),
+        orm.joinedload('program_controls'),
+        orm.joinedload('system_controls'),
+        orm.joinedload('object_controls'),
+        )

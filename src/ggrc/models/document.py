@@ -1,22 +1,22 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 
 class Document(Base, db.Model):
   __tablename__ = 'documents'
 
-  title = db.Column(db.String)
-  link = db.Column(db.String)
-  description = db.Column(db.Text)
-  type_id = db.Column(db.Integer)
-  kind_id = db.Column(db.Integer)
-  year_id = db.Column(db.Integer)
-  language_id = db.Column(db.Integer)
+  title = deferred(db.Column(db.String), 'Document')
+  link = deferred(db.Column(db.String), 'Document')
+  description = deferred(db.Column(db.Text), 'Document')
+  type_id = deferred(db.Column(db.Integer), 'Document')
+  kind_id = deferred(db.Column(db.Integer), 'Document')
+  year_id = deferred(db.Column(db.Integer), 'Document')
+  language_id = deferred(db.Column(db.Integer), 'Document')
+
   object_documents = db.relationship('ObjectDocument', backref='document', cascade='all, delete-orphan')
   population_worksheets_documented = db.relationship(
       'PopulationSample',

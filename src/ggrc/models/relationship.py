@@ -1,12 +1,11 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 import ggrc.models
 from ggrc import db
-from .mixins import Base, Described
+from .mixins import deferred, Base, Described
 
 class Relationship(Base, db.Model):
   __tablename__ = 'relationships'
@@ -68,10 +67,11 @@ class Relationship(Base, db.Model):
 
 class RelationshipType(Base, Described, db.Model):
   __tablename__ = 'relationship_types'
-  relationship_type = db.Column(db.String)
-  forward_phrase = db.Column(db.String)
-  backward_phrase = db.Column(db.String)
-  symmetric = db.Column(db.Boolean, nullable=False)
+  relationship_type = deferred(db.Column(db.String), 'RelationshipType')
+  forward_phrase = deferred(db.Column(db.String), 'RelationshipType')
+  backward_phrase = deferred(db.Column(db.String), 'RelationshipType')
+  symmetric = deferred(
+      db.Column(db.Boolean, nullable=False), 'RelationshipType')
 
   _publish_attrs = [
       'forward_phrase',

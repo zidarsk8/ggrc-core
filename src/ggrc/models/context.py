@@ -4,14 +4,16 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import Base, Described
+from ggrc.models.mixins import deferred, Base, Described
 
 class Context(Base, Described, db.Model):
   __tablename__ = 'contexts'
 
-  name = db.Column(db.String(128), nullable=True)
-  related_object_id = db.Column(db.Integer(), nullable=True)
-  related_object_type = db.Column(db.String(128), nullable=True)
+  name = deferred(db.Column(db.String(128), nullable=True), 'Context')
+  related_object_id = deferred(
+      db.Column(db.Integer(), nullable=True), 'Context')
+  related_object_type = deferred(
+      db.Column(db.String(128), nullable=True), 'Context')
 
   @property
   def related(self, obj=[]):

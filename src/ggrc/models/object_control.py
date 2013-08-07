@@ -6,15 +6,16 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import Base, Timeboxed
+from .mixins import deferred, Base, Timeboxed
 from .reflection import PublishOnly
 
 class ObjectControl(Base, Timeboxed, db.Model):
   __tablename__ = 'object_controls'
 
-  role = db.Column(db.String)
-  notes = db.Column(db.Text)
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  role = deferred(db.Column(db.String), 'ObjectControl')
+  notes = deferred(db.Column(db.Text), 'ObjectControl')
+  control_id = db.Column(
+      db.Integer, db.ForeignKey('controls.id'), nullable=False)
 
   # TODO: Polymorphic relationship
   controllable_id = db.Column(db.Integer)

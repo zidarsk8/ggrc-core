@@ -5,15 +5,19 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Hierarchical
+from .mixins import deferred, BusinessObject, Hierarchical
 from .reflection import PublishOnly
 
 class Section(Hierarchical, BusinessObject, db.Model):
   __tablename__ = 'sections'
 
-  directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
-  na = db.Column(db.Boolean, default=False, nullable=False)
-  notes = db.Column(db.Text)
+  directive_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False),
+      'Section')
+  na = deferred(db.Column(db.Boolean, default=False, nullable=False),
+      'Section')
+  notes = deferred(db.Column(db.Text), 'Section')
+
   control_sections = db.relationship(
       'ControlSection', backref='section', cascade='all, delete-orphan')
   controls = association_proxy(

@@ -6,14 +6,14 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import Base, Timeboxed
+from .mixins import deferred, Base, Timeboxed
 from .reflection import PublishOnly
 
 class ObjectSection(Base, Timeboxed, db.Model):
   __tablename__ = 'object_sections'
 
-  role = db.Column(db.String)
-  notes = db.Column(db.Text)
+  role = deferred(db.Column(db.String), 'ObjectSection')
+  notes = deferred(db.Column(db.Text), 'ObjectSection')
   section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable=False)
 
   # TODO: Polymorphic relationship

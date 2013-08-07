@@ -9,8 +9,10 @@ from .mixins import Base
 class ControlSection(Base, db.Model):
   __tablename__ = 'control_sections'
 
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
-  section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable=False)
+  control_id = db.Column(
+      db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  section_id = db.Column(
+      db.Integer, db.ForeignKey('sections.id'), nullable=False)
 
   __table_args__ = (
     db.UniqueConstraint('control_id', 'section_id'),

@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -40,7 +39,6 @@ class Categorization(Base, db.Model):
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
-
     query = super(Categorization, cls).eager_query()
     return query.options(
         orm.subqueryload('category'))
@@ -78,12 +76,10 @@ class Categorizable(object):
         backref=BACKREF_NAME_FORMAT.format(type=cls.__name__, scope=scope),
         )
 
-  # FIXME: make eager-loading work for categorizations/assertations
   #@classmethod
   #def eager_query(cls):
-  #  from sqlalchemy import orm
-
-  #  query = super(Categorizable, cls).eager_query()
-  #  return query.options(
-  #      orm.subqueryload_all('categorizations.category'),
-  #      orm.subqueryload_all('assertations.category'))
+    #from sqlalchemy import orm
+    #query = super(Categorizable, cls).eager_query()
+    #return query.options(
+        #orm.subqueryload_all('categorizations'),
+        #orm.subqueryload_all('assertations'))

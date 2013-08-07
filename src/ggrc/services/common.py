@@ -91,7 +91,7 @@ class ModelView(View):
           query = query.filter(or_(
             j_class.context_id.in_(j_contexts),
             j_class.context_id == None))
-    return query.order_by(self.modified_attr.desc())
+    return query.order_by(self.modified_attr.desc())#.limit(20)
 
   def get_object(self, id):
     # This could also use `self.pk`
