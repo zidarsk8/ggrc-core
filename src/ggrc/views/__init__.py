@@ -28,6 +28,7 @@ def base_context():
   return dict(
       get_model=get_model,
       permissions_json=get_permissions_json,
+      permissions=permissions
       )
 
 from flask import render_template
