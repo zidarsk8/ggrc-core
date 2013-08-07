@@ -19,7 +19,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     , show_filter : false
     , object_category : null //e.g. "governance"
     , content_selector : ".content"
-    , minimum_widget_height : 100
+    //, minimum_widget_height : 100
     , content_controller : null
     , content_controller_options : {}
   }
@@ -43,7 +43,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     .addClass("widget")
     .addClass(this.options.object_category)
     .attr("id", this.options.widget_id + "_widget")
-    .css("height", this.options.minimum_widget_height)
+    //.css("height", this.options.minimum_widget_height)
     .html($(new Spinner().spin().el).css({
         width: '100px',
         height: '100px',

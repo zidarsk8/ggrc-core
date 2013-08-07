@@ -30,3 +30,6 @@ class ControlRisk(Base, db.Model):
     return query.options(
         orm.subqueryload('control'),
         orm.subqueryload('risk'))
+
+  def _display_name(self):
+    return self.risk.display_name + '<->' + self.control.display_name

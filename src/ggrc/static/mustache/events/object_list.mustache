@@ -9,14 +9,9 @@
               <div class="tree-title-area">
                 <i class="grcicon-{{resource_type.toLowerCase}}-color" rel="tooltip" title="{{resource_type}}"></i>
                 {{#revisions}}
-                  {{#content}}
-                    <strong>
-                      {{firstnonempty title name email}}
-                    </strong>
-                  {{/content}}
-                  <span class="event-action">
-                    {{action}}
-                  </span>
+                  <strong>
+                    {{firstnonempty description display_name}};
+                  </strong>
                 {{/revisions}}
                 <span class="event-owner">
                   by

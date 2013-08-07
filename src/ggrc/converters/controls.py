@@ -27,21 +27,21 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_raw_attr('title')
     self.handle_raw_attr('url')
 
-    #self.handle_option('kind', role = 'control_kind')
-    #self.handle_option('means', role = 'control_means')
-    #self.handle_option('verify_frequency')
+    self.handle_option('kind', role = 'control_kind')
+    self.handle_option('means', role = 'control_means')
+    self.handle_option('verify_frequency')
 
-    #self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'])
-    #self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'])
-    #self.handle_boolean('active', truthy_values = ['active'])
+    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'])
+    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'])
+    self.handle_boolean('active', truthy_values = ['active'])
 
-    #self.handle('documents', LinkDocumentsHandler)
-    #self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
-    #self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
-    #self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
-    #self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
-    #self.handle('systems', LinkSystemsHandler, is_biz_process = False)
-    #self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
+    self.handle('documents', LinkDocumentsHandler)
+    self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
+    self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
+    self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
+    self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
+    self.handle('systems', LinkSystemsHandler, is_biz_process = False)
+    self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):

@@ -47,7 +47,10 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlRisk        |
       | Cycle              |
       | DataAsset          |
-      | Directive          |
+      #| Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
@@ -60,6 +63,7 @@ Feature: RBAC Permissions enforcement for REST API
       | PbcList            |
       | Person             |
       | PopulationSample   |
+      | Process            |
       | Product            |
       | Project            |
       | Program            |
@@ -119,7 +123,10 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlRisk        |
       | Cycle              |
       | DataAsset          |
-      | Directive          |
+      #| Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
@@ -132,6 +139,7 @@ Feature: RBAC Permissions enforcement for REST API
       | PbcList            |
       | Person             |
       | PopulationSample   |
+      | Process            |
       | Product            |
       | Project            |
       | Program            |
@@ -199,7 +207,10 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlRisk        |
       | Cycle              |
       | DataAsset          |
-      | Directive          |
+      #| Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
@@ -212,6 +223,7 @@ Feature: RBAC Permissions enforcement for REST API
       | PbcList            |
       | Person             |
       | PopulationSample   |
+      | Process            |
       | Product            |
       | Project            |
       | Program            |
@@ -279,7 +291,10 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlRisk        |
       | Cycle              |
       | DataAsset          |
-      | Directive          |
+      #| Directive          |
+      | Contract           |
+      | Policy             |
+      | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
@@ -292,6 +307,7 @@ Feature: RBAC Permissions enforcement for REST API
       | PbcList            |
       | Person             |
       | PopulationSample   |
+      | Process            |
       | Product            |
       | Project            |
       | Program            |
@@ -314,7 +330,7 @@ Feature: RBAC Permissions enforcement for REST API
       "name": "Bob Tester",
       "permissions": {
         "create": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
           ],
@@ -324,7 +340,7 @@ Feature: RBAC Permissions enforcement for REST API
           ]
         },
         "read": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
           ],
@@ -334,7 +350,7 @@ Feature: RBAC Permissions enforcement for REST API
           ]
         },
         "update": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
           ]
@@ -342,11 +358,11 @@ Feature: RBAC Permissions enforcement for REST API
       }
     }
     """
-    And a new "Directive" named "directive_in_1"
+    And a new "Contract" named "directive_in_1"
     And "directive_in_1" property "kind" is "Contract"
     And "directive_in_1" link property "context" is "context1"
     And "directive_in_1" is POSTed to its collection
-    And a new "Directive" named "directive_in_2"
+    And a new "Contract" named "directive_in_2"
     And "directive_in_2" property "kind" is "Contract"
     And "directive_in_2" link property "context" is "context2"
     And "directive_in_2" is POSTed to its collection
@@ -366,12 +382,12 @@ Feature: RBAC Permissions enforcement for REST API
       "name": "Jo Tester",
       "permissions": {
         "create": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}}
           ]
         },
         "read": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}}
           ],
           "Program": [
@@ -379,7 +395,7 @@ Feature: RBAC Permissions enforcement for REST API
           ]
         },
         "update": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}}
           ]
         }
@@ -397,13 +413,13 @@ Feature: RBAC Permissions enforcement for REST API
       "name": "Alice Tester",
       "permissions": {
         "read": {
-          "Directive": [333],
+          "Contract": [333],
           "Program": [
             {{context.context1.value['context']['id']}}
           ]
         },
         "update": {
-          "Directive": [
+          "Contract": [
             {{context.context1.value['context']['id']}}
           ]
         }

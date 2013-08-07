@@ -288,7 +288,12 @@ class Builder(AttributeInfo):
     elif include or class_attr.property.backref:
       return self.publish_link(obj, attr_name, inclusions, include)
     else:
-      target_type = class_attr.property.mapper.class_.__name__
+      if class_attr.property.mapper.class_.__mapper__.polymorphic_on \
+          is not None:
+        target = getattr(obj, attr_name)
+        target_type = target.__class__.__name__
+      else:
+        target_type = class_attr.property.mapper.class_.__name__
       target_name = list(class_attr.property.local_columns)[0].key
       attr_value = getattr(obj, target_name)
       if attr_value is not None:

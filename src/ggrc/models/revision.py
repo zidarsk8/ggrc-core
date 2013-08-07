@@ -6,6 +6,7 @@
 from ggrc import db
 from .mixins import Base
 from .types import JsonType
+from .computed_property import computed_property
 
 class Revision(Base, db.Model):
   __tablename__ = 'revisions'
@@ -21,6 +22,7 @@ class Revision(Base, db.Model):
       'resource_type',
       'action',
       'content',
+      'description',
   ]
 
   def __init__(self, obj, modified_by_id, action, content):
@@ -29,3 +31,28 @@ class Revision(Base, db.Model):
     self.resource_type = str(obj.__class__.__name__)
     self.action = action
     self.content = content
+
+  @computed_property
+  def description(self):
+    link_objects = ['ObjectDocument']
+    display_name = self.content['display_name']
+    if '<->' in display_name:
+      #TODO: Fix too many values to unpack below
+      source, destination = display_name.split('<->')[:2]
+      if self.resource_type in link_objects:
+        if self.action == 'created':
+          result = "{1} linked to {0}".format(source, destination)
+        elif self.action == 'deleted':
+          result = "{1} unlinked from {0}".format(source, destination)
+        else:
+          result = "{0} {1}".format(display_name, self.action)
+      else:
+        if self.action == 'created':
+          result = "{1} mapped to {0}".format(source, destination)
+        elif self.action == 'deleted':
+          result = "{1} unmapped from {0}".format(source, destination)
+        else:
+          result = "{0} {1}".format(display_name, self.action)
+    else:
+      result = "{0} {1}".format(display_name, self.action)
+    return result

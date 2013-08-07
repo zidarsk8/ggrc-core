@@ -7,8 +7,27 @@ from collections import namedtuple
 from flask import session
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
+from ggrc.models import get_model
 
 Permission = namedtuple('Permission', 'action resource_type context_id')
+
+_contributing_resource_types = {}
+
+# Return a list of resource types using the same context space.
+# This is needed because permissions may be given for, e.g., "Contract", but
+#   the restriction on join is done knowing only "Directive".
+def get_contributing_resource_types(resource_type):
+  resource_types = _contributing_resource_types.get(resource_type, None)
+  if resource_types is None:
+    resource_types = [resource_type]
+    resource_model = get_model(resource_type)
+    if resource_model:
+      resource_manager = resource_model._sa_class_manager
+      resource_types.extend(
+          manager.class_.__name__ for manager in
+            resource_manager.subclass_managers(True))
+    _contributing_resource_types[resource_type] = resource_types
+  return resource_types
 
 class DefaultUserPermissionsProvider(object):
   def __init__(self, settings):
@@ -84,7 +103,15 @@ class DefaultUserPermissions(UserPermissions):
       return None
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
-    ret = list(permissions.get(action, {}).get(resource_type, ()))
+
+    # Get the list of contexts for a given resource type and any
+    #   superclasses
+    resource_types = get_contributing_resource_types(resource_type)
+
+    ret = []
+    for resource_type in resource_types:
+      ret.extend(permissions.get(action, {}).get(resource_type, ()))
+
     # Extend with the list of all contexts for which the user is an ADMIN
     admin_list = list(
         permissions.get(self.ADMIN_PERMISSION.action, {})\

@@ -101,12 +101,26 @@ var model_descriptors = {
     , object_route : "systems"
     , object_display : "Processes"
   }
+  , "system_or_process" : {
+    model : CMS.Models.SystemOrProcess
+    , object_type : "system_or_process"
+    , object_category : "business"
+    , object_route : "systems_or_processes"
+    , object_display : "Systems or Processes"
+  }
   , "system" : {
-    model : CMS.Models.StrictSystem
+    model : CMS.Models.System
     , object_type : "system"
     , object_category : "business"
     , object_route : "systems"
     , object_display : "Systems"
+  }
+  , "process" : {
+    model : CMS.Models.Process
+    , object_type : "process"
+    , object_category : "business"
+    , object_route : "processes"
+    , object_display : "Processes"
   }
   , "control" : {
     model : CMS.Models.Control
@@ -181,7 +195,7 @@ $(function() {
          $(this)
           .cms_controllers_resize_widgets({
             model : data[0]
-            , minimum_widget_height : (/dashboard/.test(window.location) ? 97 : 167)
+            //, minimum_widget_height : (/dashboard/.test(window.location) ? 97 : 167)
           }).control(CMS.Controllers.ResizeWidgets);
 
     }

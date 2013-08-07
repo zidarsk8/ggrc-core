@@ -12,7 +12,7 @@ from .reflection import PublishOnly
 
 from sqlalchemy.orm import validates
 
-class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
+class Directive(Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')
@@ -22,6 +22,7 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
   audit_start_date = deferred(db.Column(db.DateTime), 'Directive')
   audit_frequency_id = deferred(db.Column(db.Integer), 'Directive')
   audit_duration_id = deferred(db.Column(db.Integer), 'Directive')
+  meta_kind = db.Column(db.String)
   kind = deferred(db.Column(db.String), 'Directive')
 
   sections = db.relationship(
@@ -43,6 +44,10 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
       uselist=False,
       )
 
+  __mapper_args__ = {
+      'polymorphic_on': meta_kind
+      }
+
   _publish_attrs = [
       'audit_start_date',
       'audit_frequency',
@@ -59,28 +64,8 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
 
   @validates('kind')
   def validate_kind(self, key, value):
-    if type(self) is Directive:
-      assert self._model_for_kind(value) is not None
-    else:
-      assert value in self.valid_kinds
+    assert value in self.valid_kinds
     return value
-
-  def kind_model(self):
-    return self._model_for_kind(self.kind)
-
-  @classmethod
-  def _model_for_kind(cls, kind):
-    for model in (Policy, Regulation, Contract):
-      if kind in model.valid_kinds:
-        return model
-
-  @property
-  def kind_plural(self):
-    return self.kind_model()._kind_plural
-
-  @property
-  def kind_singular(self):
-    return self.kind_model().__name__
 
   @classmethod
   def eager_query(cls):
@@ -95,14 +80,38 @@ class Directive(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
         orm.subqueryload('sections'))
 
 # FIXME: For subclasses, restrict kind
-class Policy(Directive):
-  _kind_plural = 'policies'
-  valid_kinds = ("Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy")
+class Policy(Documentable, Personable, Directive):
+  __mapper_args__ = {
+      'polymorphic_identity': 'Policy'
+      }
+  _table_plural = 'policies'
+  valid_kinds = (
+      "Company Policy", "Org Group Policy", "Data Asset Policy",
+      "Product Policy", "Contract-Related Policy", "Company Controls Policy"
+      )
 
-class Regulation(Directive):
-  _kind_plural = 'regulations'
+  @validates('meta_kind')
+  def validates_meta_kind(self, key, value):
+    return 'Policy'
+
+class Regulation(Documentable, Personable, Directive):
+  __mapper_args__ = {
+      'polymorphic_identity': 'Regulation'
+      }
+  _table_plural = 'regulations'
   valid_kinds = ("Regulation",)
 
-class Contract(Directive):
-  _kind_plural = 'contracts'
+  @validates('meta_kind')
+  def validates_meta_kind(self, key, value):
+    return 'Regulation'
+
+class Contract(Documentable, Personable, Directive):
+  __mapper_args__ = {
+      'polymorphic_identity': 'Contract'
+      }
+  _table_plural = 'contracts'
   valid_kinds = ("Contract",)
+
+  @validates('meta_kind')
+  def validates_meta_kind(self, key, value):
+    return 'Contract'

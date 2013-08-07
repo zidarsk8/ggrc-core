@@ -33,6 +33,37 @@ resources.
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
 
+def log_event(session, obj = None):
+  revisions = []
+  new_objects = list(session.new) # Delay creation of revisions as ids are not available
+  current_user = get_current_user_id()
+  for o in session.dirty:
+    if session.is_modified(o):
+      revision = Revision(o, current_user, 'modified', o.to_json())
+      revisions.append(revision)
+  for o in session.deleted:
+    revision = Revision(o, current_user, 'deleted', o.to_json())
+    revisions.append(revision)
+  session.flush() # this ensures that ids are available for new objects
+  for o in new_objects:
+    revision = Revision(o, current_user, 'created', o.to_json())
+    revisions.append(revision)
+  if obj is None:
+    resource_id = 0
+    resource_type = 'Import'
+    http_method = ''
+  else:
+    resource_id = obj.id
+    resource_type = str(obj.__class__.__name__)
+    http_method = request.method
+  event = Event(
+    modified_by_id = current_user,
+    http_method = http_method,
+    resource_id = resource_id,
+    resource_type = resource_type)
+  event.revisions = revisions
+  session.add(event)
+
 class ModelView(View):
   pk = 'id'
   pk_type = 'int'
@@ -299,7 +330,7 @@ class Resource(ModelView):
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    self.log_event(db.session, obj)
+    log_event(db.session, obj)
     db.session.commit()
     obj = self.get_object(id)
     get_indexer().update_record(fts_record_for(obj))
@@ -317,9 +348,9 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
-    self.log_event(db.session, obj)
+    log_event(db.session, obj)
     db.session.commit()
-    get_indexer().delete_record(self.url_for(id=id))
+    get_indexer().delete_record(id, self.model.__name__)
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj))
 
@@ -397,34 +428,11 @@ class Resource(ModelView):
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    self.log_event(db.session, obj)
+    log_event(db.session, obj)
     db.session.commit()
     get_indexer().create_record(fts_record_for(obj))
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
-
-  def log_event(self, session, obj):
-    revisions = []
-    new_objects = list(session.new) # Delay creation of revisions as ids are not available
-    http_method = request.method
-    for o in session.dirty:
-      if session.is_modified(o):
-        revision = Revision( o, get_current_user_id(), 'modified', o.to_json())
-        revisions.append(revision)
-    for o in session.deleted:
-      revision = Revision( o, get_current_user_id(), 'deleted', o.to_json())
-      revisions.append(revision)
-    session.flush() # this ensures that ids are available for new objects
-    for o in new_objects:
-      revision = Revision( o, get_current_user_id(), 'created', o.to_json())
-      revisions.append(revision)
-    event = Event(
-      modified_by_id = get_current_user_id(),
-      http_method = http_method,
-      resource_id = obj.id,
-      resource_type = str(obj.__class__.__name__))
-    event.revisions = revisions
-    session.add(event)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):

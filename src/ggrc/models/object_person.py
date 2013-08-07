@@ -50,6 +50,8 @@ class ObjectPerson(Base, Timeboxed, db.Model):
     return query.options(
         orm.subqueryload_all('person'))
 
+  def _display_name(self):
+    return self.personable.display_name + '<->' + self.person.display_name
 
 class Personable(object):
   @declared_attr

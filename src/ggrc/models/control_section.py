@@ -31,3 +31,6 @@ class ControlSection(Base, db.Model):
     return query.options(
         orm.subqueryload('control'),
         orm.subqueryload('section'))
+
+  def _display_name(self):
+    return self.section.display_name + '<->' + self.control.display_name

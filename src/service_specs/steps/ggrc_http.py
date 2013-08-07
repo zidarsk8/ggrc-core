@@ -182,10 +182,17 @@ def get_related_resource_types(resource_type, resource_types):
     if isinstance(attr, RelationshipProperty):
       columns = tuple(attr.local_columns)[0]
       if not (attr.uselist or columns.primary_key or columns.nullable):
-        related_resource_type = attr.mapper.class_.__name__
-        if related_resource_type not in resource_types:
-          resource_types.add(related_resource_type)
-          get_related_resource_types(related_resource_type, resource_types)
+        # If the resource has subclasses, then it is abstract, so use one of
+        #   its subclasses
+        related_resource_types = [
+            manager.class_.__name__ for manager in
+              attr.mapper.class_manager.subclass_managers(True)]
+        if len(related_resource_types) == 0:
+          related_resource_types = [attr.mapper.class_.__name__]
+        for related_resource_type in related_resource_types:
+          if related_resource_type not in resource_types:
+            resource_types.add(related_resource_type)
+            get_related_resource_types(related_resource_type, resource_types)
 
 @given('current user has create permissions on resource types that "{resource_type}" depends on in context "{rbac_context}"')
 def add_related_resource_permissions(context, resource_type, rbac_context):

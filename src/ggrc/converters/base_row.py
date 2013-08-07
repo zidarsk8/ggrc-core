@@ -1,4 +1,5 @@
 from .common import *
+#FIXME: Remove import of all model classes while we import
 from ggrc.models.all_models import *
 
 def unpack_list(vals):
@@ -56,7 +57,7 @@ class BaseRowConverter(object):
 
   def warnings_for(self, key):
     warning_messages = []
-    if self.handlers.get(key) and self.handlers[key].warnings:
+    if self.handlers.get(key) and self.handlers[key].has_warnings():
       warning_messages  += self.handlers[key].warnings
     warning_messages += self.errors.get(key, [])
     return warning_messages
@@ -102,8 +103,8 @@ class BaseRowConverter(object):
       self.obj = self.model_class()
     else:
       self.obj = self.find_by_slug(slug)
-      self.obj = self.obj if self.obj else self.importer.find_object(self.model_class, slug)
-      self.obj = self.obj if self.obj else self.model_class()
+      self.obj = self.obj or self.importer.find_object(self.model_class, slug)
+      self.obj = self.obj or self.model_class()
       self.obj.slug = slug
     self.importer.add_object(self.model_class, slug, self.obj)
     return self.obj
@@ -191,7 +192,8 @@ class ColumnHandler(object):
     return any(self.warnings) or self.importer.warnings.get(self.key)
 
   def display(self):
-    return getattr(self.importer.obj, str(self.key), '')
+    value = getattr(self.importer.obj, self.key, '') or ''
+    return value if value != 'null' else '' # Some columns returning null strings - should show as ''
 
   def after_save(self, obj):
     pass
@@ -249,8 +251,22 @@ class SlugColumnHandler(ColumnHandler):
     return content
 
 class OptionColumnHandler(ColumnHandler):
+  from ggrc.models.option import Option
   def parse_item(self, value):
-    pass
+    if value:
+      role = self.options.get('role') or self.key
+      option = Option.query.filter_by(role = role.lower(), title = value.lower()).first()
+      if not option:
+        self.warnings.append(
+          'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
+            self.options.get('role'), value.lower()))
+      return option
+
+  def display(self):
+    if self.has_errors():
+      return self.original
+    else:
+      return self.value.title
 
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
@@ -285,7 +301,7 @@ class DateColumnHandler(ColumnHandler):
     if self.has_errors():
       return self.original
     else:
-      return getattr(self.importer.obj, self.key, '') or ''
+      return self.value or getattr(self.importer.obj, self.key, '') or ''
 
   def export(self):
     date_result = getattr(self.importer.obj, self.key, '')
@@ -293,12 +309,13 @@ class DateColumnHandler(ColumnHandler):
 
 class LinksHandler(ColumnHandler):
 
+  model_class = None
+
   def __init__(self, importer, key, **options):
     options['association'] = str(key) if not options.get('association') else options['association']
     options['append_only'] = options.get('append_only', True)
     super(LinksHandler, self).__init__(importer, key, **options)
 
-    self.model_class = None
     self.pre_existing_links = None
     self.link_status = {}
     self.link_objects = {}
@@ -408,7 +425,9 @@ class LinksHandler(ColumnHandler):
     obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
     if not obj:
       create_params = self.get_create_params(data)
-      obj = self.model_class(create_params)
+      obj = self.model_class()
+      if create_params.get('slug'):
+        obj.slug = create_params['slug']
       self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
     self.create_item_warnings(obj, data)
     return obj
@@ -420,7 +439,7 @@ class LinksHandler(ColumnHandler):
     return getattr(self.importer.obj, self.options.get('association'), None)
 
   def export(self):
-    return self.join_rendered_items([self.render_item(item) for item in self.get_existing_items()])
+    return self.join_rendered_items([self.render_item(item) for item in self.get_existing_items() if item])
 
   def join_rendered_items(self, items):
     return "\r\n".join(items)
@@ -462,29 +481,92 @@ class LinkControlsHandler(LinksHandler):
     return {'slug' : data.upper()}
 
   def create_item(self, data):
+    self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
 class LinkCategoriesHandler(LinksHandler):
+  from ggrc.models.category import Category
   model_class = Category
 
   def parse_item(self, data):
-    return { 'name':data }
+    return { 'name' : data }
 
+  def get_where_params(self, data):
+    return {'name' : data.get('name'), 'scope_id' : self.options.get('scope_id')}
+
+  def find_existing_item(self, data):
+    items = self.model_class.query.filter_by(scope_id = self.options.get('scope_id'), name = data.get('name') ).all()
+
+    if len(items) > 1:
+      self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
+    else:
+      return items[0]
+
+  def create_item(self, data):
+    self.add_link_warning('Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
+
+  def render_item(self, item):
+    return item.name
+
+  def display_link(self, obj):
+    return obj.name
 
 class LinkDocumentsHandler(LinksHandler):
+  from ggrc.models.document import Document
+  import re
   model_class = Document
 
   def parse_item(self, value):
-    pass
+    data = {}
+    if value[0] == '[':
+      prog = re.compile(r'^\[([^\s]+)(?:\s+([^\]]*))?\]([^$]*)$')
+      result = prog.match(value.strip())
+      if result:
+        data = { 'link': result.group(1), 'title': result.group(2), 'description': result.group(3)}
+      else:
+        self.add_link_error('Invalid format: use "[www.yoururl.com Document] Title"')
+    else:
+      data = { 'link' : value.strip() }
+
+    #TODO: Add link validation here later on
+    data['link'] = data['link'].strip()
+    return data
+
+  def get_where_params(self, data):
+    return {'link' : data.get('link')}
+
+  def create_item_warnings(self, obj, data):
+    self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
+
+  def render_item(self, item):
+    return "[{} {}] {}".format(item.link_url, item.title, item.description)
 
 class LinkPeopleHandler(LinksHandler):
+  from ggrc.models.person import Person
+  from ggrc.models.all_models import ObjectPerson
   model_class = Person
+  import re
 
   def parse_item(self, value):
-    pass
+    data = {}
+    if value[0] == '[':
+      prog = re.compile(r'^\[([\w\d-]+@[^\s\]]+)(?:\s+([^\]]+))?\]([^$]*)$')
+      match = prog.match(value)
+      if match:
+        data = { 'email' : match.group(1), 'name' : match.group(3) }
+      else:
+        self.add_link_error('Invalid format')
+    else:
+      data = { 'email' : value }
+
+    if data:
+      return data #TODO: Provide email validation here
+
+  def get_where_params(self, data):
+    return { 'email' : data.get('email') }
 
   def get_create_params(self, data):
-    return {'email' : data.get('email'), 'name': data.get('name')}
+    return {'email' : data.get('email'), 'name' : data.get('name') }
 
   def create_item_warnings(self, obj, data):
     self.add_link_warning('"{}" will be created'.format(data.get('email')))
@@ -493,14 +575,51 @@ class LinkPeopleHandler(LinksHandler):
     where_params = {}
     where_params['role'] = self.options.get('role')
     where_params['personable_type'] = self.importer.obj.__class__.__name__
-    where_params['personable_id'] = self.importer.obj.id
-    #object_people
+    object_people = ObjectPerson.query.filter_by(**where_params).all()
+    objects = [obj.person for obj in object_people]
+    return objects
+
+  def after_save(self, obj):
+    db_session = db.session
+    for linked_object in self.created_links():
+      db_session.add(linked_object)
+      object_person = ObjectPerson()
+      object_person.personable = self.importer.obj
+      object_person.person = linked_object
+      db_session.add(object_person)
+
+  def render_item(self, item):
+    return item.email
+
+  def display_link(self, obj):
+    return obj.email
 
 class LinkSystemsHandler(LinksHandler):
+  from ggrc.models.all_models import System
   model_class = System
 
   def parse_item(self, value):
-    pass
+    return { 'slug' : value.upper(), 'title' : value }
+
+  def find_existing_item(self, data):
+    system = System.query.filter_by(slug = data.get('slug')).first()
+    if not system:
+      sys_type = "Process" if self.options.get('is_biz_process') else "System"
+      self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
+    else:
+      if self.options.get('is_biz_process') and not system.is_biz_process:
+        self.add_link_warning("That code is used by a System, and will not be linked")
+      elif not self.options.get('is_biz_process') and system.is_biz_process:
+        self.add_link_warning('That code is used by a Process, and will not be linked')
+      else:
+        return system
+
+  def get_existing_items(self):
+    where_params = { 'is_biz_process' : self.options.get('is_biz_process') or False }
+    return System.query.filter_by(**where_params).all()
+
+  def create_item(self, data):
+    return None
 
 class LinkRelationshipsHandler(LinksHandler):
 

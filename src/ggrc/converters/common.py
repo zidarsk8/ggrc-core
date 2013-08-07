@@ -1,5 +1,5 @@
 import re
-from ggrc.app import db
+from ggrc import db
 from pprint import pprint
 from copy import *
 

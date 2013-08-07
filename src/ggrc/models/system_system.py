@@ -33,3 +33,6 @@ class SystemSystem(Base, db.Model):
     return query.options(
         orm.subqueryload('parent'),
         orm.subqueryload('child'))
+
+  def _display_name(self):
+    return self.child.display_name + '<->' + self.parent.display_name

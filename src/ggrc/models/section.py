@@ -23,7 +23,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
   controls = association_proxy(
       'control_sections', 'control', 'ControlSection')
   section_objectives = db.relationship(
-      'SectionObjective', backref='section')
+      'SectionObjective', backref='section', cascade='all, delete-orphan')
   objectives = association_proxy(
       'section_objectives', 'objective', 'SectionObjective')
   object_sections = db.relationship(

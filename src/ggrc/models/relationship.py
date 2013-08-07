@@ -65,6 +65,9 @@ class Relationship(Base, db.Model):
       'relationship_type_id',
       ]
 
+  def _display_name(self):
+    return self.source.display_name + '<->' + self.destination.display_name
+
 class RelationshipType(Base, Described, db.Model):
   __tablename__ = 'relationship_types'
   relationship_type = deferred(db.Column(db.String), 'RelationshipType')

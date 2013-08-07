@@ -31,3 +31,6 @@ class ControlControl(Base, db.Model):
     return query.options(
         orm.subqueryload('control'),
         orm.subqueryload('implemented_control'))
+
+  def _display_name(self):
+    return self.implemented_control.display_name + '<->' + self.control.display_name

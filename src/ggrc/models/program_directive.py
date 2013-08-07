@@ -29,3 +29,7 @@ class ProgramDirective(Base, db.Model):
     return query.options(
         orm.subqueryload('program'),
         orm.subqueryload('directive'))
+
+  def _display_name(self):
+    return self.program.display_name + '<->' + self.directive.display_name
+

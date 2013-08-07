@@ -45,3 +45,6 @@ class Response(Documentable, Personable, Base, db.Model):
         orm.joinedload('system'),
         orm.subqueryload('meetings'),
         orm.subqueryload('population_sample'))
+
+  def _display_name(self):
+    return self.system.display_name + '<->' + self.request.display_name

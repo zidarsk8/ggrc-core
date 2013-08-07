@@ -81,7 +81,7 @@ class Control(
   sections = association_proxy(
       'control_sections', 'section', 'ControlSection')
   objective_controls = db.relationship(
-      'ObjectiveControl', backref='control')
+      'ObjectiveControl', backref='control', cascade='all, delete-orphan')
   objectives = association_proxy(
       'objective_controls', 'objective', 'ObjectiveControl')
   control_controls = db.relationship(

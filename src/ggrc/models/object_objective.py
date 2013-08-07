@@ -50,6 +50,9 @@ class ObjectObjective(Base, Timeboxed, db.Model):
     return query.options(
         orm.subqueryload('objective'))
 
+  def _display_name(self):
+    return self.objectiveable.display_name + '<->' + self.objective.display_name
+
 class Objectiveable(object):
   @declared_attr
   def object_objectives(cls):
