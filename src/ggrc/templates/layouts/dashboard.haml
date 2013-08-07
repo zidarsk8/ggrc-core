@@ -56,13 +56,11 @@
                         =current_user.email
                     %i.grcicon-carot-white
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-                    -# FIXME: Restrict view to administrators
-                    -#if current_user.can_admin?
-                    -# FIXME: Fix link
-                    %li
-                      %a{'href': "/admin"}
-                        %i.grcicon-admin
-                        Admin Dashboard
+                    -if permissions.is_allowed_read('/admin', 1)
+                      %li
+                        %a{'href': "/admin"}
+                          %i.grcicon-admin
+                          Admin Dashboard
                     %li
                       %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
                         %i.grcicon-desktop
