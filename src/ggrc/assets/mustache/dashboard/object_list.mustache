@@ -5,7 +5,7 @@
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span10">
+          <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
                 {{title}}
@@ -17,10 +17,6 @@
               {{^owner}}
                 <i class="grcicon-people-warning"></i>
               {{/owner}}
-            </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
             </div>
           </div>
         </div>
@@ -41,7 +37,7 @@
           </div>
         </div>
         <div class="row-fluid">
-          <div class="span8">
+          <div class="span6">
             <div class="tree-info">
               <strong>Owner:</strong>
               {{^owner}}
@@ -54,11 +50,7 @@
               {{/if}}
             </div>
           </div>
-          <div class="span4">
-          </div>
-        </div>
-        <div class="row-fluid">
-          <div class="span8">
+          <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
               {{^if_null url}}
@@ -71,9 +63,12 @@
               {{/if_null}}
             </div>
           </div>
-          <a href="{{viewLink}}" class="info-action pull-right" rel="tooltip" title="View {{object_type}}" data-placement="left">
+        </div>
+        <div class="row-fluid">
+          <div class="span6">
+          <a href="{{viewLink}}" class="info-action">
+            View {{object_type}}
             <i class="grcicon-goto"></i>
-            View
           </a>
         </div>
       </div>

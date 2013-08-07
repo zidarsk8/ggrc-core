@@ -197,13 +197,12 @@ ul.new-tree {
   text-transform:uppercase;
   font-weight:bold;
   color:#111;
-  margin-left:20px;
   i.grcicon-edit {
     margin-top:5px;
   }
-  @include opacity(0.3);
+  @include opacity(0.6);
   &:hover {
-    @include opacity(0.8);
+    @include opacity(1);
     text-decoration:none;
   }
 }
