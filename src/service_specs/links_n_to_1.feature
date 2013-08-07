@@ -30,7 +30,7 @@ Feature: Many resources have links to other resources. This feature will
     | ControlAssessment | Request           | control_assessment        | requests                         |
     | Request           | Response          | request                   | responses                        |
     | System            | Response          | system                    | responses                        |
-    | Directive         | Section           | directive                 | sections                         |
+    | Regulation        | Section           | directive                 | sections                         |
 
   Scenario Outline:
     Given a new "<parent_type>" named "parent"

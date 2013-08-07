@@ -30,18 +30,8 @@ can.Model.Cacheable("CMS.Models.Control", {
   , tree_view_options : {
       list_view : "/static/mustache/controls/tree.mustache"
     , child_options : [{
-        model : null
-      , list_title : "Objects"
+        model : can.Model.Cacheable
       , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
-      , list_loader : function(object) {
-          return CMS.Models.ObjectControl
-            .findAll({control_id: object.id})
-            .then(function(linked_objects) {
-              return can.map(linked_objects, function(join) {
-                return join.controllable;
-              });
-            });
-        }
     }]
   }
   , links_to : {
@@ -82,22 +72,33 @@ can.Model.Cacheable("CMS.Models.Control", {
       "content_id" : Math.floor(Math.random() * 10000000)
     });
     this._super();
-    this.attr("business_objects", can.compute(function() {
-      var objs = [], q = new RefreshQueue();
-      can.Observe.startBatch();
-      that.attr("object_controls").each(function(oc, i) {
-        if(!oc.selfLink) {
-          q.enqueue(oc);
-          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else {
-          objs.push(oc.controllable);
-        }
-      });
-      q.trigger().done(function() {
-        can.Observe.stopBatch();
-      });
-      return objs;
-    }));
+    this.attr("business_objects", new can.Model.List(
+      can.map(
+        this.object_controls,
+        function(os) {return os.controllable || new can.Model({ selfLink : "/" }); }
+      )
+    ));
+    this.object_controls.bind("change", function(ev, attr, how) {
+      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+        that.business_objects.replace(
+          can.map(
+            that.object_controls,
+            function(os, i) {
+              if(os.controllable) {
+                return os.controllable;
+              } else {
+                os.refresh({ "__include" : "controllable" }).done(function(d) {
+                  that.business_objects.attr(i, d.controllable);
+                  //can.Observe.stopBatch();
+                }).fail(function() {
+                  //can.Observe.stopBatch();
+                });
+                return new can.Model({ selfLink : "/"});
+              }
+          })
+        );
+      }
+    });
 
   }
 

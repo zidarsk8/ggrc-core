@@ -52,4 +52,5 @@ class Program(
     query = super(Program, cls).eager_query()
     return query.options(
         orm.subqueryload_all('program_directives.directive'),
-        orm.subqueryload('cycles'))
+        orm.subqueryload('cycles'),
+        orm.subqueryload_all('program_controls.control'))

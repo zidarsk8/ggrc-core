@@ -50,7 +50,7 @@ class UserPermissions(DefaultUserPermissions):
       self.load_permissions()
     elif session['permissions'] is None\
         and 'permissions_header_asserted' not in session:
-      pass
+      self.load_permissions()
     elif session['permissions'] is not None\
         and '__header_override' in session['permissions']:
       pass
@@ -87,8 +87,10 @@ class UserPermissions(DefaultUserPermissions):
               ],
             },
           }
+      session['permissions']['__user'] = email
     else:
       session['permissions'] = {}
+      session['permissions']['__user'] = email
       user_roles = db.session.query(UserRole)\
           .options(sqlalchemy.orm.subqueryload('role'))\
           .filter(UserRole.person_id==user.id)\
@@ -184,7 +186,7 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.
-#@BaseObjectView.extension_contributions.connect_via(Program)
+# @BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
   if obj.context_id != None and \
       permissions.is_allowed_read('Role', 1) and \

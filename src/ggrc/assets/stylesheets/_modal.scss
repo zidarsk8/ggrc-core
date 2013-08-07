@@ -517,9 +517,10 @@
       font-size:$f-regular;
     }
     .deny-buttons {
-      .btn {
+      .btn-danger {
+        @include opacity(0.5);
         &:hover {
-          border: 1px solid $white;
+          @include opacity(1);
         }
       }
     }
@@ -612,4 +613,13 @@ a.show-hidden-fields {
   @include oneline();
   margin-bottom:10px;
   font-size:12px;
+}
+
+p.modal-value {
+  @include oneline();
+  margin:0;
+  padding:0;
+  font-weight:bold;
+  color:$governance;
+  line-height:28px;
 }

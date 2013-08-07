@@ -48,12 +48,10 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
-  , create : "POST /api/directives"
-  , update : "PUT /api/directives/{id}"
-  , destroy : "DELETE /api/directives/{id}"
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -63,35 +61,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , defaults : {
     sections : []
   }
-  , model : function(attrs) {
-    if(!attrs[this.root_object]) {
-      attrs = { directive : attrs };
-    }
-    var kind;
-    try {
-      kind = GGRC.infer_object_type(attrs);
-    } catch(e) {
-      console.warn("infer_object_type threw an error on Directive stub (likely no 'kind')");
-      kind = CMS.Models.Directive;
-    }
-    var m = this.findInCacheById(attrs.directive.id);
-    if(!m || m.constructor === CMS.Models.Directive) {
-      //We accidentally created a Directive or haven't created a subtype yet.
-      if(m) {
-        delete CMS.Models.Directive.cache[m.id];
-        m = this._super.call(kind, $.extend(m.serialize(), attrs));
-      } else {
-        m = this._super.call(kind, attrs);
-      }
-      this.cache[m.id] = m;
-    } else {
-      m = this._super.apply(this, arguments);
-    }
-    return m;
-  }
   , init : function() {
     this.validatePresenceOf("title");
-    this.validateInclusionOf("kind", this.meta_kinds);
+    //this.validateInclusionOf("kind", this.meta_kinds);
     this._super.apply(this, arguments);
   }
   , meta_kinds : []
@@ -117,19 +89,25 @@ can.Model.Cacheable("CMS.Models.Directive", {
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
-  model_plural : "Regulations"
+  root_object : "regulation"
+  , root_collection : "regulations"
+  , model_plural : "Regulations"
   , table_plural : "regulations"
   , title_plural : "Regulations"
   , model_singular : "Regulation"
   , title_singular : "Regulation"
   , table_singular : "regulation"
-  , findAll : "/api/directives?kind=Regulation"
+  , findAll : "GET /api/regulations"
+  , create : "POST /api/regulations"
+  , update : "PUT /api/regulations/{id}"
+  , destroy : "DELETE /api/regulations/{id}"
   , defaults : {
     kind : "Regulation"
   }
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -141,19 +119,25 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Policy", {
-  model_plural : "Policies"
+  root_object : "policy"
+  , root_collection : "regulations"
+  , model_plural : "Policies"
   , table_plural : "policies"
   , title_plural : "Policies"
   , model_singular : "Policy"
   , title_singular : "Policy"
   , table_singular : "policy"
-  , findAll : "/api/directives?kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy"
+  , findAll : "GET /api/policies"
+  , create : "POST /api/policies"
+  , update : "PUT /api/policies/{id}"
+  , destroy : "DELETE /api/policies/{id}"
   , defaults : {
     kind : "Company Policy"
   }
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -165,19 +149,25 @@ CMS.Models.Directive("CMS.Models.Policy", {
 }, {});
 
 CMS.Models.Directive("CMS.Models.Contract", {
-  model_plural : "Contracts"
+  root_object : "contract"
+  , root_collection : "contracts"
+  , model_plural : "Contracts"
   , table_plural : "contracts"
   , title_plural : "Contracts"
   , model_singular : "Contract"
   , title_singular : "Contract"
   , table_singular : "contract"
-  , findAll : "/api/directives?kind=Contract"
+  , findAll : "GET /api/contracts"
+  , create : "POST /api/contracts"
+  , update : "PUT /api/contracts/{id}"
+  , destroy : "DELETE /api/contracts/{id}"
   , defaults : {
     kind : "Contract"
   }
   , attributes : {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -201,7 +191,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "OrgGroup"
         , relationship_type_id : "org_group_has_process"
       }
@@ -263,7 +253,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Project"
         , relationship_type_id : "project_has_process"
       }
@@ -309,7 +299,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Facility"
         , relationship_type_id : "facility_has_process"
       }
@@ -377,7 +367,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Product"
         , relationship_type_id : "product_has_process"
       }
@@ -452,7 +442,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "DataAsset"
         , relationship_type_id : "data_asset_has_process"
       }
@@ -514,7 +504,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , child_options : [{
       model : null
       , find_params : {
-        "destination_type" : "System"
+        "destination_type" : "Process"
         , "source_type" : "Market"
         , relationship_type_id : "market_has_process"
       }
@@ -673,6 +663,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , section_objectives : "CMS.Models.SectionObjective.models"
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
   }
   , defaults : {
     object_objectives : []
@@ -684,22 +675,34 @@ can.Model.Cacheable("CMS.Models.Objective", {
 }, {
   init : function() {
     var that = this;
-    this.attr("business_objects", can.compute(function() {
-      var objs = [], q = new RefreshQueue();
-      can.Observe.startBatch();
-      that.attr("object_objectives").each(function(oc, i) {
-        if(!oc.selfLink) {
-          q.enqueue(oc);
-          objs.push(new can.Model.Cacheable({ selfLink : "/" }));
-        } else {
-          objs.push(oc.objectiveable);
-        }
-      });
-      q.trigger().done(function() {
-        can.Observe.stopBatch();
-      });
-      return objs;
-    }));
+    this._super.apply(this, arguments);
+    this.attr("business_objects", new can.Model.List(
+      can.map(
+        this.object_objectives,
+        function(os) {return os.objectiveable || new can.Model({ selfLink : "/" }); }
+      )
+    ));
+    this.object_objectives.bind("change", function(ev, attr, how) {
+      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+        that.business_objects.replace(
+          can.map(
+            that.object_objectives,
+            function(os, i) {
+              if(os.objectiveable) {
+                return os.objectiveable;
+              } else {
+                os.refresh({ "__include" : "objectiveable" }).done(function(d) {
+                  that.business_objects.attr(i, d.objectiveable);
+                  //can.Observe.stopBatch();
+                }).fail(function() {
+                  //can.Observe.stopBatch();
+                });
+                return new can.Model({ selfLink : "/"});
+              }
+          })
+        );
+      }
+    });
 
   }
 });
@@ -747,11 +750,17 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   if(typeof object_type === "object") {
     //assume we only passed in params_or_object
     params_or_object = object_type;
-    object_type = params_or_object.type;
+    object_type = params_or_object.type
+      || can.map(
+          window.cms_singularize(
+            /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
+          ).split("_")
+          , can.capitalize
+        ).join("");
     object_id = params_or_object.id;
   }
 
-  model = CMS.Models[object_type]
+  model = CMS.Models[object_type];
 
   if (!model)
     return null;

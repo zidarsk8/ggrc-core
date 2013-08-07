@@ -37,3 +37,12 @@ class Cycle(Documentable, Personable, Base, Described, db.Model):
       'report_due_at',
       'pbc_lists',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Cycle, cls).eager_query()
+    return query.options(
+        orm.joinedload('program'),
+        orm.subqueryload('pbc_lists'))

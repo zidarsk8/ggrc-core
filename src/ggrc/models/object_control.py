@@ -42,6 +42,17 @@ class ObjectControl(Base, Timeboxed, db.Model):
       'controllable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectControl, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'))
+
+  def _display_name(self):
+    return self.controllable.display_name + '<->' + self.control.display_name
+
 class Controllable(object):
   @declared_attr
   def object_controls(cls):
@@ -60,6 +71,7 @@ class Controllable(object):
         'ObjectControl',
         primaryjoin=joinstr,
         backref='{0}_controllable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [

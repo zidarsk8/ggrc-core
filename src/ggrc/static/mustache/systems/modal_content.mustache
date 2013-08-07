@@ -30,7 +30,7 @@
       {{! FIXME: Add 'owner' when the model reflects it }}
       <input class="input-block-level" {{!name="owner"}} placeholder="Enter email address" type="text" value="{{owner}}">
       <label>
-        Direct URL
+        {{constructor.title_singular}} URL
         <i class="grcicon-help-black" rel="tooltip" title="Enter URL"></i>
       </label>
       <input class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
@@ -50,7 +50,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Network Zone, Reference URL, Notes
+            Code, Network Zone, Notes
           </span>
         </a>
       </div>
@@ -58,26 +58,19 @@
   </div>
   <div class="hidden-fields-area" style="display:none">
     <div class="row-fluid">
-      <div class="span3">
+      <div class="span6">
         <label>
           Code
           <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
         </label>
         <input class="input-block-level" name="slug" placeholder="SYSTEM-XXX" type="text" value="{{slug}}">
       </div>
-      <div class="span3">
+      <div class="span6">
         <label>
           Network Zone
           <i class="grcicon-help-black" rel="tooltip" title="Enter Network Zone"></i>
         </label>
         <input class="input-block-level" name="network_zone.id" placeholder="Enter Network Zone" type="text" value="{{network_zone_id}}">
-      </div>
-      <div class="span6">
-        <label>
-          Reference URL
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Reference URL"></i>
-        </label>
-        <input class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
       </div>
     </div>
     <div class="row-fluid">

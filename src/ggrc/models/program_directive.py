@@ -21,3 +21,16 @@ class ProgramDirective(Base, db.Model):
       'program',
       'directive',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ProgramDirective, cls).eager_query()
+    return query.options(
+        orm.subqueryload('program'),
+        orm.subqueryload('directive'))
+
+  def _display_name(self):
+    return self.program.display_name + '<->' + self.directive.display_name
+

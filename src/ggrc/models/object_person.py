@@ -43,6 +43,17 @@ class ObjectPerson(Base, Timeboxed, db.Model):
       'personable',
       ]
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ObjectPerson, cls).eager_query()
+    return query.options(
+        orm.subqueryload_all('person'))
+
+  def _display_name(self):
+    return self.personable.display_name + '<->' + self.person.display_name
+
 class Personable(object):
   @declared_attr
   def object_people(cls):
@@ -61,6 +72,7 @@ class Personable(object):
         'ObjectPerson',
         primaryjoin=joinstr,
         backref='{0}_personable'.format(cls.__name__),
+        cascade='all, delete-orphan',
         )
 
   _publish_attrs = [
@@ -73,4 +85,5 @@ class Personable(object):
     from sqlalchemy import orm
 
     query = super(Personable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_people.person'))
+    return query.options(
+        orm.subqueryload_all('object_people.person'))

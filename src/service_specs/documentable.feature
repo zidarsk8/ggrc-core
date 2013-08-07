@@ -20,7 +20,10 @@ Feature: Some resources can be related to Document resources
       | Control           |
       | Cycle             |
       | DataAsset         |
-      | Directive         |
+      #| Directive         |
+      | Contract          |
+      | Policy            |
+      | Regulation        |
       | Facility          |
       | Market            |
       | Objective         |
@@ -32,4 +35,4 @@ Feature: Some resources can be related to Document resources
       | Risk              |
       | RiskyAttribute    |
       | System            |
-
+      | Process           |

@@ -20,3 +20,15 @@ class ControlRisk(Base, db.Model):
       'control',
       'risk',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ControlRisk, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'),
+        orm.subqueryload('risk'))
+
+  def _display_name(self):
+    return self.risk.display_name + '<->' + self.control.display_name

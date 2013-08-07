@@ -84,6 +84,7 @@ ul.new-tree {
   }
   .tree-description {
     line-height:18px;
+    margin-right:60px;
     font-size:13px;
     &.short {
       height:36px;
@@ -95,11 +96,14 @@ ul.new-tree {
     }
   }
   a.show-long {
+    position:absolute;
+    top:18px;
+    right:36px;
     color:$disabled;
+    float:left;
     display:block;
     font-size:13px;
     line-height:18px;
-    margin-top:-2px;
     text-decoration:underline;
     &:hover {
       color:$link;
@@ -140,6 +144,7 @@ ul.new-tree {
 }
 .tier-2-info-content {
   padding:0 20px;
+  position:relative;
 }
 
 .item-data {
@@ -192,13 +197,12 @@ ul.new-tree {
   text-transform:uppercase;
   font-weight:bold;
   color:#111;
-  margin-left:20px;
   i.grcicon-edit {
     margin-top:5px;
   }
-  @include opacity(0.3);
+  @include opacity(0.6);
   &:hover {
-    @include opacity(0.8);
+    @include opacity(1);
     text-decoration:none;
   }
 }
