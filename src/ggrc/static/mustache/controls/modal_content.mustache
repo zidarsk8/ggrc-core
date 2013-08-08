@@ -148,9 +148,40 @@
         </label>
         {{!FIXME: Couldn't find variable name for this one w/ POSTMAN}}
         <select class="input-block-level" multiple="multiple" name="categories.id">
+          {{!Added Categories Below
           {{#all 'Category'}}
           <option value="{{id}}">{{name}}</option>
+          {{!
           {{/all}}
+          {{!end of comment}}
+          <option value="0">Access Control</option>
+          <option value="1">&nbsp;&nbsp; Access Management</option>
+          <option value="2">&nbsp;&nbsp; Authentication</option>
+          <option value="3">&nbsp;&nbsp; Authorization</option>
+          <option value="4">&nbsp;&nbsp; Governance</option>
+          <option value="5">&nbsp;&nbsp; Monitoring</option>
+          <option value="6">&nbsp;&nbsp; Policies & Procedures</option>
+          <option value="7">&nbsp;&nbsp; Training</option>
+          <option value="8">Accuracy</option>
+          <option value="9">Availability</option>
+          <option value="10">Business Continuity</option>
+          <option value="11">&nbsp;&nbsp; Disaster Recovery</option>
+          <option value="12">&nbsp;&nbsp; Physical Security</option>
+          <option value="13">Change Management</option>
+          <option value="14">&nbsp;&nbsp; Configuration Management</option>
+          <option value="15">&nbsp;&nbsp; Segregation of Duties</option>
+          <option value="16">Classification</option>
+          <option value="17">Completeness</option>
+          <option value="18">Confidentiality</option>
+          <option value="19">Core</option>
+          <option value="20">Cutoff</option>
+          <option value="21">Existence</option>
+          <option value="22">Integrity</option>
+          <option value="23">Occurrence</option>
+          <option value="24">Out of Scope</option>
+          <option value="25">Rights and Obligations</option>
+          <option value="26">Understandability</option>
+          <option value="27">Valuation and Allocation</option>
         </select>
       </div>
     </div>
