@@ -56,13 +56,14 @@ def log_event(session, obj = None):
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
     http_method = request.method
-  event = Event(
-    modified_by_id = current_user,
-    http_method = http_method,
-    resource_id = resource_id,
-    resource_type = resource_type)
-  event.revisions = revisions
-  session.add(event)
+  if revisions:
+    event = Event(
+      modified_by_id = current_user,
+      http_method = http_method,
+      resource_id = resource_id,
+      resource_type = resource_type)
+    event.revisions = revisions
+    session.add(event)
 
 class ModelView(View):
   pk = 'id'
