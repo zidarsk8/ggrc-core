@@ -4,14 +4,19 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 
 class PbcList(Base, db.Model):
   __tablename__ = 'pbc_lists'
 
-  audit_cycle_id = db.Column(db.Integer, db.ForeignKey('cycles.id'), nullable=False)
-  requests = db.relationship('Request', backref='pbc_list', cascade='all, delete-orphan')
-  control_assessments = db.relationship('ControlAssessment', backref='pbc_list', cascade='all, delete-orphan')
+  audit_cycle_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('cycles.id'), nullable=False),
+      'PbcList')
+
+  requests = db.relationship(
+      'Request', backref='pbc_list', cascade='all, delete-orphan')
+  control_assessments = db.relationship(
+      'ControlAssessment', backref='pbc_list', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'audit_cycle',

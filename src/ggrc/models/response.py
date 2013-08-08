@@ -4,16 +4,21 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 from .object_document import Documentable
 from .object_person import Personable
 
 class Response(Documentable, Personable, Base, db.Model):
   __tablename__ = 'responses'
 
-  request_id = db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False)
-  system_id = db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False)
-  status = db.Column(db.String)
+  request_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
+      'Response')
+  system_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('systems.id'), nullable=False),
+      'Response')
+  status = deferred(db.Column(db.String), 'Response')
+
   meetings = db.relationship('Meeting', backref='response', cascade='all, delete-orphan')
   population_sample = db.relationship(
       'PopulationSample', backref='response', uselist=False, cascade='all, delete-orphan')

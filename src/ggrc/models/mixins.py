@@ -23,6 +23,18 @@ must also inherit from ``db.Model``. For example:
 
 """
 
+def deferred(column, classname):
+  """Defer column loading for basic properties, such as boolean or string, so
+  that they are not loaded on joins. However, Identifiable provides an
+  eager_query implementation that will specify undefer in the options so that
+  when the resource is loaded itself, rather than through a join, it is
+  completely loaded.
+
+  In join tables, this function should not wrap foreign keys nor should it wrap
+  type properties for polymorphic relations.
+  """
+  return db.deferred(column, group=classname+'_complete')
+
 class Identifiable(object):
   """A model with an ``id`` property that is the primary key."""
   id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +47,10 @@ class Identifiable(object):
 
   @classmethod
   def eager_query(cls):
-    return db.session.query(cls)
+    mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
+    return db.session.query(cls).options(
+        db.undefer_group(mapper_class.__name__+'_complete'),
+        )
 
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
@@ -54,19 +69,30 @@ class ChangeTracked(object):
   """
   # FIXME: change modified_by_id to nullable=False when there is an Account
   # model
-  modified_by_id = db.Column(db.Integer)
-  created_at = db.Column(
+  @declared_attr
+  def modified_by_id(cls):
+    return deferred(db.Column(db.Integer), cls.__name__)
+
+  @declared_attr
+  def created_at(cls):
+    return deferred(db.Column(
       db.DateTime,
-      **created_at_args())
-  updated_at = db.Column(
+      **created_at_args()), cls.__name__)
+
+  @declared_attr
+  def updated_at(cls):
+    return deferred(db.Column(
       db.DateTime,
-      **updated_at_args())
+      **updated_at_args()), cls.__name__)
+
   @declared_attr
   def modified_by(cls):
     return db.relationship(
         'Person',
         primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
-        foreign_keys='{0}.modified_by_id'.format(cls.__name__))
+        foreign_keys='{0}.modified_by_id'.format(cls.__name__),
+        uselist=False,
+        )
   #TODO Add a transaction id, this will be handy for generating etags
   #and for tracking the changes made to several resources together.
   #transaction_id = db.Column(db.Integer)
@@ -78,14 +104,6 @@ class ChangeTracked(object):
       'updated_at',
       ]
   _update_attrs = []
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(ChangeTracked, cls).eager_query()
-    return query.options(
-        orm.subqueryload('modified_by'))
 
 class Relatable(object):
   @declared_attr
@@ -125,14 +143,20 @@ class Relatable(object):
   #      orm.subqueryload('related_destinations'))
 
 class Described(object):
-  description = db.Column(db.Text)
+  @declared_attr
+  def description(cls):
+    return deferred(db.Column(db.Text), cls.__name__)
+
 
   # REST properties
   _publish_attrs = ['description']
   _fulltext_attrs = ['description']
 
 class Hyperlinked(object):
-  url = db.Column(db.String)
+  @declared_attr
+  def url(cls):
+    return deferred(db.Column(db.String), cls.__name__)
+
 
   # REST properties
   _publish_attrs = ['url']
@@ -140,8 +164,9 @@ class Hyperlinked(object):
 class Hierarchical(object):
   @declared_attr
   def parent_id(cls):
-    return db.Column(
-        db.Integer, db.ForeignKey('{0}.id'.format(cls.__tablename__)))
+    return deferred(db.Column(
+        db.Integer, db.ForeignKey('{0}.id'.format(cls.__tablename__))),
+        cls.__name__)
 
   @declared_attr
   def children(cls):
@@ -163,20 +188,28 @@ class Hierarchical(object):
     query = super(Hierarchical, cls).eager_query()
     return query.options(
         orm.subqueryload('children'),
-        orm.joinedload('parent'))
+        #orm.joinedload('parent'),
+        )
 
 
 class Timeboxed(object):
-  start_date = db.Column(db.DateTime)
-  end_date = db.Column(db.DateTime)
+  @declared_attr
+  def start_date(cls):
+    return deferred(db.Column(db.DateTime), cls.__name__)
+
+  @declared_attr
+  def end_date(cls):
+    return deferred(db.Column(db.DateTime), cls.__name__)
+
 
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
 
 class ContextRBAC(object):
   @declared_attr
-  def context_id(self):
-    return db.Column(db.Integer, db.ForeignKey('contexts.id'))
+  def context_id(cls):
+    return deferred(
+        db.Column(db.Integer, db.ForeignKey('contexts.id')), cls.__name__)
 
   @declared_attr
   def context(self):
@@ -184,13 +217,13 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
+  #@classmethod
+  #def eager_query(cls):
+    #from sqlalchemy import orm
 
-    query = super(ContextRBAC, cls).eager_query()
-    return query.options(
-        orm.subqueryload('context'))
+    #query = super(ContextRBAC, cls).eager_query()
+    #return query.options(
+        #orm.subqueryload('context'))
 
 class Base(ChangeTracked, Relatable, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
@@ -217,8 +250,13 @@ class Slugged(Base):
   "slugged" and have additional fields related to their publishing in the
   system.
   """
-  slug = db.Column(db.String, nullable=False)
-  title = db.Column(db.String, nullable=False)
+  @declared_attr
+  def slug(cls):
+    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+
+  @declared_attr
+  def title(cls):
+    return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
   # REST properties
   _publish_attrs = ['slug', 'title']

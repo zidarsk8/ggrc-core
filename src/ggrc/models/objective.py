@@ -5,7 +5,7 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject
+from .mixins import deferred, BusinessObject
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
@@ -13,7 +13,8 @@ from .reflection import PublishOnly
 class Objective(Documentable, Personable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
 
-  notes = db.Column(db.Text)
+  notes = deferred(db.Column(db.Text), 'Objective')
+
   section_objectives = db.relationship(
       'SectionObjective', backref='objective', cascade='all, delete-orphan')
   sections = association_proxy(

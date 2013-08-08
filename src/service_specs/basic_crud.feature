@@ -13,7 +13,6 @@ Feature: Basic RESTful CRUD Support
 
   Examples: Resources
       | resource_type      |
-      #| Categorization     |
       | Category           |
       | Control            |
       | ControlAssessment  |

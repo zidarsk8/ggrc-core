@@ -6,7 +6,7 @@
 from ggrc import db
 from .associationproxy import association_proxy
 from .control import ControlCategorized
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
@@ -16,21 +16,22 @@ class Risk(
     db.Model):
   __tablename__ = 'risks'
 
-  kind = db.Column(db.String)
-  likelihood = db.Column(db.Text)
-  threat_vector = db.Column(db.Text)
-  trigger = db.Column(db.Text)
-  preconditions = db.Column(db.Text)
+  kind = deferred(db.Column(db.String), 'Risk')
+  likelihood = deferred(db.Column(db.Text), 'Risk')
+  threat_vector = deferred(db.Column(db.Text), 'Risk')
+  trigger = deferred(db.Column(db.Text), 'Risk')
+  preconditions = deferred(db.Column(db.Text), 'Risk')
 
-  likelihood_rating = db.Column(db.Integer)
-  financial_impact_rating = db.Column(db.Integer)
-  reputational_impact_rating = db.Column(db.Integer)
-  operational_impact_rating = db.Column(db.Integer)
+  likelihood_rating = deferred(db.Column(db.Integer), 'Risk')
+  financial_impact_rating = deferred(db.Column(db.Integer), 'Risk')
+  reputational_impact_rating = deferred(db.Column(db.Integer), 'Risk')
+  operational_impact_rating = deferred(db.Column(db.Integer), 'Risk')
 
-  inherent_risk = db.Column(db.Text)
-  risk_mitigation = db.Column(db.Text)
-  residual_risk = db.Column(db.Text)
-  impact = db.Column(db.Text)
+  inherent_risk = deferred(db.Column(db.Text), 'Risk')
+  risk_mitigation = deferred(db.Column(db.Text), 'Risk')
+  residual_risk = deferred(db.Column(db.Text), 'Risk')
+  impact = deferred(db.Column(db.Text), 'Risk')
+
   control_risks = db.relationship('ControlRisk', backref='risk', cascade='all, delete-orphan')
   controls = association_proxy('control_risks', 'control', 'ControlRisk')
   risk_risky_attributes = db.relationship(
@@ -39,8 +40,7 @@ class Risk(
       'risk_risky_attributes', 'risky_attribute', 'RiskRiskyAttribute')
 
   _publish_attrs = [
-      # FIXME: add this in once eager-loading works correctly
-      #'categories',
+      'categories',
       'controls',
       'financial_impact_rating',
       'inherent_risk',

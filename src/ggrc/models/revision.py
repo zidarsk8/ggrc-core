@@ -24,6 +24,15 @@ class Revision(Base, db.Model):
       'content',
       'description',
   ]
+  
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Revision, cls).eager_query()
+    return query.options(
+        orm.subqueryload('modified_by'),
+        )
 
   def __init__(self, obj, modified_by_id, action, content):
     self.resource_id = obj.id

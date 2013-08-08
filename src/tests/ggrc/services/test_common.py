@@ -69,8 +69,11 @@ class TestResource(TestCase):
     return {
         u'id': int(model.id),
         u'selfLink': unicode(URL_MOCK_RESOURCE.format(model.id)),
-        u'modified_by': int(model.modified_by) \
-            if model.modified_by is not None else None,
+        u'modified_by': {
+          u'href': u'/api/people/1',
+          u'id': model.modified_by_id,
+          u'type': 'Person',
+          } if model.modified_by_id is not None else None,
         u'modified_by_id': int(model.modified_by_id),
         u'updated_at': updated_at,
         u'created_at': created_at,

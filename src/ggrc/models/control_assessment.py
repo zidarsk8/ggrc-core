@@ -4,19 +4,22 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 
 class ControlAssessment(Base, db.Model):
   __tablename__ = 'control_assessments'
 
-  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False)
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
-  control_version = db.Column(db.String)
-  internal_tod = db.Column(db.Boolean)
-  internal_toe = db.Column(db.Boolean)
-  external_tod = db.Column(db.Boolean)
-  external_toe = db.Column(db.Boolean)
-  notes = db.Column(db.Text)
+  pbc_list_id = db.Column(
+      db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False)
+  control_id = db.Column(
+      db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  control_version = deferred(db.Column(db.String), 'ControlAssessment')
+  internal_tod = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  internal_toe = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  external_tod = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  external_toe = deferred(db.Column(db.Boolean), 'ControlAssessment')
+  notes = deferred(db.Column(db.Text), 'ControlAssessment')
+
   requests = db.relationship('Request', backref='control_assessment')
 
   __table_args__ = (

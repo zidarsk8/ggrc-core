@@ -1,20 +1,19 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import Base, Timeboxed
+from .mixins import deferred, Base, Timeboxed
 from .reflection import PublishOnly
 
 class ObjectPerson(Base, Timeboxed, db.Model):
   __tablename__ = 'object_people'
 
-  role = db.Column(db.String)
-  notes = db.Column(db.Text)
+  role = deferred(db.Column(db.String), 'ObjectPerson')
+  notes = deferred(db.Column(db.Text), 'ObjectPerson')
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
 
   # TODO: Polymorphic relationship
@@ -86,4 +85,5 @@ class Personable(object):
 
     query = super(Personable, cls).eager_query()
     return query.options(
-        orm.subqueryload_all('object_people.person'))
+        #orm.subqueryload_all('object_people.person'))
+        orm.joinedload('object_people'))

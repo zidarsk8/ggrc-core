@@ -5,7 +5,7 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
@@ -24,7 +24,8 @@ class Program(
       'Company Controls Policy',
       ]
 
-  kind = db.Column(db.String)
+  kind = deferred(db.Column(db.String), 'Program')
+
   program_controls = db.relationship(
       'ProgramControl', backref='program', cascade='all, delete-orphan')
   controls = association_proxy(

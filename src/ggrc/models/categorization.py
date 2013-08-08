@@ -1,8 +1,7 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -40,7 +39,6 @@ class Categorization(Base, db.Model):
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
-
     query = super(Categorization, cls).eager_query()
     return query.options(
         orm.subqueryload('category'))
@@ -57,7 +55,21 @@ class Categorizable(object):
            'control_categorizations', 'control_categories', 100)
   """
   @classmethod
+  def _categorization_attrs(cls):
+    if not hasattr(cls, '_eager_loading_categorizations'):
+      cls._eager_loading_categorizations = []
+    return cls._eager_loading_categorizations
+
+  @classmethod
+  def _categorization_scopes(cls):
+    if not hasattr(cls, '_categorization_scopes_map'):
+      cls._categorization_scopes_map = {}
+    return cls._categorization_scopes_map
+
+  @classmethod
   def _categorizations(cls, rel_name, proxy_name, scope):
+    cls._categorization_attrs().append(rel_name)
+    cls._categorization_scopes()[rel_name] = scope
     setattr(cls, proxy_name, association_proxy(
         rel_name, 'category',
         creator=lambda category: Categorization(
@@ -78,12 +90,24 @@ class Categorizable(object):
         backref=BACKREF_NAME_FORMAT.format(type=cls.__name__, scope=scope),
         )
 
-  # FIXME: make eager-loading work for categorizations/assertations
-  #@classmethod
-  #def eager_query(cls):
-  #  from sqlalchemy import orm
-
-  #  query = super(Categorizable, cls).eager_query()
-  #  return query.options(
-  #      orm.subqueryload_all('categorizations.category'),
-  #      orm.subqueryload_all('assertations.category'))
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+    from sqlalchemy.sql.expression import and_
+    from ggrc.models import Category
+    query = super(Categorizable, cls).eager_query()
+    for r in cls._categorization_attrs():
+      categorizations_alias = \
+          orm.aliased(Categorization, name='Categorization_{0}'.format(r))
+      categories_alias = orm.aliased(Category, name='Category_{0}'.format(r))
+      query = query\
+          .outerjoin(categorizations_alias,
+            and_(
+              categorizations_alias.categorizable_id == cls.id,
+              categorizations_alias.categorizable_type == cls.__name__))\
+          .outerjoin(categories_alias,
+            and_(
+              categorizations_alias.category_id == categories_alias.id,
+              categories_alias.scope_id == cls._categorization_scopes()[r]))
+    loads = [orm.contains_eager(r, alias=categorizations_alias) for r in cls._categorization_attrs()]
+    return query.options(*loads)
