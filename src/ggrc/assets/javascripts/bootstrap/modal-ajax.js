@@ -171,6 +171,8 @@
       $target.on('modal:success', function(e, data) {
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
           window.location.assign('/dashboard');
+        } else if ($trigger.attr("data-object-singular") == 'Person') { //FIXME: Kludge
+          window.location.assign('/admin');
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
