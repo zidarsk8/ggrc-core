@@ -21,3 +21,15 @@ class ControlControl(Base, db.Model):
     'control',
     'implemented_control',
     ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ControlControl, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'),
+        orm.subqueryload('implemented_control'))
+
+  def _display_name(self):
+    return self.implemented_control.display_name + '<->' + self.control.display_name

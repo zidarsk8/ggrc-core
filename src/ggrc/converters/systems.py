@@ -15,7 +15,7 @@ class SystemRowConverter(BaseRowConverter):
     else:
       if self.obj.is_biz_process and not self.importer.options.get('is_biz_process'):
         self.add_error('slug', "Code is already used for a Process")
-      elif (not self.obj.is_biz_process) and self.impoter.options.get('is_biz_process'):
+      elif (not self.obj.is_biz_process) and self.importer.options.get('is_biz_process'):
         self.add_error('slug', "Code is already used for a System")
       else:
         sys_type = "Process" if self.importer.options.get('is_biz_process') else "System"

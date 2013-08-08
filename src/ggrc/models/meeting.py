@@ -18,3 +18,11 @@ class Meeting(Base, db.Model):
       'start_at',
       'calendar_url',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Meeting, cls).eager_query()
+    return query.options(
+        orm.joinedload('response'))

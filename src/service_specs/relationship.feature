@@ -28,7 +28,7 @@ Feature: A Relationship models a relation between two resources. Relationships
       | ControlAssessment | Section          |
       | Cycle             | RiskyAttribute   |
       | DataAsset         | Risk             |
-      | Directive         | Response         |
+      | Regulation        | Response         |
       | Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |
@@ -58,7 +58,7 @@ Feature: A Relationship models a relation between two resources. Relationships
       | ControlAssessment | Section          |
       | Cycle             | RiskyAttribute   |
       | DataAsset         | Risk             |
-      | Directive         | Response         |
+      | Regulation        | Response         |
       | Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |

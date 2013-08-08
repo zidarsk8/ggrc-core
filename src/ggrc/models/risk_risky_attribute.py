@@ -20,3 +20,15 @@ class RiskRiskyAttribute(Base, db.Model):
       'risk',
       'risky_attribute',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(RiskRiskyAttribute, cls).eager_query()
+    return query.options(
+        orm.subqueryload('risk'),
+        orm.subqueryload('risky_attribute'))
+
+  def _display_name(self):
+    return self.risky_attribute.display_name + '<->' + self.risk.display_name

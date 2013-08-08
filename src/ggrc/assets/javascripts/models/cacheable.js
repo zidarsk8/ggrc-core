@@ -279,7 +279,7 @@ can.Model("can.Model.Cacheable", {
       , parent_find_param : "destination_id"
     }, {
       model : null
-      , start_expanded : true
+      , start_expanded : false
       , draw_children : true
     }]
   }
@@ -320,13 +320,14 @@ can.Model("can.Model.Cacheable", {
     }
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
-  , refresh : function() {
+  , refresh : function(params) {
     var href = this.selfLink || this.href;
 
     if (!href)
       return (new can.Deferred()).reject();
     return $.ajax({
       url : href
+      , params : params
       , type : "get"
       , dataType : "json"
     })
@@ -357,7 +358,7 @@ can.Model("can.Model.Cacheable", {
           for(var i = 0; i < val.length; i++) {
             serial[name].push(val[i].stub());
           }
-        } else if(fun_name === "model") {
+        } else if(fun_name === "model" || fun_name === "get_instance") {
           serial[name] = (val ? val.stub() : null);
         } else {
           serial[name] = that._super(name);
@@ -366,7 +367,7 @@ can.Model("can.Model.Cacheable", {
         serial[name] = val.stub();
       } else if(typeof val === "object" && val != null && val.length != null) {
         serial[name] = can.map(val, function(v) {
-          return typeof v.save === "function" ? v.stub() : (v.serialize ? v.serialize() : v);
+          return (v && typeof v.save === "function") ? v.stub() : (v.serialize ? v.serialize() : v);
         });
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);

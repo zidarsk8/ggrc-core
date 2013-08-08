@@ -10,6 +10,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import Session
 from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
+from .reflection import PublishOnly
+from .computed_property import computed_property
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -85,6 +87,43 @@ class ChangeTracked(object):
     return query.options(
         orm.subqueryload('modified_by'))
 
+class Relatable(object):
+  @declared_attr
+  def related_sources(cls):
+    joinstr = 'and_(remote(Relationship.destination_id) == {type}.id, '\
+                    'remote(Relationship.destination_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.destination_id',
+        cascade = 'all, delete-orphan')
+
+  @declared_attr
+  def related_destinations(cls):
+    joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
+                    'remote(Relationship.source_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.source_id',
+        cascade = 'all, delete-orphan')
+
+  #_publish_attrs = [
+  #    'related_sources',
+  #    'related_destinations'
+  #    ]
+
+  #@classmethod
+  #def eager_query(cls):
+  #  from sqlalchemy import orm
+
+  #  query = super(Relatable, cls).eager_query()
+  #  return query.options(
+  #      orm.subqueryload('related_sources'),
+  #      orm.subqueryload('related_destinations'))
+
 class Described(object):
   description = db.Column(db.Text)
 
@@ -145,7 +184,15 @@ class ContextRBAC(object):
 
   _publish_attrs = ['context']
 
-class Base(ChangeTracked, Identifiable, ContextRBAC):
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ContextRBAC, cls).eager_query()
+    return query.options(
+        orm.subqueryload('context'))
+
+class Base(ChangeTracked, Relatable, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
   case.
   """
@@ -154,7 +201,16 @@ class Base(ChangeTracked, Identifiable, ContextRBAC):
     d = {}
     for column in self.__table__.columns:
       d[column.name] = getattr(self, column.name)
+    d['display_name'] = self.display_name
     return d
+
+  @computed_property
+  def display_name(self):
+    return self._display_name()
+
+  def _display_name(self):
+    return getattr(self, "title", None) or getattr(self, "name", "")
+
 
 class Slugged(Base):
   """Several classes make use of the common mixins and additional are

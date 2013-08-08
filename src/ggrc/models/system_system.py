@@ -24,3 +24,15 @@ class SystemSystem(Base, db.Model):
       'type',
       'order',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(SystemSystem, cls).eager_query()
+    return query.options(
+        orm.subqueryload('parent'),
+        orm.subqueryload('child'))
+
+  def _display_name(self):
+    return self.child.display_name + '<->' + self.parent.display_name

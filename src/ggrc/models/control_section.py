@@ -20,3 +20,15 @@ class ControlSection(Base, db.Model):
       'control',
       'section',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(ControlSection, cls).eager_query()
+    return query.options(
+        orm.subqueryload('control'),
+        orm.subqueryload('section'))
+
+  def _display_name(self):
+    return self.section.display_name + '<->' + self.control.display_name

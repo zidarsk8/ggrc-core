@@ -1,6 +1,7 @@
 import csv
 from .common import *
 from ggrc import db
+from ggrc.services.common import log_event
 from flask import redirect, flash
 
 class BaseConverter(object):
@@ -154,10 +155,10 @@ class BaseConverter(object):
     return self
 
   def save_import(self):
-    db_session = db.session
     for row_converter in self.objects:
-      row_converter.save(db_session, **self.options)
-    db_session.commit()
+      row_converter.save(db.session, **self.options)
+    log_event(db.session)
+    db.session.commit()
 
   def read_objects(self, headers, rows):
     attrs_collection = []

@@ -100,14 +100,14 @@ Feature: Collection filtering via query parameters
     And "resource1_2" is in query result
 
   Examples:
-      | resource_type1 | link_property_name | resource_type2 | target_property_name | match_value1 | match_value2 |
-      | Section        | directive          | Directive      | title                | 'foo'        | 'bar'        |
-      | Control        | directive          | Directive      | kind                 | 'Contract'   | 'Regulation' |
+      | resource_type1 | link_property_name | resource_type2 | target_property_name | match_value1       | match_value2 |
+      | Section        | directive          | Policy         | title                | 'foo'              | 'bar'        |
+      | Control        | directive          | Policy         | kind                 | 'Company Policy'   | 'Org Group Policy' |
 
   Scenario: Query for controls related to a program
     Given a new "Program" named "program"
     And "program" is POSTed to its collection
-    And a new "Directive" named "directive"
+    And a new "Contract" named "directive"
     And "program" is added to links property "programs" of "directive"
     And "directive" is POSTed to its collection
     And a new "Control" named "control"
@@ -119,7 +119,7 @@ Feature: Collection filtering via query parameters
     Then "control" is not in query result
 
   Scenario: Query can use both a property path and an __in suffix to supply a comma separated list of values
-    Given a new "Directive" named "directive"
+    Given a new "Contract" named "directive"
     And "directive" property "kind" is "Contract"
     And "directive" is POSTed to its collection
     And a new "Control" named "control"
@@ -133,7 +133,7 @@ Feature: Collection filtering via query parameters
     And "control" is not in query result
 
   Scenario: Property link objects can be included with __include
-    Given a new "Directive" named "directive"
+    Given a new "Contract" named "directive"
     And "directive" property "kind" is "Contract"
     And "directive" is POSTed to its collection
     And a new "Program" named "program"

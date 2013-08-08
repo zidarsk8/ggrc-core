@@ -15,11 +15,11 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
 
   notes = db.Column(db.Text)
   section_objectives = db.relationship(
-      'SectionObjective', backref='objective')
+      'SectionObjective', backref='objective', cascade='all, delete-orphan')
   sections = association_proxy(
       'section_objectives', 'section', 'SectionObjective')
   objective_controls = db.relationship(
-      'ObjectiveControl', backref='objective')
+      'ObjectiveControl', backref='objective', cascade='all, delete-orphan')
   controls = association_proxy(
       'objective_controls', 'control', 'ObjectiveControl')
   object_objectives = db.relationship(

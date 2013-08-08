@@ -17,8 +17,10 @@ class RelatedObjectResults(object):
     self.obj_type = obj_type
     self.far_type = far_type
 
-    self.obj_real_type = 'System' if obj_type == 'Process' else obj_type
-    self.far_real_type = 'System' if far_type == 'Process' else far_type
+    self.obj_real_type = obj_type
+    self.far_real_type = far_type
+    #self.obj_real_type = 'System' if obj_type == 'Process' else obj_type
+    #self.far_real_type = 'System' if far_type == 'Process' else far_type
 
   def related_is_src_query(self, vr):
     return Relationship.query.filter_by(

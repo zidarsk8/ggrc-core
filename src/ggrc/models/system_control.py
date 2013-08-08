@@ -26,3 +26,16 @@ class SystemControl(Base, db.Model):
       'state',
       'cycle',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(SystemControl, cls).eager_query()
+    return query.options(
+        orm.joinedload('cycle'),
+        orm.subqueryload('system'),
+        orm.subqueryload('control'))
+
+  def _display_name(self):
+    return self.control.display_name + '<->' + self.system.display_name

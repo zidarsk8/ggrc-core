@@ -345,7 +345,8 @@
 
     $(document).delegate(rails.inputChangeSelector, 'change.rails', function(e) {
       var link = $(this);
-      if (!rails.allowAction(link)) return rails.stopEverything(e);      
+      if (!rails.allowAction(link)) return rails.stopEverything(e);
+
       rails.handleRemote(link);
       return false;
     });
@@ -368,6 +369,7 @@
           // slight timeout so that the submit button gets properly serialized
           // (make it easy for event handler to serialize form without disabled values)
           setTimeout(function(){ rails.disableFormElements(form); }, 13);
+
           var aborted = rails.fire(form, 'ajax:aborted:file', [nonBlankFileInputs]);
 
           // re-enable form elements if event bindings return false (canceling normal form submission)
@@ -379,6 +381,7 @@
         // If browser does not support submit bubbling, then this live-binding will be called before direct
         // bindings. Therefore, we should directly call any direct bindings before remotely submitting form.
         if (!$.support.submitBubbles && $().jquery < '1.7' && rails.callFormSubmitBindings(form, e) === false) return rails.stopEverything(e);
+
         rails.handleRemote(form);
         return false;
 

@@ -28,6 +28,7 @@ def base_context():
   return dict(
       get_model=get_model,
       permissions_json=get_permissions_json,
+      permissions=permissions
       )
 
 from flask import render_template
@@ -67,13 +68,16 @@ def admin_reindex():
   from ggrc.models import all_models
   from ggrc.app import db
 
-  models = set(all_models.all_models) - set([all_models.LogEvent])
+  # Find all models then remove base classes
+  models = set(all_models.all_models) -\
+      set([all_models.Directive, all_models.SystemOrProcess])
   for model in models:
     for instance in model.query.all():
       indexer.create_record(fts_record_for(instance), False)
   db.session.commit()
 
-  return redirect(url_for('admin'))
+  return app.make_response((
+    'success', 200, [('Content-Type', 'text/html')]))
 
 @app.route("/admin")
 @login_required
@@ -293,10 +297,14 @@ def all_object_views():
   return _all_views([
       'programs',
       'directives',
+      'contracts',
+      'policies',
+      'regulations',
       'cycles',
       'controls',
       'objectives',
       'systems',
+      'processes',
       'products',
       'org_groups',
       'facilities',
@@ -314,10 +322,14 @@ def all_tooltip_views():
   return _all_views([
       'programs',
       'directives',
+      'contracts',
+      'policies',
+      'regulations',
       'cycles',
       'controls',
       'objectives',
       'systems',
+      'processes',
       'products',
       'org_groups',
       'facilities',

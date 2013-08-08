@@ -2,7 +2,7 @@
 <li class="{{constructor.category}}" data-model="true" {{data 'model'}}>
   <a href="{{viewLink}}" class="show-extended">
     <div class="row-fluid">
-      <div class="span9">
+      <div class="span8">
         <span class="lhs-item">
           {{title}}
         </span>
@@ -11,6 +11,9 @@
         {{#is_private}}
           <i class="grcicon-private" rel="tooltip" title="Private"></i>
         {{/is_private}}
+      </div>
+      <div class="span1">
+        &nbsp;
       </div>
       <div class="span1">
       {{^people}}
