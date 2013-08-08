@@ -31,8 +31,9 @@ class SystemRowConverter(BaseRowConverter):
     self.handle('sub_processes', LinkSystemsHandler, association = 'sub_systems',
                 is_biz_process = True)
     self.handle_option('network_zone')
-    #self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
-                #relationship_type_id = 'org_group_is_responsible_for_system')
+    id_str = "org_group_is_responsible_for_{}".format("process" if self.options.get('is_biz_process') else "system")
+    self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
+                relationship_type_id = id_str, direction = 'from', model_human_name = 'Org Group')
     self.handle_date('start_date')
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
