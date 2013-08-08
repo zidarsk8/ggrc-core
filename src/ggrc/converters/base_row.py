@@ -594,6 +594,7 @@ class LinkPeopleHandler(LinksHandler):
     where_params = {}
     where_params['role'] = self.options.get('role')
     where_params['personable_type'] = self.importer.obj.__class__.__name__
+    where_params['personable_id'] = self.importer.obj.id
     object_people = ObjectPerson.query.filter_by(**where_params).all()
     objects = [obj.person for obj in object_people]
     return objects
@@ -603,6 +604,7 @@ class LinkPeopleHandler(LinksHandler):
     for linked_object in self.created_links():
       db_session.add(linked_object)
       object_person = ObjectPerson()
+      object_person.role = self.options.get('role')
       object_person.personable = self.importer.obj
       object_person.person = linked_object
       db_session.add(object_person)
@@ -639,8 +641,9 @@ class LinkSystemsHandler(LinksHandler):
         return system
 
   def get_existing_items(self):
-    where_params = { 'is_biz_process' : self.options.get('is_biz_process') or False }
-    return System.query.filter_by(**where_params).all()
+    sys_type = self.options.get('is_biz_process') or False
+    systems = super(LinkSystemsHandler, self).get_existing_items()
+    return [sys for sys in systems if sys.is_biz_process == sys_type]
 
   def create_item(self, data):
     return None
