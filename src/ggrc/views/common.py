@@ -114,6 +114,6 @@ class BaseObjectView(ModelView):
     view_func = cls.decorate_view_func(view_func, decorators)
     view_route = '{url}/<{type}:{pk}>'.format(
         url=url, type=cls.pk_type, pk=cls.pk)
-    app.add_url_rule(view_route, cls.__name__,
+    app.add_url_rule(view_route, view_class.endpoint_name(),
       view_func=view_func,
       methods=['GET'])
