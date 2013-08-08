@@ -78,6 +78,7 @@
 </ul>
 <ul class="new-tree">
   <li class="tree-item tree-item-add">
+    {{#is_related}}
     <a
       href="javascript://"
       rel="tooltip"
@@ -94,7 +95,23 @@
       data-related-model-singular="{{model.model_singular}}"
       data-relationship-type="" {{! FIXME This should be a real relationship type }}
       data-tab-target="#related-objects-{{find_params.relationship_type_id}}">
+      + {{model.title_singular}} {{find_params.relationship_type_id}}
+    </a>
+    {{/is_related}}
+    {{^is_related}}
+    <a
+      href="javascript://"
+      rel="tooltip"
+      data-placement="left"
+      data-toggle="modal-ajax-form"
+      data-object-plural="{{model.model_plural}}"
+      data-object-singular="{{model.model_singular}}"
+      data-modal-class="modal-wide"
+      data-modal-reset="reset"
+      data-form-target="refresh"
+      data-original-title="Create a new {{model.title_singular.toLowerCase}}">
       + {{model.title_singular}}
     </a>
+    {{/is_related}}
   </li>
 </ul>
