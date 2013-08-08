@@ -75,7 +75,7 @@ class BaseConverter(object):
     return cls(rows, **options)
 
   def import_metadata(self):
-    if len(self.rows) < 5:
+    if len(self.rows) < 6:
       self.errors.append("Could not import: verify the file is correctly formatted.")
       raise ImportException("Could not import: verify the file is correctly formatted.")
     headers = self.read_headers(self.metadata_map, self.rows.pop(0))
@@ -108,7 +108,7 @@ class BaseConverter(object):
         ignored_colums.append(heading)
         keys.append(None) # Placeholder None to prevent position problems when headers are zipped with values
         continue
-      else:
+      elif heading != "start_date" and heading != "stop_date": #
         keys.append(import_map[heading])
 
     if len(ignored_colums):

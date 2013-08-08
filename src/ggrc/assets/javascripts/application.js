@@ -287,10 +287,13 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 
   $(document).ajaxError(function(event, jqxhr, settings, exception) {
     if(!jqxhr.hasFailCallback || settings.flashOnFail || (settings.flashOnFail == null && jqxhr.flashOnFail)) {
-      $(document.body).trigger(
-        "ajax:flash"
-        , {"error" : jqxhr.getResponseHeader("X-Flash-Error") || statusmsgs[jqxhr.status] || exception.message || exception}
-      );
+      // TODO: Import produced 'canceled' ajax flash message that needed handling. Will refactor once better method works.
+      if (settings.url.indexOf("import") == -1 || exception !== 'canceled') {
+        $(document.body).trigger(
+          "ajax:flash"
+          , {"error" : jqxhr.getResponseHeader("X-Flash-Error") || statusmsgs[jqxhr.status] || exception.message || exception}
+        );
+      }
     }
   });
 })(jQuery);
