@@ -67,16 +67,33 @@
         }
       };
 
-      if (name[0] == "view" && name[1] == "__ALL__" && value[name[1]] == true) {
+      var clear = function(target) {
+        target.splice(0, target.length);
+      }
+
+      if (name[0] == "view" && name[1] == "__ALL__") {
         for (i in rtypes) {
-          push_if_missing(instance.permissions.read, rtypes[i]);
+          if (value[name[1]] == true) {
+            push_if_missing(instance.permissions.read, rtypes[i]);
+          } else {
+            clear(instance.permissions.create);
+            clear(instance.permissions.read);
+            clear(instance.permissions.update);
+            clear(instance.permissions.delete);
+          }
         }
-      } else if (name[0] == "modify" && name[1] == "__ALL__" && value[name[1]] == true) {
+      } else if (name[0] == "modify" && name[1] == "__ALL__") {
         for (i in rtypes) {
-          push_if_missing(instance.permissions.create, rtypes[i]);
-          push_if_missing(instance.permissions.read, rtypes[i]);
-          push_if_missing(instance.permissions.update, rtypes[i]);
-          push_if_missing(instance.permissions.delete, rtypes[i]);
+          if (value[name[1]] == true) {
+            push_if_missing(instance.permissions.create, rtypes[i]);
+            push_if_missing(instance.permissions.read, rtypes[i]);
+            push_if_missing(instance.permissions.update, rtypes[i]);
+            push_if_missing(instance.permissions.delete, rtypes[i]);
+          } else {
+            clear(instance.permissions.create);
+            clear(instance.permissions.update);
+            clear(instance.permissions.delete);
+          }
         }
       } else if (name[0] == "view") {
         if (value[name[1]] == true) {
