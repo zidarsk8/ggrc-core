@@ -202,7 +202,7 @@
       border: 1px solid $popOverBorder;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
-      @include background-size(296px 344px);
+      @include background-size(368px 416px);
       background-position:-259px -195px;
       padding-left: 40px;
       margin-top:4px;
@@ -371,7 +371,7 @@
           background-color: lighten($lightGray,5%);
           background-repeat:no-repeat;
           background-image: image-url("grcicons/icons.png");
-          @include background-size(296px 344px);
+          @include background-size(368px 416px);
           background-position:50% -157px;
           @include opacity(0.8);
         }
