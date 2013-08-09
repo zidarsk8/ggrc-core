@@ -336,7 +336,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       can.each(lists, function(list) {
         var $list = $(list)
           , model_name = self.get_list_model($list)
-          , results = search_result.getResultsForType(model_name);
+          , results = search_result.getResultsForType(model_name)
           , refresh_queue = new RefreshQueue()
           ;
 
