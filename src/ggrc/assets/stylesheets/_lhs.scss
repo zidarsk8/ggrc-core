@@ -232,9 +232,9 @@
 }
 
 .bar-v {
-  position: absolute;
-  right: -8px;
-  top:0;
+  position: fixed;
+  top:30px;
+  left:240px;
   height:100%;
   z-index:100;
   width:6px;
@@ -251,6 +251,9 @@
     background-color:#fff;
     cursor:move;
   };
+  &.bar-closed {
+    left:40px;
+  }
 }
 
 
@@ -430,4 +433,9 @@
       margin-bottom:6px;
     }
   }
+}
+
+// fix for redundant lhn scroll
+.accordion {
+  margin-bottom:0;
 }
