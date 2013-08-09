@@ -62,26 +62,7 @@ can.Model.Cacheable("CMS.Models.ObjectPerson", {
     , root_collection : "object_people"
     , findAll: "GET /api/object_people"
     , create : "POST /api/object_people"
-    , update : function(id, object) {
-        var _params = {
-            object_person : {
-              personable: {
-                id: params.object_person.personable_id || params.xable_id,
-                type: params.object_person.personable_type || params.xable_type
-              }
-            , person: {
-                id: params.object_person.person_id
-              }
-            , role : params.role
-            }
-        };
-        return $.ajax({
-            type : "PUT"
-            , "url" : "/api/object_people/" + id
-            , dataType : "json"
-            , data : _params
-        });
-    }
+    , update : "PUT /api/object_people/{id}"
     , destroy : "DELETE /api/object_people/{id}"
 }, {
     init : function() {
@@ -95,11 +76,7 @@ can.Model.Cacheable("CMS.Models.ObjectPerson", {
             this.attr("personable", CMS.Models.get_instance(
                   this.personable_type || (this.personable && this.personable.type),
                   this.personable_id || (this.personable && this.personable.id)));
-            /*this.attr(
-                "person"
-                , CMS.Models.Person.findInCacheById(this.person_id)
-                || new CMS.Models.Person(this.person && this.person.serialize ? this.person.serialize() : this.person));
-*/
+
             this.each(function(value, name) {
               if (value === null)
               that.removeAttr(name);

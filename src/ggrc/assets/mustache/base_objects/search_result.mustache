@@ -24,6 +24,10 @@
   </a>
 </li>
 {{/list}}
+{{^list}}
+<li class="spinner">
+</li>
+{{/list}}
 {{^if_equals list.length filtered_items.length}}
 <li class="view-more">
   <a href="javascript://">
