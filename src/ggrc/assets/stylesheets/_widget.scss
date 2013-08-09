@@ -1,10 +1,16 @@
 
 // widgets styles
 .widget {
-  width:100%;
+  @include border-radius();
+  &.widget-active {
+    .content {
+      @include opacity(1);
+    }
+  }
+  width:96%;
+  margin:0 2% 4% 2%;
   overflow-y:hidden;
-  background:$white;
-  border:1px solid $widgetBorder;
+  border:1px solid #aaa;
   @include transition(box-shadow 0.2s,border-color 0.2s);
   &.widget-tabs {
     &.widget-tabs-horizontal {
@@ -141,7 +147,7 @@
     }
   }
   .header {
-    background:$lightGray;
+    background:$white;
     border-bottom:1px solid darken($lightGray, 10%);
     @include transition(background-color 0.2s);
     color:$text;
@@ -158,7 +164,7 @@
       height: 30px;
       width: 30px;
       i {
-        @include opacity(0.5);
+        @include opacity(0.2);
         @include transition(opacity 0.3s ease);
       }
       a {
@@ -182,7 +188,7 @@
           width: 30px;
           height: 30px;
           padding: 0;
-          @include opacity(0.5);
+          @include opacity(0.2);
           @include transition(opacity 0.3s ease);
           &:hover {
             @include opacity(1);
@@ -345,20 +351,7 @@
   .content {
     border-top: none;
     background:$white;
-    height:85%; //needs to be removed
-    overflow-y:auto;
-    > .tabs-left {
-      height:100%;
-      overflow-y:hidden;
-      > .tab-content {
-        height:100%;
-      }
-      > .nav-tabs {
-        height:100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-    }
+    @include opacity(0.7);
   }
   .footer {
     color:$text;
@@ -461,6 +454,10 @@
   }
   .info {
     padding:5px 16px 0 16px;
+    p {
+      margin:0;
+      padding-bottom:9px;
+    }
     h3 {
       font-weight:normal;
       padding-bottom:6px;

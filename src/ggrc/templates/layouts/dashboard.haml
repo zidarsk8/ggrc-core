@@ -23,7 +23,7 @@
 -block body
   -# FIXME: Fix page_type_attributes, etc
   -#{ page_type_attributes, :class => "#{has_feature?(:BETA) ? 'BETA' : ''}" }
-  %body{ 'data-target': '.inner-nav', 'data-spy': 'scroll', 'data-offset': '81' }
+  %body{ 'data-spy': 'scroll'}
 
     %header.header.main
       .header-bar
@@ -109,7 +109,7 @@
               .object-nav
                 %ul.nav{ 'class': "internav ={ model_display_class }" }
                 -include 'shared/_add_widget_section.haml'
-            .object-area
+            .object-area{ 'data-spy': 'scroll', 'data-target': '.internav'}
               #show_columns.column-set{ 'data-resize': "true" }
                 #middle_column.widget-area
                   -block widget_area

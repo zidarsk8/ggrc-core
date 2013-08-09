@@ -745,7 +745,7 @@ function resize_areas() {
   $header.css("width",headerWidth);
   $objectArea
     .css("margin-left",internavWidth)
-    .css("height",internavHeight)
+    .css("height",internavHeight -30)
     .css("width",objectWidth)
     ;
 
