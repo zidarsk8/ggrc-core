@@ -30,8 +30,6 @@ class SystemOrProcess(
   __tablename__ = 'systems'
 
   infrastructure = deferred(db.Column(db.Boolean), 'SystemOrProcess')
-  # TODO: unused?
-  owner_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'SystemOrProcess')
   is_biz_process = db.Column(db.Boolean, default=False)
   # TODO: handle option
   type_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
@@ -44,7 +42,6 @@ class SystemOrProcess(
   controls = association_proxy('system_controls', 'control', 'SystemControl')
   responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')
   #TODO What about system_section?
-  owner = db.relationship('Person', uselist=False)
   sub_system_systems = db.relationship(
       'SystemSystem', foreign_keys='SystemSystem.parent_id', backref='parent', cascade='all, delete-orphan')
   sub_systems = association_proxy(
