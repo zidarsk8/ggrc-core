@@ -202,6 +202,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , model_attr: 'data-model-name'
       , count_selector: '.item-count'
       , list_content_selector: 'ul'
+      , spinner_selector: '.spinner'
       , limit : 6
       , observer : null
     }
@@ -224,6 +225,22 @@ can.Control("CMS.Controllers.LHN_Search", {
           self.options.results_lists[model_name].unshift(instance);
         }
       });
+    }
+
+  , make_spinner: function() {
+      var spinner = new Spinner({
+          radius: 4
+        , length: 7
+        , width: 2
+        }).spin();
+      $(spinner.el).css({
+        width: '30px',
+        height: '30px',
+        left: '30px',
+        top: '15px',
+        //zIndex : calculate_spinner_z_index
+      });
+      return spinner.el;
     }
 
   , "{list_selector} {list_content_selector} show": "on_show_list"
@@ -313,18 +330,24 @@ can.Control("CMS.Controllers.LHN_Search", {
 
   , display_lists: function(search_result) {
       var self = this
-        , models;
-      models = can.map(this.get_visible_lists(), this.proxy("get_list_model"));
-      can.each(models, function(model_name) {
-        var results;
-        results = search_result.getResultsForType(model_name);
-        refresh_queue = new RefreshQueue();
+        , lists = this.get_visible_lists()
+        ;
+
+      can.each(lists, function(list) {
+        var $list = $(list)
+          , model_name = self.get_list_model($list)
+          , results = search_result.getResultsForType(model_name);
+          , refresh_queue = new RefreshQueue()
+          ;
+
         can.each(results, can.proxy(refresh_queue, "enqueue"));
         refresh_queue.trigger().then(function(_) {
           self.options.results_lists[model_name].replace(results);
           self.options.visible_lists[model_name].replace(
             self.options.results_lists[model_name]
               .slice(0, self.options.limit));
+          // Stop spinner when request is complete
+          $list.find(self.options.spinner_selector).html("");
         });
       });
     }
@@ -353,6 +376,12 @@ can.Control("CMS.Controllers.LHN_Search", {
         // Register that the lists are loaded
         can.each(models, function(model_name) {
           self.options.loaded_lists.push(model_name);
+        });
+
+        // Start the spinners before the request
+        can.each(lists, function(list) {
+          var $list = $(list);
+          $list.find('.spinner').html(self.make_spinner());
         });
 
         GGRC.Models.Search.search_for_types(this.current_term, models)
