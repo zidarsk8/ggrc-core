@@ -14,21 +14,9 @@ can.Model.Cacheable("CMS.Models.Document", {
     root_object : "document"
     , root_collection : "documents"
     , findAll : "GET /api/documents"
-    , create : function(params) {
-        var _params = {
-            document : {
-                title : params.document.title
-                , description : params.document.description
-                , link : params.document.link
-            }
-        };
-        return $.ajax({
-            type : "POST"
-            , "url" : "/api/documents"
-            , dataType : "json"
-            , data : _params
-        });
-    }
+    , create : "POST /api/documents"
+    , update : "PUT /api/documents/{id}"
+    , destroy : "DELETE /api/documents/{id}"
     , search : function(request, response) {
         return $.ajax({
             type : "get"
