@@ -705,9 +705,12 @@ class LinkRelationshipsHandler(LinksHandler):
       elif self.options.get('direction') == 'from':
         relationship.destination = self.importer.obj
         relationship.source = linked_object
-      db_session.add(linked_object)
+      db_session.add(relationship)
 
-
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = self.options.get('model_class')
+    return model_class.query.filter_by(**where_params).first() if model_class else None
 
 
 
