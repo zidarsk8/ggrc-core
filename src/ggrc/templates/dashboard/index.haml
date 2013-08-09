@@ -16,3 +16,10 @@
   %h1.dashboard-title
     %i.grciconlarge-dashboard
     Dashboard
+
+-block main
+  .clearfix
+    .object-area.dashboard-area
+      #show_columns.column-set{ 'data-resize': "true" }
+        #middle_column.widget-area
+          -block widget_area

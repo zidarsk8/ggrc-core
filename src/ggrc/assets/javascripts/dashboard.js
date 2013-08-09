@@ -735,7 +735,7 @@ function resize_areas() {
   internavHeight = lhsHeight - 55;
   lhsWidth = $lhsHolder.width();
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
-  objectWidth = winWidth - lhsWidth - internavWidth;
+  objectWidth = winWidth - lhsWidth - internavWidth - 8;
   headerWidth = winWidth - lhsWidth;
 
   $lhs.css("height",lhsHeight);
