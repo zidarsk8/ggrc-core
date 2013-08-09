@@ -115,15 +115,18 @@ $(function() {
     var $lhs = $("#lhs")
     ,   $lhsHolder = $(".lhs-holder")
     ,   $area = $(".area")
+    ,   $bar = $(".bar-v")
     ;
     
     if( $lhs.hasClass("lhs-closed") ) {
       $lhs.removeClass("lhs-closed");
-      $lhsHolder.css("width","248px");
+      $bar.removeClass("bar-closed");
+      $lhsHolder.css("width","240px");
       $area.css("margin-left","248px");
     } else {
       $lhs.addClass("lhs-closed");
-      $lhsHolder.css("width","48px");
+      $bar.addClass("bar-closed");
+      $lhsHolder.css("width","40px");
       $area.css("margin-left","48px");
     }
     
@@ -135,10 +138,12 @@ $(function() {
     var $lhs = $(this)
     ,   $lhsHolder = $(".lhs-holder")
     ,   $area = $(".area")
+    ,   $bar = $(".bar-v")
     ;
     
     $lhs.removeClass("lhs-closed");
-    $lhsHolder.css("width","248px");
+    $bar.removeClass("bar-closed");
+    $lhsHolder.css("width","240px");
     $area.css("margin-left","248px");
     
     resize_areas();  
