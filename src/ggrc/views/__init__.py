@@ -72,7 +72,11 @@ def admin_reindex():
   models = set(all_models.all_models) -\
       set([all_models.Directive, all_models.SystemOrProcess])
   for model in models:
-    for instance in model.query.all():
+    mapper_class = model._sa_class_manager.mapper.base_mapper.class_
+    query = model.query.options(
+        db.undefer_group(mapper_class.__name__+'_complete'),
+        )
+    for instance in query.all():
       indexer.create_record(fts_record_for(instance), False)
   db.session.commit()
 
