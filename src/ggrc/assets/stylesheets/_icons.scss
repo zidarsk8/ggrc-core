@@ -544,7 +544,7 @@ i.short {
   .grcicon-program-color { background-position:-102px -104px; }
 
   li {
-    //&.active,
+    &.active,
     &:hover {
       // turned icons to white
       .grcicon-info { background-position:-198px -80px; }

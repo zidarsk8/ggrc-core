@@ -312,6 +312,7 @@
       margin-right:6px;
       @include opacity(0.3);
     }
+    li.active,
     li:hover {
       a {
         background-color:#444;
@@ -321,8 +322,8 @@
         }
       }
     }
-    
     &.business {
+      li.active,
       li:hover {
         a {
           color:#fff;
@@ -331,6 +332,7 @@
       }
     }
     &.governance {
+      li.active,
       li:hover {
         a {
           color:#fff;
@@ -339,6 +341,7 @@
       }
     }
     &.risk {
+      li.active,
       li:hover {
         a {
           color:#fff;
@@ -347,6 +350,7 @@
       }
     }
     &.program {
+      li.active,
       li:hover {
         a {
           color:#fff;
