@@ -22,6 +22,9 @@ class Example(object):
   def get(self, attr):
     return self.value.get(get_resource_table_singular(self.resource_type)).get(attr)
 
+  def set_embedded_val(self, attr, value):
+    self.value.get(get_resource_table_singular(self.resource_type))[attr] = value
+
   def set(self, attr, value):
     self.value[attr] = value
 

@@ -9,14 +9,14 @@ from .mixins import Base, created_at_args
 class Event(Base, db.Model):
   __tablename__ = 'events'
 
-  http_method = db.Column(db.Enum(u'POST', u'PUT', u'DELETE'), nullable = False)
-  resource_id = db.Column(db.Integer, nullable = False)
-  resource_type = db.Column(db.String, nullable = False)
+  action = db.Column(db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT'), nullable = False)
+  resource_id = db.Column(db.Integer)
+  resource_type = db.Column(db.String)
 
   revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
 
   _publish_attrs = [
-      'http_method',
+      'action',
       'resource_id',
       'resource_type',
       'revisions',

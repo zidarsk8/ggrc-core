@@ -44,6 +44,9 @@ class Revision(Base, db.Model):
   @computed_property
   def description(self):
     link_objects = ['ObjectDocument']
+    # TODO: Remove check below if migration can guarantee display_name in content
+    if 'display_name' not in self.content:
+      return ''
     display_name = self.content['display_name']
     if '<->' in display_name:
       #TODO: Fix too many values to unpack below

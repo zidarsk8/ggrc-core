@@ -50,19 +50,20 @@ def log_event(session, obj = None):
     revisions.append(revision)
   if obj is None:
     resource_id = 0
-    resource_type = 'Import'
-    http_method = ''
+    resource_type = None
+    action = 'IMPORT'
   else:
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
-    http_method = request.method
-  event = Event(
-    modified_by_id = current_user,
-    http_method = http_method,
-    resource_id = resource_id,
-    resource_type = resource_type)
-  event.revisions = revisions
-  session.add(event)
+    action = request.method
+  if revisions:
+    event = Event(
+      modified_by_id = current_user,
+      action = action,
+      resource_id = resource_id,
+      resource_type = resource_type)
+    event.revisions = revisions
+    session.add(event)
 
 class ModelView(View):
   pk = 'id'

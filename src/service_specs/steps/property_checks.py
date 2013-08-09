@@ -121,6 +121,11 @@ def check_link_to_parent(
       'Expected to find link to parent, id={0}, instead found {1}'.format(
           parent.get(u'id'), link)
 
+@when('"{resource_name}" property "{property_name}" is "{value}"')
+def set_embedded_property_value_by_name(context, resource_name, property_name, value):
+  resource = getattr(context, resource_name)
+  resource.set_embedded_val(property_name, value)
+
 @given('"{resource_name}" property "{property_name}" is "{value}"')
 def set_property_value_by_name(context, resource_name, property_name, value):
   resource = getattr(context, resource_name)
