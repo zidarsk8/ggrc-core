@@ -74,8 +74,6 @@ class Categorizable(object):
         rel_name, 'category',
         creator=lambda category: Categorization(
             category=category,
-            #FIXME add from http session!
-            modified_by_id=1,
             categorizable_type=cls.__name__,
             ),
         ))

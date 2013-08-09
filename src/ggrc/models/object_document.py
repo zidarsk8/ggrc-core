@@ -60,7 +60,6 @@ class Documentable(object):
         'object_documents', 'document',
         creator=lambda document: ObjectDocument(
             document=document,
-            modified_by_id=1,
             documentable_type=cls.__name__,
             )
         )

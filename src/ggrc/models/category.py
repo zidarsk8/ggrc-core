@@ -53,7 +53,6 @@ class Category(Base, Hierarchical, db.Model):
       'control_categorizations', 'categorizable',
       creator=lambda categorizable: Categorization(
           categorizable=categorizable,
-          modified_by_id=1,
           categorizable_type='Control',
           ),
       )
@@ -61,7 +60,6 @@ class Category(Base, Hierarchical, db.Model):
       'risk_categorizations', 'categorizable',
       creator=lambda categorizable: Categorization(
           categorizable=categorizable,
-          modified_by_id=1,
           categorizable_type='Risk',
           ),
       )

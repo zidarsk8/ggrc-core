@@ -8,6 +8,7 @@ import ggrc.services
 import iso8601
 from datetime import datetime
 from ggrc import db
+from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.services.util import url_for
 from sqlalchemy.ext.associationproxy import AssociationProxy
@@ -105,11 +106,28 @@ class UpdateAttrHandler(object):
       # It works if we update them with changes
       new_set = set(value)
       old_set = set(getattr(obj, attr_name))
+      coll_class_attr = getattr(obj.__class__, attr_name)
       coll_attr = getattr(obj, attr_name)
-      for item in new_set - old_set:
-        coll_attr.append(item)
-      for item in old_set - new_set:
-        coll_attr.remove(item)
+      # Join table objects require special handling so that we can be sure to
+      # set the modified_by_id correctly
+      if isinstance(coll_class_attr, AssociationProxy):
+        current_user_id = get_current_user_id()
+        proxied_attr = coll_class_attr.local_attr
+        proxied_property = coll_class_attr.remote_attr
+        proxied_set_map = dict([(getattr(i, proxied_property.key), i)\
+            for i in getattr(obj, proxied_attr.key)])
+        coll_attr = getattr(obj, proxied_attr.key)
+        for item in new_set - old_set:
+          new_item = coll_class_attr.creator(item)
+          new_item.modified_by_id = current_user_id
+          coll_attr.append(new_item)
+        for item in old_set - new_set:
+          coll_attr.remove(proxied_set_map[item])
+      else:
+        for item in new_set - old_set:
+          coll_attr.append(item)
+        for item in old_set - new_set:
+          coll_attr.remove(item)
     else:
       setattr(obj, attr_name, value)
 
