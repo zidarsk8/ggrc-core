@@ -52,10 +52,10 @@ class BaseRowConverter(object):
     self.messages = {}
 
 
-  def add_error(key, message):
+  def add_error(self, key, message):
     self.errors.setdefault(key, []).append(message)
 
-  def add_warning(key, message):
+  def add_warning(self, key, message):
     self.errors.setdefault(key, []).append(message)
 
   def errors_for(self, key):
