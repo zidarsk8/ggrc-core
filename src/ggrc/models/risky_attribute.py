@@ -5,14 +5,15 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
 
 class RiskyAttribute(Documentable, Personable, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'risky_attributes'
 
-  type_string = db.Column(db.String)
+  type_string = deferred(db.Column(db.String), 'RiskyAttribute')
+
   risk_risky_attributes = db.relationship(
       'RiskRiskyAttribute', backref='risky_attribute', cascade='all, delete-orphan')
   risks = association_proxy('risk_risky_attributes', 'risk', 'Risk')

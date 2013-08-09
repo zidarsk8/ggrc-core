@@ -16,7 +16,7 @@
   background-image: image-url("grcicons/icons.png");
   background-position: -2000px -2000px; // blank default state 
   background-repeat: no-repeat;
-  @include background-size(296px 344px);
+  @include background-size(368px 416px);
   &.process-icon {
     margin-top:2px;
     @include opacity(0.5);
@@ -32,7 +32,7 @@
   background-image: image-url("grcicons/icons-large.png");
   background-position: -2000px -2000px; // blank default state 
   background-repeat: no-repeat;
-  @include background-size(264px 264px);
+  @include background-size(360px 360px);
 }
 
 .grcicon-add {
@@ -361,7 +361,7 @@
     background-position: -241px -241px;
     background-image: image-url("grcicons/icons.png");
     background-repeat: no-repeat;
-    @include background-size(296px 344px);
+    @include background-size(368px 416px);
     &.active {
      background-position: -241px -217px;
     }
@@ -377,7 +377,7 @@
   background-image: image-url("grcicons/objects.png");
   background-repeat: no-repeat;
   background-position: -2000px -2000px; // blank default state 
-  @include background-size(144px 144px);
+  @include background-size(252px 252px);
   line-height:24px;
   &.governance {
     background-position: 0 0;

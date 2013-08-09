@@ -4,24 +4,29 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 
 class Request(Base, db.Model):
   __tablename__ = 'requests'
 
-  pbc_list_id = db.Column(db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False)
-  type_id = db.Column(db.Integer)
-  pbc_control_code = db.Column(db.String)
-  pbc_control_desc = db.Column(db.Text)
-  request = db.Column(db.Text)
-  test = db.Column(db.Text)
-  notes = db.Column(db.Text)
-  company_responsible = db.Column(db.String)
-  auditor_responsible = db.Column(db.String)
-  date_requested = db.Column(db.DateTime)
-  status = db.Column(db.String)
-  control_assessment_id = db.Column(db.Integer, db.ForeignKey('control_assessments.id'))
-  response_due_at = db.Column(db.Date)
+  pbc_list_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('pbc_lists.id'), nullable=False),
+      'Request')
+  type_id = deferred(db.Column(db.Integer), 'Request')
+  pbc_control_code = deferred(db.Column(db.String), 'Request')
+  pbc_control_desc = deferred(db.Column(db.Text), 'Request')
+  request = deferred(db.Column(db.Text), 'Request')
+  test = deferred(db.Column(db.Text), 'Request')
+  notes = deferred(db.Column(db.Text), 'Request')
+  company_responsible = deferred(db.Column(db.String), 'Request')
+  auditor_responsible = deferred(db.Column(db.String), 'Request')
+  date_requested = deferred(db.Column(db.DateTime), 'Request')
+  status = deferred(db.Column(db.String), 'Request')
+  control_assessment_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('control_assessments.id')),
+      'Request')
+  response_due_at = deferred(db.Column(db.Date), 'Request')
+
   responses = db.relationship('Response', backref='request', cascade='all, delete-orphan')
 
   _publish_attrs = [

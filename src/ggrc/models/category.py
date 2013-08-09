@@ -7,7 +7,7 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from .categorization import Categorization
-from .mixins import Base, Hierarchical
+from .mixins import deferred, Base, Hierarchical
 
 class CategorizedPublishable(object):
   def __init__(self, attr_name, type_name):
@@ -25,12 +25,12 @@ class CategorizedPublishable(object):
 class Category(Base, Hierarchical, db.Model):
   __tablename__ = 'categories'
 
-  name = db.Column(db.String)
-  lft = db.Column(db.Integer)
-  rgt = db.Column(db.Integer)
-  scope_id = db.Column(db.Integer)
-  depth = db.Column(db.Integer)
-  required = db.Column(db.Boolean)
+  name = deferred(db.Column(db.String), 'Category')
+  lft = deferred(db.Column(db.Integer), 'Category')
+  rgt = deferred(db.Column(db.Integer), 'Category')
+  scope_id = deferred(db.Column(db.Integer), 'Category')
+  depth = deferred(db.Column(db.Integer), 'Category')
+  required = deferred(db.Column(db.Boolean), 'Category')
 
   categorizations = db.relationship(
       'ggrc.models.categorization.Categorization',

@@ -4,14 +4,16 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import Base
+from .mixins import deferred, Base
 
 class Meeting(Base, db.Model):
   __tablename__ = 'meetings'
 
-  response_id = db.Column(db.Integer, db.ForeignKey('responses.id'), nullable=False)
-  start_at = db.Column(db.DateTime)
-  calendar_url = db.Column(db.String)
+  response_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('responses.id'), nullable=False),
+      'Meeting')
+  start_at = deferred(db.Column(db.DateTime), 'Meeting')
+  calendar_url = deferred(db.Column(db.String), 'Meeting')
 
   _publish_attrs = [
       'response',

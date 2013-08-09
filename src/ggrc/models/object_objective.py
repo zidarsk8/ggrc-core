@@ -6,14 +6,14 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import Base, Timeboxed
+from .mixins import deferred, Base, Timeboxed
 from .reflection import PublishOnly
 
 class ObjectObjective(Base, Timeboxed, db.Model):
   __tablename__ = 'object_objectives'
 
-  role = db.Column(db.String)
-  notes = db.Column(db.Text)
+  role = deferred(db.Column(db.String), 'ObjectObjective')
+  notes = deferred(db.Column(db.Text), 'ObjectObjective')
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
 
   # TODO: Polymorphic relationship

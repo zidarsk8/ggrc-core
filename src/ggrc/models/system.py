@@ -1,13 +1,13 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .categorization import Categorizable
 from .object_control import Controllable
 from .object_document import Documentable
@@ -29,16 +29,17 @@ class SystemOrProcess(
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
 
-  infrastructure = db.Column(db.Boolean)
+  infrastructure = deferred(db.Column(db.Boolean), 'SystemOrProcess')
   # TODO: unused?
-  owner_id = db.Column(db.Integer, db.ForeignKey('people.id'))
+  owner_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'SystemOrProcess')
   is_biz_process = db.Column(db.Boolean, default=False)
   # TODO: handle option
-  type_id = db.Column(db.Integer)
-  version = db.Column(db.String)
-  notes = db.Column(db.Text)
+  type_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
+  version = deferred(db.Column(db.String), 'SystemOrProcess')
+  notes = deferred(db.Column(db.Text), 'SystemOrProcess')
   # TODO: handle option
-  network_zone_id = db.Column(db.Integer)
+  network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
+
   system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
   controls = association_proxy('system_controls', 'control', 'SystemControl')
   responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')
@@ -108,10 +109,10 @@ class SystemOrProcess(
     return query.options(
         orm.joinedload('type'),
         orm.joinedload('network_zone'),
-        orm.subqueryload('responses'),
-        orm.subqueryload_all('system_controls.control'),
-        orm.subqueryload_all('sub_system_systems.child'),
-        orm.subqueryload_all('super_system_systems.parent'))
+        orm.joinedload('responses'),
+        orm.joinedload_all('system_controls.control'),
+        orm.joinedload_all('sub_system_systems.child'),
+        orm.joinedload_all('super_system_systems.parent'))
 
 
 # Not 'Controllable', since system_controls is used instead

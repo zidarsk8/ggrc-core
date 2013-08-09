@@ -9,7 +9,8 @@ from .mixins import Base
 class ControlRisk(Base, db.Model):
   __tablename__ = 'control_risks'
 
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable=False)
+  control_id = db.Column(
+      db.Integer, db.ForeignKey('controls.id'), nullable=False)
   risk_id = db.Column(db.Integer, db.ForeignKey('risks.id'), nullable=False)
 
   __table_args__ = (

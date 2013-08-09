@@ -192,7 +192,7 @@
       background-color: lighten($lightGray,5%);
       background-repeat:no-repeat;
       background-image: image-url("grcicons/icons.png");
-      @include background-size(296px 344px);
+      @include background-size(368px 416px);
       background-position:50% -157px;
       @include opacity(0.8);
     }

@@ -70,7 +70,7 @@
       margin-bottom: 0;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
-      @include background-size(296px 344px);
+      @include background-size(368px 416px);
       background-position:-268px -195px;
       padding-left: 23px;
       
@@ -294,7 +294,7 @@
         background-color:#444;
         background-image: image-url("grcicons/icons.png");
         background-repeat: no-repeat;
-        @include background-size(296px 344px);
+        @include background-size(368px 416px);
         background-position: -270px -313px;
         color:#fff;
         text-decoration:none;

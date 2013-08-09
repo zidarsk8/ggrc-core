@@ -37,13 +37,11 @@ def get_json_builder(obj):
     setattr(ggrc.builder, cls.__name__, builder)
   return builder
 
-def publish(obj, inclusions=(), inclusion_filter=None):
+def publish(obj, inclusions=()):
   """Translate ``obj`` into a valid JSON value. Objects with properties are
   translated into a ``dict`` object representing a JSON object while simple
   values are returned unchanged or specially formatted if needed.
   """
-  if inclusion_filter is None:
-    inclusion_filter = lambda x: True
   publisher = get_json_builder(obj)
   if publisher and hasattr(publisher, '_publish_attrs') \
       and publisher._publish_attrs:
@@ -54,8 +52,7 @@ def publish(obj, inclusions=(), inclusion_filter=None):
     view_url = view_url_for(obj)
     if view_url:
       ret['viewLink'] = view_url
-    ret.update(publisher.publish_contribution(
-      obj, inclusions, inclusion_filter))
+    ret.update(publisher.publish_contribution(obj, inclusions))
     return ret
   # Otherwise, just return the value itself by default
   return obj
@@ -226,15 +223,18 @@ class UpdateAttrHandler(object):
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  def generate_link_object_for(
-      self, obj, inclusions, include, inclusion_filter):
+  def generate_link_object_for_foreign_key(self, id, type):
+    """Generate a link object for this object reference."""
+    return {'id': id, 'type': type, 'href': url_for(type, id=id)}
+
+  def generate_link_object_for(self, obj, inclusions, include):
     """Generate a link object for this object. If there are property paths
     to be included specified in the ``inclusions`` parameter, those properties
     will be added to the object representation. If the ``include`` parameter
     is ``True`` the entire object will be represented in the result.
     """
-    if include and inclusion_filter(obj):
-      return publish(obj, inclusions, inclusion_filter)
+    if include:
+      return publish(obj, inclusions)
     result = {'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj)}
     for path in inclusions:
       if type(path) is not str and type(path) is not unicode:
@@ -244,8 +244,7 @@ class Builder(AttributeInfo):
       result[attr_name] = self.publish_attr(obj, attr_name, remaining_path)
     return result
 
-  def publish_link_collection(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+  def publish_link_collection(self, obj, attr_name, inclusions, include):
     """The ``attr_name`` attribute is a collection of object references;
     translate the collection of object references into a collection of link
     objects for the JSON dictionary representation.
@@ -253,41 +252,71 @@ class Builder(AttributeInfo):
     # FIXME: Remove the "if o is not None" when we can guarantee referential
     #   integrity
     return [
-        self.generate_link_object_for(o, inclusions, include, inclusion_filter)
+        self.generate_link_object_for(o, inclusions, include)
         for o in getattr(obj, attr_name) if o is not None]
 
-  def publish_link(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+  def publish_link(self, obj, attr_name, inclusions, include):
     """The ``attr_name`` attribute is an object reference; translate the object
     reference into a link object for the JSON dictionary representation.
     """
     attr_value = getattr(obj, attr_name)
     if attr_value:
-      return self.generate_link_object_for(
-          attr_value, inclusions, include, inclusion_filter)
-    return None
+      return self.generate_link_object_for(attr_value, inclusions, include)
+    else:
+      return None
 
-  def publish_attr(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+  def publish_association_proxy(
+      self, obj, attr_name, class_attr, inclusions, include):
+    if include:
+      return self.publish_link_collection(obj, attr_name, inclusions, include)
+    else:
+      join_objects = getattr(obj, class_attr.local_attr.key)
+      if isinstance(class_attr.remote_attr, property):
+        target_name = class_attr.value_attr + '_id'
+        target_type = class_attr.value_attr + '_type'
+      else:
+        target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+        target_type = class_attr.remote_attr.property.mapper.class_.__name__
+      return [self.generate_link_object_for_foreign_key(
+            getattr(o, target_name), target_type) for o in join_objects]
+
+  def publish_relationship(
+      self, obj, attr_name, class_attr, inclusions, include):
+    uselist = class_attr.property.uselist
+    if uselist:
+      return self.publish_link_collection(obj, attr_name, inclusions, include)
+    elif include or class_attr.property.backref:
+      return self.publish_link(obj, attr_name, inclusions, include)
+    else:
+      if class_attr.property.mapper.class_.__mapper__.polymorphic_on \
+          is not None:
+        target = getattr(obj, attr_name)
+        target_type = target.__class__.__name__
+      else:
+        target_type = class_attr.property.mapper.class_.__name__
+      target_name = list(class_attr.property.local_columns)[0].key
+      attr_value = getattr(obj, target_name)
+      if attr_value is not None:
+        return self.generate_link_object_for_foreign_key(
+            attr_value, target_type)
+      else:
+        return None
+
+  def publish_attr(self, obj, attr_name, inclusions, include):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
-      return self.publish_link_collection(
-          obj, attr_name, inclusions, include, inclusion_filter)
+      return self.publish_association_proxy(
+          obj, attr_name, class_attr, inclusions, include)
     elif isinstance(class_attr, InstrumentedAttribute) and \
          isinstance(class_attr.property, RelationshipProperty):
-      if class_attr.property.uselist:
-        return self.publish_link_collection(
-            obj, attr_name, inclusions, include, inclusion_filter)
-      else:
-        return self.publish_link(
-            obj, attr_name, inclusions, include, inclusion_filter)
+      return self.publish_relationship(
+          obj, attr_name, class_attr, inclusions, include)
     elif class_attr.__class__.__name__ == 'property':
-      return self.publish_link(
-          obj, attr_name, inclusions, include, inclusion_filter)
+      return self.publish_link(obj, attr_name, inclusions, include)
     else:
       return getattr(obj, attr_name)
 
-  def publish_attrs(self, obj, json_obj, inclusions, inclusion_filter):
+  def publish_attrs(self, obj, json_obj, inclusions):
     """Translate the state represented by ``obj`` into the JSON dictionary
     ``json_obj``.
     
@@ -314,8 +343,7 @@ class Builder(AttributeInfo):
           local_inclusion = inclusion
           break
       json_obj[attr_name] = self.publish_attr(
-          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
-          inclusion_filter)
+          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0)
 
   @classmethod
   def do_update_attrs(cls, obj, json_obj, attrs):
@@ -338,10 +366,10 @@ class Builder(AttributeInfo):
     """
     self.do_update_attrs(obj, json_obj, self._create_attrs)
 
-  def publish_contribution(self, obj, inclusions, inclusion_filter):
+  def publish_contribution(self, obj, inclusions):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
-    self.publish_attrs(obj, json_obj, inclusions, inclusion_filter)
+    self.publish_attrs(obj, json_obj, inclusions)
     return json_obj
 
   def update(self, obj, json_obj):

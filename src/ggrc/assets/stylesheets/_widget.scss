@@ -150,7 +150,7 @@
     &:hover {
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
-      @include background-size(296px 344px);
+      @include background-size(368px 416px);
       background-position: -270px -169px;
       cursor: move;
     }
@@ -317,7 +317,7 @@
       border: 1px solid $popOverBorder;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
-      @include background-size(296px 344px);
+      @include background-size(368px 416px);
       background-position:-259px -195px;
       padding-left: 40px;
     }

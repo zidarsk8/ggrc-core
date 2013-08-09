@@ -1,11 +1,10 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: david@reciprocitylabs.com
+# Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .object_control import Controllable
 from .object_document import Documentable
 from .object_objective import Objectiveable
@@ -17,8 +16,9 @@ class Product(
     Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'products'
 
-  type_id = db.Column(db.Integer)
-  version = db.Column(db.String)
+  type_id = deferred(db.Column(db.Integer), 'Product')
+  version = deferred(db.Column(db.String), 'Product')
+
   type = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Product.type_id) == Option.id, '\

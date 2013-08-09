@@ -5,7 +5,7 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .mixins import BusinessObject, Timeboxed
+from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
@@ -15,15 +15,16 @@ from sqlalchemy.orm import validates
 class Directive(Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
-  version = db.Column(db.String)
-  organization = db.Column(db.String)
-  scope = db.Column(db.Text)
-  kind_id = db.Column(db.Integer)
-  audit_start_date = db.Column(db.DateTime)
-  audit_frequency_id = db.Column(db.Integer)
-  audit_duration_id = db.Column(db.Integer)
+  version = deferred(db.Column(db.String), 'Directive')
+  organization = deferred(db.Column(db.String), 'Directive')
+  scope = deferred(db.Column(db.Text), 'Directive')
+  kind_id = deferred(db.Column(db.Integer), 'Directive')
+  audit_start_date = deferred(db.Column(db.DateTime), 'Directive')
+  audit_frequency_id = deferred(db.Column(db.Integer), 'Directive')
+  audit_duration_id = deferred(db.Column(db.Integer), 'Directive')
   meta_kind = db.Column(db.String)
-  kind = db.Column(db.String)
+  kind = deferred(db.Column(db.String), 'Directive')
+
   sections = db.relationship(
       'Section', backref='directive', order_by='Section.slug', cascade='all, delete-orphan')
   controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')

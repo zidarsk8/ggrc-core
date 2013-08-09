@@ -5,7 +5,7 @@
 
 import ggrc.builder
 from blinker import Namespace
-from flask import request, render_template, current_app
+from flask import request, render_template, current_app, url_for
 from ggrc.rbac import permissions
 from ggrc.services.common import ModelView, as_json
 from werkzeug.exceptions import Forbidden
@@ -97,11 +97,13 @@ class BaseObjectView(ModelView):
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
     if model_class:
+      cls_name = '{0}ObjectView'.format(model_class.__name__)
       view_class = type(
-        '{0}ObjectView'.format(model_class.__name__),
+        cls_name,
         (BaseObjectView,),
         {
-          '_model': model_class
+          '_model': model_class,
+          'base_url_for': classmethod(lambda cls: url),
         })
       import ggrc.views
       setattr(ggrc.views, model_class.__name__, view_class)
@@ -112,6 +114,6 @@ class BaseObjectView(ModelView):
     view_func = cls.decorate_view_func(view_func, decorators)
     view_route = '{url}/<{type}:{pk}>'.format(
         url=url, type=cls.pk_type, pk=cls.pk)
-    app.add_url_rule(view_route,
+    app.add_url_rule(view_route, view_class.endpoint_name(),
       view_func=view_func,
       methods=['GET'])
