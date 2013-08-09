@@ -51,6 +51,13 @@ class BaseRowConverter(object):
     self.warnings = {}
     self.messages = {}
 
+
+  def add_error(key, message):
+    self.errors.setdefault(key, []).append(message)
+
+  def add_warning(key, message):
+    self.errors.setdefault(key, []).append(message)
+
   def errors_for(self, key):
     error_messages = []
     if self.handlers.get(key) and self.handlers[key].errors:
@@ -255,6 +262,7 @@ class SlugColumnHandler(ColumnHandler):
 
 class OptionColumnHandler(ColumnHandler):
   from ggrc.models.option import Option
+
   def parse_item(self, value):
     if value:
       role = self.options.get('role') or self.key
@@ -262,7 +270,7 @@ class OptionColumnHandler(ColumnHandler):
       if not option:
         self.warnings.append(
           'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
-            self.options.get('role'), value.lower()))
+            role, value.lower()))
       return option
 
   def display(self):
@@ -553,7 +561,7 @@ class LinkDocumentsHandler(LinksHandler):
     self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
 
   def render_item(self, item):
-    return "[{} {}] {}".format(item.link_url, item.title, item.description)
+    return "[{} {}] {}".format(item.link, item.title, item.description)
 
 class LinkPeopleHandler(LinksHandler):
   from ggrc.models.person import Person
@@ -648,7 +656,66 @@ class LinkSystemsHandler(LinksHandler):
     return None
 
 class LinkRelationshipsHandler(LinksHandler):
+  from ggrc.models.relationship import Relationship
+  import re
 
   def parse_item(self, value):
-    pass
+    if value and value[0] == '[':
+      match = re.match(r'^(?:\[([\w\d-]+)\])?([^$]*)$', value)
+      if match and len(match.groups()) == 2 and not (match.group(1) is None):
+        return { 'slug' : match.group(1) , 'title' : match.group(2) }
+      else:
+        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+    else:
+      return {'slug' : value.upper()}
+
+  def get_existing_items(self):
+    where_params= {'relationship_type_id' : self.options.get('relationship_type_id')}
+    objects = []
+    if self.options.get('direction') == 'to':
+      where_params['source_type'] = self.importer.obj.__class__.__name__
+      where_params['source_id'] = self.importer.obj.id
+      where_params['destination_type'] = self.model_class.__name__
+      relationships = Relationship.query.filter_by(**where_params).all()
+      objects = [rel.destination for rel in relationships]
+    elif self.options.get('direction') == 'from':
+      where_params['destination_type'] = self.importer.obj.__class__.__name__
+      where_params['destination_id'] = self.importer.obj.id
+      where_params['source_type'] = self.model_class.__name__
+      relationships = Relationship.query.filter_by(**where_params).all()
+      objects = [rel.source for rel in relationships]
+
+    return objects
+
+  def model_human_name(self):
+    return self.options.get('model_human_name') or self.model_class.__name__
+
+  def create_item(self, data):
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(self.model_human_name(), data.get('slug')))
+
+  def after_save(self, obj):
+    db_session = db.session
+    for linked_object in self.created_links():
+      db_session.add(linked_object)
+      relationship = Relationship()
+      relationship.relationship_type_id = self.options.get('relationship_type_id')
+      if self.options.get('direction') == 'to':
+        relationship.source = self.importer.obj
+        relationship.destination = linked_object
+      elif self.options.get('direction') == 'from':
+        relationship.destination = self.importer.obj
+        relationship.source = linked_object
+      db_session.add(relationship)
+
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = self.options.get('model_class')
+    return model_class.query.filter_by(**where_params).first() if model_class else None
+
+
+
+
+
+
+
 
