@@ -60,7 +60,6 @@ class Sectionable(object):
         'object_sections', 'section',
         creator=lambda section: ObjectSection(
             section=section,
-            modified_by_id=1,
             sectionable_type=cls.__name__,
             )
         )

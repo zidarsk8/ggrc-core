@@ -61,7 +61,6 @@ class Controllable(object):
         'object_controls', 'control',
         creator=lambda control: ObjectControl(
             control=control,
-            modified_by_id=1,
             controllable_type=cls.__name__,
             )
         )

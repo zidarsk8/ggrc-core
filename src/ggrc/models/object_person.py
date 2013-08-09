@@ -60,7 +60,6 @@ class Personable(object):
         'object_people', 'person',
         creator=lambda person: ObjectPerson(
             person=person,
-            modified_by_id=1,
             personable_type=cls.__name__,
             )
         )
