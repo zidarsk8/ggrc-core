@@ -337,7 +337,7 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , update_scrollspy : function() {
-      var $body = $("body")
+      var $body = $(".object-area")
         , top = $body.scrollTop()
         ;
 
