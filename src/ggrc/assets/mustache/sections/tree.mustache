@@ -98,13 +98,13 @@
       &nbsp;
       &nbsp;
       {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="/directives/{{parent_instance.id}}/import_sections" class="section-import">
+        <a href="{{parent_instance.viewLink}}/import_sections" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Import Sections
         </a>
         &nbsp;
         &nbsp;
-        <a href="/directives/{{parent_instance.id}}/export_sections" class="section-import">
+        <a href="{{parent_instance.viewLink}}/export_sections" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Export Sections
         </a>
