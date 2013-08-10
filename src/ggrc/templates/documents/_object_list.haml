@@ -8,8 +8,8 @@
           .span12
             .item-data
               .tree-title-area
-                %a.reference{ 'href': '<%= document.link_url %>', 'target': '_blank' }
-                  <%= document.title || document.link_url || '&nbsp;' %>
+                %a.reference{ 'href': '<%= document.link %>', 'target': '_blank' }
+                  <%= document.title || document.link || '&nbsp;' %>
                 %span.option
                   <%= document.document_type || '&nbsp;' %>
 
@@ -27,6 +27,8 @@
                     =item.title
                   %span.option
                     =item.document_type|default('')
+
+%ul.new-tree
   %li.tree-item-add
     %a{ 'href': 'javascript://', 'data-toggle': 'modal-selector', 'data-modal-selector-options': 'object_documents', 'data-list-target': '#referenceList', 'data-modal-class': 'modal-wide', 'rel': 'tooltip', 'data-placement': 'left', 'title': 'Add References' }
       .row-fluid
