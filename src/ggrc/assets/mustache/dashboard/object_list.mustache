@@ -25,17 +25,29 @@
     
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
+
         <div class="row-fluid">
-          <div class="span12">
-            <div class="tree-description short">
-              {{^description}}
-                <p><i>No description</i></p>
-              {{/description}}
-              {{{description}}}
-            </div>
-            <a href="javascript://" class="show-long">...more</a>
+          <div class="span6">
+            <a href="{{viewLink}}" class="info-action">
+              View {{object_type}}
+              <i class="grcicon-goto"></i>
+            </a>
           </div>
         </div>
+        
+        {{#description}}
+        <div class="show-description">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="tree-description short">
+                {{{description}}}
+              </div>
+              <a href="javascript://" class="show-long">...more</a>
+            </div>
+          </div>
+        </div>
+        {{/description}}
+        
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
@@ -50,26 +62,18 @@
               {{/if}}
             </div>
           </div>
+
+          {{#url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              {{^if_null url}}
-                <a class="url" href="{{url}}">
-                  {{instance.url}}
+                <a class="url" href="{{url}}" target="_blank">
+                  {{url}}
                 </a>
-              {{/if_null}}
-              {{#if_null url}}
-                <i>No URL</i>
-              {{/if_null}}
             </div>
           </div>
-        </div>
-        <div class="row-fluid">
-          <div class="span6">
-          <a href="{{viewLink}}" class="info-action">
-            View {{object_type}}
-            <i class="grcicon-goto"></i>
-          </a>
+          {{/url}}
+
         </div>
       </div>
     </div>
