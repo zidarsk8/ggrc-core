@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from .associationproxy import association_proxy
 from .categorization import Categorizable
 from .mixins import (
-    deferred, Slugged, Described, Hierarchical, Hyperlinked, Timeboxed,
+    deferred, BusinessObject, Hierarchical, Timeboxed,
     )
 from .object_document import Documentable
 from .object_person import Personable
@@ -30,8 +30,8 @@ class AssertionCategorized(Categorizable):
         'assertations', 'assertions', CATEGORY_ASSERTION_TYPE_ID)
 
 class Control(
-    Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Described, Hierarchical, Hyperlinked, Timeboxed, Slugged, db.Model):
+    BusinessObject, Documentable, Personable, ControlCategorized, AssertionCategorized,
+    Hierarchical, Timeboxed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')

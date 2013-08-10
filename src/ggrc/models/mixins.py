@@ -292,4 +292,10 @@ event.listen(
   Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 class BusinessObject(Slugged, Described, Hyperlinked):
-  pass
+  @declared_attr
+  def owner_id(cls):
+    return deferred(
+        db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
+  @declared_attr
+  def owner(self):
+    return db.relationship('Person', uselist=False)
