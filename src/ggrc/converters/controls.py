@@ -63,7 +63,7 @@ class ControlsConverter(BaseConverter):
     ('Means', 'means'),
     ('Version', 'version'),
     ('Start Date', 'start_date'),
-    ('Stop Date', 'end_date'),
+    ('Stop Date', 'stop_date'),
     ('URL', 'url'),
     ('Link:Systems', 'systems'),
     ('Link:Processes', 'processes'),
