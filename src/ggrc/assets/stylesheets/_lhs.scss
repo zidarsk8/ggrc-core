@@ -215,15 +215,17 @@
   background-color:#fff;
   border-top:1px solid #aaa;
   border-bottom:1px solid #aaa;
-  background-image: image-url("bgnds/drag-h.png");
+  //background-image: image-url("bgnds/drag-h.png");
   @include background-size(30px 2px);
   background-repeat:no-repeat;
   background-position:50% 2px;
   @include opacity(0.3);
+  /*
   &:hover {
     @include opacity(1);
     cursor:move;
   };
+  */
 }
 
 .bar-v {
@@ -241,13 +243,14 @@
   background-repeat:no-repeat;
   background-position:2px 50%;
   @include opacity(0.6);
+  cursor:w-resize;
   &:hover {
     @include opacity(1);
     background-color:#fff;
-    cursor:move;
   };
   &.bar-closed {
     left:40px;
+    cursor:e-resize;
   }
 }
 
@@ -285,6 +288,16 @@
     overflow-y:auto;
     li {
       background:$white;
+      position:relative;
+      .drag {
+        position:absolute;
+        @include opacity(0.5);
+        top:0;
+        left:0;
+        width:16px;
+        height:30px;
+        cursor:move;
+      }
     }
     a {
       padding-left:20px;
@@ -301,7 +314,6 @@
         background-position: -270px -313px;
         color:#fff;
         text-decoration:none;
-        cursor:move;
       }
       span {
         font-size:11px;
