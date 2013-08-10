@@ -234,12 +234,12 @@ def import_processes():
 def export_processes():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import System
+  from ggrc.models.all_models import System, Process
   if request.method == 'GET':
     options = {}
     options['export'] = True
     options['is_biz_process'] = '1'
-    procs = System.query.filter_by(is_biz_process=True).all()
+    procs = Process.query.all()
     filename = "PROCESSES.csv"
     return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
   return redirect('/admin')

@@ -30,7 +30,7 @@
 
       -if status == "created"
         %span
-          New link:
+          New Mapping:
         %a{href:'{{document.link}}',rel:"tooltip",title:'{{document.link}}'}
           ={document.title or document.link}
       -elif status == "existing"
@@ -60,7 +60,7 @@
 
       -if status == "created"
         %span
-          New link:
+          New Mapping:
         ={cell.display_link(object)} 
       -elif status == "existing"
         ={cell.display_link(object)}
