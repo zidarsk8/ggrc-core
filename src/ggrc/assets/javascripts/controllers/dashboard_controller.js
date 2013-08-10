@@ -341,6 +341,10 @@ can.Control("CMS.Controllers.InnerNav", {
         , top = $body.scrollTop()
         ;
 
+      // Some pages may not have scrollspy set up (e.g., dashboard)
+      if (!$body.data("scrollspy"))
+        return
+
       // FIXME: This is currently necessary because Bootstrap's ScrollSpy uses
       //   the `href` to determine the active element, and the element may have
       //   changed (due to view update) while keeping the same `href`.
