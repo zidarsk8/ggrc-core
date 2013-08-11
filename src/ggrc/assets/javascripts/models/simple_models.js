@@ -120,7 +120,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
 
 CMS.Models.Directive("CMS.Models.Policy", {
   root_object : "policy"
-  , root_collection : "regulations"
+  , root_collection : "policies"
   , model_plural : "Policies"
   , table_plural : "policies"
   , title_plural : "Policies"
