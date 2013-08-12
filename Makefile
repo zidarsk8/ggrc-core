@@ -110,7 +110,7 @@ src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
 
 src/ggrc/static/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \
-		bin/build_assets
+		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 
 src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml \
