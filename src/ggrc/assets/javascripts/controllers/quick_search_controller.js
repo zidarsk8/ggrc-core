@@ -295,6 +295,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         var context = {
             model: CMS.Models[model_name]
           , list: self.options.visible_lists[model_name]
+          , count: can.compute(function() {
+              return self.options.results_lists[model_name].attr('length');
+            })
         };
 
         can.view(self.options.list_view, context, function(frag, xhr) {
