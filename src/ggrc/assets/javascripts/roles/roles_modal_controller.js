@@ -155,7 +155,7 @@
       $target.modal_form(option, $trigger);
       options = {
         new_object_form : !$trigger.attr('data-object-id')
-        , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+        , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
         , modal_title : (instance ? "Edit " : "New ") + $trigger.attr("data-object-singular")

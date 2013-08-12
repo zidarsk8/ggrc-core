@@ -169,8 +169,11 @@
       });
 
       $target.on('modal:success', function(e, data) {
+        var model_name = $trigger.attr("data-object-singular");
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
           window.location.assign('/dashboard');
+        } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
+          window.location.assign('/admin');
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
