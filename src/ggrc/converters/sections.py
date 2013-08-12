@@ -43,7 +43,7 @@ class SectionsConverter(BaseConverter):
     ('Created' ,'created_at'),
     ('Updated', 'updated_at'),
     ('Start','start_date'),
-    ('Stop' , 'stop_date'),
+    ('Stop' , 'end_date'),
     ('Kind', 'kind'),
     ('Audit Start', 'audit_start_date'),
     ('Audit Frequency', 'audit_frequency'),
