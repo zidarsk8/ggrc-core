@@ -177,6 +177,7 @@ $(function() {
 
   CMS.Models.Section.findAll({ directive_id : directive_id })
   .done(function(s) {
+    s = can.makeArray(s).sort(window.natural_comparator);
 
     CMS.Models.Section.bind("created", function(ev, instance) {
       if (instance instanceof CMS.Models.Section

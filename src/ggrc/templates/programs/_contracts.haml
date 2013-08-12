@@ -1,20 +1,18 @@
 -extends 'layouts/_widget_box.haml'
 
 -block widget_help
-  program_directives
+  program_contracts
 
 -block widget_id
-  program_directives_widget
+  program_contracts_widget
 
 -#block widget_class
   business
 
 -block widget_title
-  %i.grcicon-directive-color
-  Mapped Directives
-  %span.subtitle
-      (Regulations, Contracts, Policies)
+  %i.grcicon-contract-color
+  Mapped Contracts
 
 -block main
-  #directives
+  #contracts
     %ul.tree-structure.new-tree
