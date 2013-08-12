@@ -324,7 +324,23 @@ $(function() {
     $
     , directive_dfds
   ).done(function(r, p, c) {
-    var d = r.concat(p).concat(c);
+    var d = new can.Observe.List(r.concat(p).concat(c));
+
+    CMS.Models.ProgramDirective.bind("created", function(ev, instance) {
+      if (instance instanceof CMS.Models.ProgramDirective
+          && instance.program.id == program_id)
+        d.push(instance.directive);
+    });
+
+    CMS.Models.ProgramDirective.bind("destroyed", function(ev, instance) {
+      var index;
+      if (instance instanceof CMS.Models.ProgramDirective
+          && instance.program.id == program_id) {
+        index = d.indexOf(instance.directive);
+        if (index > -1)
+          d.splice(index, 1);
+      }
+    });
 
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.Directive
