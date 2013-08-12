@@ -108,7 +108,7 @@ class BaseConverter(object):
         ignored_colums.append(heading)
         keys.append(None) # Placeholder None to prevent position problems when headers are zipped with values
         continue
-      elif heading != "start_date" and heading != "stop_date": #
+      elif heading != "start_date" and heading != "end_date": #
         keys.append(import_map[heading])
 
     if len(ignored_colums):
