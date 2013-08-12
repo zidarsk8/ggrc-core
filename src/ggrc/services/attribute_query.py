@@ -8,7 +8,7 @@ import iso8601
 from collections import namedtuple
 from sqlalchemy import and_, cast
 from sqlalchemy.ext.associationproxy import AssociationProxy
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload_all
 from sqlalchemy.types import AbstractType, Boolean, Date, DateTime
 from werkzeug.exceptions import BadRequest
 
@@ -121,7 +121,7 @@ class AttributeQueryBuilder(object):
             segment, current_model)
         real_segments.append(real_segment)
       realized_path = '.'.join(real_segments)
-      options.append(joinedload(realized_path))
+      options.append(joinedload_all(realized_path))
     return options
 
   def collection_filters(self, args):
