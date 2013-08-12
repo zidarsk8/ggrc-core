@@ -8,7 +8,7 @@ import iso8601
 from collections import namedtuple
 from sqlalchemy import and_, cast
 from sqlalchemy.ext.associationproxy import AssociationProxy
-from sqlalchemy.orm import subqueryload_all
+from sqlalchemy.orm import joinedload
 from sqlalchemy.types import AbstractType, Boolean, Date, DateTime
 from werkzeug.exceptions import BadRequest
 
@@ -120,9 +120,9 @@ class AttributeQueryBuilder(object):
         real_segment, current_model = self.resolve_path_segment(
             segment, current_model)
         real_segments.append(real_segment)
-      options.append('.'.join(real_segments))
-    print 'process_eager_loading', options
-    return [subqueryload_all(option) for option in options]
+      realized_path = '.'.join(real_segments)
+      options.append(joinedload(realized_path))
+    return options
 
   def collection_filters(self, args):
     """Create filter expressions using ``request.args``"""
@@ -145,5 +145,4 @@ class AttributeQueryBuilder(object):
       filter = filter_expressions[0]
       for f in filter_expressions[1:]:
         filter = and_(filter, f)
-    print 'collection_filters', optionlist
     return AttributeQuery(filter, joinlist, optionlist)
