@@ -330,7 +330,19 @@ can.Control("CMS.Controllers.InnerNav", {
         widget_list.push({
             selector: "#" + $widget.attr("id")
           , internav_icon: $widget.find(".header h2 i").attr("class")
-          , internav_display: $widget.find(".header").text()
+          , internav_display: function() {
+              
+              var menuItem = $widget.find(".header").text().trim()
+              ,   first
+              ;
+
+              var first = menuItem.substring(0,6);
+              if (first === "Mapped") {
+                menuItem = menuItem.substr(6);
+              }
+              return menuItem;
+            }
+          
           });
       });
       this.options.widget_list.replace(widget_list);

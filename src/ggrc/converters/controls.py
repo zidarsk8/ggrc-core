@@ -18,7 +18,7 @@ class ControlRowConverter(BaseRowConverter):
   def reify(self):
     self.handle('slug', SlugColumnHandler)
     self.handle_date('start_date')
-    self.handle_date('stop_date')
+    self.handle_date('end_date')
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
     self.handle_text_or_html('description')
