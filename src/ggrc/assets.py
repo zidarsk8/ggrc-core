@@ -32,6 +32,8 @@ environment = webassets.Environment()
 
 environment.manifest = 'file:assets.manifest'
 environment.versions = 'hash:32'
+if settings.DEBUG:
+  environment.url_expire = False
 
 import webassets.updater
 environment.updater = webassets.updater.TimestampUpdater()
@@ -102,25 +104,29 @@ class MustacheFilter(JSTemplateFilter):
       out.write("= '{template}';\n"
           .format(template=contents))
 
+version_suffix = '-%(version)s'
+if settings.DEBUG:
+  version_suffix = ''
+
 environment.register("dashboard-js", webassets.Bundle(
   *asset_paths['dashboard-js-files'],
   #filters='jsmin',
-  output='dashboard-%(version)s.js'))
+  output='dashboard' + version_suffix + '.js'))
 
 environment.register("dashboard-js-templates", webassets.Bundle(
   *asset_paths['dashboard-js-template-files'],
   filters=MustacheFilter,
-  output='dashboard-templates-%(version)s.js'))
+  output='dashboard-templates' + version_suffix + '.js'))
 
 environment.register("dashboard-css", webassets.Bundle(
   *asset_paths['dashboard-css-files'],
-  output='dashboard-%(version)s.css'))
+  output='dashboard' + version_suffix + '.css'))
 
 if settings.ENABLE_JASMINE:
   environment.register("dashboard-js-specs", webassets.Bundle(
     *asset_paths['dashboard-js-spec-files'],
-    output='dashboard-%(version)s-specs.js'))
+    output='dashboard' + version_suffix + '-specs.js'))
 
   environment.register("dashboard-js-spec-helpers", webassets.Bundle(
     *asset_paths['dashboard-js-spec-helpers'],
-    output='dashboard-%(version)s-spec-helpers.js'))
+    output='dashboard' + version_suffix + '-spec-helpers.js'))
