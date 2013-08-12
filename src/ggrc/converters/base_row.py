@@ -110,7 +110,7 @@ class BaseRowConverter(object):
   def setup_object_by_slug(self, attrs):
     slug = prepare_slug(attrs['slug']) if attrs.get('slug') else ''
     if not slug:
-      self.obj = self.model_class()
+      self.obj = self.model_class() if not self.importer.options.get('is_biz_process') else Process()
     else:
       self.obj = self.find_by_slug(slug)
       self.obj = self.obj or self.importer.find_object(self.model_class, slug)
@@ -159,7 +159,12 @@ class BaseRowConverter(object):
     self.handle(key, OptionColumnHandler, **options)
 
   def find_by_slug(self, slug):
-    return self.model_class.query.filter_by(slug=str(slug)).first()
+    if self.importer.options.get('is_biz_process'):
+      target_class = Process
+    else:
+      target_class = self.model_class
+    return target_class.query.filter_by(slug=slug).first()
+
 
   def set_attr(self, name, value):
     setattr(self.obj, name, value)
@@ -511,7 +516,8 @@ class LinkCategoriesHandler(LinksHandler):
     return {'name' : data.get('name'), 'scope_id' : self.options.get('scope_id')}
 
   def find_existing_item(self, data):
-    items = self.model_class.query.filter_by(scope_id = self.options.get('scope_id'), name = data.get('name') ).all()
+    params = {'scope_id': self.options.get('scope_id'), 'name': data.get('name')}
+    items = self.model_class.query.filter_by(**params).all()
 
     if len(items) > 1:
       self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
@@ -628,14 +634,15 @@ class LinkPeopleHandler(LinksHandler):
       return obj.email
 
 class LinkSystemsHandler(LinksHandler):
-  from ggrc.models.all_models import System
+  from ggrc.models.all_models import System, Process
   model_class = System
 
   def parse_item(self, value):
     return { 'slug' : value.upper(), 'title' : value }
 
   def find_existing_item(self, data):
-    system = System.query.filter_by(slug = data.get('slug')).first()
+    sys_class = Process if self.options.get('is_biz_process') else System
+    system = sys_class.query.filter_by(slug = data.get('slug')).first()
     if not system:
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
       self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
@@ -648,9 +655,9 @@ class LinkSystemsHandler(LinksHandler):
         return system
 
   def get_existing_items(self):
-    sys_type = self.options.get('is_biz_process') or False
+    sys_class = Process if self.options.get('is_biz_process') else System
     systems = super(LinkSystemsHandler, self).get_existing_items()
-    return [sys for sys in systems if sys.is_biz_process == sys_type]
+    return [sys for sys in systems if sys.__class__ is sys_class]
 
   def create_item(self, data):
     return None

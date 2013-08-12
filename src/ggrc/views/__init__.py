@@ -103,7 +103,6 @@ def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
 
-#@app.route("/directives/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
@@ -111,6 +110,7 @@ def import_controls(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Directive
   import ggrc.views
 
   directive = Directive.query.get(directive_id)
@@ -144,7 +144,6 @@ def import_controls(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
 
-#@app.route("/directives/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
@@ -152,6 +151,7 @@ def import_sections(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Directive
   import ggrc.views
 
   directive = Directive.query.get(directive_id)
@@ -250,12 +250,12 @@ def import_processes():
 def export_processes():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import System
+  from ggrc.models.all_models import Process
 
   options = {}
   options['export'] = True
   options['is_biz_process'] = '1'
-  procs = System.query.filter_by(is_biz_process=True).all()
+  procs = Process.query.all()
   filename = "PROCESSES.csv"
   return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
 
@@ -271,7 +271,6 @@ def export_systems():
   filename = "SYSTEMS.csv"
   return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
-#@app.route("/directives/<directive_id>/export_sections", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
@@ -287,7 +286,6 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
-#@app.route("/directives/<directive_id>/export_controls", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
