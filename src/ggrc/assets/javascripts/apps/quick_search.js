@@ -72,6 +72,209 @@ var RELATIONSHIP_TYPES = {
 
 GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
+  GGRC.JoinDescriptor = can.Construct({
+      defaults: {
+          object_model_name: null
+        , option_model_name: null
+        , join_model_name: null
+        , join_option_attr: null
+        , join_object_attr: null
+        , join_options: null
+        , options: null
+      }
+
+    , by_object_model: {}
+    , by_option_model: {}
+    , by_object_option_models: {}
+    , by_option_object_models: {}
+
+    , from_arguments_list: function(args_list) {
+        var self = this;
+
+        return can.map(args_list, function(args) {
+          return self.from_arguments_cross_product.apply(self, args);
+        });
+      }
+
+    , from_arguments_cross_product: function(
+          object_model_names, option_model_names) {
+        var self = this
+          , rest = Array.prototype.splice.call(arguments, 2)
+          , results = []
+          ;
+
+        if (!(object_model_names instanceof Array))
+          object_model_names = [object_model_names];
+        if (!(option_model_names instanceof Array))
+          option_model_names = [option_model_names];
+
+        can.each(object_model_names, function(object_model) {
+          can.each(option_model_names, function(option_model) {
+            results.push(
+              self.from_arguments.apply(
+                self, [object_model, option_model].concat(rest)))
+          });
+        });
+
+        return results;
+      }
+
+    , from_arguments: function(
+          object_model_name, option_model_name, join_model_name,
+          join_option_attr, join_object_attr, join_options, options) {
+
+        // Create a new subclass of `this`
+        return new this($.extend({
+            object_model_name: object_model_name
+          , option_model_name: option_model_name
+          , join_model_name: join_model_name
+          , join_option_attr: join_option_attr
+          , join_object_attr: join_object_attr
+          , join_options: join_options || {}
+        }, (options || {})), {});
+      }
+  }, {
+      init: function(options) {
+        var options = $.extend({}, this.constructor.defaults, options)
+          , constructor = this.constructor
+          , by_object_model = constructor.by_object_model
+          , by_option_model = constructor.by_option_model
+          , by_object_option_models = constructor.by_object_option_models
+          , by_option_object_models = constructor.by_option_object_models
+          , object_option_models
+          , option_object_models
+          , object_model_name = options.object_model_name
+          , option_model_name = options.option_model_name
+          ;
+
+        this.options = options;
+
+        // Add to registry of joins
+        if (!by_object_model[object_model_name])
+          by_object_model[object_model_name] = [];
+        by_object_model[object_model_name].push(this);
+
+        if (!by_option_model[option_model_name])
+          by_option_model[option_model_name] = [];
+        by_option_model[option_model_name].push(this);
+
+        if (!by_object_option_models[object_model_name])
+          by_object_option_models[object_model_name] = {};
+        object_option_models = by_object_option_models[object_model_name];
+        if (!object_option_models[option_model_name])
+          object_option_models[option_model_name] = [];
+        object_option_models[option_model_name].push(this);
+
+        if (!by_option_object_models[option_model_name])
+          by_option_object_models[option_model_name] = {};
+        option_object_models = by_option_object_models[option_model_name];
+        if (!option_object_models[object_model_name])
+          option_object_models[object_model_name] = [];
+        option_object_models[object_model_name].push(this);
+      }
+
+    , get_model: function(model_name) {
+        return GGRC.Models[model_name] || CMS.Models[model_name] || null;
+      }
+
+    , get_join_model: function() {
+        if (!this.options.join_model)
+          this.options.join_model = this.get_model(this.options.join_model_name);
+        return this.options.join_model;
+      }
+
+    , make_join_object: function(object, option, join_attrs) {
+        var join_model = this.get_join_model() //this.get_model(this.options.join_model_name)
+          , object_attrs = { id: object.id, type: object.constructor.shortName }
+          , option_attrs = { id: option.id, type: option.constructor.shortName }
+          ;
+
+        join_attrs = $.extend({}, this.options.join_options, join_attrs || {});
+        join_attrs[this.options.join_option_attr] = option_attrs;
+        join_attrs[this.options.join_object_attr] = object_attrs;
+
+        return new join_model(join_attrs);
+      }
+  });
+
+  business_minus_system_object_types = [
+    "DataAsset", "Facility", "Market", "OrgGroup",
+    "Process", "Product", "Project"
+    ];
+
+  business_object_types =
+    business_minus_system_object_types.concat(["System"]);
+
+  business_plus_program_object_types =
+    business_object_types.concat(["Program"]);
+
+  directive_object_types = ["Regulation", "Policy", "Contract"];
+
+  governance_object_types =
+    directive_object_types.concat(["Control", "Section"]);
+
+  all_object_types =
+    governance_object_types.concat(business_plus_program_object_types);
+
+  join_descriptor_arguments = [
+        [business_minus_system_object_types,
+          "Control", "ObjectControl", "control", "controllable"]
+      , [all_object_types,
+          "Document", "ObjectDocument", "document", "documentable"]
+      , [business_plus_program_object_types,
+          "Objective", "ObjectObjective", "objective", "objectiveable"]
+      , ["Objective", business_plus_program_object_types,
+          "ObjectObjective", "objectiveable", "objective"]
+      , [all_object_types,
+          "Person", "ObjectPerson", "person", "personable"]
+      , [business_object_types,
+          "Section", "ObjectSection", "section", "sectionable"]
+      , ["System", "System", "SystemSystem", "child", "parent"]
+      , ["System", "Process", "SystemSystem", "child", "parent"]
+      , ["Process", "System", "SystemSystem", "child", "parent"]
+      , ["Process", "Process", "SystemSystem", "child", "parent"]
+      , ["System", "Control", "SystemControl", "control", "system"]
+      , ["Control", "System", "SystemControl", "system", "control"]
+      , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
+      , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
+      , ["Section", "Objective", "SectionObjective", "objective", "section"]
+      , ["Objective", "Section", "SectionObjective", "section", "objective"]
+      //, ["Risk", "Control", "RiskControl", "control", "risk"]
+      //, ["Control", "Risk", "RiskControl", "risk", "control"]
+      ];
+
+
+  make_join_descriptor_arguments_from_relationships = function(relationship_types) {
+    var relationship_join_descriptor_arguments = [];
+    can.each(relationship_types, function(source_relationship_types, source_model) {
+      can.each(source_relationship_types, function(relationship_type_ids, destination_model) {
+        // For now, just ignore types in relationships
+        /*can.each(relationship_type_ids, function(relationship_type_id) {
+          //console.debug(relationship_type_id);
+          relationship_join_descriptor_arguments.push(
+            [source_model, destination_model, "Relationship", "destination", "source",
+              { relationship_type_id: relationship_type_id }]);
+          // Avoid double-adding symmetric relations
+          if (destination_model !== source_model)
+            relationship_join_descriptor_arguments.push(
+              [destination_model, source_model, "Relationship", "source", "destination",
+                { relationship_type_id: relationship_type_id }]);
+        });*/
+        relationship_join_descriptor_arguments.push(
+          [destination_model, source_model, "Relationship", "source", "destination"]);
+        if (destination_model != source_model)
+          relationship_join_descriptor_arguments.push(
+            [source_model, destination_model, "Relationship", "destination", "source"]);
+      });
+    });
+    return relationship_join_descriptor_arguments;
+  };
+
+  GGRC.JoinDescriptor.from_arguments_list(join_descriptor_arguments);
+  GGRC.JoinDescriptor.from_arguments_list(
+      make_join_descriptor_arguments_from_relationships(RELATIONSHIP_TYPES));
+
+
 $(function() {
 
   $(".recent").ggrc_controllers_recently_viewed();
@@ -155,7 +358,8 @@ $(function() {
     var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
     , page_model = GGRC.infer_object_type(GGRC.page_object)
     , page_instance = GGRC.make_model_instance(GGRC.page_object)
-    , link = page_model.links_to[inst.constructor.model_singular]
+    , join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0]
+    //, link = page_model.links_to[inst.constructor.model_singular]
     , params = {};
 
     if(typeof link === "string") {
@@ -180,7 +384,7 @@ $(function() {
           });
     }
 
-    if(can.isPlainObject(link)) {
+    /*if(can.isPlainObject(link)) {
 
       $("<div id='relationship_type_modal' class='modal hide'>").appendTo(document.body)
         .modal_form({}, ev.target)
@@ -202,12 +406,15 @@ $(function() {
           , content_view : GGRC.mustache_path + "/base_objects/map_related_modal_content.mustache"
         })
         .one("modal:success", triggerFlash);
-    } else {
-      params[page_model.root_object] = { id : page_instance.id };
-      params[inst.constructor.root_object] = { id : inst.id };
-      params.context = page_instance.context || { id : null };
-      new link(params).save().done(triggerFlash);
-    }
+    } else {*/
+      join_object = join_descriptor.make_join_object(
+          page_instance, inst, { context: page_instance.context || { id : null } });
+      join_object.save().done(triggerFlash);
+      //params[page_model.root_object] = { id : page_instance.id };
+      //params[inst.constructor.root_object] = { id : inst.id };
+      //params.context = page_instance.context || { id : null };
+      //new link(params).save().done(triggerFlash);
+    //}
 
   });
 
