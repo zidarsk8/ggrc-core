@@ -103,11 +103,13 @@ class ModelView(View):
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
-      filter, joinlist = querybuilder.collection_filters(request.args)
+      filter, joinlist, options = querybuilder.collection_filters(request.args)
       if filter is not None:
         for j in joinlist:
           query = query.join(j)
         query = query.filter(filter)
+      if options:
+        query = query.options(*options)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       if contexts is not None and len(contexts) > 0:
