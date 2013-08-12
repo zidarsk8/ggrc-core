@@ -41,9 +41,9 @@ can.Model.Cacheable("CMS.Models.Section", {
       model : CMS.Models.Control
       , property : "controls"
       , list_view : "/static/mustache/controls/tree.mustache"
-    }, {
-      model : CMS.Models.Section
-      , property : "children"
+    //}, {
+    //  model : CMS.Models.Section
+    //  , property : "children"
     }]
   }
   , defaults : {
@@ -55,7 +55,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     , slug : ""
     , description : ""
   }
-  , findTree : function(params) {
+  /*, findTree : function(params) {
     function filter_out(original, predicate) {
       var target = [];
       for(var i = original.length - 1; i >= 0; i--) {
@@ -101,10 +101,10 @@ can.Model.Cacheable("CMS.Models.Section", {
           }
           return roots;
         });
-  }
+  }*/
   , init : function() {
     this._super.apply(this, arguments);
-    this.tree_view_options.child_options[3].model = this;
+    //this.tree_view_options.child_options[3].model = this;
     this.validatePresenceOf("title");
     this.bind("created updated", function(ev, inst) {
       can.each(this.attributes, function(v, key) {
@@ -165,14 +165,14 @@ can.Model.Cacheable("CMS.Models.Section", {
         that.removeAttr(name);
     });
 
-    this.attr("descendant_sections", can.compute(function() {
+    /*this.attr("descendant_sections", can.compute(function() {
       return that.attr("children").concat(can.reduce(that.children, function(a, b) {
         return a.concat(can.makeArray(b.descendant_sections()));
       }, []));
     }));
     this.attr("descendant_sections_count", can.compute(function() {
       return that.attr("descendant_sections")().length;
-    }));
+    }));*/
     this.attr("business_objects", new can.Model.List(
       can.map(
         this.object_sections,

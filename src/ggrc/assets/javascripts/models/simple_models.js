@@ -72,7 +72,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   init : function() {
     this._super && this._super.apply(this, arguments);
     var that = this;
-    this.attr("descendant_sections", can.compute(function() {
+    /*this.attr("descendant_sections", can.compute(function() {
       var sections = [].slice.call(that.attr("sections"), 0);
       return can.reduce(that.sections, function(a, b) {
         return a.concat(can.makeArray(b.descendant_sections()));
@@ -80,7 +80,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }));
     this.attr("descendant_sections_count", can.compute(function() {
       return that.attr("descendant_sections")(true).length; //giving it a value to force revalidation
-    }));
+    }));*/
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
   , stub : function() {

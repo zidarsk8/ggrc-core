@@ -350,7 +350,7 @@ $(function() {
       , child_options : [{
         model : CMS.Models.Section
         , parent_find_param : "directive.id"
-        , find_params : { "parent_id__null" : true }
+        //, find_params : { "parent_id__null" : true }
       }]
     });
   });
