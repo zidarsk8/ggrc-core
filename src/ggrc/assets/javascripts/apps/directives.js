@@ -107,18 +107,18 @@ if (!/\/(?:directives|contracts|policies|regulations)\/\d+($|\?|#)/.test(window.
 
 $(function() {
   var spin_opts = { position : "absolute", top : 100, left : 100, height : 50, width : 50};
+  var $controls_tree, uncategorized;
 
-    CMS.Controllers.DirectiveRoutes.Instances = {
-      Control : $(document.body).cms_controllers_directive_routes({}).control(CMS.Controllers.DirectiveRoutes)};
+  CMS.Controllers.DirectiveRoutes.Instances = {
+    Control : $(document.body).cms_controllers_directive_routes({}).control(CMS.Controllers.DirectiveRoutes)};
 
-  var $controls_tree = $("#controls .tree-structure").append(
+  $controls_tree = $("#controls .tree-structure").append(
     $(new Spinner().spin().el).css(spin_opts));
-
   $.when(
     CMS.Models.Category.findTree()
     , CMS.Models.Control.findAll({ directive_id : directive_id })
   ).done(function(cats, ctls) {
-    var uncategorized = cats[cats.length - 1]
+    uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
     // can.each(ctls, function(c) {
@@ -145,6 +145,8 @@ $(function() {
     $controls_tree.parent().ggrc_controllers_list_view({
       model : CMS.Models.Control
       , list: page_model.controls
+      , list_view : "/static/mustache/controls/object_list.mustache"
+      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list_loader : function() {
         return $.when(page_model.controls);
       }
@@ -173,8 +175,24 @@ $(function() {
 
   var $sections_tree = $("#sections .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
 
-  CMS.Models.Section.findTree({ directive_id : directive_id })
+  CMS.Models.Section.findAll({ directive_id : directive_id })
   .done(function(s) {
+
+    CMS.Models.Section.bind("created", function(ev, instance) {
+      if (instance instanceof CMS.Models.Section
+          && instance.directive.id == directive_id)
+        s.push(instance);
+    });
+
+    CMS.Models.Section.bind("destroyed", function(ev, instance) {
+      var index;
+      if (instance instanceof CMS.Models.Section
+          && instance.directive.id == directive_id) {
+        index = s.indexOf(instance);
+        if (index > -1)
+          s.splice(index, 1);
+      }
+    });
 
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.Section
