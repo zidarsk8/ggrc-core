@@ -100,34 +100,34 @@
     <div class="span12">
 
       {{#if model.root_object}}
-      <a href="javascript://" rel="tooltip" data-placement="left" data-toggle="modal-selector" data-modal-selector-options="{{parent_instance.constructor.table_singular}}_{{firstnonempty table_plural model.table_plural 'objects'}}" data-modal-class="modal-wide" xdata-modal-reset="reset" data-original-title="Map {{firstnonempty title_singular model.title_singular 'object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'object'}}" xdata-join-object="lookup-tree" data-join-object-id="{{parent_instance.id}}" data-join-object-type="{{parent_instance.constructor.model_singular}}">
-          + Object
+      <a
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="modal-selector"
+        data-modal-selector-options="{{parent_instance.constructor.table_singular}}_{{firstnonempty table_plural model.table_plural 'objects'}}"
+        data-modal-class="modal-wide"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'object'}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.constructor.model_singular}}">
+        + Object
       </a>
-      <a href="javascript://" class="control-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.constructor.model_singular}}" data-object-plural="{{parent_instance.constructor.table_plural}}" >
+      <a href="javascript://"class="control-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.constructor.model_singular}}" data-object-plural="{{parent_instance.constructor.table_plural}}" >
         <i class="grcicon-add-black"></i>
         Create Object
       </a>
       {{else}}
-
-      <a href="javascript://" rel="tooltip" data-placement="left" data-toggle="multitype-modal-selector" data-join-object-id="{{parent_instance.id}}" data-join-object-type="{{parent_instance.constructor.shortName}}" data-original-title="Map {{firstnonempty title_singular model.title_singular 'object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'object'}}">
+      <a
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="multitype-modal-selector"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'object'}}">
         + Object
       </a>
-
       {{/if}}
-      &nbsp;
-      &nbsp;
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="/directives/{{parent_instance.id}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Import Objects
-        </a>
-        &nbsp;
-        &nbsp;
-        <a href="/directives/{{parent_instance.id}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Export Objects
-        </a>
-      {{/if_match}}
     </div>
   </div>
 </li>

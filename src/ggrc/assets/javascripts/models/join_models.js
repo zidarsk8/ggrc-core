@@ -407,7 +407,7 @@ can.Model.Join("CMS.Models.SectionObjective", {
   }*/
 });
 
-can.Model.Join("GGRC.Models.DirectiveControl", {
+can.Model.Join("CMS.Models.DirectiveControl", {
   join_keys : {
     "directive" : CMS.Models.Directive
     , "control" : CMS.Models.Control
@@ -431,7 +431,7 @@ can.Model.Join("GGRC.Models.DirectiveControl", {
 
 });
 
-can.Model.Join("GGRC.Models.ProgramControl", {
+can.Model.Join("CMS.Models.ProgramControl", {
   root_collection : "program_controls"
   , root_object : "program_control"
   , join_keys : {

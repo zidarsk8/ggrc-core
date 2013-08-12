@@ -101,10 +101,67 @@
       <a href="javascript://" class="section-add">
         + Control
       </a>
-      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections">
-        <i class="grcicon-add-black"></i>
-        Create Control
-      </a>
+      {{#if_equals parent_instance.constructor.shortName "Section"}}
+        <a
+          href="javascript://"
+          class="section-create"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="modal-selector"
+          data-modal-selector-options="section_controls"
+          data-modal-class="modal-wide"
+          data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}">
+          + {{model.title_singular}}
+        </a>
+      {{else}}
+      {{#if_match parent_instance.constructor.shortName '^(System|Process)$'}}
+        <a
+          href="javascript://"
+          class="section-create"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="modal-selector"
+          data-modal-selector-options="system_controls"
+          data-modal-class="modal-wide"
+          data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}">
+          + {{model.title_singular}}
+        </a>
+      {{else}}
+      {{#if_equals parent_instance.constructor.shortName "Program"}}
+        <a
+          href="javascript://"
+          class="section-create"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="modal-selector"
+          data-modal-selector-options="program_controls"
+          data-modal-class="modal-wide"
+          data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}">
+          + {{model.title_singular}}
+        </a>
+      {{else}}
+        <a
+          href="javascript://"
+          class="section-create"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="modal-selector-dispatch"
+          data-modal-class="modal-wide"
+          data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+          data-join-option-type="{{model.shortName}}"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}">
+          + {{model.title_singular}}
+        </a>
+      {{/if_equals}}
+      {{/if_match}}
+      {{/if_equals}}
       &nbsp;
       &nbsp;
       {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}

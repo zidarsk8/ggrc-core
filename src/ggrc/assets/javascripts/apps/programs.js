@@ -255,6 +255,8 @@ $(function() {
     $controls_tree.parent().ggrc_controllers_list_view({
       model : CMS.Models.Control
       , list : combined_ctls
+      , list_view : "/static/mustache/controls/object_list.mustache"
+      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list_loader : function() {
         return $.when(combined_ctls);
       }

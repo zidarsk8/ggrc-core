@@ -12,6 +12,12 @@
 can.Model.Cacheable("CMS.Models.Section", {
   root_object : "section"
   , root_collection : "sections"
+  , model_plural : "Sections"
+  , table_plural : "sections"
+  , title_plural : "Sections"
+  , model_singular : "Section"
+  , title_singular : "Section"
+  , table_singular : "section"
   , category : "governance"
   , root_model : "Section"
   , findAll : "GET /api/sections"

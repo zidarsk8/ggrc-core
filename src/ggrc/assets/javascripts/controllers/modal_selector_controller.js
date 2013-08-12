@@ -282,7 +282,7 @@
 
     match_join: function(option_id, join) {
       return join[this.options.option_id_field] == option_id ||
-        (join[this.options.option_attr] 
+        (join[this.options.option_attr]
          && join[this.options.option_attr].id == option_id)
     },
 
@@ -346,6 +346,58 @@
         option_type_field: null,
         join_id_field: 'documentable_id',
         join_type_field: 'documentable_type',
+
+        join_object: get_page_object(),
+      },
+
+      object_sections: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Section",
+        modal_title: "Select Sections",
+
+        related_model_singular: "Section",
+        related_table_plural: "sections",
+        related_title_singular: "Section",
+        related_title_plural: "Sections",
+
+        option_model: CMS.Models.Section,
+
+        join_model: CMS.Models.ObjectSection,
+        option_attr: 'section',
+        join_attr: 'sectionable',
+        option_id_field: 'section_id',
+        option_type_field: null,
+        join_id_field: 'sectionable_id',
+        join_type_field: 'sectionable_type',
+
+        join_object: get_page_object(),
+      },
+
+      object_objectives: {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Objective",
+        modal_title: "Select Objectives",
+
+        related_model_singular: "Objective",
+        related_table_plural: "objectives",
+        related_title_singular: "Objective",
+        related_title_plural: "Objectives",
+
+        option_model: CMS.Models.Objective,
+
+        join_model: CMS.Models.ObjectObjective,
+        option_attr: 'objective',
+        join_attr: 'objectiveable',
+        option_id_field: 'objective_id',
+        option_type_field: null,
+        join_id_field: 'objectiveable_id',
+        join_type_field: 'objectiveable_type',
 
         join_object: get_page_object(),
       },
@@ -427,6 +479,7 @@
 
         join_object: CMS.Models.System.findInCacheById(data.join_object_id)
       }
+
       , program_directives : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -503,12 +556,73 @@
         join_id_field: 'risk_id',
         join_type_field: null,
 
-        join_object: CMS.Models.Program.findInCacheById(data.join_object_id)
+        join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
+      }
+
+      , section_controls : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Control",
+        modal_title: "Select Controls",
+
+        related_model_singular: "Control",
+        related_table_plural: "controls",
+        related_title_singular: "Control",
+        related_title_plural: "Controls",
+
+        option_model: CMS.Models.Control,
+        join_model: CMS.Models.ControlSection,
+
+        option_attr: 'control',
+        join_attr: 'section',
+        option_id_field: 'control_id',
+        //option_type_field: 'control_type',
+        join_id_field: 'section_id',
+        join_type_field: null,
+
+        join_object_id: data.join_object_id,
+        join_object_type: data.join_object_type
+        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
+      }
+
+      , program_controls : {
+        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
+        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
+        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
+
+        new_object_title: "Control",
+        modal_title: "Select Controls",
+
+        related_model_singular: "Control",
+        related_table_plural: "controls",
+        related_title_singular: "Control",
+        related_title_plural: "Controls",
+
+        option_model: CMS.Models.Control,
+        join_model: CMS.Models.ProgramControl,
+
+        option_attr: 'control',
+        join_attr: 'program',
+        option_id_field: 'control_id',
+        //option_type_field: 'control_type',
+        join_id_field: 'program_id',
+        join_type_field: null,
+
+        join_object_id: data.join_object_id,
+        join_object_type: data.join_object_type
+        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
     };
-    return can.extend(OPTION_SETS[name], {
-      join_query : can.deparam(data.join_query)
-    });
+
+    // If no 'name' provided, return all
+    if (!name)
+      return OPTION_SETS;
+    else
+      return can.extend(OPTION_SETS[name], {
+        join_query : can.deparam(data.join_query)
+      });
   }
 
   function get_relationship_option_set(data) {
@@ -863,17 +977,21 @@
     return descriptors;
   }
 
+  business_object_types = [
+    "DataAsset", "Facility", "Market", "OrgGroup",
+    "Process", "Product", "Project", "System"
+    ];
+
+  business_plus_program_object_types =
+    business_object_types.concat(["Program"]);
+
   var join_descriptors = {
       "Section": {
         object_model: "Section"
       , default_option_descriptor: "DataAsset"
       , option_descriptors: $.extend({},
             make_join_model_modal_option_descriptors(
-              "ObjectSection", "sectionable",
-              [
-                "DataAsset", "Facility", "Market", "OrgGroup",
-                "Process", "Product", "Project", "System"
-              ])
+              "ObjectSection", "sectionable", business_object_types)
           )
       }
 
@@ -882,11 +1000,7 @@
       , default_option_descriptor: "DataAsset"
       , option_descriptors: $.extend({},
             make_join_model_modal_option_descriptors(
-              "ObjectControl", "controllable",
-              [
-                "DataAsset", "Facility", "Market", "OrgGroup",
-                "Process", "Product", "Project", "System"
-              ])
+              "ObjectControl", "controllable", business_object_types)
           )
       }
 
@@ -895,17 +1009,16 @@
       , default_option_descriptor: "DataAsset"
       , option_descriptors: $.extend({},
             make_join_model_modal_option_descriptors(
-              "ObjectObjective", "objectiveable",
-              [
-                "DataAsset", "Facility", "Market", "OrgGroup",
-                "Process", "Product", "Project", "System"
-              ])
+              "ObjectObjective", "objectiveable", business_plus_program_object_types)
           )
       }
     }
 
   function get_multitype_option_set(name, data) {
-    return $.extend({}, join_descriptors[name]);
+    if (!name)
+      return join_descriptors;
+    else
+      return $.extend({}, join_descriptors[name]);
   }
 
   $(function() {
@@ -937,6 +1050,102 @@
       .on("relationshipcreated relationshipdestroyed", function(ev, data) {
         $this.trigger("modal:" + ev.type, data);
       });
+    });
+  });
+
+  $(function() {
+    $('body').on('click', '[data-toggle="modal-selector-dispatch"]', function(e) {
+      var $this = $(this)
+        , options
+        , data_set = can.extend({}, $this.data())
+        , object
+        , option_type
+        , $element
+        ;
+
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
+      object = CMS.Models.get_instance(
+        data_set.join_object_type, data_set.join_object_id);
+
+      object_model_name = data_set.join_object_type;
+      object_model = CMS.Models[object_model_name];
+      option_model_name = data_set.join_option_type;
+      option_model = CMS.Models[option_model_name];
+
+      option_sets = get_option_set(null, data_set);
+      multitype_option_sets = get_multitype_option_set(null, data_set);
+
+      found = false;
+
+      if (option_model_name) {
+        can.each(option_sets, function(options, name) {
+          if (!found
+              && (!options.object_model
+                  || object_model_name == options.object_model.shortName)
+              && (options.option_model
+                  && option_model_name == options.option_model.shortName)) {
+            found = true;
+            options = $.extend({}, options);
+            $element = GGRC.Controllers.ModalSelector.launch($this, options);
+          }
+        });
+      }
+
+      can.each(multitype_option_sets, function(options, model_name) {
+        if (!found) {
+          if (object_model_name == model_name
+              && options.option_descriptors[option_model_name]) {
+            // This one matches
+            found = true;
+            options = $.extend({}, options);
+            options.selected_object = object;
+            $element = GGRC.Controllers.MultitypeModalSelector.launch($this, options);
+          }
+        }
+      });
+
+      if (!found) {
+        // Use the generic Relationship modal
+        options_extras = {
+            related_model_singular: option_model.model_singular //$this.data('related-model-singular')
+          , related_title_singular: option_model.title_singular //$this.data('related-title-singular')
+          , related_title_plural: option_model.title_plural //$this.data('related-title-plural')
+          , related_table_plural: option_model.table_plural //$this.data('related-table-plural')
+          , related_side: "destination" //$this.data('related-side')
+          , related_model: option_model_name //$this.data('related-model')
+          , join_object_id: data_set.join_object_id //$this.data('join-object-id')
+          , join_object_type: data_set.join_object_type //$this.data('join-object-type')
+          , object_side: "source" //$this.data('object-side')
+          , relationship_type: "" //$this.data('relationship-type')
+        }
+      }
+
+      if (!found) {
+        alert("No dialog found for this mapping");
+      }
+
+      /*options = get_multitype_option_set(
+        data_set.join_object_type, data_set);
+
+      options.selected_object = CMS.Models.get_instance(
+          data_set.join_object_type, data_set.join_object_id);*/
+
+      e.preventDefault();
+
+      if ($element)
+        $element.on("relationshipcreated relationshipdestroyed", function(ev, data) {
+          $this.trigger("modal:" + ev.type, data);
+        });
+      // Trigger the controller
+      /*GGRC.Controllers.MultitypeModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });*/
     });
   });
 
