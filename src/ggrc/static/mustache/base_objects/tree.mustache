@@ -117,13 +117,13 @@
       &nbsp;
       &nbsp;
       {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="/directives/{{parent_instance.id}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
+        <a href="{{parent_instance.viewLink}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
           <i class="grcicon-imp-exp"></i>
           Import Objects
         </a>
         &nbsp;
         &nbsp;
-        <a href="/directives/{{parent_instance.id}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
+        <a href="{{parent_instance.viewLink}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
           <i class="grcicon-imp-exp"></i>
           Export Objects
         </a>

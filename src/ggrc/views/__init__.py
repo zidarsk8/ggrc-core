@@ -103,15 +103,23 @@ def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
 
-@app.route("/directives/<directive_id>/import_controls", methods=['GET', 'POST'])
+@app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
+@app.route("/policies/<directive_id>/import_controls", methods=['GET', 'POST'])
+@app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
 def import_controls(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Directive
+  import ggrc.views
+
+  directive = Directive.query.get(directive_id)
+  directive_url =\
+    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
 
   if request.method == 'POST':
     if 'cancel' in request.form:
-      return import_redirect("/directives/{}".format(directive_id))
+      return import_redirect(directive_url)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -129,23 +137,31 @@ def import_controls(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect("/directives/{}".format(directive_id))
+          return import_redirect(directive_url)
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
 
-@app.route("/directives/<directive_id>/import_sections", methods=['GET', 'POST'])
+@app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
+@app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
+@app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Directive
+  import ggrc.views
+
+  directive = Directive.query.get(directive_id)
+  directive_url =\
+    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
 
   if request.method == 'POST':
 
     if 'cancel' in request.form:
-      return import_redirect("/directives/{}".format(directive_id))
+      return import_redirect(directive_url)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -160,7 +176,7 @@ def import_sections(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect("/directives/{}".format(directive_id))
+          return import_redirect(directive_url)
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -203,7 +219,7 @@ def import_redirect(location):
       json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
 
 
-@app.route("/systems/import_processes", methods=['GET', 'POST'])
+@app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
   from werkzeug import secure_filename
   from ggrc.converters.systems import SystemsConverter
@@ -230,62 +246,60 @@ def import_processes():
 
   return render_template("systems/import.haml", import_kind = 'Processes')
 
-@app.route("/systems/export_processes", methods=['GET', 'POST'])
+@app.route("/processes/export", methods=['GET'])
 def export_processes():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import System, Process
-  if request.method == 'GET':
-    options = {}
-    options['export'] = True
-    options['is_biz_process'] = '1'
-    procs = Process.query.all()
-    filename = "PROCESSES.csv"
-    return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
-  return redirect('/admin')
+  from ggrc.models.all_models import Process
 
-@app.route("/systems/export", methods=['GET', 'POST'])
+  options = {}
+  options['export'] = True
+  options['is_biz_process'] = '1'
+  procs = Process.query.all()
+  filename = "PROCESSES.csv"
+  return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
+
+@app.route("/systems/export", methods=['GET'])
 def export_systems():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import System
-  if request.method == 'GET':
-    options = {}
-    options['export'] = True
-    systems = System.query.filter_by(is_biz_process=False).all()
-    filename = "SYSTEMS.csv"
-    return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
-  return redirect('/admin')
 
-@app.route("/directives/<directive_id>/export_sections", methods=['GET', 'POST'])
+  options = {}
+  options['export'] = True
+  systems = System.query.filter_by(is_biz_process=False).all()
+  filename = "SYSTEMS.csv"
+  return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
+
+@app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
+@app.route("/policies/<directive_id>/export_sections", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
 def export_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Directive
 
-  if request.method == 'GET':
-    options = {}
-    directive = Directive.query.filter_by(id=int(directive_id)).first()
-    options['directive'] = directive
-    options['export'] = True
-    filename = "{}.csv".format(directive.slug)
-    return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
-  return redirect('directives/{}'.format(directive_id))
+  options = {}
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options['directive'] = directive
+  options['export'] = True
+  filename = "{}.csv".format(directive.slug)
+  return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
-@app.route("/directives/<directive_id>/export_controls", methods=['GET', 'POST'])
+@app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
+@app.route("/policies/<directive_id>/export_sections", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
 def export_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Directive
 
-  if request.method == 'GET':
-    options = {}
-    directive = Directive.query.filter_by(id=int(directive_id)).first()
-    options['directive'] = directive
-    options['export'] = True
-    filename = "{}-controls.csv".format(directive.slug)
-    return handle_converter_csv_export(filename, directive.controls, ControlsConverter, **options)
-  return redirect('directives/{}'.format(directive_id))
+  options = {}
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options['directive'] = directive
+  options['export'] = True
+  filename = "{}-controls.csv".format(directive.slug)
+  return handle_converter_csv_export(filename, directive.controls, ControlsConverter, **options)
 
 def _all_views(view_list):
   import ggrc.services
