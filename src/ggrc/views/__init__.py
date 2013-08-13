@@ -286,9 +286,9 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
-@app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
-@app.route("/policies/<directive_id>/export_sections", methods=['GET'])
-@app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
+@app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
+@app.route("/policies/<directive_id>/export_controls", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
 def export_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
