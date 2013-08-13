@@ -12,7 +12,11 @@ can.Model("GGRC.Models.Search", {
     return this.findOne($.extend({q : str}, params));
   }
   , search_for_types : function(str, types, params) {
-    return this.findOne($.extend({q : str, types : types.join(",") }, params));
+    if (!str || str.trim().length == 0)
+      // Empty search, so actually hit normal endpoints instead of search
+      return this.load_via_model_endpoints(types);
+    else
+      return this.findOne($.extend({q : str, types : types.join(",") }, params));
   }
   , counts : function(str, params) {
     return this.findOne($.extend({q : str, counts_only : true}, params));
@@ -21,6 +25,26 @@ can.Model("GGRC.Models.Search", {
     return this.findOne(
       $.extend({q: str, types: types.join(","), counts_only: true }, params));
   }
+  , load_via_model_endpoints: function(types) {
+    var dfds;
+
+    dfds = can.map(types, function(model_name) {
+      return CMS.Models[model_name].findAll();
+    });
+
+    return $.when.apply($, dfds).then(function() {
+      var model_results = can.makeArray(arguments)
+        , search_response = { entries: {}, selfLink: "Fake" }
+        ;
+      // Mock the search resource format
+      can.each(types, function(model_name, index) {
+        search_response.entries[model_name] = model_results[index];
+      });
+
+      return new GGRC.Models.Search(search_response);
+    });
+    }
+
   , init : function() {
     this._super && this._super.apply(this, arguments);
     var _findOne = this.findOne;
@@ -62,7 +86,7 @@ can.Model("GGRC.Models.Search", {
       var model = CMS.Models[model_name]
         , entries;
 
-      if (this.entries instanceof Array)
+      if (!(this.entries instanceof Array || this.entries instanceof can.Observe.List))
         entries = this.entries[model_name] || [];
       else
         entries = can.map(this.entries, function(v) {
@@ -71,7 +95,7 @@ can.Model("GGRC.Models.Search", {
         });
 
       return can.map(entries, function(stub) {
-        return new model({ id: stub.id });
+        return CMS.Models.get_instance(model.shortName, stub.id);
       });
   }
 
