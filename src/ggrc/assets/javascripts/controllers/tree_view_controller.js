@@ -97,8 +97,11 @@ can.Control("CMS.Controllers.TreeView", {
         find_function = this.options.find_function;
       else
         find_function = this.options.single_object ? "findOne" : "findAll";
-      this.find_all_deferred = this.options.model[find_function](
-          this.options.find_params.serialize());
+      this.find_all_deferred =
+        this.options.model[find_function](this.options.find_params.serialize());
+      if (this.options.fetch_post_process)
+        this.find_all_deferred =
+          this.find_all_deferred.then(this.options.fetch_post_process);
     }
 
     this.find_all_deferred.done(this.proxy("draw_list"));

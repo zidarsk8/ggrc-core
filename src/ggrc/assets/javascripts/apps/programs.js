@@ -299,45 +299,41 @@ $(function() {
       });
     });
 
-  var directives_by_type = {
-    regulation : []
-    , contract : []
-    , policy : []
-  };
-
   var models_by_kind = {
-    regulation : CMS.Models.Regulation
-    , contract : CMS.Models.Contract
-    , policy : CMS.Models.Policy
+      regulations : CMS.Models.Regulation
+    , contracts : CMS.Models.Contract
+    , policies : CMS.Models.Policy
   };
 
-  var directive_dfds = [];
-
-  can.each(directives_by_type, function(v, k) {
-    var query_params = { "program_directives.program_id" : program_id };
-    directive_dfds.push(models_by_kind[k].findAll(query_params)
-    .done(function(directives) {
-      directives_by_type[k] = directives;
-    }));
+  can.each(models_by_kind, function(model, table_plural) {
+    model
+      .findAll({ "program_directives.program_id": program_id })
+      .done(function(directives) {
+        init_directive_tree(table_plural, model, directives);
+      });
   });
 
-  var $sections_tree = $("#directives .tree-structure").append($(new Spinner().spin().el).css(spin_opts));
-  $.when.apply(
-    $
-    , directive_dfds
-  ).done(function(r, p, c) {
-    var d = new can.Observe.List(r.concat(p).concat(c));
+  function sort_sections(sections) {
+    return can.makeArray(sections).sort(window.natural_comparator);
+  }
+
+  function init_directive_tree(table_plural, model, directives) {
+    var $sections_tree = $("#" + table_plural + " .tree-structure")
+          .append($(new Spinner().spin().el).css(spin_opts))
+      , d = new can.Observe.List(directives);
 
     CMS.Models.ProgramDirective.bind("created", function(ev, instance) {
       if (instance instanceof CMS.Models.ProgramDirective
-          && instance.program.id == program_id)
+          && instance.program.id == program_id
+          && instance.directive instanceof model)
         d.push(instance.directive);
     });
 
     CMS.Models.ProgramDirective.bind("destroyed", function(ev, instance) {
       var index;
       if (instance instanceof CMS.Models.ProgramDirective
-          && instance.program.id == program_id) {
+          && instance.program.id == program_id
+          && instance.directive instanceof model) {
         index = d.indexOf(instance.directive);
         if (index > -1)
           d.splice(index, 1);
@@ -345,17 +341,18 @@ $(function() {
     });
 
     $sections_tree.cms_controllers_tree_view({
-      model : CMS.Models.Directive
+        model : model
       , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list : d
       , list_view : "/static/mustache/directives/tree.mustache"
       , child_options : [{
         model : CMS.Models.Section
         , parent_find_param : "directive.id"
+        , fetch_post_process : sort_sections
         //, find_params : { "parent_id__null" : true }
       }]
     });
-  });
+  };
 
   $(document.body).on("modal:success", "a[href^='/controls/new']", function(ev, data) {
     var c = new CMS.Models.Control(data);
