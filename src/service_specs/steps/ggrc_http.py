@@ -168,7 +168,10 @@ def define_current_user(context, user_json):
     # logout current user
     response = requests.get(
         context.base_url+'/logout',
-        headers={'Accept': 'text/html'},
+        headers={
+          'Accept': 'text/html',
+          'X-Requested-By': 'Reciprocity Behave Tests',
+          },
         cookies=getattr(context, 'cookies', {})
         )
     assert response.status_code == 200, 'Failed to logout!!'
@@ -259,6 +262,7 @@ def delete_resource(context, url, resource):
       'Content-Type': 'application/json',
       'If-Match': resource.response.headers['Etag'],
       'If-Unmodified-Since': resource.response.headers['Last-Modified'],
+      'X-Requested-By': 'Reciprocity Behave Tests',
       }
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json

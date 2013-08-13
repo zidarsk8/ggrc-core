@@ -200,6 +200,7 @@ jQuery.extend(GGRC, {
 var etags = {};
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   var data;
+  jqXHR.setRequestHeader("X-Requested-By", "gGRC");
   if ( /^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
     data = originalOptions.data;
     options.dataType = "json";

@@ -55,7 +55,10 @@ def handle_get_resource_and_name_it(context, url, name):
   setattr(context, name, response.json())
 
 def get_resource(context, url):
-  headers={'Accept': 'application/json',}
+  headers={
+      'Accept': 'application/json',
+      'X-Requested-By': 'Reciprocity Behave Tests',
+      }
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
   response = requests.get(
@@ -71,6 +74,7 @@ def put_resource(context, url, resource):
       'Content-Type': 'application/json',
       'If-Match': resource.response.headers['Etag'],
       'If-Unmodified-Since': resource.response.headers['Last-Modified'],
+      'X-Requested-By': 'Reciprocity Behave Tests',
       }
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
@@ -117,7 +121,10 @@ def handle_post_named_example(context, name, expected_status=201):
 def post_to_endpoint(context, endpoint, data, url=None):
   if url is None:
     url = get_service_endpoint_url(context, endpoint)
-  headers = {'Content-Type': 'application/json',}
+  headers = {
+      'Content-Type': 'application/json',
+      'X-Requested-By': 'Reciprocity Behave Tests',
+      }
   response = requests.post(
       context.base_url+url,
       data=data,
@@ -127,7 +134,10 @@ def post_to_endpoint(context, endpoint, data, url=None):
       )
   if response.status_code == 302:
     # deal with login redirect, expect noop
-    headers={'Accept': 'text/html',}
+    headers={
+        'Accept': 'text/html',
+        'X-Requested-By': 'Reciprocity Behave Tests',
+        }
     if hasattr(context, 'current_user_json'):
       headers['X-ggrc-user'] = context.current_user_json
     response = requests.get(
@@ -141,6 +151,7 @@ def post_to_endpoint(context, endpoint, data, url=None):
         data=data,
         headers={
           'Content-Type': 'application/json',
+          'X-Requested-By': 'Reciprocity Behave Tests',
           },
         cookies=context.cookies,
         )
