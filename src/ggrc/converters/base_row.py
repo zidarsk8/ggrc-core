@@ -539,10 +539,8 @@ class LinkDocumentsHandler(LinksHandler):
   model_class = Document
 
   def is_valid_url(self, url_string):
-    from urlparse import urlparse
-    pieces = urlparse(url_string)
-    valid_schemes = ['http', 'https']
-    return (all([pieces.scheme, pieces.netloc]) and pieces.scheme in valid_schemes)
+    # TODO: Apply url validation later when a good method is found
+    return True
 
   def parse_item(self, value):
     data = {}
