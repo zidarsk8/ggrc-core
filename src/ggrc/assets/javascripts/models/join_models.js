@@ -444,4 +444,38 @@ can.Model.Join("CMS.Models.ProgramControl", {
 
 });
 
+can.Model.Join("CMS.Models.ObjectPerson", {
+  root_object : "object_person"
+  , root_collection : "object_people"
+  , findAll: "GET /api/object_people?__include=person"
+  , create : "POST /api/object_people"
+  , update : "PUT /api/object_people/{id}"
+  , destroy : "DELETE /api/object_people/{id}"
+  , join_keys : {
+    personable : can.Model.Cacheable
+    , person : CMS.Models.Person
+  }
+  , attributes : {
+    person : "CMS.Models.Person.model"
+    , personable : "CMS.Models.get_instance"
+  }
+
+}, {});
+
+can.Model.Join("CMS.Models.ObjectDocument", {
+  root_object : "object_document"
+  , root_collection : "object_documents"
+  , findAll: "GET /api/object_documents?__include=document"
+  , create: "POST /api/object_documents"
+  , destroy : "DELETE /api/object_documents/{id}"
+  , join_keys : {
+    documentable : can.Model.Cacheable
+    , document : CMS.Models.Document
+  }
+  , attributes : {
+    document : "CMS.Models.Document.model"
+    , documentable : "CMS.Models.get_instance"
+  }
+}, {});
+
 })(this.can, this.can.$);
