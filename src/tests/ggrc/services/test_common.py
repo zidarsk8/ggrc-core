@@ -118,12 +118,22 @@ class TestResource(TestCase):
     self.assertIn('Allow', response.headers)
     self.assertItemsEqual(allowed, response.headers['Allow'].split(', '))
 
-  def test_empty_collection_get(self):
+  def headers(self, *args, **kwargs):
+    ret = list(args)
+    ret.append(('X-Requested-By', 'Unit Tests'))
+    ret.extend([(k,v) for k,v in kwargs.items()])
+    return ret
+
+  def test_X_Requested_By_required(self):
     response = self.client.get(self.mock_url())
+    self.assert400(response)
+
+  def test_empty_collection_get(self):
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
 
   def test_missing_resource_get(self):
-    response = self.client.get(self.mock_url('foo'))
+    response = self.client.get(self.mock_url('foo'), headers=self.headers())
     self.assert404(response)
 
   def test_collection_get(self):
@@ -133,7 +143,7 @@ class TestResource(TestCase):
         modified_by_id=42, created_at=date1, updated_at=date1)
     mock2 = self.mock_model(
         modified_by_id=43, created_at=date2, updated_at=date2)
-    response = self.client.get(self.mock_url())
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(
         response,
@@ -153,7 +163,7 @@ class TestResource(TestCase):
     date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
     mock1 = self.mock_model(
         modified_by_id=42, created_at=date1, updated_at=date1)
-    response = self.client.get(self.mock_url(mock1.id))
+    response = self.client.get(self.mock_url(mock1.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(
       response,
@@ -164,11 +174,14 @@ class TestResource(TestCase):
     self.assertDictEqual(self.mock_json(mock1), response.json['services_test_mock_model'])
 
   def test_collection_put(self):
-    self.assertAllow(self.client.put(URL_MOCK_COLLECTION), COLLECTION_ALLOWED)
+    self.assertAllow(
+        self.client.put(URL_MOCK_COLLECTION, headers=self.headers()),
+        COLLECTION_ALLOWED)
 
   def test_collection_delete(self):
     self.assertAllow(
-        self.client.delete(URL_MOCK_COLLECTION), COLLECTION_ALLOWED)
+        self.client.delete(URL_MOCK_COLLECTION, headers=self.headers()),
+        COLLECTION_ALLOWED)
 
   def test_collection_post_successful(self):
     data = json.dumps(
@@ -177,10 +190,12 @@ class TestResource(TestCase):
         URL_MOCK_COLLECTION, 
         content_type='application/json',
         data=data,
+        headers=self.headers(),
         )
     self.assertStatus(response, 201)
     self.assertIn('Location', response.headers)
-    response = self.client.get(self.get_location(response))
+    response = self.client.get(
+        self.get_location(response), headers=self.headers())
     self.assert200(response)
     self.assertIn('Content-Type', response.headers)
     self.assertEqual('application/json', response.headers['Content-Type'])
@@ -188,7 +203,7 @@ class TestResource(TestCase):
     self.assertIn('foo', response.json['services_test_mock_model'])
     self.assertEqual('bar', response.json['services_test_mock_model']['foo'])
     # check the collection, too
-    response = self.client.get(URL_MOCK_COLLECTION)
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
     self.assert200(response)
     self.assertEqual(
         1, len(response.json['test_model_collection']['test_model']))
@@ -200,6 +215,7 @@ class TestResource(TestCase):
         URL_MOCK_COLLECTION,
         content_type='application/json',
         data='This is most definitely not valid content.',
+        headers=self.headers(),
         )
     self.assert400(response)
 
@@ -208,12 +224,13 @@ class TestResource(TestCase):
         URL_MOCK_COLLECTION,
         content_type='text/plain',
         data="Doesn't matter, now does it?",
+        headers=self.headers(),
         )
     self.assertStatus(response, 415)
 
   def test_put_successful(self):
     mock = self.mock_model(foo='buzz')
-    response = self.client.get(self.mock_url(mock.id))
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(response)
     obj = response.json
@@ -228,14 +245,14 @@ class TestResource(TestCase):
     response = self.client.put(
         url,
         data=json.dumps(obj),
-        headers=[
+        headers=self.headers(
           ('If-Unmodified-Since', original_headers['Last-Modified']),
           ('If-Match', original_headers['Etag']),
-          ],
+          ),
         content_type='application/json',
         )
     self.assert200(response)
-    response = self.client.get(url)
+    response = self.client.get(url, headers=self.headers())
     self.assert200(response)
     self.assertNotEqual(
         original_headers['Last-Modified'], response.headers['Last-Modified'])
@@ -245,7 +262,7 @@ class TestResource(TestCase):
 
   def test_put_bad_request(self):
     mock = self.mock_model(foo='tough')
-    response = self.client.get(self.mock_url(mock.id))
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(response)
     url = urlparse(response.json['services_test_mock_model']['selfLink']).path
@@ -253,16 +270,16 @@ class TestResource(TestCase):
         url,
         content_type='application/json',
         data='This is most definitely not valid content.',
-        headers=[
+        headers=self.headers(
           ('If-Unmodified-Since', response.headers['Last-Modified']),
           ('If-Match', response.headers['Etag']),
-          ],
+          ),
         )
     self.assert400(response)
 
   def test_put_and_delete_conflict(self):
     mock = self.mock_model(foo='mudder')
-    response = self.client.get(self.mock_url(mock.id))
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(response)
     obj = response.json
@@ -277,26 +294,26 @@ class TestResource(TestCase):
     response = self.client.put(
         url,
         data=json.dumps(obj),
-        headers=[
+        headers=self.headers(
           ('If-Unmodified-Since', original_headers['Last-Modified']),
           ('If-Match', original_headers['Etag']),
-          ],
+          ),
         content_type='application/json',
         )
     self.assertStatus(response, 409)
     response = self.client.delete(
         url,
-        headers=[
+        headers=self.headers(
           ('If-Unmodified-Since', original_headers['Last-Modified']),
           ('If-Match', original_headers['Etag']),
-          ],
+          ),
         content_type='application/json',
         )
     self.assertStatus(response, 409)
 
   def test_put_and_delete_missing_precondition(self):
     mock = self.mock_model(foo='tricky')
-    response = self.client.get(self.mock_url(mock.id))
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     obj = response.json
     obj['services_test_mock_model']['foo'] = 'strings'
@@ -305,42 +322,45 @@ class TestResource(TestCase):
         url,
         data=json.dumps(obj),
         content_type='application/json',
+        headers=self.headers(),
         )
     self.assertStatus(response, 428)
-    response = self.client.delete(url)
+    response = self.client.delete(url, headers=self.headers())
     self.assertStatus(response, 428)
 
   def test_delete_successful(self):
     mock = self.mock_model(foo='delete me')
-    response = self.client.get(self.mock_url(mock.id))
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     url = urlparse(response.json['services_test_mock_model']['selfLink']).path
     response = self.client.delete(
         url,
-        headers=[
+        headers=self.headers(
           ('If-Unmodified-Since', response.headers['Last-Modified']),
           ('If-Match', response.headers['Etag']),
-          ],
+          ),
         )
     self.assert200(response)
-    response = self.client.get(url)
+    response = self.client.get(url, headers=self.headers())
     #410 would be nice! But, requires a tombstone.
     self.assert404(response)
 
   def test_options(self):
     mock = self.mock_model()
-    response = self.client.open(self.mock_url(mock.id), method='OPTIONS')
+    response = self.client.open(
+        self.mock_url(mock.id), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, RESOURCE_ALLOWED)
 
   def test_collection_options(self):
-    response = self.client.open(self.mock_url(), method='OPTIONS')
+    response = self.client.open(
+        self.mock_url(), method='OPTIONS', headers=self.headers())
     self.assertOptions(response, COLLECTION_ALLOWED)
   
   def test_get_bad_accept(self):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=[('Accept', 'text/plain')],
+        headers=self.headers(('Accept', 'text/plain')),
         )
     self.assertStatus(response, 406)
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
@@ -349,7 +369,7 @@ class TestResource(TestCase):
   def test_collection_get_bad_accept(self):
     response = self.client.get(
         URL_MOCK_COLLECTION,
-        headers=[('Accept', 'text/plain')],
+        headers=self.headers(('Accept', 'text/plain')),
         )
     self.assertStatus(response, 406)
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
@@ -359,16 +379,16 @@ class TestResource(TestCase):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=[('Accept', 'application/json')],
+        headers=self.headers(('Accept', 'application/json')),
         )
     self.assert200(response)
     previous_headers = dict(response.headers)
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=[
+        headers=self.headers(
           ('Accept', 'application/json'),
           ('If-None-Match', previous_headers['Etag']),
-          ]
+          ),
         )
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)
@@ -377,16 +397,16 @@ class TestResource(TestCase):
     self.mock_model(foo='baz')
     response = self.client.get(
         URL_MOCK_COLLECTION,
-        headers=[('Accept', 'application/json')],
+        headers=self.headers(('Accept', 'application/json')),
         )
     self.assert200(response)
     previous_headers = dict(response.headers)
     response = self.client.get(
         URL_MOCK_COLLECTION,
-        headers=[
+        headers=self.headers(
           ('Accept', 'application/json'),
           ('If-None-Match', previous_headers['Etag']),
-          ]
+          ),
         )
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)

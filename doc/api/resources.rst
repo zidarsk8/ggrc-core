@@ -65,6 +65,16 @@ All GGRC base resources provide the following set of common properties.
      - string
      - *OPTIONAL* URL of the HTML view for the resource.
 
+HTTP
+====
+
+Headers
+-------
+
+The custom header *X-Requested-By* is required on all HTTP requests to prevent
+a kind of CSRF attack vulnerability. The value of this header should be a
+string identifying the requesting client application.
+
 All GGRC Resource Types
 =======================
 
