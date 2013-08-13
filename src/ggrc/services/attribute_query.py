@@ -7,10 +7,12 @@ import datetime
 import iso8601
 from collections import namedtuple
 from sqlalchemy import and_, cast
+from sqlalchemy.ext.associationproxy import AssociationProxy
+from sqlalchemy.orm import joinedload_all
 from sqlalchemy.types import AbstractType, Boolean, Date, DateTime
 from werkzeug.exceptions import BadRequest
 
-AttributeQuery = namedtuple('AttributeQuery', 'filter joinlist')
+AttributeQuery = namedtuple('AttributeQuery', 'filter joinlist options')
 
 class AttributeQueryBuilder(object):
   def __init__(self, model):
@@ -63,6 +65,7 @@ class AttributeQueryBuilder(object):
   def process_property_path(self, arg, value):
     joinlist = []
     filters = []
+    options = []
     if arg.endswith('__in'):
       clean_arg = arg[0:-4]
     elif arg.endswith('__null'):
@@ -79,6 +82,8 @@ class AttributeQueryBuilder(object):
           joinlist.append(attr)
         attr = self.get_attr_for_model(segment, current_model)
       self.check_valid_property(attr, segment)
+    elif clean_arg == '__include':
+      pass
     else:
       attr = self.get_attr_for_model(clean_arg, self.model)
       self.check_valid_property(attr, clean_arg)
@@ -88,20 +93,48 @@ class AttributeQueryBuilder(object):
       filters.append(attr.in_(value))
     elif arg.endswith('__null'):
       filters.append(attr == None)
+    elif clean_arg == '__include':
+      options.extend(self.process_eager_loading(value))
     else:
       value = self.coerce_value_for_query_param(attr, arg, value)
       filters.append(attr == cast(value, attr.type))
-    return joinlist, filters
+    return joinlist, filters, options
+
+  def resolve_path_segment(self, segment, model):
+    attr = self.get_attr_for_model(segment, model)
+    if isinstance(attr, AssociationProxy):
+      segment = '.'.join([attr.local_attr.key, attr.remote_attr.key])
+      model = attr.remote_attr.property.mapper.class_
+    else:
+      model = attr.property.mapper.class_
+    return segment, model
+
+  def process_eager_loading(self, value):
+    paths = value.split(',')
+    options = []
+    for path in paths:
+      segments = path.split('.')
+      real_segments = []
+      current_model = self.model
+      for segment in segments:
+        real_segment, current_model = self.resolve_path_segment(
+            segment, current_model)
+        real_segments.append(real_segment)
+      realized_path = '.'.join(real_segments)
+      options.append(joinedload_all(realized_path))
+    return options
 
   def collection_filters(self, args):
     """Create filter expressions using ``request.args``"""
     filter = None
     joinlist = []
     filter_expressions = []
+    optionlist = []
     for arg, value in args.items():
       try:
-        joins, filters = self.process_property_path(arg, value)
+        joins, filters, options = self.process_property_path(arg, value)
         joinlist.extend(joins)
+        optionlist.extend(options)
         filter_expressions.extend(filters)
       except BadRequest:
         # FIXME: raise BadRequest when client-side is ready for it
@@ -112,4 +145,4 @@ class AttributeQueryBuilder(object):
       filter = filter_expressions[0]
       for f in filter_expressions[1:]:
         filter = and_(filter, f)
-    return AttributeQuery(filter, joinlist)
+    return AttributeQuery(filter, joinlist, optionlist)
