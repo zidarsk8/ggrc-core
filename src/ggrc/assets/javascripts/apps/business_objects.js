@@ -15,10 +15,44 @@ $(function() {
 
   var object_class = GGRC.infer_object_type(GGRC.page_object);
   var object = GGRC.make_model_instance(GGRC.page_object);
+  var queue = new RefreshQueue();
 
-  can.view(GGRC.mustache_path + "/people/list.mustache", {list : GGRC.page_object.people}, function(frag) {
-    $("#people_widget").find("section.content").html(frag);
+  can.each(object.object_people, can.proxy(queue, "enqueue"));
+  can.each(object.object_documents, can.proxy(queue, "enqueue"));
+  queue.trigger();
+
+  // var c = $('.cms_controllers_page_object').control(CMS.Controllers.PageObject);
+  // if (c) {
+  //   c.add_dashboard_widget_from_name("person");
+  //   c.add_dashboard_widget_from_name("document");
+  // }
+
+  $("#people_widget").find("section.content").ggrc_controllers_list_view({
+    model : CMS.Models.ObjectPerson
+    , list : object.object_people
+    , list_view : GGRC.mustache_path + "/people/list.mustache"
+    , parent_instance : object
+    , list_loader : function() {
+      return $.when(object.object_people);
+    }
   });
+  object.object_people.bind("add remove", function() {
+    $("#people_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
+  });
+
+  $("#documents_widget").find("section.content").ggrc_controllers_list_view({
+    model : CMS.Models.ObjectDocument
+    , list : object.object_documents
+    , list_view : GGRC.mustache_path + "/documents/list.mustache"
+    , parent_instance : object
+    , list_loader : function() {
+      return $.when(object.object_documents);
+    }
+  });
+  object.object_documents.bind("add remove", function() {
+    $("#documents_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
+  });
+
 
   if(!~can.inArray(
     object_class

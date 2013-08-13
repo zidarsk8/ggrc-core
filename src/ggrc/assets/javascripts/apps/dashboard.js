@@ -164,6 +164,20 @@ var model_descriptors = {
     , object_route : "sections"
     , object_category : "governance"
   }
+  /*
+  , "person" : {
+    model : CMS.Models.Person
+    , object_type : "person"
+    , object_route : "people"
+    , object_category : "programs"
+  }
+  , "document" : {
+    model : CMS.Models.Document
+    , object_type : "document"
+    , object_route : "documents"
+    , object_category : "programs"
+  }
+  */
 };
 
 dashboard_menu_spec = [

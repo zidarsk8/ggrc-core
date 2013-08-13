@@ -34,6 +34,10 @@ can.Model.Cacheable("CMS.Models.Person", {
             }
         });
     }
+    , defaults : {
+      name : ""
+      , email : ""
+    }
 }, {
     init : function () {
         this._super && this._super();
@@ -54,39 +58,6 @@ can.Model.Cacheable("CMS.Models.Person", {
   , display_name : function() {
     return this.email;
   }
-});
-
-
-can.Model.Cacheable("CMS.Models.ObjectPerson", {
-    root_object : "object_person"
-    , root_collection : "object_people"
-    , findAll: "GET /api/object_people"
-    , create : "POST /api/object_people"
-    , update : "PUT /api/object_people/{id}"
-    , destroy : "DELETE /api/object_people/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("person", CMS.Models.get_instance(
-                  "Person", this.person_id || (this.person && this.person.id)));
-            this.attr("personable", CMS.Models.get_instance(
-                  this.personable_type || (this.personable && this.personable.type),
-                  this.personable_id || (this.personable && this.personable.id)));
-
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
 });
 
 })(this, can);

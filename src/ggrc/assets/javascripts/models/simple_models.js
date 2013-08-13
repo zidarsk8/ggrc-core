@@ -52,6 +52,10 @@ can.Model.Cacheable("CMS.Models.Directive", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -108,6 +112,10 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -138,6 +146,10 @@ CMS.Models.Directive("CMS.Models.Policy", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -168,6 +180,10 @@ CMS.Models.Directive("CMS.Models.Contract", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -664,6 +680,8 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
   }
   , defaults : {
     object_objectives : []
