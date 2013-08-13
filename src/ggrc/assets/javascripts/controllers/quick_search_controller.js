@@ -490,10 +490,22 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
       }
     }
 
+  , get_tooltip_view: function(el) {
+      var tooltip_view = $(el)
+            .closest('[data-tooltip-view]').attr('data-tooltip-view');
+      if (tooltip_view && tooltip_view.length > 0)
+        return GGRC.mustache_path + tooltip_view;
+      else
+        return this.options.tooltip_view;
+    }
+
   , on_fade_in_timeout: function(el, instance) {
-      var self = this;
+      var self = this
+        , tooltip_view = this.get_tooltip_view(el)
+        ;
+
       this.fade_in_timeout = null;
-      can.view(this.options.tooltip_view, instance, function(frag) {
+      can.view(tooltip_view, instance, function(frag) {
         self.options.$extended
           .html(frag)
           .addClass('in')

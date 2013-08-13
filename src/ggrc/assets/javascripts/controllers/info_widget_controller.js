@@ -29,10 +29,19 @@ can.Control("GGRC.Controllers.InfoWidget", {
         model : this.options.model
       , instance : this.options.instance
       });
-    can.view(this.options.widget_view, this.options.context, function(frag) {
+    can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       $content.html(frag);
     });
   }
+
+  , get_widget_view: function(el) {
+      var widget_view = $(el)
+            .closest('[data-widget-view]').attr('data-widget-view');
+      if (widget_view && widget_view.length > 0)
+        return GGRC.mustache_path + widget_view;
+      else
+        return this.options.widget_view;
+    }
 
 });
 

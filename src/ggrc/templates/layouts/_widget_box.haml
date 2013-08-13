@@ -14,13 +14,13 @@
 
 -set widget_help = (self.widget_help()|trim if self.widget_help is defined else None)
 
--set widget_view_mustache = widget_view_mustache|default('')
+-set widget_view = (self.widget_view()|trim if self.widget_view is defined else '')
 
 -#FIXME: prevent risk view if not allowed
   -if widget_class != 'risk' || current_user.can_manage_risk?
 
 -block widget
-  %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}', 'data-widget-view': '{{ widget_view_mustache }}' }
+  %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}', 'data-widget-view': '{{ widget_view }}' }
     %header.header
       .row-fluid
         .span8

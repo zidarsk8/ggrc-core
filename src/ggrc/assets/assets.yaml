@@ -105,6 +105,8 @@ dashboard-js-template-files:
   - modals/modal_header.mustache
   - modals/save_cancel_buttons.mustache
   - objectives/list_popover.mustache
+  - programs/extended_info.mustache
+  - programs/info.mustache
   - sections/tree.mustache
 
 dashboard-css-files:
