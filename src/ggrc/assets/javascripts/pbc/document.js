@@ -13,6 +13,8 @@
 can.Model.Cacheable("CMS.Models.Document", {
     root_object : "document"
     , root_collection : "documents"
+    , title_singular : "Reference"
+    , title_plural : "References"
     , findAll : "GET /api/documents"
     , create : "POST /api/documents"
     , update : "PUT /api/documents/{id}"

@@ -329,13 +329,13 @@
         active_column_view: GGRC.mustache_path + "/documents/active_column.mustache",
         option_detail_view: GGRC.mustache_path + "/documents/option_detail.mustache",
 
-        new_object_title: "Document",
+        new_object_title: "Reference",
         modal_title: "Select References",
 
         related_model_singular: "Document",
         related_table_plural: "documents",
-        related_title_singular: "Document",
-        related_title_plural: "Documents",
+        related_title_singular: "Reference",
+        related_title_plural: "References",
 
         option_model: CMS.Models.Document,
 
