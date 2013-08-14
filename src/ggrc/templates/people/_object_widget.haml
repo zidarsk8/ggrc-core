@@ -3,7 +3,7 @@
 -block widget_title
   %i.grcicon-user-black
   Mapped People
-  %span
+  %span.item-count
     (={ instance.object_people|length })
 
 -#if not model
@@ -18,4 +18,4 @@
   -#=model._inflector.model_singular + "_people_widget"
 
 -block main
-  -include 'people/_object_list.haml'
+  -#include 'people/_object_list.haml'
