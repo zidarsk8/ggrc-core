@@ -6,7 +6,6 @@
           <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
-                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
@@ -107,21 +106,18 @@
 
       {{#if_match model.shortName '^(Directive|Regulation)$'}}
       <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="Regulation" data-related-title-plural="Regulations" data-modal-selector-options="program_directives" data-join-object-type="Directive" data-join-object-id="{{parent_instance.id}}" data-child-meta-type="Regulation" data-child-property="directive_id" data-join-query="directive.kind__in=Regulation">
-        <i class="grcicon-regulation-color"></i>
         + Regulation
       </a>
       {{/if_match}}
       {{#if_equals model.shortName 'Directive'}}&nbsp;&nbsp;{{/if_equals}}
       {{#if_match model.shortName '^(Directive|Contract)$'}}
       <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="Contract" data-related-title-plural="Contracts" data-modal-selector-options="program_directives" data-join-object-id="{{parent_instance.id}}" data-join-object-type="Directive" data-child-meta-type="Contract" data-child-property="directive_id" data-join-query="directive.kind__in=Contract">
-        <i class="grcicon-contract-color"></i>
         + Contract
       </a>
       {{/if_match}}
       {{#if_equals model.shortName 'Directive'}}&nbsp;&nbsp;{{/if_equals}}
       {{#if_match model.shortName '^(Directive|Policy)$'}}
       <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="Policy" data-related-title-plural="Policies" data-modal-selector-options="program_directives" data-join-object-id="{{parent_instance.id}}" data-join-object-type="Directive" data-child-meta-type="Policy" data-child-property="directive_id" data-join-query="directive.kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy">
-        <i class="grcicon-policy-color"></i>
         + Policy
       </a>
       {{/if_match}}
