@@ -27,6 +27,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , programs : "CMS.Models.Program.models"
     , object_controls : "CMS.Models.ObjectControl.models"
     , people : "CMS.Models.Person.models"
+    , owner : "CMS.Mdoels.Person.model"
   }
   , tree_view_options : {
       list_view : "/static/mustache/controls/tree.mustache"

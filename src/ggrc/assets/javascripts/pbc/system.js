@@ -45,6 +45,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , attributes : {
       controls : "CMS.Models.Control.models"
       , sub_systems : "CMS.Models.System.models"
+      , owner : "CMS.Models.Person.model"
     }
     , serialize : {
     }
