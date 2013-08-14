@@ -186,7 +186,7 @@ can.Control("GGRC.Controllers.ListView", {
   }
 
   , update_count: function() {
-      this.element.trigger("updateCount", this.options.list.length);
+      this.element.trigger("updateCount", this.options.list.length).trigger("widget_updated");
     }
 
   , "{list} change": "update_count"
