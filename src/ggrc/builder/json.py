@@ -330,7 +330,12 @@ class Builder(AttributeInfo):
       return self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include)
     elif class_attr.__class__.__name__ == 'property':
-      return self.publish_link(obj, attr_name, inclusions, include)
+      if not inclusions or include:
+        return self.generate_link_object_for_foreign_key(
+            getattr(obj, '{0}_id'.format(attr_name)),
+            getattr(obj, '{0}_type'.format(attr_name)))
+      else:
+        return self.publish_link(obj, attr_name, inclusions, include)
     else:
       return getattr(obj, attr_name)
 

@@ -16,7 +16,7 @@ class Context(Base, Described, db.Model):
       db.Column(db.String(128), nullable=True), 'Context')
 
   @property
-  def related(self, obj=[]):
+  def related_object(self, obj=[]):
     if len(obj) == 0:
       if self.related_object_type is not None:
         import ggrc.models
@@ -28,8 +28,8 @@ class Context(Base, Described, db.Model):
         obj.append(None)
     return obj[0]
 
-  @related.setter
-  def related(self, obj):
+  @related_object.setter
+  def related_object(self, obj):
     if obj is not None:
       self.related_object_id = obj.id
       self.related_object_type = obj.__class__.__name__
@@ -37,5 +37,5 @@ class Context(Base, Described, db.Model):
       self.related_object_id = None
       self.related_object_type = None
 
-  _publish_attrs = ['name', 'related',]
+  _publish_attrs = ['name', 'related_object',]
 
