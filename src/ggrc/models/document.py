@@ -71,6 +71,10 @@ class Document(Base, db.Model):
       'year',
       'language',
       ]
+  _sanitize_html = [
+      'title',
+      'description',
+      ]
 
   @classmethod
   def eager_query(cls):

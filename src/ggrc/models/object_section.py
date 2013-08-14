@@ -41,6 +41,9 @@ class ObjectSection(Base, Timeboxed, db.Model):
       'section',
       'sectionable',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

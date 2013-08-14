@@ -30,6 +30,9 @@ class Product(
       'type',
       'version',
       ]
+  _sanitize_html = [
+      'version',
+      ]
 
   @classmethod
   def eager_query(cls):
