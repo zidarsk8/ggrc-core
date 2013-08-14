@@ -35,6 +35,16 @@
               <i class="grcicon-goto"></i>
             </a>
           </div>
+          
+          {{! UNMAP
+          <div class="span6">
+            <a href="javascript://" class="info-action unmap pull-right">
+              <i class="grcicon-remove"></i>
+              Unmap
+            </a>
+          </div>
+          }}
+          
         </div>
 
         {{#instance.description}}
@@ -97,11 +107,10 @@
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
-
+      
       {{#if_equals parent_instance.constructor.shortName "Section"}}
         <a
           href="javascript://"
-          class="section-create"
           rel="tooltip"
           data-placement="left"
           data-toggle="modal-selector"
@@ -116,7 +125,6 @@
       {{#if_match parent_instance.constructor.shortName '^(System|Process)$'}}
         <a
           href="javascript://"
-          class="section-create"
           rel="tooltip"
           data-placement="left"
           data-toggle="modal-selector"

@@ -209,6 +209,13 @@ ul.new-tree {
     @include opacity(1);
     text-decoration:none;
   }
+  &.unmap {
+    @include opacity(0.25);
+    &:hover {
+      color:$error;
+      @include opacity(1);
+    }
+  }
 }
 
 .counter {
