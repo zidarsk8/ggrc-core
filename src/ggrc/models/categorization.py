@@ -88,8 +88,9 @@ class Categorizable(object):
         backref=BACKREF_NAME_FORMAT.format(type=cls.__name__, scope=scope),
         )
 
+  # Method seems to not work
   @classmethod
-  def eager_query(cls):
+  def x_eager_query(cls):
     from sqlalchemy import orm
     from sqlalchemy.sql.expression import and_
     from ggrc.models import Category
