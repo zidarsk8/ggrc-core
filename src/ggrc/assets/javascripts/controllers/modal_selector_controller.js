@@ -87,32 +87,21 @@
         ;
 
       this.option_list = new can.Observe.List();
-      this.join_list = new can.Observe.List();
-      this.active_list = new can.Observe.List();
+      this.options.join_list = this.options.join_list || new can.Observe.List();
+      this.active_list = this.options.active_list || new can.Observe.List();
 
-      this.join_list.bind("change", function() {
-        self.active_list.replace(
-          can.map(self.join_list, function(join) {
-            return new can.Observe({
-              option: CMS.Models.get_instance(
-                self.options.option_model.shortName || CMS.Models.get_link_type(join, self.options.option_attr),
-                join[self.options.option_id_field] || join[self.options.option_attr].id)
-            , join: join
-            });
-          }))
-      });
-
-      this.join_list.bind("change", function() {
-        // FIXME: This is to update the Document and Person lists when the
-        //   selected items change -- that list should be Can-ified.
-        var list_target = self.options.$trigger.data('list-target');
-        if (list_target)
-          $(list_target)
-          .tmpl_setitems(self.join_list)
-          .closest(":has(.grc-badge)")
-          .find(".grc-badge")
-          .text("(" + self.join_list.length + ")");
-      });
+      this.on();
+      // this.options.join_list.bind("change", function() {
+      //   // FIXME: This is to update the Document and Person lists when the
+      //   //   selected items change -- that list should be Can-ified.
+      //   var list_target = self.options.$trigger.data('list-target');
+      //   if (list_target)
+      //     $(list_target)
+      //     .tmpl_setitems(self.options.join_list)
+      //     .closest(":has(.grc-badge)")
+      //     .find(".grc-badge")
+      //     .text("(" + self.options.join_list.length + ")");
+      // });
 
       $.when(
         this.post_init(),
@@ -120,6 +109,19 @@
       ).then(
         this.proxy('post_draw')
       );
+    },
+
+    "{join_list} change" : function() {
+      var self = this;
+      this.active_list.replace(
+        can.map(this.options.join_list, function(join) {
+          return new can.Observe({
+            option: CMS.Models.get_instance(
+              self.options.option_model.shortName || CMS.Models.get_link_type(join, self.options.option_attr),
+              join[self.options.option_id_field] || join[self.options.option_attr].id)
+          , join: join
+          });
+        }));
     },
 
     fetch_data: function() {
@@ -137,15 +139,15 @@
         this.options.option_model.findAll(
           $.extend({}, this.option_query),
           function(options) {
-            self.option_list.replace(options)
+            self.option_list.replace(options);
           }),
-        this.options.join_model.findAll(
+        this.options.join_list || this.options.join_model.findAll(
           $.extend({}, join_query),
           function(joins) {
             //can.each(joins, function(join) {
             //  join.attr('_removed', false);
             //});
-            self.join_list.replace(joins);
+            self.options.join_list.replace(joins);
           })
         );
     },
@@ -157,7 +159,7 @@
 
       this.context = new can.Observe($.extend({
         options: this.option_list,
-        joins: this.join_list,
+        joins: this.options.join_list,
         actives: this.active_list,
         selected_option: null,
       }, this.options));
@@ -182,7 +184,7 @@
         , $option_list = $(this.element).find('.selector-list ul')
         ;
 
-      this.join_list.forEach(function(join, index, list) {
+      this.options.join_list.forEach(function(join, index, list) {
         $option_list
           .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=checkbox]')
           .prop('checked', true);
@@ -230,7 +232,7 @@
           join = this.get_new_join(option.id, option.constructor.getRootModelName());
           join.save().then(function() {
             //join.refresh().then(function() {
-              self.join_list.push(join);
+              self.options.join_list.push(join);
               self.element.trigger("relationshipcreated", join);
             //});
           });
@@ -241,9 +243,9 @@
           // Ensure '_removed' attribute is false
           if (join.isNew()) {
             // It was created, then removed, so remove from list
-            join_index = this.join_list.indexOf(join);
+            join_index = this.options.join_list.indexOf(join);
             if (join_index >= 0) {
-              this.join_list.splice(join_index, 1);
+              this.options.join_list.splice(join_index, 1);
             }
           } else {
             // FIXME: The data should be updated in bulk, and only when "Save"
@@ -251,9 +253,9 @@
             //join.attr('_removed', true);
             join.refresh().done(function() {
               join.destroy().then(function() {
-                join_index = self.join_list.indexOf(join);
+                join_index = self.options.join_list.indexOf(join);
                 if (join_index >= 0) {
-                  self.join_list.splice(join_index, 1);
+                  self.options.join_list.splice(join_index, 1);
                 }
                 self.element.trigger("relationshipdestroyed", join);
               });
@@ -270,7 +272,7 @@
         ;
 
       return can.reduce(
-        this.join_list,
+        this.options.join_list,
         function(result, join) {
           if (result)
             return result;
@@ -348,6 +350,7 @@
         join_type_field: 'documentable_type',
 
         join_object: get_page_object(),
+        join_list: get_page_object().object_documents
       },
 
       object_sections: {
@@ -426,6 +429,7 @@
         join_type_field: 'personable_type',
 
         join_object: get_page_object(),
+        join_list: get_page_object().object_people
       },
 
       system_systems: {
@@ -764,7 +768,7 @@
       init: function() {
         this.object_list = new can.Observe.List();
         this.option_list = new can.Observe.List();
-        this.join_list = new can.Observe.List();
+        this.options.options.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
 
         this.init_menu();
@@ -827,7 +831,7 @@
           this.context = new can.Observe($.extend({
             objects: this.object_list,
             options: this.option_list,
-            joins: this.join_list,
+            joins: this.options.join_list,
             actives: this.active_list,
             selected_object: null,
             selected_option_type: null,

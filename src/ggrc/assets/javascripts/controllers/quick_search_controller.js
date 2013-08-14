@@ -118,6 +118,13 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       }
 
       if (view_data) {
+        $pane.html(
+          $(new Spinner().spin().el)
+          .css({
+            width: '100px', height: '100px',
+            left: '38%', top: '50%',
+            zIndex : calculate_spinner_z_index
+          }));
         can.view(template, view_data, function(frag, xhr) {
           $tab.data('tab-loaded', true);
           $pane.html(frag).trigger("loaded", xhr, $tab.data("list"));
@@ -466,6 +473,9 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         // If tooltip is already showing, show new content without delay
         if (this.options.$extended.hasClass('in'))
           delay = 0;
+        if(instance.owner && !instance.owner.selfLink) {
+          instance.owner.refresh();
+        }
         this.fade_in_timeout = setTimeout(
             this.proxy('on_fade_in_timeout', el, instance), delay);
         clearTimeout(this.fade_out_timeout);
