@@ -288,3 +288,8 @@ def check_DELETE_is_allowed(context, resource_name):
 @then('DELETE of "{resource_name}" is forbidden')
 def check_DELETE_is_allowed(context, resource_name):
   delete_example_resource(context, resource_name, expected_status=403)
+
+@then('fail')
+def fail(context):
+  """Handy force failure so the trace can be retrieved when debugging tests."""
+  assert False

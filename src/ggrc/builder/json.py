@@ -3,6 +3,7 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+import bleach
 import ggrc.builder
 import ggrc.services
 import iso8601

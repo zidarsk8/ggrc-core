@@ -23,6 +23,9 @@ class RiskyAttribute(Documentable, Personable, Timeboxed, BusinessObject, db.Mod
       'risk_risky_attributes',
       'risks',
       ]
+  _sanitize_html = [
+      'type_string',
+      ]
 
   @classmethod
   def eager_query(cls):

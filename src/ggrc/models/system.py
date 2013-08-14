@@ -97,6 +97,10 @@ class SystemOrProcess(
       'sub_systems',
       'super_systems',
       ]
+  _sanitize_html = [
+      'notes',
+      'version',
+      ]
 
   @classmethod
   def eager_query(cls):
