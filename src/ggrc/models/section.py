@@ -54,7 +54,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
 
     query = super(Section, cls).eager_query()
     return query.options(
-        orm.subqueryload('directive'),
-        orm.subqueryload_all('control_sections.control'),
-        orm.subqueryload_all('section_objectives.objective'),
-        orm.subqueryload('object_sections'))
+        orm.joinedload('directive'),
+        orm.joinedload('control_sections'),
+        orm.joinedload('section_objectives'),
+        orm.joinedload('object_sections'))

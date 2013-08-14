@@ -83,4 +83,4 @@ class Sectionable(object):
     from sqlalchemy import orm
 
     query = super(Sectionable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_sections.section'))
+    return query.options(orm.joinedload('object_sections'))

@@ -84,4 +84,4 @@ class Controllable(object):
     from sqlalchemy import orm
 
     query = super(Controllable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_controls.control'))
+    return query.options(orm.joinedload('object_controls'))
