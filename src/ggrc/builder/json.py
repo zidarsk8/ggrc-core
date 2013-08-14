@@ -292,10 +292,13 @@ class Builder(AttributeInfo):
       if isinstance(class_attr.remote_attr, property):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
+        return [self.generate_link_object_for_foreign_key(
+            getattr(o, target_name), getattr(o, target_type))
+              for o in join_objects]
       else:
         target_name = list(class_attr.remote_attr.property.local_columns)[0].key
         target_type = class_attr.remote_attr.property.mapper.class_.__name__
-      return [self.generate_link_object_for_foreign_key(
+        return [self.generate_link_object_for_foreign_key(
             getattr(o, target_name), target_type) for o in join_objects]
 
   def publish_relationship(
