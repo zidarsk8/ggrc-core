@@ -492,8 +492,8 @@
         new_object_title: data.related_title_singular,
         modal_title: "Select " + data.related_title_plural,
 
-        related_model_singular: "Directive",
-        related_table_plural: "directives",
+        related_model_singular: data.child_meta_type,
+        related_table_plural: (CMS.Models[data.child_meta_type] || {}).table_plural,
         related_title_singular: "System",
         related_title_plural: "Systems",
 
