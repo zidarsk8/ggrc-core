@@ -19,6 +19,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , destroy : "DELETE /api/programs/{id}"
   , attributes : {
     controls : "CMS.Models.Control.models"
+    , owner : "CMS.Models.Person.model"
   }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -52,6 +53,11 @@ can.Model.Cacheable("CMS.Models.Directive", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , owner : "CMS.Models.Person.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -108,6 +114,11 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , owner : "CMS.Models.Person.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -138,6 +149,11 @@ CMS.Models.Directive("CMS.Models.Policy", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , owner : "CMS.Models.Person.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -168,6 +184,11 @@ CMS.Models.Directive("CMS.Models.Contract", {
     sections : "CMS.Models.Section.models"
     , program : "CMS.Models.Program.model"
     , controls : "CMS.Models.Control.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , owner : "CMS.Models.Person.model"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -186,6 +207,9 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
+  , attributes : {
+    owner : "CMS.Models.Person.model"
+  }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -248,6 +272,9 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
+  , attributes : {
+    owner : "CMS.Models.Person.model"
+  }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -294,6 +321,9 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
+  , attributes : {
+    owner : "CMS.Models.Person.model"
+  }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -358,6 +388,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , destroy : "DELETE /api/products/{id}"
   , attributes : {
     type : "CMS.Models.Option.model"
+    , owner : "CMS.Models.Person.model"
   }
   , defaults : {
     type : {}
@@ -437,6 +468,9 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
+  , attributes : {
+    owner : "CMS.Models.Person.model"
+  }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -499,6 +533,9 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
+  , attributes : {
+    owner : "CMS.Models.Person.model"
+  }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
     , child_options : [{
@@ -664,6 +701,9 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , controls : "CMS.Models.Control.models"
     , objective_controls : "CMS.Models.ObjectiveControls.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
+    , people : "CMS.Models.Person.models"
+    , documents : "CMS.Models.Document.models"
+    , owner : "CMS.Models.Person.model"
   }
   , defaults : {
     object_objectives : []

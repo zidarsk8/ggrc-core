@@ -299,3 +299,5 @@ class BusinessObject(Slugged, Described, Hyperlinked):
   @declared_attr
   def owner(self):
     return db.relationship('Person', uselist=False)
+
+  _publish_attrs = ['owner']
