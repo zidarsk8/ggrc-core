@@ -533,7 +533,7 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, context);
 });
 
-function defer_render(tag_name, func) {
+function defer_render(tag_name, func, deferred) {
   var hook
     ;
 
@@ -541,10 +541,13 @@ function defer_render(tag_name, func) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      frag_or_html = func();
+      frag_or_html = func.apply(this, arguments);
       $(element).after(frag_or_html).remove();
     };
-    setTimeout(f, 13);
+    if (deferred)
+      deferred.done(f)
+    else
+      setTimeout(f, 13);
   }
 
   hook = can.view.hook(hookup);
@@ -665,8 +668,6 @@ Mustache.registerHelper("handle_context", function() {
     ].join("\n");
 });
 
-})(this, jQuery, can);
-
 Mustache.registerHelper("with_page_object_as", function(name, options) {
   if(!options) {
     options = name;
@@ -741,3 +742,64 @@ Mustache.registerHelper("is_private", function(options) {
   }
   return options.inverse(this);
 });
+
+Mustache.registerHelper("option_select", function(object, attr_name, role) {
+  var selected_option = object.attr(attr_name)
+    , selected_id = selected_option ? selected_option.id : null
+    , options_dfd = CMS.Models.Option.for_role(role)
+    ;
+
+  function get_select_html(options) {
+    return [
+        '<select class="span12" model="Option"'
+      ,   ' name="', attr_name
+      , '">'
+      , '<option value=""'
+      ,   !selected_id ? ' selected=selected' : ''
+      , '>None</option>'
+      , can.map(options, function(option) {
+          return [
+            '<option value="', option.id, '"'
+          ,   selected_id == option.id ? ' selected=selected' : ''
+          , '>'
+          ,   option.title
+          , '</option>'
+          ].join('');
+        }).join('\n')
+      , '</select>'
+    ].join('');
+  }
+
+  return defer_render('select', get_select_html, options_dfd);
+});
+
+Mustache.registerHelper("category_select", function(object, attr_name, scope) {
+  var selected_options = object.attr(attr_name) || []
+    , selected_ids = can.map(selected_options, function(selected_option) {
+        return selected_option.id;
+      })
+    , options_dfd = CMS.Models.Category.for_scope(scope)
+    ;
+
+  function get_select_html(options) {
+    return [
+        '<select class="span12" model="Category" multiple=multiple'
+      ,   ' name="', attr_name
+      , '">'
+      , can.map(options, function(option) {
+          return [
+            '<option value="', option.id, '"'
+          ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
+          , '>'
+          ,   option.name
+          , '</option>'
+          ].join('');
+        }).join('\n')
+      , '</select>'
+    ].join('');
+  }
+
+  return defer_render('select', get_select_html, options_dfd);
+});
+
+})(this, jQuery, can);

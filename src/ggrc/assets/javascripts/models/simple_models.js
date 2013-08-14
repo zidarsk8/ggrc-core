@@ -478,6 +478,18 @@ can.Model.Cacheable("CMS.Models.Product", {
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
   , root_collection : "options"
+  , cache_by_role: {}
+  , for_role: function(role) {
+      var self = this;
+
+      if (!this.cache_by_role[role])
+        this.cache_by_role[role] =
+          this.findAll({ role: role }).then(function(options) {
+            self.cache_by_role[role] = options;
+            return options;
+          });
+      return $.when(this.cache_by_role[role]);
+    }
 }, {});
 
 can.Model.Cacheable("CMS.Models.DataAsset", {
