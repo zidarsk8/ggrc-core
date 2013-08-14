@@ -26,7 +26,7 @@
 
         <div class="row-fluid">
           <div class="span12">
-            <a href="{{instance.viewLink}}" class="info-action pull-right">
+            <a href="{{instance.viewLink}}" class="info-action">
               View Objective
               <i class="grcicon-goto"></i>
             </a>
@@ -55,9 +55,9 @@
                   Not Assigned
                 </span>
               {{/instance.owner}}
-              {{#if instance.owner}}
+              {{#instance.owner}}
                 {{instance.owner.name}}
-              {{/if}}
+              {{/}}
             </div>
           </div>
           {{#instance.url}}
