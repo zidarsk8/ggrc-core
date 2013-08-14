@@ -118,6 +118,13 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       }
 
       if (view_data) {
+        $pane.html(
+          $(new Spinner().spin().el)
+          .css({
+            width: '100px', height: '100px',
+            left: '38%', top: '50%',
+            zIndex : calculate_spinner_z_index
+          }));
         can.view(template, view_data, function(frag, xhr) {
           $tab.data('tab-loaded', true);
           $pane.html(frag).trigger("loaded", xhr, $tab.data("list"));
