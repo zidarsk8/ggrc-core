@@ -240,9 +240,11 @@ class Resource(ModelView):
     )
 
   def dispatch_request(self, *args, **kwargs):
-    if 'X-Requested-By' not in request.headers:
-      raise BadRequest('X-Requested-By header is REQUIRED.')
     method = request.method
+
+    if method in ('POST', 'PUT', 'DELETE')\
+        and 'X-Requested-By' not in request.headers:
+      raise BadRequest('X-Requested-By header is REQUIRED.')
 
     if method == 'GET':
       if self.pk in kwargs and kwargs[self.pk] is not None:
