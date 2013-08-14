@@ -820,6 +820,8 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   if(typeof object_type === "object") {
     //assume we only passed in params_or_object
     params_or_object = object_type;
+    if (!params_or_object)
+      return null;
     object_type = params_or_object.type
       || can.map(
           window.cms_singularize(
