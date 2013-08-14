@@ -154,6 +154,7 @@ can.Control("CMS.Controllers.TreeView", {
     can.each(newVals, function(newVal) {
       that.element.trigger("newChild", newVal);
     });
+    can.trigger(this.options, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
@@ -165,6 +166,7 @@ can.Control("CMS.Controllers.TreeView", {
     //   }
     // });
     this.options.list.splice(index, oldVals.length);
+    can.trigger(this.options, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} change" : function(list, ev, newVals, index) {
     var that = this;
