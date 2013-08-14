@@ -218,6 +218,11 @@
         margin-top: 7px;
         margin-right: 7px;
       }
+      span.explanation {
+        color:#999;
+        font-style:italic;
+        margin-left:10px;
+      }
     }
     .btn-mini {
       margin-left:6px;
@@ -246,6 +251,10 @@
         background-color:$governance;
         h2 {
           color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
         }
       }
     }
@@ -261,6 +270,10 @@
         background-color:$programs;
         h2 {
           color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
         }
       }
     }
@@ -276,6 +289,10 @@
         background-color:$risk;
         h2 {
           color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
         }
       }
     }
@@ -291,6 +308,10 @@
         background-color:$business;
         h2 {
           color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
         }
       }
     }
@@ -436,6 +457,16 @@
       background:#444;
       h2 {
         color:$white;
+      }
+      .widget-action {
+        i {
+          @include opacity(0.5);
+        }
+        &.widget-showhide {
+          a {
+            @include opacity(0.5);
+          }
+        }
       }
     }
   }
