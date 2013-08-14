@@ -117,7 +117,8 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , set_value : function(item) {
-    var instance = this.options.instance;
+    var instance = this.options.instance
+    , that = this;
     if(!(instance instanceof this.options.model)) {
       instance = this.options.instance
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
@@ -144,10 +145,35 @@ can.Control("GGRC.Controllers.Modals", {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
       } else {
-        value = new can.Observe({}).attr(name.slice(1).join("."), value);
+
+        if(name[name.length - 1] === "email") {
+          if(!value) {
+            name.pop(); //set the owner to null, not the email
+            value = null;
+          } else {
+            this.bindXHRToButton($.when(
+                CMS.Models.Person.findInCacheByEmail(value) || CMS.Models.Person.findAll({email : value})
+              ).done(function(data) {
+                if(data.length != null)
+                  data = data[0];
+
+                if(data) {
+                  value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
+                  instance.attr(name[0], value);
+                } else {
+                  that.element.trigger("ajax:flash", { warning : "user " + value + " not found"});
+                  $elem.val($elem.attr("value"));
+                }
+              }), this.options.$footer.find("a.btn[data-toggle='modal-submit']")
+            );
+            return; //don't update the existing owner email if there is one.
+          }
+        } else {
+          value = new can.Observe({}).attr(name.slice(1).join("."), value);
+        }
       }
     }
-    instance.attr(name[0], value);
+    instance.attr(name[0], value && value.serialize ? value.serialize() : value);
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit']:not(.disabled) click" : function(el, ev) {

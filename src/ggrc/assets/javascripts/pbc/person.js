@@ -38,6 +38,16 @@ can.Model.Cacheable("CMS.Models.Person", {
       name : ""
       , email : ""
     }
+    , findInCacheByEmail : function(email) {
+      var result = null, that = this;
+      can.each(Object.keys(this.cache || {}), function(k) {
+        if(that.cache[k].email === email) {
+          result = that.cache[k];
+          return false;
+        }
+      });
+      return result;
+    }
 }, {
     init : function () {
         this._super && this._super();
