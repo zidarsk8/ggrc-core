@@ -62,29 +62,29 @@
         {{#edit_sections}}
           <div class="row-fluid">
             <div class="span12">
-
-                <a href="javascript://" class="info-action">
-                  <i class="grcicon-edit"></i>
-                  Edit Section
-                </a>
-            
+              <a href="javascript://" class="info-action">
+                <i class="grcicon-edit"></i>
+                Edit Section
+              </a>
             </div>
           </div>
         {{/edit_sections}}
         
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="tree-description short">
-              {{^instance.description}}
-                <p><i>No text for this section/clause</i></p>
-              {{/instance.description}}
-              {{{instance.description}}}
+        <div class="show-description">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="tree-description short">
+                {{^instance.description}}
+                  <p><i>No text for this section/clause</i></p>
+                {{/instance.description}}
+                {{{instance.description}}}
+              </div>
+              <a href="javascript://" class="show-long">...more</a>
             </div>
-            <a href="javascript://" class="show-long">...more</a>
           </div>
         </div>
       </div>
-
+      
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
