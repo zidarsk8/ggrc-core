@@ -25,6 +25,13 @@ can.Control("GGRC.Controllers.InfoWidget", {
       this.options.widget_view = GGRC.mustache_path + this.element.data('widget-view');
     }
 
+    if(this.options.instance 
+        && this.options.instance.owner 
+        && !this.options.instance.owner.selfLink
+    ) {
+      this.options.instance.owner.refresh();
+    }
+
     this.options.context = new can.Observe({
         model : this.options.model
       , instance : this.options.instance
