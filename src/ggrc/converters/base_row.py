@@ -109,14 +109,16 @@ class BaseRowConverter(object):
 
   def setup_object_by_slug(self, attrs):
     slug = prepare_slug(attrs['slug']) if attrs.get('slug') else ''
+    model_class = self.model_class if not self.importer.options.get('is_biz_process') else Process
+
     if not slug:
-      self.obj = self.model_class() if not self.importer.options.get('is_biz_process') else Process()
+      self.obj = model_class()
     else:
       self.obj = self.find_by_slug(slug)
-      self.obj = self.obj or self.importer.find_object(self.model_class, slug)
-      self.obj = self.obj or self.model_class()
+      self.obj = self.obj or self.importer.find_object(model_class, slug)
+      self.obj = self.obj or model_class()
       self.obj.slug = slug
-    self.importer.add_object(self.model_class, slug, self.obj)
+    self.importer.add_object(model_class, slug, self.obj)
     return self.obj
 
   def save(self, db_session, **options):
