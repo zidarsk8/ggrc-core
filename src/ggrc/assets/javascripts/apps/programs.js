@@ -17,6 +17,9 @@ var RefreshQueue = function() {
 
   return {
     enqueue: function(obj, force) {
+      if (!obj)
+        return;
+
       var model = obj.constructor
         , model_name = model.shortName
         ;

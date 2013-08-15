@@ -213,10 +213,16 @@ can.Model("can.Model.Cacheable", {
     if(m = this.findInCacheById(params.id)) {
       if(m === params)
         return m;
+      if (!params.selfLink)
+        return m;
       if(!m.selfLink) {
         //we are fleshing out a stub, which is much like creating an object new.
         //But we don't want to trigger every change event on the new object's props.
         m._init = 1;
+        // Stub attributes should be removed to not conflict with real model
+        // attributes; however, this should be well-tested first
+        //m.removeAttr('type');
+        //m.removeAttr('href');
       }
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
@@ -333,7 +339,8 @@ can.Model("can.Model.Cacheable", {
     })
     .then(can.proxy(this.constructor, "model"))
     .done(function(d) {
-      can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
+      d.updated();
+      //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
     });
   }
   , attr : function() {

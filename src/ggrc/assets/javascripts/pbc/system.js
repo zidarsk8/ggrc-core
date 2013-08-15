@@ -15,17 +15,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , root_collection : "systems_or_processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
-    , init : function() {
-        this._super && this._super();
-        $(can.proxy(this, "bind_object_star_events"));
-        this.tree_view_options.child_options[1].model = CMS.Models.SystemOrProcess;
-        this.risk_tree_options.child_options[1].list_view = "/static/mustache/systems/tree.mustache";
-        this.risk_tree_options.child_options[1].parent_find_param = "super_system_systems.parent_id";
-        this.risk_tree_options.child_options[1].link_buttons = true;
-
-        this.validatePresenceOf("title");
-        this.validateFormatOf("network_zone", /[0-9]*/);
-    }
     , tree_view_options : {
       list_view : "/static/mustache/systems/tree.mustache"
       , link_buttons : true
@@ -41,11 +30,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]
-    }
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , sub_systems : "CMS.Models.System.models"
-      , owner : "CMS.Models.Person.model"
     }
     , serialize : {
     }
@@ -98,37 +82,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Risk" : {}
       }
 }, {
-
-    init : function() {
-      var that = this;
-      this._super && this._super();
-      this.bind("created updated", can.proxy(this, 'reinit'));
-      this.reinit();
-      //careful to only do this on init.  Once live binding is set up, some live binding
-      //  stops happening when doing removeAttr instead of attr(..., null)
-      this.each(function(value, name) {
-        if (value === null)
-          that.removeAttr(name);
-      });
-    }
-    , reinit : function() {
-        var that = this;
-        can.each({
-            "Person" : "people"
-            , "Document" : "documents"
-            , "ObjectPerson" : "object_people"
-            , "ObjectDocument" : "object_documents"}
-        , function(collection, model) {
-            var list = new can.Model.List();
-
-            can.each(that[collection], function(obj) {
-                list.push(new CMS.Models[model](obj.serialize()));
-            });
-            that.attr(collection, list);
-        });
-
-    }
-    , system_or_process: function() {
+    system_or_process: function() {
       if (this.attr('is_biz_process'))
         return 'process';
       else
@@ -149,6 +103,16 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , destroy : "DELETE /api/systems/{id}"
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+    , attributes : {
+      controls : "CMS.Models.Control.models"
+      , sub_systems : "can.Model.Cacheable"
+      , super_systems : "can.Model.Cacheable"
+      , documents : "CMS.Models.Document.models"
+      , people : "CMS.Models.Person.models"
+      , object_documents : "CMS.Models.ObjectDocument.models"
+      , object_people : "CMS.Models.ObjectPerson.models"
+      , owner : "CMS.Models.Person.model"
+    }
   , init : function() {
     this._super && this._super();
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
@@ -157,7 +121,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
     init : function() {
-      this._super && this._super();
+      this._super && this._super.apply(this, arguments);
       this.attr('is_biz_process', false);
     }
 });
@@ -176,15 +140,25 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
+    , attributes : {
+      controls : "CMS.Models.Control.models"
+      , sub_systems : "can.Model.Cacheable"
+      , super_systems : "can.Model.Cacheable"
+      , documents : "CMS.Models.Document.models"
+      , people : "CMS.Models.Person.models"
+      , object_documents : "CMS.Models.ObjectDocument.models"
+      , object_people : "CMS.Models.ObjectPerson.models"
+      , owner : "CMS.Models.Person.model"
+    }
   , init : function() {
-    this._super && this._super();
+    this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
 }, {
     init : function() {
-      this._super && this._super();
+      this._super && this._super.apply(this, arguments);
       this.attr('is_biz_process', true);
     }
 });

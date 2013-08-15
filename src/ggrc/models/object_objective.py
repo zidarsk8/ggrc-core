@@ -87,4 +87,4 @@ class Objectiveable(object):
     from sqlalchemy import orm
 
     query = super(Objectiveable, cls).eager_query()
-    return query.options(orm.subqueryload_all('object_objectives.objective'))
+    return query.options(orm.joinedload('object_objectives'))
