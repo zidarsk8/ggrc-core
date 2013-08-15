@@ -9,7 +9,7 @@ import hashlib
 import time
 from blinker import Namespace
 from exceptions import TypeError
-from flask import url_for, request, current_app, session
+from flask import url_for, request, current_app
 from flask.views import View
 from ggrc import db
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
@@ -25,6 +25,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
+from .events import log_event
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.

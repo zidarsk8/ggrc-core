@@ -5,11 +5,11 @@
 
 import ggrc.builder
 from blinker import Namespace
-from flask import request, render_template, current_app, url_for
+from flask import redirect, request, render_template, current_app
 from ggrc.rbac import permissions
 from ggrc.services.common import ModelView, as_json
+from ggrc.utils import view_url_for
 from werkzeug.exceptions import Forbidden
-
 
 class BaseObjectView(ModelView):
   model_template = '{model_plural}/show.haml'
@@ -100,7 +100,7 @@ class BaseObjectView(ModelView):
       cls_name = '{0}ObjectView'.format(model_class.__name__)
       view_class = type(
         cls_name,
-        (BaseObjectView,),
+        (cls,),
         {
           '_model': model_class,
           'base_url_for': classmethod(lambda cls: url),
@@ -117,3 +117,20 @@ class BaseObjectView(ModelView):
     app.add_url_rule(view_route, view_class.endpoint_name(),
       view_func=view_func,
       methods=['GET'])
+
+class RedirectedPolymorphView(BaseObjectView):
+  """Out of paranoia, be sure to redirect any direct link to a Directive view
+  to the appropriate view for one of its polymorpic representations.
+  """
+  def get(self, id):
+    obj = self.get_object(id)
+    if obj is None:
+      return self.not_found_response()
+    if 'Accept' in self.request.headers and\
+        'text/html' not in self.request.headers['Accept']:
+      return current_app.make_response((
+        'text/html', 406, [('Content-Type', 'text/plain')]))
+    if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+      raise Forbidden()
+    print 'RedirectedPolymorphView.get', view_url_for(obj)
+    return redirect(view_url_for(obj))
