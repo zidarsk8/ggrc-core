@@ -56,7 +56,7 @@ class BaseRowConverter(object):
     self.errors.setdefault(key, []).append(message)
 
   def add_warning(self, key, message):
-    self.errors.setdefault(key, []).append(message)
+    self.warnings.setdefault(key, []).append(message)
 
   def errors_for(self, key):
     error_messages = []
@@ -69,7 +69,7 @@ class BaseRowConverter(object):
     warning_messages = []
     if self.handlers.get(key) and self.handlers[key].has_warnings():
       warning_messages  += self.handlers[key].warnings
-    warning_messages += self.errors.get(key, [])
+    warning_messages += self.warnings.get(key, [])
     return warning_messages
 
   def has_errors(self):
@@ -588,9 +588,12 @@ class LinkPeopleHandler(LinksHandler):
 
     if data:
       if data.get('email') and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
-        self.add_link_warning("This email address is invalid and will not be linked")
+        self.add_link_warning("This email address is invalid and will not be mapped")
       else:
         return data
+
+  def create_item(self, data):
+    self.add_link_warning("This email does not exist and will not be mapped.")
 
   def get_where_params(self, data):
     return { 'email' : data.get('email') } if data else {}
@@ -612,6 +615,7 @@ class LinkPeopleHandler(LinksHandler):
 
   def after_save(self, obj):
     db_session = db.session
+
     for linked_object in self.created_links():
       db_session.add(linked_object)
       object_person = ObjectPerson()
@@ -646,9 +650,9 @@ class LinkSystemsHandler(LinksHandler):
       self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
       if self.options.get('is_biz_process') and not (system is Process):
-        self.add_link_warning("That code is used by a System, and will not be linked")
+        self.add_link_warning("That code is used by a System, and will not be mapped")
       elif not self.options.get('is_biz_process') and system is Process:
-        self.add_link_warning('That code is used by a Process, and will not be linked')
+        self.add_link_warning('That code is used by a Process, and will not be mapped')
       else:
         return system
 
