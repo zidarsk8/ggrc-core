@@ -768,7 +768,7 @@
       init: function() {
         this.object_list = new can.Observe.List();
         this.option_list = new can.Observe.List();
-        this.options.options.join_list = new can.Observe.List();
+        this.options.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
 
         this.init_menu();
