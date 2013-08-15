@@ -29,12 +29,13 @@
 
 .lhs-holder {
   @include gradient-horizontal(#fff,#e1e1e1);
+  //overflow-x:hidden;
 }
 
 .lhs {
   position:relative;
-  width:240px;
-  margin-right: 8px;
+  //width:220px;
+  //margin-right: 8px;
   .lhs-bg {
     margin-top:5px;
     display:none;
@@ -47,6 +48,7 @@
   &.lhs-closed {
     margin-left:-200px;
     cursor:pointer;
+    overflow:hidden;
     .lhs-bg {
       display:block;
     }
