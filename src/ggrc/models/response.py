@@ -34,6 +34,9 @@ class Response(Documentable, Personable, Base, db.Model):
       'meetings',
       'population_sample',
       ]
+  _sanitize_html = [
+      'status',
+      ]
 
   @classmethod
   def eager_query(cls):

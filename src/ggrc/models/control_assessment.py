@@ -37,6 +37,10 @@ class ControlAssessment(Base, db.Model):
       'notes',
       'requests',
       ]
+  _sanitize_html = [
+      'control_version',
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

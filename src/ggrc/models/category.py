@@ -75,3 +75,7 @@ class Category(Base, Hierarchical, db.Model):
       CategorizedPublishable('controls', 'Control'),
       CategorizedPublishable('risks', 'Risk'),
       ]
+
+  _sanitize_html = [
+      'name',
+      ]

@@ -39,6 +39,9 @@ class Section(Hierarchical, BusinessObject, db.Model):
       'objectives',
       'object_sections',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
   #_update_attrs = [
   #    'directive',
   #    'na',
