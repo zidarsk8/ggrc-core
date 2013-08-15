@@ -96,7 +96,8 @@ class ModelView(View):
 
   # Default model/DB helpers
   def get_collection(self, filter_by_contexts=True):
-    if hasattr(self.model, 'eager_query'):
+    if '__stubs_only' not in request.args and \
+        hasattr(self.model, 'eager_query'):
       query = self.model.eager_query()
     else:
       query = db.session.query(self.model)
@@ -498,9 +499,13 @@ class Resource(ModelView):
     collection_name = collection_name or '{0}_collection'.format(model_plural)
 
     objects_json = []
+    stubs = '__stubs_only' in request.args
     for object in objects:
-      object_for_json = ggrc.builder.json.publish(
-          object, self.get_properties_to_include())
+      if not stubs:
+        object_for_json = ggrc.builder.json.publish(
+            object, self.get_properties_to_include())
+      else:
+        object_for_json = ggrc.builder.json.publish_stub(object)
       objects_json.append(object_for_json)
 
     collection_json = {
