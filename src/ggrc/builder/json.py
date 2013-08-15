@@ -39,6 +39,16 @@ def get_json_builder(obj):
     setattr(ggrc.builder, cls.__name__, builder)
   return builder
 
+def publish_base_properties(obj):
+    ret = {}
+    self_url = url_for(obj)
+    if self_url:
+      ret['selfLink'] = self_url
+    view_url = view_url_for(obj)
+    if view_url:
+      ret['viewLink'] = view_url
+    return ret
+
 def publish(obj, inclusions=()):
   """Translate ``obj`` into a valid JSON value. Objects with properties are
   translated into a ``dict`` object representing a JSON object while simple
@@ -47,17 +57,22 @@ def publish(obj, inclusions=()):
   publisher = get_json_builder(obj)
   if publisher and hasattr(publisher, '_publish_attrs') \
       and publisher._publish_attrs:
-    ret = {}
-    self_url = url_for(obj)
-    if self_url:
-      ret['selfLink'] = self_url
-    view_url = view_url_for(obj)
-    if view_url:
-      ret['viewLink'] = view_url
+    ret = publish_base_properties(obj)
     ret.update(publisher.publish_contribution(obj, inclusions))
     return ret
   # Otherwise, just return the value itself by default
   return obj
+
+def publish_stub(obj):
+  publisher = get_json_builder(obj)
+  if publisher:
+    ret = publish_base_properties(obj)
+    if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
+      ret.update(publisher.publish_stubs(obj))
+    return ret
+  # Otherwise, just return the value itself by default
+  return obj
+
 
 def update(obj, json_obj):
   """Translate the state represented by ``json_obj`` into update actions
@@ -350,6 +365,26 @@ class Builder(AttributeInfo):
     else:
       return getattr(obj, attr_name)
 
+  def _publish_attrs_for(
+      self,
+      obj,
+      attrs,
+      json_obj,
+      inclusions=[],
+      ):
+    for attr in attrs:
+      if hasattr(attr, '__call__'):
+        attr_name = attr.attr_name
+      else:
+        attr_name = attr
+      local_inclusion = ()
+      for inclusion in inclusions:
+        if inclusion[0] == attr_name:
+          local_inclusion = inclusion
+          break
+      json_obj[attr_name] = self.publish_attr(
+          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0)
+
   def publish_attrs(self, obj, json_obj, inclusions):
     """Translate the state represented by ``obj`` into the JSON dictionary
     ``json_obj``.
@@ -366,18 +401,8 @@ class Builder(AttributeInfo):
       [('directives'),('cycles')]
       [('directives', ('audit_frequency','organization')),('cycles')]
     """
-    for attr in self._publish_attrs:
-      if hasattr(attr, '__call__'):
-        attr_name = attr.attr_name
-      else:
-        attr_name = attr
-      local_inclusion = ()
-      for inclusion in inclusions:
-        if inclusion[0] == attr_name:
-          local_inclusion = inclusion
-          break
-      json_obj[attr_name] = self.publish_attr(
-          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0)
+    return self._publish_attrs_for(
+        obj, self._publish_attrs, json_obj, inclusions)
 
   @classmethod
   def do_update_attrs(cls, obj, json_obj, attrs):
@@ -404,6 +429,14 @@ class Builder(AttributeInfo):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
     self.publish_attrs(obj, json_obj, inclusions)
+    return json_obj
+
+  def publish_stubs(self, obj):
+    """Translate the state represented by ``obj`` into a JSON dictionary
+    containing an abbreviated representation.
+    """
+    json_obj = {}
+    self._publish_attrs_for(obj, self._stub_attrs, json_obj)
     return json_obj
 
   def update(self, obj, json_obj):
