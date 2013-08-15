@@ -41,7 +41,7 @@ can.Model.Cacheable("CMS.Models.Document", {
         });
     }
   , init : function() {
-    this.validatePresenceOf("title");
+    this.validatePresenceOf("link");
     this._super.apply(this, arguments);
   }
 

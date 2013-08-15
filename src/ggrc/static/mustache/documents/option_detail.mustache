@@ -1,27 +1,16 @@
-<div class="selector-info" style="margin-right:-10%;">
-  {{!<div class="pull-right">
-    <a class="btn btn-mini" rel="tooltip" title="Edit">
-      <i class="grcicon-edit"></i>
-    </a>
-    <a class="btn btn-mini" rel="tooltip" title="Remove">
-      <i class="grcicon-remove"></i>
-    </a>
-  </div>
-  <p>
-    <img src="/static/images/sample/profile100.jpg" alt="">
-  </p>}}
+<div class="selector-info">
   <h4>
-    {{ title }}
-    <br>
-    {{ link }}
-    <br>
-    {{!<small>
-      Google, inc
-    </small>
-    <small></small>
-    <br>
-    <a href="mailto:ernestmandel@gmail.com">
-      ernestmandel@gmail.com
-    </a>}}
+    <i class="grcicon-link"></i>
+    {{firstnonempty title link }}
+  </h4>
+  {{#if description}}
+    <div class="rtf">
+      {{{description}}}
+    </div>
+  {{/if}}
+  <h4 class="simple-url">
+    <a href="{{ link }}" target="_blank">
+      {{ link }}
+    </a>
   </h4>
 </div>
