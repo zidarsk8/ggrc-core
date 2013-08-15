@@ -54,9 +54,17 @@ def named_example_resource(context, resource_type, example_name, **kwargs):
 @given('GET of "{typename}" collection')
 @when('GET of "{typename}" collection')
 def get_collection_for(context, typename):
+  do_get_collection_for(context, typename)
+
+@given('GET of "{typename}" collection with stubs only')
+@when('GET of "{typename}" collection with stubs only')
+def get_collection_for_with_stubs_only(context, typename):
+  do_get_collection_for(context, typename, stubs_only=True)
+
+def do_get_collection_for(context, typename, stubs_only=False):
   handle_get_resource_and_name_it(
       context,
-      get_service_endpoint_url(context, typename),
+      get_service_endpoint_url(context, typename) + '?__stubs_only',
       'collectionresource',
       )
 
