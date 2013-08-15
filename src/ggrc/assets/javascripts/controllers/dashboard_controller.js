@@ -195,7 +195,22 @@ can.Control("CMS.Controllers.Dashboard", {
         content_controller: GGRC.Controllers.ListView,
         content_controller_options: descriptor,
         widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.model.title_plural,
+        widget_name: function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return descriptor.model.title_plural;
+          } else {
+            return "Mapped " + descriptor.model.title_plural;
+          }
+        },
+        widget_info : function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return ""
+          } else {
+            return "Does not include mappings to Directives, Objectives and Controls"
+          }
+        },
         widget_icon: descriptor.model.table_singular,
         object_category: descriptor.model.category || descriptor.object_category
       }
