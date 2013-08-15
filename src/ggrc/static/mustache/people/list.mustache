@@ -1,0 +1,41 @@
+<ul class="new-tree">
+  
+  {{#list}}
+    <li class='controlSlot tree-item' data-id='{{person.id}}'>
+      <div class='item-main'>
+        <div class='simple-link'>
+          <div class='row-fluid'>
+            <div class='span12'>
+              <div class='item-data'>
+                <div class='tree-title-area'>
+                  {{#person}}
+                  {{#if email}}
+                  <a href='mailto:{{email}}' rel='tooltip' title='{{email}}'>
+                    {{#name}}
+                      {{trim}}
+                    {{/name}}
+                    {{^name}}
+                      {{email}}
+                    {{/name}}
+                  </a>
+                  {{else}}
+                    {{name}}
+                  {{/if}}
+                  {{/person}}
+                  <span class='role'>
+                    {{firstnonempty role ''}}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  {{/list}}
+  <li class="tree-item-add">
+    <a href="javascript://" data-placement="left" rel="tooltip" data-modal-selector-options="object_people" data-toggle="modal-selector" data-modal-class="modal-wide" data-original-title="Map People" title="Map People to this {{parent_instance.constructor.shortName}}">
+      + Person
+    </a>
+  </li>
+</ul>

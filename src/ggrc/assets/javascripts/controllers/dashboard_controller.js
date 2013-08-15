@@ -334,12 +334,18 @@ can.Control("CMS.Controllers.InnerNav", {
               
               var menuItem = $widget.find(".header").text().trim()
               ,   first
+              ,   last
               ;
 
               var first = menuItem.substring(0,6);
+              var last = menuItem.slice(-12);
               if (first === "Mapped") {
                 menuItem = menuItem.substr(6);
               }
+              if (last === "and Controls") {
+                menuItem = menuItem.slice(0,-64);
+              }
+              
               return menuItem;
             }
           

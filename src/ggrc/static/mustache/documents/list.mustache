@@ -1,0 +1,29 @@
+<ul id="referenceList" class="new-tree">
+  {{#list}}
+    
+  <li class="tree-item" data-id="{{id}}">
+    <div class="item-main">
+      <div class="simple-link">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="item-data">
+              <div class="tree-title-area">
+                <a class="reference" href="{{document.url}}" target="_blank">
+                  {{document.title}}
+                </a>
+                <span class="option">
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>  
+  {{/list}}
+  <li class="tree-item tree-item-add">
+    <a href="javascript://" data-modal-selector-options="object_documents" data-toggle="modal-selector" data-modal-class="modal-wide" data-original-title="Map Reference Links" data-placement="left" rel="tooltip" title="Map Reference Links to this {{parent_instance.constructor.shortName}}">
+      + Reference Link
+    </a>
+  </li>
+</ul>

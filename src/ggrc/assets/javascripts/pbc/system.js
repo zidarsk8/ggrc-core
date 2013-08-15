@@ -17,7 +17,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , findAll : "GET /api/systems_or_processes"
     , init : function() {
         this._super && this._super();
-        this.bind_object_star_events();
+        $(can.proxy(this, "bind_object_star_events"));
         this.tree_view_options.child_options[1].model = CMS.Models.SystemOrProcess;
         this.risk_tree_options.child_options[1].list_view = "/static/mustache/systems/tree.mustache";
         this.risk_tree_options.child_options[1].parent_find_param = "super_system_systems.parent_id";
@@ -45,6 +45,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , attributes : {
       controls : "CMS.Models.Control.models"
       , sub_systems : "CMS.Models.System.models"
+      , owner : "CMS.Models.Person.model"
     }
     , serialize : {
     }

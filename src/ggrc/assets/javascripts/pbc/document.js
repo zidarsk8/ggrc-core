@@ -66,39 +66,4 @@ can.Model.Cacheable("CMS.Models.Document", {
 });
 
 
-can.Model.Cacheable("CMS.Models.ObjectDocument", {
-    root_object : "object_document"
-    , root_collection : "object_documents"
-    , findAll: "GET /api/object_documents"
-    , create: "POST /api/object_documents"
-    , destroy : "DELETE /api/object_documents/{id}"
-}, {
-    init : function() {
-        var _super = this._super;
-        function reinit() {
-            var that = this;
-
-            typeof _super === "function" && _super.call(this);
-            this.attr("document", CMS.Models.get_instance(
-                  "Document", this.document_id || (this.document && this.document.id)));
-            this.attr("documentable", CMS.Models.get_instance(
-                  this.documentable_type || (this.documentable && this.documentable.type),
-                  this.documentable_id || (this.documentable && this.documentable.id)));
-            /*this.attr(
-                "document"
-                , CMS.Models.Document.findInCacheById(this.document_id)
-                || new CMS.Models.Document(this.document && this.document.serialize ? this.document.serialize() : this.document));
-*/
-            this.each(function(value, name) {
-              if (value === null)
-              that.removeAttr(name);
-            });
-        }
-
-        this.bind("created", can.proxy(reinit, this));
-
-        reinit.call(this);
-    }
-});
-
 })(this, can);

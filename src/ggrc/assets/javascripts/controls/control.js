@@ -26,6 +26,8 @@ can.Model.Cacheable("CMS.Models.Control", {
     , sections : "CMS.Models.Section.models"
     , programs : "CMS.Models.Program.models"
     , object_controls : "CMS.Models.ObjectControl.models"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , owner : "CMS.Models.Person.model"
   }
   , tree_view_options : {
