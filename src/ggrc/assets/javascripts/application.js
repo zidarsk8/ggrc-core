@@ -649,10 +649,12 @@ jQuery(function($) {
         use_slide ? $content.slideUp('fast') : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
+        $content.removeClass('content-open');
       } else if(cmd === "open") {
         use_slide ? $content.slideDown('fast') : $content.css("display", "block");
         $icon.addClass('active');
         $li.addClass('item-open');
+        $content.addClass('content-open');
       }
     });
 

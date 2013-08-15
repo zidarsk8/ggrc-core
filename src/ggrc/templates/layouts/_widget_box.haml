@@ -23,11 +23,11 @@
   %section{ 'class': "widget {{ widget_class }}", 'id': '{{ widget_id }}', 'data-widget-view': '{{ widget_view }}' }
     %header.header
       .row-fluid
-        .span8
+        .span10
           %h2
             -block widget_title
 
-        .span4
+        .span2
           .widget-action.pull-right.widget-showhide
             %a.active{ 'href': "javascript://" }
           -if widget_help is not none
