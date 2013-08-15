@@ -41,6 +41,9 @@ class ObjectPerson(Base, Timeboxed, db.Model):
       'person',
       'personable',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

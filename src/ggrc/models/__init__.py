@@ -60,4 +60,18 @@ def init_app(app):
   from .all_models import all_models
   [model._inflector for model in all_models]
 
+  # Register event listener on all String and Text attributes to sanitize them.
+  import bleach
+  import sqlalchemy as sa
+  from ggrc.models.reflection import SanitizeHtmlInfo
+  def cleaner(target, value, oldvalue, initiator):
+    ret = bleach.clean(value)
+    return ret
+
+  for model in all_models:
+    attr_info = SanitizeHtmlInfo(model)
+    for attr_name in attr_info._sanitize_html:
+      attr = getattr(model, attr_name)
+      sa.event.listen(attr, 'set', cleaner, retval=True)
+
 from .inflector import get_model

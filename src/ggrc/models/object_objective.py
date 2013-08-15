@@ -41,6 +41,9 @@ class ObjectObjective(Base, Timeboxed, db.Model):
       'objective',
       'objectiveable',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

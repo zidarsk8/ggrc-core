@@ -42,6 +42,9 @@ class ObjectControl(Base, Timeboxed, db.Model):
       'control',
       'controllable',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

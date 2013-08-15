@@ -31,6 +31,10 @@ class Person(Base, db.Model):
       'name',
       PublishOnly('object_people'),
       ]
+  _sanitize_html = [
+      'company',
+      'name',
+      ]
 
   # Methods required by Flask-Login
   def is_authenticated(self):
