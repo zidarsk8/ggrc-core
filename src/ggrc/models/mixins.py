@@ -3,10 +3,11 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+import bleach
 from ggrc import settings, db
 from sqlalchemy import event
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.orm.session import Session
 from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
@@ -152,6 +153,7 @@ class Described(object):
   # REST properties
   _publish_attrs = ['description']
   _fulltext_attrs = ['description']
+  _sanitize_html = ['description']
 
 class Hyperlinked(object):
   @declared_attr
@@ -191,7 +193,6 @@ class Hierarchical(object):
         orm.subqueryload('children'),
         #orm.joinedload('parent'),
         )
-
 
 class Timeboxed(object):
   @declared_attr
@@ -262,6 +263,7 @@ class Slugged(Base):
   # REST properties
   _publish_attrs = ['slug', 'title']
   _fulltext_attrs = ['slug', 'title']
+  _sanitize_html = ['slug', 'title']
 
   @classmethod
   def generate_slug_for(cls, obj):

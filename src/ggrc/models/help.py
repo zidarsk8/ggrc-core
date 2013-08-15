@@ -14,3 +14,6 @@ class Help(Slugged, db.Model):
   _publish_attrs = [
       'content',
       ]
+  _sanitize_html = [
+      'content',
+      ]

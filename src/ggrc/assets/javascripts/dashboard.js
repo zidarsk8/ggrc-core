@@ -719,7 +719,7 @@ function resize_areas() {
   ;
   
   $window = $(window);
-  $lhs = $(".lhs-holder, .lhs");
+  $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
   $footer = $(".footer");
   $header = $(".header-content");
@@ -738,7 +738,7 @@ function resize_areas() {
   objectWidth = winWidth - lhsWidth - internavWidth - 8;
   headerWidth = winWidth - lhsWidth;
 
-  $lhs.css("height",lhsHeight);
+  $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);

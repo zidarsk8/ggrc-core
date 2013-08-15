@@ -8,8 +8,7 @@
     <li class="{{#if _removed}}removed{{/if}}">
       <a class="jump-to-control" href="#">
         <span>
-          {{document.title}}
-          &nbsp;
+          {{ firstnonempty document.title document.link }}
         </span>
       </a>
     </li>

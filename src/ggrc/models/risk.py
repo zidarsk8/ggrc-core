@@ -55,8 +55,20 @@ class Risk(
       'risky_attributes',
       'threat_vector',
       'trigger',
+      'risk_mitigation',
       PublishOnly('control_risks'),
       PublishOnly('risk_risky_attributes'),
+      ]
+  _sanitize_html = [
+      'residual_risk',
+      'impact',
+      'trigger',
+      'preconditions',
+      'risk_mitigation',
+      'likelihood',
+      'kind',
+      'threat_vector',
+      'inherent_risk',
       ]
 
   @classmethod

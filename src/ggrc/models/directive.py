@@ -61,6 +61,11 @@ class Directive(Timeboxed, BusinessObject, db.Model):
       'sections',
       'version',
       ]
+  _sanitize_html = [
+      'organization',
+      'scope',
+      'version',
+      ]
 
   @validates('kind')
   def validate_kind(self, key, value):

@@ -22,10 +22,12 @@
               <div class="span11">
                 <div class="item-data">
                   <div class="tree-title-area">
-                    {{title}}
+                    {{ firstnonempty title link }}
+                    {{#if title}}
                     <span class="url-link">
                       {{link}}
                     </span>
+                    {{/if}}
                   </div>
                 </div>
               </div>

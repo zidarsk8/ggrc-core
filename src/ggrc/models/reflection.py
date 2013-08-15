@@ -97,3 +97,8 @@ class AttributeInfo(object):
   def gather_create_attrs(cls, tgt_class):
     return cls.gather_attrs(tgt_class, [
       '_create_attrs', '_update_attrs', '_publish_attrs'])
+
+class SanitizeHtmlInfo(AttributeInfo):
+  def __init__(self, tgt_class):
+    self._sanitize_html = SanitizeHtmlInfo.gather_attrs(
+        tgt_class, '_sanitize_html')
