@@ -231,5 +231,3 @@ def upgrade():
         connection.execute(categories_table.update().where(categories_table.c.id == i).values(row))
 def downgrade():
     pass
-
-

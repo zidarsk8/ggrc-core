@@ -5,6 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from .associationproxy import association_proxy
 from .categorization import Categorizable
 from .mixins import (
@@ -146,6 +147,12 @@ class Control(
       'version',
       'notes',
       ]
+
+  @validates('type', 'kind', 'means', 'verify_frequency')
+  def validate_options(self, key, option):
+    desired_role = key if key == 'verify_frequency' else 'control_' + key
+    assert option is None or option.role == desired_role
+    return option
 
   @classmethod
   def eager_query(cls):
