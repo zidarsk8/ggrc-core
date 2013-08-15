@@ -102,11 +102,16 @@ dashboard-js-template-files:
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
   - directives/tree.mustache
+  - modals/close_buttons.mustache
+  - modals/delete_cancel_buttons.mustache
+  - modals/done_buttons.mustache
   - modals/modal_header.mustache
   - modals/save_cancel_buttons.mustache
+  - modals/save_cancel_delete_buttons.mustache
   - objectives/list_popover.mustache
   - programs/extended_info.mustache
   - programs/info.mustache
+  - programs/modal_content.mustache
   - sections/tree.mustache
 
 dashboard-css-files:
