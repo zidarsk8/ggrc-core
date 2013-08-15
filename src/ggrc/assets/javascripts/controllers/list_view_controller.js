@@ -169,6 +169,7 @@ can.Control("GGRC.Controllers.ListView", {
   }
 
   , fetch_list : function(params) {
+    this.element.trigger("loading");
     this.options.list_loader(this).then(this.proxy("draw_list"));
   }
 
@@ -181,6 +182,7 @@ can.Control("GGRC.Controllers.ListView", {
     can.view(this.options.list_view, this.options, function(frag) {
       that.element
         .html(frag)
+        .trigger("loaded")
         .trigger("updateCount", that.options.list.length);
     });
   }

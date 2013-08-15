@@ -190,6 +190,9 @@ def import_systems():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
   if request.method == 'POST':
     if 'cancel' in request.form:
       return import_redirect('/admin')
@@ -225,6 +228,9 @@ def import_processes():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
   if request.method == 'POST':
     if 'cancel' in request.form:
       return import_redirect('/admin')
@@ -252,6 +258,9 @@ def export_processes():
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Process
 
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
   options = {}
   options['export'] = True
   options['is_biz_process'] = '1'
@@ -264,6 +273,9 @@ def export_systems():
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import System
+
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
 
   options = {}
   options['export'] = True
