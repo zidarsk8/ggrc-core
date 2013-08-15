@@ -76,9 +76,9 @@
         </div>
         <div class="span4">
           {{^single_object}}
-            <a href="{{instance.viewLink}}" class="info-action pull-right" rel="tooltip" title="View {{instance.constructor.model_singular}}" data-placement="left">
+            <a href="{{instance.viewLink}}" class="info-action pull-right">
               <i class="grcicon-goto"></i>
-              View
+              View {{instance.constructor.model_singular}}
             </a>
           {{/single_object}}
         </div>
