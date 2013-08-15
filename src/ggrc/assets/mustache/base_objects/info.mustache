@@ -19,6 +19,17 @@
     </a>
   </p>
   <p>
+    <strong>Owner:</strong>
+    {{^owner}}
+    <span class="error">
+      Not Assigned
+    </span>
+    {{/owner}}
+    {{#if owner}}
+      {{owner.name}}
+    {{/if}}
+  </p>
+  <p>
     <small>Code: {{slug}} | Created: {{created_at}}</small>
   </p>
   {{/instance}}
