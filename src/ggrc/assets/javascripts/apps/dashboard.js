@@ -151,12 +151,19 @@ var model_descriptors = {
     , object_category : "governance"
   }
   , "system_process" : {
-    model : CMS.Models.System
+    model : CMS.Models.SystemOrProcess
     , object_type : "system_process"
     , object_category : "business"
-    , object_route : "systems"
+    , object_route : "systems_or_processes"
     , object_display : "Systems/Processes"
     , widget_view : "/static/mustache/systems/object_widget.mustache"
+  }
+  , "system" : {
+    model : CMS.Models.System
+    , object_type : "system"
+    , object_category : "business"
+    , object_route : "systems"
+    , object_display : "Systems"
   }
   , "sectionslug" : {
     model : CMS.Models.Section

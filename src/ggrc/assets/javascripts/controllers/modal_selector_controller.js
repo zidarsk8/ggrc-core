@@ -141,7 +141,7 @@
           function(options) {
             self.option_list.replace(options);
           }),
-        this.options.join_list || this.options.join_model.findAll(
+        this.options.join_model.findAll(
           $.extend({}, join_query),
           function(joins) {
             //can.each(joins, function(join) {
@@ -432,7 +432,7 @@
         join_list: get_page_object().object_people
       },
 
-      system_systems: {
+      /*system_systems: {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
         option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
@@ -456,7 +456,7 @@
         join_type_field: null,
 
         join_object: CMS.Models.System.findInCacheById(data.join_object_id)
-      },
+      },*/
 
       system_controls: {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",

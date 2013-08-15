@@ -333,7 +333,8 @@ can.Model("can.Model.Cacheable", {
     })
     .then(can.proxy(this.constructor, "model"))
     .done(function(d) {
-      can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
+      d.updated();
+      //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
     });
   }
   , attr : function() {
