@@ -639,15 +639,15 @@ class LinkSystemsHandler(LinksHandler):
     return { 'slug' : value.upper(), 'title' : value }
 
   def find_existing_item(self, data):
-    sys_class = Process if self.options.get('is_biz_process') else System
-    system = sys_class.query.filter_by(slug = data.get('slug')).first()
+    system = SystemOrProcess.query.filter_by(slug=data.get('slug')).first()
+
     if not system:
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
       self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
-      if self.options.get('is_biz_process') and not system.is_biz_process:
+      if self.options.get('is_biz_process') and not (system is Process):
         self.add_link_warning("That code is used by a System, and will not be linked")
-      elif not self.options.get('is_biz_process') and system.is_biz_process:
+      elif not self.options.get('is_biz_process') and system is Process:
         self.add_link_warning('That code is used by a Process, and will not be linked')
       else:
         return system
