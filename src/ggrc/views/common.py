@@ -132,5 +132,4 @@ class RedirectedPolymorphView(BaseObjectView):
         'text/html', 406, [('Content-Type', 'text/plain')]))
     if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
       raise Forbidden()
-    print 'RedirectedPolymorphView.get', view_url_for(obj)
     return redirect(view_url_for(obj))
