@@ -130,7 +130,7 @@ class ModelView(View):
   def get_object(self, id):
     # This could also use `self.pk`
     return self.get_collection(filter_by_contexts=False)\
-        .filter(self.model.id == id).first()
+        .filter(self.model.id == id).one()
 
   def not_found_message(self):
     return '{0} not found.'.format(self.model._inflector.title_singular)

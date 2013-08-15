@@ -90,23 +90,23 @@ class Categorizable(object):
 
   # Method seems to not work
   @classmethod
-  def x_eager_query(cls):
+  def eager_query(cls):
     from sqlalchemy import orm
-    from sqlalchemy.sql.expression import and_
+    from sqlalchemy.sql.expression import and_, select
     from ggrc.models import Category
     query = super(Categorizable, cls).eager_query()
     for r in cls._categorization_attrs():
-      categorizations_alias = \
-          orm.aliased(Categorization, name='Categorization_{0}'.format(r))
-      categories_alias = orm.aliased(Category, name='Category_{0}'.format(r))
+      scope_id = cls._categorization_scopes()[r]
+      subselect = select(
+          (Categorization.id, Categorization.category_id,
+            Categorization.categorizable_id, Categorization.categorizable_type),
+          and_(
+            Categorization.categorizable_type == cls.__name__,
+            Category.id == Categorization.category_id,
+            Category.scope_id == scope_id))
+      alias = orm.aliased(subselect)
       query = query\
-          .outerjoin(categorizations_alias,
-            and_(
-              categorizations_alias.categorizable_id == cls.id,
-              categorizations_alias.categorizable_type == cls.__name__))\
-          .outerjoin(categories_alias,
-            and_(
-              categorizations_alias.category_id == categories_alias.id,
-              categories_alias.scope_id == cls._categorization_scopes()[r]))
-    loads = [orm.contains_eager(r, alias=categorizations_alias) for r in cls._categorization_attrs()]
-    return query.options(*loads)
+          .outerjoin(alias, alias.c.categorizable_id == cls.id)\
+          .options(orm.contains_eager(getattr(cls, r), alias=alias))
+
+    return query
