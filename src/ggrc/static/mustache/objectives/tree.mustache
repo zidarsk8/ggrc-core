@@ -25,12 +25,23 @@
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
-          <div class="span12">
-            <a href="{{instance.viewLink}}" class="info-action pull-right">
+
+          <div class="span6">
+            <a href="{{instance.viewLink}}" class="info-action">
               View Objective
               <i class="grcicon-goto"></i>
             </a>
           </div>
+          
+          {{! UNMAP
+          <div class="span6">
+            <a href="javascript://" class="info-action unmap pull-right">
+              <i class="grcicon-remove"></i>
+              Unmap
+            </a>
+          </div>
+          }}
+
         </div>
 
         {{#instance.description}}
@@ -55,9 +66,9 @@
                   Not Assigned
                 </span>
               {{/instance.owner}}
-              {{#if instance.owner}}
+              {{#instance.owner}}
                 {{instance.owner.name}}
-              {{/if}}
+              {{/}}
             </div>
           </div>
           {{#instance.url}}
@@ -96,7 +107,7 @@
     data-toggle="modal-selector"
     data-modal-selector-options="section_objectives"
     data-modal-class="modal-wide"
-    data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.constructor.shortName}}">
     + {{model.title_singular}}
@@ -110,7 +121,7 @@
     data-placement="left"
     data-toggle="modal-selector-dispatch"
     data-modal-class="modal-wide"
-    data-original-title="map {{model.title_singular.toLowerCase}} to this object"
+    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
     data-join-option-type="{{model.shortName}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.constructor.shortName}}">
