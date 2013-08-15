@@ -296,10 +296,17 @@ class Builder(AttributeInfo):
             getattr(o, target_name), getattr(o, target_type))
               for o in join_objects]
       else:
-        target_name = list(class_attr.remote_attr.property.local_columns)[0].key
-        target_type = class_attr.remote_attr.property.mapper.class_.__name__
-        return [self.generate_link_object_for_foreign_key(
-            getattr(o, target_name), target_type) for o in join_objects]
+        target_mapper = class_attr.remote_attr.property.mapper
+        # Handle inheritance -- we must check the object itself for the type
+        if len(list(target_mapper.self_and_descendants)) > 1:
+          target_attr = class_attr.remote_attr.property.key
+          return [self.generate_link_object_for(
+            getattr(o, target_attr), inclusions, include) for o in join_objects]
+        else:
+          target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+          target_type = class_attr.remote_attr.property.mapper.class_.__name__
+          return [self.generate_link_object_for_foreign_key(
+              getattr(o, target_name), target_type) for o in join_objects]
 
   def publish_relationship(
       self, obj, attr_name, class_attr, inclusions, include):
