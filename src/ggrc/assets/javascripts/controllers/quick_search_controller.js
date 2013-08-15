@@ -62,7 +62,8 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
       , model_name = get_attr($tab, that.options.tab_model_attr)
       , model = can.getObject("CMS.Models." + model_name) || can.getObject("GGRC.Models." + model_name)
       , view_data = null
-      , spinner;
+      , spinner
+      , xhrs = {};
 
       if(!template && typeof console !== "undefined") {
         console.warn("No template defined for quick_search in ", $pane.attr("id"));
@@ -79,6 +80,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
 
         $tab.data("view_data", view_data);
         $tab.data("model", model);
+        $pane.trigger("loading");
         model.findAll().done(function(data) {
           view_data.attr('all_items', data);
           view_data.attr('filtered_items', data.slice(0));
@@ -90,6 +92,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
               view_data.attr('list', data);
             }
             can.Observe.stopBatch();
+            $pane.trigger("loaded", xhrs[$pane.attr("id")], $tab.data("list"));
           } else {
             GGRC.queue_event(function() {
               if(that.options.limit != null) {
@@ -97,6 +100,7 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
               } else {
                 view_data.attr('list', data);
               }
+              $pane.trigger("loaded", xhrs[$pane.attr("id")], $tab.data("list"));
             });
           }
           $tab.find(".item-count").html(data ? data.length : 0);
@@ -127,7 +131,8 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
           }));
         can.view(template, view_data, function(frag, xhr) {
           $tab.data('tab-loaded', true);
-          $pane.html(frag).trigger("loaded", xhr, $tab.data("list"));
+          $pane.html(frag);
+          xhrs[$pane.attr("id")] = xhr;
         });
       }
     });

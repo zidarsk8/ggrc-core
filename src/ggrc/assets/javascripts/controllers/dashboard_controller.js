@@ -284,6 +284,7 @@ can.Control("CMS.Controllers.InnerNav", {
   defaults: {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
     , widget_list : null
+    , spinners : {}
   }
 }, {
     init: function(options) {
@@ -323,6 +324,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , replace_widget_list : function(widget_elements) {
       var widget_list = []
+        , that = this
         ;
 
       can.each(widget_elements, function(widget_element) {
@@ -333,20 +335,39 @@ can.Control("CMS.Controllers.InnerNav", {
           , internav_display: function() {
               
               var menuItem = $widget.find(".header").text().trim()
-              ,   first
-              ;
-
-              var first = menuItem.substring(0,6);
+              ,   first = menuItem.substring(0,6);
               if (first === "Mapped") {
                 menuItem = menuItem.substr(6);
               }
               return menuItem;
             }
-          
+          , spinner : that.options.spinners["#" + $widget.attr("id")]
           });
       });
       this.options.widget_list.replace(widget_list);
     }
+
+  , "{document.body} loading" : function(body, ev) {
+    var that = this;
+    can.each(this.options.widget_list, function(widget) {
+      var spinner;
+      if($(widget.selector).has(ev.target).length) {
+        widget.attr("spinner", true);
+        that.options.spinners[widget.selector] = true;
+      }
+    });
+  }
+
+  , "{document.body} loaded" : function(body, ev) {
+    var that = this;
+    can.each(this.options.widget_list, function(widget) {
+      var spinner;
+      if($(widget.selector).has(ev.target).length) {
+        widget.attr("spinner", false);
+        delete that.options.spinners[widget.selector];
+      }
+    });
+  }
 
   , update_scrollspy : function() {
       var $body = $(".object-area")
