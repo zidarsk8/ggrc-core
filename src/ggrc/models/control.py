@@ -141,6 +141,11 @@ class Control(
       PublishOnly('program_controls'),
       'object_controls',
       ]
+  _sanitize_html = [
+      'documentation_description',
+      'version',
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

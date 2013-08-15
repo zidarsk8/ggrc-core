@@ -41,6 +41,9 @@ class ObjectDocument(Base, Timeboxed, db.Model):
       'document',
       'documentable',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

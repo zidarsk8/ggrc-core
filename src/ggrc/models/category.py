@@ -75,6 +75,9 @@ class Category(Hierarchical, Base, db.Model):
       CategorizedPublishable('controls', 'Control'),
       CategorizedPublishable('risks', 'Risk'),
       ]
+  _sanitize_html = [
+      'name',
+      ]
 
   @classmethod
   def eager_query(cls):

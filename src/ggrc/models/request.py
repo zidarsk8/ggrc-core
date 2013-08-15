@@ -45,6 +45,16 @@ class Request(Base, db.Model):
       'response_due_at',
       'responses',
       ]
+  _sanitize_html = [
+      'pbc_control_desc',
+      'company_responsible',
+      'auditor_responsible',
+      'test',
+      'status', 
+      'notes',
+      'request',
+      'pbc_control_code',
+      ]
 
   @classmethod
   def eager_query(cls):

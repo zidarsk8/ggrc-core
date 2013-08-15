@@ -39,6 +39,13 @@ class Cycle(Documentable, Personable, Base, Described, db.Model):
       'report_due_at',
       'pbc_lists',
       ]
+  _sanitize_html = [
+      'audit_firm',
+      'audit_lead',
+      'status',
+      'title',
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

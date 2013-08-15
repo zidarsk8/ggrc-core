@@ -18,10 +18,10 @@ class Context(Base, Described, db.Model):
   @property
   def related_object(self, obj=[]):
     if len(obj) == 0:
-      if self.related_object_type is not None:
+      if self.related_object_type:
         import ggrc.models
         import ggrc.services.util
-        service = ggrc.services.util.service_for(self.related_object_type)
+        service = ggrc.services.util.service_for(str(self.related_object_type))
         model_class = service._model
         obj.append(db.session.query(model_class).get(self.related_object_id))
       else:
@@ -38,4 +38,4 @@ class Context(Base, Described, db.Model):
       self.related_object_type = None
 
   _publish_attrs = ['name', 'related_object',]
-
+  _sanitize_html = ['name',]

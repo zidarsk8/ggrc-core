@@ -34,6 +34,9 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
       'controls',
       'object_objectives',
       ]
+  _sanitize_html = [
+      'notes',
+      ]
 
   @classmethod
   def eager_query(cls):

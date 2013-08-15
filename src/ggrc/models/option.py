@@ -18,3 +18,6 @@ class Option(Base, Described, db.Model):
       'title',
       'required',
       ]
+  _sanitize_html = [
+      'title',
+      ]
