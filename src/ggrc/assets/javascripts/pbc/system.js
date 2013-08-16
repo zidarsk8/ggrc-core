@@ -105,8 +105,6 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
     , attributes : {
       controls : "CMS.Models.Control.models"
-      , sub_systems : "CMS.Models.get_instances"
-      , super_systems : "CMS.Models.get_instances"
       , documents : "CMS.Models.Document.models"
       , people : "CMS.Models.Person.models"
       , object_documents : "CMS.Models.ObjectDocument.models"
@@ -142,8 +140,6 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
     , attributes : {
       controls : "CMS.Models.Control.models"
-      , sub_systems : "CMS.Models.get_instances"
-      , super_systems : "CMS.Models.get_instances"
       , documents : "CMS.Models.Document.models"
       , people : "CMS.Models.Person.models"
       , object_documents : "CMS.Models.ObjectDocument.models"
