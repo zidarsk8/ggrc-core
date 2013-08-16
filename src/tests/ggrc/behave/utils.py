@@ -238,7 +238,9 @@ def check_for_resource_in_collection(
   from ggrc import models
   model_class = getattr(models, resource.resource_type)
   entry_list = collection[root][model_class._inflector.table_plural]
-  result_pairs = set([(o[u'id'], o[u'selfLink']) for o in entry_list])
+  result_pairs = set(
+      [(o.get(u'id'), o.get(u'selfLink') or o.get(u'href'))
+        for o in entry_list])
   check_pair = (resource.get(u'id'), resource.get(u'selfLink'))
   if expected:
     assert check_pair in result_pairs, \
