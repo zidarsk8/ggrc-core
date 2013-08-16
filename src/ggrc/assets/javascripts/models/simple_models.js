@@ -834,7 +834,9 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
     params_or_object = object_type;
     if (!params_or_object)
       return null;
-    object_type = params_or_object.type
+    object_type =
+      (params_or_object.constructor && params_or_object.constructor.shortName)
+      || (!params_or_object.selfLink && params_or_object.type)
       || can.map(
           window.cms_singularize(
             /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
@@ -872,6 +874,12 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   }
   return instance;
 };
+
+CMS.Models.get_instances = function(instances) {
+  if (!instances)
+    return [];
+  return can.map(instances, CMS.Models.get_instance);
+}
 
 CMS.Models.get_link_type = function(instance, attr) {
   var type
