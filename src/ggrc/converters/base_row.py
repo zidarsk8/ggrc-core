@@ -289,8 +289,15 @@ class OptionColumnHandler(ColumnHandler):
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
     truthy_values = self.options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
+    no_values = self.options.get('no_values',[]) + ['no', '0', 'false','n']
     if value:
-      return value.lower() in truthy_values
+      if value.lower() in truthy_values:
+        return "True"
+      elif value.lower() in no_values:
+          return "False"
+      else:
+        self.warnings.append('bad value')
+        return value
     return None
 
 class DateColumnHandler(ColumnHandler):
