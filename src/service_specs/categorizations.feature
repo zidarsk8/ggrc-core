@@ -23,3 +23,19 @@ Feature: Many resources can be "categorized". This feature will exercise
       | Control       | assertions        | controls               | 102   |
       | Risk          | categories        | risks                  | 100   |
 
+  Scenario: Control categories and assertions are independent
+    Given a Category resource named "a_control_category" for scope "100"
+    And "a_control_category" is POSTed to its collection
+    And a Category resource named "a_control_assertion" for scope "102"
+    And "a_control_assertion" is POSTed to its collection
+    And a new "Control" named "control"
+    And "a_control_category" is added to links property "categories" of "control"
+    And "a_control_assertion" is added to links property "assertions" of "control"
+    And "control" is POSTed to its collection
+    When GET of the resource "control"
+    Then the "categories" property of the "control" is not empty
+    And the "assertions" property of the "control" is not empty
+    #And "a_control_category" is in the links property "categories" of "control"
+    And "a_control_category" is not in the links property "assertions" of "control"
+    #And "a_control_assertion" is not in the links property "categories" of "control"
+    And "a_control_assertion" is in the links property "assertions" of "control"
