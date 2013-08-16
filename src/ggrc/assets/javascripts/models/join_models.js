@@ -140,6 +140,10 @@ can.Model.Cacheable("can.Model.Join", {
 can.Model.Join("CMS.Models.Relationship", {
     root_object: "relationship"
   , root_collection: "relationships"
+  , attributes : {
+    source : "CMS.Models.get_instance"
+    , destination : "CMS.Models.get_instance"
+  }
   , join_keys : {
     source : can.Model.Cacheable
     , destination : can.Model.Cacheable
@@ -153,11 +157,19 @@ can.Model.Join("CMS.Models.Relationship", {
 
     //typeof this._super_init === "function" && this._super_init.call(this);
     this.attr("source", CMS.Models.get_instance(
-      this.source_type || (this.source && this.source.type)
+      this.source_type
+        || (this.source
+            && (this.source.constructor
+                && this.source.constructor.shortName
+                || (!this.source.selfLink && this.source.type)))
       , this.source_id || (this.source && this.source.id)
       , this.source) || this.source);
     this.attr("destination", CMS.Models.get_instance(
-      this.destination_type || (this.destination && this.destination.type)
+      this.destination_type
+        || (this.destination
+            && (this.destination.constructor
+                && this.destination.constructor.shortName
+                || (!this.source.selfLink && this.destination.type)))
       , this.destination_id || (this.destination && this.destination.id)
       , this.destination) || this.destination);
 
@@ -235,6 +247,10 @@ can.Model.Join("CMS.Models.ProgramDirective", {
     "program" : CMS.Models.Program
     , "directive" : CMS.Models.Directive
   }
+  , attributes : {
+    "program" : "CMS.Models.Program.model"
+    , "directive" : "CMS.Models.Directive.model"
+  }
   , create: "POST /api/program_directives"
   , destroy : "DELETE /api/program_directives/{id}"
 }, {
@@ -243,6 +259,10 @@ can.Model.Join("CMS.Models.ProgramDirective", {
 can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"
+  , attributes : {
+      "objective" : "CMS.Models.Objective.model"
+    , "control" : "CMS.Models.Control.model"
+    }
   , join_keys : {
       "objective" : CMS.Models.Objective
     , "control" : CMS.Models.Control
@@ -256,6 +276,10 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
 can.Model.Join("CMS.Models.SystemControl", {
   root_object : "system_control"
   , root_collection : "system_controls"
+  , attributes: {
+    "system" : "CMS.Models.System.model"
+    , "control" : "CMS.Models.Control.model"
+  }
   , join_keys : {
     "system" : CMS.Models.System
     , "control" : CMS.Models.Control
@@ -269,6 +293,10 @@ can.Model.Join("CMS.Models.SystemControl", {
 can.Model.Join("CMS.Models.SystemSystem", {
   root_object : "system_system"
   , root_collection : "system_systems"
+  , attributes : {
+    "parent" : "CMS.Models.System.model"
+    , "child" : "CMS.Models.System.model"
+  }
   , join_keys : {
     "parent" : can.Model.Cacheable
     , "child" : can.Model.Cacheable
@@ -286,6 +314,10 @@ can.Model.Join("CMS.Models.UserRole", {
   , update : "PUT /api/user_roles/{id}"
   , create : "POST /api/user_roles"
   , destroy : "DELETE /api/user_roles/{id}"
+  , attributes : {
+      person : "CMS.Models.Person.model"
+    , role : "CMS.Models.Role.model"
+  }
   , join_keys : {
       person : CMS.Models.Person
     , role : CMS.Models.Role
@@ -327,10 +359,10 @@ can.Model.Join("CMS.Models.ControlSection", {
     section : CMS.Models.Section
     , control : CMS.Models.Control
   }
-  /*, attributes : {
+  , attributes : {
     section : "CMS.Models.Section.model"
     , control : "CMS.Models.Control.model"
-  }
+  }/*
   , init : function() {
     var that = this;
     this._super.apply(this, arguments);
@@ -438,8 +470,12 @@ can.Model.Join("CMS.Models.ProgramControl", {
     "program" : CMS.Models.Program
     , "control" : CMS.Models.Control
   }
+  , attributes : {
+    "program" : "CMS.Models.Program.model"
+    , "control" : "CMS.Models.Control.model"
+  }
   , create : "POST /api/program_controls"
-  , destroy : "DELETE /api/program_controls"
+  , destroy : "DELETE /api/program_controls/{id}"
 }, {
 
 });
