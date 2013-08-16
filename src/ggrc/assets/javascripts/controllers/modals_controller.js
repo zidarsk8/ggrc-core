@@ -53,7 +53,6 @@ can.Control("GGRC.Controllers.Modals", {
 
     if (this.options.object_params)
       can.each(this.options.object_params, function(value, key) {
-        debugger
         self.set_value({ name: key, value: value });
       });
   }
