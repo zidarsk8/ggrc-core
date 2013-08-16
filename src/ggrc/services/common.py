@@ -9,7 +9,7 @@ import hashlib
 import time
 from blinker import Namespace
 from exceptions import TypeError
-from flask import url_for, request, current_app, session
+from flask import url_for, request, current_app
 from flask.views import View
 from ggrc import db
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper

@@ -4,16 +4,16 @@
 # Maintained By: dan@reciprocitylabs.com
 
 import json
-
-from ggrc.app import db, app
-from ggrc.rbac import permissions
-from werkzeug.exceptions import Forbidden
-from .tooltip import TooltipView
-from .relationships import RelatedObjectResults
-from . import filters
-from flask import request, redirect, url_for, flash, session
+from collections import namedtuple
+from flask import request, flash, session
+from ggrc.app import app
 from ggrc.converters.common import ImportException
 from ggrc.converters.sections import SectionsConverter
+from ggrc.rbac import permissions
+from werkzeug.exceptions import Forbidden
+from . import filters
+from .common import BaseObjectView, RedirectedPolymorphView
+from .tooltip import TooltipView
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -313,77 +313,85 @@ def export_controls(directive_id):
   filename = "{}-controls.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.controls, ControlsConverter, **options)
 
-def _all_views(view_list):
-  import ggrc.services
-  collections = dict(
-      [(e.name, e.model_class) for e in ggrc.services.all_collections()])
+ViewEntry = namedtuple('ViewEntry', 'url model_class service_class')
 
-  def with_model(object_plural):
-    return (object_plural, collections.get(object_plural))
+def object_view(model_class, base_service_class=BaseObjectView):
+  return ViewEntry(
+      model_class._inflector.table_plural,
+      model_class,
+      base_service_class)
 
-  return map(with_model, view_list)
+def tooltip_view(model_class, base_service_class=TooltipView):
+  return object_view(model_class, base_service_class=base_service_class)
 
 def all_object_views():
-  return _all_views([
-      'programs',
-      'directives',
-      'contracts',
-      'policies',
-      'regulations',
-      'cycles',
-      'controls',
-      'objectives',
-      'systems',
-      'processes',
-      'products',
-      'org_groups',
-      'facilities',
-      'markets',
-      'projects',
-      'data_assets',
-      'risky_attributes',
-      'risks',
-      'people',
-      'pbc_lists',
-      'roles',
-      ])
+  from ggrc import models
+  return [
+      object_view(models.Program),
+      object_view(models.Directive, RedirectedPolymorphView),
+      object_view(models.Contract),
+      object_view(models.Policy),
+      object_view(models.Regulation),
+      object_view(models.Cycle),
+      object_view(models.Control),
+      object_view(models.Objective),
+      object_view(models.System),
+      object_view(models.Process),
+      object_view(models.Product),
+      object_view(models.OrgGroup),
+      object_view(models.Facility),
+      object_view(models.Market),
+      object_view(models.Project),
+      object_view(models.DataAsset),
+      object_view(models.RiskyAttribute),
+      object_view(models.Risk),
+      object_view(models.Person),
+      object_view(models.PbcList),
+      ]
 
 def all_tooltip_views():
-  return _all_views([
-      'programs',
-      'directives',
-      'contracts',
-      'policies',
-      'regulations',
-      'cycles',
-      'controls',
-      'objectives',
-      'systems',
-      'processes',
-      'products',
-      'org_groups',
-      'facilities',
-      'markets',
-      'projects',
-      'data_assets',
-      'risky_attributes',
-      'risks',
-      'people',
-      'events',
-      ])
+  from ggrc import models
+  return [
+      tooltip_view(models.Program),
+      tooltip_view(models.Contract),
+      tooltip_view(models.Policy),
+      tooltip_view(models.Regulation),
+      tooltip_view(models.Cycle),
+      tooltip_view(models.Control),
+      tooltip_view(models.Objective),
+      tooltip_view(models.System),
+      tooltip_view(models.Process),
+      tooltip_view(models.Product),
+      tooltip_view(models.OrgGroup),
+      tooltip_view(models.Facility),
+      tooltip_view(models.Market),
+      tooltip_view(models.Project),
+      tooltip_view(models.DataAsset),
+      tooltip_view(models.RiskyAttribute),
+      tooltip_view(models.Risk),
+      tooltip_view(models.Person),
+      tooltip_view(models.Event),
+      ]
 
 def init_all_object_views(app):
   import sys
   from ggrc import settings
-  from .common import BaseObjectView
 
-  for k,v in all_object_views():
-    BaseObjectView.add_to(
-      app, '/{0}'.format(k), v, decorators=(login_required,))
+  for entry in all_object_views():
+    entry.service_class.add_to(
+      app,
+      '/{0}'.format(entry.url),
+      entry.model_class,
+      decorators=(login_required,)
+      )
 
-  for k,v in all_tooltip_views():
-    TooltipView.add_to(
-      app, '/{0}'.format(k), v, decorators=(login_required,))
+  for entry in all_tooltip_views():
+    entry.service_class.add_to(
+      app,
+      '/{0}'.format(entry.url),
+      entry.model_class,
+      decorators=(login_required,)
+      )
 
   if hasattr(settings, 'EXTENSIONS'):
     for extension in settings.EXTENSIONS:

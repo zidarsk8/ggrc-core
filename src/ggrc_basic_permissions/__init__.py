@@ -7,14 +7,14 @@ import datetime
 from flask import session, Blueprint
 import sqlalchemy.orm
 from ggrc import db, settings
-from ggrc.login import get_current_user
+from ggrc.login import get_current_user, login_required
 from ggrc.models.context import Context
 from ggrc.models.program import Program
 from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
-from ggrc.views.common import BaseObjectView
+from ggrc.views import object_view
 from .models import Role, UserRole
 
 blueprint = Blueprint(
@@ -202,3 +202,11 @@ from ggrc.app import app
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for,}
 
+def initialize_all_object_views(app):
+  role_view_entry = object_view(Role)
+  role_view_entry.service_class.add_to(
+      app,
+      '/{0}'.format(role_view_entry.url),
+      role_view_entry.model_class,
+      decorators=(login_required,),
+      )

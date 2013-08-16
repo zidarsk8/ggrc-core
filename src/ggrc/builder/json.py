@@ -11,17 +11,13 @@ from datetime import datetime
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
-from ggrc.services.util import url_for
+from ggrc.utils import url_for, view_url_for
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
 from werkzeug.exceptions import BadRequest
 
 """JSON resource state representation handler for gGRC models."""
-
-def view_url_for(obj):
-  view = getattr(ggrc.views, obj.__class__.__name__, None)
-  return view.url_for(obj) if view else None
 
 def get_json_builder(obj):
   """Instantiate or retrieve a JSON representation builder for the given

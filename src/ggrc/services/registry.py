@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from collections import namedtuple
-from .common import *
+from .common import Resource
 
 ServiceEntry = namedtuple('ServiceEntry', 'name model_class service_class')
 
