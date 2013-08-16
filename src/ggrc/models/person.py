@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from sqlalchemy.orm import validates
 from .mixins import deferred, Base
 from .reflection import PublishOnly
 
@@ -48,6 +49,11 @@ class Person(Base, db.Model):
 
   def get_id(self):
     return unicode(self.id)
+
+  @validates('language')
+  def validate_options(self, key, option):
+    assert option is None or option.role == 'person_language'
+    return option
 
   @classmethod
   def eager_query(cls):

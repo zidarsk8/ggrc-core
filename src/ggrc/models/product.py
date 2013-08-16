@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from sqlalchemy.orm import validates
 from .mixins import deferred, BusinessObject, Timeboxed
 from .object_control import Controllable
 from .object_document import Documentable
@@ -33,6 +34,11 @@ class Product(
   _sanitize_html = [
       'version',
       ]
+
+  @validates('type')
+  def validate_options(self, key, option):
+    assert option is None or option.role == 'product_type'
+    return option
 
   @classmethod
   def eager_query(cls):

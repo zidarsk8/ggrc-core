@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from sqlalchemy.orm import validates
 from .mixins import deferred, Base
 
 class Document(Base, db.Model):
@@ -75,6 +76,17 @@ class Document(Base, db.Model):
       'title',
       'description',
       ]
+
+  @validates('type', 'kind', 'year', 'language')
+  def validate_options(self, key, option):
+    if key in ('type', 'year'):
+      desired_role  = 'document_' + key
+    elif key == 'kind':
+      desired_role = 'reference_type'
+    else:
+      desired_role = key
+    assert option is None or option.role == desired_role
+    return option
 
   @classmethod
   def eager_query(cls):
