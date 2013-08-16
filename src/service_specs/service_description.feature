@@ -9,7 +9,7 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | endpoint           | max_query_count |
       | Categorization     | -1              |
       | Category           | -1              |
-      | Control            | 10              |
+      | Control            | 12              |
       | ControlAssessment  | 10              |
       | ControlRisk        | 10              |
       | Cycle              | 10              |
