@@ -48,8 +48,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "Program" : "ProgramControl"
   }
   , defaults : {
-    "type" : {id : 1}
-    , "selected" : false
+      "selected" : false
     , "title" : ""
     , "slug" : ""
     , "description" : ""
