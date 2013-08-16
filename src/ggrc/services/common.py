@@ -10,6 +10,7 @@ import time
 from blinker import Namespace
 from exceptions import TypeError
 from flask import url_for, request, current_app
+from flask.ext.sqlalchemy import Pagination
 from flask.views import View
 from ggrc import db
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
@@ -67,6 +68,8 @@ def log_event(session, obj = None):
     session.add(event)
 
 class ModelView(View):
+  DEFAULT_PAGE_SIZE = 7
+  MAX_PAGE_SIZE = 20
   pk = 'id'
   pk_type = 'int'
 
@@ -127,7 +130,8 @@ class ModelView(View):
           query = query.filter(or_(
             j_class.context_id.in_(j_contexts),
             j_class.context_id == None))
-    return query.order_by(self.modified_attr.desc())#.limit(20)
+    query = query.order_by(self.modified_attr.desc())
+    return query
 
   def get_object(self, id):
     # This could also use `self.pk`
@@ -502,29 +506,73 @@ class Resource(ModelView):
       inclusions = ()
     return inclusions
 
+  def build_page_object_for_json(self, paging):
+    def page_args(next_num, per_page):
+      ret = dict(request.args)
+      ret['__page'] = next_num
+      if '__page_size' in ret:
+        ret['__page_size'] = per_page
+      return ret
+    paging_obj = {}
+    base_url = self.url_for()
+    page_url = lambda params: base_url + '?' + urlencode(params)
+    if paging.has_next:
+      paging_obj['next'] = page_url(
+          page_args(paging.next_num, paging.per_page))
+    if paging.has_prev:
+      paging_obj['prev'] = page_url(
+          page_args(paging.prev_num, paging.per_page))
+    paging_obj['first'] = page_url(page_args(1, paging.per_page))
+    paging_obj['last'] = page_url(page_args(paging.pages, paging.per_page))
+    paging_obj['count'] = paging.pages
+    return paging_obj
+
+  def build_collection_for_json(
+      self, objects, model_plural, collection_name, paging=None):
+    objects_json = []
+    stubs = '__stubs_only' in request.args
+    for obj in objects:
+      if not stubs:
+        object_for_json = ggrc.builder.json.publish(
+            obj, self.get_properties_to_include())
+      else:
+        object_for_json = ggrc.builder.json.publish_stub(obj)
+      objects_json.append(object_for_json)
+    collection_json = {
+        collection_name: {
+          'selfLink': self.url_for_preserving_querystring(),
+          model_plural: objects_json,
+          }
+        }
+    if paging:
+      collection_json[collection_name]['paging'] = \
+          self.build_page_object_for_json(paging)
+    return collection_json
+
+  def paged_collection_for_json(
+      self, query, model_plural, collection_name):
+    page_number = int(request.args['__page'])
+    page_size = min(
+        int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
+        self.MAX_PAGE_SIZE)
+    items = query.limit(page_size).offset((page_number-1)*page_size).all()
+    if page_number == 1 and len(items) < page_size:
+      total = len(items)
+    else:
+      total = query.order_by(None).count()
+    page = Pagination(query, page_number, page_size, total, items)
+    return self.build_collection_for_json(
+        page.items, model_plural, collection_name, paging=page)
+
   def collection_for_json(
       self, objects, model_plural=None, collection_name=None):
     model_plural = model_plural or self.model._inflector.table_plural
     collection_name = collection_name or '{0}_collection'.format(model_plural)
-
-    objects_json = []
-    stubs = '__stubs_only' in request.args
-    for object in objects:
-      if not stubs:
-        object_for_json = ggrc.builder.json.publish(
-            object, self.get_properties_to_include())
-      else:
-        object_for_json = ggrc.builder.json.publish_stub(object)
-      objects_json.append(object_for_json)
-
-    collection_json = {
-      collection_name: {
-        'selfLink': self.url_for_preserving_querystring(),
-        model_plural: objects_json,
-        }
-      }
-
-    return collection_json
+    if '__page' in request.args:
+      return self.paged_collection_for_json(
+          objects, model_plural, collection_name)
+    return self.build_collection_for_json(
+        objects, model_plural, collection_name)
 
   def http_timestamp(self, timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
