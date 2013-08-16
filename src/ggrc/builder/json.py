@@ -62,7 +62,11 @@ def publish(obj, inclusions=()):
 def publish_stub(obj):
   publisher = get_json_builder(obj)
   if publisher:
-    ret = publish_base_properties(obj)
+    ret = {}
+    self_url = url_for(obj)
+    if self_url:
+      ret['href'] = self_url
+    ret['type'] = obj.__class__.__name__
     if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
       ret.update(publisher.publish_stubs(obj))
     return ret

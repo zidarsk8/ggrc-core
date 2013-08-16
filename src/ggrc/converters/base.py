@@ -1,8 +1,26 @@
 import csv
 from .common import *
 from ggrc import db
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
+
+def get_objects_for_indexing(session):
+  return (list(session.new), list(session.dirty), list(session.deleted))
+
+def update_index_for_objects(session, created, updated, deleted):
+  indexer = get_indexer()
+  if created:
+    for obj in created:
+      indexer.create_record(fts_record_for(obj), commit=False)
+  if updated:
+    for obj in updated:
+      indexer.update_record(fts_record_for(obj), commit=False)
+  if deleted:
+    for obj in deleted:
+      indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+  session.commit()
 
 class BaseConverter(object):
 
@@ -153,8 +171,10 @@ class BaseConverter(object):
   def save_import(self):
     for row_converter in self.objects:
       row_converter.save(db.session, **self.options)
+    objects_for_indexing = get_objects_for_indexing(db.session)
     log_event(db.session)
     db.session.commit()
+    update_index_for_objects(db.session, *objects_for_indexing)
 
   def read_objects(self, headers, rows):
     attrs_collection = []
