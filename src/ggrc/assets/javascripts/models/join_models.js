@@ -270,8 +270,8 @@ can.Model.Join("CMS.Models.SystemSystem", {
   root_object : "system_system"
   , root_collection : "system_systems"
   , join_keys : {
-    "parent" : CMS.Models.System
-    , "child" : CMS.Models.System
+    "parent" : can.Model.Cacheable
+    , "child" : can.Model.Cacheable
   }
   , findAll: "GET /api/system_systems"
   , create: "POST /api/system_systems"

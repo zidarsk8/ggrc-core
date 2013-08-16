@@ -73,10 +73,10 @@ class BaseRowConverter(object):
     return warning_messages
 
   def has_errors(self):
-    return any(self.errors) or any([val.errors for val in self.handlers.values()])
+    return any(self.errors) or any([val.has_errors() for val in self.handlers.values()])
 
   def has_warnings(self):
-    return any(self.warnings) or any([val.warnings for val in self.handlers.values()])
+    return any(self.warnings) or any([val.has_warnings() for val in self.handlers.values()])
 
   def setup(self):
     pass
@@ -264,7 +264,7 @@ class SlugColumnHandler(ColumnHandler):
         self.importer.importer.add_slug_to_slugs(self.value)
       self.validate(content)
     else:
-      self.add_warning('Code will be autofilled')
+      self.add_error('Code is required')
     return content
 
 class OptionColumnHandler(ColumnHandler):

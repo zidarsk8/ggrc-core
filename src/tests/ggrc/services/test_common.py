@@ -125,7 +125,11 @@ class TestResource(TestCase):
     return ret
 
   def test_X_Requested_By_required(self):
-    response = self.client.get(self.mock_url())
+    response = self.client.post(self.mock_url())
+    self.assert400(response)
+    response = self.client.put(self.mock_url()+'/1', data='blah')
+    self.assert400(response)
+    response = self.client.delete(self.mock_url()+'/1')
     self.assert400(response)
 
   def test_empty_collection_get(self):

@@ -108,7 +108,7 @@
             .inner-nav
               .object-nav
                 %ul.nav{ 'class': "internav ={ model_display_class }" }
-                -include 'shared/_add_widget_section.haml'
+                -#include 'shared/_add_widget_section.haml' #Widget adding/removing isn't ready yet
             .object-area{ 'data-spy': 'scroll', 'data-target': '.object-nav', 'data-offset': '30'}
               #show_columns.column-set{ 'data-resize': "true" }
                 #middle_column.widget-area

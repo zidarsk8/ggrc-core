@@ -72,6 +72,11 @@ class Directive(Timeboxed, BusinessObject, db.Model):
     assert value in self.valid_kinds
     return value
 
+  @validates('audit_duration', 'audit_frequency')
+  def validate_options(self, key, option):
+    assert option is None or option.role == key
+    return option
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm

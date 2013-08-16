@@ -102,6 +102,12 @@ class SystemOrProcess(
       'version',
       ]
 
+  @validates('network_zone', 'type')
+  def validate_options(self, key, option):
+    desired_role = key if key == 'network_zone' else 'system_type'
+    assert option is None or option.role == desired_role
+    return option
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm

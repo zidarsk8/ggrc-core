@@ -22,7 +22,7 @@ def create_user(email, **kwargs):
   user_context = Context(
       name='Personal Context for {0}'.format(email),
       description='',
-      related=user,
+      related_object=user,
       context_id=1,
       )
   db.session.add(user_context)
