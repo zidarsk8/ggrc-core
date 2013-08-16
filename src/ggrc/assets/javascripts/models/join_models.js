@@ -439,7 +439,7 @@ can.Model.Join("CMS.Models.ProgramControl", {
     , "control" : CMS.Models.Control
   }
   , create : "POST /api/program_controls"
-  , destroy : "DELETE /api/program_controls"
+  , destroy : "DELETE /api/program_controls/{id}"
 }, {
 
 });

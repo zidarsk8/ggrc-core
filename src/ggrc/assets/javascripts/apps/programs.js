@@ -231,38 +231,35 @@ $(function() {
     var uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
-    // can.each(ctls, function(c) {
-    //   uncat_cache[c.id] = ctl_cache[c.id] = c;
-    // });
-    // function link_controls(c) {
-    //   //empty out the category controls that aren't part of the program
-    //   c.controls.replace(can.map(c.controls, function(ctl) {
-    //     delete uncat_cache[c.id];
-    //     return ctl_cache[c.id];
-    //   }));
-    //   can.each(c.children, link_controls);
-    // }
-    // can.each(cats, link_controls);
-    // can.each(Object.keys(uncat_cache), function(cid) {
-    //     uncategorized.controls.push(uncat_cache[cid]);
-    // });
 
-    // $controls_tree.cms_controllers_tree_view({
-    //   model : CMS.Models.Category
-    //   , list : cats
-    // });
+    //Can't currently RefreshQueue object_controls with __include=controllable due to the polymorphic nature of controllables.
+    //  --BM 8/16/2013
+    can.each(ctls, function(ctl) {
+      can.each(ctl.object_controls, function(oc) {
+        if(oc.selfLink && oc.controllable && !oc.controllable.selfLink) {
+          oc.controllable.refresh().done(can.proxy(oc, "updated"));
+        } else if(!oc.selfLink) {
+          oc.refresh().done(function(c) {
+            c.controllable && !c.controllable.selfLink && c.controllable.refresh().done(can.proxy(c, "updated", c));
+          });
+        } else {
+          oc.updated();
+        }
+      });
+    });
 
     var page_model = GGRC.make_model_instance(GGRC.page_object)
     , combined_ctls = new CMS.Models.Control.List(can.unique(can.map(ctls, function(c) { return c; }).concat(can.map(page_model.controls, function(c) { return c; }))));
 
-    $controls_tree.parent().ggrc_controllers_list_view({
+    $controls_tree.cms_controllers_tree_view({
       model : CMS.Models.Control
       , list : combined_ctls
-      , list_view : "/static/mustache/controls/object_list.mustache"
+      , list_view : GGRC.mustache_path + "/controls/tree.mustache"
       , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list_loader : function() {
         return $.when(combined_ctls);
       }
+      , draw_children : true
     });
 
     page_model.controls.bind("change", function() {

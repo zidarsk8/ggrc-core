@@ -105,6 +105,8 @@ class AttributeQueryBuilder(object):
     if isinstance(attr, AssociationProxy):
       segment = '.'.join([attr.local_attr.key, attr.remote_attr.key])
       model = attr.remote_attr.property.mapper.class_
+    elif isinstance(attr, property):
+      model = None
     else:
       model = attr.property.mapper.class_
     return segment, model
@@ -118,8 +120,9 @@ class AttributeQueryBuilder(object):
       current_model = self.model
       for segment in segments:
         real_segment, current_model = self.resolve_path_segment(
-            segment, current_model)
-        real_segments.append(real_segment)
+          segment, current_model)
+        if current_model is not None:
+          real_segments.append(real_segment)
       realized_path = '.'.join(real_segments)
       options.append(joinedload_all(realized_path))
     return options
