@@ -26,7 +26,6 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
-from .events import log_event
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
