@@ -355,7 +355,7 @@ can.Control("CMS.Controllers.LHN_Search", {
           , refresh_queue = new RefreshQueue()
           ;
 
-        can.each(results, can.proxy(refresh_queue, "enqueue"));
+        can.each(results, function(obj) { refresh_queue.enqueue(obj); });
         refresh_queue.trigger().then(function(_) {
           self.options.results_lists[model_name].replace(results);
           self.options.visible_lists[model_name].replace(
