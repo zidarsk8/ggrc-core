@@ -21,6 +21,7 @@ from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.rbac import permissions
 from sqlalchemy import or_
+import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -130,8 +131,14 @@ class ModelView(View):
 
   def get_object(self, id):
     # This could also use `self.pk`
-    return self.get_collection(filter_by_contexts=False)\
-        .filter(self.model.id == id).first()
+    # .one() is required as long as any .eager_load() adds joins using
+    #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
+    #   that JOIN result (e.g. Categorizable)
+    try:
+      return self.get_collection(filter_by_contexts=False)\
+          .filter(self.model.id == id).one()
+    except sqlalchemy.orm.exc.NoResultFound:
+      return None
 
   def not_found_message(self):
     return '{0} not found.'.format(self.model._inflector.title_singular)
@@ -241,9 +248,11 @@ class Resource(ModelView):
     )
 
   def dispatch_request(self, *args, **kwargs):
-    if 'X-Requested-By' not in request.headers:
-      raise BadRequest('X-Requested-By header is REQUIRED.')
     method = request.method
+
+    if method in ('POST', 'PUT', 'DELETE')\
+        and 'X-Requested-By' not in request.headers:
+      raise BadRequest('X-Requested-By header is REQUIRED.')
 
     if method == 'GET':
       if self.pk in kwargs and kwargs[self.pk] is not None:

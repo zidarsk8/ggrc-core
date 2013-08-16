@@ -11,7 +11,19 @@
 can.Model.Cacheable("CMS.Models.Category", {
   root_object : "category"
   , root_collection : "categories"
-  ,  findAll : "GET /api/categories"
+  , findAll : "GET /api/categories"
+  , cache_by_scope: {}
+  , for_scope: function(scope) {
+      var self = this;
+
+      if (!this.cache_by_scope[scope])
+        this.cache_by_scope[scope] =
+          this.findAll({ scope_id: scope }).then(function(categories) {
+            self.cache_by_scope[scope] = categories;
+            return categories;
+          });
+      return $.when(this.cache_by_scope[scope]);
+    }
   , findTree : function(params) {
     var root_object = this.root_object
     , root_collection = this.root_collection

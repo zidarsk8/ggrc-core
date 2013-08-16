@@ -22,7 +22,7 @@ class CategorizedPublishable(object):
   def __call__(self, updater, obj, json_obj):
     return updater.query_for(self.rel_class, json_obj, self.attr_name, True)
 
-class Category(Base, Hierarchical, db.Model):
+class Category(Hierarchical, Base, db.Model):
   __tablename__ = 'categories'
 
   name = deferred(db.Column(db.String), 'Category')
@@ -75,7 +75,16 @@ class Category(Base, Hierarchical, db.Model):
       CategorizedPublishable('controls', 'Control'),
       CategorizedPublishable('risks', 'Risk'),
       ]
-
   _sanitize_html = [
       'name',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Category, cls).eager_query()
+    return query.options(
+        orm.subqueryload('categorizations'),
+        orm.subqueryload('risk_categorizations'),
+        orm.subqueryload('control_categorizations'))

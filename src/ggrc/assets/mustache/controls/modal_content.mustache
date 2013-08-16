@@ -79,13 +79,7 @@
           Kind
           <i class="grcicon-help-black" rel="tooltip" title="Choose Control Kind"></i>
         </label>
-        <select class="input-block-level" name="kind.id" numeric="numeric">
-          <option {{^kind.id}}selected="selected"{{/kind.id}} value="">None</option>
-          <option value="1" {{#if_equals kind.id '1'}}selected="selected"{{/if_equals}}>Reactive</option>
-          <option value="2" {{#if_equals kind.id '2'}}selected="selected"{{/if_equals}}>Administrative</option>
-          <option value="3" {{#if_equals kind.id '3'}}selected="selected"{{/if_equals}}>Detective</option>
-          <option value="4" {{#if_equals kind.id '4'}}selected="selected"{{/if_equals}}>Preventative</option>
-        </select>
+        {{{option_select this "kind" "control_kind"}}}
       </div>
       <div class="span3">
         <label>
@@ -114,12 +108,7 @@
           Means
           <i class="grcicon-help-black" rel="tooltip" title="Define Control Means"></i>
         </label>
-        <select class="span12" name="means.id" numeric="numeric">
-          <option value="" {{^means.id}}selected="selected"{{/means.id}}>None</option>
-          <option value="5" {{#if_equals means.id '5'}}selected="selected"{{/if_equals}}>Manual</option>
-          <option value="7" {{#if_equals means.id '7'}}selected="selected"{{/if_equals}}>Automated</option>
-          <option value="6" {{#if_equals means.id '6'}}selected="selected"{{/if_equals}}>Manual with Segregation of Duties</option>
-        </select>
+        {{{option_select this "means" "means"}}}
       </div>
     </div>
     <div class="row-fluid">
@@ -128,50 +117,14 @@
           Assertions
           <i class="grcicon-help-black" rel="tooltip" title="Choose Control Assertions"></i>
         </label>
-        {{!FIXME: Couldn't find variable name for this one w/ POSTMAN}}
-        <select class="input-block-level" multiple="multiple" name="assertions">
-          <option value="17">Accuracy</option>
-          <option value="18">Classification</option>
-          <option value="19">Completeness</option>
-          <option value="20">Cutoff</option>
-          <option value="21">Existence</option>
-          <option value="22">Occurrence</option>
-          <option value="23">Rights and Obligations</option>
-          <option value="24">Valuation and Allocation</option>
-          <option value="25">Understandability</option>
-        </select>
+        {{{category_select this "assertions" 102}}}
       </div>
       <div class="span6">
         <label>
           Categories
           <i class="grcicon-help-black" rel="tooltip" title="Choose Control Categories"></i>
         </label>
-        {{!FIXME: Couldn't find variable name for this one w/ POSTMAN}}
-        <select class="input-block-level" multiple="multiple" name="categories.id">
-          {{!Added Categories Below}}
-          {{!#all 'Category'}}
-          {{!<option value="{{id}}">{{name}}</option>}}
-          {{!/all}}
-          {{!end of comment}}
-          <option value="0">Access Control</option>
-          <option value="1">&nbsp;&nbsp; Access Management</option>
-          <option value="2">&nbsp;&nbsp; Authentication</option>
-          <option value="3">&nbsp;&nbsp; Authorization</option>
-          <option value="4">&nbsp;&nbsp; Governance</option>
-          <option value="5">&nbsp;&nbsp;&nbsp;&nbsp; Training</option>
-          <option value="6">&nbsp;&nbsp;&nbsp;&nbsp; Policies & Procedures</option>
-          <option value="7">&nbsp;&nbsp;&nbsp;&nbsp; Monitoring</option>
-          <option value="8">Change Management</option>
-          <option value="9">&nbsp;&nbsp; Segregation of Duties</option>
-          <option value="10">&nbsp;&nbsp; Configuration Management</option>
-          <option value="11">Business Continuity</option>
-          <option value="12">&nbsp;&nbsp; Disaster Recovery</option>
-          <option value="13">&nbsp;&nbsp; Physical Security</option>
-          <option value="14">Core</option>
-          <option value="15">Availability</option>
-          <option value="16">Integrity</option>
-          <option value="17">Confidentiality</option>
-        </select>
+        {{{category_select this "categories" 100}}}
       </div>
     </div>
     <div class="row-fluid">

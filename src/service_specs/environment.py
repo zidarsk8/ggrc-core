@@ -16,6 +16,13 @@ def before_all(context):
   create_db(use_migrations)
   app.debug = False
   app.testing = True
+
+  context.query_count = 0
+  def increment_query_count(conn, clauseelement, multiparams, params):
+    context.query_count += 1
+  from sqlalchemy import event
+  event.listen(db.engine, "before_execute", increment_query_count)
+
   context.server = make_server('', 9000, app)
   context.thread = threading.Thread(target=context.server.serve_forever)
   context.thread.start()

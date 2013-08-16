@@ -55,20 +55,16 @@ class BaseConverter(object):
     pass
 
   def has_errors(self):
-    return bool(len(self.errors)) or has_object_errors()
+    return bool(self.errors) or self.has_object_errors()
 
   def has_object_errors(self):
-    for obj in self.objects:
-      if obj.has_errors(): return True
-    return False
+    return any([obj.has_errors() for obj in self.objects])
 
   def has_warnings(self):
-    return bool(len(self.warnings)) or has_object_warnings()
+    return bool(self.warnings) or self.has_object_warnings()
 
   def has_object_warnings(self):
-   for obj in self.objects:
-      if obj.has_warnings(): return True
-   return False
+    return any([obj.has_warnings() for obj in self.objects])
 
   @classmethod
   def from_rows(cls, rows, **options):
