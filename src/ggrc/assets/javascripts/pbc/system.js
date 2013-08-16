@@ -105,8 +105,8 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
     , attributes : {
       controls : "CMS.Models.Control.models"
-      , sub_systems : "can.Model.Cacheable"
-      , super_systems : "can.Model.Cacheable"
+      , sub_systems : "CMS.Models.get_instances"
+      , super_systems : "CMS.Models.get_instances"
       , documents : "CMS.Models.Document.models"
       , people : "CMS.Models.Person.models"
       , object_documents : "CMS.Models.ObjectDocument.models"
@@ -114,7 +114,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
       , owner : "CMS.Models.Person.model"
     }
   , init : function() {
-    this._super && this._super();
+    this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
@@ -142,8 +142,8 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
     , attributes : {
       controls : "CMS.Models.Control.models"
-      , sub_systems : "can.Model.Cacheable"
-      , super_systems : "can.Model.Cacheable"
+      , sub_systems : "CMS.Models.get_instances"
+      , super_systems : "CMS.Models.get_instances"
       , documents : "CMS.Models.Document.models"
       , people : "CMS.Models.Person.models"
       , object_documents : "CMS.Models.ObjectDocument.models"
