@@ -96,7 +96,7 @@ function related_model_list_loader(controller) {
     .when(
         all_relationships_as_source.then(insert_related_instances)
       , all_relationships_as_destination.then(insert_related_instances))
-    .then(refresh_queue.trigger)
+    .then(refresh_queue.proxy("trigger"))
     .then(function() { return list });
 
   return $.when(
@@ -112,7 +112,7 @@ function related_model_list_loader(controller) {
         , destination_type : parent_type
         , source_type : object_type
         }).then(insert_related_instances))
-    .then(refresh_queue.trigger)
+    .then(refresh_queue.proxy("trigger"))
     .then(function() {
       return list;
     });
