@@ -231,38 +231,35 @@ $(function() {
     var uncategorized = cats[cats.length - 1]
     , ctl_cache = {}
     , uncat_cache = {};
-    // can.each(ctls, function(c) {
-    //   uncat_cache[c.id] = ctl_cache[c.id] = c;
-    // });
-    // function link_controls(c) {
-    //   //empty out the category controls that aren't part of the program
-    //   c.controls.replace(can.map(c.controls, function(ctl) {
-    //     delete uncat_cache[c.id];
-    //     return ctl_cache[c.id];
-    //   }));
-    //   can.each(c.children, link_controls);
-    // }
-    // can.each(cats, link_controls);
-    // can.each(Object.keys(uncat_cache), function(cid) {
-    //     uncategorized.controls.push(uncat_cache[cid]);
-    // });
 
-    // $controls_tree.cms_controllers_tree_view({
-    //   model : CMS.Models.Category
-    //   , list : cats
-    // });
+    //Can't currently RefreshQueue object_controls with __include=controllable due to the polymorphic nature of controllables.
+    //  --BM 8/16/2013
+    can.each(ctls, function(ctl) {
+      can.each(ctl.object_controls, function(oc) {
+        if(oc.selfLink && oc.controllable && !oc.controllable.selfLink) {
+          oc.controllable.refresh().done(can.proxy(oc, "updated"));
+        } else if(!oc.selfLink) {
+          oc.refresh().done(function(c) {
+            c.controllable && !c.controllable.selfLink && c.controllable.refresh().done(can.proxy(c, "updated", c));
+          });
+        } else {
+          oc.updated();
+        }
+      });
+    });
 
     var page_model = GGRC.make_model_instance(GGRC.page_object)
     , combined_ctls = new CMS.Models.Control.List(can.unique(can.map(ctls, function(c) { return c; }).concat(can.map(page_model.controls, function(c) { return c; }))));
 
-    $controls_tree.parent().ggrc_controllers_list_view({
+    $controls_tree.cms_controllers_tree_view({
       model : CMS.Models.Control
       , list : combined_ctls
-      , list_view : "/static/mustache/controls/object_list.mustache"
+      , list_view : GGRC.mustache_path + "/controls/tree.mustache"
       , parent_instance : GGRC.make_model_instance(GGRC.page_object)
       , list_loader : function() {
         return $.when(combined_ctls);
       }
+      , draw_children : true
     });
 
     page_model.controls.bind("change", function() {
@@ -290,16 +287,46 @@ $(function() {
   var $objectives_tree = $("#objectives .tree-structure").append(
     $(new Spinner().spin().el).css(spin_opts));
 
-  CMS.Models.Objective
-    .findAll({ "section_objectives.section.directive.program_directives.program_id" : program_id, "__include" : "object_objectives" })
-    .done(function(s) {
+  $.when(
+    CMS.Models.Objective
+      .findAll({ "section_objectives.section.directive.program_directives.program_id" : program_id, "__include" : "object_objectives" })
+    , CMS.Models.Control.findAll({ "program_controls.program_id" : program_id })
+    ).done(function(s) {
+      var page_model = GGRC.make_model_instance(GGRC.page_object)
+      , combined_objs = new CMS.Models.Objective.List(can.unique(can.map(s, function(c) { return c; }).concat(can.map(page_model.objectives, function(c) { return c; }))));
+
       $objectives_tree.cms_controllers_tree_view({
           model : CMS.Models.Objective
         //, edit_sections : true
-        , list : s
+        , list : combined_objs
         , list_view : "/static/mustache/objectives/tree.mustache"
-        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+        , parent_instance : page_model
+        , list_loader : function() {
+          return $.when(combined_objs);
+        }
       });
+
+      can.each(s, function(obj) {
+        can.each(obj.object_objectives, function(oc) {
+          if(oc.selfLink && oc.objectiveable && !oc.objectiveable.selfLink) {
+            oc.objectiveable.refresh().done(can.proxy(oc, "updated"));
+          } else if(!oc.selfLink) {
+            oc.refresh().done(function(c) {
+              c.objectiveable && !c.objectiveable.selfLink && c.objectiveable.refresh().done(can.proxy(c, "updated", c));
+            });
+          } else {
+            oc.updated();
+          }
+        });
+      });
+
+      page_model.objectives.bind("change", function() {
+        combined_objs.replace(
+          can.unique(
+            can.map(s, function(c) { return c; })
+            .concat(can.map(page_model.objectives, function(c) { return c; }))
+        ));
+      });      
     });
 
   var models_by_kind = {

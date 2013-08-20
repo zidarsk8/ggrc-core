@@ -39,14 +39,17 @@ can.Model.Cacheable("CMS.Models.Section", {
       , property : "business_objects"
       , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
+      , draw_children : false
     }, {
       model : CMS.Models.Objective
       , property : "objectives"
       , list_view : "/static/mustache/objectives/tree.mustache"
+      , draw_children : false
     }, {
       model : CMS.Models.Control
       , property : "controls"
       , list_view : "/static/mustache/controls/tree.mustache"
+      , draw_children : false
     //}, {
     //  model : CMS.Models.Section
     //  , property : "children"

@@ -24,6 +24,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , object_people : "CMS.Models.ObjectPerson.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
     , owner : "CMS.Models.Person.model"
+    , objectives : "CMS.Models.Objective.models"
   }
   , links_to : {
     "Regulation" : "ProgramDirective"
