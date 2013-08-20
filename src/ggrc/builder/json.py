@@ -145,6 +145,8 @@ class UpdateAttrHandler(object):
         for item in old_set - new_set:
           coll_attr.remove(item)
     else:
+      if isinstance(value, basestring) and value == '':
+        value = None
       setattr(obj, attr_name, value)
 
   @classmethod

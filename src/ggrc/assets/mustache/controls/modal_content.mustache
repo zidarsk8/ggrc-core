@@ -87,9 +87,9 @@
           <i class="grcicon-help-black" rel="tooltip" title="Is control fraud related?"></i>
         </label>
         <select class="input-block-level" name="fraud_related">
-          <option selected="selected" value="">Choose</option>
-          <option value="0" {{^fraud_related}}selected="selected"{{/fraud_related}}>No</option>
-          <option value="1" {{#if_equals fraud_related '1'}}selected="selected"{{/if_equals}}>Yes</option>
+          <option value="" {{#if_equals fraud_related ""}}selected{{/if_equals}}>Choose</option>
+          <option value="0" {{#if_equals fraud_related "0"}}selected{{/if_equals}}>No</option>
+          <option value="1" {{#if_equals fraud_related "1"}}selected{{/if_equals}}>Yes</option>
         </select>
       </div>
       <div class="span3">
@@ -98,9 +98,9 @@
           <i class="grcicon-help-black" rel="tooltip" title="Choose Significance"></i>
         </label>
         <select class="input-block-level" name="key_control">
-          <option selected="selected" value="">Choose</option>
-          <option value="0" {{^key_control}}selected="selected"{{/key_control}}>Non-key</option>
-          <option value="1" {{#if_equals key_control '1'}}selected="selected"{{/if_equals}}>Key</option>
+          <option value="" {{#if_equals key_control ""}}selected{{/if_equals}}>Choose</option>
+          <option value="0" {{#if_equals key_control "0"}}selected{{/if_equals}}>No</option>
+          <option value="1" {{#if_equals key_control "1"}}selected{{/if_equals}}>Yes</option>
         </select>
       </div>
       <div class="span3">
