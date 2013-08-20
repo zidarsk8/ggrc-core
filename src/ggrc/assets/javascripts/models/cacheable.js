@@ -307,12 +307,12 @@ can.Model("can.Model.Cacheable", {
     var cache = can.getObject("cache", this.constructor, true);
     if (this.id)
       cache[this.id] = this;
-
-    var that = this;
-    this.attr("computed_errors", can.compute(function() {
-      return that.errors();
-    }));
   }
+  , computed_errors : function() {
+      var that = this
+        , compute = can.compute(function() { return that.errors(); });
+      return compute;
+    }
   , addElementToChildList : function(attrName, new_element) {
     this[attrName].push(new_element);
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
