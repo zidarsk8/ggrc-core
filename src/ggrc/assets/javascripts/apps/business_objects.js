@@ -13,13 +13,14 @@ $(function() {
   if (!GGRC.page_object)
     return;
 
-  var object_class = GGRC.infer_object_type(GGRC.page_object);
-  var object = GGRC.make_model_instance(GGRC.page_object);
-  var queue = new RefreshQueue();
+  var object_class = GGRC.infer_object_type(GGRC.page_object)
+  , object = GGRC.make_model_instance(GGRC.page_object)
+  , queue = new RefreshQueue()
+  , queue_dfd;
 
   can.each(object.object_people, can.proxy(queue, "enqueue"));
   can.each(object.object_documents, can.proxy(queue, "enqueue"));
-  queue.trigger();
+  queue_dfd = queue.trigger();
 
   // var c = $('.cms_controllers_page_object').control(CMS.Controllers.PageObject);
   // if (c) {
@@ -27,30 +28,32 @@ $(function() {
   //   c.add_dashboard_widget_from_name("document");
   // }
 
-  $("#people_widget").find("section.content").ggrc_controllers_list_view({
-    model : CMS.Models.ObjectPerson
-    , list : object.object_people
-    , list_view : GGRC.mustache_path + "/people/list.mustache"
-    , parent_instance : object
-    , list_loader : function() {
-      return $.when(object.object_people);
-    }
-  });
-  object.object_people.bind("add remove", function() {
-    $("#people_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
-  });
+  queue_dfd.done(function() {
+    $("#people_widget").find("section.content").ggrc_controllers_list_view({
+      model : CMS.Models.ObjectPerson
+      , list : object.object_people
+      , list_view : GGRC.mustache_path + "/people/list.mustache"
+      , parent_instance : object
+      , list_loader : function() {
+        return $.when(object.object_people);
+      }
+    });
+    object.object_people.bind("add remove", function() {
+      $("#people_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
+    });
 
-  $("#documents_widget").find("section.content").ggrc_controllers_list_view({
-    model : CMS.Models.ObjectDocument
-    , list : object.object_documents
-    , list_view : GGRC.mustache_path + "/documents/list.mustache"
-    , parent_instance : object
-    , list_loader : function() {
-      return $.when(object.object_documents);
-    }
-  });
-  object.object_documents.bind("add remove", function() {
-    $("#documents_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
+    $("#documents_widget").find("section.content").ggrc_controllers_list_view({
+      model : CMS.Models.ObjectDocument
+      , list : object.object_documents
+      , list_view : GGRC.mustache_path + "/documents/list.mustache"
+      , parent_instance : object
+      , list_loader : function() {
+        return $.when(object.object_documents);
+      }
+    });
+    object.object_documents.bind("add remove", function() {
+      $("#documents_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
+    });
   });
 
 
