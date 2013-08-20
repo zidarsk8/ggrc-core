@@ -911,6 +911,12 @@
           return (new $.Deferred()).reject();
         }
       }
+
+    , " hide": function(el, ev) {
+        // Ensure element is fully removed from DOM after bootstrap 'hide'
+        if (this.element)
+          this.element.remove();
+      }
   });
 
   ModalOptionDescriptor = can.Construct({
