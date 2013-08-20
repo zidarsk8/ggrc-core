@@ -136,7 +136,7 @@ can.Model("can.Model.Cacheable", {
         that.risk_tree_options.child_options[1].model = that;
     });
 
-
+    this.init_mappings();
   }
 
   , findInCacheById : function(id) {
@@ -292,6 +292,94 @@ can.Model("can.Model.Cacheable", {
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }
+
+  , init_mappings: function() {
+      var self = this;
+      can.each(this.mappings, function(options, name) {
+        self.define_association_proxy(name, options);
+      });
+    }
+
+  , define_association_proxy: function(name, options) {
+      /* Adds association proxy methods to prototype
+       */
+      var attr = options.attr
+        , target_attr = options.target_attr
+        , update_function_name = "_update_" + name
+        , update_function
+        , change_handler_name = "_handle_changed_" + name
+        , change_handler
+        , init_flag_name = "_initialized_" + name
+        ;
+
+      update_function = function() {
+        console.debug("Updating", name, "on", this.id, this);
+        var self = this
+          , refresh_queue = new RefreshQueue()
+          ;
+
+        can.each(self[attr], function(mapping) {
+          refresh_queue.enqueue(mapping);
+        });
+        return refresh_queue.trigger()
+          .then(function(mappings) {
+            var refresh_queue = new RefreshQueue();
+            can.each(mappings, function(mapping) {
+              refresh_queue.enqueue(mapping[target_attr]);
+            });
+            return refresh_queue.trigger()
+              .then(function(mapped_objects) {
+                self[name].replace(
+                  can.map(mappings, function(mapping) {
+                    return {
+                        instance: mapping[target_attr]
+                      , mappings: [mapping]
+                    };
+                  }))
+              });
+          });
+      };
+
+      this.prototype[update_function_name] = update_function;
+
+      change_handler = function(ev, attr, how) {
+          console.debug("Change seen for", name, "on", this.id, this, arguments);
+        var self = this;
+        if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+          //self[update_function_name]();
+          setTimeout(self.proxy(update_function_name), 10);
+        }
+      };
+
+      this.prototype[change_handler_name] = change_handler;
+
+      if (!this.prototype._init_mappings) {
+        this.prototype._init_mappings = function() {
+          var self = this;
+          can.each(this.constructor.mappings_init_functions, function(fn) {
+            fn.apply(self);
+          });
+        }
+      }
+
+      this.prototype[name] = function() {
+        console.debug("Initializing ", name, "on", this.id, this);
+        this[init_flag_name] = true;
+        if (!this.attr(name))
+          this[name] = new can.Observe.List();
+        this[update_function_name]();
+        this[attr].bind("change", this.proxy(change_handler_name));
+        return this[name];
+      }
+      /*if (!this.mappings_init_functions)
+        this.mappings_init_functions = [];
+
+      this.mappings_init_functions.push(function() {
+        if (!this[name])
+          this[name] = new can.Observe.List();
+        this[attr].bind("change", this.proxy(change_handler_name));
+      });*/
+    }
 }, {
   init : function() {
     var obj_name = this.constructor.root_object;

@@ -35,6 +35,8 @@ dashboard-js-files:
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
+  - pbc/document.js
+  - pbc/person.js
   - models/simple_models.js
   - models/recently_viewed_object.js
   - models/search.js
@@ -56,8 +58,6 @@ dashboard-js-files:
   - controllers/dashboard_controller.js
   - apps/controls.js
   - sections/section.js
-  - pbc/document.js
-  - pbc/person.js
   - pbc/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
@@ -135,6 +135,7 @@ dashboard-js-template-files:
   - people/multitype_option_detail.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
+  - people/tree.mustache
   - policies/modal_content.mustache
   - processes/modal_content.mustache
   - products/modal_content.mustache

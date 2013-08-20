@@ -721,36 +721,74 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
-    , create_link : true
-    , draw_children : true
-    , start_expanded : false
-    , child_options : [{
-      model : can.Model.Cacheable
-      , property : "business_objects"
-      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
-      , title_plural : "Business Objects"
-    }]
-  }
   , links_to : {
       "Section" : "SectionObjective"
   }
   , attributes : {
-      sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , section_objectives : "CMS.Models.SectionObjective.models"
+    , sections : "CMS.Models.Section.models"
+    , objective_controls : "CMS.Models.ObjectiveControl.models"
     , controls : "CMS.Models.Control.models"
-    , objective_controls : "CMS.Models.ObjectiveControls.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+    //, people : "CMS.Models.Person.models"
+    //, documents : "CMS.Models.Document.models"
     , object_people : "CMS.Models.ObjectPerson.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
   }
+
   , defaults : {
     object_objectives : []
+    , objective_controls : []
+    , section_objectives : []
+    , object_people : []
   }
+
+  , mappings: {
+      people_mappings: {
+          attr: "object_people"
+        , target_attr: "person"
+      }
+    , business_object_mappings: {
+          attr: "object_objectives"
+        , target_attr: "objectiveable"
+      }
+    , control_mappings: {
+          attr: "objective_controls"
+        , target_attr: "control"
+      }
+    , section_mappings: {
+          attr: "section_objectives"
+        , target_attr: "section"
+      }
+    }
+
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , create_link : true
+    //, draw_children : true
+    , start_expanded : false
+    , child_options : [{
+        model : "Control"
+      , property : "control_mappings"
+      , list_view : "/static/mustache/controls/tree.mustache"
+    }, {
+        model : "Person"
+      , property : "people_mappings"
+      , list_view : "/static/mustache/people/tree.mustache"
+/*    }, {
+        model : "Section"
+      , property : "section_mappings"
+      , list_view : "/static/mustache/sections/tree.mustache"
+*/    }, {
+        model : can.Model.Cacheable
+      , property : "business_object_mappings"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+    }]
+  }
+
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
@@ -759,34 +797,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-    this.attr("business_objects", new can.Model.List(
-      can.map(
-        this.object_objectives,
-        function(os) {return os.objectiveable || new can.Model({ selfLink : "/" }); }
-      )
-    ));
-    this.object_objectives.bind("change", function(ev, attr, how) {
-      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-        that.business_objects.replace(
-          can.map(
-            that.object_objectives,
-            function(os, i) {
-              if(os.objectiveable) {
-                return os.objectiveable;
-              } else {
-                os.refresh({ "__include" : "objectiveable" }).done(function(d) {
-                  that.business_objects.attr(i, d.objectiveable);
-                  //can.Observe.stopBatch();
-                }).fail(function() {
-                  //can.Observe.stopBatch();
-                });
-                return new can.Model({ selfLink : "/"});
-              }
-          })
-        );
-      }
-    });
-
+    this._init_mappings();
   }
 });
 
