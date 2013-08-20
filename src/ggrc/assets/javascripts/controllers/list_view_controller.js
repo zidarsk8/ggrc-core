@@ -29,94 +29,158 @@ function model_list_loader(controller) {
   });
 }
 
-var all_relationships_as_source = null
-  , all_relationships_as_destination = null;
+can.Construct("GGRC.ListLoaders.BaseListLoader", {
+}, {
+});
+
+GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.RelatedListLoader", {
+    init_relationships: function(parent_instance) {
+      var parent_id = parent_instance.id
+        , parent_type = parent_instance.constructor.shortName
+        ;
+
+      if (!this.all_relationships_as_source)
+        this.all_relationships_as_source = CMS.Models.Relationship.findAll({
+            source_id : parent_id
+          , source_type : parent_type
+        });
+
+      if (!this.all_relationships_as_destination)
+        this.all_relationships_as_destination = CMS.Models.Relationship.findAll({
+            destination_id : parent_id
+          , destination_type : parent_type
+        });
+    }
+}, {
+    init: function(parent_instance, object_type) {
+      this.list = new can.Observe.List();
+      this.refresh_queue = new RefreshQueue();
+
+      this.parent_instance = parent_instance;
+      this.object_type = object_type;
+
+      this.parent_type = parent_instance.constructor.shortName;
+      this.parent_id = parent_instance.id;
+
+      this.init_bindings();
+    }
+
+  , insert_instance: function(instance, mapping) {
+      var self = this
+        , found = false
+        ;
+
+      can.each(this.list, function(data, index) {
+        if (data.instance.id == instance.id) {
+          self.list.attr(index).attr('mappings').push(mapping);
+          self.refresh_queue.enqueue(mapping);
+          found = true;
+        }
+      });
+      if (!found) {
+        this.list.push({
+          instance: instance,
+          mappings: [mapping]
+        });
+        self.refresh_queue.enqueue(instance);
+      }
+    }
+
+  , remove_instance: function(instance, mapping) {
+      var self = this
+        , mappings
+        , mapping_index
+        , instance_index_to_remove = -1
+        ;
+
+      can.each(this.list, function(data, index) {
+        if (data.instance.id == instance.id) {
+          mappings = self.list.attr(index).attr('mappings');
+          mapping_index = mappings.indexOf(mapping);
+          if (mapping_index > -1) {
+            mappings.splice(mapping_index, 1);
+            if (mappings.length == 0)
+              instance_index_to_remove = index;
+          }
+        }
+      });
+      if (instance_index_to_remove > -1)
+        this.list.splice(instance_index_to_remove, 1);
+    }
+
+  , get_related_instance: function(relationship) {
+      if (relationship.destination.constructor.shortName == this.object_type
+          && (relationship.source === this.parent_instance
+              || (relationship.source_type === this.parent_type
+                  && relationship.source_id === this.parent_id)))
+        return relationship.destination;
+      else if (relationship.source.constructor.shortName == this.object_type
+          && (relationship.destination === this.parent_instance
+              || (relationship.destination_type === this.parent_type
+                  && relationship.destination_id === this.parent_id)))
+        return relationship.source;
+    }
+
+  , insert_related_instance: function(relationship) {
+      var instance = this.get_related_instance(relationship);
+      if (instance)
+        this.insert_instance(instance, relationship);
+    }
+
+  , insert_related_instances: function(relationships) {
+      can.each(relationships.reverse(), this.proxy("insert_related_instance"));
+    }
+
+  , remove_related_instance: function(relationship) {
+      var instance = this.get_related_instance(relationship);
+      if (instance)
+        this.remove_instance(instance, relationship);
+    }
+
+  , init_bindings: function() {
+      var self = this;
+
+      CMS.Models.Relationship.bind("created", function(ev, instance) {
+        if (instance.constructor == CMS.Models.Relationship) {
+          self.insert_related_instance(instance);
+        }
+      });
+
+      CMS.Models.Relationship.bind("destroyed", function(ev, instance) {
+        if (instance.constructor == CMS.Models.Relationship) {
+          self.remove_related_instance(instance);
+        }
+      });
+    }
+
+  , refresh_list: function() {
+      var self = this;
+
+      this.constructor.init_relationships(this.parent_instance);
+
+      return $.when(
+          this.constructor.all_relationships_as_source
+            .then(this.proxy("insert_related_instances"))
+        , this.constructor.all_relationships_as_destination
+            .then(this.proxy("insert_related_instances"))
+        )
+        .then(this.refresh_queue.proxy("trigger"))
+        .then(function() { return self.list });
+    }
+});
 
 function related_model_list_loader(controller) {
-  var list = new can.Observe.List()
-    , refresh_queue = new RefreshQueue()
-    , parent = controller.options.parent_instance
-    , parent_type = controller.options.parent_type
-    , parent_id = controller.options.parent_id
+  var parent_instance = controller.options.parent_instance
+    , parent_type = parent_instance.constructor.shortName
     , object_type = controller.options.object_type
-    ;
+    , loader;
 
-  function insert_instance(instance) {
-    if (list.indexOf(instance) == -1) {
-      refresh_queue.enqueue(instance);
-      list.unshift(instance);
-    }
-  }
+  loader = new GGRC.ListLoaders.RelatedListLoader(
+    controller.options.parent_instance, controller.options.object_type);
 
-  function remove_instance(instance) {
-    var index = list.indexOf(instance);
-
-    if (index > -1)
-      list.splice(index, 1);
-  }
-
-  function insert_related_instance(relationship) {
-    if (relationship.destination.constructor.shortName == object_type
-        && (relationship.source === parent
-            || (relationship.source_type === parent_type
-                && relationship.source_id === parent_id)))
-      insert_instance(relationship.destination);
-    if (relationship.destination.constructor.shortName == object_type
-        && (relationship.destination === parent
-            || (relationship.destination_type === parent_type
-                && relationship.destination_id === parent_id)))
-      insert_instance(relationship.source);
-  }
-
-  function insert_related_instances(relationships) {
-    can.each(relationships.reverse(), insert_related_instance);
-  }
-
-  // Should collate relationships by `relationship_type` and fetch both
-  // as source and as destination
-
-  CMS.Models.Relationship.bind("created", function(ev, instance) {
-    if (instance.constructor == CMS.Models.Relationship) {
-      insert_related_instance(instance);
-    }
-  });
-
-  if (!all_relationships_as_source)
-    all_relationships_as_source = CMS.Models.Relationship.findAll({
-        source_id : parent_id
-      , source_type : parent_type
-    })
-  if (!all_relationships_as_destination)
-    all_relationships_as_destination = CMS.Models.Relationship.findAll({
-        destination_id : parent_id
-      , destination_type : parent_type
-    })
-
-  return $
-    .when(
-        all_relationships_as_source.then(insert_related_instances)
-      , all_relationships_as_destination.then(insert_related_instances))
-    .then(refresh_queue.proxy("trigger"))
-    .then(function() { return list });
-
-  return $.when(
-      CMS.Models.Relationship.findAll({
-      //controller.options.model.findRelated({
-          source_id : parent_id
-        , source_type : parent_type
-        , destination_type : object_type
-        }).then(insert_related_instances)
-    , //controller.options.model.findRelated({
-      CMS.Models.Relationship.findAll({
-          destination_id : parent_id
-        , destination_type : parent_type
-        , source_type : object_type
-        }).then(insert_related_instances))
-    .then(refresh_queue.proxy("trigger"))
-    .then(function() {
-      return list;
-    });
+  return loader.refresh_list();
 }
+
 
 can.Control("GGRC.Controllers.ListView", {
   defaults : {
@@ -130,7 +194,6 @@ can.Control("GGRC.Controllers.ListView", {
     , list_view : "/static/mustache/dashboard/object_list.mustache"
     , list_objects : null
     , list_loader : null
-    //, show_view : "/static/mustache/controls/tree.mustache"
     , tooltip_view : "/static/mustache/dashboard/object_tooltip.mustache"
   }
 }, {
@@ -159,13 +222,17 @@ can.Control("GGRC.Controllers.ListView", {
         this.options.parent_type.split("_").map(can.capitalize).join(" ");
     }
 
-    if (!this.options.list_loader) {
-      if (this.options.is_related)
-        this.options.list_loader = related_model_list_loader;
-      else
-        this.options.list_loader = model_list_loader;
+    if (this.options.list) {
+      this.draw_list(this.options.list);
+    } else {
+      if (!this.options.list_loader) {
+        if (this.options.is_related)
+          this.options.list_loader = related_model_list_loader;
+        else
+          this.options.list_loader = model_list_loader;
+      }
+      this.fetch_list({});
     }
-    this.fetch_list({});
   }
 
   , fetch_list : function(params) {

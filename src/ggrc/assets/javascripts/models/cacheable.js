@@ -448,7 +448,7 @@ can.Model("can.Model.Cacheable", {
       if(that.constructor.attributes && that.constructor.attributes[name]) {
         fun_name = that.constructor.attributes[name];
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
-        if(fun_name === "models") {
+        if(fun_name === "models" || fun_name === "get_instances") {
           serial[name] = [];
           for(var i = 0; i < val.length; i++) {
             serial[name].push(val[i].stub());
