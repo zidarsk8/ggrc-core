@@ -1,0 +1,34 @@
+<div class="selector-info" style="margin-left:-10%;">
+  {{!<div class="pull-right">
+    <a class="btn btn-mini" rel="tooltip" title="Edit">
+      <i class="grcicon-edit"></i>
+    </a>
+    <a class="btn btn-mini" rel="tooltip" title="Remove">
+      <i class="grcicon-remove"></i>
+    </a>
+  </div>
+  <p>
+    <img src="/static/images/sample/profile100.jpg" alt="">
+  </p>}}
+  <h4 class="oneline">
+    <i class="grcicon-{{constructor.table_singular}}-color"></i>
+    {{ firstnonempty name email }}
+    {{!<small>
+      Google, inc
+    </small>
+    <small></small>
+    <br>
+    <a href="mailto:ernestmandel@gmail.com">
+      ernestmandel@gmail.com
+    </a>}}
+  </h4>
+  <div class="rtf">
+    {{{description}}}
+  </div>
+  {{#if name}}
+  <div class="owner">
+    <strong>Email:</strong>
+    <a href="mailto:{{email}}">{{email}}</a>
+  </div>
+  {{/if}}
+</div>

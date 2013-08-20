@@ -264,10 +264,10 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     governance_object_types.concat(business_plus_program_object_types);
 
   join_descriptor_arguments = [
-        [business_minus_system_object_types,
+        [business_object_types,
           "Control", "ObjectControl", "control", "controllable"]
-      , [all_object_types,
-          "Document", "ObjectDocument", "document", "documentable"]
+      , ["Control", business_object_types,
+          "ObjectControl", "controllable", "control"]
       , [business_plus_program_object_types,
           "Objective", "ObjectObjective", "objective", "objectiveable"]
       , ["Objective", business_plus_program_object_types,
@@ -276,18 +276,26 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
-      , ["System", "System", "SystemSystem", "child", "parent"]
-      , ["System", "Process", "SystemSystem", "child", "parent"]
-      , ["Process", "System", "SystemSystem", "child", "parent"]
-      , ["Process", "Process", "SystemSystem", "child", "parent"]
-      , ["System", "Control", "SystemControl", "control", "system"]
-      , ["Control", "System", "SystemControl", "system", "control"]
+      , ["Section", business_object_types,
+          "ObjectSection", "sectionable", "section"]
+      , ["Control", "Program", "ProgramControl", "program", "control"]
+      , ["Program", "Control", "ProgramControl", "control", "program"]
+      , ["Control", "Section", "ControlSection", "section", "control"]
+      , ["Section", "Control", "ControlSection", "control", "section"]
+      //, ["System", "System", "SystemSystem", "child", "parent"]
+      //, ["System", "Process", "SystemSystem", "child", "parent"]
+      //, ["Process", "System", "SystemSystem", "child", "parent"]
+      //, ["Process", "Process", "SystemSystem", "child", "parent"]
+      //, ["System", "Control", "SystemControl", "control", "system"]
+      //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
       , ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
+      , [all_object_types,
+          "Document", "ObjectDocument", "document", "documentable"]
       ];
 
 
