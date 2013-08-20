@@ -107,13 +107,25 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , destroy : "DELETE /api/systems/{id}"
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , documents : "CMS.Models.Document.models"
-      , people : "CMS.Models.Person.models"
-      , object_documents : "CMS.Models.ObjectDocument.models"
-      , object_people : "CMS.Models.ObjectPerson.models"
-      , owner : "CMS.Models.Person.model"
+  , attributes : {
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , response : "CMS.Models.Response.model"
+    , sub_system_systems : "CMS.Models.SystemSystem.models"
+    , sub_systems : "CMS.Models.get_instances"
+    , super_system_systems : "CMS.Models.SystemSystem.models"
+    , super_systems : "CMS.Models.get_instances"
+    //, controls : "CMS.Models.Control.models"
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -142,13 +154,26 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , documents : "CMS.Models.Document.models"
-      , people : "CMS.Models.Person.models"
-      , object_documents : "CMS.Models.ObjectDocument.models"
-      , object_people : "CMS.Models.ObjectPerson.models"
-      , owner : "CMS.Models.Person.model"
+  , attributes : {
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , network_zone : "CMS.Models.Option.model"
+    , response : "CMS.Models.Response.model"
+    , sub_system_systems : "CMS.Models.SystemSystem.models"
+    , sub_systems : "CMS.Models.get_instances"
+    , super_system_systems : "CMS.Models.SystemSystem.models"
+    , super_systems : "CMS.Models.get_instances"
+    //, controls : "CMS.Models.Control.models"
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);
