@@ -313,7 +313,6 @@ can.Model("can.Model.Cacheable", {
         ;
 
       update_function = function() {
-        console.debug("Updating", name, "on", this.id, this);
         var self = this
           , refresh_queue = new RefreshQueue()
           ;
@@ -343,7 +342,6 @@ can.Model("can.Model.Cacheable", {
       this.prototype[update_function_name] = update_function;
 
       change_handler = function(ev, attr, how) {
-          console.debug("Change seen for", name, "on", this.id, this, arguments);
         var self = this;
         if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
           //self[update_function_name]();
@@ -363,7 +361,6 @@ can.Model("can.Model.Cacheable", {
       }
 
       this.prototype[name] = function() {
-        console.debug("Initializing ", name, "on", this.id, this);
         this[init_flag_name] = true;
         if (!this.attr(name))
           this[name] = new can.Observe.List();
