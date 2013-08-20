@@ -32,6 +32,11 @@ environment = webassets.Environment()
 
 environment.manifest = 'file:assets.manifest'
 environment.versions = 'hash:32'
+
+# `asset-debug` mode doesn't merge bundles into a single file
+environment.debug = settings.DEBUG_ASSETS
+
+# `settings-debug` mode doesn't finger-print files (no cache-busting)
 if settings.DEBUG:
   environment.url_expire = False
 
@@ -116,7 +121,9 @@ environment.register("dashboard-js", webassets.Bundle(
 environment.register("dashboard-js-templates", webassets.Bundle(
   *asset_paths['dashboard-js-template-files'],
   filters=MustacheFilter,
-  output='dashboard-templates' + version_suffix + '.js'))
+  output='dashboard-templates' + version_suffix + '.js',
+  # Always keep `debug` False here, since raw mustache is not valid JS
+  debug=False))
 
 environment.register("dashboard-css", webassets.Bundle(
   *asset_paths['dashboard-css-files'],
