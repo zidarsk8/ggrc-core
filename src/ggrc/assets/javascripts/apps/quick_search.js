@@ -99,6 +99,9 @@ var RELATIONSHIP_TYPES = {
     , "Market": []
     , "OrgGroup": []
     , "Program": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "Process": {
       "System": []
     , "Process": []
@@ -109,6 +112,9 @@ var RELATIONSHIP_TYPES = {
     , "Market": []
     , "OrgGroup": []
     , "Program": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
 }};
 
 GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
@@ -252,7 +258,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
   governance_object_types =
-    directive_object_types.concat(["Control", "Section"]);
+    directive_object_types.concat(["Control", "Section", "Objective"]);
 
   all_object_types =
     governance_object_types.concat(business_plus_program_object_types);
