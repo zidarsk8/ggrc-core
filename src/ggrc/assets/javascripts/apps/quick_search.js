@@ -407,7 +407,22 @@ $(function() {
     resize_areas();  
   });
 
+  $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
+    var $el = $(this)
+      ;
 
+    $el.children("span").each(function(i, mapping_el) {
+      var $mapping_el = $(mapping_el)
+        , mapping = $mapping_el.data('mapping');
+
+      if (mapping) {
+        mapping.refresh().done(function() {
+          mapping.destroy();
+        });
+        //$mapping_el.remove();
+      }
+    });
+  });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
     var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
