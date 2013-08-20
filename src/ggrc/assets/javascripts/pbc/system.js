@@ -80,6 +80,10 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Program" : {}
       , "Market" : {}
       , "Risk" : {}
+      , "Regulation" : {}
+      , "Policy" : {}
+      , "Contract" : {}
+      , "Objective" : {}
       }
 }, {
     system_or_process: function() {
