@@ -10,49 +10,167 @@
 //= require controls/control
 //= require controls/category
 
-var RefreshQueue = function() {
-  var refresh_types_ids = {}
-    , refresh_types_models = {}
-    ;
+/*  RefreshQueue
+ *
+ *  enqueue(obj, force=false) -> queue or null
+ *  trigger() -> Deferred
+ */
 
-  return {
-    enqueue: function(obj, force) {
+can.Construct("ModelRefreshQueue", {
+}, {
+    init: function(model) {
+      this.model = model;
+      this.ids = [];
+      this.deferred = new $.Deferred();
+      this.triggered = false;
+      this.completed = false;
+      this.updated_at = Date.now();
+    }
+
+  , enqueue: function(id) {
+      if (this.triggered)
+        return null;
+      else {
+        if (this.ids.indexOf(id) === -1) {
+          this.ids.push(id);
+          this.updated_at = Date.now();
+        }
+        return this;
+      }
+    }
+
+  , trigger: function() {
+      var self = this;
+      if (!this.triggered) {
+        this.triggered = true;
+        if (this.ids.length > 0)
+          this.model.findAll({ id__in: this.ids.join(",") }).then(function() {
+            self.completed = true;
+            self.deferred.resolve();
+          });
+        else {
+          this.completed = true;
+          this.deferred.resolve();
+        }
+      }
+      return this.deferred;
+    }
+
+  , trigger_with_debounce: function(delay) {
+      var ms_to_wait = (delay || 0) + this.updated_at - Date.now();
+
+      if (!this.triggered) {
+        if (ms_to_wait < 0)
+          this.trigger();
+        else
+          setTimeout(this.proxy("trigger_with_debounce", delay), ms_to_wait);
+      }
+
+      return this.deferred;
+    }
+});
+
+can.Construct("RefreshQueueManager", {
+}, {
+    init: function() {
+      this.null_queue = new ModelRefreshQueue(null);
+      this.queues = [];
+    }
+
+  , enqueue: function(obj, force) {
+      var self = this
+        , model = obj.constructor
+        , model_name = model.shortName
+        , found_queue = null
+        , id = obj.id
+        ;
+
+      if (!force)
+        // Check if the ID is already contained in another queue
+        can.each(this.queues, function(queue) {
+          if (!found_queue
+              && queue.model === model && queue.ids.indexOf(id) > -1)
+            found_queue = queue;
+        });
+
+      if (!found_queue) {
+        can.each(this.queues, function(queue) {
+          if (!found_queue
+              && queue.model === model && !queue.triggered)
+            found_queue = queue.enqueue(id);
+        });
+        if (!found_queue) {
+          found_queue = new ModelRefreshQueue(model);
+          this.queues.push(found_queue)
+          found_queue.enqueue(id);
+          found_queue.deferred.done(function() {
+            var index = self.queues.indexOf(found_queue);
+            if (index > -1)
+              self.queues.splice(index, 1);
+          });
+        }
+      }
+
+      return found_queue;
+    }
+});
+
+var _refresh_queue_manager = new RefreshQueueManager();
+
+can.Construct("RefreshQueue", {
+
+}, {
+    init: function() {
+      this.objects = [];
+      this.queues = [];
+      this.deferred = new $.Deferred();
+      this.triggered = false;
+      this.completed = false;
+    }
+
+  , enqueue: function(obj, force) {
       if (!obj)
         return;
+      if (this.triggered)
+        return null;
 
       var model = obj.constructor
         , model_name = model.shortName
         ;
 
+      this.objects.push(obj);
       if (force || !obj.selfLink) {
-        refresh_types_models[model_name] = model;
-        refresh_types_ids[model_name] = refresh_types_ids[model_name] || [];
-        if (refresh_types_ids[model_name].indexOf(obj.id) == -1)
-          refresh_types_ids[model_name].push(obj.id);
+        queue = _refresh_queue_manager.enqueue(obj, force);
+        if (this.queues.indexOf(queue) === -1)
+          this.queues.push(queue);
       }
-    },
+      return this;
+    }
 
-    trigger: function() {
-      var dfds = []
-        , this_refresh_types_ids = refresh_types_ids
-        , this_refresh_types_models = refresh_types_models
+  , trigger: function(delay) {
+      var self = this
+        , deferreds = []
         ;
 
-      refresh_types_ids = {};
-      refresh_types_models = {};
+      if (!delay)
+        delay = 50;
 
-      can.each(this_refresh_types_ids, function(ids, model_name) {
-        var model = this_refresh_types_models[model_name];
-        dfds.push(model.findAll({ id__in: ids.join(",") }));
+      this.triggered = true;
+      can.each(this.queues, function(queue) {
+        deferreds.push(queue.trigger_with_debounce(50));
       });
 
-      if (dfds.length > 0)
-        return $.when.apply($, dfds);
+      if (deferreds.length > 0)
+        $.when.apply($, deferreds).then(function() {
+          self.deferred.resolve(self.objects);
+        });
       else
-        return (new $.Deferred()).resolve()
+        return this.deferred.resolve(this.objects);
+
+      return this.deferred;
     }
-  }
-};
+});
+
 
 (function(can, $) {
 

@@ -193,11 +193,12 @@
       if(instance && instance.owner && !instance.owner.selfLink) {
         instance.owner.refresh({ "__include" : "owner" });
       }
-      
+
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
-        new_object_form : !$trigger.attr('data-object-id')
+          new_object_form : !$trigger.attr('data-object-id')
+        , object_params : $trigger.data('object-params')
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance

@@ -176,12 +176,12 @@ ul.new-tree {
       border-right:1px solid #ccc;
       font-size:13px;
       line-height:30px;
-      &:first-child {
-        border-top:1px solid #ddd;
-      }
-      &:last-child {
-        border-bottom:1px solid #ccc;
-      }
+      //&:first-child {
+      //  border-top:1px solid #ddd;
+      //}
+      //&:last-child {
+      //  border-bottom:1px solid #ccc;
+      //}
     }
   }
 }
