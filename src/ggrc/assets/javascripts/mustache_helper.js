@@ -802,4 +802,15 @@ Mustache.registerHelper("category_select", function(object, attr_name, scope) {
   return defer_render('select', get_select_html, options_dfd);
 });
 
+Mustache.registerHelper("schemed_url", function(url) {
+  if (url) {
+    url = url.isComputed? url(): url;
+    if (!url.match(/^[a-zA-Z]+:/)) {
+        return 'http://' + url;
+    }
+  }
+  return url;
+});
+
+
 })(this, jQuery, can);
