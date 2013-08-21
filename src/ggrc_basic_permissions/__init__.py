@@ -135,7 +135,7 @@ def all_collections():
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
-  if 'private' in src:
+  if src.get('private', False):
     # get the personal context for this logged in user
     personal_context = service.personal_context()
 

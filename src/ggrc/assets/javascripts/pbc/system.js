@@ -16,7 +16,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
     , tree_view_options : {
-      list_view : "/static/mustache/systems/tree.mustache"
+      list_view : "/static/mustache/base_objects/tree.mustache"
       , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
@@ -26,7 +26,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         , draw_children : false
       },{
         model : null ///filled in after init.
-        , list_view : "/static/mustache/systems/tree.mustache"
+        , list_view : "/static/mustache/base_objects/tree.mustache"
         , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]

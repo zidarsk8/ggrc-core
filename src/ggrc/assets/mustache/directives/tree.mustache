@@ -1,7 +1,7 @@
 {{#list}}
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-sub-type="{{instance.lowercase_kind}}" data-object-type="{{instance.constructor.shortName}}" data-object-meta-type="directive">
-    <div class="item-main" {{data 'model'}}>
-      <a class="openclose" href="javascript://">
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+      <a href="javascript://" class="openclose">
         <div class="row-fluid">
           <div class="span10">
             <div class="item-data">
@@ -30,20 +30,34 @@
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
-          <div class="span12">
+
+          {{#if instance.viewLink}}
+          <div class="span6">
             <a href="{{instance.viewLink}}" class="info-action">
-              View {{instance.constructor.table_singular}}
+              View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
           </div>
+          {{/if}}
+
+          {{#if mappings}}
+          <div class="span6">
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
+              <i class="grcicon-remove"></i>
+              Unmap
+            </a>
+          </div>
+          {{/if}}
+
         </div>
 
-        {{#description}}
+        {{#instance.description}}
           <div class="show-description">
             <div class="row-fluid">
               <div class="span12">
                 <div class="tree-description short">
-                  {{{description}}}
+                  {{{instance.description}}}
                 </div>
                 <a href="javascript://" class="show-long">
                   ...more
@@ -51,7 +65,7 @@
               </div>
             </div>
           </div>
-        {{/description}}
+        {{/instance.description}}
 
         <div class="row-fluid">
           <div class="span6">
@@ -99,24 +113,24 @@
   </li>
 {{/list}}
 
-{{! FIXME: Add tree item - should be Contract OR Regulation OR Policy NOT Directive }}
-<li class="tree-item-add">
-  {{#if_match model.shortName '^(Directive|Regulation)$'}}
-  <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="{{model.title_singular}}" data-related-title-plural="Regulations" data-modal-selector-options="program_directives" data-join-object-id="{{parent_instance.id}}" data-join-object-type="{{model.title_singular}}" data-child-meta-type="Regulation" data-child-property="directive_id" data-join-query="directive.kind__in=Regulation" rel="tooltip" data-placement="left" title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
-  {{/if_match}}
-  {{#if_equals model.shortName 'Directive'}}&nbsp;&nbsp;{{/if_equals}}
-  {{#if_match model.shortName '^(Directive|Contract)$'}}
-  <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="{{model.title_singular}}" data-related-title-plural="Contracts" data-modal-selector-options="program_directives" data-join-object-id="{{parent_instance.id}}" data-join-object-type="Directive" data-child-meta-type="{{model.title_singular}}" data-child-property="directive_id" data-join-query="directive.kind__in=Contract" rel="tooltip" data-placement="left" title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
-  {{/if_match}}
-  {{#if_equals model.shortName 'Directive'}}&nbsp;&nbsp;{{/if_equals}}
-  {{#if_match model.shortName '^(Directive|Policy)$'}}
-  <a data-modal-reset="reset" data-toggle="modal-selector" href="javascript://" data-modal-class="modal-wide" data-related-title-singular="{{model.title_singular}}" data-related-title-plural="Policies" data-modal-selector-options="program_directives" data-join-object-id="{{parent_instance.id}}" data-join-object-type="Directive" data-child-meta-type="{{model.title_singular}}" data-child-property="directive_id" data-join-query="directive.kind__in=Company+Policy,Org+Group+Policy,Data+Asset+Policy,Product+Policy,Contract-Related+Policy,Company+Controls+Policy" rel="tooltip" data-placement="left" title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
-  {{/if_match}}
-  </a>
+{{#if allow_mapping_or_creating}}
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+      {{#if allow_mapping}}
+      <a
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="multitype-modal-selector"
+        data-join-option-type="{{model.shortName}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+        + {{model.title_singular}}
+      </a>
+      {{/if}}
+    </div>
+  </div>
 </li>
+{{/if}}

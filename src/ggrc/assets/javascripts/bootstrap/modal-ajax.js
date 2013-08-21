@@ -202,7 +202,7 @@
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
-        , modal_title : (instance ? "Edit " : "New ") + model.title_singular || $trigger.attr("data-object-singular")
+        , modal_title : (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"))
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       });
 
