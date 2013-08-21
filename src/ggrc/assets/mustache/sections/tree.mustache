@@ -89,7 +89,7 @@
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
-            <h6>Mapped Objects ({{child_count}})</h6>
+            <h6>Objectives, Controls, and Business Objects ({{child_count}})</h6>
             {{#child_options}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
