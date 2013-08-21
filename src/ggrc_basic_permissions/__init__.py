@@ -59,7 +59,7 @@ class UserPermissions(DefaultUserPermissions):
         or session['permissions']['__user'] != \
             self.get_email_for(get_current_user()):
       self.load_permissions()
-    elif 'permission__ts' in session and not get_current_user().is_anonymous():
+    elif 'permissions__ts' in session and not get_current_user().is_anonymous():
       current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
           .filter(UserRole.person_id==get_current_user().id)\
           .order_by(UserRole.updated_at.desc())\
