@@ -86,7 +86,7 @@
           Fraud Related
           <i class="grcicon-help-black" rel="tooltip" title="Is control fraud related?"></i>
         </label>
-        <select class="input-block-level" name="fraud_related">
+        <select class="input-block-level" name="fraud_related" null-if-empty="null-if-empty">
           <option value="" {{#if_equals fraud_related ""}}selected{{/if_equals}}>Choose</option>
           <option value="0" {{#if_equals fraud_related "0"}}selected{{/if_equals}}>No</option>
           <option value="1" {{#if_equals fraud_related "1"}}selected{{/if_equals}}>Yes</option>
@@ -97,7 +97,7 @@
           Significance
           <i class="grcicon-help-black" rel="tooltip" title="Choose Significance"></i>
         </label>
-        <select class="input-block-level" name="key_control">
+        <select class="input-block-level" name="key_control" null-if-empty="null-if-empty">
           <option value="" {{#if_equals key_control ""}}selected{{/if_equals}}>Choose</option>
           <option value="0" {{#if_equals key_control "0"}}selected{{/if_equals}}>No</option>
           <option value="1" {{#if_equals key_control "1"}}selected{{/if_equals}}>Yes</option>
