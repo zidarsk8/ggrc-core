@@ -828,5 +828,29 @@ Mustache.registerHelper("schemed_url", function(url) {
   return url;
 });
 
+Mustache.registerHelper("show_long", function() {
+  return  [
+      '<a href="javascript://" class="show-long"'
+    , can.view.hook(function(el, parent, view_id) {
+        el = $(el);
+        var content = el.prevAll('.short');
+
+        if (content.length) {
+          !function hide() {
+            if (el[0].offsetHeight) {
+              if (content[0].offsetHeight === content[0].scrollHeight) {
+                el.trigger('click');
+              }
+            }
+            else {
+              setTimeout(hide, 100);
+            }
+          }();
+        }
+      })
+    , ">...more</a>"
+  ].join('');
+});
+
 
 })(this, jQuery, can);

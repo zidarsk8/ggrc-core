@@ -11,6 +11,18 @@
       </label>
       <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
     </div>
+    {{#with_page_object_as "page_object"}}
+      <div class="span6">
+        <label>
+          Directive
+          <i class="grcicon-help-black" rel="tooltip" title="Contract, Policy or Regulation Code"></i>
+        </label>
+        <input id="directive.id" name="directive" type="hidden" model="Directive" value="{{directive.id}}">
+        <p class="modal-value">
+          {{directive.title}}
+        </p>
+      </div>
+    {{/with_page_object_as}}
   </div>
   <div class="row-fluid">
     <div class="span6">
