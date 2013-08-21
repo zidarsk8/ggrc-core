@@ -84,6 +84,12 @@ class ControlsConverter(BaseConverter):
 
   row_converter = ControlRowConverter
 
+  # Creates the correct metadata_map for the specific directive kind.
+  def create_metadata_map(self):
+    if self.options.get('directive'):
+      self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().kind), v) \
+                          if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
+
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")
     self.validate_code(attrs)
