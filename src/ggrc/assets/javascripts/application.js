@@ -359,7 +359,7 @@ jQuery(document).ready(function($) {
 
     _tooltip_show.apply(this);
 
-    return_value = this.$tip.css({ 'white-space': 'nowrap' });
+    return_value = this.$tip.css({ 'white-space': 'normal' });
 
     tip_pos = this.$tip.position();
     tip_pos.width = this.$tip.width();
