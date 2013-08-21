@@ -251,7 +251,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       function sub_all(el, ev, newVal, oldVal) {
         var $el = $(el);
         can.each(attribs, function(attrib) {
-          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data.serialize ? data.serialize() : data)).html());
+          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
         });
       }
 
@@ -291,15 +291,15 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       slugs.push.apply(slugs, controlslugs.call(this));
     });
     return slugs;
-  }
+  };
 
   var countcontrols = function() {
     var slugs = [];
     can.each(this.linked_controls, function() {
-      slugs.push.apply(slugs, controlslugs.apply(this)); 
+      slugs.push.apply(slugs, controlslugs.apply(this));
     });
     return slugs.length;
-  }
+  };
 
   Mustache.registerHelper("controlscount", countcontrols);
 
@@ -499,6 +499,8 @@ Mustache.registerHelper("if_page_type", function(page_type, options) {
     return options.inverse(this);
 });
 
+// Render a named template with the specified context, serialized and
+// augmented by 'options.hash'
 Mustache.registerHelper("render", function(template, context, options) {
   if(!options) {
     options = context;
@@ -513,9 +515,23 @@ Mustache.registerHelper("render", function(template, context, options) {
     template = template();
   }
 
-  return can.view.render(template, context.serialize ? context.serialize() : context);
+  context = $.extend({}, context.serialize ? context.serialize() : context);
+
+  if (options.hash) {
+    for(var k in options.hash) {
+      if(options.hash.hasOwnProperty(k)) {
+        context[k] = options.hash[k];
+        if (typeof context[k] == "function")
+          context[k] = context[k]();
+      }
+    }
+  }
+
+  return can.view.render(template, context);
 });
 
+// Like 'render', but doesn't serialize the 'context' object, and doesn't
+// apply options.hash
 Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
