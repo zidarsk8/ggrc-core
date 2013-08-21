@@ -805,7 +805,7 @@ Mustache.registerHelper("category_select", function(object, attr_name, scope) {
 Mustache.registerHelper("schemed_url", function(url) {
   if (url) {
     url = url.isComputed? url(): url;
-    if (!url.match(/^[a-zA-Z]+:/)) {
+    if (url && !url.match(/^[a-zA-Z]+:/)) {
         return 'http://' + url;
     }
   }
