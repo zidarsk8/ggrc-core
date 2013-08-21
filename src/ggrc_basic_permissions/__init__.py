@@ -64,7 +64,8 @@ class UserPermissions(DefaultUserPermissions):
           .filter(UserRole.person_id==get_current_user().id)\
           .order_by(UserRole.updated_at.desc())\
           .first()
-      if current_most_recent_role_ts[0] > session['permissions__ts']:
+      if not session['permissions__ts']\
+          or current_most_recent_role_ts[0] > session['permissions__ts']:
         self.load_permissions()
 
   def get_email_for(self, user):
