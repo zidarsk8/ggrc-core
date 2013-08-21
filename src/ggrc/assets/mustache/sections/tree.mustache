@@ -107,12 +107,12 @@
 
       {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
       <a href="javascript://" class="section-add">
-        + Section
+        + {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clause{{else}}Section{{/if_equals}}
       </a>
       {{#if allow_creating}}
-      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections" data-object-params='{ "directive": {{parent_instance.id}} }'>
+      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Section" data-object-plural="sections" data-object-singular-override="{{#if_equals parent_instance.constructor.shortName 'Contract'}}Clause{{/if_equals}}" data-object-params='{ "directive": {{parent_instance.id}} }'>
         <i class="grcicon-add-black"></i>
-        Create Section
+        Create {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clause{{else}}Section{{/if_equals}}
       </a>
       {{/if_match}}
 
@@ -121,13 +121,13 @@
         &nbsp;
         <a href="{{parent_instance.viewLink}}/import_sections" class="section-import">
           <i class="grcicon-imp-exp"></i>
-          Import Sections
+          Import {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clauses{{else}}Sections{{/if_equals}}
         </a>
         &nbsp;
         &nbsp;
         <a href="{{parent_instance.viewLink}}/export_sections" class="section-import">
           <i class="grcicon-imp-exp"></i>
-          Export Sections
+          Export {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clauses{{else}}Sections{{/if_equals}}
         </a>
       {{/if_match}}
       {{/if}}
