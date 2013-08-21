@@ -251,7 +251,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       function sub_all(el, ev, newVal, oldVal) {
         var $el = $(el);
         can.each(attribs, function(attrib) {
-          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data.serialize ? data.serialize() : data)).html());
+          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
         });
       }
 
@@ -291,15 +291,15 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       slugs.push.apply(slugs, controlslugs.call(this));
     });
     return slugs;
-  }
+  };
 
   var countcontrols = function() {
     var slugs = [];
     can.each(this.linked_controls, function() {
-      slugs.push.apply(slugs, controlslugs.apply(this)); 
+      slugs.push.apply(slugs, controlslugs.apply(this));
     });
     return slugs.length;
-  }
+  };
 
   Mustache.registerHelper("controlscount", countcontrols);
 
