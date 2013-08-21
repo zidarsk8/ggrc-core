@@ -701,7 +701,7 @@ Mustache.registerHelper("private_program", function(modal_title) {
     '<div class="span6">'
     , '<label>'
     , 'Privacy'
-    , '<i class="grcicon-help-black" rel="tooltip" title="Program won\'t be visible to others"></i>'
+    , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
     , '<input name="private" value="private" type="checkbox"> Private Program'
