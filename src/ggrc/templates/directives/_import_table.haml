@@ -9,7 +9,7 @@
             {{header_overrides[a]}}
         -else
           %th
-            {{converter.get_header_for_column(a)}}
+            {{converter.get_header_for_object_column(a)}}
   %tbody
     %tr
       %td{colspan:"{{width_pcts|length}}",cellspacing:"0",cellpadding:"0"}
