@@ -513,7 +513,19 @@ Mustache.registerHelper("render", function(template, context, options) {
     template = template();
   }
 
-  return can.view.render(template, context.serialize ? context.serialize() : context);
+  context = $.extend({}, context.serialize ? context.serialize() : context);
+
+  if (options.hash) {
+    for(var k in options.hash) {
+      if(options.hash.hasOwnProperty(k)) {
+        context[k] = options.hash[k];
+        if (typeof context[k] == "function")
+          context[k] = context[k]();
+      }
+    }
+  }
+
+  return can.view.render(template, context);
 });
 
 Mustache.registerHelper("renderLive", function(template, context, options) {
