@@ -189,6 +189,33 @@ can.Control("CMS.Controllers.Dashboard", {
         return this.add_dashboard_widget_from_descriptor(descriptor);
     }
 
+  , make_tree_view_descriptor_from_model_descriptor: function(descriptor) {
+      return {
+        content_controller: CMS.Controllers.TreeView,
+        content_controller_options: descriptor,
+        content_controller_selector: "ul",
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+        widget_id: descriptor.model.table_singular,
+        widget_name: function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return descriptor.model.title_plural;
+          } else {
+            return "Mapped " + descriptor.model.title_plural;
+          }
+        },
+        widget_info : function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return ""
+          } else {
+            return "Does not include mappings to Directives, Objectives and Controls"
+          }
+        },
+        widget_icon: descriptor.model.table_singular,
+        object_category: descriptor.model.category || descriptor.object_category
+      }
+    }
 
   , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
       return {
@@ -254,11 +281,23 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
     }
 
   , make_related_descriptor_from_model_descriptor: function(descriptor) {
-      descriptor = this.make_list_view_descriptor_from_model_descriptor(descriptor);
+      var parent_instance = GGRC.make_model_instance(GGRC.page_object)
+        , object_type = descriptor.model.shortName
+        , list_loader = new GGRC.ListLoaders.RelatedListLoader(
+              parent_instance, object_type)
+        ;
+
+      descriptor = this.make_tree_view_descriptor_from_model_descriptor(descriptor);
       descriptor = $.extend({}, descriptor);
       descriptor.content_controller_options =
         $.extend({}, descriptor.content_controller_options);
-      descriptor.content_controller_options.is_related = true;
+      descriptor.content_controller_options.child_options = [];
+      descriptor.content_controller_options.draw_children = false;
+      descriptor.content_controller_options.parent_instance = parent_instance;
+      descriptor.content_controller_options.model = object_type;
+
+      list_loader.refresh_list();
+      descriptor.content_controller_options.list = list_loader.list;
       return descriptor;
     }
 
@@ -314,6 +353,20 @@ can.Control("CMS.Controllers.InnerNav", {
       can.view(this.options.internav_view, this.options, function(frag) {
         that.element.append(frag);
         that.update_scrollspy();
+
+        // Update scrollspy as scrollable content changes
+        var $body = $(".object-area")
+          , lastHeight = 0
+          ;
+        if ($body[0] && $body.data('scrollspy')) {
+          lastHeight = $body[0].scrollHeight;
+          setInterval(function() {
+            if ($body[0] && $body[0].scrollHeight !== lastHeight) {
+              lastHeight = $body[0].scrollHeight;
+              that.update_scrollspy();
+            }
+          }, 1000);
+        }
       });
     }
 

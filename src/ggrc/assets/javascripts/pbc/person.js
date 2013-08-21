@@ -18,7 +18,7 @@ can.Model.Cacheable("CMS.Models.Person", {
    , create : "POST /api/people"
    , update : "PUT /api/people/{id}"
    , destroy : "DELETE /api/people/{id}"
-    , search : function(request, response) {
+   , search : function(request, response) {
         return $.ajax({
             type : "get"
             , url : "/api/people"
@@ -33,6 +33,11 @@ can.Model.Cacheable("CMS.Models.Person", {
                 }));
             }
         });
+    }
+    , attributes : {
+        modified_by : "CMS.Models.Person.model"
+      , object_people : "CMS.Models.ObjectPerson.models"
+      , language : "CMS.Models.Option.model"
     }
     , defaults : {
       name : ""

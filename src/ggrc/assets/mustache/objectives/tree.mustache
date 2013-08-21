@@ -6,6 +6,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
@@ -21,26 +22,30 @@
       </a>
     </div>
 
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
 
+          {{#if instance.viewLink}}
           <div class="span6">
             <a href="{{instance.viewLink}}" class="info-action">
-              View Objective
+              View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
           </div>
-          
-          {{! UNMAP
+          {{/if}}
+
+          {{#if mappings}}
           <div class="span6">
-            <a href="javascript://" class="info-action unmap pull-right">
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
           </div>
-          }}
+          {{/if}}
 
         </div>
 
@@ -87,8 +92,8 @@
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
+            <h6>Mapped Objects ({{child_count}})</h6>
             {{#child_options}}
-              <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
@@ -96,36 +101,23 @@
       {{/if}}
 
     </div>
+    {{/if}}
   </li>
 {{/list}}
-{{#if_equals parent_instance.constructor.shortName "Section"}}
+{{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
+  {{#if allow_mapping}}
   <a
     href="javascript://"
     rel="tooltip"
     data-placement="left"
-    data-toggle="modal-selector"
-    data-modal-selector-options="section_objectives"
-    data-modal-class="modal-wide"
-    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-    data-join-object-id="{{parent_instance.id}}"
-    data-join-object-type="{{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
-</li>
-{{else}}
-<li class="tree-item tree-item-add">
-  <a
-    href="javascript://"
-    rel="tooltip"
-    data-placement="left"
-    data-toggle="modal-selector-dispatch"
-    data-modal-class="modal-wide"
-    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
+    data-toggle="multitype-modal-selector"
     data-join-option-type="{{model.shortName}}"
     data-join-object-id="{{parent_instance.id}}"
-    data-join-object-type="{{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
+    data-join-object-type="{{parent_instance.constructor.shortName}}"
+    data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+    + Object
   </a>
+  {{/if}}
 </li>
-{{/if_equals}}
+{{/if}}

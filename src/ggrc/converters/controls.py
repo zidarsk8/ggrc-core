@@ -31,9 +31,10 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_option('means', role = 'control_means')
     self.handle_option('verify_frequency')
 
-    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'])
-    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'])
-    self.handle_boolean('active', truthy_values = ['active'])
+    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'], no_values = [])
+    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'], \
+      no_values = ['not fraud', 'not_fraud','not fraud_related', 'not fraud related'])
+    self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
     self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
@@ -82,6 +83,12 @@ class ControlsConverter(BaseConverter):
   ])
 
   row_converter = ControlRowConverter
+
+  # Creates the correct metadata_map for the specific directive kind.
+  def create_metadata_map(self):
+    if self.options.get('directive'):
+      self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().kind), v) \
+                          if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")

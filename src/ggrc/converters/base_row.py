@@ -230,7 +230,7 @@ class ColumnHandler(object):
     if content:
       data = self.parse_item(content)
       self.validate(data)
-      if data:
+      if data is not None:
         self.value = data
         self.set_attr(data)
       return data
@@ -289,9 +289,22 @@ class OptionColumnHandler(ColumnHandler):
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
     truthy_values = self.options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
+    no_values = self.options.get('no_values',[]) + ['no', '0', 'false','n']
     if value:
-      return value.lower() in truthy_values
+      if value.lower() in truthy_values:
+        return True
+      elif value.lower() in no_values:
+        return False
+      else:
+        self.warnings.append('bad value')
+        return None
     return None
+
+  def display(self):
+    if self.value is None:
+      return self.original
+    else:
+      return str(self.value)
 
 class DateColumnHandler(ColumnHandler):
 
@@ -722,11 +735,3 @@ class LinkRelationshipsHandler(LinksHandler):
     where_params = self.get_where_params(data)
     model_class = self.options.get('model_class')
     return model_class.query.filter_by(**where_params).first() if model_class else None
-
-
-
-
-
-
-
-

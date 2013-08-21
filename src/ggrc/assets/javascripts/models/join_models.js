@@ -15,10 +15,13 @@ can.Model.Cacheable("can.Model.Join", {
         //can.proxy(this, "reinit"));
 
           can.each(instance.constructor.join_keys, function(cls, key) {
-            var obj =
-              cls.findInCacheById(instance[key].id);
-
-            obj && obj.refresh();
+            if (instance[key].refresh)
+              instance[key].refresh();
+            else {
+              var obj =
+                cls.findInCacheById(instance[key].id);
+              obj && obj.refresh();
+            }
           });
         }
       });
@@ -140,6 +143,11 @@ can.Model.Cacheable("can.Model.Join", {
 can.Model.Join("CMS.Models.Relationship", {
     root_object: "relationship"
   , root_collection: "relationships"
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , source : "CMS.Models.get_instance"
+    , destination : "CMS.Models.get_instance"
+  }
   , join_keys : {
     source : can.Model.Cacheable
     , destination : can.Model.Cacheable
@@ -153,11 +161,19 @@ can.Model.Join("CMS.Models.Relationship", {
 
     //typeof this._super_init === "function" && this._super_init.call(this);
     this.attr("source", CMS.Models.get_instance(
-      this.source_type || (this.source && this.source.type)
+      this.source_type
+        || (this.source
+            && (this.source.constructor
+                && this.source.constructor.shortName
+                || (!this.source.selfLink && this.source.type)))
       , this.source_id || (this.source && this.source.id)
       , this.source) || this.source);
     this.attr("destination", CMS.Models.get_instance(
-      this.destination_type || (this.destination && this.destination.type)
+      this.destination_type
+        || (this.destination
+            && (this.destination.constructor
+                && this.destination.constructor.shortName
+                || (!this.source.selfLink && this.destination.type)))
       , this.destination_id || (this.destination && this.destination.id)
       , this.destination) || this.destination);
 
@@ -176,10 +192,11 @@ can.Model.Join("CMS.Models.ObjectSection", {
     , "sectionable" : can.Model.Cacheable
   }
   , attributes : {
-    section : "CMS.Models.Section.model"
+      modified_by : "CMS.Models.Person.model"
+    , section : "CMS.Models.Section.model"
     , sectionable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_sections?__include=sectionable"
+  , findAll: "GET /api/object_sections"
   , create: "POST /api/object_sections"
   , destroy: "DELETE /api/object_sections/{id}"
 }, {
@@ -196,10 +213,11 @@ can.Model.Join("CMS.Models.ObjectControl", {
     , "controllable" : can.Model.Cacheable
   }
   , attributes : {
-    control : "CMS.Models.Control.model"
+      modified_by : "CMS.Models.Person.model"
+    , control : "CMS.Models.Control.model"
     , controllable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_controls?__include=controllable"
+  , findAll: "GET /api/object_controls"
   , create: "POST /api/object_controls"
   , destroy: "DELETE /api/object_controls/{id}"
 }, {
@@ -216,10 +234,11 @@ can.Model.Join("CMS.Models.ObjectObjective", {
     , "objectiveable" : can.Model.Cacheable
   }
   , attributes : {
-    objective : "CMS.Models.Objective.model"
+      modified_by : "CMS.Models.Person.model"
+    , objective : "CMS.Models.Objective.model"
     , objectiveable : "CMS.Models.get_instance"
   }
-  , findAll: "GET /api/object_objectives?__include=objectiveable"
+  , findAll: "GET /api/object_objectives"
   , create: "POST /api/object_objectives"
   , destroy: "DELETE /api/object_objectives/{id}"
 }, {
@@ -235,6 +254,12 @@ can.Model.Join("CMS.Models.ProgramDirective", {
     "program" : CMS.Models.Program
     , "directive" : CMS.Models.Directive
   }
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , program : "CMS.Models.Program.model"
+    , directive : "CMS.Models.Directive.model"
+  }
+  , findAll: "GET /api/program_directives"
   , create: "POST /api/program_directives"
   , destroy : "DELETE /api/program_directives/{id}"
 }, {
@@ -243,6 +268,11 @@ can.Model.Join("CMS.Models.ProgramDirective", {
 can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , objective : "CMS.Models.Objective.model"
+    , control : "CMS.Models.Control.model"
+    }
   , join_keys : {
       "objective" : CMS.Models.Objective
     , "control" : CMS.Models.Control
@@ -256,6 +286,11 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
 can.Model.Join("CMS.Models.SystemControl", {
   root_object : "system_control"
   , root_collection : "system_controls"
+  , attributes: {
+      modified_by : "CMS.Models.Person.model"
+    , system : "CMS.Models.System.model"
+    , control : "CMS.Models.Control.model"
+  }
   , join_keys : {
     "system" : CMS.Models.System
     , "control" : CMS.Models.Control
@@ -269,6 +304,11 @@ can.Model.Join("CMS.Models.SystemControl", {
 can.Model.Join("CMS.Models.SystemSystem", {
   root_object : "system_system"
   , root_collection : "system_systems"
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , parent : "CMS.Models.System.model"
+    , child : "CMS.Models.System.model"
+  }
   , join_keys : {
     "parent" : can.Model.Cacheable
     , "child" : can.Model.Cacheable
@@ -286,6 +326,11 @@ can.Model.Join("CMS.Models.UserRole", {
   , update : "PUT /api/user_roles/{id}"
   , create : "POST /api/user_roles"
   , destroy : "DELETE /api/user_roles/{id}"
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , person : "CMS.Models.Person.model"
+    , role : "CMS.Models.Role.model"
+  }
   , join_keys : {
       person : CMS.Models.Person
     , role : CMS.Models.Role
@@ -321,16 +366,18 @@ can.Model.Join("CMS.Models.UserRole", {
 can.Model.Join("CMS.Models.ControlSection", {
   root_collection : "control_sections"
   , root_object : "control_section"
+  , findAll : "GET /api/control_sections"
   , create : "POST /api/control_sections"
   , destroy : "DELETE /api/control_sections/{id}"
   , join_keys : {
     section : CMS.Models.Section
     , control : CMS.Models.Control
   }
-  /*, attributes : {
-    section : "CMS.Models.Section.model"
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , section : "CMS.Models.Section.model"
     , control : "CMS.Models.Control.model"
-  }
+  }/*
   , init : function() {
     var that = this;
     this._super.apply(this, arguments);
@@ -372,7 +419,8 @@ can.Model.Join("CMS.Models.SectionObjective", {
     , objective : CMS.Models.Objective
   }
   , attributes : {
-      section : "CMS.Models.Section.model"
+      modified_by : "CMS.Models.Person.model"
+    , section : "CMS.Models.Section.model"
     , objective : "CMS.Models.Objective.model"
   }
   /*, init : function() {
@@ -435,11 +483,55 @@ can.Model.Join("CMS.Models.ProgramControl", {
   root_collection : "program_controls"
   , root_object : "program_control"
   , join_keys : {
-    "program" : CMS.Models.Program
-    , "control" : CMS.Models.Control
+      program : CMS.Models.Program
+    , control : CMS.Models.Control
   }
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , program : "CMS.Models.Program.model"
+    , control : "CMS.Models.Control.model"
+  }
+  , findAll : "GET /api/program_controls"
   , create : "POST /api/program_controls"
-  , destroy : "DELETE /api/program_controls"
+  , destroy : "DELETE /api/program_controls/{id}"
+}, {
+
+});
+
+can.Model.Join("CMS.Models.ControlControl", {
+  root_collection : "control_controls"
+  , root_object : "control_control"
+  , join_keys : {
+      control : CMS.Models.Control
+    , implemented_control : CMS.Models.Control
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , control : "CMS.Models.Control.model"
+    , implemented_control : "CMS.Models.Control.model"
+  }
+  , findAll : "GET /api/control_controls"
+  , create : "POST /api/control_controls"
+  , destroy : "DELETE /api/control_controls/{id}"
+}, {
+
+});
+
+can.Model.Join("CMS.Models.ControlRisk", {
+  root_collection : "control_risks"
+  , root_object : "control_risk"
+  , join_keys : {
+      control : CMS.Models.Control
+    , risk : CMS.Models.Risk
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.model"
+    , control : "CMS.Models.Control.model"
+    , risk : "CMS.Models.Risk.model"
+  }
+  , findAll : "GET /api/control_risks"
+  , create : "POST /api/control_risks"
+  , destroy : "DELETE /api/control_risks/{id}"
 }, {
 
 });
@@ -456,7 +548,8 @@ can.Model.Join("CMS.Models.ObjectPerson", {
     , person : CMS.Models.Person
   }
   , attributes : {
-    person : "CMS.Models.Person.model"
+      modified_by : "CMS.Models.Person.model"
+    , person : "CMS.Models.Person.model"
     , personable : "CMS.Models.get_instance"
   }
 
@@ -473,7 +566,8 @@ can.Model.Join("CMS.Models.ObjectDocument", {
     , document : CMS.Models.Document
   }
   , attributes : {
-    document : "CMS.Models.Document.model"
+      modified_by : "CMS.Models.Person.model"
+    , document : "CMS.Models.Document.model"
     , documentable : "CMS.Models.get_instance"
   }
 }, {});
