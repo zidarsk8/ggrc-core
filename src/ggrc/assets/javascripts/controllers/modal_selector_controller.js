@@ -265,6 +265,12 @@
       }
     },
 
+    ".btn-add modal:success" : function(el, ev, data) {
+      this.option_list.unshift(data);
+      this.context.attr('selected_option', data);
+      this.element.find(".tree-item[data-id=" + data.id + "] input[type=checkbox]").click();
+    },
+
     // HELPERS
 
     find_join: function(option_id) {
@@ -920,6 +926,11 @@
         if (this.element)
           this.element.remove();
       }
+
+    , ".btn-add modal:success" : function(el, ev, data) {
+      this.option_list.unshift(data);
+      this.context.attr('selected_option', data);
+    }
   });
 
   ModalOptionDescriptor = can.Construct({
