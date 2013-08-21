@@ -221,8 +221,9 @@ $.extend(Permission, (function() {
     return false;
   };
 
-  is_allowed = function(permission) {
-    return _is_allowed(GGRC.permissions, permission);
+  is_allowed = function(action, resource_type, context_id) {
+    return _is_allowed(
+        GGRC.permissions, new Permission(action, resource_type, context_id));
   };
 
   return {
