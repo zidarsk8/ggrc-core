@@ -177,28 +177,17 @@ $(function() {
 
   CMS.Models.Section.findAll({ directive_id : directive_id })
   .done(function(s) {
-    s = can.makeArray(s).sort(window.natural_comparator);
+    page_model.sections.replace(can.makeArray(s).sort(window.natural_comparator));
 
-    CMS.Models.Section.bind("created", function(ev, instance) {
-      if (instance instanceof CMS.Models.Section
-          && instance.directive.id == directive_id)
-        s.push(instance);
-    });
-
-    CMS.Models.Section.bind("destroyed", function(ev, instance) {
-      var index;
-      if (instance instanceof CMS.Models.Section
-          && instance.directive.id == directive_id) {
-        index = s.indexOf(instance);
-        if (index > -1)
-          s.splice(index, 1);
-      }
+    CMS.Models.Section.bind("created destroyed", function(ev, instance) {
+      page_model.refresh();
+      page_model.sections.replace(can.makeArray(page_model.sections).sort(window.natural_comparator));
     });
 
     $sections_tree.cms_controllers_tree_view({
       model : CMS.Models.Section
       , edit_sections : true
-      , list : s
+      , list : page_model.sections
       , list_view : "/static/mustache/sections/tree.mustache"
       , parent_instance : GGRC.make_model_instance(GGRC.page_object)
     });
