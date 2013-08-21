@@ -24,43 +24,96 @@ can.Model.Cacheable("CMS.Models.Section", {
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , attributes : {
-    parent : "CMS.Models.Section.model"
-    , children : "CMS.Models.Section.models"
-    , controls : "CMS.Models.Control.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
     , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , directive : "CMS.Models.get_instance"
+    //, parent : "CMS.Models.Section.model"
+    , children : "CMS.Models.Section.models"
     , control_sections : "CMS.Models.ControlSection.models"
+    , controls : "CMS.Models.Control.models"
     , section_objectives : "CMS.Models.SectionObjective.models"
+    , objectives : "CMS.Models.Objective.models"
     , object_sections : "CMS.Models.ObjectSection.models"
   }
+
+  , defaults : {
+      title : ""
+    , slug : ""
+    , description : ""
+
+    , object_people : []
+    , people : []
+    , object_documents : []
+    , documents : []
+    , object_objectives : []
+    , objectives : []
+    , object_controls : []
+    , controls : []
+    , directive : "CMS.Models.get_instance"
+    //, parent : "CMS.Models.Section.model"
+    , children : []
+    , control_sections : []
+    , controls : []
+    , section_objectives : []
+    , objectives : []
+    , object_sections : []
+  }
+
+  , mappings: {
+      people_mappings: {
+          attr: "object_people"
+        , target_attr: "person"
+      }
+    , business_object_mappings: {
+          attr: "object_sections"
+        , target_attr: "sectionable"
+      }
+    , control_mappings: {
+          attr: "control_sections"
+        , target_attr: "control"
+      }
+    , objective_mappings: {
+          attr: "section_objectives"
+        , target_attr: "objective"
+      }
+    }
+
   , tree_view_options : {
     list_view : "/static/mustache/sections/tree.mustache"
     , child_options : [{
-      model : can.Model.Cacheable
-      , property : "business_objects"
-      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
-      , title_plural : "Business Objects"
-    }, {
-      model : CMS.Models.Objective
-      , property : "objectives"
+        model : "Objective"
+      , property : "objective_mappings"
       , list_view : "/static/mustache/objectives/tree.mustache"
+      , draw_children : false
     }, {
-      model : CMS.Models.Control
-      , property : "controls"
+        model : "Control"
+      , property : "control_mappings"
       , list_view : "/static/mustache/controls/tree.mustache"
+      , draw_children : false
     //}, {
     //  model : CMS.Models.Section
     //  , property : "children"
+    }, {
+        model : "Person"
+      , property : "people_mappings"
+      , list_view : "/static/mustache/people/tree.mustache"
+    }, {
+        model : can.Model.Cacheable
+      , property : "business_object_mappings"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+      , draw_children : false
     }]
   }
-  , defaults : {
-    children : []
-    , controls : []
-    , objectives : []
-    , object_sections : []
-    , title : ""
-    , slug : ""
-    , description : ""
-  }
+
   /*, findTree : function(params) {
     function filter_out(original, predicate) {
       var target = [];
@@ -171,41 +224,7 @@ can.Model.Cacheable("CMS.Models.Section", {
         that.removeAttr(name);
     });
 
-    /*this.attr("descendant_sections", can.compute(function() {
-      return that.attr("children").concat(can.reduce(that.children, function(a, b) {
-        return a.concat(can.makeArray(b.descendant_sections()));
-      }, []));
-    }));
-    this.attr("descendant_sections_count", can.compute(function() {
-      return that.attr("descendant_sections")().length;
-    }));*/
-    this.attr("business_objects", new can.Model.List(
-      can.map(
-        this.object_sections,
-        function(os) {return os.sectionable || new can.Model({ selfLink : "/" }); }
-      )
-    ));
-    this.object_sections.bind("change", function(ev, attr, how) {
-      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-        that.business_objects.replace(
-          can.map(
-            that.object_sections,
-            function(os, i) {
-              if(os.sectionable) {
-                return os.sectionable;
-              } else {
-                os.refresh({ "__include" : "sectionable" }).done(function(d) {
-                  that.business_objects.attr(i, d.sectionable);
-                  //can.Observe.stopBatch();
-                }).fail(function() {
-                  //can.Observe.stopBatch();
-                });
-                return new can.Model({ selfLink : "/"});
-              }
-          })
-        );
-      }
-    });
+    this._init_mappings();
   }
 
   , map_control : function(params) {
@@ -220,4 +239,3 @@ can.Model.Cacheable("CMS.Models.Section", {
   }
 
 });
-

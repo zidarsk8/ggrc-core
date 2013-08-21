@@ -11,17 +11,13 @@ from datetime import datetime
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
-from ggrc.services.util import url_for
+from ggrc.utils import url_for, view_url_for
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
 from werkzeug.exceptions import BadRequest
 
 """JSON resource state representation handler for gGRC models."""
-
-def view_url_for(obj):
-  view = getattr(ggrc.views, obj.__class__.__name__, None)
-  return view.url_for(obj) if view else None
 
 def get_json_builder(obj):
   """Instantiate or retrieve a JSON representation builder for the given
@@ -66,7 +62,11 @@ def publish(obj, inclusions=()):
 def publish_stub(obj):
   publisher = get_json_builder(obj)
   if publisher:
-    ret = publish_base_properties(obj)
+    ret = {}
+    self_url = url_for(obj)
+    if self_url:
+      ret['href'] = self_url
+    ret['type'] = obj.__class__.__name__
     if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
       ret.update(publisher.publish_stubs(obj))
     return ret
@@ -308,11 +308,21 @@ class Builder(AttributeInfo):
       if isinstance(class_attr.remote_attr, property):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
+        return [self.generate_link_object_for_foreign_key(
+            getattr(o, target_name), getattr(o, target_type))
+              for o in join_objects]
       else:
-        target_name = list(class_attr.remote_attr.property.local_columns)[0].key
-        target_type = class_attr.remote_attr.property.mapper.class_.__name__
-      return [self.generate_link_object_for_foreign_key(
-            getattr(o, target_name), target_type) for o in join_objects]
+        target_mapper = class_attr.remote_attr.property.mapper
+        # Handle inheritance -- we must check the object itself for the type
+        if len(list(target_mapper.self_and_descendants)) > 1:
+          target_attr = class_attr.remote_attr.property.key
+          return [self.generate_link_object_for(
+            getattr(o, target_attr), inclusions, include) for o in join_objects]
+        else:
+          target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+          target_type = class_attr.remote_attr.property.mapper.class_.__name__
+          return [self.generate_link_object_for_foreign_key(
+              getattr(o, target_name), target_type) for o in join_objects]
 
   def publish_relationship(
       self, obj, attr_name, class_attr, inclusions, include):
@@ -346,7 +356,12 @@ class Builder(AttributeInfo):
       return self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include)
     elif class_attr.__class__.__name__ == 'property':
-      return self.publish_link(obj, attr_name, inclusions, include)
+      if not inclusions or include:
+        return self.generate_link_object_for_foreign_key(
+            getattr(obj, '{0}_id'.format(attr_name)),
+            getattr(obj, '{0}_type'.format(attr_name)))
+      else:
+        return self.publish_link(obj, attr_name, inclusions, include)
     else:
       return getattr(obj, attr_name)
 

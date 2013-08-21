@@ -6,8 +6,7 @@
 import json
 from flask import request, current_app
 from ggrc.fulltext import get_indexer
-from ggrc.utils import DateTimeEncoder
-from .util import url_for
+from ggrc.utils import DateTimeEncoder, url_for
 
 def search():
   terms = request.args.get('q')

@@ -6,9 +6,11 @@
 from ggrc import db
 from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Hierarchical
+from .object_document import Documentable
+from .object_person import Personable
 from .reflection import PublishOnly
 
-class Section(Hierarchical, BusinessObject, db.Model):
+class Section(Documentable, Personable, Hierarchical, BusinessObject, db.Model):
   __tablename__ = 'sections'
 
   directive_id = deferred(
@@ -57,7 +59,7 @@ class Section(Hierarchical, BusinessObject, db.Model):
 
     query = super(Section, cls).eager_query()
     return query.options(
-        orm.subqueryload('directive'),
-        orm.subqueryload_all('control_sections.control'),
-        orm.subqueryload_all('section_objectives.objective'),
-        orm.subqueryload('object_sections'))
+        orm.joinedload('directive'),
+        orm.joinedload('control_sections'),
+        orm.joinedload('section_objectives'),
+        orm.joinedload('object_sections'))

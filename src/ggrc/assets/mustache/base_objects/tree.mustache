@@ -1,7 +1,6 @@
 {{#list}}
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-    {{#instance}}
-    <div class="item-main" {{data 'model'}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
           <div class="span11">
@@ -9,22 +8,22 @@
               <div class="tree-title-area">
                 {{^model.root_object}}
                   {{!assume use of stub class or Cacheable here}}
-                  <i class="grcicon-{{constructor.table_singular}}-color"></i>
+                  <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{/model}}
-                {{#title}}
-                  {{title}}
-                {{/title}}
-                {{^title}}
-                  {{{firstnonempty description_inline ''}}}
-                {{/title}}
+                {{#instance.title}}
+                  {{instance.title}}
+                {{/instance.title}}
+                {{^instance.title}}
+                  {{{firstnonempty instance.description_inline ''}}}
+                {{/instance.title}}
               </div>
             </div>
           </div>
           <div class="span1">
             <div class="counter">
-              {{^owner}}
+              {{^instance.owner}}
                 <i class="grcicon-people-warning"></i>
-              {{/owner}}
+              {{/instance.owner}}
             </div>
           </div>
         </div>
@@ -35,65 +34,67 @@
 
         <div class="row-fluid">
 
+          {{#if instance.viewLink}}
           <div class="span6">
-            <a href="{{viewLink}}" class="info-action">
-              View {{constructor.title_singular}}
+            <a href="{{instance.viewLink}}" class="info-action">
+              View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
           </div>
+          {{/if}}
 
-          {{! UNMAP
+          {{#if mappings}}
           <div class="span6">
-            <a href="javascript://" class="info-action unmap pull-right">
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
           </div>
-          }}
+          {{/if}}
 
         </div>
-        
-        {{#description}}
+
+        {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
               <div class="tree-description short">
-                {{{description}}}
+                {{{instance.description}}}
               </div>
               <a href="javascript://" class="show-long">...more</a>
             </div>
           </div>
         </div>
-        {{/description}}
+        {{/instance.description}}
         
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
               <strong>Owner:</strong>
-              {{^owner}}
+              {{^instance.owner}}
                 <span class="error">
                   Not Assigned
                 </span>
-              {{/owner}}
-              {{#if owner}}
-                {{owner.name}}
+              {{/instance.owner}}
+              {{#if instance.owner}}
+                {{instance.owner.name}}
               {{/if}}
             </div>
           </div>
-          {{#url}}
+          {{#instance.url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              <a class="url" href="{{url}}" target="_blank">
-                {{url}}
+              <a class="url" href="{{instance.url}}" target="_blank">
+                {{instance.url}}
               </a>
             </div>
           </div>
-          {{/url}}
+          {{/instance.url}}
         </div>
       </div>
     </div>
-    {{/instance}}
     {{#if draw_children}}
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           {{#child_options}}
@@ -106,6 +107,8 @@
     {{/if}}
   </li>
 {{/list}}
+
+{{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -115,18 +118,19 @@
         href="javascript://"
         rel="tooltip"
         data-placement="left"
-        data-toggle="modal-selector"
-        data-modal-selector-options="{{parent_instance.constructor.table_singular}}_{{firstnonempty table_plural model.table_plural 'objects'}}"
-        data-modal-class="modal-wide"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'Object'}}"
+        data-toggle="multitype-modal-selector"
+        data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
-        data-join-object-type="{{parent_instance.constructor.model_singular}}">
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
         + Object
       </a>
+      {{#if null}}
       <a href="javascript://"class="control-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.constructor.model_singular}}" data-object-plural="{{parent_instance.constructor.table_plural}}" >
         <i class="grcicon-add-black"></i>
         Create Object
       </a>
+      {{/if}}
       {{else}}
       <a
         href="javascript://"
@@ -135,7 +139,7 @@
         data-toggle="multitype-modal-selector"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'Object'}}">
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
         + Object
       </a>
       {{/if}}
@@ -156,3 +160,4 @@
     </div>
   </div>
 </li>
+{{/if}}

@@ -27,10 +27,9 @@
         Owner/Person of Contact
         <i class="grcicon-help-black" rel="tooltip" title="Enter Owner/Person of Contact"></i>
       </label>
-      {{! FIXME: Add 'owner' when the model reflects it }}
       <input class="input-block-level" name="owner.email" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}">
       <label>
-        {{constructor.title_singular}} URL
+        Product URL
         <i class="grcicon-help-black" rel="tooltip" title="Enter URL"></i>
       </label>
       <input class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
@@ -50,7 +49,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Network Zone, Notes
+            Code, Kind/Type
           </span>
         </a>
       </div>
@@ -63,28 +62,16 @@
           Code
           <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
         </label>
-        <input class="input-block-level" name="slug" placeholder="SYSTEM-XXX" type="text" value="{{slug}}">
+        <input class="input-block-level" name="slug" placeholder="PRODUCT-XXX" type="text" value="{{slug}}">
       </div>
       <div class="span6">
         <label>
-          Network Zone
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Network Zone"></i>
+          Kind/Type
+          <i class="grcicon-help-black" rel="tooltip" title="Choose Kind/Type"></i>
         </label>
-        <input class="input-block-level" name="network_zone.id" placeholder="Enter Network Zone" type="text" value="{{network_zone_id}}">
+        {{{option_select this "type" "product_type"}}}
       </div>
     </div>
-    <div class="row-fluid">
-      <div class="span12">
-        <label>
-          Notes
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Additional Notes"></i>
-        </label>
-        <div class="wysiwyg-area">
-          <textarea id="system_notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
-        </div>
-      </div>
-    </div>
-    
   </div>
 </form>
 {{/instance}}

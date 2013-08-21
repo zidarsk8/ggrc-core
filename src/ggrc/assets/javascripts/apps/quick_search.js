@@ -15,17 +15,31 @@ var RELATIONSHIP_TYPES = {
     , "DataAsset": ["data_asset_relies_upon_data_asset"]
     , "Facility": ["data_asset_relies_upon_facility"]
     , "System": ["data_asset_relies_upon_system"]
+    , "Market": []
+    , "OrgGroup": []
+    , "Product": []
+    , "Program": []
+    , "Project": []
   }, "Facility": {
     "Process": ["facility_has_process"]
     , "DataAsset": ["facility_relies_upon_data_asset"]
     , "Facility": ["facility_relies_upon_facility"]
     , "System": ["facility_relies_upon_system"]
+    , "Market": []
+    , "OrgGroup": []
+    , "Product": []
+    , "Program": []
+    , "Project": []
   }, "Market": {
     "Process": ["market_has_process"]
     , "Market": ["market_includes_market"]
     , "DataAsset": ["market_relies_upon_data_asset"]
     , "Facility": ["market_relies_upon_facility"]
     , "System": ["market_relies_upon_system"]
+    , "OrgGroup": []
+    , "Product": []
+    , "Program": []
+    , "Project": []
   }, "OrgGroup": {
       "Process": ["org_group_has_process", "org_group_is_responsible_for_process"]
     , "OrgGroup": ["org_group_is_affiliated_with_org_group", "org_group_is_responsible_for_org_group", "org_group_relies_upon_org_group"]
@@ -35,6 +49,7 @@ var RELATIONSHIP_TYPES = {
     , "Product": ["org_group_is_responsible_for_product"]
     , "Project": ["org_group_is_responsible_for_project"]
     , "System": ["org_group_is_responsible_for_system", "org_group_relies_upon_system"]
+    , "Program": []
   }, "Product": {
     "Process": ["product_has_process"]
     , "Product": ["product_is_affiliated_with_product", "product_relies_upon_product"]
@@ -42,6 +57,9 @@ var RELATIONSHIP_TYPES = {
     , "DataAsset": ["product_relies_upon_data_asset"]
     , "Facility": ["product_relies_upon_facility"]
     , "System": ["product_relies_upon_system"]
+    , "OrgGroup": []
+    , "Program": []
+    , "Project": []
   }, "Program": {
     "DataAsset": ["program_applies_to_data_asset"]
     , "Facility": ["program_applies_to_facility"]
@@ -59,6 +77,8 @@ var RELATIONSHIP_TYPES = {
     , "Market": ["project_targets_market"]
     , "OrgGroup": ["project_targets_org_group"]
     , "Product": ["project_targets_product"]
+    , "Project": ["project_relies_upon_project"]
+    , "Program": []
   }, "Risk": {
     "DataAsset": ["risk_is_a_threat_to_data_asset"]
     , "Facility": ["risk_is_a_threat_to_facility"]
@@ -68,6 +88,33 @@ var RELATIONSHIP_TYPES = {
     , "Product": ["risk_is_a_threat_to_product"]
     , "Project": ["risk_is_a_threat_to_project"]
     , "System": ["risk_is_a_threat_to_system"]
+    , "Program": []
+  }, "System": {
+      "System": []
+    , "Process": []
+    , "DataAsset": []
+    , "Facility": []
+    , "Product": []
+    , "Project": []
+    , "Market": []
+    , "OrgGroup": []
+    , "Program": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
+  }, "Process": {
+      "System": []
+    , "Process": []
+    , "DataAsset": []
+    , "Facility": []
+    , "Product": []
+    , "Project": []
+    , "Market": []
+    , "OrgGroup": []
+    , "Program": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
 }};
 
 GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
@@ -211,16 +258,16 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
   governance_object_types =
-    directive_object_types.concat(["Control", "Section"]);
+    directive_object_types.concat(["Control", "Section", "Objective"]);
 
   all_object_types =
     governance_object_types.concat(business_plus_program_object_types);
 
   join_descriptor_arguments = [
-        [business_minus_system_object_types,
+        [business_object_types,
           "Control", "ObjectControl", "control", "controllable"]
-      , [all_object_types,
-          "Document", "ObjectDocument", "document", "documentable"]
+      , ["Control", business_object_types,
+          "ObjectControl", "controllable", "control"]
       , [business_plus_program_object_types,
           "Objective", "ObjectObjective", "objective", "objectiveable"]
       , ["Objective", business_plus_program_object_types,
@@ -229,18 +276,26 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
-      , ["System", "System", "SystemSystem", "child", "parent"]
-      , ["System", "Process", "SystemSystem", "child", "parent"]
-      , ["Process", "System", "SystemSystem", "child", "parent"]
-      , ["Process", "Process", "SystemSystem", "child", "parent"]
-      , ["System", "Control", "SystemControl", "control", "system"]
-      , ["Control", "System", "SystemControl", "system", "control"]
+      , ["Section", business_object_types,
+          "ObjectSection", "sectionable", "section"]
+      , ["Control", "Program", "ProgramControl", "program", "control"]
+      , ["Program", "Control", "ProgramControl", "control", "program"]
+      , ["Control", "Section", "ControlSection", "section", "control"]
+      , ["Section", "Control", "ControlSection", "control", "section"]
+      //, ["System", "System", "SystemSystem", "child", "parent"]
+      //, ["System", "Process", "SystemSystem", "child", "parent"]
+      //, ["Process", "System", "SystemSystem", "child", "parent"]
+      //, ["Process", "Process", "SystemSystem", "child", "parent"]
+      //, ["System", "Control", "SystemControl", "control", "system"]
+      //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
       , ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
+      , [all_object_types,
+          "Document", "ObjectDocument", "document", "documentable"]
       ];
 
 
@@ -352,7 +407,22 @@ $(function() {
     resize_areas();  
   });
 
+  $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
+    var $el = $(this)
+      ;
 
+    $el.children("span").each(function(i, mapping_el) {
+      var $mapping_el = $(mapping_el)
+        , mapping = $mapping_el.data('mapping');
+
+      if (mapping) {
+        mapping.refresh().done(function() {
+          mapping.destroy();
+        });
+        //$mapping_el.remove();
+      }
+    });
+  });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
     var inst = $(ev.target).closest("[data-model], :data(model)").data("model")

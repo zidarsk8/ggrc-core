@@ -3,8 +3,9 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
-import json
 import datetime
+import json
+import sys
 
 class DateTimeEncoder(json.JSONEncoder):
   """Custom JSON Encoder to handle datetime objects
@@ -40,3 +41,34 @@ class UnicodeSafeJsonWrapper(dict):
 def as_json(obj, **kwargs):
   return json.dumps(obj, cls=DateTimeEncoder, **kwargs)
 
+def service_for(obj):
+  module = sys.modules['ggrc.services']
+  if type(obj) is str or type(obj) is unicode:
+    model_type = obj
+  else:
+    model_type = obj.__class__.__name__
+  return getattr(module, model_type, None)
+
+def url_for(obj, id=None):
+  service = service_for(obj)
+  if service is None:
+    return None
+  if id:
+    return service.url_for(id=id)
+  return service.url_for(obj)
+
+def view_service_for(obj):
+  module = sys.modules['ggrc.views']
+  if type(obj) is str or type(obj) is unicode:
+    model_type = obj
+  else:
+    model_type = obj.__class__.__name__
+  return getattr(module, model_type, None)
+
+def view_url_for(obj, id=None):
+  service = view_service_for(obj)
+  if service is None:
+    return None
+  if id:
+    return service.url_for(id=id)
+  return service.url_for(obj)

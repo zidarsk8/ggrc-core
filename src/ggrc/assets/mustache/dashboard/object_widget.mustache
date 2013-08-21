@@ -10,11 +10,13 @@
         </h2>
       </div>
       <div class="span2">
+        {{#if 0}}
         <div class="widget-action pull-right remove-widget" rel="tooltip" title="Remove">
           <a class="remove" href="javascript://">
             <i class="grcicon-x-grey"></i>
           </a>
         </div>
+        {{/if}}
         <div class="widget-action pull-right widget-showhide" rel="tooltip" title="Expand / Collapse">
           <a class="active" href="javascript://"></a>
         </div>
@@ -44,6 +46,7 @@
     </div>
   </div>
   {{/if}}
-  <section class="content"></section>
-              
+  <section class="content">
+    {{{widget_initial_content}}}
+  </section>
 {{!/section}}

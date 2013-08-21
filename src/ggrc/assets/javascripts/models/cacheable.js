@@ -136,7 +136,7 @@ can.Model("can.Model.Cacheable", {
         that.risk_tree_options.child_options[1].model = that;
     });
 
-
+    this.init_mappings();
   }
 
   , findInCacheById : function(id) {
@@ -213,10 +213,16 @@ can.Model("can.Model.Cacheable", {
     if(m = this.findInCacheById(params.id)) {
       if(m === params)
         return m;
+      if (!params.selfLink)
+        return m;
       if(!m.selfLink) {
         //we are fleshing out a stub, which is much like creating an object new.
         //But we don't want to trigger every change event on the new object's props.
         m._init = 1;
+        // Stub attributes should be removed to not conflict with real model
+        // attributes; however, this should be well-tested first
+        //m.removeAttr('type');
+        //m.removeAttr('href');
       }
       var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
@@ -286,6 +292,91 @@ can.Model("can.Model.Cacheable", {
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }
+
+  , init_mappings: function() {
+      var self = this;
+      can.each(this.mappings, function(options, name) {
+        self.define_association_proxy(name, options);
+      });
+    }
+
+  , define_association_proxy: function(name, options) {
+      /* Adds association proxy methods to prototype
+       */
+      var attr = options.attr
+        , target_attr = options.target_attr
+        , update_function_name = "_update_" + name
+        , update_function
+        , change_handler_name = "_handle_changed_" + name
+        , change_handler
+        , init_flag_name = "_initialized_" + name
+        ;
+
+      update_function = function() {
+        var self = this
+          , refresh_queue = new RefreshQueue()
+          ;
+
+        can.each(self[attr], function(mapping) {
+          refresh_queue.enqueue(mapping);
+        });
+        return refresh_queue.trigger()
+          .then(function(mappings) {
+            var refresh_queue = new RefreshQueue();
+            can.each(mappings, function(mapping) {
+              refresh_queue.enqueue(mapping[target_attr]);
+            });
+            return refresh_queue.trigger()
+              .then(function(mapped_objects) {
+                self[name].replace(
+                  can.map(mappings, function(mapping) {
+                    return {
+                        instance: mapping[target_attr]
+                      , mappings: [mapping]
+                    };
+                  }))
+              });
+          });
+      };
+
+      this.prototype[update_function_name] = update_function;
+
+      change_handler = function(ev, attr, how) {
+        var self = this;
+        if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+          //self[update_function_name]();
+          setTimeout(self.proxy(update_function_name), 10);
+        }
+      };
+
+      this.prototype[change_handler_name] = change_handler;
+
+      if (!this.prototype._init_mappings) {
+        this.prototype._init_mappings = function() {
+          var self = this;
+          can.each(this.constructor.mappings_init_functions, function(fn) {
+            fn.apply(self);
+          });
+        }
+      }
+
+      this.prototype[name] = function() {
+        this[init_flag_name] = true;
+        if (!this.attr(name))
+          this[name] = new can.Observe.List();
+        this[update_function_name]();
+        this[attr].bind("change", this.proxy(change_handler_name));
+        return this[name];
+      }
+      /*if (!this.mappings_init_functions)
+        this.mappings_init_functions = [];
+
+      this.mappings_init_functions.push(function() {
+        if (!this[name])
+          this[name] = new can.Observe.List();
+        this[attr].bind("change", this.proxy(change_handler_name));
+      });*/
+    }
 }, {
   init : function() {
     var obj_name = this.constructor.root_object;
@@ -301,12 +392,12 @@ can.Model("can.Model.Cacheable", {
     var cache = can.getObject("cache", this.constructor, true);
     if (this.id)
       cache[this.id] = this;
-
-    var that = this;
-    this.attr("computed_errors", can.compute(function() {
-      return that.errors();
-    }));
   }
+  , computed_errors : function() {
+      var that = this
+        , compute = can.compute(function() { return that.errors(); });
+      return compute;
+    }
   , addElementToChildList : function(attrName, new_element) {
     this[attrName].push(new_element);
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
@@ -333,7 +424,8 @@ can.Model("can.Model.Cacheable", {
     })
     .then(can.proxy(this.constructor, "model"))
     .done(function(d) {
-      can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
+      d.updated();
+      //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
     });
   }
   , attr : function() {
@@ -353,7 +445,7 @@ can.Model("can.Model.Cacheable", {
       if(that.constructor.attributes && that.constructor.attributes[name]) {
         fun_name = that.constructor.attributes[name];
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
-        if(fun_name === "models") {
+        if(fun_name === "models" || fun_name === "get_instances") {
           serial[name] = [];
           for(var i = 0; i < val.length; i++) {
             serial[name].push(val[i].stub());

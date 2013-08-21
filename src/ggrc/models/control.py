@@ -5,6 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from .associationproxy import association_proxy
 from .categorization import Categorizable
 from .mixins import (
@@ -30,8 +31,8 @@ class AssertionCategorized(Categorizable):
         'assertations', 'assertions', CATEGORY_ASSERTION_TYPE_ID)
 
 class Control(
-    BusinessObject, Documentable, Personable, ControlCategorized, AssertionCategorized,
-    Hierarchical, Timeboxed, db.Model):
+    Documentable, Personable, ControlCategorized, AssertionCategorized,
+    Hierarchical, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -118,8 +119,8 @@ class Control(
       'directive',
       'documentation_description',
       'fraud_related',
-      'implemented_controls',
-      'implementing_controls',
+      #'implemented_controls',
+      #'implementing_controls',
       'key_control',
       'kind',
       'means',
@@ -132,11 +133,11 @@ class Control(
       'type',
       'verify_frequency',
       'version',
-      PublishOnly('control_controls'),
+      #PublishOnly('control_controls'),
       PublishOnly('control_risks'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
-      PublishOnly('implementing_control_controls'),
+      #PublishOnly('implementing_control_controls'),
       PublishOnly('system_controls'),
       PublishOnly('program_controls'),
       'object_controls',
@@ -146,6 +147,12 @@ class Control(
       'version',
       'notes',
       ]
+
+  @validates('type', 'kind', 'means', 'verify_frequency')
+  def validate_options(self, key, option):
+    desired_role = key if key == 'verify_frequency' else 'control_' + key
+    assert option is None or option.role == desired_role
+    return option
 
   @classmethod
   def eager_query(cls):

@@ -98,16 +98,33 @@ def check_not_empty_property(context, property_path, resource):
   assert len(obj) > 0
 
 @then('"{target_resource}" is in the links property "{property_name}" of "{source_resource}"')
-def check_link_present_in_list(
+def check_link_is_in_list(
     context, target_resource, property_name, source_resource):
+  check_link_present_in_list(
+      context, target_resource, property_name, source_resource, expected=True)
+
+@then('"{target_resource}" is not in the links property "{property_name}" of "{source_resource}"')
+def check_link_is_not_in_list(
+    context, target_resource, property_name, source_resource):
+  check_link_present_in_list(
+      context, target_resource, property_name, source_resource, expected=False)
+
+def check_link_present_in_list(
+    context, target_resource, property_name, source_resource, expected=True):
   source = getattr(context, source_resource)
   target = getattr(context, target_resource)
   links = source.get(unicode(property_name))
   rel_ids = set([o[u'id'] for o in links])
-  assert target.get(u'id') in rel_ids, \
-      'Expected to find {0} in links: {1}'.format(
-          target.get(u'id'),
-          rel_ids)
+  if expected:
+    assert target.get(u'id') in rel_ids, \
+        'Expected to find {0} in links: {1}'.format(
+            target.get(u'id'),
+            rel_ids)
+  else:
+    assert target.get(u'id') not in rel_ids, \
+        'Expected not to find {0} in links: {1}'.format(
+            target.get(u'id'),
+            rel_ids)
 
 @then('the "{parent_property}" of "{child_resource}" is a link to "{parent_resource}"')
 def check_link_to_parent(

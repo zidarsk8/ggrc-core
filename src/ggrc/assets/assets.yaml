@@ -35,6 +35,8 @@ dashboard-js-files:
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
+  - pbc/document.js
+  - pbc/person.js
   - models/simple_models.js
   - models/recently_viewed_object.js
   - models/search.js
@@ -56,8 +58,6 @@ dashboard-js-files:
   - controllers/dashboard_controller.js
   - apps/controls.js
   - sections/section.js
-  - pbc/document.js
-  - pbc/person.js
   - pbc/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
@@ -90,24 +90,74 @@ dashboard-js-files:
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
+  - base_objects/confirm_delete.mustache
   - base_objects/extended_info.mustache
   - base_objects/info.mustache
   - base_objects/map_related_modal_content.mustache
   - base_objects/search_result.mustache
+  - base_objects/tree.mustache
+  - contracts/modal_content.mustache
   - controls/categories_tree.mustache
   - controls/list_popover.mustache
+  - controls/modal_content.mustache
+  - controls/object_list.mustache
+  - controls/tree.mustache
   - dashboard/internav_list.mustache
+  - data_assets/modal_content.mustache
+  - documents/active_column.mustache
+  - documents/list.mustache
+  - documents/modal_content.mustache
+  - documents/option_column.mustache
+  - documents/option_detail.mustache
   - dashboard/modal_preload.mustache
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
   - directives/tree.mustache
+  - facilities/modal_content.mustache
+  - help/help_modal_content.mustache
+  - help/help_modal_header.mustache
+  - markets/modal_content.mustache
+  - modals/close_buttons.mustache
+  - modals/delete_cancel_buttons.mustache
+  - modals/done_buttons.mustache
   - modals/modal_header.mustache
   - modals/save_cancel_buttons.mustache
+  - modals/save_cancel_delete_buttons.mustache
   - objectives/list_popover.mustache
+  - objectives/modal_content.mustache
+  - objectives/tree.mustache
+  - org_groups/modal_content.mustache
+  - people/active_column.mustache
+  - people/list.mustache
+  - people/modal_content.mustache
+  - people/multitype_option_column.mustache
+  - people/multitype_option_detail.mustache
+  - people/option_column.mustache
+  - people/option_detail.mustache
+  - people/tree.mustache
+  - policies/modal_content.mustache
+  - processes/modal_content.mustache
+  - products/modal_content.mustache
   - programs/extended_info.mustache
   - programs/info.mustache
+  - programs/modal_content.mustache
+  - projects/modal_content.mustache
+  - regulations/modal_content.mustache
+  - risks/modal_content.mustache
+  - risky_attributes/modal_content.mustache
+  - roles/modal_content.mustache
+  - sections/modal_content.mustache
   - sections/tree.mustache
+  - selectors/active_column.mustache
+  - selectors/base_modal.mustache
+  - selectors/multitype_base_modal.mustache
+  - selectors/multitype_object_detail.mustache
+  - selectors/multitype_option_detail.mustache
+  - selectors/multitype_option_column.mustache
+  - selectors/option_column.mustache
+  - selectors/option_detail.mustache
+  - systems/modal_content.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

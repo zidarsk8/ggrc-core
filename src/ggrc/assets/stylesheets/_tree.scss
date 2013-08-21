@@ -33,7 +33,7 @@ ul.new-tree {
   
   li.tree-item {
     border-bottom:1px solid #ccc;
-    line-height:30px;
+    line-height:31px;
     min-height:31px;
     background:#fafafa;
     &.tree-item-open {
@@ -121,6 +121,47 @@ ul.new-tree {
     @include oneline();
     font-size:13px;
   }
+  // reduce visibility of closed tree-items
+  &.tree-open {
+    > li.tree-item {
+      background:#eee;
+      .tree-title-area {
+        @include opacity(0.5);
+      }
+      &.item-open {
+        .tree-title-area {
+          @include opacity(1);
+        }
+      }
+    }
+    ul.tree-open {
+      > li.tree-item {
+        background:#eee;
+        .tree-title-area {
+          @include opacity(0.5);
+        }
+        &.item-open {
+          .tree-title-area {
+            @include opacity(1);
+          }
+        }
+      }
+      ul.tree-open {
+        > li.tree-item {
+          background:#eee;
+          .tree-title-area {
+            @include opacity(0.5);
+          }
+          &.item-open {
+            .tree-title-area {
+              @include opacity(1);
+            }
+          }
+        }
+      }
+    }
+  }
+  // end
 }
 
 .inner-tree {
@@ -135,12 +176,12 @@ ul.new-tree {
       border-right:1px solid #ccc;
       font-size:13px;
       line-height:30px;
-      &:first-child {
-        border-top:1px solid #ddd;
-      }
-      &:last-child {
-        border-bottom:1px solid #ccc;
-      }
+      //&:first-child {
+      //  border-top:1px solid #ddd;
+      //}
+      //&:last-child {
+      //  border-bottom:1px solid #ccc;
+      //}
     }
   }
 }
@@ -153,8 +194,8 @@ ul.new-tree {
 .tier-2-info {
   display:none;
   &.content-open {
-    @include box-shadow(inset 0 0 8px #aaa);
-    background:#f0f0f0;
+    @include box-shadow(inset 0 4px 3px -3px #bbb);
+    background:#fff;
     padding-bottom:2px;
   }
 }

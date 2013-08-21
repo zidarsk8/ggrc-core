@@ -40,6 +40,12 @@ can.Model.Cacheable("CMS.Models.Document", {
             }
         });
     }
+    , attributes : {
+        object_documents : "CMS.Models.ObjectDocument.models"
+      , type : "CMS.Models.Option.model"
+      , kind : "CMS.Models.Option.model"
+      , year : "CMS.Models.Option.model"
+    }
   , init : function() {
     this.validatePresenceOf("link");
     this._super.apply(this, arguments);

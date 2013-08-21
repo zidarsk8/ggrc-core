@@ -30,23 +30,31 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
-
-    function after_preload(content) {
-      if(content) {
-        this.element.html(content);
-      }
-      this.options.$header = this.element.find(".modal-header");
-      this.options.$content = this.element.find(".modal-body");
-      this.options.$footer = this.element.find(".modal-footer");
-      this.on();
-      this.fetch_all();
-    }
-
     if(!this.element.find(".modal-body").length) {
-      can.view(this.options.preload_view, {}, this.proxy(after_preload));
+      can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
-      after_preload.call(this);
+      this.after_preload()
     }
+  }
+
+  , after_preload : function(content) {
+    if (content) {
+      this.element.html(content);
+    }
+    this.options.$header = this.element.find(".modal-header");
+    this.options.$content = this.element.find(".modal-body");
+    this.options.$footer = this.element.find(".modal-footer");
+    this.on();
+    this.fetch_all().then(this.proxy("apply_object_params"));
+  }
+
+  , apply_object_params : function() {
+    var self = this;
+
+    if (this.options.object_params)
+      can.each(this.options.object_params, function(value, key) {
+        self.set_value({ name: key, value: value });
+      });
   }
 
   , fetch_templates : function(dfd) {
@@ -108,30 +116,52 @@ can.Control("GGRC.Controllers.Modals", {
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
-    can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
+    this.serialize_form();
   }
 
   , "input, textarea, select change" : function(el, ev) {
-    var value = el.val();
-    this.set_value({name : el.attr("name"), value : value });
+      this.set_value_from_element(el);
   }
 
-  , set_value : function(item) {
+  , serialize_form : function() {
+      var $form = this.options.$content.find("form")
+        , $elements = $form.find(":input")
+        ;
+
+      can.each($elements.toArray(), this.proxy("set_value_from_element"));
+    }
+
+  , set_value_from_element : function(el) {
+      var $el = $(el)
+        , name = $el.attr('name')
+        , value = $el.val()
+        ;
+
+      if ($el.is('select[multiple]'))
+        value = value || [];
+      if (name)
+        this.set_value({ name: name, value: value });
+    }
+
+  , set_value: function(item) {
     var instance = this.options.instance
-    , that = this;
+      , that = this;
     if(!(instance instanceof this.options.model)) {
       instance = this.options.instance
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
     }
     var name = item.name.split(".")
-      , $elem, value;
+      , $elem, value, model;
     $elem = this.options.$content.find("[name='" + item.name + "']");
+    model = $elem.attr("model");
 
-    if (typeof(item.value) == 'undefined') {
-      value = $elem.val();
-      if($elem.attr("numeric") && isNaN(parseInt(value, 10))) {
-        value = null;
-      }
+    if (model) {
+      if (item.value instanceof Array)
+        value = can.map(item.value, function(id) {
+          return CMS.Models.get_instance(model, id);
+        });
+      else
+        value = CMS.Models.get_instance(model, item.value);
     } else if ($elem.is("[type=checkbox]")) {
       value = $elem.is(":checked");
     } else {
@@ -181,7 +211,7 @@ can.Control("GGRC.Controllers.Modals", {
     , that = this
     , ajd;
 
-    can.each(this.options.$content.find("form").serializeArray(), this.proxy("set_value"));
+    this.serialize_form();
 
     ajd = instance.save().done(function(obj) {
       that.element.trigger("modal:success", obj).modal_form("hide");

@@ -17,25 +17,34 @@ can.Model.Cacheable("CMS.Models.Control", {
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
   , attributes : {
-    object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    //, implementing_controls : "CMS.Models.Control.models"
-    , control_sections : "CMS.Models.ControlSection.models"
-    //, implemented_controls : "CMS.Models.Control.models"
-    , directive : "CMS.Models.Directive.model"
-    , sections : "CMS.Models.Section.models"
-    , programs : "CMS.Models.Program.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
     , people : "CMS.Models.Person.models"
-    , owner : "CMS.Models.Person.model"
-  }
-  , tree_view_options : {
-      list_view : "/static/mustache/controls/tree.mustache"
-    , child_options : [{
-        model : can.Model.Cacheable
-      , list_view : GGRC.mustache_path + "/base_objects/list.mustache"
-    }]
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , categories : "CMS.Models.Category.models"
+    , assertions : "CMS.Models.Category.models"
+    , control_controls : "CMS.Models.ControlControl.models"
+    , implemented_controls : "CMS.Models.Control.models"
+    , implementing_control_controls : "CMS.Models.ControlControl.models"
+    , implementing_controls : "CMS.Models.Control.models"
+    , objective_controls : "CMS.Models.ObjectiveControl.models"
+    , objectives : "CMS.Models.Objective.models"
+    , directive : "CMS.Models.Directive.model"
+    , control_sections : "CMS.Models.ControlSection.models"
+    , sections : "CMS.Models.Section.models"
+    , program_controls : "CMS.Models.ProgramControl.models"
+    , programs : "CMS.Models.Program.models"
+    , system_controls : "CMS.Models.SystemControl.models"
+    , systems : "CMS.Models.System.models"
+    , control_risks : "CMS.Models.ControlRisk.models"
+    , risks : "CMS.Models.Risk.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , type : "CMS.Models.Option.model"
+    , kind : "CMS.Models.Option.model"
+    , means : "CMS.Models.Option.model"
+    , verify_frequency : "CMS.Models.Option.model"
   }
   , links_to : {
     "Section" : "ControlSection"
@@ -45,23 +54,77 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "Risk" : {}
     , "Program" : "ProgramControl"
   }
+
   , defaults : {
-    "type" : {id : 1}
-    , "selected" : false
+      "selected" : false
     , "title" : ""
     , "slug" : ""
     , "description" : ""
+
+    , object_people : []
+    , people : []
+    , object_documents : []
+    , documents : []
+    , categories : []
+    , assertions : []
+    , control_controls : []
+    , implemented_controls : []
+    , implementing_control_controls : []
+    , implementing_controls : []
+    , objective_controls : []
+    , objectives : []
+    , control_sections : []
+    , sections : []
+    , program_controls : []
+    , programs : []
+    , system_controls : []
+    , systems : []
+    , control_risks : []
+    , risks : []
     , object_controls : []
   }
+
+  , mappings: {
+      people_mappings: {
+          attr: "object_people"
+        , target_attr: "person"
+      }
+    , business_object_mappings: {
+          attr: "object_controls"
+        , target_attr: "controllable"
+      }
+    , section_mappings: {
+          attr: "control_sections"
+        , target_attr: "section"
+      }
+    , objective_mappings: {
+          attr: "objective_controls"
+        , target_attr: "objective"
+      }
+    }
+
   , tree_view_options : {
     draw_children : true
     , child_options : [{
-      model : can.Model.Cacheable
-      , property : "business_objects"
+    /*    model : "Section"
+      , property : "section_mappings"
+      , list_view : "/static/mustache/sections/tree.mustache"
+    }, {*/
+        model : "Person"
+      , property : "people_mappings"
+      , list_view : "/static/mustache/people/tree.mustache"
+    }, {
+        model : "Objective"
+      , property : "objective_mappings"
+      , list_view : "/static/mustache/objectives/tree.mustache"
+    }, {
+        model : can.Model.Cacheable
+      , property : "business_object_mappings"
       , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
     }]
   }
+
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
@@ -75,34 +138,7 @@ can.Model.Cacheable("CMS.Models.Control", {
       "content_id" : Math.floor(Math.random() * 10000000)
     });
     this._super();
-    this.attr("business_objects", new can.Model.List(
-      can.map(
-        this.object_controls,
-        function(os) {return os.controllable || new can.Model({ selfLink : "/" }); }
-      )
-    ));
-    this.object_controls.bind("change", function(ev, attr, how) {
-      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-        that.business_objects.replace(
-          can.map(
-            that.object_controls,
-            function(os, i) {
-              if(os.controllable) {
-                return os.controllable;
-              } else {
-                os.refresh({ "__include" : "controllable" }).done(function(d) {
-                  that.business_objects.attr(i, d.controllable);
-                  //can.Observe.stopBatch();
-                }).fail(function() {
-                  //can.Observe.stopBatch();
-                });
-                return new can.Model({ selfLink : "/"});
-              }
-          })
-        );
-      }
-    });
-
+    this._init_mappings();
   }
 
   , bind_section : function(section) {
