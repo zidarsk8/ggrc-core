@@ -499,6 +499,8 @@ Mustache.registerHelper("if_page_type", function(page_type, options) {
     return options.inverse(this);
 });
 
+// Render a named template with the specified context, serialized and
+// augmented by 'options.hash'
 Mustache.registerHelper("render", function(template, context, options) {
   if(!options) {
     options = context;
@@ -528,6 +530,8 @@ Mustache.registerHelper("render", function(template, context, options) {
   return can.view.render(template, context);
 });
 
+// Like 'render', but doesn't serialize the 'context' object, and doesn't
+// apply options.hash
 Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
