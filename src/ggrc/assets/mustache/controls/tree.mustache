@@ -82,7 +82,7 @@
             <div class="tree-info">
               <strong>URL:</strong>
               {{^if_null instance.url}}
-                <a class="url" href="{{instance.url}}">
+                <a class="url" href="{{schemed_url instance.url}}" target="_blank">
                   {{instance.url}}
                 </a>
               {{/if_null}}
