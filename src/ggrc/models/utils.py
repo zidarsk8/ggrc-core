@@ -1,0 +1,6 @@
+def validate_option(model, attribute, option, desired_role):
+  if option and option.role != desired_role:
+    message = "Invalid value for attribute {}.{}.\
+      Expected option with role {}, received role {}.".format(model, attribute, desired_role, option.role)
+    raise ValueError(message)
+  return option

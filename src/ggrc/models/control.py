@@ -14,6 +14,7 @@ from .mixins import (
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
+from .utils import validate_option
 
 CATEGORY_CONTROL_TYPE_ID = 100
 CATEGORY_ASSERTION_TYPE_ID = 102
@@ -143,10 +144,9 @@ class Control(
       ]
 
   @validates('type', 'kind', 'means', 'verify_frequency')
-  def validate_options(self, key, option):
+  def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
-    assert option is None or option.role == desired_role
-    return option
+    return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @classmethod
   def eager_query(cls):

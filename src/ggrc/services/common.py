@@ -348,7 +348,12 @@ class Resource(ModelView):
     if new_context != obj.context_id \
         and not permissions.is_allowed_update(self.model.__name__, new_context):
       raise Forbidden()
-    self.json_update(obj, src)
+    try:
+      self.json_update(obj, src)
+    except ValueError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
+
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)

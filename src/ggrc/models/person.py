@@ -7,6 +7,7 @@ from ggrc import db
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base
 from .reflection import PublishOnly
+from .utils import validate_option
 
 class Person(Base, db.Model):
   __tablename__ = 'people'
@@ -51,9 +52,8 @@ class Person(Base, db.Model):
     return unicode(self.id)
 
   @validates('language')
-  def validate_options(self, key, option):
-    assert option is None or option.role == 'person_language'
-    return option
+  def validate_person_options(self, key, option):
+    return validate_option(self.__class__.__name__, key, option, 'person_language')
 
   @classmethod
   def eager_query(cls):
