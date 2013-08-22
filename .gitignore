@@ -14,6 +14,7 @@ site-cookbooks/ggrc/recipes/local.rb
 
 # Asset-pipeline/cache related files
 src/ggrc/static/.webassets-cache
+src/ggrc/static/webassets-external
 src/ggrc/static/assets.manifest
 src/ggrc/static/dashboard*
 src/ggrc/assets/stylesheets/dashboard.css
