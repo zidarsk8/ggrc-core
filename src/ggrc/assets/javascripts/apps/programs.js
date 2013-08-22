@@ -303,7 +303,6 @@ function authorizations_list_loader() {
 }
 
 function should_show_authorizations() {
-  //var context_id = GGRC.page_object.context && GGRC.page_object.context.id;
   var instance = GGRC.make_model_instance(GGRC.page_object)
     , context_id = instance.context && instance.context.id
     ;
@@ -339,182 +338,277 @@ $(function() {
       program_widget_descriptors.authorizations);
   }
 
-  var $controls_tree = $("#controls .tree-structure").append(
-    $(new Spinner().spin().el).css(spin_opts));
-
-  $.when(
-    CMS.Models.Category.findTree()
-    , CMS.Models.Control.findAll({ "directive.program_directives.program_id" : program_id })
-    , CMS.Models.Control.findAll({ "program_controls.program_id" : program_id })
-  ).done(function(cats, ctls) {
-    var uncategorized = cats[cats.length - 1]
-    , ctl_cache = {}
-    , uncat_cache = {};
-
-    //Can't currently RefreshQueue object_controls with __include=controllable due to the polymorphic nature of controllables.
-    //  --BM 8/16/2013
-    can.each(ctls, function(ctl) {
-      can.each(ctl.object_controls, function(oc) {
-        if(oc.selfLink && oc.controllable && !oc.controllable.selfLink) {
-          oc.controllable.refresh().done(can.proxy(oc, "updated"));
-        } else if(!oc.selfLink) {
-          oc.refresh().done(function(c) {
-            c.controllable && !c.controllable.selfLink && c.controllable.refresh().done(can.proxy(c, "updated", c));
-          });
-        } else {
-          oc.updated();
-        }
-      });
-    });
-
-    var page_model = GGRC.make_model_instance(GGRC.page_object)
-    , combined_ctls = new CMS.Models.Control.List(can.unique(can.map(ctls, function(c) { return c; }).concat(can.map(page_model.controls, function(c) { return c; }))));
-
-    $controls_tree.cms_controllers_tree_view({
-      model : CMS.Models.Control
-      , list : combined_ctls
-      , list_view : GGRC.mustache_path + "/controls/tree.mustache"
-      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
-      , list_loader : function() {
-        return $.when(combined_ctls);
+  can.Construct("GGRC.ListLoaders.MultiList", {
+  }, {
+      init: function(loaders) {
+        this.list = new can.Observe.List;
+        this.loaders = loads;
       }
-      , draw_children : true
-    });
 
-    page_model.controls.bind("change", function() {
-      combined_ctls.replace(
-        can.unique(
-          can.map(ctls, function(c) { return c; })
-          .concat(can.map(page_model.controls, function(c) { return c; }))
-      ));
-    });
+    , refresh_list: function() {
+      }
   });
-  /*
-  CMS.Models.Control
-    .findAll({ "directive.program_directives.program_id" : program_id })
-    .done(function(s) {
-      $controls_tree.cms_controllers_tree_view({
-          model : CMS.Models.Control
-        //, edit_sections : true
-        , list : s
-        , list_view : "/static/mustache/controls/tree.mustache"
-        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
-      });
-    });
-  */
 
-  var $objectives_tree = $("#objectives .tree-structure").append(
-    $(new Spinner().spin().el).css(spin_opts));
+  can.Construct("GGRC.ListLoaders.List", {
+      insert_object: function(list, instance_mappings) {
+        var i
+          , entry
+          , found = false
+          ;
 
-  $.when(
-    CMS.Models.Objective
-      .findAll({ "section_objectives.section.directive.program_directives.program_id" : program_id, "__include" : "object_objectives" })
-    , CMS.Models.Control.findAll({ "program_controls.program_id" : program_id })
-    ).done(function(s) {
-      var page_model = GGRC.make_model_instance(GGRC.page_object)
-      , combined_objs = new CMS.Models.Objective.List(can.unique(can.map(s, function(c) { return c; }).concat(can.map(page_model.objectives, function(c) { return c; }))));
-
-      $objectives_tree.cms_controllers_tree_view({
-          model : CMS.Models.Objective
-        //, edit_sections : true
-        , list : combined_objs
-        , list_view : "/static/mustache/objectives/tree.mustache"
-        , parent_instance : page_model
-        , list_loader : function() {
-          return $.when(combined_objs);
-        }
-      });
-
-      can.each(s, function(obj) {
-        can.each(obj.object_objectives, function(oc) {
-          if(oc.selfLink && oc.objectiveable && !oc.objectiveable.selfLink) {
-            oc.objectiveable.refresh().done(can.proxy(oc, "updated"));
-          } else if(!oc.selfLink) {
-            oc.refresh().done(function(c) {
-              c.objectiveable && !c.objectiveable.selfLink && c.objectiveable.refresh().done(can.proxy(c, "updated", c));
-            });
-          } else {
-            oc.updated();
+        for (i=0; i<list.length; i++) {
+          entry = list[i];
+          if (entry.instance === instance_mappings.instance) {
+            // Cannot use 'concat', since can.Observe.List.concat will serialize()
+            // list entries, which breaks 'instanceof'.
+            entry.mappings.push.apply(entry.mappings, instance_mappings.mappings);
+            //entry.mappings = entry.mappings.concat(instance_mappings.mappings);
+            found = true;
+            break;
           }
-        });
-      });
+        }
+        if (!found)
+          list.push(instance_mappings);
+      }
 
-      page_model.objectives.bind("change", function() {
-        combined_objs.replace(
-          can.unique(
-            can.map(s, function(c) { return c; })
-            .concat(can.map(page_model.objectives, function(c) { return c; }))
-        ));
-      });      
-    });
+    , remove_object_via_mapping: function(list, mapping) {
+        var i
+          , j
+          , entry
+          , mappings
+          , found = false
+          ;
+
+        for (i=0; i<list.length; i++) {
+          mappings = list[i].mappings;
+          for (j=0; j<mappings.length; j++) {
+            if (mappings[j] === mapping) {
+              mappings.splice(j, 1);
+              j--;
+            }
+          }
+          if (mappings.length == 0) {
+            list.splice(i, 1);
+            i--;
+          }
+        }
+      }
+  }, {
+      init: function(options) {
+        $.extend(this, options);
+        if (!this.list)
+          this.list = new can.Observe.List();
+        this.refresh_queue = new RefreshQueue();
+        this.init_bindings();
+      }
+
+    , init_bindings: function() {
+        var self = this;
+
+        this.mapping_model.bind("created", function(ev, mapping) {
+          if (mapping instanceof self.mapping_model
+              && (!self.source_value
+                  || mapping[self.mapping_source_attr] == self.source_value)
+              && mapping[self.mapping_target_attr] instanceof self.model)
+            self.insert_object({
+                instance: mapping[self.mapping_target_attr]
+              , mappings: [mapping]
+            });
+        });
+
+       this. mapping_model.bind("destroyed", function(ev, mapping) {
+          if (mapping instanceof self.mapping_model
+              && (!self.source_value
+                  || mapping[self.mapping_source_attr] == self.source_value)
+              && mapping[self.mapping_target_attr] instanceof self.model)
+            self.remove_object_via_mapping(mapping);
+        });
+      }
+
+    , init_list: function(mappings) {
+        var self = this;
+
+        can.each(mappings, function(mapping) {
+          self.refresh_queue.enqueue(mapping[self.mapping_target_attr]);
+          self.insert_object({
+              instance: mapping[self.mapping_target_attr]
+            , mappings: [mapping]
+          });
+        });
+
+        return self.refresh_queue.trigger();
+      }
+
+    , insert_object: function(result) {
+        this.constructor.insert_object(this.list, result);
+      }
+
+    , remove_object_via_mapping: function(mapping) {
+        this.constructor.remove_object_via_mapping(this.list, mapping);
+      }
+  });
+
 
   var models_by_kind = {
-      regulations : CMS.Models.Regulation
-    , contracts : CMS.Models.Contract
+      contracts : CMS.Models.Contract
     , policies : CMS.Models.Policy
+    , regulations : CMS.Models.Regulation
   };
 
-  can.each(models_by_kind, function(model, table_plural) {
-    model
-      .findAll({ "program_directives.program_id": program_id })
-      .done(function(directives) {
-        init_directive_tree(table_plural, model, directives);
-      });
-  });
+  function init_directive_tree(program, table_plural, model, mappings) {
+    var $sections_tree = $("#" + table_plural + " .tree-structure")
+          .append($(new Spinner().spin().el).css(spin_opts));
 
-  function sort_sections(sections) {
-    return can.makeArray(sections).sort(window.natural_comparator);
+    var loader = new GGRC.ListLoaders.List({
+        model: model
+      , mapping_model: CMS.Models.ProgramDirective
+      , mapping_target_attr: 'directive'
+      , mapping_source_attr: 'program'
+      , source_value: program
+    });
+
+    function sort_sections(sections) {
+      return can.makeArray(sections).sort(window.natural_comparator);
+    }
+
+    loader.init_list(mappings).then(function() {
+      $sections_tree.cms_controllers_tree_view({
+          model : model
+        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
+        , list : loader.list
+        , list_view : GGRC.mustache_path + "/directives/tree.mustache"
+        , child_options : [{
+            model : CMS.Models.Section
+          , parent_find_param : "directive.id"
+          , fetch_post_process : sort_sections
+        }]
+      });
+    });
   }
 
-  function init_directive_tree(table_plural, model, directives) {
-    var $sections_tree = $("#" + table_plural + " .tree-structure")
-          .append($(new Spinner().spin().el).css(spin_opts))
-      , d = new can.Observe.List(directives);
+  function init_directives_from_program(object) {
+    var refresh_queue = new RefreshQueue()
+      , results_list = new can.Observe.List();
 
-    CMS.Models.ProgramDirective.bind("created", function(ev, instance) {
-      if (instance instanceof CMS.Models.ProgramDirective
-          && instance.program.id == program_id
-          && instance.directive instanceof model)
-        d.push(instance.directive);
+    can.each(object.program_directives, function(mapping) {
+      refresh_queue.enqueue(mapping);
     });
 
-    CMS.Models.ProgramDirective.bind("destroyed", function(ev, instance) {
-      var index;
-      if (instance instanceof CMS.Models.ProgramDirective
-          && instance.program.id == program_id
-          && instance.directive instanceof model) {
-        index = d.indexOf(instance.directive);
-        if (index > -1)
-          d.splice(index, 1);
-      }
+    return refresh_queue.trigger().then(function(mappings) {
+      can.each(models_by_kind, function(model, table_plural) {
+        var program_directives = can.map(mappings, function(mapping) {
+          if (mapping.directive instanceof model)
+            return mapping;
+        });
+        init_directive_tree(object, table_plural, model, program_directives);
+      });
+    });
+  }
+
+
+  function init_objectives_from_object(object) {
+    var $objectives_tree = $("#objectives .tree-structure").append(
+      $(new Spinner().spin().el).css(spin_opts));
+
+    var refresh_queue = new RefreshQueue()
+      , results_list = new can.Observe.List();
+
+    var loader1 = new GGRC.ListLoaders.List({
+        list: results_list
+      , model: CMS.Models.Objective
+      , mapping_model: CMS.Models.ObjectObjective
+      , mapping_target_attr: 'objective'
+      , mapping_source_attr: 'objectiveable'
+      , source_value: object
     });
 
-    $sections_tree.cms_controllers_tree_view({
-        model : model
-      , parent_instance : GGRC.make_model_instance(GGRC.page_object)
-      , list : d
-      , list_view : "/static/mustache/directives/tree.mustache"
-      , child_options : [{
-        model : CMS.Models.Section
-        , parent_find_param : "directive.id"
-        , fetch_post_process : sort_sections
-        //, find_params : { "parent_id__null" : true }
-      }]
+    var loader2 = new GGRC.ListLoaders.List({
+        list: results_list
+      , model: CMS.Models.Objective
+      , mapping_model: CMS.Models.SectionObjective
+      , mapping_target_attr: 'objective'
+      , mapping_source_attr: 'section'
+      , source_value: null
     });
-  };
 
-  $(document.body).on("modal:success", "a[href^='/controls/new']", function(ev, data) {
+    can.each(object.object_objectives, function(object_objective) {
+      refresh_queue.enqueue(object_objective);
+    });
+
+    var params = {
+      "section.directive.program_directives.program_id":
+          program_id
+    };
+
+    $.when(
+        refresh_queue.trigger().then(can.proxy(loader1, "init_list"))
+      , CMS.Models.SectionObjective.findAll(params).then(can.proxy(loader2, "init_list"))
+    ).then(function() {
+      $objectives_tree.cms_controllers_tree_view({
+          model : CMS.Models.Objective
+        , list : results_list
+        , list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+        , parent_instance : page_model
+      });
+    });
+  }
+
+  function init_controls_from_object(object) {
+    var $controls_tree = $("#controls .tree-structure").append(
+      $(new Spinner().spin().el).css(spin_opts));
+
+    var refresh_queue = new RefreshQueue()
+      , results_list = new can.Observe.List();
+
+    var loader = new GGRC.ListLoaders.List({
+        list: results_list
+      , model: CMS.Models.Control
+      , mapping_model: CMS.Models.ProgramControl
+      , mapping_target_attr: 'control'
+      , mapping_source_attr: 'program'
+      , source_value: object
+    });
+
+    can.each(object.program_controls, function(mapping) {
+      refresh_queue.enqueue(mapping);
+    });
+
+    var params = {
+      "directive.program_directives.program_id": program_id
+    };
+
+    $.when(
+        refresh_queue.trigger().then(can.proxy(loader, "init_list"))
+    ).then(function() {
+      $controls_tree.cms_controllers_tree_view({
+          model : CMS.Models.Control
+        , list : results_list
+        , list_view : GGRC.mustache_path + "/controls/tree.mustache"
+        , parent_instance : page_model
+        //, draw_children : true
+      });
+    });
+  }
+
+  var page_model = GGRC.make_model_instance(GGRC.page_object)
+
+  init_directives_from_program(page_model);
+  init_objectives_from_object(page_model);
+  init_controls_from_object(page_model);
+
+
+  /*$(document.body).on("modal:success", "a[href^='/controls/new']", function(ev, data) {
     var c = new CMS.Models.Control(data);
     $("a[href='#controls']").click();
       can.each(c.category_ids.length ? c.category_ids : [-1], function(catid) {
         $controls_tree.find("[data-object-id=" + catid + "] > .item-content > ul[data-object-type=control]").trigger("newChild", c);
       });
-  });
+  });*/
 
-  $(document.body).on("modal:relationshipcreated modal:relationshipdestroyed", ".add-new-item a", function(ev, data) {
+  /*$(document.body).on("modal:relationshipcreated modal:relationshipdestroyed", ".add-new-item a", function(ev, data) {
     $sections_tree
     .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", data.directive || CMS.Models.Directive.findInCacheById(data.directive_id));
-  });
+  });*/
 
 });
 

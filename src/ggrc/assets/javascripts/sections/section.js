@@ -30,8 +30,6 @@ can.Model.Cacheable("CMS.Models.Section", {
     , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
     , object_controls : "CMS.Models.ObjectControl.models"
     , controls : "CMS.Models.Control.models"
     , directive : "CMS.Models.get_instance"
