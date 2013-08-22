@@ -112,8 +112,8 @@ class Control(
   # REST properties
   _publish_attrs = [
       'active',
-      'categories',
-      'assertions',
+      #'categories',
+      #'assertions',
       'company_control',
       'control_assessments',
       'directive',
