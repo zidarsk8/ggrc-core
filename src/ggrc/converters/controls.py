@@ -22,7 +22,6 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
     self.handle_text_or_html('description')
-    self.handle_text_or_html('documentation_description')
 
     self.handle_raw_attr('title')
     self.handle_raw_attr('url')
@@ -69,7 +68,6 @@ class ControlsConverter(BaseConverter):
     ('Map:Processes', 'processes'),
     ('Map:Categories', 'categories'),
     ('Map:Assertions', 'assertions'),
-    ('Documentation', 'documentation_description'),
     ('Frequency', 'verify_frequency'),
     ('References', 'documents'),
     ('Map:People;Responsible','people_responsible'),
