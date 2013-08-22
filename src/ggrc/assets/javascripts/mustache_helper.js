@@ -849,11 +849,10 @@ Mustache.registerHelper("show_long", function() {
                 , toggle;
               if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
                 // Listen for the toggle instead of timeouts
-                toggle.on('click', function toggled() {
+                toggle.one('click', function() {
                   // Delay to ensure all event handlers have fired
                   setTimeout(hide, 0);
-                  toggle.off('click', toggled);
-                })
+                });
               }
               // Otherwise just detect visibility
               else {
