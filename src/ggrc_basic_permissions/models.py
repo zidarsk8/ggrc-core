@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.mixins import Base, Described
+from sqlalchemy.orm import backref
 
 class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
@@ -45,9 +46,11 @@ class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
-  role = db.relationship('Role')
+  role = db.relationship(
+      'Role', backref=backref('user_roles', cascade='all, delete-orphan'))
   person_id = db.Column(db.Integer(), db.ForeignKey('people.id'), nullable=False)
-  person = db.relationship('Person')
+  person = db.relationship(
+      'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
 
   _publish_attrs = ['role', 'person']
 
@@ -60,7 +63,6 @@ class UserRole(Base, db.Model):
     for assignment in all_assignments:
         assignments_by_user.setdefault(assignment.person.email, [])\
             .append(assignment.role)
-    print 'role_assignments_for', assignments_by_user
     return assignments_by_user
 
   @classmethod
