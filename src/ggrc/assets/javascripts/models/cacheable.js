@@ -334,7 +334,7 @@ can.Model("can.Model.Cacheable", {
                         instance: mapping[target_attr]
                       , mappings: [mapping]
                     };
-                  }))
+                  }));
               });
           });
       };

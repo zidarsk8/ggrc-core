@@ -265,6 +265,12 @@
       }
     },
 
+    ".btn-add modal:success" : function(el, ev, data) {
+      this.option_list.unshift(data);
+      this.context.attr('selected_option', data);
+      this.element.find(".tree-item[data-id=" + data.id + "] input[type=checkbox]").click();
+    },
+
     // HELPERS
 
     find_join: function(option_id) {
@@ -492,8 +498,8 @@
         new_object_title: data.related_title_singular,
         modal_title: "Select " + data.related_title_plural,
 
-        related_model_singular: "Directive",
-        related_table_plural: "directives",
+        related_model_singular: data.child_meta_type,
+        related_table_plural: (CMS.Models[data.child_meta_type] || {}).table_plural,
         related_title_singular: "System",
         related_title_plural: "Systems",
 
@@ -863,6 +869,9 @@
         this.context.attr('option_detail_view', descriptor.detail_view);
         this.context.attr('option_descriptor', descriptor);
         this.context.attr('selected_option', null);
+        this.context.attr('related_table_plural', descriptor.related_table_plural);
+        this.context.attr('related_model_singular', descriptor.related_model_singular);
+        this.context.attr('new_object_title', descriptor.new_object_title);
         this.options.option_model = descriptor.model;
 
         this.refresh_option_list().always(function() {
@@ -917,6 +926,11 @@
         if (this.element)
           this.element.remove();
       }
+
+    , ".btn-add modal:success" : function(el, ev, data) {
+      this.option_list.unshift(data);
+      this.context.attr('selected_option', data);
+    }
   });
 
   ModalOptionDescriptor = can.Construct({
@@ -948,6 +962,9 @@
           , join_object_attr: join_object_attr
           , model: model
           , model_display: model.title_plural
+          , related_model_singular : model.model_singular
+          , related_table_plural : model.table_plural
+          , new_object_title : model.title_singular
         }, options), {});
       }
 

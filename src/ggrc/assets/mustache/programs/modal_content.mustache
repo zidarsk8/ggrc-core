@@ -8,7 +8,7 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Enter Title"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       {{^if_null '1'}}
       <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
@@ -19,7 +19,7 @@
     <div class="span6">
       <label>
         Description
-        <i class="grcicon-help-black" rel="tooltip" title="Enter Description"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
       <div class="wysiwyg-area">
         <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
@@ -28,12 +28,12 @@
     <div class="span6">
       <label>
         Owner/Person of Contact
-        <i class="grcicon-help-black" rel="tooltip" title="Enter Owner/Person of Contact"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model.model_singular}}."></i>
       </label>
       <input class="input-block-level" name="owner.email" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}">
       <label>
         Program URL
-        <i class="grcicon-help-black" rel="tooltip" title="Enter URL"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
       </label>
       <input class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
     </div>
@@ -63,14 +63,14 @@
       <div class="span6">
         <label>
           Code
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
+          <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
         <input class="input-block-level" name="slug" placeholder="PROGRAM-XXX" type="text" value="{{slug}}">
       </div>
       <div class="span6">
         <label>
           Organization
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Organization"></i>
+          <i class="grcicon-help-black" rel="tooltip" title="Which organization is this {{model.model_singular}} related to?"></i>
         </label>
         <input class="input-block-level" name="org_name" placeholder="Enter Organization" type="text" value="{{org_name}}">
       </div>
@@ -79,7 +79,7 @@
       <div class="span6">
         <label>
           Program Scope
-          <i class="grcicon-help-black" rel="tooltip" title="Enter Program Scope"></i>
+          <i class="grcicon-help-black" rel="tooltip" title="Provide some details on how far reaching this {{model.model_singular}} might be."></i>
         </label>
         <input class="input-block-level" name="scope" placeholder="Enter Scope" type="text" value="{{scope}}">
       </div>

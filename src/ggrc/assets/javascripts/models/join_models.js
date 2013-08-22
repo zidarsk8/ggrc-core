@@ -251,13 +251,13 @@ can.Model.Join("CMS.Models.ProgramDirective", {
   root_object : "program_directive"
   , root_collection : "program_directives"
   , join_keys : {
-    "program" : CMS.Models.Program
-    , "directive" : CMS.Models.Directive
+      program : CMS.Models.Program
+    , directive : CMS.Models.Directive
   }
   , attributes : {
       modified_by : "CMS.Models.Person.model"
     , program : "CMS.Models.Program.model"
-    , directive : "CMS.Models.Directive.model"
+    , directive : "CMS.Models.get_instance"
   }
   , findAll: "GET /api/program_directives"
   , create: "POST /api/program_directives"

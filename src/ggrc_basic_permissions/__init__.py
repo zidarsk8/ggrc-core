@@ -59,13 +59,17 @@ class UserPermissions(DefaultUserPermissions):
         or session['permissions']['__user'] != \
             self.get_email_for(get_current_user()):
       self.load_permissions()
-    elif 'permission__ts' in session and not get_current_user().is_anonymous():
-      current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
-          .filter(UserRole.person_id==get_current_user().id)\
-          .order_by(UserRole.updated_at.desc())\
-          .first()
-      if current_most_recent_role_ts[0] > session['permissions__ts']:
+    elif 'permissions__ts' in session and not get_current_user().is_anonymous():
+      if not session['permissions__ts']:
         self.load_permissions()
+      else:
+        current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
+            .filter(UserRole.person_id==get_current_user().id)\
+            .order_by(UserRole.updated_at.desc())\
+            .first()
+        if current_most_recent_role_ts\
+            and current_most_recent_role_ts[0] > session['permissions__ts']:
+          self.load_permissions()
 
   def get_email_for(self, user):
     return user.email if hasattr(user, 'email') else 'ANONYMOUS'
@@ -135,7 +139,7 @@ def all_collections():
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
-  if 'private' in src:
+  if src.get('private', False):
     # get the personal context for this logged in user
     personal_context = service.personal_context()
 

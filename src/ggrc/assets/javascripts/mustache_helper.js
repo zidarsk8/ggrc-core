@@ -251,7 +251,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       function sub_all(el, ev, newVal, oldVal) {
         var $el = $(el);
         can.each(attribs, function(attrib) {
-          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data.serialize ? data.serialize() : data)).html());
+          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
         });
       }
 
@@ -291,15 +291,15 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       slugs.push.apply(slugs, controlslugs.call(this));
     });
     return slugs;
-  }
+  };
 
   var countcontrols = function() {
     var slugs = [];
     can.each(this.linked_controls, function() {
-      slugs.push.apply(slugs, controlslugs.apply(this)); 
+      slugs.push.apply(slugs, controlslugs.apply(this));
     });
     return slugs.length;
-  }
+  };
 
   Mustache.registerHelper("controlscount", countcontrols);
 
@@ -499,6 +499,8 @@ Mustache.registerHelper("if_page_type", function(page_type, options) {
     return options.inverse(this);
 });
 
+// Render a named template with the specified context, serialized and
+// augmented by 'options.hash'
 Mustache.registerHelper("render", function(template, context, options) {
   if(!options) {
     options = context;
@@ -513,9 +515,23 @@ Mustache.registerHelper("render", function(template, context, options) {
     template = template();
   }
 
-  return can.view.render(template, context.serialize ? context.serialize() : context);
+  context = $.extend({}, context.serialize ? context.serialize() : context);
+
+  if (options.hash) {
+    for(var k in options.hash) {
+      if(options.hash.hasOwnProperty(k)) {
+        context[k] = options.hash[k];
+        if (typeof context[k] == "function")
+          context[k] = context[k]();
+      }
+    }
+  }
+
+  return can.view.render(template, context);
 });
 
+// Like 'render', but doesn't serialize the 'context' object, and doesn't
+// apply options.hash
 Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
@@ -701,7 +717,7 @@ Mustache.registerHelper("private_program", function(modal_title) {
     '<div class="span6">'
     , '<label>'
     , 'Privacy'
-    , '<i class="grcicon-help-black" rel="tooltip" title="Program won\'t be visible to others"></i>'
+    , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
     , '<input name="private" value="private" type="checkbox"> Private Program'
@@ -801,5 +817,54 @@ Mustache.registerHelper("category_select", function(object, attr_name, scope) {
 
   return defer_render('select', get_select_html, options_dfd);
 });
+
+Mustache.registerHelper("schemed_url", function(url) {
+  if (url) {
+    url = url.isComputed? url(): url;
+    if (url && !url.match(/^[a-zA-Z]+:/)) {
+        return 'http://' + url;
+    }
+  }
+  return url;
+});
+
+Mustache.registerHelper("show_long", function() {
+  return  [
+      '<a href="javascript://" class="show-long"'
+    , can.view.hook(function(el, parent, view_id) {
+        el = $(el);
+
+        var content = el.prevAll('.short');
+        if (content.length) {
+          !function hide() {
+            // Trigger the "more" toggle if the height is the same as the scrollable area
+            if (el[0].offsetHeight) {
+              if (content[0].offsetHeight === content[0].scrollHeight) {
+                el.trigger('click');
+              }
+            }
+            else {
+              // If there is an open/close toggle, wait until that is triggered
+              var root = el.closest('.tree-item')
+                , toggle;
+              if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
+                // Listen for the toggle instead of timeouts
+                toggle.one('click', function() {
+                  // Delay to ensure all event handlers have fired
+                  setTimeout(hide, 0);
+                });
+              }
+              // Otherwise just detect visibility
+              else {
+                setTimeout(hide, 100);
+              }
+            }
+          }();
+        }
+      })
+    , ">...more</a>"
+  ].join('');
+});
+
 
 })(this, jQuery, can);

@@ -49,10 +49,10 @@
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
-              <div class="tree-description short">
+              <div class="tree-description short" {{(el) -> console.log(el.scrollHeight)}}>
                 {{{description}}}
               </div>
-              <a href="javascript://" class="show-long">...more</a>
+              {{{show_long}}}
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-                <a class="url" href="{{url}}" target="_blank">
+                <a class="url" href="{{schemed_url url}}" target="_blank">
                   {{url}}
                 </a>
             </div>

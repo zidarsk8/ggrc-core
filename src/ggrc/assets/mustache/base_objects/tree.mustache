@@ -62,7 +62,7 @@
               <div class="tree-description short">
                 {{{instance.description}}}
               </div>
-              <a href="javascript://" class="show-long">...more</a>
+              {{{show_long}}}
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              <a class="url" href="{{instance.url}}" target="_blank">
+              <a class="url" href="{{schemed_url instance.url}}" target="_blank">
                 {{instance.url}}
               </a>
             </div>
@@ -123,7 +123,7 @@
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
-        + Object
+        + {{model.title_singular}}
       </a>
       {{#if null}}
       <a href="javascript://"class="control-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.constructor.model_singular}}" data-object-plural="{{parent_instance.constructor.table_plural}}" >
