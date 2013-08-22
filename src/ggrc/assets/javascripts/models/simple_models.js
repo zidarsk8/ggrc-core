@@ -967,10 +967,15 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
-CMS.Models.get_instances = function(instances) {
-  if (!instances)
+CMS.Models.get_instances = function(objects) {
+  var i, instances = []
+  if (!objects)
     return [];
-  return can.map(instances, CMS.Models.get_instance);
+  for (i=0; i<objects.length; i++) {
+    instances[i] = CMS.Models.get_instance(objects[i]);
+  }
+  return instances;
+  //return can.map(instances, CMS.Models.get_instance);
 }
 
 CMS.Models.get_link_type = function(instance, attr) {
