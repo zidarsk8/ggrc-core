@@ -11,7 +11,7 @@ can.Control("CMS.Controllers.Dashboard", {
     defaults: {
         model_descriptors: null
       , menu_tree_spec: null
-      //  widget_descriptors: null
+      , widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
       //

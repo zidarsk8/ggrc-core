@@ -36,6 +36,9 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     if(!this.options.widget_icon && this.options.model) {
       this.options.widget_icon = this.options.model.table_singular;
     }
+    if(this.options.widget_icon && !/^grcicon/.test(this.options.widget_icon)) {
+      this.options.widget_icon = "grcicon-" + this.options.widget_icon + "-color";
+    }
 
     if(!this.options.object_category && this.options.model) {
       this.options.object_category = this.options.model.category;

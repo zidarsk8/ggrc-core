@@ -115,10 +115,8 @@ can.Construct("RefreshQueueManager", {
     }
 });
 
-var _refresh_queue_manager = new RefreshQueueManager();
-
 can.Construct("RefreshQueue", {
-
+    refresh_queue_manager: new RefreshQueueManager()
 }, {
     init: function() {
       this.objects = [];
@@ -140,7 +138,7 @@ can.Construct("RefreshQueue", {
 
       this.objects.push(obj);
       if (force || !obj.selfLink) {
-        queue = _refresh_queue_manager.enqueue(obj, force);
+        queue = this.constructor.refresh_queue_manager.enqueue(obj, force);
         if (this.queues.indexOf(queue) === -1)
           this.queues.push(queue);
       }
@@ -315,28 +313,7 @@ function should_show_authorizations() {
       && Permission.is_allowed('delete', 'UserRole', context_id));
 }
 
-program_widget_descriptors = {
-  authorizations: {
-      widget_id: "authorizations"
-    , widget_name: "Authorizations"
-    , widget_icon: "authorization"
-    , widget_guard: should_show_authorizations
-    , extra_widget_actions_view: '/static/ggrc_basic_permissions/mustache/people_roles/authorizations_modal_actions.mustache'
-    , content_controller: GGRC.Controllers.ListView
-    , content_controller_options: {
-          list_view: "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_by_person_list.mustache"
-        , list_loader: authorizations_list_loader
-        }
-    }
-};
-
 $(function() {
-
-  if (/programs\/\d+/.test(window.location)) {
-    var c = $('.cms_controllers_page_object').control(CMS.Controllers.PageObject);
-    c.add_dashboard_widget_from_descriptor(
-      program_widget_descriptors.authorizations);
-  }
 
   can.Construct("GGRC.ListLoaders.MultiList", {
   }, {
@@ -439,7 +416,9 @@ $(function() {
           }
         });
 
-        return self.refresh_queue.trigger();
+        return this.refresh_queue.trigger().then(function() {
+          return self.list;
+        });
       }
 
     , insert_object: function(result) {
@@ -452,16 +431,8 @@ $(function() {
   });
 
 
-  var models_by_kind = {
-      contracts : CMS.Models.Contract
-    , policies : CMS.Models.Policy
-    , regulations : CMS.Models.Regulation
-  };
-
-  function init_directive_tree(program, table_plural, model, mappings) {
-    var $sections_tree = $("#" + table_plural + " .tree-structure")
-          .append($(new Spinner().spin().el).css(spin_opts));
-
+  function init_directives_from_program(model, program) {
+    var refresh_queue = new RefreshQueue();
     var loader = new GGRC.ListLoaders.List({
         model: model
       , mapping_model: CMS.Models.ProgramDirective
@@ -470,44 +441,21 @@ $(function() {
       , source_value: program
     });
 
-    function sort_sections(sections) {
-      return can.makeArray(sections).sort(window.natural_comparator);
-    }
-
-    loader.init_list(mappings).then(function() {
-      $sections_tree.cms_controllers_tree_view({
-          model : model
-        , parent_instance : GGRC.make_model_instance(GGRC.page_object)
-        , list : loader.list
-        , list_view : GGRC.mustache_path + "/directives/tree.mustache"
-        , child_options : [{
-            model : CMS.Models.Section
-          , parent_find_param : "directive.id"
-          , fetch_post_process : sort_sections
-        }]
-      });
-    });
-  }
-
-  function init_directives_from_program(object) {
-    var refresh_queue = new RefreshQueue()
-      , results_list = new can.Observe.List();
-
-    can.each(object.program_directives, function(mapping) {
+    can.each(program.program_directives, function(mapping) {
       refresh_queue.enqueue(mapping);
     });
 
-    return refresh_queue.trigger().then(function(mappings) {
-      can.each(models_by_kind, function(model, table_plural) {
-        var program_directives = can.map(mappings, function(mapping) {
-          if (mapping.directive instanceof model)
-            return mapping;
+    return function() {
+      return refresh_queue.trigger()
+        .then(function(mappings) {
+          var program_directives = can.map(mappings, function(mapping) {
+            if (mapping.directive instanceof model)
+              return mapping;
+          });
+          return loader.init_list(program_directives);
         });
-        init_directive_tree(object, table_plural, model, program_directives);
-      });
-    });
+    }
   }
-
 
   function init_objectives_from_object(object) {
     var $objectives_tree = $("#objectives .tree-structure").append(
@@ -543,16 +491,11 @@ $(function() {
           program_id
     };
 
-    $.when(
+    return $.when(
         refresh_queue.trigger().then(can.proxy(loader1, "init_list"))
       , CMS.Models.SectionObjective.findAll(params).then(can.proxy(loader2, "init_list"))
     ).then(function() {
-      $objectives_tree.cms_controllers_tree_view({
-          model : CMS.Models.Objective
-        , list : results_list
-        , list_view : GGRC.mustache_path + "/objectives/tree.mustache"
-        , parent_instance : page_model
-      });
+      return results_list;
     });
   }
 
@@ -576,42 +519,105 @@ $(function() {
       refresh_queue.enqueue(mapping);
     });
 
-    var params = {
-      "directive.program_directives.program_id": program_id
-    };
-
-    $.when(
-        refresh_queue.trigger().then(can.proxy(loader, "init_list"))
-    ).then(function() {
-      $controls_tree.cms_controllers_tree_view({
-          model : CMS.Models.Control
-        , list : results_list
-        , list_view : GGRC.mustache_path + "/controls/tree.mustache"
-        , parent_instance : page_model
-        //, draw_children : true
-      });
-    });
+    return refresh_queue.trigger().then(can.proxy(loader, "init_list"));
   }
+
 
   var page_model = GGRC.make_model_instance(GGRC.page_object)
 
-  init_directives_from_program(page_model);
-  init_objectives_from_object(page_model);
-  init_controls_from_object(page_model);
+  program_widget_descriptors = {
+      authorizations: {
+          widget_id: "authorizations"
+        , widget_name: "Authorizations"
+        , widget_icon: "authorization"
+        , widget_guard: should_show_authorizations
+        , extra_widget_actions_view: '/static/ggrc_basic_permissions/mustache/people_roles/authorizations_modal_actions.mustache'
+        , content_controller: GGRC.Controllers.ListView
+        , content_controller_options: {
+              list_view: "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_by_person_list.mustache"
+            , list_loader: authorizations_list_loader
+            }
+        }
+
+    , objectives: {
+          widget_id: "objectives"
+        , widget_name: "Mapped Objectives"
+        , widget_icon: "objective"
+        , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
+        , content_controller: CMS.Controllers.TreeView
+        , content_controller_selector: "ul"
+        , content_controller_options: {
+              model : CMS.Models.Objective
+            , list_loader : init_objectives_from_object
+            , list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+            , parent_instance : page_model
+            }
+        }
+
+    , controls: {
+          widget_id: "controls"
+        , widget_name: "Mapped Controls"
+        , widget_icon: "control"
+        , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
+        , content_controller: CMS.Controllers.TreeView
+        , content_controller_selector: "ul"
+        , content_controller_options: {
+              model : CMS.Models.Control
+            , list_loader : init_controls_from_object
+            , list_view : GGRC.mustache_path + "/controls/tree.mustache"
+            , parent_instance : page_model
+            }
+        }
+  };
+
+  var models_by_kind = {
+      contracts : CMS.Models.Contract
+    , policies : CMS.Models.Policy
+    , regulations : CMS.Models.Regulation
+  };
+
+  function sort_sections(sections) {
+    return can.makeArray(sections).sort(window.natural_comparator);
+  }
+
+  can.each(models_by_kind, function(model, table_plural) {
+    program_widget_descriptors[table_plural] = {
+        widget_id: table_plural
+      , widget_name: "Mapped " + model.title_plural
+      , widget_icon: model.table_singular
+      , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
+      , content_controller: CMS.Controllers.TreeView
+      , content_controller_selector: "ul"
+      , content_controller_options: {
+            model : model
+          , list_loader : init_directives_from_program(model, page_model)
+          , list_view : GGRC.mustache_path + "/directives/tree.mustache"
+          , parent_instance : page_model
+          , child_options : [{
+              model : CMS.Models.Section
+            , parent_find_param : "directive.id"
+            , fetch_post_process : sort_sections
+          }]
+        }
+    }
+  });
 
 
-  /*$(document.body).on("modal:success", "a[href^='/controls/new']", function(ev, data) {
-    var c = new CMS.Models.Control(data);
-    $("a[href='#controls']").click();
-      can.each(c.category_ids.length ? c.category_ids : [-1], function(catid) {
-        $controls_tree.find("[data-object-id=" + catid + "] > .item-content > ul[data-object-type=control]").trigger("newChild", c);
-      });
-  });*/
+  if (/programs\/\d+/.test(window.location)) {
+    var widget_ids = [
+            'regulations', 'policies', 'contracts'
+          , 'controls', 'objectives', 'authorizations'
+        ]
 
-  /*$(document.body).on("modal:relationshipcreated modal:relationshipdestroyed", ".add-new-item a", function(ev, data) {
-    $sections_tree
-    .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", data.directive || CMS.Models.Directive.findInCacheById(data.directive_id));
-  });*/
+    if (!GGRC.extra_widget_descriptors)
+      GGRC.extra_widget_descriptors = {};
+    $.extend(GGRC.extra_widget_descriptors, program_widget_descriptors);
+
+    if (!GGRC.extra_default_widgets)
+      GGRC.extra_default_widgets = [];
+    GGRC.extra_default_widgets.push.apply(
+        GGRC.extra_default_widgets, widget_ids);
+  }
 
 });
 

@@ -22,39 +22,48 @@ $(function() {
   can.each(object.object_documents, can.proxy(queue, "enqueue"));
   queue_dfd = queue.trigger();
 
-  // var c = $('.cms_controllers_page_object').control(CMS.Controllers.PageObject);
-  // if (c) {
-  //   c.add_dashboard_widget_from_name("person");
-  //   c.add_dashboard_widget_from_name("document");
-  // }
-
-  queue_dfd.done(function() {
-    $("#people_widget").find("section.content").ggrc_controllers_list_view({
-      model : CMS.Models.ObjectPerson
-      , list : object.object_people
-      , list_view : GGRC.mustache_path + "/people/list.mustache"
-      , parent_instance : object
-      , list_loader : function() {
-        return $.when(object.object_people);
+  var business_object_widget_descriptors = {
+      people: {
+          widget_id: "people"
+        , widget_name: "Mapped People"
+        , widget_icon: "grcicon-user-black"
+        , content_controller: GGRC.Controllers.ListView
+        , content_controller_options: {
+              model : CMS.Models.ObjectPerson
+            , list_loader: function() {
+                return queue_dfd.then(function() { return object.object_people; });
+              }
+            , list_view : GGRC.mustache_path + "/people/list.mustache"
+            , parent_instance : object
+          }
       }
-    });
-    object.object_people.bind("add remove", function() {
-      $("#people_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
-    });
-
-    $("#documents_widget").find("section.content").ggrc_controllers_list_view({
-      model : CMS.Models.ObjectDocument
-      , list : object.object_documents
-      , list_view : GGRC.mustache_path + "/documents/list.mustache"
-      , parent_instance : object
-      , list_loader : function() {
-        return $.when(object.object_documents);
+    , documents: {
+          widget_id: "documents"
+        , widget_name: "Reference Links"
+        , widget_icon: "grcicon-link"
+        , content_controller: GGRC.Controllers.ListView
+        , content_controller_options: {
+              model : CMS.Models.ObjectDocument
+            , list_loader: function(){
+                return queue_dfd.then(function() { return object.object_documents; });
+              }
+            , list_view : GGRC.mustache_path + "/documents/list.mustache"
+            , parent_instance : object
+          }
       }
-    });
-    object.object_documents.bind("add remove", function() {
-      $("#documents_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
-    });
-  });
+
+  }
+
+  var widget_ids = ['people', 'documents']
+
+  if (!GGRC.extra_widget_descriptors)
+    GGRC.extra_widget_descriptors = {};
+  $.extend(GGRC.extra_widget_descriptors, business_object_widget_descriptors);
+
+  if (!GGRC.extra_default_widgets)
+    GGRC.extra_default_widgets = [];
+  GGRC.extra_default_widgets.push.apply(
+      GGRC.extra_default_widgets, widget_ids);
 
 
   if(!~can.inArray(
