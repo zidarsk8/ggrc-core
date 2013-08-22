@@ -74,6 +74,7 @@ can.Control("CMS.Controllers.TreeView", {
     // Allow parent_instance even when there is no parent tree
     if (!this.options.parent_instance && this.options.parent)
       this.options.parent_instance = this.options.parent.instance;
+    this.element.trigger("loading");
     this.options.list ? this.draw_list() : this.fetch_list();
 
     var object_type = can.underscore(
@@ -175,6 +176,7 @@ can.Control("CMS.Controllers.TreeView", {
       if (that.element) {
         that.element.html(frag);
         that.element.trigger('updateCount', that.options.list.length);
+        that.element.trigger("loaded");
       }
       /*GGRC.queue_event(function() {
         if(that.options.start_expanded) {
