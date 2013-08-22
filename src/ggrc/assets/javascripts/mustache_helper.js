@@ -833,17 +833,31 @@ Mustache.registerHelper("show_long", function() {
       '<a href="javascript://" class="show-long"'
     , can.view.hook(function(el, parent, view_id) {
         el = $(el);
-        var content = el.prevAll('.short');
 
+        var content = el.prevAll('.short');
         if (content.length) {
           !function hide() {
+            // Trigger the "more" toggle if the height is the same as the scrollable area
             if (el[0].offsetHeight) {
               if (content[0].offsetHeight === content[0].scrollHeight) {
                 el.trigger('click');
               }
             }
             else {
-              setTimeout(hide, 100);
+              // If there is an open/close toggle, wait until that is triggered
+              var root = el.closest('.tree-item')
+                , toggle;
+              if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
+                // Listen for the toggle instead of timeouts
+                toggle.one('click', function() {
+                  // Delay to ensure all event handlers have fired
+                  setTimeout(hide, 0);
+                });
+              }
+              // Otherwise just detect visibility
+              else {
+                setTimeout(hide, 100);
+              }
             }
           }();
         }
