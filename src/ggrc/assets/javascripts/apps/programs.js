@@ -429,11 +429,14 @@ $(function() {
         var self = this;
 
         can.each(mappings, function(mapping) {
-          self.refresh_queue.enqueue(mapping[self.mapping_target_attr]);
-          self.insert_object({
-              instance: mapping[self.mapping_target_attr]
-            , mappings: [mapping]
-          });
+          var instance = mapping[self.mapping_target_attr];
+          if (instance) {
+            self.refresh_queue.enqueue(instance);
+            self.insert_object({
+                instance: instance
+              , mappings: [mapping]
+            });
+          }
         });
 
         return self.refresh_queue.trigger();
