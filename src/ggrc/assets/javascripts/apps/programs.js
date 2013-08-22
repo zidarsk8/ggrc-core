@@ -543,6 +543,14 @@ $(function() {
           widget_id: "objectives"
         , widget_name: "Mapped Objectives"
         , widget_icon: "objective"
+        , widget_info : function() {
+            var $objectArea = $(".object-area");
+            if ( $objectArea.hasClass("dashboard-area") ) {
+              return ""
+            } else {
+              return "Does not include mappings to Directives, Objectives and Controls"
+            }
+          }
         , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
         , content_controller: CMS.Controllers.TreeView
         , content_controller_selector: "ul"
@@ -558,6 +566,14 @@ $(function() {
           widget_id: "controls"
         , widget_name: "Mapped Controls"
         , widget_icon: "control"
+        , widget_info : function() {
+            var $objectArea = $(".object-area");
+            if ( $objectArea.hasClass("dashboard-area") ) {
+              return ""
+            } else {
+              return "Does not include mappings to Directives, Objectives and Controls"
+            }
+          }
         , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
         , content_controller: CMS.Controllers.TreeView
         , content_controller_selector: "ul"
