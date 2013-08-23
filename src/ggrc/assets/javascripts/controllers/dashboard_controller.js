@@ -353,20 +353,6 @@ can.Control("CMS.Controllers.InnerNav", {
       can.view(this.options.internav_view, this.options, function(frag) {
         that.element.append(frag);
         that.update_scrollspy();
-
-        // Update scrollspy as scrollable content changes
-        var $body = $(".object-area")
-          , lastHeight = 0
-          ;
-        if ($body[0] && $body.data('scrollspy')) {
-          lastHeight = $body[0].scrollHeight;
-          setInterval(function() {
-            if ($body[0] && $body[0].scrollHeight !== lastHeight) {
-              lastHeight = $body[0].scrollHeight;
-              that.update_scrollspy();
-            }
-          }, 1000);
-        }
       });
     }
 
@@ -452,16 +438,10 @@ can.Control("CMS.Controllers.InnerNav", {
       if (!$body.data("scrollspy"))
         return
 
-      // FIXME: This is currently necessary because Bootstrap's ScrollSpy uses
-      //   the `href` to determine the active element, and the element may have
-      //   changed (due to view update) while keeping the same `href`.
-      // So, we nullify the "current" href.
-      $body.data("scrollspy").activeTarget = null;
       $body
-        .scrollTop(0)
+        .scrollspy("activate", null)
         .scrollspy("refresh")
-        .scrollTop(top)
-        .scrollspy("process");
+        .scrollspy("process")
     }
 
   , update_widget_list : function(widget_elements) {
