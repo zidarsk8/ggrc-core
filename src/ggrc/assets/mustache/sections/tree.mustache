@@ -65,7 +65,7 @@
         {{#edit_sections}}
           <div class="row-fluid">
             <div class="span12">
-              <a href="javascript://" class="info-action">
+              <a href="javascript://" class="info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
                 Edit Section
               </a>

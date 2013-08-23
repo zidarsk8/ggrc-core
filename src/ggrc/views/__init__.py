@@ -7,8 +7,6 @@ import json
 from collections import namedtuple
 from flask import request, flash, session
 from ggrc.app import app
-from ggrc.converters.common import ImportException
-from ggrc.converters.sections import SectionsConverter
 from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
 from . import filters
@@ -108,6 +106,7 @@ def allowed_file(filename):
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
 def import_controls(directive_id):
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
@@ -149,6 +148,7 @@ def import_controls(directive_id):
 @app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
@@ -187,6 +187,7 @@ def import_sections(directive_id):
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
@@ -225,6 +226,7 @@ def import_redirect(location):
 @app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
