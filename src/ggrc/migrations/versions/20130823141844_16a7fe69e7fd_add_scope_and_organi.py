@@ -12,7 +12,6 @@ down_revision = '56fa965233f9'
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import mysql
 
 def upgrade():
     op.add_column(u'programs', sa.Column('scope', sa.Text(), nullable=True))
