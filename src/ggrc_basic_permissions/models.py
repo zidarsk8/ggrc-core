@@ -24,7 +24,7 @@ class Role(Base, Described, db.Model):
   """
   __tablename__ = 'roles'
 
-  name  = db.Column(db.String(128), nullable=False)
+  name = db.Column(db.String(128), nullable=False)
   permissions_json = db.Column(db.Text(), nullable=False)
 
   @simple_property
@@ -41,6 +41,14 @@ class Role(Base, Described, db.Model):
     self.permissions_json = json.dumps(value)
 
   _publish_attrs = ['name', 'permissions']
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import not_
+    query = super(Role, cls).eager_query()
+    # FIXME: 'RoleReader' role should not be shown in interface, but this is
+    #   the wrong place to filter it.
+    return query.filter(not_(cls.name == 'RoleReader'))
 
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
