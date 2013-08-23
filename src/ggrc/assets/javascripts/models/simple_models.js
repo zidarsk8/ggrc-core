@@ -901,7 +901,7 @@ can.Model.Cacheable("CMS.Models.Help", {
 can.Model.Cacheable("CMS.Models.Event", {
   root_object : "event"
   , root_collection : "events"
-  , findAll : "GET /api/events?__include=revisions,modified_by"
+  , findAll : "GET /api/events?__include=revisions,modified_by&__limit=50"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Role", {

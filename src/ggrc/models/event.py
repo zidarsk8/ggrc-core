@@ -26,7 +26,7 @@ class Event(Base, db.Model):
   def eager_query(cls):
     from sqlalchemy import orm
 
-    query = super(Event, cls).eager_query().order_by('events.id desc')
+    query = super(Event, cls).eager_query()
     return query.options(
         orm.undefer_group('Revision_complete'),
         orm.subqueryload('revisions'))
