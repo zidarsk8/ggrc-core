@@ -282,9 +282,6 @@ $(function() {
       , model_class : notes_model
     });
   });
-
-  $("section[id$=_info_widget]:not([id$=_more_info_widget])").ggrc_controllers_info_widget();
-
 });
 
 })(this, jQuery);

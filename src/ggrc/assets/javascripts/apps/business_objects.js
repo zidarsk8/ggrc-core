@@ -14,8 +14,37 @@ $(function() {
     return;
 
   var object_class = GGRC.infer_object_type(GGRC.page_object)
-  , object = GGRC.make_model_instance(GGRC.page_object)
-  , queue = new RefreshQueue()
+    , object_table = object_class.table_plural
+    , object = GGRC.make_model_instance(GGRC.page_object);
+
+  var info_widget_views = {
+    'programs': GGRC.mustache_path + "/programs/info.mustache"
+  }
+  default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
+
+  var info_widget_descriptors = {
+      info: {
+          widget_id: "info"
+        , widget_name: object_class.title_singular + " Info"
+        , widget_icon: "grcicon-info"
+        , content_controller: GGRC.Controllers.InfoWidget
+        , content_controller_options: {
+              instance: object
+            , model: object_class
+            , widget_view: info_widget_views[object_table] || default_info_widget_view
+          }
+      }
+  }
+
+  if (!GGRC.extra_widget_descriptors)
+    GGRC.extra_widget_descriptors = {};
+  if (!GGRC.extra_default_widgets)
+    GGRC.extra_default_widgets = [];
+
+  GGRC.extra_widget_descriptors.info = info_widget_descriptors.info;
+  GGRC.extra_default_widgets.splice(0, 0, 'info');
+
+  var queue = new RefreshQueue()
   , queue_dfd;
 
   can.each(object.object_people, can.proxy(queue, "enqueue"));
@@ -56,14 +85,8 @@ $(function() {
 
   var widget_ids = ['people', 'documents']
 
-  if (!GGRC.extra_widget_descriptors)
-    GGRC.extra_widget_descriptors = {};
   $.extend(GGRC.extra_widget_descriptors, business_object_widget_descriptors);
-
-  if (!GGRC.extra_default_widgets)
-    GGRC.extra_default_widgets = [];
-  GGRC.extra_default_widgets.push.apply(
-      GGRC.extra_default_widgets, widget_ids);
+  GGRC.extra_default_widgets.push.apply(GGRC.extra_default_widgets, widget_ids);
 
 
   if(!~can.inArray(

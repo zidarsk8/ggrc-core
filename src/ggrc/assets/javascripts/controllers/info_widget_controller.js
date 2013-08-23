@@ -19,7 +19,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
   }
 }, {
   init : function() {
-    var $content = this.options.$content = this.element.find("section.content");
+    var that = this;
 
     if (this.element.data('widget-view')) {
       this.options.widget_view = GGRC.mustache_path + this.element.data('widget-view');
@@ -37,7 +37,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
       , instance : this.options.instance
       });
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
-      $content.html(frag);
+      that.element.html(frag);
     });
   }
 
