@@ -23,6 +23,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   , findAll : "GET /api/sections"
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
+  , destroy : "DELETE /api/sections/{id}"
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
@@ -55,7 +56,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     , objectives : []
     , object_controls : []
     , controls : []
-    , directive : "CMS.Models.get_instance"
+    , directive : null
     //, parent : "CMS.Models.Section.model"
     , children : []
     , control_sections : []
