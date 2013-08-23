@@ -71,6 +71,10 @@ can.Model.Cacheable("CMS.Models.Section", {
           attr: "object_people"
         , target_attr: "person"
       }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
+      }
     , business_object_mappings: {
           attr: "object_sections"
         , target_attr: "sectionable"
@@ -100,6 +104,10 @@ can.Model.Cacheable("CMS.Models.Section", {
     //}, {
     //  model : CMS.Models.Section
     //  , property : "children"
+    }, {
+        model : "Document"
+      , property : "document_mappings"
+      , list_view : "/static/mustache/documents/tree.mustache"
     }, {
         model : "Person"
       , property : "people_mappings"
