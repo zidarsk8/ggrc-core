@@ -174,7 +174,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     role_reader_for_user = db.session.query(UserRole)\
         .join(Role, UserRole.role == role_reader_role)\
         .filter(UserRole.person_id == current_user_id\
-            and Role.name == 'RoleReader')\
+            and Role.name == 'RoleReader'
+            and UserRole.context_id == 1)\
         .first()
     if not role_reader_for_user:
       role_reader_for_user = UserRole(
