@@ -236,6 +236,16 @@ them as they change:
 
   watch_assets
 
+Importing Example Data
+----------------------
+
+Example test data can be loaded by using the following command (with ``root`` 
+being the mysql password):
+
+.. sourcecode:: bash
+
+  mysql -u root -p ggrcdev < grc-dev-backup-20130801.sql
+
 Gotchas
 =======
 
