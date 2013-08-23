@@ -77,8 +77,8 @@ dashboard-js-files:
   - controls/category.js
   - apps/quick_search.js
   - apps/systems.js
-  - apps/business_objects.js
   - apps/programs.js
+  - apps/business_objects.js
   - apps/dashboard.js
   - sections/notes_controller.js
   - roles/roles_modal_controller.js
