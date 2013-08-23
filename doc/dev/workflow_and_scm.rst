@@ -34,7 +34,7 @@ General Workflow
 
           git hf update
           git hf feature pull
-          git hf feature merge
+          git merge develop
 
      Though, if you aren't collaborating on a feature branch, a feature rebase
      can be used instead:
