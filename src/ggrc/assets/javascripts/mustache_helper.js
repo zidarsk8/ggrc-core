@@ -866,5 +866,42 @@ Mustache.registerHelper("show_long", function() {
   ].join('');
 });
 
+Mustache.registerHelper("using", function(args, options) {
+  var refresh_queue = new RefreshQueue()
+    , context = this
+    , i, arg;
+
+  args = can.makeArray(arguments);
+  options = args.pop();
+
+  for (i=0; i<args.length; i++) {
+    arg = args[i];
+    if (can.isFunction(arg))
+      arg = arg();
+    args[i] = arg;
+  }
+  if (options.hash) {
+    for (i in options.hash) {
+      if (options.hash.hasOwnProperty(i)) {
+        arg = options.hash[i];
+        if (can.isFunction(arg))
+          arg = arg();
+        args.push(arg);
+      }
+    }
+  }
+
+  for (i=0; i<args.length; i++) {
+    arg = args[i];
+    if (arg)
+      refresh_queue.enqueue(args[i]);
+  }
+
+  function finish() {
+    return options.fn(this);
+  }
+
+  return defer_render('span', finish, refresh_queue.trigger());
+});
 
 })(this, jQuery, can);

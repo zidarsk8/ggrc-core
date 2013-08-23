@@ -36,6 +36,8 @@ class Program(
       'program_directives', 'directive', 'ProgramDirective')
   cycles = db.relationship(
       'Cycle', backref='program', cascade='all, delete-orphan')
+  scope = deferred(db.Column(db.Text), 'Program')
+  organization = deferred(db.Column(db.String), 'Program')
 
   _publish_attrs = [
       'kind',
@@ -44,6 +46,8 @@ class Program(
       'program_directives',
       'directives',
       'cycles',
+      'scope',
+      'organization',
       ]
 
   @classmethod

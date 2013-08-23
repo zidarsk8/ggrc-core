@@ -23,6 +23,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   , findAll : "GET /api/sections"
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
+  , destroy : "DELETE /api/sections/{id}"
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
@@ -55,7 +56,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     , objectives : []
     , object_controls : []
     , controls : []
-    , directive : "CMS.Models.get_instance"
+    , directive : null
     //, parent : "CMS.Models.Section.model"
     , children : []
     , control_sections : []
@@ -69,6 +70,10 @@ can.Model.Cacheable("CMS.Models.Section", {
       people_mappings: {
           attr: "object_people"
         , target_attr: "person"
+      }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
       }
     , business_object_mappings: {
           attr: "object_sections"
@@ -99,6 +104,10 @@ can.Model.Cacheable("CMS.Models.Section", {
     //}, {
     //  model : CMS.Models.Section
     //  , property : "children"
+    }, {
+        model : "Document"
+      , property : "document_mappings"
+      , list_view : "/static/mustache/documents/tree.mustache"
     }, {
         model : "Person"
       , property : "people_mappings"

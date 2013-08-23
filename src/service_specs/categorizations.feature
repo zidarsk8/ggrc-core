@@ -1,3 +1,4 @@
+@wip
 Feature: Many resources can be "categorized". This feature will exercise
   categorizing relations.
 

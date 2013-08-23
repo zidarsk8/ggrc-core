@@ -61,7 +61,6 @@ dashboard-js-files:
   - pbc/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
-  - apps/dashboard.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js
   - apps/directives.js
@@ -76,10 +75,11 @@ dashboard-js-files:
   - products/routes_controller.js
   - apps/products.js
   - controls/category.js
-  - apps/programs.js
   - apps/quick_search.js
   - apps/systems.js
+  - apps/programs.js
   - apps/business_objects.js
+  - apps/dashboard.js
   - sections/notes_controller.js
   - roles/roles_modal_controller.js
   - dashboard.js
@@ -109,6 +109,7 @@ dashboard-js-template-files:
   - documents/modal_content.mustache
   - documents/option_column.mustache
   - documents/option_detail.mustache
+  - documents/tree.mustache
   - dashboard/modal_preload.mustache
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache

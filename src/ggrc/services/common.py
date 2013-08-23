@@ -127,7 +127,14 @@ class ModelView(View):
           query = query.filter(or_(
             j_class.context_id.in_(j_contexts),
             j_class.context_id == None))
-    return query.order_by(self.modified_attr.desc())#.limit(20)
+    query = query.order_by(self.modified_attr.desc())
+    if '__limit' in request.args:
+      try:
+        limit = int(request.args['__limit'])
+        query = query.limit(limit)
+      except (TypeError, ValueError):
+        pass
+    return query
 
   def get_object(self, id):
     # This could also use `self.pk`

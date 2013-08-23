@@ -231,6 +231,8 @@ $(function() {
     if (/\w+\/\d+($|\?|\#)/.test(window.location)) {
       $area.cms_controllers_page_object({
           model_descriptors: model_descriptors
+        , widget_descriptors: GGRC.extra_widget_descriptors || {}
+        , default_widgets: GGRC.extra_default_widgets || []
         , instance: GGRC.make_model_instance(GGRC.page_object)
         });
     } else if (/dashboard/.test(window.location)) {
@@ -280,9 +282,6 @@ $(function() {
       , model_class : notes_model
     });
   });
-
-  $("section[id$=_info_widget]:not([id$=_more_info_widget])").ggrc_controllers_info_widget();
-
 });
 
 })(this, jQuery);

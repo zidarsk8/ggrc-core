@@ -830,6 +830,10 @@ can.Model.Cacheable("CMS.Models.Objective", {
           attr: "object_people"
         , target_attr: "person"
       }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
+      }
     , business_object_mappings: {
           attr: "object_objectives"
         , target_attr: "objectiveable"
@@ -857,6 +861,10 @@ can.Model.Cacheable("CMS.Models.Objective", {
         model : "Person"
       , property : "people_mappings"
       , list_view : "/static/mustache/people/tree.mustache"
+    }, {
+        model : "Document"
+      , property : "document_mappings"
+      , list_view : "/static/mustache/documents/tree.mustache"
 /*    }, {
         model : "Section"
       , property : "section_mappings"
@@ -893,7 +901,7 @@ can.Model.Cacheable("CMS.Models.Help", {
 can.Model.Cacheable("CMS.Models.Event", {
   root_object : "event"
   , root_collection : "events"
-  , findAll : "GET /api/events?__include=revisions,modified_by"
+  , findAll : "GET /api/events?__include=revisions,modified_by&__limit=50"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Role", {

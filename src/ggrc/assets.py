@@ -99,7 +99,7 @@ class MustacheFilter(JSTemplateFilter):
   def process_templates(self, out, hunks, **kwargs):
     namespace = self.namespace or 'GGRC.Templates'
 
-    out.write("{namespace} = {namespace} || {};\n"
+    out.write("{namespace} = {namespace} || {{}};\n"
         .format('{}', namespace=namespace))
 
     for name, hunk in self.iter_templates_with_base(hunks):

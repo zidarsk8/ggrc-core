@@ -320,7 +320,7 @@
     },
 
     get_join_object_type: function() {
-      return this.options.join_object_type || this.options.join_object.constructor.getRootModelName();
+      return this.options.join_object_type || this.options.join_object.constructor.shortName;
     },
 
   });

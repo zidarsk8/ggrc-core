@@ -11,7 +11,7 @@ can.Control("CMS.Controllers.Dashboard", {
     defaults: {
         model_descriptors: null
       , menu_tree_spec: null
-      //  widget_descriptors: null
+      , widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
       //
@@ -295,9 +295,9 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
       descriptor.content_controller_options.draw_children = false;
       descriptor.content_controller_options.parent_instance = parent_instance;
       descriptor.content_controller_options.model = object_type;
-
-      list_loader.refresh_list();
-      descriptor.content_controller_options.list = list_loader.list;
+      descriptor.content_controller_options.list_loader = function() {
+        return list_loader.refresh_list();
+      };
       return descriptor;
     }
 

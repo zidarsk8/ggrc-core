@@ -30,11 +30,14 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   init : function() {
 
     if(!this.options.model && GGRC.page_model) {
-      this.options.model = GGRC.infer_object_type(GGRC.page_model);
+      this.options.model = GGRC.infer_object_type(GGRC.page_object);
     }
 
     if(!this.options.widget_icon && this.options.model) {
       this.options.widget_icon = this.options.model.table_singular;
+    }
+    if(this.options.widget_icon && !/^grcicon/.test(this.options.widget_icon)) {
+      this.options.widget_icon = "grcicon-" + this.options.widget_icon + "-color";
     }
 
     if(!this.options.object_category && this.options.model) {
