@@ -791,7 +791,7 @@ jQuery(function($) {
     ,   $targetWidget = $($widgetID)
     ;
     
-    if( $targetWidget.hasClass("widget-active") ) {
+    if( $targetWidget.hasClass("widget-active") && $(".object-area").data('scrollspy').activeTarget !== $widgetID ) {
       $targetWidget.removeClass("widget-active");
     }
   });  
@@ -804,25 +804,26 @@ jQuery(function($) {
     
     $targetWidget.addClass("widget-active");
     $(".object-area").scrollspy('activate', $widgetID);
-  });  
+  });    
 
   $('body').on('mouseenter', '.widget', function(e) {
     var $this = $(this)
+    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
     ;
     if( ! $this.hasClass("widget-active") ) {
       $this.addClass("widget-active");
+      $('.object-area').scrollspy('activate', '#' + $this.attr('id'));
     }
   });  
 
-  $('body').on('mouseleave', '.widget', function(e) {
+  $('body').on('deactivate', '.widget', function(e) {
     var $this = $(this)
+    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
     ;
     if( $this.hasClass("widget-active") ) {
       $this.removeClass("widget-active");
     }
-  });  
-
-  
+  });    
   
 });
 

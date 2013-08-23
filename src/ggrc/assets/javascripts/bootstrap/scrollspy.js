@@ -70,7 +70,7 @@
       }
 
     , process: function () {
-        if (this.activating) {
+        if (this.activating || this.activeTarget) {
           return;
         }
 
@@ -103,6 +103,10 @@
         var self = this
           , active
           , selector
+
+        if (target !== this.activeTarget && this.activeTarget) {
+          $(this.activeTarget).trigger('deactivate');
+        }
 
         this.activeTarget = target
 

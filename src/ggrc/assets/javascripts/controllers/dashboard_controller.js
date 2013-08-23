@@ -353,6 +353,20 @@ can.Control("CMS.Controllers.InnerNav", {
       can.view(this.options.internav_view, this.options, function(frag) {
         that.element.append(frag);
         that.update_scrollspy();
+
+        // Update scrollspy as scrollable content changes
+        var $body = $(".object-area")
+          , lastHeight = 0
+          ;
+        if ($body[0] && $body.data('scrollspy')) {
+          lastHeight = $body[0].scrollHeight;
+          setInterval(function() {
+            if ($body[0] && $body[0].scrollHeight !== lastHeight) {
+              lastHeight = $body[0].scrollHeight;
+              that.update_scrollspy();
+            }
+          }, 100);
+        }
       });
     }
 
@@ -438,10 +452,10 @@ can.Control("CMS.Controllers.InnerNav", {
       if (!$body.data("scrollspy"))
         return
 
+      $body.data('scrollspy').activeTarget = null;
       $body
-        .scrollspy("activate", null)
-        .scrollspy("refresh")
-        .scrollspy("process")
+        .scrollspy('refresh')
+        .scrollspy('process');
     }
 
   , update_widget_list : function(widget_elements) {
