@@ -364,7 +364,7 @@ can.Control("CMS.Controllers.TreeView", {
 
   , " updateCount": function(el, ev) {
       // Suppress events from sub-trees
-      if (!(el.closest('.' + this.constructor._fullName).is(this.element)))
+      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element)))
         ev.stopPropagation();
     }
 

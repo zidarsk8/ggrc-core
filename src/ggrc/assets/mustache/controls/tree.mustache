@@ -26,6 +26,8 @@
         </div>
       </a>
     </div>
+
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
         <div class="row-fluid">
@@ -106,6 +108,7 @@
       {{/if}}
 
     </div>
+    {{/if}}
   </li>
 {{/list}}
 {{#if allow_mapping_or_creating}}
