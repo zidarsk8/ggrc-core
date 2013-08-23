@@ -282,6 +282,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Program", "Control", "ProgramControl", "control", "program"]
       , ["Control", "Section", "ControlSection", "section", "control"]
       , ["Section", "Control", "ControlSection", "control", "section"]
+      , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
+      , ["Objective", "Control", "ObjectiveControl", "control", "objective"]
       //, ["System", "System", "SystemSystem", "child", "parent"]
       //, ["System", "Process", "SystemSystem", "child", "parent"]
       //, ["Process", "System", "SystemSystem", "child", "parent"]

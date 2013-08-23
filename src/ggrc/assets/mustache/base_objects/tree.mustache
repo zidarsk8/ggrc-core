@@ -29,6 +29,8 @@
         </div>
       </a>
     </div>
+
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
@@ -94,16 +96,19 @@
           {{/instance.url}}
         </div>
       </div>
+
+      {{#if draw_children}}
+        {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+            {{#child_options}}
+              <div class="inner-tree">
+                <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
+                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              </div>
+            {{/child_options}}
+        {{/if_null}}
+      {{/if}}
+
     </div>
-    {{#if draw_children}}
-      {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-          {{#child_options}}
-            <div class="inner-tree">
-              <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-            </div>
-          {{/child_options}}
-      {{/if_null}}
     {{/if}}
   </li>
 {{/list}}
