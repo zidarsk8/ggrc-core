@@ -64,6 +64,13 @@ $(function() {
     // or to prevent creating People widget on Objective page:
     //     { Objective: { Person: false } }
     , overridden_models = {
+          Program: {
+              Objective: false
+            , Control: false
+            , Regulation: false
+            , Policy: false
+            , Contract: false
+          }
       }
     ;
 
@@ -73,7 +80,7 @@ $(function() {
           && !overridden_models[model_name])
         || (overridden_models[object.constructor.shortName]
             && overridden_models[object.constructor.shortName].hasOwnProperty(model_name)
-            && !overridden_[object.constructor.shortName][model_name]))
+            && !overridden_models[object.constructor.shortName][model_name]))
       return;
 
     join_descriptor = join_descriptor[0];
