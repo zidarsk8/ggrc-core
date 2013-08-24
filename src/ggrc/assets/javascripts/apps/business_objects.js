@@ -48,19 +48,32 @@ $(function() {
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
     , model_default_widgets = []
-    , overridden_models = {
-      //  Person: true
-      //, Document: true
+    , extra_descriptor_options = {
+          all: {
+              Person: {
+                  widget_icon: 'grcicon-user-black'
+              }
+            , Document: {
+                  widget_icon: 'grcicon-link'
+              }
+          }
       }
-    , overridden_pairs = {
-        Objective: {}
+    // Prevent widget creation with <model_name>: false
+    // e.g. to prevent ever creating People widget:
+    //     { Person: false }
+    // or to prevent creating People widget on Objective page:
+    //     { Objective: { Person: false } }
+    , overridden_models = {
       }
     ;
 
   can.each(far_models, function(join_descriptor, model_name) {
-    if (overridden_models[model_name]
-        || (overridden_pairs[object.constructor.shortName]
-            && overridden_pairs[object.constructor.shortName][model_name]))
+    if ((overridden_models.all
+          && overridden_models.all.hasOwnProperty(model_name)
+          && !overridden_models[model_name])
+        || (overridden_models[object.constructor.shortName]
+            && overridden_models[object.constructor.shortName].hasOwnProperty(model_name)
+            && !overridden_[object.constructor.shortName][model_name]))
       return;
 
     join_descriptor = join_descriptor[0];
@@ -101,6 +114,21 @@ $(function() {
             }
         }
       ;
+
+    // Custom overrides
+    if (extra_descriptor_options.all
+        && extra_descriptor_options.all[model_name]) {
+      can.extend(
+          descriptor,
+          extra_descriptor_options.all[model_name]);
+    }
+
+    if (extra_descriptor_options[object.constructor.shortName]
+        && extra_descriptor_options[object.constructor.shortName][model_name]) {
+      can.extend(
+          descriptor,
+          extra_descriptor_options[object.constructor.shortName][model_name]);
+    }
 
     if (!list_loader)
       return;
