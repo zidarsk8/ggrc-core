@@ -36,24 +36,24 @@
 
         <div class="row-fluid">
 
-          {{#if instance.viewLink}}
           <div class="span6">
+          {{#if instance.viewLink}}
             <a href="{{instance.viewLink}}" class="info-action">
               View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
-          </div>
           {{/if}}
+          </div>
 
-          {{#if mappings}}
           <div class="span6">
+          {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
-          </div>
           {{/if}}
+          </div>
 
         </div>
 
