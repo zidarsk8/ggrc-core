@@ -293,7 +293,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
-      , ["Objective", "Section", "SectionObjective", "section", "objective"]
+      //, ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
       , [all_object_types,
