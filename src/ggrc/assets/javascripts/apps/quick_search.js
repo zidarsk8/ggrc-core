@@ -79,7 +79,7 @@ var RELATIONSHIP_TYPES = {
     , "Product": ["project_targets_product"]
     , "Project": ["project_relies_upon_project"]
     , "Program": []
-  }, "Risk": {
+  }, /*"Risk": {
     "DataAsset": ["risk_is_a_threat_to_data_asset"]
     , "Facility": ["risk_is_a_threat_to_facility"]
     , "Market": ["risk_is_a_threat_to_market"]
@@ -89,7 +89,7 @@ var RELATIONSHIP_TYPES = {
     , "Project": ["risk_is_a_threat_to_project"]
     , "System": ["risk_is_a_threat_to_system"]
     , "Program": []
-  }, "System": {
+  },*/ "System": {
       "System": []
     , "Process": []
     , "DataAsset": []

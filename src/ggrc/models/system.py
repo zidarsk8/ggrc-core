@@ -38,8 +38,8 @@ class SystemOrProcess(
   # TODO: handle option
   network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
 
-  system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
-  controls = association_proxy('system_controls', 'control', 'SystemControl')
+  #system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
+  #controls = association_proxy('system_controls', 'control', 'SystemControl')
   responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')
   #TODO What about system_section?
   sub_system_systems = db.relationship(
@@ -75,8 +75,8 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'system_controls',
-      'controls',
+      #'system_controls',
+      #'controls',
       'responses',
       'owner',
       'sub_system_systems',
@@ -91,7 +91,7 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'controls',
+      #'controls',
       'responses',
       'owner',
       'sub_systems',
@@ -117,14 +117,14 @@ class SystemOrProcess(
         orm.joinedload('type'),
         orm.joinedload('network_zone'),
         orm.joinedload('responses'),
-        orm.joinedload_all('system_controls.control'),
+        #orm.joinedload_all('system_controls.control'),
         orm.joinedload_all('sub_system_systems.child'),
         orm.joinedload_all('super_system_systems.parent'))
 
 
 # Not 'Controllable', since system_controls is used instead
 class System(
-    Documentable, Personable, Objectiveable, Sectionable,
+    Documentable, Personable, Objectiveable, Controllable, Sectionable,
     SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
@@ -137,7 +137,7 @@ class System(
 
 
 class Process(
-    Documentable, Personable, Objectiveable, Sectionable,
+    Documentable, Personable, Objectiveable, Controllable, Sectionable,
     SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
