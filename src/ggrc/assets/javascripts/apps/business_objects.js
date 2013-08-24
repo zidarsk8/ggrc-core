@@ -44,100 +44,73 @@ $(function() {
   GGRC.extra_widget_descriptors.info = info_widget_descriptors.info;
   GGRC.extra_default_widgets.splice(0, 0, 'info');
 
-  var queue = new RefreshQueue()
-  , queue_dfd;
-
-  can.each(object.object_people, can.proxy(queue, "enqueue"));
-  can.each(object.object_documents, can.proxy(queue, "enqueue"));
-  queue_dfd = queue.trigger();
-
-  var business_object_widget_descriptors = {
-      people: {
-          widget_id: "people"
-        , widget_name: "Mapped People"
-        , widget_icon: "grcicon-user-black"
-        , content_controller: GGRC.Controllers.ListView
-        , content_controller_options: {
-              model : CMS.Models.ObjectPerson
-            , list_loader: function() {
-                return queue_dfd.then(function() { return object.object_people; });
-              }
-            , list_view : GGRC.mustache_path + "/people/list.mustache"
-            , parent_instance : object
-          }
+  var far_models = GGRC.JoinDescriptor
+        .by_object_option_models[object.constructor.shortName]
+    , model_widget_descriptors = {}
+    , model_default_widgets = []
+    , overridden_models = {
+      //  Person: true
+      //, Document: true
       }
-    , documents: {
-          widget_id: "documents"
-        , widget_name: "Reference Links"
-        , widget_icon: "grcicon-link"
-        , content_controller: GGRC.Controllers.ListView
-        , content_controller_options: {
-              model : CMS.Models.ObjectDocument
-            , list_loader: function(){
-                return queue_dfd.then(function() { return object.object_documents; });
-              }
-            , list_view : GGRC.mustache_path + "/documents/list.mustache"
-            , parent_instance : object
-          }
+    , overridden_pairs = {
+        Objective: {}
       }
+    ;
 
-  }
+  can.each(far_models, function(join_descriptor, model_name) {
+    if (overridden_models[model_name]
+        || (overridden_pairs[object.constructor.shortName]
+            && overridden_pairs[object.constructor.shortName][model_name]))
+      return;
 
-  var widget_ids = ['people', 'documents']
+    join_descriptor = join_descriptor[0];
+    var far_model = join_descriptor.get_model(model_name)
+      , list_loader = join_descriptor.get_list_loader(object)
+      , descriptor = {
+            content_controller: CMS.Controllers.TreeView
+          , content_controller_selector: "ul"
+          , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
+          , widget_id: far_model.table_singular
+          , widget_name: function() {
+              var $objectArea = $(".object-area");
+              if ( $objectArea.hasClass("dashboard-area") ) {
+                return far_model.title_plural;
+              } else {
+                return "Mapped " + far_model.title_plural;
+              }
+            }
 
-  $.extend(GGRC.extra_widget_descriptors, business_object_widget_descriptors);
-  GGRC.extra_default_widgets.push.apply(GGRC.extra_default_widgets, widget_ids);
+          , widget_info : function() {
+              var $objectArea = $(".object-area");
+              if ( $objectArea.hasClass("dashboard-area") ) {
+                return ""
+              } else {
+                return "Does not include mappings to Directives, Objectives and Controls"
+              }
+            }
+          , widget_icon: far_model.table_singular
+          , object_category: far_model.category || 'default'
+          , content_controller_options: {
+                child_options: []
+              , draw_children: false
+              , parent_instance: object
+              , model: model_name
+              , list_loader: function() {
+                  return list_loader.refresh_list();
+                }
+            }
+        }
+      ;
 
-
-  if(!~can.inArray(
-    object_class
-    , [CMS.Models.OrgGroup
-      , CMS.Models.Project
-      , CMS.Models.Product
-      , CMS.Models.DataAsset
-      , CMS.Models.Facility
-      , CMS.Models.Market
-      , CMS.Models.Risk]))
-    return;
-
-  var $top_tree = $("#" + object_class.root_object + "_widget .tree-structure").cms_controllers_tree_view({
-    model : object_class
-    , single_object : true
-    , list : [object]
-  }).on("modal:relationshipcreated modal:relationshipdestroyed", "li", function(ev, data) {
-    var tree_obj = $(this).find(".item-main:first").data("model")
-    , other_obj;
-
-    if((other_obj = data.getOtherSide(tree_obj)) != null) {
-      $(this)
-      .find([".tree-structure[data-object-sub-type="
-        , other_obj.constructor.table_singular
-        , "], .tree-structure[data-object-type="
-        , other_obj.constructor.shortName + "], .tree-structure[data-object-meta-type="
-        , other_obj.constructor.root_object
-        , "]"].join(""))
-      .first()
-      .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", other_obj);
-    }
+    if (!list_loader)
+      return;
+    model_widget_descriptors[far_model.table_singular] = descriptor;
+    model_default_widgets.push(far_model.table_singular);
   });
 
-  var $risk_tree = $("#" + object_class.root_object + "_risk_widget .tree-structure").cms_controllers_tree_view({
-    model : object_class
-    , single_object : true
-    , list : [object]
-    , options_property : "risk_tree_options"
-  });
-
-
-  $(document.body).on("modal:success", ".link-objects", function(ev, data) {
-    $top_tree.trigger("linkObject", $.extend($(this).data(), {
-      parentId : object.id
-      , data : data
-    }));
-
-  });
-
-
+  can.extend(GGRC.extra_widget_descriptors, model_widget_descriptors);
+  GGRC.extra_default_widgets.push.apply(
+      GGRC.extra_default_widgets, model_default_widgets);
 });
 
 })(window.can, window.can.$);

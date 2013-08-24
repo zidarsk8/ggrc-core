@@ -98,7 +98,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
             top: '50px'
           }));
       new this.options.content_controller(
-          controller_content//this.element.find(this.options.content_selector)
+          controller_content
         , this.options.content_controller_options
       );
     }

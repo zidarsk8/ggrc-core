@@ -251,54 +251,12 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
     init: function() {
       this.options.model = this.options.instance.constructor;
       this._super();
-      this.init_related_widgets();
-    }
-
-  , init_related_widgets: function() {
-      var that = this
-        , model_name = this.options.instance.constructor.shortName
-        , relationships = GGRC.RELATIONSHIP_TYPES[model_name]
-        ;
-
-      can.each(relationships, function(value, key) {
-        var related_model = CMS.Models[key]
-          , descriptor = that.options.widget_descriptors[related_model.table_singular]
-          ;
-
-        that.add_dashboard_widget_from_descriptor(descriptor);
-      });
     }
 
   , init_widget_descriptors: function() {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-
-      can.each(this.options.model_descriptors, function(descriptor, key) {
-        that.options.widget_descriptors[key] =
-          that.make_related_descriptor_from_model_descriptor(descriptor);
-      });
-    }
-
-  , make_related_descriptor_from_model_descriptor: function(descriptor) {
-      var parent_instance = GGRC.make_model_instance(GGRC.page_object)
-        , object_type = descriptor.model.shortName
-        , list_loader = new GGRC.ListLoaders.RelatedListLoader(
-              parent_instance, object_type)
-        ;
-
-      descriptor = this.make_tree_view_descriptor_from_model_descriptor(descriptor);
-      descriptor = $.extend({}, descriptor);
-      descriptor.content_controller_options =
-        $.extend({}, descriptor.content_controller_options);
-      descriptor.content_controller_options.child_options = [];
-      descriptor.content_controller_options.draw_children = false;
-      descriptor.content_controller_options.parent_instance = parent_instance;
-      descriptor.content_controller_options.model = object_type;
-      descriptor.content_controller_options.list_loader = function() {
-        return list_loader.refresh_list();
-      };
-      return descriptor;
     }
 
   , init_menu_tree: function() {

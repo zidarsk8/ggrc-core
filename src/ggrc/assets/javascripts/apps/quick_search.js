@@ -242,6 +242,21 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
         return new join_model(join_attrs);
       }
+
+    , get_list_loader: function(object) {
+        if (this.options.join_model_name === 'Relationship')
+          return new GGRC.ListLoaders.RelatedListLoader(
+              object, this.options.option_model_name);
+        else
+          return new GGRC.ListLoaders.ProxyListLoader(
+              object,
+              this.options.join_model_name,
+              this.options.join_object_attr,
+              this.options.join_option_attr,
+              this.options.object_join_attr,
+              this.options.option_model_name);
+      }
+
   });
 
   business_minus_system_object_types = [
