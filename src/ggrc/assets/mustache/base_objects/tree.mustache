@@ -148,20 +148,6 @@
         + Object
       </a>
       {{/if}}
-      &nbsp;
-      &nbsp;
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="{{parent_instance.viewLink}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Import Objects
-        </a>
-        &nbsp;
-        &nbsp;
-        <a href="{{parent_instance.viewLink}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Export Objects
-        </a>
-      {{/if_match}}
     </div>
   </div>
 </li>

@@ -61,18 +61,30 @@
     {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        
-        {{#edit_sections}}
-          <div class="row-fluid">
-            <div class="span12">
+
+        <div class="row-fluid">
+
+          <div class="span6">
+            {{#edit_sections}}
               <a href="javascript://" class="info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
                 Edit Section
               </a>
-            </div>
+            {{/edit_sections}}
           </div>
-        {{/edit_sections}}
-        
+
+          <div class="span6">
+          {{#if mappings}}
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
+              <i class="grcicon-remove"></i>
+              {{unmap_or_delete instance mappings}}
+            </a>
+          {{/if}}
+          </div>
+
+        </div>
+
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
@@ -103,6 +115,7 @@
     {{/if}}
   </li>
 {{/list}}
+
 {{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">

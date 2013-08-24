@@ -247,6 +247,11 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
         if (this.options.join_model_name === 'Relationship')
           return new GGRC.ListLoaders.RelatedListLoader(
               object, this.options.option_model_name);
+        else if (!this.options.join_model_name) // join_model_name === option_model_name
+          return new GGRC.ListLoaders.DirectListLoader(
+              object,
+              this.options.option_model_name,
+              this.options.join_object_attr);
         else
           return new GGRC.ListLoaders.ProxyListLoader(
               object,
@@ -307,6 +312,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
+      , [directive_object_types, "Section", null, null, "directive"]
+      , [directive_object_types, "Control", null, null, "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
       //, ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]

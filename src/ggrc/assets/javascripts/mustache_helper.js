@@ -904,4 +904,18 @@ Mustache.registerHelper("using", function(args, options) {
   return defer_render('span', finish, refresh_queue.trigger());
 });
 
+Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
+  if (can.isFunction(instance))
+    instance = instance();
+  if (can.isFunction(mappings))
+    mappings = mappings();
+  if (mappings.indexOf(instance) > -1) {
+    if (mappings.length == 1)
+      return "Delete"
+    else
+      return "Unmap and Delete"
+  } else
+    return "Unmap"
+});
+
 })(this, jQuery, can);

@@ -104,7 +104,8 @@ can.Model.Cacheable("CMS.Models.Control", {
     }
 
   , tree_view_options : {
-    draw_children : true
+      list_view : GGRC.mustache_path + "/controls/tree.mustache"
+    , draw_children : true
     , child_options : [{
     /*    model : "Section"
       , property : "section_mappings"

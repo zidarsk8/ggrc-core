@@ -175,6 +175,95 @@ GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.ProxyListLoader", {
     }
 });
 
+
+GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.DirectListLoader", {
+}, {
+    init: function(parent_instance, model_name, object_attr) {
+      this._super();
+
+      this.parent_instance = parent_instance;
+
+      this.model_name = model_name;
+      this.object_attr = object_attr;
+
+      this.object_type = this.parent_instance.constructor.shortName;
+
+      this.init_bindings();
+    }
+
+  , init_bindings: function() {
+      var self = this
+        , model = CMS.Models[this.model_name]
+        ;
+
+      model.bind("created", function(ev, mapping) {
+        self.refresh_queue = new RefreshQueue();
+        self.insert_instance_from_mapping(mapping);
+        self.refresh_queue.trigger();
+      });
+
+      model.bind("destroyed", function(ev, mapping) {
+        self.remove_instance_from_mapping(mapping);
+      });
+    }
+
+  , is_valid_mapping: function(mapping) {
+      var model = CMS.Models[this.model_name]
+        , object_model = this.parent_instance.constructor
+        ;
+
+      return (mapping.constructor === model
+              && (mapping[this.object_attr] === this.parent_instance
+                  || (mapping[this.object_attr].constructor == object_model &&
+                      mapping[this.object_attr].id == this.parent_instance.id)));
+    }
+
+  , get_instance_from_mapping: function(mapping) {
+      return mapping;
+    }
+
+  , insert_instances_from_mappings: function(mappings) {
+      can.each(mappings.reverse(), this.proxy("insert_instance_from_mapping"));
+      return mappings;
+    }
+
+  , insert_instance_from_mapping: function(mapping) {
+      var instance;
+      if (this.is_valid_mapping(mapping)) {
+        instance = this.get_instance_from_mapping(mapping);
+        if (instance)
+          this.insert_instance(instance, mapping);
+      }
+    }
+
+  , remove_instance_from_mapping: function(mapping) {
+      var instance;
+      if (this.is_valid_mapping(mapping)) {
+        instance = this.get_instance_from_mapping(mapping);
+        if (instance)
+          this.remove_instance(instance, mapping);
+      }
+    }
+
+  , refresh_list: function() {
+      var self = this
+        , model = CMS.Models[this.model_name]
+        , refresh_queue = new RefreshQueue()
+        , object_join_attr = this.object_join_attr || model.table_plural
+        ;
+
+      can.each(this.parent_instance[object_join_attr], function(mapping) {
+        refresh_queue.enqueue(mapping);
+      });
+
+      return refresh_queue.trigger()
+        .then(this.proxy("insert_instances_from_mappings"))
+        .then(function() { return self.refresh_queue.trigger(); })
+        .then(function() { return self.list; });
+    }
+});
+
+
 GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.RelatedListLoader", {
     init_relationships: function(parent_instance) {
       var parent_id = parent_instance.id

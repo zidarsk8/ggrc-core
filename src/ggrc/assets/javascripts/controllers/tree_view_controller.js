@@ -26,8 +26,7 @@ can.Control("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
-    , list_view : "/static/mustache/controls/tree.mustache"
-    , show_view : "/static/mustache/controls/show.mustache"
+    , list_view : "/static/mustache/base_objects/tree.mustache"
     , parent : null
     , list : null
     , single_object : false
