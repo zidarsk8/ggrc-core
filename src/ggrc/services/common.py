@@ -19,6 +19,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
+from ggrc.models.exceptions import ValidationError
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 import sqlalchemy.orm.exc
@@ -350,7 +351,7 @@ class Resource(ModelView):
       raise Forbidden()
     try:
       self.json_update(obj, src)
-    except ValueError, v:
+    except ValidationError, v:
       current_app.logger.warn(v)
       return ((str(v), 403, []))
 
@@ -451,7 +452,11 @@ class Resource(ModelView):
       if not permissions.is_allowed_create(
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
-    self.json_create(obj, src)
+    try:
+      self.json_create(obj, src)
+    except ValidationError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
