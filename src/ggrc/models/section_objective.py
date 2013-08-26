@@ -9,8 +9,8 @@ from .mixins import Base
 class SectionObjective(Base, db.Model):
   __tablename__ = 'section_objectives'
 
-  section_id = db.Column(db.Integer, db.ForeignKey('sections.id'))
-  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'))
+  section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable=False)
+  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
 
   _publish_attrs = [
       'section',
@@ -25,3 +25,6 @@ class SectionObjective(Base, db.Model):
     return query.options(
         orm.subqueryload('section'),
         orm.subqueryload('objective'))
+
+  def _display_name(self):
+    return self.section.display_name + '<->' + self.objective.display_name
