@@ -296,7 +296,7 @@ class BooleanColumnHandler(ColumnHandler):
       elif value.lower() in no_values:
         return False
       else:
-        self.warnings.append('bad value')
+        self.add_error('bad value')
         return None
     return None
 
@@ -304,7 +304,12 @@ class BooleanColumnHandler(ColumnHandler):
     if self.value is None:
       return self.original
     else:
-      return str(self.value)
+      if self.value is True:
+        return "Yes"
+      elif self.value is False:
+        return "No"
+      else:
+        return str(self.value) # unknown value - shouldn't happen
 
 class DateColumnHandler(ColumnHandler):
 
