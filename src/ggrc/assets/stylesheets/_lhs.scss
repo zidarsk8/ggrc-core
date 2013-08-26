@@ -391,7 +391,6 @@
     display : none;
   }
   &.in {
-    @include opacity(0.95);
     display : block;
   }
   span.error {
