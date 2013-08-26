@@ -50,6 +50,7 @@
 
         this.offsets = $([])
         this.targets = $([])
+        this.prevHeight = this.$scrollElement[0].scrollHeight;
 
         $targets = this.$body
           .find(this.selector)
@@ -69,6 +70,15 @@
       }
 
     , process: function () {
+        if (this.activating || this.activeTarget) {
+          return;
+        }
+
+        // Refresh if content changed
+        if (!this.prevHeight || this.prevHeight !== this.$scrollElement[0].scrollHeight) {
+          this.refresh();
+        }
+
         var scrollTop = this.$scrollElement.scrollTop() + this.options.offset
           , scrollHeight = this.$scrollElement[0].scrollHeight || this.$body[0].scrollHeight
           , maxScroll = scrollHeight - this.$scrollElement.height()
@@ -77,24 +87,34 @@
           , activeTarget = this.activeTarget
           , i
 
+        for (i = 0; i < offsets.length; i++) {
+          if (scrollTop >= offsets[i] && (!offsets[i + 1] || scrollTop <= offsets[i + 1])) {
+            return this.activate( targets[i] )
+          }
+        }
+
         if (scrollTop >= maxScroll) {
           return activeTarget != (i = targets.last()[0])
             && this.activate ( i )
         }
-
-        for (i = offsets.length; i--;) {
-          activeTarget != targets[i]
-            && scrollTop >= offsets[i]
-            && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
-            && this.activate( targets[i] )
-        }
       }
 
     , activate: function (target) {
-        var active
+        var self = this
+          , active
           , selector
 
+        if (target !== this.activeTarget && this.activeTarget) {
+          $(this.activeTarget).trigger('deactivate');
+        }
+
         this.activeTarget = target
+
+        // Give activating a buffer before processing
+        this.activating = true;
+        setTimeout(function() {
+          self.activating = false;
+        }, 100);
 
         $(this.selector)
           .parent('.active')
@@ -124,12 +144,13 @@
   var old = $.fn.scrollspy
 
   $.fn.scrollspy = function (option) {
+    var args = Array.prototype.slice.call(arguments, 1);
     return this.each(function () {
       var $this = $(this)
         , data = $this.data('scrollspy')
         , options = typeof option == 'object' && option
       if (!data) $this.data('scrollspy', (data = new ScrollSpy(this, options)))
-      if (typeof option == 'string') data[option]()
+      if (typeof option == 'string') data[option].apply(data, args)
     })
   }
 
