@@ -33,24 +33,7 @@ can.Model.Cacheable("can.Model.Join", {
       this.reinit();
     }
   , reinit : function() {//ev, data) {
-      var self = this
-        ;
-
       this.init_join_objects();
-/*    can.each(this.constructor.join_keys, function(cls, attr_name) {
-      var attr_val = self[attr_name];
-      self.attr(attr_name, CMS.Models.get_instance(
-        attr_val && attr_val.constructor.model_singular ? attr_val.constructor.model_singular : cls.model_singular
-        , self[attr_name + "_id"] || (attr_val && attr_val.id)
-        ));
-
-      self[attr_name] && self[attr_name].refresh();
-    });*/
-
-    this.each(function(value, name) {
-      if (value === null)
-      self.removeAttr(name);
-    });
   }
   , getOtherSide : function(obj) {
     var that = this;
@@ -152,6 +135,10 @@ can.Model.Join("CMS.Models.Relationship", {
     source : can.Model.Cacheable
     , destination : can.Model.Cacheable
   }
+  , defaults : {
+      source : null
+    , destination : null
+  }
   , findAll: "GET /api/relationships"
   , create: "POST /api/relationships"
   , destroy: "DELETE /api/relationships/{id}"
@@ -176,11 +163,6 @@ can.Model.Join("CMS.Models.Relationship", {
                 || (!this.source.selfLink && this.destination.type)))
       , this.destination_id || (this.destination && this.destination.id)
       , this.destination) || this.destination);
-
-    this.each(function(value, name) {
-      if (value === null)
-      that.removeAttr(name);
-    });
   }
 });
 
