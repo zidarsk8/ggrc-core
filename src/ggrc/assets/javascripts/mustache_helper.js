@@ -918,4 +918,8 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap"
 });
 
+Mustache.registerHelper("date", function(date) {
+  return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
+});
+
 })(this, jQuery, can);
