@@ -13,8 +13,7 @@ ul.new-tree {
     &.active {
       font-weight:bold;
       .row-fluid {
-        background:$white image-url("bgnds/hover.png") no-repeat 50% bottom;
-        @include background-size(30px 6px);
+        background:$white;
       }
     }
     
