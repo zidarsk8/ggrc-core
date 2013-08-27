@@ -52,8 +52,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     .html($(new Spinner().spin().el).css({
         width: '100px',
         height: '100px',
-        left: '50px',
-        top: '50px'
+        left: '0px',
+        top: '10px'
         }))
     .trigger("section_created");
 
@@ -95,7 +95,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
             width: '100px',
             height: '100px',
             left: '50px',
-            top: '50px'
+            top: '40px'
           }));
       new this.options.content_controller(
           controller_content

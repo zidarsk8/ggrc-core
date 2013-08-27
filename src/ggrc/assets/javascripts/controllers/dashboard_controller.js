@@ -423,8 +423,16 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , update_widget_list : function(widget_elements) {
-      this.replace_widget_list(widget_elements);
-      this.update_scrollspy();
+      var that = this;
+
+      if (this._update_timeout)
+        return;
+
+      this._update_timeout = setTimeout(function() {
+        that.replace_widget_list(widget_elements);
+        that.update_scrollspy();
+        that._update_timeout = null;
+      }, 100);
     }
 
 });
