@@ -132,8 +132,8 @@ dashboard-js-template-files:
   - people/active_column.mustache
   - people/list.mustache
   - people/modal_content.mustache
-  - people/multitype_option_column.mustache
   - people/multitype_option_detail.mustache
+  - people/multitype_option_items.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/tree.mustache
@@ -154,8 +154,9 @@ dashboard-js-template-files:
   - selectors/base_modal.mustache
   - selectors/multitype_base_modal.mustache
   - selectors/multitype_object_detail.mustache
-  - selectors/multitype_option_detail.mustache
   - selectors/multitype_option_column.mustache
+  - selectors/multitype_option_detail.mustache
+  - selectors/multitype_option_items.mustache
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
   - systems/modal_content.mustache
