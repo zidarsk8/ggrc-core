@@ -754,7 +754,7 @@ function resize_areas() {
 
 jQuery(function($) {
 
-  $('body').on('mouseover', '.section-add', function(e) {
+  $('body').on('mouseenter', '.section-add', function(e) {
     var $this = $(this)
       , $createLink = $this.closest('div').find('.section-create')
       , $importLink = $this.closest('div').find('.section-import')
@@ -774,7 +774,7 @@ jQuery(function($) {
 
   // activate widget from object nav
   
-  $('body').on('mouseover', 'ul.internav li a', function(e) {
+  $('body').on('mouseenter', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
@@ -785,34 +785,45 @@ jQuery(function($) {
     }
   });  
 
-  $('body').on('mouseout', 'ul.internav li a', function(e) {
+  $('body').on('mouseleave', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
     ;
     
-    if( $targetWidget.hasClass("widget-active") ) {
+    if( $targetWidget.hasClass("widget-active") && $(".object-area").data('scrollspy').activeTarget !== $widgetID ) {
       $targetWidget.removeClass("widget-active");
     }
   });  
 
-  $('body').on('mouseover', '.widget', function(e) {
+  $('body').on('click', 'ul.internav li a', function(e) {
     var $this = $(this)
+    ,   $widgetID = $this.attr("href") 
+    ,   $targetWidget = $($widgetID)
+    ;
+    
+    $targetWidget.addClass("widget-active");
+    $(".object-area").scrollspy('activate', $widgetID);
+  });    
+
+  $('body').on('mouseenter', '.widget', function(e) {
+    var $this = $(this)
+    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
     ;
     if( ! $this.hasClass("widget-active") ) {
       $this.addClass("widget-active");
+      $('.object-area').scrollspy('activate', '#' + $this.attr('id'));
     }
   });  
 
-  $('body').on('mouseout', '.widget', function(e) {
+  $('body').on('deactivate', '.widget', function(e) {
     var $this = $(this)
+    ,   $navitem = $('[href=#' + $this.attr('id') + ']').closest('li')
     ;
     if( $this.hasClass("widget-active") ) {
       $this.removeClass("widget-active");
     }
-  });  
-
-  
+  });    
   
 });
 

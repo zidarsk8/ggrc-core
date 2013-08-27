@@ -70,6 +70,7 @@
       @include background-size(368px 416px);
       background-position:-268px -195px;
       padding-left: 23px;
+      font-size:12px;
       
     }
   }
@@ -390,7 +391,6 @@
     display : none;
   }
   &.in {
-    @include opacity(0.95);
     display : block;
   }
   span.error {
