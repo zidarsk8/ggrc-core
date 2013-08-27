@@ -9,8 +9,12 @@ from .mixins import Base
 class ObjectiveControl(Base, db.Model):
   __tablename__ = 'objective_controls'
 
-  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'))
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
+  __table_args__ = (
+    db.UniqueConstraint('objective_id', 'control_id'),
+  )
+
+  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable = False)
+  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable = False)
 
   _publish_attrs = [
       'objective',
