@@ -33,7 +33,6 @@ Feature: Many resources type pairs reference each other M x N relations. This
       | type_a    | link_property_a      | type_b    | link_property_b       |
      #| Control   | documents            | Document  | FIXME no property??   |
      #| Control   | people               | Person    | ??                    |
-      | Control   | systems              | System    | controls              |
       | Control   | sections             | Section   | controls              |
       | Control   | implemented_controls | Control   | implementing_controls |
       | Control   | risks                | Risk      | controls              |
@@ -45,10 +44,6 @@ Feature: Many resources type pairs reference each other M x N relations. This
       | Section   | objectives           | Objective | sections              |
       | Objective | controls             | Control   | objectives            |
       | Objective | sections             | Section   | objectives            |
-      | System    | sub_systems          | System    | super_systems         |
-      | System    | sub_systems          | Process   | super_systems         |
-      | Process   | sub_systems          | System    | super_systems         |
-      | Process   | sub_systems          | Process   | super_systems         |
 
   Scenario Outline: Update of M x N relationships
     Given a new "<source>" named "source_a"

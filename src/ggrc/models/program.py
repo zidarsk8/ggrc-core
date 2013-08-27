@@ -10,9 +10,10 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
 from .reflection import PublishOnly
+from .relationship import Relatable
 
 class Program(
-    Documentable, Personable, Objectiveable,
+    Documentable, Personable, Objectiveable, Relatable,
     BusinessObject, Timeboxed, db.Model):
   __tablename__ = 'programs'
 

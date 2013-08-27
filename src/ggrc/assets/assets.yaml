@@ -25,6 +25,7 @@ dashboard-js-files:
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.3.0_rc2.js
   - bootstrap-wysihtml5-0.0.2.js
+  - moment.js
   - application.js
   - fastfix.js
   - related_selector.js
@@ -63,7 +64,6 @@ dashboard-js-files:
   - controllers/modal_selector_controller.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js
-  - apps/directives.js
   - sections/sections_controller.js
   - apps/mapping.js
   - pbc/population_sample.js
@@ -132,8 +132,8 @@ dashboard-js-template-files:
   - people/active_column.mustache
   - people/list.mustache
   - people/modal_content.mustache
-  - people/multitype_option_column.mustache
   - people/multitype_option_detail.mustache
+  - people/multitype_option_items.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/tree.mustache
@@ -154,8 +154,9 @@ dashboard-js-template-files:
   - selectors/base_modal.mustache
   - selectors/multitype_base_modal.mustache
   - selectors/multitype_object_detail.mustache
-  - selectors/multitype_option_detail.mustache
   - selectors/multitype_option_column.mustache
+  - selectors/multitype_option_detail.mustache
+  - selectors/multitype_option_items.mustache
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
   - systems/modal_content.mustache

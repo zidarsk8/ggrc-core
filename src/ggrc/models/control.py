@@ -73,10 +73,6 @@ class Control(
       'ProgramControl', backref='control', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_controls', 'program', 'ProgramControl')
-  system_controls = db.relationship(
-      'SystemControl', backref='control', cascade='all, delete-orphan')
-  systems = association_proxy(
-      'system_controls', 'system', 'SystemControl')
   control_sections = db.relationship(
       'ControlSection', backref='control', cascade='all, delete-orphan')
   sections = association_proxy(
@@ -129,7 +125,6 @@ class Control(
       'sections',
       'objectives',
       'programs',
-      'systems',
       'type',
       'verify_frequency',
       'version',
@@ -138,7 +133,6 @@ class Control(
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
       #PublishOnly('implementing_control_controls'),
-      PublishOnly('system_controls'),
       PublishOnly('program_controls'),
       'object_controls',
       ]
@@ -167,6 +161,5 @@ class Control(
         orm.joinedload('control_sections'),
         orm.joinedload('objective_controls'),
         orm.joinedload('program_controls'),
-        orm.joinedload('system_controls'),
         orm.joinedload('object_controls'),
         )

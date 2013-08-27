@@ -30,7 +30,7 @@ can.Model("GGRC.Models.Search", {
 
     dfds = can.map(types, function(model_name) {
       // FIXME: This should use __stubs_only=true when paging is used
-      return CMS.Models[model_name].findAll();
+      return CMS.Models[model_name].findAll({ __stubs_only: true });
     });
 
     return $.when.apply($, dfds).then(function() {

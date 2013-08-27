@@ -53,6 +53,9 @@ can.Model.Cacheable("CMS.Models.Person", {
       });
       return result;
     }
+  , tree_view_options: {
+        list_view: GGRC.mustache_path + "/people/tree.mustache"
+    }
 }, {
     init : function () {
         this._super && this._super();

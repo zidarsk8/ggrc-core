@@ -8,9 +8,10 @@ from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject
 from .object_document import Documentable
 from .object_person import Personable
+from .object_objective import Objectiveable
 from .reflection import PublishOnly
 
-class Objective(Documentable, Personable, BusinessObject, db.Model):
+class Objective(Objectiveable, Documentable, Personable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
 
   notes = deferred(db.Column(db.Text), 'Objective')
@@ -23,7 +24,7 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
       'ObjectiveControl', backref='objective', cascade='all, delete-orphan')
   controls = association_proxy(
       'objective_controls', 'control', 'ObjectiveControl')
-  object_objectives = db.relationship(
+  objective_objects = db.relationship(
       'ObjectObjective', backref='objective', cascade='all, delete-orphan')
 
   _publish_attrs = [
@@ -32,7 +33,8 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
       'sections',
       PublishOnly('objective_controls'),
       'controls',
-      'object_objectives',
+      #'object_objectives',
+      'objective_objects',
       ]
   _sanitize_html = [
       'notes',
@@ -46,4 +48,4 @@ class Objective(Documentable, Personable, BusinessObject, db.Model):
     return query.options(
         orm.subqueryload_all('section_objectives.section'),
         orm.subqueryload_all('objective_controls.control'),
-        orm.subqueryload_all('object_objectives'))
+        orm.subqueryload_all('objective_objects'))

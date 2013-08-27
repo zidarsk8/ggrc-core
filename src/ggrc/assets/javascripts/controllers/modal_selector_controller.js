@@ -752,6 +752,7 @@
           option_type_menu: null
         , option_descriptors: null
         , base_modal_view: "/static/mustache/selectors/multitype_base_modal.mustache"
+        , option_items_view: "/static/mustache/selectors/multitype_option_items.mustache"
         , object_detail_view: "/static/mustache/selectors/multitype_object_detail.mustache"
         , option_type: null
         , option_model: null
@@ -834,11 +835,18 @@
 
     , init_context: function() {
         if (!this.context) {
+          // Calculate the total number of options
+          var option_type_count = 0;
+          if (this.options.option_type_menu) {
+            can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+          }
+
           this.context = new can.Observe($.extend({
             objects: this.object_list,
             options: this.option_list,
             joins: this.options.join_list,
             actives: this.active_list,
+            option_type_count: this.options.option_type_menu ? option_type_count : null,
             selected_object: null,
             selected_option_type: null,
             selected_option: null,
@@ -849,12 +857,50 @@
 
     , refresh_option_list: function() {
         var self = this
+          , visible_options
+          , current_option_model = this.options.option_model
+          , current_option_model_name = current_option_model.shortName
+          , current_search_term = this.options.option_search_term
+          , $option_list = this.element.find('.option_column ul')
           ;
 
-        return this.options.option_model.findAll(
-          $.extend({}, this.option_query),
-          function(options) {
-            self.option_list.replace(options)
+        function refresh_up_to(objects, request_limit, render_limit) {
+          var i = 0
+            , count = 0
+            , refresh_queue = new RefreshQueue()
+            ;
+
+          while (i < objects.length && count < request_limit && i < render_limit) {
+            if (!objects[i].selfLink)
+              count++;
+            refresh_queue.enqueue(objects[i]);
+            i++;
+          }
+          refresh_queue.trigger().then(function(options) {
+            if (self.element
+                && self.options.option_model === current_option_model
+                && self.options.option_search_term === current_search_term) {
+              can.view(self.options.option_items_view, { options: options }, function(frag) {
+                self.element && self.element.find('.option_column ul').append(frag);
+              });
+              if (i < objects.length) {
+                setTimeout(function() {
+                  refresh_up_to(objects.slice(i), request_limit, render_limit);
+                }, 100);
+              }
+            }
+          });
+        }
+
+        self.option_list.replace([]);
+        self.element.find('.option_column ul').empty();
+
+        return GGRC.Models.Search
+          .search_for_types(current_search_term || '', [current_option_model_name])
+          .then(function(search_result) {
+            var options = search_result.getResultsForType(current_option_model_name);
+            self.option_list.push.apply(self.option_list, options);
+            return refresh_up_to(options, 50, 50);
           });
       }
 
@@ -872,11 +918,13 @@
         this.context.attr('related_table_plural', descriptor.related_table_plural);
         this.context.attr('related_model_singular', descriptor.related_model_singular);
         this.context.attr('new_object_title', descriptor.new_object_title);
+        this.options.option_items_view = descriptor.items_view;
         this.options.option_model = descriptor.model;
+        this.options.option_search_term = '';
 
-        this.refresh_option_list().always(function() {
-          can.Model.stopBatch();
-        });
+        can.Model.stopBatch();
+
+        this.refresh_option_list();
       }
 
     , on_select_option_type: function(el, ev) {
@@ -994,7 +1042,7 @@
 
   modal_descriptor_view_options = {
     "Person": {
-        column_view : GGRC.mustache_path + "/people/multitype_option_column.mustache"
+        items_view  : GGRC.mustache_path + "/people/multitype_option_items.mustache"
       , detail_view : GGRC.mustache_path + "/people/multitype_option_detail.mustache"
     }
   }
@@ -1036,6 +1084,7 @@
       if (!extra_options)
         extra_options = {
             column_view : GGRC.mustache_path + "/selectors/multitype_option_column.mustache"
+          , items_view  : GGRC.mustache_path + "/selectors/multitype_option_items.mustache"
           , detail_view : GGRC.mustache_path + "/selectors/multitype_option_detail.mustache"
         }
 

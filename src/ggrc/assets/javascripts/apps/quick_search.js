@@ -20,6 +20,9 @@ var RELATIONSHIP_TYPES = {
     , "Product": []
     , "Program": []
     , "Project": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "Facility": {
     "Process": ["facility_has_process"]
     , "DataAsset": ["facility_relies_upon_data_asset"]
@@ -30,6 +33,9 @@ var RELATIONSHIP_TYPES = {
     , "Product": []
     , "Program": []
     , "Project": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "Market": {
     "Process": ["market_has_process"]
     , "Market": ["market_includes_market"]
@@ -40,6 +46,9 @@ var RELATIONSHIP_TYPES = {
     , "Product": []
     , "Program": []
     , "Project": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "OrgGroup": {
       "Process": ["org_group_has_process", "org_group_is_responsible_for_process"]
     , "OrgGroup": ["org_group_is_affiliated_with_org_group", "org_group_is_responsible_for_org_group", "org_group_relies_upon_org_group"]
@@ -50,6 +59,9 @@ var RELATIONSHIP_TYPES = {
     , "Project": ["org_group_is_responsible_for_project"]
     , "System": ["org_group_is_responsible_for_system", "org_group_relies_upon_system"]
     , "Program": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "Product": {
     "Process": ["product_has_process"]
     , "Product": ["product_is_affiliated_with_product", "product_relies_upon_product"]
@@ -60,6 +72,9 @@ var RELATIONSHIP_TYPES = {
     , "OrgGroup": []
     , "Program": []
     , "Project": []
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
   }, "Program": {
     "DataAsset": ["program_applies_to_data_asset"]
     , "Facility": ["program_applies_to_facility"]
@@ -79,7 +94,10 @@ var RELATIONSHIP_TYPES = {
     , "Product": ["project_targets_product"]
     , "Project": ["project_relies_upon_project"]
     , "Program": []
-  }, "Risk": {
+    , "Regulation": []
+    , "Policy" : []
+    , "Contract" : []
+  }, /*"Risk": {
     "DataAsset": ["risk_is_a_threat_to_data_asset"]
     , "Facility": ["risk_is_a_threat_to_facility"]
     , "Market": ["risk_is_a_threat_to_market"]
@@ -89,7 +107,7 @@ var RELATIONSHIP_TYPES = {
     , "Project": ["risk_is_a_threat_to_project"]
     , "System": ["risk_is_a_threat_to_system"]
     , "Program": []
-  }, "System": {
+  },*/ "System": {
       "System": []
     , "Process": []
     , "DataAsset": []
@@ -168,7 +186,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
     , from_arguments: function(
           object_model_name, option_model_name, join_model_name,
-          join_option_attr, join_object_attr, join_options, options) {
+          join_option_attr, join_object_attr, object_join_attr, join_options, options) {
 
         // Create a new subclass of `this`
         return new this($.extend({
@@ -177,6 +195,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           , join_model_name: join_model_name
           , join_option_attr: join_option_attr
           , join_object_attr: join_object_attr
+          , object_join_attr: object_join_attr
           , join_options: join_options || {}
         }, (options || {})), {});
       }
@@ -192,6 +211,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           , option_object_models
           , object_model_name = options.object_model_name
           , option_model_name = options.option_model_name
+          , object_join_attr = options.object_join_attr
           ;
 
         this.options = options;
@@ -242,6 +262,43 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
         return new join_model(join_attrs);
       }
+
+    , get_loader: function() {
+        if (false && this.options.join_model_name === 'Relationship')
+          return new GGRC.ListLoaders.RelatedListLoader(
+              this.options.option_model_name);
+        else if (!this.options.join_model_name) // join_model_name === option_model_name
+          return new GGRC.ListLoaders.DirectListLoader(
+              this.options.option_model_name,
+              this.options.join_object_attr);
+        else
+          return new GGRC.ListLoaders.ProxyListLoader(
+              this.options.join_model_name,
+              this.options.join_object_attr,
+              this.options.join_option_attr,
+              this.options.object_join_attr,
+              this.options.option_model_name);
+      }
+
+    /*, get_list_loader: function(object) {
+        if (false && this.options.join_model_name === 'Relationship')
+          return new GGRC.ListLoaders.RelatedListLoader(
+              object, this.options.option_model_name);
+        else if (!this.options.join_model_name) // join_model_name === option_model_name
+          return new GGRC.ListLoaders.DirectListLoader(
+              object,
+              this.options.option_model_name,
+              this.options.join_object_attr);
+        else
+          return new GGRC.ListLoaders.ProxyListLoader(
+              object,
+              this.options.join_model_name,
+              this.options.join_object_attr,
+              this.options.join_option_attr,
+              this.options.object_join_attr,
+              this.options.option_model_name);
+      }*/
+
   });
 
   business_minus_system_object_types = [
@@ -272,6 +329,10 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "Objective", "ObjectObjective", "objective", "objectiveable"]
       , ["Objective", business_plus_program_object_types,
           "ObjectObjective", "objectiveable", "objective"]
+      , ["Objective", "Objective",
+          "ObjectObjective", "objectiveable", "objective", "objective_objects"]
+      , ["Objective", "Objective",
+          "ObjectObjective", "objective", "objectiveable"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,
@@ -292,6 +353,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
+      , [directive_object_types, "Section", null, null, "directive"]
+      , [directive_object_types, "Control", null, null, "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
       //, ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
@@ -306,22 +369,22 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     can.each(relationship_types, function(source_relationship_types, source_model) {
       can.each(source_relationship_types, function(relationship_type_ids, destination_model) {
         // For now, just ignore types in relationships
-        /*can.each(relationship_type_ids, function(relationship_type_id) {
-          //console.debug(relationship_type_id);
-          relationship_join_descriptor_arguments.push(
-            [source_model, destination_model, "Relationship", "destination", "source",
-              { relationship_type_id: relationship_type_id }]);
-          // Avoid double-adding symmetric relations
-          if (destination_model !== source_model)
-            relationship_join_descriptor_arguments.push(
-              [destination_model, source_model, "Relationship", "source", "destination",
-                { relationship_type_id: relationship_type_id }]);
-        });*/
+        //can.each(relationship_type_ids, function(relationship_type_id) {
+        //  //console.debug(relationship_type_id);
+        //  relationship_join_descriptor_arguments.push(
+        //    [source_model, destination_model, "Relationship", "destination", "source",
+        //      { relationship_type_id: relationship_type_id }]);
+        //  // Avoid double-adding symmetric relations
+        //  if (destination_model !== source_model)
+        //    relationship_join_descriptor_arguments.push(
+        //      [destination_model, source_model, "Relationship", "source", "destination",
+        //        { relationship_type_id: relationship_type_id }]);
+        //});
         relationship_join_descriptor_arguments.push(
-          [destination_model, source_model, "Relationship", "source", "destination"]);
-        if (destination_model != source_model)
-          relationship_join_descriptor_arguments.push(
-            [source_model, destination_model, "Relationship", "destination", "source"]);
+          [destination_model, source_model, "Relationship", "source", "destination", "related_sources"]);
+        //if (destination_model != source_model)
+        relationship_join_descriptor_arguments.push(
+          [source_model, destination_model, "Relationship", "destination", "source", "related_destinations"]);
       });
     });
     return relationship_join_descriptor_arguments;
