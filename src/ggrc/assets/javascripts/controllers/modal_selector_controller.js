@@ -835,11 +835,18 @@
 
     , init_context: function() {
         if (!this.context) {
+          // Calculate the total number of options
+          var option_type_count = 0;
+          if (this.options.option_type_menu) {
+            can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+          }
+
           this.context = new can.Observe($.extend({
             objects: this.object_list,
             options: this.option_list,
             joins: this.options.join_list,
             actives: this.active_list,
+            option_type_count: this.options.option_type_menu ? option_type_count : null,
             selected_object: null,
             selected_option_type: null,
             selected_option: null,
