@@ -14,6 +14,7 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
 from .object_section import Sectionable
+from .relationship import Relatable
 
 CATEGORY_SYSTEM_TYPE_ID = 101
 
@@ -125,7 +126,7 @@ class SystemOrProcess(
 # Not 'Controllable', since system_controls is used instead
 class System(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    SystemOrProcess):
+    Relatable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
       }
@@ -138,7 +139,7 @@ class System(
 
 class Process(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    SystemOrProcess):
+    Relatable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
       }

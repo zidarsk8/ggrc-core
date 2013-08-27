@@ -6,6 +6,7 @@
 import ggrc.models
 from ggrc import db
 from .mixins import deferred, Base, Described
+from sqlalchemy.ext.declarative import declared_attr
 
 class Relationship(Base, db.Model):
   __tablename__ = 'relationships'
@@ -81,3 +82,40 @@ class RelationshipType(Base, Described, db.Model):
       'backward_phrase',
       'symmetric',
       ]
+
+class Relatable(object):
+  @declared_attr
+  def related_sources(cls):
+    joinstr = 'and_(remote(Relationship.destination_id) == {type}.id, '\
+                    'remote(Relationship.destination_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.destination_id',
+        cascade = 'all, delete-orphan')
+
+  @declared_attr
+  def related_destinations(cls):
+    joinstr = 'and_(remote(Relationship.source_id) == {type}.id, '\
+                    'remote(Relationship.source_type) == "{type}")'
+    joinstr = joinstr.format(type=cls.__name__)
+    return db.relationship(
+        'Relationship',
+        primaryjoin=joinstr,
+        foreign_keys = 'Relationship.source_id',
+        cascade = 'all, delete-orphan')
+
+  _publish_attrs = [
+      'related_sources',
+      'related_destinations'
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Relatable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('related_sources'),
+        orm.subqueryload('related_destinations'))
