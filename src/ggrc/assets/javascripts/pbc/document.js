@@ -46,6 +46,9 @@ can.Model.Cacheable("CMS.Models.Document", {
       , kind : "CMS.Models.Option.model"
       , year : "CMS.Models.Option.model"
     }
+  , tree_view_options: {
+        list_view: GGRC.mustache_path + "/documents/tree.mustache"
+    }
   , init : function() {
     this.validatePresenceOf("link");
     this._super.apply(this, arguments);

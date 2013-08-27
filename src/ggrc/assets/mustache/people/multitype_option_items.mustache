@@ -1,0 +1,20 @@
+{{#options}}
+  <li class="tree-item business" {{ data 'option' }} data-id="{{ id }}">
+    <div class="item-main">
+      <div class="simple-link">
+        <div class="row-fluid">
+          <div class="span11">
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{#if name}}{{name}}{{/if}}
+                <span class="url-link">
+                  {{#if email}}{{email}}{{/if}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>
+{{/options}}

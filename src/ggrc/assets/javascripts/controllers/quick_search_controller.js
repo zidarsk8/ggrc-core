@@ -278,8 +278,15 @@ can.Control("CMS.Controllers.LHN_Search", {
         , results_list = this.options.results_lists[model_name]
         ;
 
-      visible_list.replace(results_list.slice(0, visible_list.length * 2));
-  }
+      var refresh_queue = new RefreshQueue()
+        , new_visible_list = results_list.slice(0, visible_list.length * 2);
+      can.each(new_visible_list, function(item) {
+        refresh_queue.enqueue(item);
+      });
+      refresh_queue.trigger().then(function() {
+        visible_list.replace(new_visible_list);
+      });
+    }
 
   , init_object_lists: function() {
       var self = this;
@@ -353,14 +360,18 @@ can.Control("CMS.Controllers.LHN_Search", {
           , model_name = self.get_list_model($list)
           , results = search_result.getResultsForType(model_name)
           , refresh_queue = new RefreshQueue()
+          , initial_visible_list = null;
           ;
 
-        can.each(results, function(obj) { refresh_queue.enqueue(obj); });
+        self.options.results_lists[model_name].replace(results);
+        initial_visible_list =
+          self.options.results_lists[model_name].slice(0, self.options.limit);
+
+        can.each(initial_visible_list, function(obj) {
+          refresh_queue.enqueue(obj);
+        });
         refresh_queue.trigger().then(function(_) {
-          self.options.results_lists[model_name].replace(results);
-          self.options.visible_lists[model_name].replace(
-            self.options.results_lists[model_name]
-              .slice(0, self.options.limit));
+          self.options.visible_lists[model_name].replace(initial_visible_list);
           // Stop spinner when request is complete
           $list.find(self.options.spinner_selector).html("");
         });

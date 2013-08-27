@@ -14,6 +14,7 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
 from .object_section import Sectionable
+from .relationship import Relatable
 
 CATEGORY_SYSTEM_TYPE_ID = 101
 
@@ -38,18 +39,7 @@ class SystemOrProcess(
   # TODO: handle option
   network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
 
-  system_controls = db.relationship('SystemControl', backref='system', cascade='all, delete-orphan')
-  controls = association_proxy('system_controls', 'control', 'SystemControl')
   responses = db.relationship('Response', backref='system', cascade='all, delete-orphan')
-  #TODO What about system_section?
-  sub_system_systems = db.relationship(
-      'SystemSystem', foreign_keys='SystemSystem.parent_id', backref='parent', cascade='all, delete-orphan')
-  sub_systems = association_proxy(
-      'sub_system_systems', 'child', 'SystemSystem')
-  super_system_systems = db.relationship(
-      'SystemSystem', foreign_keys='SystemSystem.child_id', backref='child', cascade='all, delete-orphan')
-  super_systems = association_proxy(
-      'super_system_systems', 'parent', 'SystemSystem')
   type = db.relationship(
       'Option',
       primaryjoin='and_(foreign(SystemOrProcess.type_id) == Option.id, '\
@@ -75,14 +65,8 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'system_controls',
-      'controls',
       'responses',
       'owner',
-      'sub_system_systems',
-      'sub_systems',
-      'super_system_systems',
-      'super_systems',
       ]
   _update_attrs = [
       'infrastructure',
@@ -91,11 +75,8 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'controls',
       'responses',
       'owner',
-      'sub_systems',
-      'super_systems',
       ]
   _sanitize_html = [
       'notes',
@@ -116,16 +97,13 @@ class SystemOrProcess(
     return query.options(
         orm.joinedload('type'),
         orm.joinedload('network_zone'),
-        orm.joinedload('responses'),
-        orm.joinedload_all('system_controls.control'),
-        orm.joinedload_all('sub_system_systems.child'),
-        orm.joinedload_all('super_system_systems.parent'))
+        orm.joinedload('responses'))
 
 
 # Not 'Controllable', since system_controls is used instead
 class System(
-    Documentable, Personable, Objectiveable, Sectionable,
-    SystemOrProcess):
+    Documentable, Personable, Objectiveable, Controllable, Sectionable,
+    Relatable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
       }
@@ -137,8 +115,8 @@ class System(
 
 
 class Process(
-    Documentable, Personable, Objectiveable, Sectionable,
-    SystemOrProcess):
+    Documentable, Personable, Objectiveable, Controllable, Sectionable,
+    Relatable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
       }

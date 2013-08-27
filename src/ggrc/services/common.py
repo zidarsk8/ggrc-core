@@ -488,10 +488,9 @@ class Resource(ModelView):
     json_obj = ggrc.builder.json.publish(obj, properties_to_include or [])
     return { model_name: json_obj }
 
-  def get_properties_to_include(self):
+  def get_properties_to_include(self, inclusions):
     #FIXME This needs to be improved to deal with branching paths... if that's
     #desirable or needed.
-    inclusions = request.args.get('__include')
     if inclusions is not None:
       if len(inclusions) == 0:
         raise BadRequest(
@@ -519,7 +518,8 @@ class Resource(ModelView):
     for object in objects:
       if not stubs:
         object_for_json = ggrc.builder.json.publish(
-            object, self.get_properties_to_include())
+            object,
+            self.get_properties_to_include(request.args.get('__include')))
       else:
         object_for_json = ggrc.builder.json.publish_stub(object)
       objects_json.append(object_for_json)

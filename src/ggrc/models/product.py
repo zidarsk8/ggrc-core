@@ -11,10 +11,11 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
 from .object_section import Sectionable
+from .relationship import Relatable
 
 class Product(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Timeboxed, BusinessObject, db.Model):
+    Relatable, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'products'
 
   type_id = deferred(db.Column(db.Integer), 'Product')

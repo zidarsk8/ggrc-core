@@ -36,24 +36,24 @@
 
         <div class="row-fluid">
 
-          {{#if instance.viewLink}}
           <div class="span6">
+          {{#if instance.viewLink}}
             <a href="{{instance.viewLink}}" class="info-action">
               View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
-          </div>
           {{/if}}
+          </div>
 
-          {{#if mappings}}
           <div class="span6">
+          {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
-          </div>
           {{/if}}
+          </div>
 
         </div>
 
@@ -148,20 +148,6 @@
         + Object
       </a>
       {{/if}}
-      &nbsp;
-      &nbsp;
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="{{parent_instance.viewLink}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Import Objects
-        </a>
-        &nbsp;
-        &nbsp;
-        <a href="{{parent_instance.viewLink}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Export Objects
-        </a>
-      {{/if_match}}
     </div>
   </div>
 </li>

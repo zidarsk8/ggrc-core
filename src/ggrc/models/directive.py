@@ -8,6 +8,7 @@ from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
+from .relationship import Relatable
 from .reflection import PublishOnly
 
 from sqlalchemy.orm import validates
@@ -90,7 +91,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
         orm.subqueryload('sections'))
 
 # FIXME: For subclasses, restrict kind
-class Policy(Documentable, Personable, Directive):
+class Policy(Relatable, Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
       }
@@ -104,7 +105,7 @@ class Policy(Documentable, Personable, Directive):
   def validates_meta_kind(self, key, value):
     return 'Policy'
 
-class Regulation(Documentable, Personable, Directive):
+class Regulation(Relatable, Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
       }
@@ -115,7 +116,7 @@ class Regulation(Documentable, Personable, Directive):
   def validates_meta_kind(self, key, value):
     return 'Regulation'
 
-class Contract(Documentable, Personable, Directive):
+class Contract(Relatable, Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
       }
