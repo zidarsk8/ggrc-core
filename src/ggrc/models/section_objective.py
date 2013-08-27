@@ -9,8 +9,12 @@ from .mixins import Base
 class SectionObjective(Base, db.Model):
   __tablename__ = 'section_objectives'
 
-  section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable=False)
-  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
+  __table_args__ = (
+    db.UniqueConstraint('section_id', 'objective_id'),
+  )
+
+  section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable = False)
+  objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable = False)
 
   _publish_attrs = [
       'section',
