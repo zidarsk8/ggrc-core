@@ -52,6 +52,4 @@ Feature: Basic RESTful CRUD Support
       #| SystemOrProcess    |
       | System             |
       | Process            |
-      | SystemSystem       |
-      | SystemControl      |
 

@@ -76,8 +76,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Section            |
       | SectionObjective   |
       | System             |
-      | SystemSystem       |
-      | SystemControl      |
 
   Scenario Outline: GET requires read permission for the context
     Given the current user
@@ -152,8 +150,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Section            |
       | SectionObjective   |
       | System             |
-      | SystemSystem       |
-      | SystemControl      |
 
   Scenario Outline: PUT requires update permission for the context
     Given the current user
@@ -236,8 +232,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Section            |
       | SectionObjective   |
       | System             |
-      | SystemSystem       |
-      | SystemControl      |
 
   Scenario Outline: DELETE requires delete permission for the context
     Given the current user
@@ -320,8 +314,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Section            |
       | SectionObjective   |
       | System             |
-      | SystemSystem       |
-      | SystemControl      |
 
   Scenario: Property link objects can be included with __include if the user has read access to the target
     Given the current user

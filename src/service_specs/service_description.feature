@@ -49,5 +49,3 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | SystemOrProcess    | -1              |
       | System             | 10              |
       | Process            | 10              |
-      | SystemSystem       | 10              |
-      | SystemControl      | 10              |
