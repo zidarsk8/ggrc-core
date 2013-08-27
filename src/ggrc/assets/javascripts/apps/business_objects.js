@@ -44,6 +44,10 @@ $(function() {
   GGRC.extra_widget_descriptors.info = info_widget_descriptors.info;
   GGRC.extra_default_widgets.splice(0, 0, 'info');
 
+  function sort_sections(sections) {
+    return can.makeArray(sections).sort(window.natural_comparator);
+  }
+
   var far_models = GGRC.JoinDescriptor
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
@@ -65,16 +69,42 @@ $(function() {
     //     { Objective: { Person: false } }
     , overridden_models = {
           Program: {
-              Objective: false
-            , Control: false
-            , Regulation: false
-            , Policy: false
-            , Contract: false
+            //  Objective: false
+            //, Control: false
+            //, Regulation: false
+            //, Policy: false
+            //, Contract: false
           }
       }
+
+    , directive_section_descriptor =
+        GGRC.JoinDescriptor.by_object_option_models.Regulation.Section[0]
+    , program_directive_options = {
+          list_view : GGRC.mustache_path + "/directives/tree.mustache"
+        , draw_children : true
+        , child_options : [{
+              model : CMS.Models.Section
+            , list_loader : function(directive) {
+                return directive_section_descriptor
+                  .get_loader()
+                  .attach(directive)
+                  .refresh_list();
+              }
+            , fetch_post_process : sort_sections
+            }]
+      }
+    , extra_content_controller_options = {
+          Program: {
+              Regulation: program_directive_options
+            , Policy: program_directive_options
+            , Contract: program_directive_options
+          }
+        , Regulation: {}
+      }
+
     ;
 
-  can.each(far_models, function(join_descriptor, model_name) {
+  can.each(far_models, function(join_descriptors, model_name) {
     if ((overridden_models.all
           && overridden_models.all.hasOwnProperty(model_name)
           && !overridden_models[model_name])
@@ -83,9 +113,18 @@ $(function() {
             && !overridden_models[object.constructor.shortName][model_name]))
       return;
 
-    join_descriptor = join_descriptor[0];
+    var sources = []
+      , list_loader
+      , join_descriptor = join_descriptors[0]
+      ;
+
+    can.each(join_descriptors, function(join_descriptor) {
+      sources.push(join_descriptor.get_loader());
+    });
+    list_loader = new GGRC.ListLoaders.MultiListLoader(sources);
+    list_loader = list_loader.attach(object);
+
     var far_model = join_descriptor.get_model(model_name)
-      , list_loader = join_descriptor.get_list_loader(object)
       , descriptor = {
             content_controller: CMS.Controllers.TreeView
           , content_controller_selector: "ul"
@@ -115,9 +154,7 @@ $(function() {
               , draw_children: false
               , parent_instance: object
               , model: model_name
-              , list_loader: function() {
-                  return list_loader.refresh_list();
-                }
+              , list_loader: can.proxy(list_loader, "refresh_list")
             }
         }
       ;
@@ -135,6 +172,20 @@ $(function() {
       can.extend(
           descriptor,
           extra_descriptor_options[object.constructor.shortName][model_name]);
+    }
+
+    if (extra_content_controller_options.all
+        && extra_content_controller_options.all[model_name]) {
+      can.extend(
+          descriptor.content_controller_options,
+          extra_content_controller_options.all[model_name]);
+    }
+
+    if (extra_content_controller_options[object.constructor.shortName]
+        && extra_content_controller_options[object.constructor.shortName][model_name]) {
+      can.extend(
+          descriptor.content_controller_options,
+          extra_content_controller_options[object.constructor.shortName][model_name]);
     }
 
     if (!list_loader)

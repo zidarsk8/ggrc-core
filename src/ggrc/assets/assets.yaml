@@ -63,7 +63,6 @@ dashboard-js-files:
   - controllers/modal_selector_controller.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js
-  - apps/directives.js
   - sections/sections_controller.js
   - apps/mapping.js
   - pbc/population_sample.js

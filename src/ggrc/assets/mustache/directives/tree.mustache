@@ -26,29 +26,31 @@
         </div>
       </a>
     </div>
+
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
 
-          {{#if instance.viewLink}}
           <div class="span6">
+          {{#if instance.viewLink}}
             <a href="{{instance.viewLink}}" class="info-action">
               View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
-          </div>
           {{/if}}
+          </div>
 
-          {{#if mappings}}
           <div class="span6">
+          {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
-          </div>
           {{/if}}
+          </div>
 
         </div>
 
@@ -98,16 +100,16 @@
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
+            <h6>{{#if_equals parent_instance.constructor.shortName 'Contract'}}Clauses{{else}}Sections{{/if_equals}} ({{list.length}})</h6>
             {{#child_options}}
-              <h6>Sections ({{instance.sections.length}})</h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")._data) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
         {{/if_null}}
       {{/if}}
-      
-      
+
     </div>
+    {{/if}}
   </li>
 {{/list}}
 

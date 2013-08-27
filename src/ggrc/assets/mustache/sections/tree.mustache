@@ -130,7 +130,7 @@
         <i class="grcicon-add-black"></i>
         Create {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clause{{else}}Section{{/if_equals}}
       </a>
-      {{/if_match}}
+      {{/if}}
 
       {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
         &nbsp;
@@ -146,8 +146,20 @@
           Export {{#if_equals parent_instance.constructor.shortName 'Contract'}}Clauses{{else}}Sections{{/if_equals}}
         </a>
       {{/if_match}}
-      {{/if}}
 
+      {{else}}
+      <a
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="multitype-modal-selector"
+        data-join-option-type="{{model.shortName}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+        + Section/Clause
+      </a>
+      {{/if_match}}
     </div>
   </div>
 </li>
