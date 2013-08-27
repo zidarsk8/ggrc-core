@@ -180,9 +180,9 @@ jQuery.extend(GGRC, {
       var fn = eventqueue.shift();
       fn && fn();
       if(eventqueue.length) {
-        currentTimeout = null;
-      } else {
         currentTimeout = setTimeout(runNext, timegap);
+      } else {
+        currentTimeout = null;
       }
     }
     eventqueue.push(event);
