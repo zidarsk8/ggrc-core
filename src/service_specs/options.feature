@@ -8,7 +8,7 @@ Feature: Options relationships
     And "option" is POSTed to its collection
     And a new "<resource_type>" named "resource"
     And "resource" link property "<link_property>" is "option"
-    and "resource" is POSTed to its collection
+    And "resource" is POSTed to its collection
     When GET of the resource "resource"
     Then the "<link_property>" of "resource" is a link to "option"
 
@@ -29,3 +29,9 @@ Feature: Options relationships
       | system_type      | System        | type             |
       | network_zone     | System        | network_zone     |
 
+  Scenario: Validation of invalid option role
+    Given an Option named "option" with role "verify_frequency"
+    And "option" is POSTed to its collection
+    And a new "Control" named "resource"
+    And "resource" link property "means" is "option"
+    Then POST of "resource" fails with "Invalid value for attribute"
