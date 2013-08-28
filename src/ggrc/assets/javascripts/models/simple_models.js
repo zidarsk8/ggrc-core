@@ -974,6 +974,10 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
   return !!~can.inArray(cls.model_singular, this.permissions[operation]);
 };
 
+CMS.Models.Role.prototype.not_system_role = function() {
+  return ["ProgramOwner", "ProgramEditor", "ProgramReader"].indexOf(this.name) < 0;
+};
+
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null;
 
