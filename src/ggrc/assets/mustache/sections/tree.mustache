@@ -8,7 +8,7 @@
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 <span class="tree-code">{{instance.slug}}</span>
-                {{instance.title}}{{#parent}}, child of {{instance.title}}{{/parent}}
+                {{instance.title}}
               </div>
             </div>
           </div>
@@ -98,7 +98,22 @@
             </div>
           </div>
         </div>
+
+        {{#parent}}
+        <div class="parent">
+          <div class="row-fluid">
+            <div class="span12">
+              Part of
+              <i class="grcicon-{{instance.constructor.table_singular}}-black" rel="tooltip" title="{{instance.kind}}"></i>
+              <strong>{{instance.title}}</strong>
+              {{instance.kind}}
+            </div>
+          </div>
+        </div>
+        {{/parent}}
+
       </div>
+
 
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
