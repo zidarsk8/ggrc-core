@@ -6,8 +6,6 @@
  */
 
 (function(can, $) {
-  var rtypes = ["Cycle", "ObjectDocument", "ObjectPerson", "Program", "ProgramControl", "ProgramDirective", "Relationship", "UserRole"];
-
   GGRC.Controllers.Modals("GGRC.Controllers.RoleModal", {
     defaults : {
       content_view : GGRC.mustache_path + "/roles/modal_content.mustache"
@@ -71,30 +69,8 @@
         target.splice(0, target.length);
       }
 
-      if (name[0] == "view" && name[1] == "__ALL__") {
-        for (i in rtypes) {
-          if (value[name[1]] == true) {
-            push_if_missing(instance.permissions.read, rtypes[i]);
-          } else {
-            clear(instance.permissions.create);
-            clear(instance.permissions.read);
-            clear(instance.permissions.update);
-            clear(instance.permissions.delete);
-          }
-        }
-      } else if (name[0] == "modify" && name[1] == "__ALL__") {
-        for (i in rtypes) {
-          if (value[name[1]] == true) {
-            push_if_missing(instance.permissions.create, rtypes[i]);
-            push_if_missing(instance.permissions.read, rtypes[i]);
-            push_if_missing(instance.permissions.update, rtypes[i]);
-            push_if_missing(instance.permissions.delete, rtypes[i]);
-          } else {
-            clear(instance.permissions.create);
-            clear(instance.permissions.update);
-            clear(instance.permissions.delete);
-          }
-        }
+      if (name[1] == "__ALL__") {
+        // Selection chaining is handled by events, so do nothing here.
       } else if (name[0] == "view") {
         if (value[name[1]] == true) {
           push_if_missing(instance.permissions.read, name[1]);
@@ -104,16 +80,39 @@
       } else if (name[0] == "modify") {
         if (value[name[1]] == true) {
           push_if_missing(instance.permissions.create, name[1]);
-          push_if_missing(instance.permissions.read, name[1]);
           push_if_missing(instance.permissions.update, name[1]);
           push_if_missing(instance.permissions.delete, name[1]);
         } else {
           splice_if_present(instance.permissions.create, name[1]);
-          splice_if_present(instance.permissions.read, name[1]);
           splice_if_present(instance.permissions.update, name[1]);
           splice_if_present(instance.permissions.delete, name[1]);
         }
       }
+    }
+
+    , "input[type=checkbox] change": function(el, ev) {
+        var name = el.attr('name').split('.')
+          , checked = el.is(':checked')
+          , $input
+          ;
+
+        if (name[1] === '__ALL__') {
+          this.element.find("input[name^='" + name[0] + ".']").each(function(i, input) {
+            $input = $(input);
+            if ($input.is(':checked') != checked)
+              $input.click();
+          });
+        } else if (name[0] === 'modify' && checked) {
+          // If checked, ensure associated 'view' is checked
+          $input = this.element.find("input[name='view." + name[1] + "']");
+          if (!$input.is(':checked'))
+            $input.click();
+        } else if (name[0] === 'view' && !checked) {
+          // If unchecked, ensure associated 'modify' is unchecked
+          $input = this.element.find("input[name='modify." + name[1] + "']");
+          if ($input.is(':checked'))
+            $input.click();
+        }
     }
   });
 
@@ -195,7 +194,10 @@ Mustache.registerHelper("permission_checkbox", function(action, resourcetype, co
   var capitalized_action = can.capitalize(action);
   var checked = false;
   if (resourcetype == "__ALL__") {
-    var rtypes = ["Cycle", "ObjectDocument", "ObjectPerson", "Program", "ProgramControl", "ProgramDirective", "Relationship", "UserRole"];
+    var rtypes = [
+      "Program", "Cycle", "ProgramDirective", "ProgramControl",
+      "ObjectObjective", "ObjectSection", "Relationship", "ObjectDocument",
+      "ObjectPerson", "UserRole"];
     if (action == "view") {
       checked = this.permissions["read"] != undefined;
       if (checked) {
