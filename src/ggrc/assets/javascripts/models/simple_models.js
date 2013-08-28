@@ -976,11 +976,10 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
 
 CMS.Models.Role.prototype.not_system_role = function() {
   return can.inArray(
-      this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]);
+      this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
 };
 
 CMS.Models.Role.prototype.permission_summary = function() {
-  debugger;
   if (this.name == "ProgramOwner") return "Owner";
   if (this.name == "ProgramEditor") return "Can Edit";
   if (this.name == "ProgramReader") return "View Only";
