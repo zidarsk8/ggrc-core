@@ -33,6 +33,7 @@ dashboard-js-files:
   - spin.min.js
   - tmpl.js
   - mustache_helper.js
+  - models/mappers.js
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
