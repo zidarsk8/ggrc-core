@@ -922,8 +922,36 @@ Mustache.registerHelper("date", function(date) {
   return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
 });
 
+/**
+ * Checks permissions. 
+ * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
+ * Usage:
+ *  {{#is_allowed ACTION RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION}} content {{/is_allowed}}
+ */
 Mustache.registerHelper("is_allowed", function(action, resource_type, context_id, options) {
-  return Permission.is_allowed(action, resource_type, context_id.isComputed ? context_id() : context_id) 
+  var page = GGRC.make_model_instance(GGRC.page_object);
+
+  // Resolve arguments
+  action = action && action.isComputed ? action() : action;
+  resource_type = resource_type && resource_type.isComputed ? resource_type() : resource_type;
+  context_id = context_id && context_id.isComputed ? context_id() : context_id;
+  options = options || arguments[arguments.length-1];
+
+  // Adjust for missing arguments
+  if (typeof resource_type !== 'string') {
+    resource_type = page.constructor.shortName;
+    if (typeof resource_type === 'number') {
+      context_id = resource_type;
+    }
+  }
+  if (typeof context_id !== 'number') {
+    context_id = (page.context && page.context.id) || undefined;
+  }
+
+  return Permission.is_allowed(action, resource_type, context_id) 
     ? options.fn(options.contexts || this) 
     : options.inverse(options.contexts || this)
     ;
