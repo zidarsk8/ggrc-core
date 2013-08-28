@@ -664,9 +664,9 @@ class LinkSystemsHandler(LinksHandler):
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
       self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
-      if self.options.get('is_biz_process') and not (system is Process):
+      if self.options.get('is_biz_process') and not (system.__class__ is Process):
         self.add_link_warning("That code is used by a System, and will not be mapped")
-      elif not self.options.get('is_biz_process') and system is Process:
+      elif not self.options.get('is_biz_process') and system.__class__ is Process:
         self.add_link_warning('That code is used by a Process, and will not be mapped')
       else:
         return system
@@ -717,11 +717,12 @@ class LinkRelationshipsHandler(LinksHandler):
     return self.options.get('model_human_name') or self.model_class.__name__
 
   def create_item(self, data):
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(self.model_human_name(), data.get('slug')))
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+      self.model_human_name(), data.get('slug')))
 
   def after_save(self, obj):
-    # Flushing here because setting source/destination for these relationships
-    # require that the object.id be available
+    # Flushing here because the setter for source/destination
+    # requires that the object.id be available
     if not self.importer.obj.id:
       db.session.flush()
 
