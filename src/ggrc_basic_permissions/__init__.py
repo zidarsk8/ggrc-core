@@ -60,16 +60,17 @@ class UserPermissions(DefaultUserPermissions):
             self.get_email_for(get_current_user()):
       self.load_permissions()
     elif 'permissions__ts' in session and not get_current_user().is_anonymous():
-      if not session['permissions__ts']:
-        self.load_permissions()
-      else:
-        current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
-            .filter(UserRole.person_id==get_current_user().id)\
-            .order_by(UserRole.updated_at.desc())\
-            .first()
-        if current_most_recent_role_ts\
-            and current_most_recent_role_ts[0] > session['permissions__ts']:
-          self.load_permissions()
+      self.load_permissions()
+      #if not session['permissions__ts']:
+        #self.load_permissions()
+      #else:
+        #current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
+            #.filter(UserRole.person_id==get_current_user().id)\
+            #.order_by(UserRole.updated_at.desc())\
+            #.first()
+        #if current_most_recent_role_ts\
+            #and current_most_recent_role_ts[0] > session['permissions__ts']:
+          #self.load_permissions()
 
   def get_email_for(self, user):
     return user.email if hasattr(user, 'email') else 'ANONYMOUS'
