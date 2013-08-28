@@ -926,32 +926,46 @@ Mustache.registerHelper("date", function(date) {
  * Checks permissions. 
  * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
  * Usage:
- *  {{#is_allowed ACTION RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
  *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION}} content {{/is_allowed}}
  */
-Mustache.registerHelper("is_allowed", function(action, resource_type, context_id, options) {
-  var page = GGRC.make_model_instance(GGRC.page_object);
+var allowed_actions = ["create","read","update","delete"]
+  , allowed_page
+  ;
+Mustache.registerHelper("is_allowed", function() {
+  allowed_page = allowed_page || GGRC.make_model_instance(GGRC.page_object);
+  var args = Array.prototype.slice.call(arguments, 0)
+    , actions = []
+    , resource_type = allowed_page.constructor.shortName
+    , context_id = allowed_page.context && allowed_page.context.id
+    , options = args[args.length-1]
+    , passed = true
+    ;
 
   // Resolve arguments
-  action = action && action.isComputed ? action() : action;
-  resource_type = resource_type && resource_type.isComputed ? resource_type() : resource_type;
-  context_id = context_id && context_id.isComputed ? context_id() : context_id;
-  options = options || arguments[arguments.length-1];
+  can.each(args, function(arg, i) {
+    arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
 
-  // Adjust for missing arguments
-  if (typeof resource_type !== 'string') {
-    resource_type = page.constructor.shortName;
-    if (typeof resource_type === 'number') {
-      context_id = resource_type;
+    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
+      actions.push(arg);
     }
-  }
-  if (typeof context_id !== 'number') {
-    context_id = (page.context && page.context.id) || undefined;
-  }
+    else if (typeof arg === 'string') {
+      resource_type = arg;
+    }
+    else if (typeof arg === 'number') {
+      context_id = arg;
+    }
+  });
+  actions = actions.length ? actions : allowed_actions;
 
-  return Permission.is_allowed(action, resource_type, context_id) 
+  // Check permissions
+  can.each(actions, function(action) {
+    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+  });
+
+  return passed
     ? options.fn(options.contexts || this) 
     : options.inverse(options.contexts || this)
     ;
