@@ -46,6 +46,7 @@
           </div>
 
           <div class="span6">
+          {{#is_allowed 'delete' instance.constructor.shortName}}
           {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
@@ -53,6 +54,7 @@
               Unmap
             </a>
           {{/if}}
+          {{/is_allowed}}
           </div>
 
         </div>
