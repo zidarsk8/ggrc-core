@@ -14,7 +14,8 @@ from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
     put_resource, get_resource_table_singular, get_service_endpoint_url,
     get_resource, handle_get_resource_and_name_it,
-    handle_post_named_example_to_collection_endpoint, post_example,
+    handle_post_fails_with_status_and_content,
+    handle_post_named_example, post_example,
     handle_get_example_resource, handle_template_text, post_to_endpoint,
     check_for_resource_in_collection,
     )
@@ -77,8 +78,7 @@ def check_resource_in_collection(context, resource_name):
 @given('"{name}" is POSTed to its collection')
 def post_named_example_to_collection_endpoint(
     context, name, expected_status=201):
-  handle_post_named_example_to_collection_endpoint(
-      context, name, expected_status)
+  handle_post_named_example( context, name, expected_status)
 
 @given('"{name}" is in context "{context_id}"')
 def set_context_id_for(context, name, context_id):
@@ -220,6 +220,10 @@ def check_POST_is_allowed(context, resource_name):
 def check_POST_is_forbidden(context, resource_name):
   post_named_example_to_collection_endpoint(
       context, resource_name, expected_status=403)
+
+@then('POST of "{resource_name}" fails with "{content}"')
+def check_post_fails(context, resource_name, content):
+  handle_post_fails_with_status_and_content(context, resource_name, expected_status=403, content=content)
 
 @then('GET of "{resource_name}" is allowed')
 def check_GET_is_allowed(context, resource_name):

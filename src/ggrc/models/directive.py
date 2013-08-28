@@ -10,6 +10,7 @@ from .object_document import Documentable
 from .object_person import Personable
 from .relationship import Relatable
 from .reflection import PublishOnly
+from .utils import validate_option
 
 from sqlalchemy.orm import validates
 
@@ -70,13 +71,15 @@ class Directive(Timeboxed, BusinessObject, db.Model):
 
   @validates('kind')
   def validate_kind(self, key, value):
-    assert value in self.valid_kinds
+    if value not in self.valid_kinds:
+      message = "Invalid value '{}' for attribute {}.{}.".format(
+        value, self.__class__.__name__, key)
+      raise ValueError(message)
     return value
 
   @validates('audit_duration', 'audit_frequency')
-  def validate_options(self, key, option):
-    assert option is None or option.role == key
-    return option
+  def validate_directive_options(self, key, option):
+    return validate_option(self.__class__.__name__, key, option, key)
 
   @classmethod
   def eager_query(cls):

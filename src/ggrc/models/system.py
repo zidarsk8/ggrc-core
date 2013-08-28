@@ -15,6 +15,7 @@ from .object_objective import Objectiveable
 from .object_person import Personable
 from .object_section import Sectionable
 from .relationship import Relatable
+from .utils import validate_option
 
 CATEGORY_SYSTEM_TYPE_ID = 101
 
@@ -84,10 +85,9 @@ class SystemOrProcess(
       ]
 
   @validates('network_zone', 'type')
-  def validate_options(self, key, option):
+  def validate_system_options(self, key, option):
     desired_role = key if key == 'network_zone' else 'system_type'
-    assert option is None or option.role == desired_role
-    return option
+    return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @classmethod
   def eager_query(cls):
