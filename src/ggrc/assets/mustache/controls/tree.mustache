@@ -112,6 +112,7 @@
   </li>
 {{/list}}
 
+{{#is_allowed 'create' 'update' 'delete' model.shortName}}
 {{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
@@ -222,3 +223,4 @@
   </div>
 </li>
 {{/if}}
+{{/is_allowed}}

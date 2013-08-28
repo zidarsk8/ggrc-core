@@ -962,7 +962,7 @@ Mustache.registerHelper("is_allowed", function() {
 
   // Check permissions
   can.each(actions, function(action) {
-    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    passed = passed && (!window.Permission || Permission.is_allowed(action, resource_type, context_id));
   });
 
   return passed
