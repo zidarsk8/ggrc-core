@@ -922,4 +922,11 @@ Mustache.registerHelper("date", function(date) {
   return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
 });
 
+Mustache.registerHelper("is_allowed", function(action, resource_type, context_id, options) {
+  return Permission.is_allowed(action, resource_type, context_id.isComputed ? context_id() : context_id) 
+    ? options.fn(options.contexts || this) 
+    : options.inverse(options.contexts || this)
+    ;
+});
+
 })(this, jQuery, can);
