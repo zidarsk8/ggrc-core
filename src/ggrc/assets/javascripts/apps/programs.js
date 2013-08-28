@@ -72,11 +72,13 @@ can.Construct("ModelRefreshQueue", {
 
 can.Construct("RefreshQueueManager", {
     model_bases: {
-        Regulation: 'Directive'
-      , Contract: 'Directive'
-      , Policy: 'Directive'
-      , System: 'SystemOrProcess'
-      , Process: 'SystemOrProcess'
+      // This won't work until Relatable/Documentable/etc mixins can handle
+      // queries with multiple `type` values.
+      //  Regulation: 'Directive'
+      //, Contract: 'Directive'
+      //, Policy: 'Directive'
+      //, System: 'SystemOrProcess'
+      //, Process: 'SystemOrProcess'
     }
 }, {
     init: function() {
