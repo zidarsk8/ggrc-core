@@ -190,26 +190,32 @@ can.Model("can.Model.Cacheable", {
       return ms;
     }
   }
-  , model : function(params) {
-    var m, that = this;
-    var obj_name = this.root_object;
-    if(!params) {
+  , object_from_resource : function(params) {
+      var obj_name = this.root_object;
+      if(!params) {
+        return params;
+      }
+      if(typeof obj_name !== "undefined" && params[obj_name]) {
+          for(var i in params[obj_name]) {
+            if(params[obj_name].hasOwnProperty(i)) {
+              params.attr
+              ? params.attr(i, params[obj_name][i])
+              : (params[i] = params[obj_name][i]);
+            }
+          }
+          if(params.removeAttr) {
+            params.removeAttr(obj_name);
+          } else {
+            delete params[obj_name];
+          }
+      }
       return params;
     }
-    if(typeof obj_name !== "undefined" && params[obj_name]) {
-        for(var i in params[obj_name]) {
-          if(params[obj_name].hasOwnProperty(i)) {
-            params.attr
-            ? params.attr(i, params[obj_name][i])
-            : (params[i] = params[obj_name][i]);
-          }
-        }
-        if(params.removeAttr) {
-          params.removeAttr(obj_name);
-        } else {
-          delete params[obj_name];
-        }
-    }
+  , model : function(params) {
+    var m, that = this;
+    params = this.object_from_resource(params);
+    if (!params)
+      return params;
     if(m = this.findInCacheById(params.id)) {
       if(m === params)
         return m;

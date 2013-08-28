@@ -15,6 +15,24 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , root_collection : "systems_or_processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
+
+    , model : function(params) {
+        if (this.shortName !== 'SystemOrProcess')
+          return this._super(params);
+        if (!params)
+          return params;
+        params = this.object_from_resource(params);
+        if (!params.selfLink) {
+          if (params.type !== 'SystemOrProcess')
+            return CMS.Models[params.type].model(params);
+        } else {
+          if (params.is_biz_process)
+            return CMS.Models.Process.model(params);
+          else
+            return CMS.Models.System.model(params);
+        }
+      }
+
     , tree_view_options : {
       list_view : "/static/mustache/base_objects/tree.mustache"
       , link_buttons : true
