@@ -64,6 +64,27 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
+
+  , model : function(params) {
+      if (this.shortName !== 'Directive')
+        return this._super(params);
+      if (!params)
+        return params;
+      params = this.object_from_resource(params);
+      if (!params.selfLink) {
+        if (params.type !== 'Directive')
+          return CMS.Models[params.type].model(params);
+      } else {
+        if (CMS.Models.Contract.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Contract.model(params);
+        else if (CMS.Models.Regulation.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Regulation.model(params);
+        else if (CMS.Models.Policy.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Policy.model(params);
+      }
+      console.debug("Invalid Directive:", params);
+    }
+
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
