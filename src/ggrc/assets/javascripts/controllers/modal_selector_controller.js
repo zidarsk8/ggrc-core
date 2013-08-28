@@ -342,6 +342,7 @@
 
         related_model_singular: "Document",
         related_table_plural: "documents",
+        related_table_singular: "document",
         related_title_singular: "Reference",
         related_title_plural: "References",
 
@@ -369,6 +370,7 @@
 
         related_model_singular: "Section",
         related_table_plural: "sections",
+        related_table_singluar: "section",
         related_title_singular: "Section",
         related_title_plural: "Sections",
 
@@ -395,6 +397,7 @@
 
         related_model_singular: "Objective",
         related_table_plural: "objectives",
+        related_table_singular: "objective",
         related_title_singular: "Objective",
         related_title_plural: "Objectives",
 
@@ -421,6 +424,7 @@
 
         related_model_singular: "Person",
         related_table_plural: "people",
+        related_table_singular: "person",
         related_title_singular: "Person",
         related_title_plural: "People",
 
@@ -474,6 +478,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -500,6 +505,7 @@
 
         related_model_singular: data.child_meta_type,
         related_table_plural: (CMS.Models[data.child_meta_type] || {}).table_plural,
+        related_table_singular: (CMS.Models[data.child_meta_type] || {}).table_singular,
         related_title_singular: "System",
         related_title_plural: "Systems",
 
@@ -526,6 +532,7 @@
 
         related_model_singular: "Objective",
         related_table_plural: "objectives",
+        related_table_singular: "objective",
         related_title_singular: "Objective",
         related_title_plural: "Objectives",
 
@@ -553,6 +560,7 @@
 
         related_model_singular: "Risk",
         related_table_plural: "risks",
+        related_table_singular: "risk",
         related_title_singular: "Risk",
         related_title_plural: "Risks",
 
@@ -579,6 +587,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -607,6 +616,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -643,6 +653,7 @@
 
     options.related_model_singular = data.related_model_singular;
     options.related_table_plural = data.related_table_plural;
+    options.related_table_singular = data.related_table_singular;
     options.related_title_singular = data.related_title_singular;
     options.related_title_plural = data.related_title_plural;
 
@@ -704,6 +715,7 @@
           , related_title_singular: $this.data('related-title-singular')
           , related_title_plural: $this.data('related-title-plural')
           , related_table_plural: $this.data('related-table-plural')
+          , related_table_singular: $this.data('related-table-singular')
           , related_side: $this.data('related-side')
           , related_model: $this.data('related-model')
           , join_object_id: $this.data('join-object-id')
@@ -916,6 +928,7 @@
         this.context.attr('option_descriptor', descriptor);
         this.context.attr('selected_option', null);
         this.context.attr('related_table_plural', descriptor.related_table_plural);
+        this.context.attr('related_table_singular', descriptor.related_table_singular);
         this.context.attr('related_model_singular', descriptor.related_model_singular);
         this.context.attr('new_object_title', descriptor.new_object_title);
         this.options.option_items_view = descriptor.items_view;
@@ -1012,6 +1025,7 @@
           , model_display: model.title_plural
           , related_model_singular : model.model_singular
           , related_table_plural : model.table_plural
+          , related_table_singular : model.table_singular
           , new_object_title : model.title_singular
         }, options), {});
       }

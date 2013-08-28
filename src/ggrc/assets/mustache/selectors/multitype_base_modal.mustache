@@ -50,9 +50,9 @@
     <div class="modal-content">
       <div class="row-fluid">
         <div class="span3">
-          {{#selected_object}}
+          {{#pack selected_object new_object_title=new_object_title table_singular=selected_object.constructor.table_singular related_table_singular=related_table_singular}}
             {{{ renderLive object_detail_view }}}
-          {{/selected_object}}
+          {{/pack}}
         </div>
         <div class="span6 option_column" {{data 'options'}}>
           {{#if null}}
