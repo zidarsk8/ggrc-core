@@ -343,6 +343,10 @@
         a {
           color:#fff;
           background-color:$business;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
         }
       }
     }
@@ -352,6 +356,11 @@
         a {
           color:#fff;
           background-color:$governance;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
@@ -361,6 +370,11 @@
         a {
           color:#fff;
           background-color:$risk;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
@@ -370,6 +384,11 @@
         a {
           color:#fff;
           background-color:$programs;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
