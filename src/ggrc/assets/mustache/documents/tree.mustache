@@ -32,6 +32,7 @@
           </div>
 
           <div class="span6">
+          {{#is_allowed 'delete' instance.constructor.shortName}}
           {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
@@ -39,6 +40,7 @@
               Unmap
             </a>
           {{/if}}
+          {{/is_allowed}}
           </div>
 
         </div>
@@ -74,6 +76,7 @@
   </li>
 {{/list}}
 
+{{#is_allowed 'create' 'update' 'delete' model.shortName}}
 {{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
@@ -95,3 +98,4 @@
   </div>
 </li>
 {{/if}}
+{{/is_allowed}}

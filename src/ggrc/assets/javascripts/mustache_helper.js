@@ -922,4 +922,53 @@ Mustache.registerHelper("date", function(date) {
   return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
 });
 
+/**
+ * Checks permissions. 
+ * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
+ * Usage:
+ *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION}} content {{/is_allowed}}
+ */
+var allowed_actions = ["create","read","update","delete"]
+  , allowed_page
+  ;
+Mustache.registerHelper("is_allowed", function() {
+  allowed_page = allowed_page || GGRC.make_model_instance(GGRC.page_object);
+  var args = Array.prototype.slice.call(arguments, 0)
+    , actions = []
+    , resource_type = allowed_page.constructor.shortName
+    , context_id = allowed_page.context && allowed_page.context.id
+    , options = args[args.length-1]
+    , passed = true
+    ;
+
+  // Resolve arguments
+  can.each(args, function(arg, i) {
+    arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
+
+    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
+      actions.push(arg);
+    }
+    else if (typeof arg === 'string') {
+      resource_type = arg;
+    }
+    else if (typeof arg === 'number') {
+      context_id = arg;
+    }
+  });
+  actions = actions.length ? actions : allowed_actions;
+
+  // Check permissions
+  can.each(actions, function(action) {
+    passed = passed && (!window.Permission || Permission.is_allowed(action, resource_type, context_id));
+  });
+
+  return passed
+    ? options.fn(options.contexts || this) 
+    : options.inverse(options.contexts || this)
+    ;
+});
+
 })(this, jQuery, can);
