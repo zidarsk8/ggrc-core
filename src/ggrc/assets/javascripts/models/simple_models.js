@@ -975,7 +975,16 @@ CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
 };
 
 CMS.Models.Role.prototype.not_system_role = function() {
-  return ["ProgramOwner", "ProgramEditor", "ProgramReader"].indexOf(this.name) < 0;
+  return can.inArray(
+      this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]);
+};
+
+CMS.Models.Role.prototype.permission_summary = function() {
+  debugger;
+  if (this.name == "ProgramOwner") return "Owner";
+  if (this.name == "ProgramEditor") return "Can Edit";
+  if (this.name == "ProgramReader") return "View Only";
+  return this.name
 };
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
