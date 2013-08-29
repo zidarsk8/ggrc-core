@@ -152,9 +152,15 @@
       }
       
       $target.modal_form(option, $trigger);
+      var button_view;
+      if (!instance || instance.not_system_role()) {
+        button_view = GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE;
+      } else {
+        button_view = GGRC.Controllers.Modals.BUTTON_VIEW_CLOSE;
+      }
       options = {
         new_object_form : !$trigger.attr('data-object-id')
-        , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
+        , button_view : button_view
         , model : model
         , instance : instance
         , modal_title : (instance ? "Edit " : "New ") + $trigger.attr("data-object-singular")
