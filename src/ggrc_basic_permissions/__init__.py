@@ -158,7 +158,6 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
     # add a user_roles mapping assigning the user creating the program
     # the ProgramOwner role in the program's context.
-    current_user_id = get_current_user().id
     program_owner_role = db.session.query(Role)\
         .filter(Role.name == 'ProgramOwner').first()
     user_role = UserRole(
@@ -169,18 +168,27 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     db.session.add(user_role)
     db.session.flush()
 
+    assign_role_reader(get_current_user())
+
+@Resource.model_posted.connect_via(UserRole)
+def handle_program_owner_role_assignment(
+    sender, obj=None, src=None, service=None):
+  if obj.role.name == 'ProgramOwner':
+    assign_role_reader(obj.person)
+
+def assign_role_reader(user):
     # assign the user RoleReader if they don't already have that role
     role_reader_role = db.session.query(Role)\
         .filter(Role.name == 'RoleReader').first()
     role_reader_for_user = db.session.query(UserRole)\
         .join(Role, UserRole.role == role_reader_role)\
-        .filter(UserRole.person_id == current_user_id\
+        .filter(UserRole.person_id == user.id\
             and Role.name == 'RoleReader'
             and UserRole.context_id == 1)\
         .first()
     if not role_reader_for_user:
       role_reader_for_user = UserRole(
-          person_id=current_user_id,
+          person_id=user.id,
           role=role_reader_role,
           context_id=1,
           )
