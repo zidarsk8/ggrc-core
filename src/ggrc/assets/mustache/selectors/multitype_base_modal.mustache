@@ -7,7 +7,8 @@
       </div>
       <h2>
         {{#if_equals option_type_count 1}}
-          Select {{#option_type_menu}}{{#items}}{{model_display}}{{/#items}}{{/option_type_menu}}
+          Map {{#option_type_menu}}{{#items}}{{model_display}}{{/#items}}{{/option_type_menu}} to {{selected_object.constructor.title_singular}}
+          
         {{else}}
           Map Object {{! modal_title }}
         {{/if_equals}}
@@ -50,7 +51,7 @@
     <div class="modal-content">
       <div class="row-fluid">
         <div class="span3">
-          {{#pack selected_object new_object_title=new_object_title table_singular=selected_object.constructor.table_singular related_table_singular=related_table_singular}}
+          {{#pack selected_object new_object_title=new_object_title title_singular=selected_object.constructor.title_singular table_singular=selected_object.constructor.table_singular related_table_singular=related_table_singular}}
             {{{ renderLive object_detail_view }}}
           {{/pack}}
         </div>
