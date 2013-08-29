@@ -243,8 +243,6 @@ can.Control("CMS.Controllers.TreeView", {
     }, null);
     if(parent.children_drawn)
       return;
-    var spinner = el.closest(".tree-item").find(":data(spinner)").data("spinner");
-    spinner && spinner.stop();
     parent.attr("children_drawn", true);
   }
 

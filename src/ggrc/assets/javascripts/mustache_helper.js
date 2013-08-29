@@ -992,12 +992,18 @@ Mustache.registerHelper("is_allowed", function() {
     ;
 });
 
-Mustache.registerHelper("attach_spinner", function(spin_opts) {
-  spin_opts = spin_opts.isComputed ? spin_opts() : spin_opts;
+function resolve_computed(maybe_computed) {
+  return (typeof maybe_computed === "function" && maybe_computed.isComputed) ? maybe_computed() : maybe_computed;
+}
+
+Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
+  spin_opts = resolve_computed(spin_opts);
+  styles = resolve_computed(styles);
   spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+  styles = typeof styles === "string" ? styles : "";
   return function(el) {
     var spinner = new Spinner(spin_opts).spin();
-    $(el).append(spinner.el).data("spinner", spinner);
+    $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
   };
 });
 
