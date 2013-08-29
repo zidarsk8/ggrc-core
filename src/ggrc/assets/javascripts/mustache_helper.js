@@ -828,6 +828,27 @@ Mustache.registerHelper("schemed_url", function(url) {
   return url;
 });
 
+function when_attached_to_dom(el, cb) {
+  // Trigger the "more" toggle if the height is the same as the scrollable area
+  el = $(el);
+  !function poll() {
+    if (el.closest(document.documentElement).length) {
+      cb();
+    }
+    else {
+      setTimeout(poll, 100);
+    }
+  }();
+}
+
+Mustache.registerHelper("trigger_created", function() {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).trigger("contentAttached");
+    });
+  };
+});
+
 Mustache.registerHelper("show_long", function() {
   return  [
       '<a href="javascript://" class="show-long"'
@@ -970,5 +991,15 @@ Mustache.registerHelper("is_allowed", function() {
     : options.inverse(options.contexts || this)
     ;
 });
+
+Mustache.registerHelper("attach_spinner", function(spin_opts) {
+  spin_opts = spin_opts.isComputed ? spin_opts() : spin_opts;
+  spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+  return function(el) {
+    var spinner = new Spinner(spin_opts).spin();
+    $(el).append(spinner.el).data("spinner", spinner);
+  };
+});
+
 
 })(this, jQuery, can);
