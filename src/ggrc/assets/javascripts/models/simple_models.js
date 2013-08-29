@@ -967,24 +967,26 @@ can.Model.Cacheable("CMS.Models.Role", {
         , "delete": []
       }
     }
-}, {});
+}, {
 
-CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
-  var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
-  return !!~can.inArray(cls.model_singular, this.permissions[operation]);
-};
+  allowed : function(operation, object_or_class) {
+    var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
+    return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+  }
 
-CMS.Models.Role.prototype.not_system_role = function() {
-  return can.inArray(
-      this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
-};
+  , not_system_role : function() {
+    return can.inArray(
+        this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
+  }
 
-CMS.Models.Role.prototype.permission_summary = function() {
-  if (this.name == "ProgramOwner") return "Owner";
-  if (this.name == "ProgramEditor") return "Can Edit";
-  if (this.name == "ProgramReader") return "View Only";
-  return this.name
-};
+  , permission_summary : function() {
+    if (this.name == "ProgramOwner") return "Owner";
+    if (this.name == "ProgramEditor") return "Can Edit";
+    if (this.name == "ProgramReader") return "View Only";
+    return this.name;
+  }
+
+});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null;
