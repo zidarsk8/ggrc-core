@@ -40,8 +40,12 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
     self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
     self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
-    self.handle('systems', LinkSystemsHandler, is_biz_process = False)
-    self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
+    self.handle('systems', LinkRelationshipsHandler, model_class = System,
+        direction = 'from')
+    self.handle('processes', LinkRelationshipsHandler, model_class = Process,
+        direction = 'from')
+    #self.handle('systems', LinkSystemsHandler, is_biz_process = False)
+   #self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):
