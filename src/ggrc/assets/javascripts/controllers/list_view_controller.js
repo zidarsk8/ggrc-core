@@ -17,7 +17,9 @@ function model_list_loader(controller) {
   }
 
   controller.options.model.bind("created", function(ev, instance) {
-    insert_instance(instance);
+    if (instance.constructor == controller.options.model) {
+      insert_instance(instance);
+    }
   });
 
   return controller.options.model.findAll().then(function(instances) {
