@@ -919,7 +919,10 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
 });
 
 Mustache.registerHelper("date", function(date) {
-  return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
+  var m = moment(new Date(date.isComputed ? date() : date))
+    , dst = m.isDST()
+    ;
+  return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
 });
 
 /**
