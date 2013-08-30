@@ -958,7 +958,7 @@
 
     , ".map-button click": "on_map"
 
-    , on_map: function(el, ev) {
+    , on_map: $.debounce(500, true, function(el, ev) {
         var that = this
           ;
 
@@ -969,7 +969,7 @@
           .fail(function() {
             //alert("Fail");
           });
-      }
+      })
 
     , create_join: function() {
         if (this.context.selected_option) {
