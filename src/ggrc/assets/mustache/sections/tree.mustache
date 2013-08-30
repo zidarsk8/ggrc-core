@@ -1,5 +1,5 @@
 {{#list}}
-  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
+  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true" {{trigger_created}}>
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
@@ -64,25 +64,13 @@
 
         <div class="row-fluid">
 
-          <div class="span6">
-            {{#edit_sections}}
-              <a href="javascript://" class="info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+          <div class="span12">
+            {{#is_allowed 'update' instance.constructor.shortName}}
+              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
                 Edit Section
               </a>
-            {{/edit_sections}}
-          </div>
-
-          <div class="span6">
-          {{#is_allowed 'delete' instance.constructor.shortName}}
-          {{#if mappings}}
-            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
-              <i class="grcicon-remove"></i>
-              {{unmap_or_delete instance mappings}}
-            </a>
-          {{/if}}
-          {{/is_allowed}}
+            {{/is_allowed}}
           </div>
 
         </div>

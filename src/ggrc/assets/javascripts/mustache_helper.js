@@ -828,6 +828,27 @@ Mustache.registerHelper("schemed_url", function(url) {
   return url;
 });
 
+function when_attached_to_dom(el, cb) {
+  // Trigger the "more" toggle if the height is the same as the scrollable area
+  el = $(el);
+  !function poll() {
+    if (el.closest(document.documentElement).length) {
+      cb();
+    }
+    else {
+      setTimeout(poll, 100);
+    }
+  }();
+}
+
+Mustache.registerHelper("trigger_created", function() {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).trigger("contentAttached");
+    });
+  };
+});
+
 Mustache.registerHelper("show_long", function() {
   return  [
       '<a href="javascript://" class="show-long"'
@@ -973,5 +994,21 @@ Mustache.registerHelper("is_allowed", function() {
     : options.inverse(options.contexts || this)
     ;
 });
+
+function resolve_computed(maybe_computed) {
+  return (typeof maybe_computed === "function" && maybe_computed.isComputed) ? maybe_computed() : maybe_computed;
+}
+
+Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
+  spin_opts = resolve_computed(spin_opts);
+  styles = resolve_computed(styles);
+  spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+  styles = typeof styles === "string" ? styles : "";
+  return function(el) {
+    var spinner = new Spinner(spin_opts).spin();
+    $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
+  };
+});
+
 
 })(this, jQuery, can);
