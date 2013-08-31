@@ -114,15 +114,18 @@ can.Model.Cacheable("CMS.Models.Control", {
         model : "Person"
       , property : "people_mappings"
       , list_view : "/static/mustache/people/tree.mustache"
+      , draw_children : false
     }, {
         model : "Objective"
       , property : "objective_mappings"
       , list_view : "/static/mustache/objectives/tree.mustache"
+      , draw_children : false
     }, {
         model : can.Model.Cacheable
       , property : "business_object_mappings"
       , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
+      , draw_children : false
     }]
   }
 
