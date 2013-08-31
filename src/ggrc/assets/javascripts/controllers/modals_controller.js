@@ -168,7 +168,7 @@ can.Control("GGRC.Controllers.Modals", {
       value = item.value;
     }
 
-    if ($elem.is("[null-if-empty]") && value.length == 0)
+    if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
     if(name.length > 1) {
