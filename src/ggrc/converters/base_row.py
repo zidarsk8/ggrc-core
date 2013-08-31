@@ -742,3 +742,51 @@ class LinkRelationshipsHandler(LinksHandler):
     where_params = self.get_where_params(data)
     model_class = self.options.get('model_class') or self.model_class
     return model_class.query.filter_by(**where_params).first() if model_class else None
+
+class LinkObjectControl(LinksHandler):
+  from ggrc.models import ObjectControl
+  import re
+
+  def parse_item(self, value):
+    if value and value[0] == '[':
+      match = re.match(r'^(?:\[([\w\d-]+)\])?([^$]*)$', value)
+      if match and len(match.groups()) == 2 and not (match.group(1) is None):
+        return { 'slug' : match.group(1) , 'title' : match.group(2) }
+      else:
+        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+    else:
+      return {'slug' : value.upper()}
+
+  def get_existing_items(self):
+    objects = []
+    model_class = self.options.get('model_class') or self.model_class
+    importer_cls_name = self.importer.obj.__class__.__name__
+    where_params = {}
+    where_params['control_id'] = self.importer.obj.id
+    where_params['controllable_type'] = model_class.__name__
+    object_controls = ObjectControl.query.filter_by(**where_params).all()
+    return [obj_cont.controllable for obj_cont in object_controls]
+
+  def create_item(self, data):
+    model_class = self.options.get('model_class') or self.model_class
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+      model_class.__name__, data.get('slug')))
+
+  def after_save(self, obj):
+    # Flushing here because the controllable setter
+    # makes use of an existing id on the object
+    if not self.importer.obj.id:
+      db.session.flush()
+
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      object_control = ObjectControl()
+      object_control.control = self.importer.obj
+      object_control.controllable = linked_object
+      db.session.add(object_control)
+
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = self.options.get('model_class') or self.model_class
+    return model_class.query.filter_by(**where_params).first() if model_class else None
+
