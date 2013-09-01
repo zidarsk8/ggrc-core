@@ -188,7 +188,7 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
 var program_id = /^\/programs\/(\d+)/.exec(window.location.pathname)[1];
 var spin_opts = { position : "absolute", top : 100, left : 100, height : 50, width : 50 };
 
-Permission = function(action, resource_type, context_id) {
+/*Permission = function(action, resource_type, context_id) {
   return {
     action: action,
     resource_type: resource_type,
@@ -239,7 +239,7 @@ $.extend(Permission, (function() {
     is_allowed: is_allowed,
   };
 })());
-
+*/
 function collated_user_roles_by_person(user_roles) {
   var person_roles = new can.Observe.List([])
     , refresh_queue = new RefreshQueue()

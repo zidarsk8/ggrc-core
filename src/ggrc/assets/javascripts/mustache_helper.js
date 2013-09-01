@@ -734,8 +734,16 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   }
 
   var page_type = GGRC.infer_object_type(GGRC.page_object);
-
-  if (GGRC.JoinDescriptor.by_object_option_models[page_type.shortName] && GGRC.JoinDescriptor.by_object_option_models[page_type.shortName][context.constructor.shortName]) {
+  var context_id = null;
+  if (page_type === CMS.Models.Program || !(context instanceof CMS.Models.Program)) {
+    context_id = GGRC.page_object[page_type.table_singular].context ?
+      GGRC.page_object[page_type.table_singular].context.id : null;
+  } else {
+    context_id = context.context ? context.context.id : null;
+  }
+  var join_model_name = GGRC.JoinDescriptor.join_model_name_for(
+      page_type.shortName, context.constructor.shortName);
+  if (join_model_name && Permission.is_allowed('create', join_model_name, context_id)) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -955,7 +963,7 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION}} content {{/is_allowed}}
  */
-var allowed_actions = ["create","read","update","delete"]
+var allowed_actions = ["create","read","update","delete","join_create", "join_read", "join_update", "join_delete"]
   , allowed_page
   ;
 Mustache.registerHelper("is_allowed", function() {
@@ -980,13 +988,27 @@ Mustache.registerHelper("is_allowed", function() {
     }
     else if (typeof arg === 'number') {
       context_id = arg;
+    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+      if (GGRC.page_model instanceof CMS.Models.Program) {
+        resource_type = arg.kind;
+      } else {
+        resource_type = arg.type;
+        context_id = arg.context.id;
+      }
     }
   });
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
   can.each(actions, function(action) {
-    passed = passed && (!window.Permission || Permission.is_allowed(action, resource_type, context_id));
+    var actual_resource_type = resource_type;
+    var actual_action = action;
+    if (action.indexOf("join_") == 0) {
+      actual_action = action.slice(5);
+      actual_resource_type = GGRC.JoinDescriptor.join_model_name_for(
+        GGRC.page_model.constructor.shortName, resource_type);
+    }
+    passed = passed && (!window.Permission || Permission.is_allowed(actual_action, actual_resource_type, context_id));
   });
 
   return passed
@@ -1010,5 +1032,13 @@ Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
   };
 });
 
+Mustache.registerHelper("determine_context", function(page_object, target) {
+  if (page_object.constructor.shortName == "Program") {
+    return page_object.context.id;
+  } else if (target.constructor.shortName == "Program") {
+    return target.context.id;
+  }
+  return page_object.context.id;
+});
 
 })(this, jQuery, can);

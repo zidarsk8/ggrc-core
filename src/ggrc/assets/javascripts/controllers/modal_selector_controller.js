@@ -907,8 +907,15 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul').empty();
 
+        var join_model = GGRC.JoinDescriptor.by_object_option_models[current_option_model_name][this.options.object_model][0].options.join_model_name;
         return GGRC.Models.Search
-          .search_for_types(current_search_term || '', [current_option_model_name])
+          .search_for_types(
+              current_search_term || '',
+              [current_option_model_name],
+              {
+                __permission_type: 'create'
+                , __permission_model: join_model
+              })
           .then(function(search_result) {
             var options = search_result.getResultsForType(current_option_model_name);
             self.option_list.push.apply(self.option_list, options);
@@ -973,8 +980,14 @@
 
     , create_join: function() {
         if (this.context.selected_option) {
+          var context_id = null;
+          if (this.context.selected_option.constructor.shortName == "Program") {
+            context_id = this.context.selected_option.context.id;
+          } else {
+            context_id = this.context.selected_object.context.id;
+          }
           join = this.context.option_descriptor.get_new_join(
-              this.context.selected_object, this.context.selected_option, null);
+              this.context.selected_object, this.context.selected_option, context_id);
           //join = this.get_new_join(this.context.selected_option);
           return join.save();
         } else {

@@ -51,7 +51,7 @@
             {{/if}}
           </div>
           <div class="span6">
-          {{#is_allowed 'delete' instance.constructor.shortName}}
+          {{#is_allowed 'join_delete' instance}}
           {{#if mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}

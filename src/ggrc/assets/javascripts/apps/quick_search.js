@@ -152,6 +152,13 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     , by_option_model: {}
     , by_object_option_models: {}
     , by_option_object_models: {}
+    , join_model_name_for: function (model_name_a, model_name_b) {
+        if (this.by_object_option_models[model_name_a] &&
+            this.by_object_option_models[model_name_a][model_name_b]) {
+          return this.by_object_option_models[model_name_a][model_name_b][0].options.join_model_name;
+        }
+        return null;
+    }
 
     , from_arguments_list: function(args_list) {
         var self = this;
