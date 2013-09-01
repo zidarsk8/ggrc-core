@@ -119,7 +119,7 @@ class BaseConverter(object):
   def get_header_for_metadata_column(self, column_name):
     return self.get_header_for_column(self.metadata_map, column_name)
 
-  def read_headers(self, import_map, row):
+  def read_headers(self, import_map, row, required_headers = []):
     ignored_colums = []
     self.trim_list(row)
     keys = []
@@ -140,18 +140,18 @@ class BaseConverter(object):
         plural='s' if len(ignored_colums) > 1 else '', ignored_text=ignored_text))
 
     missing_columns = import_map.values()
-    for element in keys:
-      if element is not None:
-        missing_columns.remove(element)
+    [missing_columns.remove(element) for element in keys if element]
 
-    # Created and Updated column headers should not thrown warnings on import
-    # because they are not used
-    missing_columns = [column for column in missing_columns if column != 'created_at' and column != 'updated_at']
+    optional_headers = ['created_at', 'updated_at']
+    missing_columns = [column for column in missing_columns if not (column in optional_headers)]
+
+    for header in required_headers:
+      if header in missing_columns:
+        self.errors.append("Missing required column: {}".format(self.get_header_for_column(import_map, header)))
+        missing_columns.remove(header)
 
     if len(missing_columns):
-      missing_headers = [
-          self.get_header_for_column(import_map, temp)
-              for temp in missing_columns if temp is not None]
+      missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
       self.warnings.append("Missing column{plural}: {missing}".format(
         plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
@@ -167,7 +167,7 @@ class BaseConverter(object):
 
   def do_import(self, dry_run = True):
     self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0))
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers = ['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
       row = self.row_converter(self, row_attrs, index)
@@ -202,7 +202,6 @@ class BaseConverter(object):
     elif self.__class__.__name__ == 'SystemsConverter':
       model_name = "Processes" if self.options.get('is_biz_process') else "Systems"
       self.validate_metadata_type(attrs, model_name)
-
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
