@@ -134,7 +134,7 @@ class BaseConverter(object):
       elif heading != "start_date" and heading != "end_date": #
         keys.append(import_map[heading])
 
-    if len(ignored_colums):
+    if any(ignored_colums):
       ignored_text = ", ".join(ignored_colums)
       self.warnings.append("Ignored column{plural}: {ignored_text}".format(
         plural='s' if len(ignored_colums) > 1 else '', ignored_text=ignored_text))
@@ -150,7 +150,7 @@ class BaseConverter(object):
         self.errors.append("Missing required column: {}".format(self.get_header_for_column(import_map, header)))
         missing_columns.remove(header)
 
-    if len(missing_columns):
+    if any(missing_columns):
       missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
       self.warnings.append("Missing column{plural}: {missing}".format(
