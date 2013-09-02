@@ -1,0 +1,11 @@
+<h1 class="{{model.category}}">
+  <div class="grcobject {{model.category}}" rel="tooltip" data-placement="bottom" title="{{model.title_singular}}">
+    <i class="grcicon-{{model.table_singular}}"></i>
+  </div>
+  {{instance.title}}
+  {{#if instance.context.id}}
+  <span class="private">
+    <i class="grcicon-private" rel="tooltip" title="Private"></i>
+  </span>
+  {{/if}}
+</h1>
