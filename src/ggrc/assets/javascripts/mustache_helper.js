@@ -689,7 +689,7 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     options = name;
     name = "page_object";
   }
-  var page_object = GGRC.make_model_instance(GGRC.page_object);
+  var page_object = GGRC.page_instance();
   if(page_object) {
     var p = {};
     p[name] = page_object;
@@ -955,12 +955,10 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION}} content {{/is_allowed}}
  */
-var allowed_actions = ["create","read","update","delete"]
-  , allowed_page
-  ;
+var allowed_actions = ["create","read","update","delete"];
 Mustache.registerHelper("is_allowed", function() {
-  allowed_page = allowed_page || GGRC.make_model_instance(GGRC.page_object);
-  var args = Array.prototype.slice.call(arguments, 0)
+  var allowed_page = GGRC.page_instance()
+    , args = Array.prototype.slice.call(arguments, 0)
     , actions = []
     , resource_type = allowed_page && allowed_page.constructor.shortName
     , context_id = allowed_page && allowed_page.context && allowed_page.context.id

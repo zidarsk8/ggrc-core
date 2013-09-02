@@ -233,7 +233,7 @@ $(function() {
           model_descriptors: model_descriptors
         , widget_descriptors: GGRC.extra_widget_descriptors || {}
         , default_widgets: GGRC.extra_default_widgets || []
-        , instance: GGRC.make_model_instance(GGRC.page_object)
+        , instance: GGRC.page_instance()
         });
     } else if (/dashboard/.test(window.location)) {
       $area.cms_controllers_dashboard({

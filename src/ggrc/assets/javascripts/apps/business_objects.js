@@ -15,7 +15,7 @@ $(function() {
 
   var object_class = GGRC.infer_object_type(GGRC.page_object)
     , object_table = object_class.table_plural
-    , object = GGRC.make_model_instance(GGRC.page_object);
+    , object = GGRC.page_instance();
 
   var info_widget_views = {
     'programs': GGRC.mustache_path + "/programs/info.mustache"
