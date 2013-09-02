@@ -674,7 +674,7 @@ class LinkSystemsHandler(LinksHandler):
   def get_existing_items(self):
     sys_class = Process if self.options.get('is_biz_process') else System
     systems = super(LinkSystemsHandler, self).get_existing_items()
-    return [sys for sys in systems if sys.__class__ is sys_class]
+    return [sys for sys in systems if sys.__class__ is sys_class] if systems else []
 
   def create_item(self, data):
     return None
