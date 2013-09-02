@@ -980,11 +980,16 @@
 
     , create_join: function() {
         if (this.context.selected_option) {
-          var context_id = null;
+          var context_id = null
+            , context_object
+            ;
           if (this.context.selected_option.constructor.shortName == "Program") {
-            context_id = this.context.selected_option.context.id;
+            context_object = this.context.selected_option;
           } else {
-            context_id = this.context.selected_object.context.id;
+            context_object = this.context.selected_object;
+          }
+          if (context_object.context && context_object.context.id) {
+            context_id = context_object.context.id;
           }
           join = this.context.option_descriptor.get_new_join(
               this.context.selected_object, this.context.selected_option, context_id);
