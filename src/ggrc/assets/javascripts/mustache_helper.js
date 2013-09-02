@@ -962,8 +962,8 @@ Mustache.registerHelper("is_allowed", function() {
   allowed_page = allowed_page || GGRC.make_model_instance(GGRC.page_object);
   var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
-    , resource_type = allowed_page.constructor.shortName
-    , context_id = allowed_page.context && allowed_page.context.id
+    , resource_type = allowed_page && allowed_page.constructor.shortName
+    , context_id = allowed_page && allowed_page.context && allowed_page.context.id
     , options = args[args.length-1]
     , passed = true
     ;
