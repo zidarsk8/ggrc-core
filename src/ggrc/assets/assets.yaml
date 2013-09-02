@@ -27,6 +27,7 @@ dashboard-js-files:
   - wysihtml5-0.3.0_rc2.js
   - bootstrap-wysihtml5-0.0.2.js
   - moment.js
+  - permission.js
   - application.js
   - fastfix.js
   - related_selector.js
