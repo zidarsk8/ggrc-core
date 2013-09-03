@@ -19,6 +19,9 @@ can.Control("CMS.Controllers.Dashboard", {
 
 }, {
     init: function(options) {
+      this.init_page_title();
+      this.init_page_help();
+      this.init_page_header();
       this.init_widget_descriptors();
       if (!this.options.menu_tree)
         this.init_menu_tree();
@@ -30,6 +33,35 @@ can.Control("CMS.Controllers.Dashboard", {
       if (!this.widget_area_controller)
         this.init_widget_area();
       this.init_default_widgets();
+    }
+
+  , init_page_title: function() {
+      var page_title = null;
+      if (typeof(this.options.page_title) === "function")
+        page_title = this.options.page_title(this);
+      else if (this.options.page_title)
+        page_title = this.options.page_title;
+      if (page_title)
+        $("head > title").text(page_title);
+    }
+
+  , init_page_help: function() {
+      var page_help = null;
+      if (typeof(this.options.page_help) === "function")
+        page_help = this.options.page_help(this);
+      else if (this.options.page_help)
+        page_help = this.options.page_help;
+      if (page_help)
+        this.element.find("#page-help").attr("data-help-slug", page_help);
+    }
+
+  , init_page_header: function() {
+      var that = this;
+      if (this.options.header_view) {
+        can.view(this.options.header_view, this.options, function(frag) {
+          that.element.find("#page-header").html(frag);
+        });
+      }
     }
 
   , init_widget_area: function() {
@@ -250,6 +282,17 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
 }, {
     init: function() {
       this.options.model = this.options.instance.constructor;
+      this._super();
+    }
+
+  , init_page_title: function() {
+      // Reset title when page object is modified
+      var that = this
+        , that_super = this._super
+        ;
+      this.options.instance.bind("change", function() {
+        that_super.apply(that);
+      });
       this._super();
     }
 

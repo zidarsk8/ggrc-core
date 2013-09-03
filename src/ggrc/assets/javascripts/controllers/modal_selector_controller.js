@@ -326,7 +326,7 @@
   });
 
   function get_page_object() {
-    return GGRC.make_model_instance(GGRC.page_object);
+    return GGRC.page_instance();
   }
 
   function get_option_set(name, data) {
