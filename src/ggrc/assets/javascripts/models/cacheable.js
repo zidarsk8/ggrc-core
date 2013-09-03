@@ -182,6 +182,8 @@ can.Model("can.Model.Cacheable", {
     if(params[this.root_collection]) {
       params = params[this.root_collection];
     }
+    if (!params || params.length == 0)
+      return new this.List();
     var ms = this._super(params);
     if(params instanceof can.Observe) {
       params.replace(ms);
@@ -216,12 +218,21 @@ can.Model("can.Model.Cacheable", {
     params = this.object_from_resource(params);
     if (!params)
       return params;
+    var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
+    fn(params, function(val, key) {
+      if (val === null)
+        if (params.removeAttr)
+          params.removeAttr(key);
+        else
+          delete params[key];
+    });
     if(m = this.findInCacheById(params.id)) {
-      if(m === params)
-        return m;
-      if (!params.selfLink)
-        return m;
-      if(!m.selfLink) {
+      if (m === params) {
+        //return m;
+      } else if (!params.selfLink) {
+        //return m;
+      } else {
+      if (!m.selfLink) {
         //we are fleshing out a stub, which is much like creating an object new.
         //But we don't want to trigger every change event on the new object's props.
         m._init = 1;
@@ -230,15 +241,35 @@ can.Model("can.Model.Cacheable", {
         //m.removeAttr('type');
         //m.removeAttr('href');
       }
-      var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
-        var p = val && val.serialize ? val.serialize() : val;
-        var i = 0, j = 0, k;
+        //var p = val && val.serialize ? val.serialize() : val;
+        var i = 0, j = 0, k, changed = false;
         if(m[key] instanceof can.Observe.List) {
-          m[key].replace(
-            m[key].constructor.models ?
-              m[key].constructor.models(p)
-              : p);
+          if (val.serialize)
+            console.debug('serializable!', val);
+          if (changed === false) {
+            for (i=0; changed === false && i < m[key].length; i++) {
+              // If m[key][i] === val[i] then they're the same
+              // If val[i] is a stub of m[key][i], then it provides no new data
+              if (!(m[key][i] === val[i]
+                    || (val[i] && !val[i].selfLink && m[key][i].id === val[i].id
+                        && m[key][i].constructor.shortName === val[i].type)))
+                changed = i;
+            }
+          }
+          if (changed === false && m[key].length < val.length)
+            changed = m[key].length;
+          if (changed !== false) {
+            var p = val && val.serialize ? val.serialize() : val;
+            p = p.slice(changed);
+            m[key].splice.apply(m[key], [changed, 0].concat(
+              //m.constructor.attributes[key] ?
+              //  can.makeArray(can.getObject(m.constructor.attributes[key])(p))
+              //  : p));
+              m[key].constructor.models ?
+                can.makeArray(m[key].constructor.models(p))
+                : p));
+          }
           // TODO -- experimental list optimization below -- BM 7/15/2013
           // p = m[key].constructor.models ? m[key].constructor.models(p) : p;
           // while(i < m[key].length && j < p.length) {
@@ -264,12 +295,17 @@ can.Model("can.Model.Cacheable", {
           //   m[key].splice(j, i - j);
           // }
         } else if(m[key] instanceof can.Model) {
-          m[key].constructor.model(params[key] || {});
+          if (!(m[key] === val
+              || (val && !val.selfLink && m[key].id === val.id
+                  && m[key].constructor.shortName === val.type))) {
+            m[key].constructor.model(params[key] || {});
+          }
         } else {
-          m.attr(key, p);
+          m.attr(key, val && val.serialize ? val.serialize() : val);
         }
       });
       delete m._init;
+      }
     } else {
       m = this._super(params);
     }
@@ -385,16 +421,6 @@ can.Model("can.Model.Cacheable", {
     }
 }, {
   init : function() {
-    var obj_name = this.constructor.root_object;
-    if(typeof obj_name !== "undefined" && this[obj_name]) {
-        for(var i in this[obj_name].serialize()) {
-          if(this[obj_name].hasOwnProperty(i)) {
-            this.attr(i, this[obj_name][i]);
-          }
-        }
-        this.removeAttr(obj_name);
-    }
-
     var cache = can.getObject("cache", this.constructor, true);
     if (this.id)
       cache[this.id] = this;
@@ -429,10 +455,10 @@ can.Model("can.Model.Cacheable", {
       , dataType : "json"
     })
     .then(can.proxy(this.constructor, "model"))
-    .done(function(d) {
+    /*.done(function(d) {
       d.updated();
       //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
-    });
+    });*/
   }
   , attr : function() {
     if(arguments.length < 1) {

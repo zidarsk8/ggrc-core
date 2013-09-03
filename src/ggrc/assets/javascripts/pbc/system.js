@@ -145,7 +145,10 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , sub_systems : "CMS.Models.get_instances"
     , super_system_systems : "CMS.Models.SystemSystem.models"
     , super_systems : "CMS.Models.get_instances"
-    //, controls : "CMS.Models.Control.models"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -195,7 +198,10 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     , sub_systems : "CMS.Models.get_instances"
     , super_system_systems : "CMS.Models.SystemSystem.models"
     , super_systems : "CMS.Models.get_instances"
-    //, controls : "CMS.Models.Control.models"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);

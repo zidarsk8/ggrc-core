@@ -107,7 +107,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
   }
   , defaults : {
-    sections : []
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -867,10 +866,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   }
 
   , defaults : {
-    object_objectives : []
-    , objective_controls : []
-    , section_objectives : []
-    , object_people : []
   }
 
   , mappings: {

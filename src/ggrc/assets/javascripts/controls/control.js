@@ -60,28 +60,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "title" : ""
     , "slug" : ""
     , "description" : ""
-
-    , object_people : []
-    , people : []
-    , object_documents : []
-    , documents : []
-    , categories : []
-    , assertions : []
-    , control_controls : []
-    , implemented_controls : []
-    , implementing_control_controls : []
-    , implementing_controls : []
-    , objective_controls : []
-    , objectives : []
-    , control_sections : []
-    , sections : []
-    , program_controls : []
-    , programs : []
-    , system_controls : []
-    , systems : []
-    , control_risks : []
-    , risks : []
-    , object_controls : []
+    , "url" : ""
   }
 
   , mappings: {
@@ -153,13 +132,8 @@ can.Model.Cacheable("CMS.Models.Control", {
   }
 }
 , {
-// prototype properties
   init : function() {
-    var that = this;
-    this.attr({
-      "content_id" : Math.floor(Math.random() * 10000000)
-    });
-    this._super();
+    this._super.apply(this, arguments);
     this._init_mappings();
   }
 
