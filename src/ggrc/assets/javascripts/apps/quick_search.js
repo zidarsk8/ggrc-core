@@ -492,7 +492,7 @@ $(function() {
   $(document.body).on("click", ".map-to-page-object", function(ev) {
     var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
     , page_model = GGRC.infer_object_type(GGRC.page_object)
-    , page_instance = GGRC.make_model_instance(GGRC.page_object)
+    , page_instance = GGRC.page_instance()
     , join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0]
     //, link = page_model.links_to[inst.constructor.model_singular]
     , params = {};

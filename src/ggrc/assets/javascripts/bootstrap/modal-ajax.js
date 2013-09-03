@@ -152,7 +152,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -170,7 +170,7 @@
 
       $target.on('modal:success', function(e, data) {
         var model_name = $trigger.attr("data-object-singular");
-        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
+        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
           window.location.assign('/dashboard');
         } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
           window.location.assign('/admin');
@@ -186,7 +186,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }

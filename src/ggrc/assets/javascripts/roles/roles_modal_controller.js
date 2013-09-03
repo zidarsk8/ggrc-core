@@ -146,7 +146,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }

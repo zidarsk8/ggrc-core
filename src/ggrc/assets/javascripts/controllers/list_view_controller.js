@@ -50,7 +50,7 @@ can.Control("GGRC.Controllers.ListView", {
   init : function() {
     if(this.options.is_related) {
       if (!this.options.parent_instance)
-        this.options.parent_instance = GGRC.make_model_instance(GGRC.page_object);
+        this.options.parent_instance = GGRC.page_instance();
       if(!this.options.parent_type)
         this.options.parent_type = this.options.parent_instance.constructor.shortName;
 

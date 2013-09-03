@@ -238,6 +238,12 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
+  , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
+    if (!this.options.instance.isNew()) {
+      this.options.instance.refresh();
+    }
+  }
+
   , destroy : function() {
     if(this.options.model && this.options.model.cache) {
       delete this.options.model.cache[undefined];
