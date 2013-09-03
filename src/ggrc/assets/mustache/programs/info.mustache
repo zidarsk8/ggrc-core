@@ -16,14 +16,15 @@
   </p>
   <p>
     <strong>Owner:</strong>
-    {{^owner}}
-    <span class="error">
-      Not Assigned
-    </span>
-    {{/owner}}
+    {{#using owner}}
     {{#if owner}}
       {{owner.name}}
+    {{else}}
+      <span class="error">
+        Not Assigned
+      </span>
     {{/if}}
+    {{/using}}
   </p>
   {{#is_allowed 'update' model.shortName}}
   <p>
