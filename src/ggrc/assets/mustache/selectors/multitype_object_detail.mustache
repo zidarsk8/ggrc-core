@@ -13,7 +13,9 @@
   <div class="owner">
     <strong>Owner:</strong>
     {{#if owner}}
-    {{owner}}
+    {{#using owner}}
+    {{owner.name}}
+    {{/using}}
     {{/if}}
   </div>
   <div class="object-url">

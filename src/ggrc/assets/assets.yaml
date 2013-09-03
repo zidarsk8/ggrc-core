@@ -117,6 +117,7 @@ dashboard-js-template-files:
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
   - directives/tree.mustache
+  - events/object_list.mustache
   - facilities/modal_content.mustache
   - help/help_modal_content.mustache
   - help/help_modal_header.mustache
@@ -136,6 +137,7 @@ dashboard-js-template-files:
   - people/modal_content.mustache
   - people/multitype_option_detail.mustache
   - people/multitype_option_items.mustache
+  - people/object_list.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/tree.mustache
@@ -150,6 +152,7 @@ dashboard-js-template-files:
   - risks/modal_content.mustache
   - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
+  - roles/object_list.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - selectors/active_column.mustache

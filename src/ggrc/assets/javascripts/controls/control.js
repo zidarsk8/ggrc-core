@@ -89,6 +89,10 @@ can.Model.Cacheable("CMS.Models.Control", {
           attr: "object_people"
         , target_attr: "person"
       }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
+      }
     , business_object_mappings: {
           attr: "object_controls"
         , target_attr: "controllable"
@@ -100,6 +104,10 @@ can.Model.Cacheable("CMS.Models.Control", {
     , objective_mappings: {
           attr: "objective_controls"
         , target_attr: "objective"
+      }
+    , program_mappings: {
+          attr: "program_controls"
+        , target_attr: "program"
       }
     }
 
@@ -116,9 +124,19 @@ can.Model.Cacheable("CMS.Models.Control", {
       , list_view : "/static/mustache/people/tree.mustache"
       , draw_children : false
     }, {
+        model : "Document"
+      , property : "document_mappings"
+      , list_view : "/static/mustache/documents/tree.mustache"
+      , draw_children : false
+    }, {
         model : "Objective"
       , property : "objective_mappings"
       , list_view : "/static/mustache/objectives/tree.mustache"
+      , draw_children : false
+    }, {
+        model : "Program"
+      , property : "program_mappings"
+      , list_view : "/static/mustache/base_objects/tree.mustache"
       , draw_children : false
     }, {
         model : can.Model.Cacheable

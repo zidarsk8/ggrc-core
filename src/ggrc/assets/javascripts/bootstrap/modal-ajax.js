@@ -287,6 +287,9 @@
       _top = offsetParent.closest(".modal").offset().top - offsetParent.offset().top + header_height;
       _left = offsetParent.closest(".modal").offset().left + offsetParent.closest(".modal").width() / 2 - offsetParent.offset().left;
     }
+    if (_top < 0) {
+      _top = 0;
+    }
     modal
     .css("top", _top + "px")
     .css({"position" : "absolute", "margin-top" : 0, "left" : _left});
@@ -301,7 +304,7 @@
         || $(shownevents).filter(function() { 
             return $.inArray("arrange", this.namespace.split(".")) > -1; 
         }).length < 1) {
-          $el.on("shown.arrange", function(ev) {
+          $el.on("shown.arrange, loaded.arrange", function(ev) {
             if(ev.target === ev.currentTarget)
                 reconfigureModals.call(that);
           });
