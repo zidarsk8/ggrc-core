@@ -28,7 +28,7 @@
 -block main
   .tabbable.tabs-left{ 'id': '{{ tabbable_id }}' }
     -# FIXME: Fix all `data-tab-href` and `data-new-href` attribute paths
-    %ul.nav.nav-tabs
+    %ul.nav.nav-tabs{ style : "display:none"}
       =tab("Person", "People", "/search?s=&qr={0}".format("qr"), "", "", "/static/mustache/people/object_list.mustache")
     .tab-content
       .tab-pane{ id : "#{prefix}_people" }
