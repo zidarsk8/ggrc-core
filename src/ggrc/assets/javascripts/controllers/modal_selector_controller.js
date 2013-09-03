@@ -868,6 +868,18 @@
         return this.context;
       }
 
+    , insert_options: function(options, prepend) {
+        var self = this;
+        can.view(this.options.option_items_view, { options: options }, function(frag) {
+          if (self.element) {
+            if (prepend)
+              self.element.find('.option_column ul').prepend(frag);
+            else
+              self.element.find('.option_column ul').append(frag);
+          }
+        });
+      }
+
     , refresh_option_list: function() {
         var self = this
           , visible_options
@@ -893,9 +905,7 @@
             if (self.element
                 && self.options.option_model === current_option_model
                 && self.options.option_search_term === current_search_term) {
-              can.view(self.options.option_items_view, { options: options }, function(frag) {
-                self.element && self.element.find('.option_column ul').append(frag);
-              });
+              self.insert_options(options);
               if (i < objects.length) {
                 setTimeout(function() {
                   refresh_up_to(objects.slice(i), request_limit, render_limit);
@@ -990,9 +1000,12 @@
       }
 
     , ".btn-add modal:success" : function(el, ev, data) {
-      this.option_list.unshift(data);
-      this.context.attr('selected_option', data);
-    }
+        this.option_list.unshift(data);
+        this.context.attr('selected_option', data);
+        this.insert_options([data], true);
+        // Scroll so the top element (the one just added) is in view
+        this.element.find(".option_column ul").parent().scrollTop(0);
+      }
   });
 
   ModalOptionDescriptor = can.Construct({
