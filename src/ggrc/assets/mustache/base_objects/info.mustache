@@ -16,14 +16,15 @@
   </p>
   <p>
     <strong>Owner:</strong>
-    {{^owner}}
-    <span class="error">
-      Not Assigned
-    </span>
-    {{/owner}}
+    {{#using owner}}
     {{#if owner}}
       {{owner.name}}
+    {{else}}
+      <span class="error">
+        Not Assigned
+      </span>
     {{/if}}
+    {{/using}}
   </p>
   <p>
     <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-form-target="refresh" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">

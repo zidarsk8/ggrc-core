@@ -219,13 +219,6 @@ can.Model("can.Model.Cacheable", {
     if (!params)
       return params;
     var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
-    fn(params, function(val, key) {
-      if (val === null)
-        if (params.removeAttr)
-          params.removeAttr(key);
-        else
-          delete params[key];
-    });
     if(m = this.findInCacheById(params.id)) {
       if (m === params) {
         //return m;
@@ -242,11 +235,8 @@ can.Model("can.Model.Cacheable", {
         //m.removeAttr('href');
       }
       fn(params, function(val, key) {
-        //var p = val && val.serialize ? val.serialize() : val;
         var i = 0, j = 0, k, changed = false;
         if(m[key] instanceof can.Observe.List) {
-          if (val.serialize)
-            console.debug('serializable!', val);
           if (changed === false) {
             for (i=0; changed === false && i < m[key].length; i++) {
               // If m[key][i] === val[i] then they're the same
@@ -263,9 +253,6 @@ can.Model("can.Model.Cacheable", {
             var p = val && val.serialize ? val.serialize() : val;
             p = p.slice(changed);
             m[key].splice.apply(m[key], [changed, 0].concat(
-              //m.constructor.attributes[key] ?
-              //  can.makeArray(can.getObject(m.constructor.attributes[key])(p))
-              //  : p));
               m[key].constructor.models ?
                 can.makeArray(m[key].constructor.models(p))
                 : p));
@@ -298,15 +285,29 @@ can.Model("can.Model.Cacheable", {
           if (!(m[key] === val
               || (val && !val.selfLink && m[key].id === val.id
                   && m[key].constructor.shortName === val.type))) {
-            m[key].constructor.model(params[key] || {});
+            if (val === null || typeof(val) === "undefined")
+              m.removeAttr(key);
+            else
+              m[key].constructor.model(params[key] || {});
           }
         } else {
-          m.attr(key, val && val.serialize ? val.serialize() : val);
+          if (val === null || typeof(val) === "undefined")
+            m.removeAttr(key)
+          else
+            m.attr(key, val && val.serialize ? val.serialize() : val);
         }
       });
       delete m._init;
       }
     } else {
+      fn(params, function(val, key) {
+        if (val === null) {
+          if (params.removeAttr)
+            params.removeAttr(key);
+          else
+            delete params[key];
+        }
+      });
       m = this._super(params);
     }
     return m;
