@@ -771,6 +771,10 @@
         , object_model: null
         , join_model: null
       }
+
+    , last_selected_option_type: null
+    , last_option_search_term: ""
+
     , launch: function($trigger, options) {
         // Extract parameters from data attributes
 
@@ -790,9 +794,12 @@
         this.options.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
 
+        this.options.option_search_term = this.constructor.last_option_search_term;
+
         this.init_menu();
         this.init_context();
-        this.set_option_descriptor(this.options.default_option_descriptor);
+        this.set_option_descriptor(
+            this.constructor.last_selected_option_type || this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
         this.init_data()
@@ -832,6 +839,9 @@
             $(self.element).html(frag);
             deferred.resolve();
             self.element.trigger('loaded');
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
           });
 
         // Start listening for events
@@ -921,15 +931,22 @@
         return GGRC.Models.Search
           .search_for_types(current_search_term || '', [current_option_model_name])
           .then(function(search_result) {
-            var options = search_result.getResultsForType(current_option_model_name);
-            self.option_list.push.apply(self.option_list, options);
-            return refresh_up_to(options, 50, 50);
+            var options;
+            if (self.element
+                && self.options.option_model === current_option_model
+                && self.options.option_search_term === current_search_term) {
+              options = search_result.getResultsForType(current_option_model_name);
+              self.option_list.push.apply(self.option_list, options);
+              return refresh_up_to(options, 50, 50);
+            }
           });
       }
 
     , set_option_descriptor: function(option_type) {
         var descriptor = this.options.option_descriptors[option_type]
           ;
+
+        this.constructor.last_selected_option_type = option_type;
 
         can.Model.startBatch();
 
@@ -944,7 +961,8 @@
         this.context.attr('new_object_title', descriptor.new_object_title);
         this.options.option_items_view = descriptor.items_view;
         this.options.option_model = descriptor.model;
-        this.options.option_search_term = '';
+        if (!this.options.option_search_term)
+          this.options.option_search_term = '';
 
         can.Model.stopBatch();
 
@@ -953,6 +971,7 @@
 
     , on_select_option_type: function(el, ev) {
         this.set_option_descriptor($(el).val());
+        this.element.find("#search").focus();
       }
 
     , "select.option-type-selector change": "on_select_option_type"
@@ -1005,6 +1024,22 @@
         this.insert_options([data], true);
         // Scroll so the top element (the one just added) is in view
         this.element.find(".option_column ul").parent().scrollTop(0);
+      }
+
+    , "#search keyup": function(el, ev) {
+        var self = this
+          , $el = $(el)
+          , term = $el.val()
+          ;
+        if (term !== this.options.option_search_term) {
+          this.options.option_search_term = term;
+          setTimeout(function() {
+            if (self.options.option_search_term === term) {
+              self.refresh_option_list();
+              self.constructor.last_option_search_term = term;
+            }
+          }, 200);
+        }
       }
   });
 
