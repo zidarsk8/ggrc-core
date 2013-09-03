@@ -831,6 +831,7 @@
           function(frag) {
             $(self.element).html(frag);
             deferred.resolve();
+            self.element.trigger('loaded');
           });
 
         // Start listening for events
