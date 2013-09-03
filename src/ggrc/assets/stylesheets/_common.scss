@@ -563,6 +563,12 @@ select.multiple-selector {
 }
 
 // Tooltips
+.tooltip{
+  &.in {
+    @include opacity(1);
+  }
+}
+
 .tooltip-inner {
   text-align: left;
 }
