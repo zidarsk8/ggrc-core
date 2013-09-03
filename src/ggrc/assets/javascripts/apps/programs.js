@@ -71,6 +71,15 @@ can.Construct("ModelRefreshQueue", {
 });
 
 can.Construct("RefreshQueueManager", {
+    model_bases: {
+      // This won't work until Relatable/Documentable/etc mixins can handle
+      // queries with multiple `type` values.
+      //  Regulation: 'Directive'
+      //, Contract: 'Directive'
+      //, Policy: 'Directive'
+      //, System: 'SystemOrProcess'
+      //, Process: 'SystemOrProcess'
+    }
 }, {
     init: function() {
       this.null_queue = new ModelRefreshQueue(null);
@@ -84,6 +93,11 @@ can.Construct("RefreshQueueManager", {
         , found_queue = null
         , id = obj.id
         ;
+
+      if (this.constructor.model_bases[model_name]) {
+        model_name = this.constructor.model_bases[model_name];
+        model = CMS.Models[model_name];
+      }
 
       if (!force)
         // Check if the ID is already contained in another queue

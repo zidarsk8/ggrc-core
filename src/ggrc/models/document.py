@@ -6,6 +6,7 @@
 from ggrc import db
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base
+from .utils import validate_option
 
 class Document(Base, db.Model):
   __tablename__ = 'documents'
@@ -78,15 +79,14 @@ class Document(Base, db.Model):
       ]
 
   @validates('type', 'kind', 'year', 'language')
-  def validate_options(self, key, option):
+  def validate_document_options(self, key, option):
     if key in ('type', 'year'):
       desired_role  = 'document_' + key
     elif key == 'kind':
       desired_role = 'reference_type'
     else:
       desired_role = key
-    assert option is None or option.role == desired_role
-    return option
+    return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @classmethod
   def eager_query(cls):

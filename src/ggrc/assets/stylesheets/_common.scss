@@ -238,6 +238,10 @@ blockquote {
     }
   }
 }
+// Disabled state
+.btn.disabled, .btn[disabled] {
+  @include opacity(0.25);
+}
 
 
 // removing outline on anchor element

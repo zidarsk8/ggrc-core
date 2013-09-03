@@ -828,6 +828,27 @@ Mustache.registerHelper("schemed_url", function(url) {
   return url;
 });
 
+function when_attached_to_dom(el, cb) {
+  // Trigger the "more" toggle if the height is the same as the scrollable area
+  el = $(el);
+  !function poll() {
+    if (el.closest(document.documentElement).length) {
+      cb();
+    }
+    else {
+      setTimeout(poll, 100);
+    }
+  }();
+}
+
+Mustache.registerHelper("trigger_created", function() {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).trigger("contentAttached");
+    });
+  };
+});
+
 Mustache.registerHelper("show_long", function() {
   return  [
       '<a href="javascript://" class="show-long"'
@@ -919,7 +940,75 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
 });
 
 Mustache.registerHelper("date", function(date) {
-  return moment(date.isComputed ? date() : date).zone("-08:00").format("MM/DD/YYYY hh:mm:ssa") + " PST";
+  var m = moment(new Date(date.isComputed ? date() : date))
+    , dst = m.isDST()
+    ;
+  return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
 });
+
+/**
+ * Checks permissions. 
+ * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
+ * Usage:
+ *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION}} content {{/is_allowed}}
+ */
+var allowed_actions = ["create","read","update","delete"]
+  , allowed_page
+  ;
+Mustache.registerHelper("is_allowed", function() {
+  allowed_page = allowed_page || GGRC.make_model_instance(GGRC.page_object);
+  var args = Array.prototype.slice.call(arguments, 0)
+    , actions = []
+    , resource_type = allowed_page && allowed_page.constructor.shortName
+    , context_id = allowed_page && allowed_page.context && allowed_page.context.id
+    , options = args[args.length-1]
+    , passed = true
+    ;
+
+  // Resolve arguments
+  can.each(args, function(arg, i) {
+    arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
+
+    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
+      actions.push(arg);
+    }
+    else if (typeof arg === 'string') {
+      resource_type = arg;
+    }
+    else if (typeof arg === 'number') {
+      context_id = arg;
+    }
+  });
+  actions = actions.length ? actions : allowed_actions;
+
+  // Check permissions
+  can.each(actions, function(action) {
+    passed = passed && (!window.Permission || Permission.is_allowed(action, resource_type, context_id));
+  });
+
+  return passed
+    ? options.fn(options.contexts || this) 
+    : options.inverse(options.contexts || this)
+    ;
+});
+
+function resolve_computed(maybe_computed) {
+  return (typeof maybe_computed === "function" && maybe_computed.isComputed) ? maybe_computed() : maybe_computed;
+}
+
+Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
+  spin_opts = resolve_computed(spin_opts);
+  styles = resolve_computed(styles);
+  spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+  styles = typeof styles === "string" ? styles : "";
+  return function(el) {
+    var spinner = new Spinner(spin_opts).spin();
+    $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
+  };
+});
+
 
 })(this, jQuery, can);

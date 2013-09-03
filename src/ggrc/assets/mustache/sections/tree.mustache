@@ -1,5 +1,5 @@
 {{#list}}
-  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true">
+  <li class="tree-item governance" id="content_{{instance.slug}}" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}" data-object-meta-type="section" data-model="true" {{trigger_created}}>
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
@@ -8,7 +8,7 @@
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 <span class="tree-code">{{instance.slug}}</span>
-                {{instance.title}}{{#parent}}, child of {{instance.title}}{{/parent}}
+                {{instance.title}}
               </div>
             </div>
           </div>
@@ -64,23 +64,13 @@
 
         <div class="row-fluid">
 
-          <div class="span6">
-            {{#edit_sections}}
-              <a href="javascript://" class="info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+          <div class="span12">
+            {{#is_allowed 'update' instance.constructor.shortName}}
+              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
                 Edit Section
               </a>
-            {{/edit_sections}}
-          </div>
-
-          <div class="span6">
-          {{#if mappings}}
-            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
-              <i class="grcicon-remove"></i>
-              {{unmap_or_delete instance mappings}}
-            </a>
-          {{/if}}
+            {{/is_allowed}}
           </div>
 
         </div>
@@ -98,7 +88,22 @@
             </div>
           </div>
         </div>
+
+        {{#parent}}
+        <div class="parent">
+          <div class="row-fluid">
+            <div class="span12">
+              Part of
+              <i class="grcicon-{{instance.constructor.table_singular}}-black" rel="tooltip" title="{{instance.kind}}"></i>
+              <strong>{{instance.title}}</strong>
+              {{instance.kind}}
+            </div>
+          </div>
+        </div>
+        {{/parent}}
+
       </div>
+
 
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
@@ -116,6 +121,7 @@
   </li>
 {{/list}}
 
+{{#is_allowed 'create' 'update' 'delete' model.shortName}}
 {{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
@@ -164,3 +170,4 @@
   </div>
 </li>
 {{/if}}
+{{/is_allowed}}

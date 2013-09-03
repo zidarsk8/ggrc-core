@@ -91,6 +91,7 @@ $(function() {
                   .refresh_list();
               }
             , fetch_post_process : sort_sections
+            , draw_children : true
             }]
       }
     , extra_content_controller_options = {
@@ -98,10 +99,22 @@ $(function() {
               Regulation: program_directive_options
             , Policy: program_directive_options
             , Contract: program_directive_options
+            , Control: { draw_children : true }
+            , Objective: { draw_children : true }
           }
-        , Regulation: {}
+        , Regulation: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Policy: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Contract : {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
       }
-
     ;
 
   can.each(far_models, function(join_descriptors, model_name) {

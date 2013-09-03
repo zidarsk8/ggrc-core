@@ -1,5 +1,5 @@
 from .base import *
-from ggrc.models import Directive, Control
+from ggrc.models import Directive, Control, System, Process
 from .base_row import *
 from collections import OrderedDict
 from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
@@ -40,8 +40,8 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
     self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
     self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
-    self.handle('systems', LinkSystemsHandler, is_biz_process = False)
-    self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
+    self.handle('systems', LinkObjectControl, model_class = System)
+    self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):

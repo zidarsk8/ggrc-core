@@ -217,6 +217,7 @@ can.Control("CMS.Controllers.TreeView", {
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
     this.options.attr('expanded', true);
+    var that = this;
     var instance = el.data("model");
     var parent = can.reduce(this.options.list, function(a, b) {
       switch(true) {
@@ -228,6 +229,21 @@ can.Control("CMS.Controllers.TreeView", {
     if(!parent.child_options && this.options.draw_children) {
       this.add_child_lists_to_child(parent);
     }
+  }
+
+  , ".tree-structure contentAttached" : function(el, ev) {
+    ev.stopPropagation();
+    var instance_id = el.closest(".tree-item").data("object-id");
+    var parent = can.reduce(this.options.list, function(a, b) {
+      switch(true) {
+        case !!a : return a;
+        case b.instance.id === instance_id: return b;
+        default: return null;
+      }
+    }, null);
+    if(parent.children_drawn)
+      return;
+    parent.attr("children_drawn", true);
   }
 
   , ".openclose:not(.active) click" : function(el, ev) {
@@ -242,9 +258,7 @@ can.Control("CMS.Controllers.TreeView", {
     if(that.options.draw_children) {
       //Recursively define tree views anywhere we have subtree configs.
       can.each(list, function(item) {
-        GGRC.queue_event(function() {
-          that.add_child_lists_to_child(item);        
-        });
+        that.add_child_lists_to_child(item);
       });
     }
   }
@@ -274,7 +288,9 @@ can.Control("CMS.Controllers.TreeView", {
           allow_creating: false,
           allow_mapping_or_creating: false
         });
-      item.child_options.push(options);
+      GGRC.queue_event(function() {
+        item.child_options.push(options);
+      });
     });
   }
 
