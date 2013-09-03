@@ -285,13 +285,13 @@ can.Model("can.Model.Cacheable", {
           if (!(m[key] === val
               || (val && !val.selfLink && m[key].id === val.id
                   && m[key].constructor.shortName === val.type))) {
-            if (val === null || typeof(val) === "undefined")
+            if (val == null)
               m.removeAttr(key);
             else
               m[key].constructor.model(params[key] || {});
           }
         } else {
-          if (val === null || typeof(val) === "undefined")
+          if (val == null)
             m.removeAttr(key)
           else
             m.attr(key, val && val.serialize ? val.serialize() : val);
@@ -301,7 +301,7 @@ can.Model("can.Model.Cacheable", {
       }
     } else {
       fn(params, function(val, key) {
-        if (val === null) {
+        if (val == null) {
           if (params.removeAttr)
             params.removeAttr(key);
           else
