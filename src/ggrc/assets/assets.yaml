@@ -96,6 +96,7 @@ dashboard-js-template-files:
   - base_objects/extended_info.mustache
   - base_objects/info.mustache
   - base_objects/map_related_modal_content.mustache
+  - base_objects/page_header.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - contracts/modal_content.mustache
@@ -147,6 +148,7 @@ dashboard-js-template-files:
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
+  - programs/page_header.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - risks/modal_content.mustache
