@@ -38,13 +38,14 @@ base_program_editor_objects = [
       'ProgramDirective',
       'Relationship',
       'ObjectObjective',
+      'ProgramControl',
+      'ObjectSection',
       ]
 
 all_program_editor_objects = list(base_program_editor_objects)
 all_program_editor_objects.append('Program')
 
 def upgrade():
-  pass
   op.execute(roles_table.update()\
       .where(roles_table.c.name == 'ProgramEditor')\
       .values(permissions_json=json.dumps({
@@ -62,4 +63,4 @@ def downgrade():
             'read':   original_program_editor_objects,
             'update': original_program_editor_objects,
             'delete': original_program_editor_objects,
-            }))),
+            })))
