@@ -509,8 +509,8 @@ can.Model("can.Model.Cacheable", {
 can.Observe.prototype.stub = function() {
   var type;
 
-  if (this.constructor.getRootModelName)
-    type = this.constructor.getRootModelName();
+  if (this.constructor.shortName)
+    type = this.constructor.shortName;
   else
     type = this.type;
 

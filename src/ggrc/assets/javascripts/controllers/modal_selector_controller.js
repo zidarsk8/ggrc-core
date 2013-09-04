@@ -229,7 +229,7 @@
           //join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.getRootModelName());
+          join = this.get_new_join(option.id, option.constructor.shortName);
           join.save().then(function() {
             //join.refresh().then(function() {
               self.options.join_list.push(join);
@@ -1111,10 +1111,10 @@
 
         join_params[this.join_option_attr] = {};
         join_params[this.join_option_attr].id = option.id;
-        join_params[this.join_option_attr].type = option.constructor.getRootModelName();
+        join_params[this.join_option_attr].type = option.constructor.shortName;
         join_params[this.join_object_attr] = {};
         join_params[this.join_object_attr].id = object.id;
-        join_params[this.join_object_attr].type = object.constructor.getRootModelName();
+        join_params[this.join_object_attr].type = object.constructor.shortName;
         join_params.context = { id: context_id };
         return new (this.join_model)(join_params);
       }
