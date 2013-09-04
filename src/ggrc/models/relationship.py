@@ -10,10 +10,10 @@ from sqlalchemy.ext.declarative import declared_attr
 
 class Relationship(Base, db.Model):
   __tablename__ = 'relationships'
-  source_id = db.Column(db.Integer)
-  source_type = db.Column(db.String)
-  destination_id = db.Column(db.Integer)
-  destination_type = db.Column(db.String)
+  source_id = db.Column(db.Integer, nullable=False)
+  source_type = db.Column(db.String, nullable=False)
+  destination_id = db.Column(db.Integer, nullable=False)
+  destination_type = db.Column(db.String, nullable=False)
   relationship_type_id = db.Column(db.String)
   # FIXME: Should this be a strict constraint?  If so, a migration is needed.
   #relationship_type_id = db.Column(
@@ -59,6 +59,10 @@ class Relationship(Base, db.Model):
     self.destination_id = value.id if value is not None else None
     self.destination_type = value.__class__.__name__ if value is not None \
         else None
+
+  __table_args__ = (
+    db.UniqueConstraint('source_id', 'source_type', 'destination_id', 'destination_type'),
+  )
 
   _publish_attrs = [
       'source',

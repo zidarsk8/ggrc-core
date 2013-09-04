@@ -16,10 +16,8 @@ class ObjectControl(Base, Timeboxed, db.Model):
   notes = deferred(db.Column(db.Text), 'ObjectControl')
   control_id = db.Column(
       db.Integer, db.ForeignKey('controls.id'), nullable=False)
-
-  # TODO: Polymorphic relationship
-  controllable_id = db.Column(db.Integer)
-  controllable_type = db.Column(db.String)
+  controllable_id = db.Column(db.Integer, nullable=False)
+  controllable_type = db.Column(db.String, nullable=False)
 
   @property
   def controllable_attr(self):
@@ -35,6 +33,10 @@ class ObjectControl(Base, Timeboxed, db.Model):
     self.controllable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.controllable_attr, value)
+
+  __table_args__ = (
+    db.UniqueConstraint('control_id', 'controllable_id', 'controllable_type'),
+  )
 
   _publish_attrs = [
       'role',

@@ -15,10 +15,8 @@ class ObjectDocument(Base, Timeboxed, db.Model):
   role = deferred(db.Column(db.String), 'ObjectDocument')
   notes = deferred(db.Column(db.Text), 'ObjectDocument')
   document_id = db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False)
-
-  # TODO: Polymorphic relationship
-  documentable_id = db.Column(db.Integer)
-  documentable_type = db.Column(db.String)
+  documentable_id = db.Column(db.Integer, nullable=False)
+  documentable_type = db.Column(db.String, nullable=False)
 
   @property
   def documentable_attr(self):
@@ -34,6 +32,10 @@ class ObjectDocument(Base, Timeboxed, db.Model):
     self.documentable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.documentable_attr, value)
+
+  __table_args__ = (
+    db.UniqueConstraint('document_id', 'documentable_id', 'documentable_type'),
+  )
 
   _publish_attrs = [
       'role',

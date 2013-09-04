@@ -15,10 +15,8 @@ class ObjectPerson(Base, Timeboxed, db.Model):
   role = deferred(db.Column(db.String), 'ObjectPerson')
   notes = deferred(db.Column(db.Text), 'ObjectPerson')
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
-
-  # TODO: Polymorphic relationship
-  personable_id = db.Column(db.Integer)
-  personable_type = db.Column(db.String)
+  personable_id = db.Column(db.Integer, nullable=False)
+  personable_type = db.Column(db.String, nullable=False)
 
   @property
   def personable_attr(self):
@@ -34,6 +32,10 @@ class ObjectPerson(Base, Timeboxed, db.Model):
     self.personable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.personable_attr, value)
+
+  __table_args__ = (
+    db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
+  )
 
   _publish_attrs = [
       'role',

@@ -15,10 +15,8 @@ class ObjectObjective(Base, Timeboxed, db.Model):
   role = deferred(db.Column(db.String), 'ObjectObjective')
   notes = deferred(db.Column(db.Text), 'ObjectObjective')
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
-
-  # TODO: Polymorphic relationship
-  objectiveable_id = db.Column(db.Integer)
-  objectiveable_type = db.Column(db.String)
+  objectiveable_id = db.Column(db.Integer, nullable=False)
+  objectiveable_type = db.Column(db.String, nullable=False)
 
   @property
   def objectiveable_attr(self):
@@ -34,6 +32,10 @@ class ObjectObjective(Base, Timeboxed, db.Model):
     self.objectiveable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.objectiveable_attr, value)
+
+  __table_args__ = (
+    db.UniqueConstraint('objective_id', 'objectiveable_id', 'objectiveable_type'),
+  )
 
   _publish_attrs = [
       'role',
