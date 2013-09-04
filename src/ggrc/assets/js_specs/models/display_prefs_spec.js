@@ -15,6 +15,7 @@ describe("display prefs model", function() {
 
   afterEach(function() {
     display_prefs.removeAttr(window.location.pathName);
+    display_prefs.isNew() || display_prefs.destroy();
   });
 
   describe("#init", function( ){
@@ -254,6 +255,81 @@ describe("display prefs model", function() {
 
     });
 
+  });
+
+  describe("#findAll", function() {
+    var dp_noversion, dp2_outdated, dp3_current;
+    beforeEach(function() {
+      dp_noversion = new CMS.Models.DisplayPrefs({});
+      dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
+      dp3_current = new CMS.Models.DisplayPrefs({ version : CMS.Models.DisplayPrefs.version });
+      spyOn(can.Model.LocalStorage, "findAll").andReturn(new $.Deferred().resolve([dp_noversion, dp2_outdated, dp3_current]));
+      spyOn(dp_noversion, "destroy");
+      spyOn(dp2_outdated, "destroy");
+      spyOn(dp3_current, "destroy");
+    });
+    it("deletes any prefs that do not have a version set", function() {
+      var dfd = CMS.Models.DisplayPrefs.findAll().done(function(dps) {
+        expect(dps).not.toContain(dp_noversion);
+        expect(dp_noversion.destroy).toHaveBeenCalled();
+      });
+      waitsFor(function() { //sanity check --ensure deferred resolves/rejects
+        return dfd.state() !== "pending";
+      });
+    });
+    it("deletes any prefs that have an out of date version", function() {
+      CMS.Models.DisplayPrefs.findAll().done(function(dps) {
+        expect(dps).not.toContain(dp2_outdated);
+        expect(dp2_outdated.destroy).toHaveBeenCalled();
+      });
+    });
+    it("retains any prefs that do not have a version set", function() {
+      CMS.Models.DisplayPrefs.findAll().done(function(dps) {
+        expect(dps).toContain(dp3_current);
+        expect(dp3_current.destroy).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("#findOne", function() {
+    var dp_noversion, dp2_outdated, dp3_current;
+    beforeEach(function() {
+      dp_noversion = new CMS.Models.DisplayPrefs({});
+      dp2_outdated = new CMS.Models.DisplayPrefs({ version : 1});
+      dp3_current = new CMS.Models.DisplayPrefs({ version : CMS.Models.DisplayPrefs.version });
+    });
+    it("404s if the display pref does not have a version set", function() {
+      spyOn(can.Model.LocalStorage, "findOne").andReturn(new $.Deferred().resolve(dp_noversion));
+      spyOn(dp_noversion, "destroy");
+      var dfd = CMS.Models.DisplayPrefs.findOne().done(function(dps) {
+        fail("Should not have resolved findOne for the unversioned display pref");
+      }).fail(function(pseudoxhr) {
+        expect(pseudoxhr.status).toBe(404);
+        expect(dp_noversion.destroy).toHaveBeenCalled();
+      });
+      waitsFor(function() { //sanity check --ensure deferred resolves/rejects
+        return dfd.state() !== "pending";
+      });
+    });
+    it("404s if the display pref has an out of date version", function() {
+      spyOn(can.Model.LocalStorage, "findOne").andReturn(new $.Deferred().resolve(dp2_outdated));
+      spyOn(dp2_outdated, "destroy");
+      CMS.Models.DisplayPrefs.findOne().done(function(dps) {
+        fail("Should not have resolved findOne for the outdated display pref");
+      }).fail(function(pseudoxhr) {
+        expect(pseudoxhr.status).toBe(404);
+        expect(dp2_outdated.destroy).toHaveBeenCalled();
+      });
+    });
+    it("retains any prefs that do not have a version set", function() {
+      spyOn(can.Model.LocalStorage, "findOne").andReturn(new $.Deferred().resolve(dp3_current));
+      spyOn(dp3_current, "destroy");
+      CMS.Models.DisplayPrefs.findOne().done(function(dps) {
+        expect(dp3_current.destroy).not.toHaveBeenCalled();
+      }).fail(function() {
+        fail("Should have resolved on findOne for the current display pref");
+      });
+    });
   });
 
   describe("PBC-only functions", function() {

@@ -15,7 +15,10 @@
   // Base model to handle reading / writing to local storage
   can.Model("can.Model.LocalStorage", {
     makeFindOne : function( findOne ) {
-        
+
+      if(typeof findOne === "function" && this !== can.Model.LocalStorage) {
+        return findOne;
+      } else {
         return function( params, success, error ) {
           params = params || {};
 
@@ -24,10 +27,10 @@
                 key = [this._shortName, params.id].join(":"),
                 // Grab the current data, if any
                 data = window.localStorage.getItem( key );
-            
+
             // Bind success and error callbacks to the deferred
-            def.then(success, error)
-            
+            def.then(success, error);
+
             // If we had existing local storage data...
             if ( data ) {
 
@@ -36,127 +39,143 @@
 
                 // Resolve the deferred with our instance
                 def.resolve( instance );
-                
+
             // Otherwise hand off the deferred to the ajax request
             } else {
                 def.reject({status : 404, responseText : "Object with id " + params.id + " was not found"});
             }
             return def;
-        }
+        };
+      }
     }
     , makeFindAll : function(findAll) {
-      return function(params, success, error) {
-        var def = new can.Deferred()
-        , key = [this._shortName, "ids"].join(":")
-        , data = window.localStorage.getItem( key )
-        , returns = new can.Model.List()
-        , that = this;
-        params = params || {};
+      if(typeof findAll === "function" && this !== can.Model.LocalStorage) {
+        return findAll;
+      } else {
+        return function(params, success, error) {
+          var def = new can.Deferred()
+          , key = [this._shortName, "ids"].join(":")
+          , data = window.localStorage.getItem( key )
+          , returns = new can.Model.List()
+          , that = this;
+          params = params || {};
 
-        if(data) {
-          can.each(JSON.parse(data), function(id) {
-            if(params.id == null || params.id === id) {
-              var k = [that._shortName, id].join(":")
-              , d = window.localStorage.getItem( k );
+          if(data) {
+            can.each(JSON.parse(data), function(id) {
+              if(params.id == null || params.id === id) {
+                var k = [that._shortName, id].join(":")
+                , d = window.localStorage.getItem( k );
 
-              if(d) {
-                d = that.store[id] || JSON.parse(d);
-                var pkeys = Object.keys(params);
-                if(pkeys.length < 1 || can.filter(pkeys, function(k) {
-                  return params[k] !== d[k];
-                }).length < 1) {
-                  returns.push(that.model(d));
+                if(d) {
+                  d = that.store[id] || JSON.parse(d);
+                  var pkeys = Object.keys(params);
+                  if(pkeys.length < 1 || can.filter(pkeys, function(k) {
+                    return params[k] !== d[k];
+                  }).length < 1) {
+                    returns.push(that.model(d));
+                  }
                 }
               }
-            }
-          });
-        }
+            });
+          }
 
-        def.resolve(returns);
-        return def;
+          def.resolve(returns);
+          return def;
+        };
       }
     }
     , makeCreate : function(create) {
-      return function(params) {
-        var key = [this._shortName, "ids"].join(":")
-          , data = window.localStorage.getItem( key )
-          , newkey = 1
-          , def = new can.Deferred()
-          ;
+      if(typeof create === "function" && this !== can.Model.LocalStorage) {
+        return create;
+      } else {
+        return function(params) {
+          var key = [this._shortName, "ids"].join(":")
+            , data = window.localStorage.getItem( key )
+            , newkey = 1
+            , def = new can.Deferred()
+            ;
 
-          //add to list
-        if(data) {
-          data = JSON.parse(data);
-          newkey = Math.max.apply(Math, data) + 1;
-          data.push(newkey);
-        } else {
-          data = [newkey];
-        }
-        window.localStorage.setItem(key, JSON.stringify(data));
+            //add to list
+          if(data) {
+            data = JSON.parse(data);
+            newkey = Math.max.apply(Math, data) + 1;
+            data.push(newkey);
+          } else {
+            data = [newkey];
+          }
+          window.localStorage.setItem(key, JSON.stringify(data));
 
-        //create new
-        key = [this._shortName, newkey].join(":");
-        var item = this.model(can.extend({id : newkey}, params));
-        window.localStorage.setItem(key, JSON.stringify(item.serialize()));
+          //create new
+          key = [this._shortName, newkey].join(":");
+          var item = this.model(can.extend({id : newkey}, params));
+          window.localStorage.setItem(key, JSON.stringify(item.serialize()));
 
-        def.resolve(item);
-        this.created && this.created(item);
-        return def;
+          def.resolve(item);
+          this.created && this.created(item);
+          return def;
+        };
       }
     }
     , makeUpdate : function(update) {
-      return function(id, params) {
-        var key = [this._shortName, id].join(":")
-          , data = window.localStorage.getItem( key )
-          , def = new can.Deferred()
-          ;
+      if(typeof update === "function" && this !== can.Model.LocalStorage) {
+        return update;
+      } else {
+        return function(id, params) {
+          var key = [this._shortName, id].join(":")
+            , data = window.localStorage.getItem( key )
+            , def = new can.Deferred()
+            ;
 
-        if(data) {
-          data = JSON.parse(data);
-          params._removedKeys && can.each(params._removedKeys, function(key) {
-            if(!params[key]) {
-              delete data[key];
-            }
-          });
-          delete params._removedKeys;
-          can.extend(data, params);
-          var item = this.model({}).attr(data);
+          if(data) {
+            data = JSON.parse(data);
+            params._removedKeys && can.each(params._removedKeys, function(key) {
+              if(!params[key]) {
+                delete data[key];
+              }
+            });
+            delete params._removedKeys;
+            can.extend(data, params);
+            var item = this.model({}).attr(data);
 
-          window.localStorage.setItem(key, JSON.stringify(item.serialize()));
-          def.resolve(item);
-          this.updated && this.updated(item);
-        } else {
-          def.reject({ status : 404, responseText : "The object with id " + id + " was not found."});
-        }
-        return def;
+            window.localStorage.setItem(key, JSON.stringify(item.serialize()));
+            def.resolve(item);
+            this.updated && this.updated(item);
+          } else {
+            def.reject({ status : 404, responseText : "The object with id " + id + " was not found."});
+          }
+          return def;
+        };
       }
     }
     , makeDestroy : function(destroy) {
-      return function(id) {
-        var def = new can.Deferred()
-        , key = [this._shortName, id].join(":")
-        , item = this.model(window.localStorage.getItem( key ));
+      if(typeof findAll === "function" && this !== can.Model.LocalStorage) {
+        return findAll;
+      } else {
+        return function(id) {
+          var def = new can.Deferred()
+          , key = [this._shortName, id].join(":")
+          , item = this.model(window.localStorage.getItem( key ));
 
-        if(item) {
-          window.localStorage.removeItem(key);
+          if(item) {
+            window.localStorage.removeItem(key);
 
-          // remove from list
-          key = [this._shortName, "ids"].join(":");
-          data = window.localStorage.getItem( key );
+            // remove from list
+            key = [this._shortName, "ids"].join(":");
+            data = window.localStorage.getItem( key );
 
-          data = JSON.parse(data);
-          data.splice(can.inArray(id, data), 1);
-          window.localStorage.setItem(key, JSON.stringify(data));
+            data = JSON.parse(data);
+            data.splice(can.inArray(id, data), 1);
+            window.localStorage.setItem(key, JSON.stringify(data));
 
-          def.resolve(item);
-          this.destroyed && this.destroyed(item); 
-        } else {
-          def.reject({ status : 404, responseText : "Object with id " + id + " was not found"});
-        }
-        return def;
+            def.resolve(item);
+            this.destroyed && this.destroyed(item);
+          } else {
+            def.reject({ status : 404, responseText : "Object with id " + id + " was not found"});
+          }
+          return def;
+        };
       }
     }
-
   }, {
     removeAttr : function(attr) {
       this._super(attr);
