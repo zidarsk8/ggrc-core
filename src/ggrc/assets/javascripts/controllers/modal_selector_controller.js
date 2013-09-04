@@ -798,8 +798,10 @@
 
         this.init_menu();
         this.init_context();
-        this.set_option_descriptor(
-            this.constructor.last_selected_option_type || this.options.default_option_descriptor);
+        if (this.options.option_descriptors[this.constructor.last_selected_option_type])
+          this.set_option_descriptor(this.constructor.last_selected_option_type);
+        else
+          this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
         this.init_data()
@@ -928,7 +930,8 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul').empty();
 
-        var join_model = GGRC.JoinDescriptor.by_object_option_models[current_option_model_name][this.options.object_model][0].options.join_model_name;
+        var join_model = GGRC.JoinDescriptor.join_model_name_for(
+              this.options.object_model, current_option_model_name);
         return GGRC.Models.Search
           .search_for_types(
               current_search_term || '',
