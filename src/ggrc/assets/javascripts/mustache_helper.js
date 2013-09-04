@@ -993,7 +993,7 @@ Mustache.registerHelper("is_allowed", function() {
         resource_type = arg.kind;
       } else {
         resource_type = arg.type;
-        context_id = arg.context.id;
+        context_id = arg.context ? arg.context.id : null;
       }
     }
   });
@@ -1034,11 +1034,11 @@ Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
 
 Mustache.registerHelper("determine_context", function(page_object, target) {
   if (page_object.constructor.shortName == "Program") {
-    return page_object.context.id;
+    return page_object.context ? page_object.context.id : null;
   } else if (target.constructor.shortName == "Program") {
-    return target.context.id;
+    return target.context ? target.context.id : null;
   }
-  return page_object.context.id;
+  return page_object.context ? page_object.context.id : null;
 });
 
 })(this, jQuery, can);
