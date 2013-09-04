@@ -373,10 +373,11 @@ can.Model("can.Model.Cacheable", {
               .then(function(mapped_objects) {
                 self[name].replace(
                   can.map(mappings, function(mapping) {
-                    return {
-                        instance: mapping[target_attr]
-                      , mappings: [mapping]
-                    };
+                    if (mapping[target_attr] && mapping[target_attr].selfLink)
+                      return {
+                          instance: mapping[target_attr]
+                        , mappings: [mapping]
+                      };
                   }));
               });
           });

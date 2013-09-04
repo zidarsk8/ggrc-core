@@ -134,7 +134,9 @@ $(function() {
     can.each(join_descriptors, function(join_descriptor) {
       sources.push(join_descriptor.get_loader());
     });
-    list_loader = new GGRC.ListLoaders.MultiListLoader(sources);
+    list_loader = new GGRC.ListLoaders.FilteredListLoader(
+      new GGRC.ListLoaders.MultiListLoader(sources),
+      function(result) { return !!result.instance.selfLink; })
     list_loader = list_loader.attach(object);
 
     var far_model = join_descriptor.get_model(model_name)
