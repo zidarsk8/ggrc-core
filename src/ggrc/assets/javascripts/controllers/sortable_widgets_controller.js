@@ -9,13 +9,34 @@
 //= require models/display_prefs
 
 (function(can, $) {
+  var default_widget_sort = [
+     "info_widget"
+   , "program_widget"
+   , "regulation_widget"
+   , "contract_widget"
+   , "policy_widget"
+   , "objective_widget"
+   , "control_widget"
+   , "system_widget"
+   , "process_widget"
+   , "data_asset_widget"
+   , "product_widget"
+   , "project_widget"
+   , "facility_widget"
+   , "market_widget"
+   , "org_group_widget"
+   , "person_widget"
+   , "document_widget"
+   ];
+
 can.Control("CMS.Controllers.SortableWidgets", {
   defaults : {
       page_token : null
+    , sort : default_widget_sort
   }
 
   , init : function(el, opts) {
-    this._super && this._super.apply(this, arguments)
+    this._super && this._super.apply(this, arguments);
     var that = this;
     CMS.Models.DisplayPrefs.findAll().done(function(data) {
       var m = data[0] || new CMS.Models.DisplayPrefs();
@@ -27,15 +48,26 @@ can.Control("CMS.Controllers.SortableWidgets", {
 
   init : function() {
     this.options.page_token = window.getPageToken();
-
     var page_sorts = this.options.model.getSorts(this.options.page_token);
+    var that = this;
 
     var this_sort = page_sorts.attr($(this.element).attr("id"));
-    if(!this_sort || !(this_sort instanceof can.Observe.List)) {
-      this_sort = new can.Observe.List();
-      page_sorts.attr($(this.element).attr("id"), this_sort);
+    if(this_sort && this_sort instanceof can.Observe.List) {
+      this.options.sort = this_sort;
+    } else {
+      this.options.sort = new can.Observe.List(can.map(this.options.sort, function(id) {
+        return that.element.find("#" + id).length ? id : undefined;
+      }));
+      //put everything NOT in the default sort at the bottom.
+      this.options.sort.push.apply(
+        this.options.sort
+        , this.element.find("section[id]").map(function(i, sec) {
+            return ~can.inArray(sec.id, that.options.sort) ? undefined : sec.id;
+          })
+        );
+      page_sorts.attr($(this.element).attr("id"), this.options.sort);
+      this_sort = this.options.sort;
     }
-    this.options.sort = this_sort;
 
     var that = this;
     var firstchild = null;

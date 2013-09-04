@@ -30,9 +30,9 @@ can.Control("CMS.Controllers.Dashboard", {
       this.update_inner_nav();
       if (!this.add_widget_controller)
         this.init_add_widget();
+      this.init_default_widgets();
       if (!this.widget_area_controller)
         this.init_widget_area();
-      this.init_default_widgets();
     }
 
   , init_page_title: function() {
