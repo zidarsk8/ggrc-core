@@ -333,13 +333,13 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Control", business_object_types,
           "ObjectControl", "controllable", "control"]
       , [business_plus_program_object_types,
-          "Objective", "ObjectObjective", "objective", "objectiveable"]
+          "Objective", "ObjectObjective", "objective", "objectiveable", "object_objectives"]
       , ["Objective", business_plus_program_object_types,
-          "ObjectObjective", "objectiveable", "objective"]
-      , ["Objective", "Objective",
           "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , ["Objective", "Objective",
-          "ObjectObjective", "objective", "objectiveable"]
+          "ObjectObjective", "objective", "objectiveable", "object_objectives"]
+      , ["Objective", "Objective",
+          "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,

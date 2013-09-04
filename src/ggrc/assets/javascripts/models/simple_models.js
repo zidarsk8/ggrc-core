@@ -878,7 +878,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         , target_attr: "document"
       }
     , business_object_mappings: {
-          attr: "object_objectives"
+          attr: "objective_objects"
         , target_attr: "objectiveable"
       }
     , control_mappings: {
