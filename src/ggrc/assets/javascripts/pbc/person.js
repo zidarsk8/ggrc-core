@@ -57,23 +57,7 @@ can.Model.Cacheable("CMS.Models.Person", {
         list_view: GGRC.mustache_path + "/people/tree.mustache"
     }
 }, {
-    init : function () {
-        this._super && this._super();
-        // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-        //     var obj;
-        //     if(obj = CMS.Models.ObjectPerson.findInCacheById(this.id) && attr !== "id") {
-        //         obj.attr(attr, newVal);
-        //     }
-        // });
-
-        var that = this;
-
-        this.each(function(value, name) {
-          if (value === null)
-            that.removeAttr(name);
-        });
-    }
-  , display_name : function() {
+  display_name : function() {
     return this.email;
   }
 });

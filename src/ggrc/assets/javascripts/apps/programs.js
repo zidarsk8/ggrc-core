@@ -246,7 +246,7 @@ function collated_user_roles_by_person(user_roles) {
 }
 
 function authorizations_list_loader() {
-  var instance = GGRC.make_model_instance(GGRC.page_object)
+  var instance = GGRC.page_instance()
     , context_id = instance.context && instance.context.id
     ;
 
@@ -256,7 +256,7 @@ function authorizations_list_loader() {
 }
 
 function should_show_authorizations() {
-  var instance = GGRC.make_model_instance(GGRC.page_object)
+  var instance = GGRC.page_instance()
     , context_id = instance.context && instance.context.id
     ;
 

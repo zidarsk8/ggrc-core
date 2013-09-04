@@ -8,7 +8,7 @@ can.Control("GGRC.Controllers.RecentlyViewed", {
   }
 }, {
   init : function() {
-    var page_model = GGRC.make_model_instance(GGRC.page_object);
+    var page_model = GGRC.page_instance();
     var instance_list = [];
     var that = this;
 

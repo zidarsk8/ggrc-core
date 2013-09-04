@@ -6,10 +6,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{^model.root_object}}
-                  {{!assume use of stub class or Cacheable here}}
-                  <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{/model}}
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{#instance.title}}
                   {{instance.title}}
                 {{/instance.title}}

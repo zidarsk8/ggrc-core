@@ -168,7 +168,7 @@ can.Control("GGRC.Controllers.Modals", {
       value = item.value;
     }
 
-    if ($elem.is("[null-if-empty]") && value.length == 0)
+    if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
     if(name.length > 1) {
@@ -236,6 +236,12 @@ can.Control("GGRC.Controllers.Modals", {
         that.options.$content.find(".flash").append(tmpl);
       }
     });
+  }
+
+  , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
+    if (!this.options.instance.isNew()) {
+      this.options.instance.refresh();
+    }
   }
 
   , destroy : function() {
