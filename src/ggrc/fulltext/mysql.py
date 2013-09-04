@@ -31,7 +31,8 @@ event.listen(
 class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
-  def _get_type_query(self, types=None):
+  def _get_type_query(
+      self, types=None, permission_type='read', permission_model=None):
     model_names = [model.__name__ for model in all_models]
     if types is not None:
       model_names = [m for m in model_names if m in types]
@@ -39,7 +40,23 @@ class MysqlIndexer(SqlIndexer):
     type_queries = []
     for model_name in model_names:
       type_query = None
-      type_permissions = permissions.read_contexts_for(model_name)
+      if permission_type == 'read':
+        type_permissions = permissions.read_contexts_for(
+            permission_model or model_name)
+      elif permission_type == 'create':
+        type_permissions = permissions.create_contexts_for(
+            permission_model or model_name)
+      elif permission_type == 'update':
+        type_permissions = permissions.update_contexts_for(
+            permission_model or model_name)
+      elif permission_type == 'delete':
+        type_permissions = permissions.delete_contexts_for(
+            permission_model or model_name)
+
+      if permission_model and type_permissions:
+        type_permissions = set(type_permissions) & set(
+            permissions.read_contexts_for(model_name))
+
       if type_permissions is None:
         type_query = (MysqlRecordProperty.type == model_name)
       elif type_permissions:
@@ -65,9 +82,11 @@ class MysqlIndexer(SqlIndexer):
     else:
       return MysqlRecordProperty.content.match(terms)
 
-  def search(self, terms, types=None):
-    type_query = self._get_type_query(types)
-    query = self._get_type_query(types)
+  def search(
+      self, terms, types=None, permission_type='read', permission_model=None):
+    print 'search permission_type:', permission_type, 'permission_model',\
+        permission_model
+    query = self._get_type_query(types, permission_type, permission_model)
     query = and_(query, self._get_filter_query(terms))
     return db.session.query(self.record_type).filter(query)
 

@@ -878,7 +878,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         , target_attr: "document"
       }
     , business_object_mappings: {
-          attr: "object_objectives"
+          attr: "objective_objects"
         , target_attr: "objectiveable"
       }
     , control_mappings: {
@@ -1056,7 +1056,7 @@ CMS.Models.get_link_type = function(instance, attr) {
   if (!type) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
-      type = model.getRootModelName();
+      type = model.shortName;
     else if (instance[attr])
       type = instance[attr].type;
   }

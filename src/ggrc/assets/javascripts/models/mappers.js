@@ -272,6 +272,7 @@
           ;
 
         return (mapping.constructor === model
+                && mapping[this.object_attr]
                 && (mapping[this.object_attr] === binding.instance
                     || (mapping[this.object_attr].constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
@@ -357,6 +358,7 @@
           ;
 
         return (mapping.constructor === model
+                && mapping[this.object_attr]
                 && (mapping[this.object_attr] === binding.instance
                     || (mapping[this.object_attr].constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id)));

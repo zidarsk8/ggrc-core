@@ -229,7 +229,7 @@
           //join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.getRootModelName());
+          join = this.get_new_join(option.id, option.constructor.shortName);
           join.save().then(function() {
             //join.refresh().then(function() {
               self.options.join_list.push(join);
@@ -798,8 +798,10 @@
 
         this.init_menu();
         this.init_context();
-        this.set_option_descriptor(
-            this.constructor.last_selected_option_type || this.options.default_option_descriptor);
+        if (this.options.option_descriptors[this.constructor.last_selected_option_type])
+          this.set_option_descriptor(this.constructor.last_selected_option_type);
+        else
+          this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
         this.init_data()
@@ -928,8 +930,16 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul').empty();
 
+        var join_model = GGRC.JoinDescriptor.join_model_name_for(
+              this.options.object_model, current_option_model_name);
         return GGRC.Models.Search
-          .search_for_types(current_search_term || '', [current_option_model_name])
+          .search_for_types(
+              current_search_term || '',
+              [current_option_model_name],
+              {
+                __permission_type: 'create'
+                , __permission_model: join_model
+              })
           .then(function(search_result) {
             var options;
             if (self.element
@@ -1003,8 +1013,19 @@
 
     , create_join: function() {
         if (this.context.selected_option) {
+          var context_id = null
+            , context_object
+            ;
+          if (this.context.selected_option.constructor.shortName == "Program") {
+            context_object = this.context.selected_option;
+          } else {
+            context_object = this.context.selected_object;
+          }
+          if (context_object.context && context_object.context.id) {
+            context_id = context_object.context.id;
+          }
           join = this.context.option_descriptor.get_new_join(
-              this.context.selected_object, this.context.selected_option, null);
+              this.context.selected_object, this.context.selected_option, context_id);
           //join = this.get_new_join(this.context.selected_option);
           return join.save();
         } else {
@@ -1093,10 +1114,10 @@
 
         join_params[this.join_option_attr] = {};
         join_params[this.join_option_attr].id = option.id;
-        join_params[this.join_option_attr].type = option.constructor.getRootModelName();
+        join_params[this.join_option_attr].type = option.constructor.shortName;
         join_params[this.join_object_attr] = {};
         join_params[this.join_object_attr].id = object.id;
-        join_params[this.join_object_attr].type = object.constructor.getRootModelName();
+        join_params[this.join_object_attr].type = object.constructor.shortName;
         join_params.context = { id: context_id };
         return new (this.join_model)(join_params);
       }

@@ -373,10 +373,11 @@ can.Model("can.Model.Cacheable", {
               .then(function(mapped_objects) {
                 self[name].replace(
                   can.map(mappings, function(mapping) {
-                    return {
-                        instance: mapping[target_attr]
-                      , mappings: [mapping]
-                    };
+                    if (mapping[target_attr] && mapping[target_attr].selfLink)
+                      return {
+                          instance: mapping[target_attr]
+                        , mappings: [mapping]
+                      };
                   }));
               });
           });
@@ -508,8 +509,8 @@ can.Model("can.Model.Cacheable", {
 can.Observe.prototype.stub = function() {
   var type;
 
-  if (this.constructor.getRootModelName)
-    type = this.constructor.getRootModelName();
+  if (this.constructor.shortName)
+    type = this.constructor.shortName;
   else
     type = this.type;
 

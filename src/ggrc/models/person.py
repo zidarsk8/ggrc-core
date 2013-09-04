@@ -28,6 +28,11 @@ class Person(Base, db.Model):
       uselist=False,
       )
 
+  _fulltext_attrs = [
+      'company',
+      'email',
+      'name',
+      ]
   _publish_attrs = [
       'company',
       'email',
