@@ -10,7 +10,10 @@ class Help(Slugged, db.Model):
   __tablename__ = 'helps'
 
   content = deferred(db.Column(db.Text), 'Help')
-  
+
+  _fulltext_attrs = [
+      'content',
+      ]
   _publish_attrs = [
       'content',
       ]
