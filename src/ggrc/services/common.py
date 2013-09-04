@@ -299,7 +299,7 @@ class Resource(ModelView):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(object_for_json))]))
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj))
+      object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
     missing_headers = []
