@@ -340,6 +340,7 @@ can.Control("CMS.Controllers.InnerNav", {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
     , widget_list : null
     , spinners : {}
+    , contexts : null
   }
 }, {
     init: function(options) {
@@ -355,6 +356,9 @@ can.Control("CMS.Controllers.InnerNav", {
         that.element.append(frag);
         that.update_scrollspy();
       });
+
+      this.options.contexts = this.options.contexts instanceof can.Observe ? this.options.contexts : new can.Observe(this.options.contexts);
+      this.on();
     }
 
   , sortable: function() {
@@ -406,7 +410,24 @@ can.Control("CMS.Controllers.InnerNav", {
           });
       });
       this.options.widget_list.replace(widget_list);
+      if(!this.options.contexts.active_widget) {
+        this.options.contexts.attr("active_widget", widget_list[0]);
+      }
     }
+
+  , "{contexts} active_widget" : function(contexts, ev) {
+    $(this.options.contexts.active_widget.selector).show().siblings().hide();
+  }
+
+  , "a click" : function(el, ev) {
+    var that = this;
+    can.each(this.options.widget_list, function(widget) {
+      if(widget.selector === el.attr("href")) {
+        that.options.contexts.attr("active_widget", widget);
+        return false;
+      }
+    });
+  }
 
   , "{document.body} loading" : function(body, ev) {
     var that = this;
