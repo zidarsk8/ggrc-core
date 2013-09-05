@@ -38,15 +38,15 @@
           </div>
 
           <div class="span6">
-          {{#is_allowed 'join_delete' instance}}
           {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/is_allowed_all}}
           {{/if}}
-          {{/is_allowed}}
           </div>
 
         </div>
@@ -107,7 +107,7 @@
   </li>
 {{/list}}
 
-{{#is_allowed 'create' 'update' 'delete' model.shortName}}
+{{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
@@ -131,4 +131,4 @@
   </div>
 </li>
 {{/if}}
-{{/is_allowed}}
+{{/is_allowed_to_map}}
