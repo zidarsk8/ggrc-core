@@ -5,15 +5,20 @@ from ggrc import db
 from ggrc.models.context import Context
 from ggrc.models.person import Person
 
+def _base_user_query():
+  from sqlalchemy import orm
+  return Person.query.options(
+      orm.undefer_group('Person_complete'))
+
 def find_user_by_id(id):
   """Find Person object by some ``id``.
   Note that ``id`` need not be Person().id, but should match the value
   returned by ``Person().get_id()``.
   """
-  return Person.query.filter(Person.id==int(id)).first()
+  return _base_user_query().filter(Person.id==int(id)).first()
 
 def find_user_by_email(email):
-  return Person.query.filter(Person.email==email).first()
+  return _base_user_query().filter(Person.email==email).first()
 
 def create_user(email, **kwargs):
   user = Person(email=email, **kwargs)

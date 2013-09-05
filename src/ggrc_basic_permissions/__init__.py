@@ -97,7 +97,10 @@ class UserPermissions(DefaultUserPermissions):
       session['permissions'] = {}
       session['permissions']['__user'] = email
       user_roles = db.session.query(UserRole)\
-          .options(sqlalchemy.orm.subqueryload('role'))\
+          .options(
+              sqlalchemy.orm.undefer_group('UserRole_complete'),
+              sqlalchemy.orm.undefer_group('Role_complete'),
+              sqlalchemy.orm.joinedload('role'))\
           .filter(UserRole.person_id==user.id)\
           .order_by(UserRole.updated_at.desc())\
           .all()
