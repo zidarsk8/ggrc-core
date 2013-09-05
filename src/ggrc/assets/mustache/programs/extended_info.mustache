@@ -70,12 +70,12 @@
       </div>
       <div class="span6">
       {{#with_page_object_as 'page_object'}}
-        {{#can_link_to_page_object this}}
+        {{#is_allowed_to_map page_object this}}
         <a class="primary map-to-page-object" href="javascript://">
           Map to this {{page_object.constructor.title_singular.toLowerCase}}
           <i class="grcicon-reg-map"></i>
         </a>
-        {{/can_link_to_page_object}}
+        {{/is_allowed_to_map}}
       {{/with_page_object_as}}
       </div>
     </div>

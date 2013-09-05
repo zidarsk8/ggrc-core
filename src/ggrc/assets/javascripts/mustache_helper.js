@@ -986,13 +986,13 @@ Mustache.registerHelper("is_allowed", function() {
     else if (typeof arg === 'string') {
       resource_type = arg;
     }
-    else if (typeof arg === 'number') {
+    else if (typeof arg === 'number' || arg == null) {
       context_id = arg;
     } else if (typeof arg === 'object' && arg instanceof can.Model) {
       if (GGRC.page_model instanceof CMS.Models.Program) {
-        resource_type = arg.kind;
+        resource_type = arg.constructor.shortName
       } else {
-        resource_type = arg.type;
+        resource_type = arg.constructor.shortName;
         context_id = arg.context ? arg.context.id : null;
       }
     }
@@ -1008,13 +1008,79 @@ Mustache.registerHelper("is_allowed", function() {
       actual_resource_type = GGRC.JoinDescriptor.join_model_name_for(
         GGRC.page_model.constructor.shortName, resource_type);
     }
-    passed = passed && (!window.Permission || Permission.is_allowed(actual_action, actual_resource_type, context_id));
+    passed = passed && Permission.is_allowed(actual_action, actual_resource_type, context_id);
   });
 
   return passed
     ? options.fn(options.contexts || this) 
     : options.inverse(options.contexts || this)
     ;
+});
+
+Mustache.registerHelper("is_allowed_for_all", function(action, instances, options) {
+  var passed = true;
+
+  action = resolve_computed(action);
+  instances = resolve_computed(instances);
+
+  can.each(instances, function(instance) {
+    var resource_type
+      , context_id
+      ;
+
+    resource_type = instance.constructor.shortName;
+    context_id = instance.context ? instance.context.id : null;
+
+    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+  });
+
+  if (passed)
+    return options.fn(options.contexts || this);
+  else
+    return options.inverse(options.contexts || this);
+});
+
+Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
+  //  For creating mappings, we only care if the user can create instances of
+  //  the join model.
+  //  - `source` must be a model instance
+  //  - `target` must be the name of the target model
+  //
+  //  FIXME: This should actually iterate through all applicable join models
+  //    and return success if any one matches.
+  var target_type
+    , resource_type
+    , context_id
+    ;
+
+  source = resolve_computed(source);
+  target = resolve_computed(target);
+
+  if (target instanceof can.Model)
+    target_type = target.constructor.shortName;
+  else
+    target_type = target;
+
+  //if (!(source instanceof can.Model)) {
+  //  //  If `source` is not a model instance, assume they want to link to the
+  //  //  page object.
+  //  options = target;
+  //  target = source;
+  //  source = GGRC.page_instance();
+  //}
+
+  resource_type = GGRC.JoinDescriptor.join_model_name_for(
+    source.constructor.shortName, target_type);
+
+  context_id = source.context ? source.context.id : null;
+  if (!(source instanceof CMS.Models.Program)
+      && target instanceof CMS.Models.Program)
+    context_id = target.context ? target.context.id : null;
+
+  if (Permission.is_allowed('create', resource_type, context_id))
+    return options.fn(options.contexts || this);
+  else
+    return options.inverse(options.contexts || this);
 });
 
 function resolve_computed(maybe_computed) {

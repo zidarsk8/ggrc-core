@@ -72,7 +72,7 @@ can.Control("CMS.Controllers.TreeView", {
     this.element.uniqueId();
     // Allow parent_instance even when there is no parent tree
     if (!this.options.parent_instance && this.options.parent)
-      this.options.parent_instance = this.options.parent.instance;
+      this.options.attr('parent_instance', this.options.parent.instance);
     this.element.trigger("loading");
     this.options.list ? this.draw_list() : this.fetch_list();
 
