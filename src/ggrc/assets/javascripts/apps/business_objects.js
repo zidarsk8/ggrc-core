@@ -13,96 +13,205 @@ $(function() {
   if (!GGRC.page_object)
     return;
 
-  var object_class = GGRC.infer_object_type(GGRC.page_object);
-  var object = GGRC.make_model_instance(GGRC.page_object);
-  var queue = new RefreshQueue();
+  var object_class = GGRC.infer_object_type(GGRC.page_object)
+    , object_table = object_class.table_plural
+    , object = GGRC.page_instance();
 
-  can.each(object.object_people, can.proxy(queue, "enqueue"));
-  can.each(object.object_documents, can.proxy(queue, "enqueue"));
-  queue.trigger();
+  var info_widget_views = {
+    'programs': GGRC.mustache_path + "/programs/info.mustache"
+  }
+  default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
 
-  // var c = $('.cms_controllers_page_object').control(CMS.Controllers.PageObject);
-  // if (c) {
-  //   c.add_dashboard_widget_from_name("person");
-  //   c.add_dashboard_widget_from_name("document");
-  // }
+  var info_widget_descriptors = {
+      info: {
+          widget_id: "info"
+        , widget_name: object_class.title_singular + " Info"
+        , widget_icon: "grcicon-info"
+        , content_controller: GGRC.Controllers.InfoWidget
+        , content_controller_options: {
+              instance: object
+            , model: object_class
+            , widget_view: info_widget_views[object_table] || default_info_widget_view
+          }
+      }
+  }
 
-  $("#people_widget").find("section.content").ggrc_controllers_list_view({
-    model : CMS.Models.ObjectPerson
-    , list : object.object_people
-    , list_view : GGRC.mustache_path + "/people/list.mustache"
-    , parent_instance : object
-    , list_loader : function() {
-      return $.when(object.object_people);
+  if (!GGRC.extra_widget_descriptors)
+    GGRC.extra_widget_descriptors = {};
+  if (!GGRC.extra_default_widgets)
+    GGRC.extra_default_widgets = [];
+
+  GGRC.extra_widget_descriptors.info = info_widget_descriptors.info;
+  GGRC.extra_default_widgets.splice(0, 0, 'info');
+
+  function sort_sections(sections) {
+    return can.makeArray(sections).sort(window.natural_comparator);
+  }
+
+  var far_models = GGRC.JoinDescriptor
+        .by_object_option_models[object.constructor.shortName]
+    , model_widget_descriptors = {}
+    , model_default_widgets = []
+    , extra_descriptor_options = {
+          all: {
+              Person: {
+                  widget_icon: 'grcicon-user-black'
+              }
+            , Document: {
+                  widget_icon: 'grcicon-link'
+              }
+          }
+      }
+    // Prevent widget creation with <model_name>: false
+    // e.g. to prevent ever creating People widget:
+    //     { Person: false }
+    // or to prevent creating People widget on Objective page:
+    //     { Objective: { Person: false } }
+    , overridden_models = {
+          Program: {
+            //  Objective: false
+            //, Control: false
+            //, Regulation: false
+            //, Policy: false
+            //, Contract: false
+          }
+      }
+
+    , directive_section_descriptor =
+        GGRC.JoinDescriptor.by_object_option_models.Regulation.Section[0]
+    , program_directive_options = {
+          list_view : GGRC.mustache_path + "/directives/tree.mustache"
+        , draw_children : true
+        , child_options : [{
+              model : CMS.Models.Section
+            , list_loader : function(directive) {
+                return directive_section_descriptor
+                  .get_loader()
+                  .attach(directive)
+                  .refresh_list();
+              }
+            , fetch_post_process : sort_sections
+            , draw_children : true
+            }]
+      }
+    , extra_content_controller_options = {
+          Program: {
+              Regulation: program_directive_options
+            , Policy: program_directive_options
+            , Contract: program_directive_options
+            , Control: { draw_children : true }
+            , Objective: { draw_children : true }
+          }
+        , Regulation: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Policy: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Contract : {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+      }
+    ;
+
+  can.each(far_models, function(join_descriptors, model_name) {
+    if ((overridden_models.all
+          && overridden_models.all.hasOwnProperty(model_name)
+          && !overridden_models[model_name])
+        || (overridden_models[object.constructor.shortName]
+            && overridden_models[object.constructor.shortName].hasOwnProperty(model_name)
+            && !overridden_models[object.constructor.shortName][model_name]))
+      return;
+
+    var sources = []
+      , list_loader
+      , join_descriptor = join_descriptors[0]
+      ;
+
+    can.each(join_descriptors, function(join_descriptor) {
+      sources.push(join_descriptor.get_loader());
+    });
+    list_loader = new GGRC.ListLoaders.FilteredListLoader(
+      new GGRC.ListLoaders.MultiListLoader(sources),
+      function(result) { return !!result.instance.selfLink; })
+    list_loader = list_loader.attach(object);
+
+    var far_model = join_descriptor.get_model(model_name)
+      , descriptor = {
+            content_controller: CMS.Controllers.TreeView
+          , content_controller_selector: "ul"
+          , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
+          , widget_id: far_model.table_singular
+          , widget_name: function() {
+              var $objectArea = $(".object-area");
+              if ( $objectArea.hasClass("dashboard-area") ) {
+                return far_model.title_plural;
+              } else {
+                return "Mapped " + far_model.title_plural;
+              }
+            }
+
+          , widget_info : function() {
+              var $objectArea = $(".object-area");
+              if ( $objectArea.hasClass("dashboard-area") ) {
+                return ""
+              } else {
+                return "Does not include mappings to Directives, Objectives and Controls"
+              }
+            }
+          , widget_icon: far_model.table_singular
+          , object_category: far_model.category || 'default'
+          , content_controller_options: {
+                child_options: []
+              , draw_children: false
+              , parent_instance: object
+              , model: model_name
+              , list_loader: can.proxy(list_loader, "refresh_list")
+            }
+        }
+      ;
+
+    // Custom overrides
+    if (extra_descriptor_options.all
+        && extra_descriptor_options.all[model_name]) {
+      can.extend(
+          descriptor,
+          extra_descriptor_options.all[model_name]);
     }
-  });
-  object.object_people.bind("add remove", function() {
-    $("#people_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
-  });
 
-  $("#documents_widget").find("section.content").ggrc_controllers_list_view({
-    model : CMS.Models.ObjectDocument
-    , list : object.object_documents
-    , list_view : GGRC.mustache_path + "/documents/list.mustache"
-    , parent_instance : object
-    , list_loader : function() {
-      return $.when(object.object_documents);
+    if (extra_descriptor_options[object.constructor.shortName]
+        && extra_descriptor_options[object.constructor.shortName][model_name]) {
+      can.extend(
+          descriptor,
+          extra_descriptor_options[object.constructor.shortName][model_name]);
     }
-  });
-  object.object_documents.bind("add remove", function() {
-    $("#documents_widget header .item-count").text("(" + this.length + ")").trigger("widgets_updated");
-  });
 
-
-  if(!~can.inArray(
-    object_class
-    , [CMS.Models.OrgGroup
-      , CMS.Models.Project
-      , CMS.Models.Product
-      , CMS.Models.DataAsset
-      , CMS.Models.Facility
-      , CMS.Models.Market
-      , CMS.Models.Risk]))
-    return;
-
-  var $top_tree = $("#" + object_class.root_object + "_widget .tree-structure").cms_controllers_tree_view({
-    model : object_class
-    , single_object : true
-    , list : [object]
-  }).on("modal:relationshipcreated modal:relationshipdestroyed", "li", function(ev, data) {
-    var tree_obj = $(this).find(".item-main:first").data("model")
-    , other_obj;
-
-    if((other_obj = data.getOtherSide(tree_obj)) != null) {
-      $(this)
-      .find([".tree-structure[data-object-sub-type="
-        , other_obj.constructor.table_singular
-        , "], .tree-structure[data-object-type="
-        , other_obj.constructor.shortName + "], .tree-structure[data-object-meta-type="
-        , other_obj.constructor.root_object
-        , "]"].join(""))
-      .first()
-      .trigger(ev.type === "modal:relationshipcreated" ? "newChild" : "removeChild", other_obj);
+    if (extra_content_controller_options.all
+        && extra_content_controller_options.all[model_name]) {
+      can.extend(
+          descriptor.content_controller_options,
+          extra_content_controller_options.all[model_name]);
     }
+
+    if (extra_content_controller_options[object.constructor.shortName]
+        && extra_content_controller_options[object.constructor.shortName][model_name]) {
+      can.extend(
+          descriptor.content_controller_options,
+          extra_content_controller_options[object.constructor.shortName][model_name]);
+    }
+
+    if (!list_loader)
+      return;
+    model_widget_descriptors[far_model.table_singular] = descriptor;
+    model_default_widgets.push(far_model.table_singular);
   });
 
-  var $risk_tree = $("#" + object_class.root_object + "_risk_widget .tree-structure").cms_controllers_tree_view({
-    model : object_class
-    , single_object : true
-    , list : [object]
-    , options_property : "risk_tree_options"
-  });
-
-
-  $(document.body).on("modal:success", ".link-objects", function(ev, data) {
-    $top_tree.trigger("linkObject", $.extend($(this).data(), {
-      parentId : object.id
-      , data : data
-    }));
-
-  });
-
-
+  can.extend(GGRC.extra_widget_descriptors, model_widget_descriptors);
+  GGRC.extra_default_widgets.push.apply(
+      GGRC.extra_default_widgets, model_default_widgets);
 });
 
 })(window.can, window.can.$);

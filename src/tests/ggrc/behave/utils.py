@@ -98,14 +98,14 @@ def handle_get_example_resource(context, name, expected_status=200):
         example.resource_type, response.json(), response=response)
     setattr(context, name, example)
 
-def handle_post_named_example_to_collection_endpoint(
-    context, name, expected_status=201):
-  """Create a new resource for the given example. Expects that there is a
-  `service_description` in `context` to use to lookup the endpoint url. The
-  created resource is added to the context as the attribute name given by
-  `name`.
-  """
-  handle_post_named_example(context, name, expected_status)
+def handle_post_fails_with_status_and_content(context, name, expected_status, content):
+  example = getattr(context, name)
+  response = post_example(
+      context, example.resource_type, example.value)
+  assert response.status_code == expected_status, \
+      'Expected status code {0}, received {1}'\
+        .format(expected_status, response.status_code)
+  assert response.text.find(content) != -1
 
 def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)
@@ -238,7 +238,9 @@ def check_for_resource_in_collection(
   from ggrc import models
   model_class = getattr(models, resource.resource_type)
   entry_list = collection[root][model_class._inflector.table_plural]
-  result_pairs = set([(o[u'id'], o[u'selfLink']) for o in entry_list])
+  result_pairs = set(
+      [(o.get(u'id'), o.get(u'selfLink') or o.get(u'href'))
+        for o in entry_list])
   check_pair = (resource.get(u'id'), resource.get(u'selfLink'))
   if expected:
     assert check_pair in result_pairs, \

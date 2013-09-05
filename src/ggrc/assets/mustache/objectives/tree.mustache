@@ -6,6 +6,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
@@ -21,26 +22,32 @@
       </a>
     </div>
 
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
 
           <div class="span6">
+          {{#if instance.viewLink}}
             <a href="{{instance.viewLink}}" class="info-action">
-              View Objective
+              View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
+          {{/if}}
           </div>
-          
-          {{! UNMAP
+
           <div class="span6">
-            <a href="javascript://" class="info-action unmap pull-right">
+          {{#is_allowed 'join_delete' instance}}
+          {{#if mappings}}
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/if}}
+          {{/is_allowed}}
           </div>
-          }}
 
         </div>
 
@@ -51,7 +58,7 @@
                 <div class="tree-description short">
                   {{{instance.description}}}
                 </div>
-                <a href="javascript://" class="show-long">...more</a>
+                {{{show_long}}}
               </div>
             </div>
           </div>
@@ -75,7 +82,7 @@
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              <a class="url" href="{{instance.url}}" target="_blank">
+              <a class="url" href="{{schemed_url instance.url}}" target="_blank">
                 {{instance.url}}
               </a>
             </div>
@@ -87,8 +94,8 @@
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
+            <h6>Mapped Objects ({{child_count}})</h6>
             {{#child_options}}
-              <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
@@ -96,36 +103,32 @@
       {{/if}}
 
     </div>
+    {{/if}}
   </li>
 {{/list}}
-{{#if_equals parent_instance.constructor.shortName "Section"}}
+
+{{#is_allowed 'create' 'update' 'delete' model.shortName}}
+{{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
-  <a
-    href="javascript://"
-    rel="tooltip"
-    data-placement="left"
-    data-toggle="modal-selector"
-    data-modal-selector-options="section_objectives"
-    data-modal-class="modal-wide"
-    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-    data-join-object-id="{{parent_instance.id}}"
-    data-join-object-type="{{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
+  <div class="row-fluid">
+    <div class="span12">
+
+      {{#if allow_mapping}}
+      <a
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="multitype-modal-selector"
+        data-join-option-type="{{model.shortName}}"
+        data-join-object-id="{{parent_instance.id}}"
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+        + {{model.title_singular}}
+      </a>
+      {{/if}}
+
+    </div>
+  </div>
 </li>
-{{else}}
-<li class="tree-item tree-item-add">
-  <a
-    href="javascript://"
-    rel="tooltip"
-    data-placement="left"
-    data-toggle="modal-selector-dispatch"
-    data-modal-class="modal-wide"
-    data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-    data-join-option-type="{{model.shortName}}"
-    data-join-object-id="{{parent_instance.id}}"
-    data-join-object-type="{{parent_instance.constructor.shortName}}">
-    + {{model.title_singular}}
-  </a>
-</li>
-{{/if_equals}}
+{{/if}}
+{{/is_allowed}}

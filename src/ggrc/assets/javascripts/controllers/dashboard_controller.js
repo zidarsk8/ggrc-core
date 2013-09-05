@@ -11,7 +11,7 @@ can.Control("CMS.Controllers.Dashboard", {
     defaults: {
         model_descriptors: null
       , menu_tree_spec: null
-      //  widget_descriptors: null
+      , widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
       //
@@ -19,6 +19,9 @@ can.Control("CMS.Controllers.Dashboard", {
 
 }, {
     init: function(options) {
+      this.init_page_title();
+      this.init_page_help();
+      this.init_page_header();
       this.init_widget_descriptors();
       if (!this.options.menu_tree)
         this.init_menu_tree();
@@ -30,6 +33,35 @@ can.Control("CMS.Controllers.Dashboard", {
       if (!this.widget_area_controller)
         this.init_widget_area();
       this.init_default_widgets();
+    }
+
+  , init_page_title: function() {
+      var page_title = null;
+      if (typeof(this.options.page_title) === "function")
+        page_title = this.options.page_title(this);
+      else if (this.options.page_title)
+        page_title = this.options.page_title;
+      if (page_title)
+        $("head > title").text(page_title);
+    }
+
+  , init_page_help: function() {
+      var page_help = null;
+      if (typeof(this.options.page_help) === "function")
+        page_help = this.options.page_help(this);
+      else if (this.options.page_help)
+        page_help = this.options.page_help;
+      if (page_help)
+        this.element.find("#page-help").attr("data-help-slug", page_help);
+    }
+
+  , init_page_header: function() {
+      var that = this;
+      if (this.options.header_view) {
+        can.view(this.options.header_view, this.options, function(frag) {
+          that.element.find("#page-header").html(frag);
+        });
+      }
     }
 
   , init_widget_area: function() {
@@ -189,6 +221,33 @@ can.Control("CMS.Controllers.Dashboard", {
         return this.add_dashboard_widget_from_descriptor(descriptor);
     }
 
+  , make_tree_view_descriptor_from_model_descriptor: function(descriptor) {
+      return {
+        content_controller: CMS.Controllers.TreeView,
+        content_controller_options: descriptor,
+        content_controller_selector: "ul",
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+        widget_id: descriptor.model.table_singular,
+        widget_name: function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return descriptor.model.title_plural;
+          } else {
+            return "Mapped " + descriptor.model.title_plural;
+          }
+        },
+        widget_info : function() {
+          var $objectArea = $(".object-area");
+          if ( $objectArea.hasClass("dashboard-area") ) {
+            return ""
+          } else {
+            return "Does not include mappings to Directives, Objectives and Controls"
+          }
+        },
+        widget_icon: descriptor.model.table_singular,
+        object_category: descriptor.model.category || descriptor.object_category
+      }
+    }
 
   , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
       return {
@@ -224,42 +283,23 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
     init: function() {
       this.options.model = this.options.instance.constructor;
       this._super();
-      this.init_related_widgets();
     }
 
-  , init_related_widgets: function() {
+  , init_page_title: function() {
+      // Reset title when page object is modified
       var that = this
-        , model_name = this.options.instance.constructor.shortName
-        , relationships = GGRC.RELATIONSHIP_TYPES[model_name]
+        , that_super = this._super
         ;
-
-      can.each(relationships, function(value, key) {
-        var related_model = CMS.Models[key]
-          , descriptor = that.options.widget_descriptors[related_model.table_singular]
-          ;
-
-        that.add_dashboard_widget_from_descriptor(descriptor);
+      this.options.instance.bind("change", function() {
+        that_super.apply(that);
       });
+      this._super();
     }
 
   , init_widget_descriptors: function() {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-
-      can.each(this.options.model_descriptors, function(descriptor, key) {
-        that.options.widget_descriptors[key] =
-          that.make_related_descriptor_from_model_descriptor(descriptor);
-      });
-    }
-
-  , make_related_descriptor_from_model_descriptor: function(descriptor) {
-      descriptor = this.make_list_view_descriptor_from_model_descriptor(descriptor);
-      descriptor = $.extend({}, descriptor);
-      descriptor.content_controller_options =
-        $.extend({}, descriptor.content_controller_options);
-      descriptor.content_controller_options.is_related = true;
-      return descriptor;
     }
 
   , init_menu_tree: function() {
@@ -390,7 +430,7 @@ can.Control("CMS.Controllers.InnerNav", {
     });
   }
 
-  , update_scrollspy : function() {
+  , update_scrollspy : function(init) {
       var $body = $(".object-area")
         , top = $body.scrollTop()
         ;
@@ -399,21 +439,23 @@ can.Control("CMS.Controllers.InnerNav", {
       if (!$body.data("scrollspy"))
         return
 
-      // FIXME: This is currently necessary because Bootstrap's ScrollSpy uses
-      //   the `href` to determine the active element, and the element may have
-      //   changed (due to view update) while keeping the same `href`.
-      // So, we nullify the "current" href.
-      $body.data("scrollspy").activeTarget = null;
+      $body.data('scrollspy').activeTarget = null;
       $body
-        .scrollTop(0)
-        .scrollspy("refresh")
-        .scrollTop(top)
-        .scrollspy("process");
+        .scrollspy('refresh')
+        .scrollspy('process');
     }
 
   , update_widget_list : function(widget_elements) {
-      this.replace_widget_list(widget_elements);
-      this.update_scrollspy();
+      var that = this;
+
+      if (this._update_timeout)
+        return;
+
+      this._update_timeout = setTimeout(function() {
+        that.replace_widget_list(widget_elements);
+        that.update_scrollspy();
+        that._update_timeout = null;
+      }, 100);
     }
 
 });

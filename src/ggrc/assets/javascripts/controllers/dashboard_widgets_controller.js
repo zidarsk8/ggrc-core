@@ -16,23 +16,28 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     , widget_icon : ""
     , widget_view : "/static/mustache/dashboard/object_widget.mustache"
     , widget_guard : null
+    , widget_initial_content : ''
     , show_filter : false
     , object_category : null //e.g. "governance"
     , content_selector : ".content"
     //, minimum_widget_height : 100
     , content_controller : null
     , content_controller_options : {}
+    , content_controller_selector : null
   }
 }, {
 
   init : function() {
 
     if(!this.options.model && GGRC.page_model) {
-      this.options.model = GGRC.infer_object_type(GGRC.page_model);
+      this.options.model = GGRC.infer_object_type(GGRC.page_object);
     }
 
     if(!this.options.widget_icon && this.options.model) {
       this.options.widget_icon = this.options.model.table_singular;
+    }
+    if(this.options.widget_icon && !/^grcicon/.test(this.options.widget_icon)) {
+      this.options.widget_icon = "grcicon-" + this.options.widget_icon + "-color";
     }
 
     if(!this.options.object_category && this.options.model) {
@@ -47,8 +52,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     .html($(new Spinner().spin().el).css({
         width: '100px',
         height: '100px',
-        left: '50px',
-        top: '50px'
+        left: '0px',
+        top: '10px'
         }))
     .trigger("section_created");
 
@@ -63,7 +68,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     this.element.html(frag[0]);
     this.element.trigger("widgets_updated");
 
-    var content = this.element;
+    var content = this.element
+      , controller_content = null;
     if(prefs[0].getCollapsed(window.getPageToken(), this.element.attr("id"))) {
 
       this.element
@@ -78,24 +84,24 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
       content.trigger("min_size");
     }
 
-      // this.element
-      // .find('.wysihtml5')
-      // .cms_wysihtml5();
     if(this.options.content_controller) {
-      this.element
-      .find(this.options.content_selector)
-      .html($(new Spinner().spin().el).css({
-        width: '100px',
-        height: '100px',
-        left: '50px',
-        top: '50px'
-        }));
+      controller_content = this.element.find(this.options.content_selector);
+      if (this.options.content_controller_selector)
+        controller_content =
+          controller_content.find(this.options.content_controller_selector);
+      controller_content
+        .html($(new Spinner().spin().el)
+          .css({
+            width: '100px',
+            height: '100px',
+            left: '50px',
+            top: '40px'
+          }));
       new this.options.content_controller(
-        this.element.find(this.options.content_selector)
+          controller_content
         , this.options.content_controller_options
       );
     }
-
   }
 
   , ".remove-widget click" : function() {

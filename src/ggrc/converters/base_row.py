@@ -230,7 +230,7 @@ class ColumnHandler(object):
     if content:
       data = self.parse_item(content)
       self.validate(data)
-      if data:
+      if data is not None:
         self.value = data
         self.set_attr(data)
       return data
@@ -289,9 +289,27 @@ class OptionColumnHandler(ColumnHandler):
 class BooleanColumnHandler(ColumnHandler):
   def parse_item(self, value):
     truthy_values = self.options.get('truthy_values', []) + ['yes', '1', 'true', 'y']
+    no_values = self.options.get('no_values',[]) + ['no', '0', 'false','n']
     if value:
-      return value.lower() in truthy_values
+      if value.lower() in truthy_values:
+        return True
+      elif value.lower() in no_values:
+        return False
+      else:
+        self.add_error('bad value')
+        return None
     return None
+
+  def display(self):
+    if self.value is None:
+      return self.original
+    else:
+      if self.value is True:
+        return "Yes"
+      elif self.value is False:
+        return "No"
+      else:
+        return str(self.value) # unknown value - shouldn't happen
 
 class DateColumnHandler(ColumnHandler):
 
@@ -651,9 +669,9 @@ class LinkSystemsHandler(LinksHandler):
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
       self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
-      if self.options.get('is_biz_process') and not (system is Process):
+      if self.options.get('is_biz_process') and not (system.__class__ is Process):
         self.add_link_warning("That code is used by a System, and will not be mapped")
-      elif not self.options.get('is_biz_process') and system is Process:
+      elif not self.options.get('is_biz_process') and system.__class__ is Process:
         self.add_link_warning('That code is used by a Process, and will not be mapped')
       else:
         return system
@@ -661,7 +679,7 @@ class LinkSystemsHandler(LinksHandler):
   def get_existing_items(self):
     sys_class = Process if self.options.get('is_biz_process') else System
     systems = super(LinkSystemsHandler, self).get_existing_items()
-    return [sys for sys in systems if sys.__class__ is sys_class]
+    return [sys for sys in systems if sys.__class__ is sys_class] if systems else []
 
   def create_item(self, data):
     return None
@@ -683,16 +701,18 @@ class LinkRelationshipsHandler(LinksHandler):
   def get_existing_items(self):
     where_params= {'relationship_type_id' : self.options.get('relationship_type_id')}
     objects = []
+    model_class = self.options.get('model_class') or self.model_class
+    importer_cls_name = self.importer.obj.__class__.__name__
     if self.options.get('direction') == 'to':
-      where_params['source_type'] = self.importer.obj.__class__.__name__
+      where_params['source_type'] = importer_cls_name
       where_params['source_id'] = self.importer.obj.id
-      where_params['destination_type'] = self.model_class.__name__
+      where_params['destination_type'] = model_class.__name__
       relationships = Relationship.query.filter_by(**where_params).all()
       objects = [rel.destination for rel in relationships]
     elif self.options.get('direction') == 'from':
-      where_params['destination_type'] = self.importer.obj.__class__.__name__
+      where_params['destination_type'] = importer_cls_name
       where_params['destination_id'] = self.importer.obj.id
-      where_params['source_type'] = self.model_class.__name__
+      where_params['source_type'] = model_class.__name__
       relationships = Relationship.query.filter_by(**where_params).all()
       objects = [rel.source for rel in relationships]
 
@@ -702,12 +722,17 @@ class LinkRelationshipsHandler(LinksHandler):
     return self.options.get('model_human_name') or self.model_class.__name__
 
   def create_item(self, data):
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(self.model_human_name(), data.get('slug')))
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+      self.model_human_name(), data.get('slug')))
 
   def after_save(self, obj):
-    db_session = db.session
+    # Flushing here because the setter for source/destination
+    # requires that the object.id be available
+    if not self.importer.obj.id:
+      db.session.flush()
+
     for linked_object in self.created_links():
-      db_session.add(linked_object)
+      db.session.add(linked_object)
       relationship = Relationship()
       relationship.relationship_type_id = self.options.get('relationship_type_id')
       if self.options.get('direction') == 'to':
@@ -716,17 +741,57 @@ class LinkRelationshipsHandler(LinksHandler):
       elif self.options.get('direction') == 'from':
         relationship.destination = self.importer.obj
         relationship.source = linked_object
-      db_session.add(relationship)
+      db.session.add(relationship)
 
   def find_existing_item(self, data):
     where_params = self.get_where_params(data)
-    model_class = self.options.get('model_class')
+    model_class = self.options.get('model_class') or self.model_class
     return model_class.query.filter_by(**where_params).first() if model_class else None
 
+class LinkObjectControl(LinksHandler):
+  from ggrc.models import ObjectControl
+  import re
 
+  def parse_item(self, value):
+    if value and value[0] == '[':
+      match = re.match(r'^(?:\[([\w\d-]+)\])?([^$]*)$', value)
+      if match and len(match.groups()) == 2 and not (match.group(1) is None):
+        return { 'slug' : match.group(1) , 'title' : match.group(2) }
+      else:
+        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+    else:
+      return {'slug' : value.upper()}
 
+  def get_existing_items(self):
+    objects = []
+    model_class = self.options.get('model_class') or self.model_class
+    importer_cls_name = self.importer.obj.__class__.__name__
+    where_params = {}
+    where_params['control_id'] = self.importer.obj.id
+    where_params['controllable_type'] = model_class.__name__
+    object_controls = ObjectControl.query.filter_by(**where_params).all()
+    return [obj_cont.controllable for obj_cont in object_controls]
 
+  def create_item(self, data):
+    model_class = self.options.get('model_class') or self.model_class
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+      model_class.__name__, data.get('slug')))
 
+  def after_save(self, obj):
+    # Flushing here because the controllable setter
+    # makes use of an existing id on the object
+    if not self.importer.obj.id:
+      db.session.flush()
 
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      object_control = ObjectControl()
+      object_control.control = self.importer.obj
+      object_control.controllable = linked_object
+      db.session.add(object_control)
 
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = self.options.get('model_class') or self.model_class
+    return model_class.query.filter_by(**where_params).first() if model_class else None
 

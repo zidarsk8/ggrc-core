@@ -226,13 +226,38 @@ $(function() {
     //$(document.body).on("mouseover", ".column-set[id][data-resize]:not(.cms_controllers_resize_widgets)", bindResizer);
 
     var $area = $('.area').first()
+      , instance
+      , model_name
+      , extra_page_options
       ;
 
+    extra_page_options = {
+        Program: {
+            header_view: GGRC.mustache_path + "/programs/page_header.mustache"
+          , page_title: function(controller) {
+              return "GRC Program: " + controller.options.instance.title;
+            }
+
+        }
+    };
+
     if (/\w+\/\d+($|\?|\#)/.test(window.location)) {
-      $area.cms_controllers_page_object({
+      instance = GGRC.page_instance();
+      model_name = instance.constructor.shortName;
+
+      $area.cms_controllers_page_object($.extend({
           model_descriptors: model_descriptors
-        , instance: GGRC.make_model_instance(GGRC.page_object)
-        });
+        , widget_descriptors: GGRC.extra_widget_descriptors || {}
+        , default_widgets: GGRC.extra_default_widgets || []
+        , instance: GGRC.page_instance()
+        , header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
+        , page_title: function(controller) {
+            return controller.options.instance.title;
+          }
+        , page_help: function(controller) {
+            return controller.options.instance.constructor.table_singular;
+          }
+        }, extra_page_options[model_name]));
     } else if (/dashboard/.test(window.location)) {
       $area.cms_controllers_dashboard({
           model_descriptors: model_descriptors
@@ -280,9 +305,6 @@ $(function() {
       , model_class : notes_model
     });
   });
-
-  $("section[id$=_info_widget]:not([id$=_more_info_widget])").ggrc_controllers_info_widget();
-
 });
 
 })(this, jQuery);

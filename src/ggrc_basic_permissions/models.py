@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.mixins import Base, Described
+from sqlalchemy.orm import backref
 
 class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
@@ -23,7 +24,7 @@ class Role(Base, Described, db.Model):
   """
   __tablename__ = 'roles'
 
-  name  = db.Column(db.String(128), nullable=False)
+  name = db.Column(db.String(128), nullable=False)
   permissions_json = db.Column(db.Text(), nullable=False)
 
   @simple_property
@@ -41,13 +42,23 @@ class Role(Base, Described, db.Model):
 
   _publish_attrs = ['name', 'permissions']
 
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import not_
+    query = super(Role, cls).eager_query()
+    # FIXME: 'RoleReader' role should not be shown in interface, but this is
+    #   the wrong place to filter it.
+    return query.filter(not_(cls.name == 'RoleReader'))
+
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
-  role = db.relationship('Role')
+  role = db.relationship(
+      'Role', backref=backref('user_roles', cascade='all, delete-orphan'))
   person_id = db.Column(db.Integer(), db.ForeignKey('people.id'), nullable=False)
-  person = db.relationship('Person')
+  person = db.relationship(
+      'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
 
   _publish_attrs = ['role', 'person']
 
@@ -60,7 +71,6 @@ class UserRole(Base, db.Model):
     for assignment in all_assignments:
         assignments_by_user.setdefault(assignment.person.email, [])\
             .append(assignment.role)
-    print 'role_assignments_for', assignments_by_user
     return assignments_by_user
 
   @classmethod

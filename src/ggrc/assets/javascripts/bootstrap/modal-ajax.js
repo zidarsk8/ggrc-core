@@ -152,7 +152,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -170,7 +170,7 @@
 
       $target.on('modal:success', function(e, data) {
         var model_name = $trigger.attr("data-object-singular");
-        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
+        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
           window.location.assign('/dashboard');
         } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
           window.location.assign('/admin');
@@ -186,22 +186,23 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
       if(instance && instance.owner && !instance.owner.selfLink) {
         instance.owner.refresh({ "__include" : "owner" });
       }
-      
+
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
-        new_object_form : !$trigger.attr('data-object-id')
+          new_object_form : !$trigger.attr('data-object-id')
+        , object_params : $trigger.data('object-params')
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
-        , modal_title : (instance ? "Edit " : "New ") + model.title_singular || $trigger.attr("data-object-singular")
+        , modal_title : (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"))
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       });
 
@@ -286,6 +287,9 @@
       _top = offsetParent.closest(".modal").offset().top - offsetParent.offset().top + header_height;
       _left = offsetParent.closest(".modal").offset().left + offsetParent.closest(".modal").width() / 2 - offsetParent.offset().left;
     }
+    if (_top < 0) {
+      _top = 0;
+    }
     modal
     .css("top", _top + "px")
     .css({"position" : "absolute", "margin-top" : 0, "left" : _left});
@@ -300,7 +304,7 @@
         || $(shownevents).filter(function() { 
             return $.inArray("arrange", this.namespace.split(".")) > -1; 
         }).length < 1) {
-          $el.on("shown.arrange", function(ev) {
+          $el.on("shown.arrange, loaded.arrange", function(ev) {
             if(ev.target === ev.currentTarget)
                 reconfigureModals.call(that);
           });

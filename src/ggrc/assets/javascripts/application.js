@@ -173,6 +173,13 @@ jQuery.extend(GGRC, {
     }
   }
 
+  , page_instance : function() {
+    if (!GGRC._page_instance && GGRC.page_object) {
+      GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
+    }
+    return GGRC._page_instance;
+  }
+
   , queue_event : function(event) {
     var timegap = 100 //ms
     , currentTimeout = null;
@@ -359,7 +366,7 @@ jQuery(document).ready(function($) {
 
     _tooltip_show.apply(this);
 
-    return_value = this.$tip.css({ 'white-space': 'nowrap' });
+    return_value = this.$tip.css({ 'white-space': 'normal' });
 
     tip_pos = this.$tip.position();
     tip_pos.width = this.$tip.width();
@@ -638,6 +645,7 @@ jQuery(function($) {
         , $li = $main.closest('li')
         , $content = $li.children('.item-content')
         , $icon = $main.find('.openclose')
+        , $parentTree = $this.closest('ul.new-tree')
         , cmd = command;
 
       if(typeof cmd !== "string" || cmd === "toggle") {
@@ -649,11 +657,13 @@ jQuery(function($) {
         use_slide ? $content.slideUp('fast') : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
+        $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
         use_slide ? $content.slideDown('fast') : $content.css("display", "block");
         $icon.addClass('active');
         $li.addClass('item-open');
+        $parentTree.addClass('tree-open');
         $content.addClass('content-open');
       }
     });

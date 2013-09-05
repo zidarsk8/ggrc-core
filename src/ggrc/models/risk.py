@@ -40,7 +40,7 @@ class Risk(
       'risk_risky_attributes', 'risky_attribute', 'RiskRiskyAttribute')
 
   _publish_attrs = [
-      'categories',
+      #'categories',
       'controls',
       'financial_impact_rating',
       'inherent_risk',

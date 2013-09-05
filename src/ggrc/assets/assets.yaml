@@ -3,6 +3,7 @@ dashboard-js-files:
   - jquery.js
   - rails.js
   - jquery-ui.js
+  - jquery.ba-throttle-debounce.js
   - sha1.js
   - bootstrap-transition.js
   - bootstrap-alert.js
@@ -25,6 +26,8 @@ dashboard-js-files:
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.3.0_rc2.js
   - bootstrap-wysihtml5-0.0.2.js
+  - moment.js
+  - permission.js
   - application.js
   - fastfix.js
   - related_selector.js
@@ -32,9 +35,12 @@ dashboard-js-files:
   - spin.min.js
   - tmpl.js
   - mustache_helper.js
+  - models/mappers.js
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
+  - pbc/document.js
+  - pbc/person.js
   - models/simple_models.js
   - models/recently_viewed_object.js
   - models/search.js
@@ -56,15 +62,11 @@ dashboard-js-files:
   - controllers/dashboard_controller.js
   - apps/controls.js
   - sections/section.js
-  - pbc/document.js
-  - pbc/person.js
   - pbc/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
-  - apps/dashboard.js
   - directives/routes_controller.js
   - mapping/mapping_controller.js
-  - apps/directives.js
   - sections/sections_controller.js
   - apps/mapping.js
   - pbc/population_sample.js
@@ -76,10 +78,11 @@ dashboard-js-files:
   - products/routes_controller.js
   - apps/products.js
   - controls/category.js
-  - apps/programs.js
   - apps/quick_search.js
   - apps/systems.js
+  - apps/programs.js
   - apps/business_objects.js
+  - apps/dashboard.js
   - sections/notes_controller.js
   - roles/roles_modal_controller.js
   - dashboard.js
@@ -94,6 +97,7 @@ dashboard-js-template-files:
   - base_objects/extended_info.mustache
   - base_objects/info.mustache
   - base_objects/map_related_modal_content.mustache
+  - base_objects/page_header.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - contracts/modal_content.mustache
@@ -109,11 +113,13 @@ dashboard-js-template-files:
   - documents/modal_content.mustache
   - documents/option_column.mustache
   - documents/option_detail.mustache
+  - documents/tree.mustache
   - dashboard/modal_preload.mustache
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
   - directives/tree.mustache
+  - events/object_list.mustache
   - facilities/modal_content.mustache
   - help/help_modal_content.mustache
   - help/help_modal_header.mustache
@@ -131,26 +137,34 @@ dashboard-js-template-files:
   - people/active_column.mustache
   - people/list.mustache
   - people/modal_content.mustache
+  - people/multitype_option_detail.mustache
+  - people/multitype_option_items.mustache
+  - people/object_list.mustache
   - people/option_column.mustache
   - people/option_detail.mustache
+  - people/tree.mustache
   - policies/modal_content.mustache
   - processes/modal_content.mustache
   - products/modal_content.mustache
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
+  - programs/page_header.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - risks/modal_content.mustache
   - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
+  - roles/object_list.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - selectors/active_column.mustache
   - selectors/base_modal.mustache
   - selectors/multitype_base_modal.mustache
   - selectors/multitype_object_detail.mustache
+  - selectors/multitype_option_column.mustache
   - selectors/multitype_option_detail.mustache
+  - selectors/multitype_option_items.mustache
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
   - systems/modal_content.mustache

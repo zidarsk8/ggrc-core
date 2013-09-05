@@ -11,10 +11,12 @@ from .object_document import Documentable
 from .object_objective import Objectiveable
 from .object_person import Personable
 from .object_section import Sectionable
+from .relationship import Relatable
+from .utils import validate_option
 
 class Product(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Timeboxed, BusinessObject, db.Model):
+    Relatable, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'products'
 
   type_id = deferred(db.Column(db.Integer), 'Product')
@@ -36,9 +38,8 @@ class Product(
       ]
 
   @validates('type')
-  def validate_options(self, key, option):
-    assert option is None or option.role == 'product_type'
-    return option
+  def validate_product_options(self, key, option):
+    return validate_option(self.__class__.__name__, key, option, 'product_type')
 
   @classmethod
   def eager_query(cls):

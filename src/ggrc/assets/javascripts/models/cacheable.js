@@ -136,7 +136,7 @@ can.Model("can.Model.Cacheable", {
         that.risk_tree_options.child_options[1].model = that;
     });
 
-
+    this.init_mappings();
   }
 
   , findInCacheById : function(id) {
@@ -182,6 +182,8 @@ can.Model("can.Model.Cacheable", {
     if(params[this.root_collection]) {
       params = params[this.root_collection];
     }
+    if (!params || params.length == 0)
+      return new this.List();
     var ms = this._super(params);
     if(params instanceof can.Observe) {
       params.replace(ms);
@@ -190,32 +192,40 @@ can.Model("can.Model.Cacheable", {
       return ms;
     }
   }
-  , model : function(params) {
-    var m, that = this;
-    var obj_name = this.root_object;
-    if(!params) {
+  , object_from_resource : function(params) {
+      var obj_name = this.root_object;
+      if(!params) {
+        return params;
+      }
+      if(typeof obj_name !== "undefined" && params[obj_name]) {
+          for(var i in params[obj_name]) {
+            if(params[obj_name].hasOwnProperty(i)) {
+              params.attr
+              ? params.attr(i, params[obj_name][i])
+              : (params[i] = params[obj_name][i]);
+            }
+          }
+          if(params.removeAttr) {
+            params.removeAttr(obj_name);
+          } else {
+            delete params[obj_name];
+          }
+      }
       return params;
     }
-    if(typeof obj_name !== "undefined" && params[obj_name]) {
-        for(var i in params[obj_name]) {
-          if(params[obj_name].hasOwnProperty(i)) {
-            params.attr
-            ? params.attr(i, params[obj_name][i])
-            : (params[i] = params[obj_name][i]);
-          }
-        }
-        if(params.removeAttr) {
-          params.removeAttr(obj_name);
-        } else {
-          delete params[obj_name];
-        }
-    }
+  , model : function(params) {
+    var m, that = this;
+    params = this.object_from_resource(params);
+    if (!params)
+      return params;
+    var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
     if(m = this.findInCacheById(params.id)) {
-      if(m === params)
-        return m;
-      if (!params.selfLink)
-        return m;
-      if(!m.selfLink) {
+      if (m === params) {
+        //return m;
+      } else if (!params.selfLink) {
+        //return m;
+      } else {
+      if (!m.selfLink) {
         //we are fleshing out a stub, which is much like creating an object new.
         //But we don't want to trigger every change event on the new object's props.
         m._init = 1;
@@ -224,15 +234,29 @@ can.Model("can.Model.Cacheable", {
         //m.removeAttr('type');
         //m.removeAttr('href');
       }
-      var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
       fn(params, function(val, key) {
-        var p = val && val.serialize ? val.serialize() : val;
-        var i = 0, j = 0, k;
+        var i = 0, j = 0, k, changed = false;
         if(m[key] instanceof can.Observe.List) {
-          m[key].replace(
-            m[key].constructor.models ?
-              m[key].constructor.models(p)
-              : p);
+          if (changed === false) {
+            for (i=0; changed === false && i < m[key].length; i++) {
+              // If m[key][i] === val[i] then they're the same
+              // If val[i] is a stub of m[key][i], then it provides no new data
+              if (!(m[key][i] === val[i]
+                    || (val[i] && !val[i].selfLink && m[key][i].id === val[i].id
+                        && m[key][i].constructor.shortName === val[i].type)))
+                changed = i;
+            }
+          }
+          if (changed === false && m[key].length < val.length)
+            changed = m[key].length;
+          if (changed !== false) {
+            var p = val && val.serialize ? val.serialize() : val;
+            p = p.slice(changed);
+            m[key].splice.apply(m[key], [changed, 0].concat(
+              m[key].constructor.models ?
+                can.makeArray(m[key].constructor.models(p))
+                : p));
+          }
           // TODO -- experimental list optimization below -- BM 7/15/2013
           // p = m[key].constructor.models ? m[key].constructor.models(p) : p;
           // while(i < m[key].length && j < p.length) {
@@ -258,13 +282,32 @@ can.Model("can.Model.Cacheable", {
           //   m[key].splice(j, i - j);
           // }
         } else if(m[key] instanceof can.Model) {
-          m[key].constructor.model(params[key] || {});
+          if (!(m[key] === val
+              || (val && !val.selfLink && m[key].id === val.id
+                  && m[key].constructor.shortName === val.type))) {
+            if (val == null)
+              m.removeAttr(key);
+            else
+              m[key].constructor.model(params[key] || {});
+          }
         } else {
-          m.attr(key, p);
+          if (val == null)
+            m.removeAttr(key)
+          else
+            m.attr(key, val && val.serialize ? val.serialize() : val);
         }
       });
       delete m._init;
+      }
     } else {
+      fn(params, function(val, key) {
+        if (val == null) {
+          if (params.removeAttr)
+            params.removeAttr(key);
+          else
+            delete params[key];
+        }
+      });
       m = this._super(params);
     }
     return m;
@@ -292,27 +335,103 @@ can.Model("can.Model.Cacheable", {
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }
-}, {
-  init : function() {
-    var obj_name = this.constructor.root_object;
-    if(typeof obj_name !== "undefined" && this[obj_name]) {
-        for(var i in this[obj_name].serialize()) {
-          if(this[obj_name].hasOwnProperty(i)) {
-            this.attr(i, this[obj_name][i]);
-          }
-        }
-        this.removeAttr(obj_name);
+
+  , init_mappings: function() {
+      var self = this;
+      can.each(this.mappings, function(options, name) {
+        self.define_association_proxy(name, options);
+      });
     }
 
+  , define_association_proxy: function(name, options) {
+      /* Adds association proxy methods to prototype
+       */
+      var attr = options.attr
+        , target_attr = options.target_attr
+        , update_function_name = "_update_" + name
+        , update_function
+        , change_handler_name = "_handle_changed_" + name
+        , change_handler
+        , init_flag_name = "_initialized_" + name
+        ;
+
+      update_function = function() {
+        var self = this
+          , refresh_queue = new RefreshQueue()
+          ;
+
+        can.each(self[attr], function(mapping) {
+          refresh_queue.enqueue(mapping);
+        });
+        return refresh_queue.trigger()
+          .then(function(mappings) {
+            var refresh_queue = new RefreshQueue();
+            can.each(mappings, function(mapping) {
+              refresh_queue.enqueue(mapping[target_attr]);
+            });
+            return refresh_queue.trigger()
+              .then(function(mapped_objects) {
+                self[name].replace(
+                  can.map(mappings, function(mapping) {
+                    if (mapping[target_attr] && mapping[target_attr].selfLink)
+                      return {
+                          instance: mapping[target_attr]
+                        , mappings: [mapping]
+                      };
+                  }));
+              });
+          });
+      };
+
+      this.prototype[update_function_name] = update_function;
+
+      change_handler = function(ev, attr, how) {
+        var self = this;
+        if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
+          //self[update_function_name]();
+          setTimeout(self.proxy(update_function_name), 10);
+        }
+      };
+
+      this.prototype[change_handler_name] = change_handler;
+
+      if (!this.prototype._init_mappings) {
+        this.prototype._init_mappings = function() {
+          var self = this;
+          can.each(this.constructor.mappings_init_functions, function(fn) {
+            fn.apply(self);
+          });
+        }
+      }
+
+      this.prototype[name] = function() {
+        this[init_flag_name] = true;
+        if (!this.attr(name))
+          this[name] = new can.Observe.List();
+        this[update_function_name]();
+        this[attr].bind("change", this.proxy(change_handler_name));
+        return this[name];
+      }
+      /*if (!this.mappings_init_functions)
+        this.mappings_init_functions = [];
+
+      this.mappings_init_functions.push(function() {
+        if (!this[name])
+          this[name] = new can.Observe.List();
+        this[attr].bind("change", this.proxy(change_handler_name));
+      });*/
+    }
+}, {
+  init : function() {
     var cache = can.getObject("cache", this.constructor, true);
     if (this.id)
       cache[this.id] = this;
-
-    var that = this;
-    this.attr("computed_errors", can.compute(function() {
-      return that.errors();
-    }));
   }
+  , computed_errors : function() {
+      var that = this
+        , compute = can.compute(function() { return that.errors(); });
+      return compute;
+    }
   , addElementToChildList : function(attrName, new_element) {
     this[attrName].push(new_element);
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
@@ -338,10 +457,10 @@ can.Model("can.Model.Cacheable", {
       , dataType : "json"
     })
     .then(can.proxy(this.constructor, "model"))
-    .done(function(d) {
+    /*.done(function(d) {
       d.updated();
       //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
-    });
+    });*/
   }
   , attr : function() {
     if(arguments.length < 1) {
@@ -360,7 +479,7 @@ can.Model("can.Model.Cacheable", {
       if(that.constructor.attributes && that.constructor.attributes[name]) {
         fun_name = that.constructor.attributes[name];
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
-        if(fun_name === "models") {
+        if(fun_name === "models" || fun_name === "get_instances") {
           serial[name] = [];
           for(var i = 0; i < val.length; i++) {
             serial[name].push(val[i].stub());
@@ -390,8 +509,8 @@ can.Model("can.Model.Cacheable", {
 can.Observe.prototype.stub = function() {
   var type;
 
-  if (this.constructor.getRootModelName)
-    type = this.constructor.getRootModelName();
+  if (this.constructor.shortName)
+    type = this.constructor.shortName;
   else
     type = this.type;
 

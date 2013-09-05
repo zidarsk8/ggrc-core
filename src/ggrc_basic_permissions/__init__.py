@@ -59,13 +59,18 @@ class UserPermissions(DefaultUserPermissions):
         or session['permissions']['__user'] != \
             self.get_email_for(get_current_user()):
       self.load_permissions()
-    elif 'permission__ts' in session and not get_current_user().is_anonymous():
-      current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
-          .filter(UserRole.person_id==get_current_user().id)\
-          .order_by(UserRole.updated_at.desc())\
-          .first()
-      if current_most_recent_role_ts[0] > session['permissions__ts']:
-        self.load_permissions()
+    elif 'permissions__ts' in session and not get_current_user().is_anonymous():
+      self.load_permissions()
+      #if not session['permissions__ts']:
+        #self.load_permissions()
+      #else:
+        #current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
+            #.filter(UserRole.person_id==get_current_user().id)\
+            #.order_by(UserRole.updated_at.desc())\
+            #.first()
+        #if current_most_recent_role_ts\
+            #and current_most_recent_role_ts[0] > session['permissions__ts']:
+          #self.load_permissions()
 
   def get_email_for(self, user):
     return user.email if hasattr(user, 'email') else 'ANONYMOUS'
@@ -135,7 +140,7 @@ def all_collections():
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
-  if 'private' in src:
+  if src.get('private', False):
     # get the personal context for this logged in user
     personal_context = service.personal_context()
 
@@ -153,7 +158,6 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
     # add a user_roles mapping assigning the user creating the program
     # the ProgramOwner role in the program's context.
-    current_user_id = get_current_user().id
     program_owner_role = db.session.query(Role)\
         .filter(Role.name == 'ProgramOwner').first()
     user_role = UserRole(
@@ -164,17 +168,27 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     db.session.add(user_role)
     db.session.flush()
 
+    assign_role_reader(get_current_user())
+
+@Resource.model_posted.connect_via(UserRole)
+def handle_program_owner_role_assignment(
+    sender, obj=None, src=None, service=None):
+  if obj.role.name == 'ProgramOwner':
+    assign_role_reader(obj.person)
+
+def assign_role_reader(user):
     # assign the user RoleReader if they don't already have that role
     role_reader_role = db.session.query(Role)\
         .filter(Role.name == 'RoleReader').first()
     role_reader_for_user = db.session.query(UserRole)\
         .join(Role, UserRole.role == role_reader_role)\
-        .filter(UserRole.person_id == current_user_id\
-            and Role.name == 'RoleReader')\
+        .filter(UserRole.person_id == user.id\
+            and Role.name == 'RoleReader'
+            and UserRole.context_id == 1)\
         .first()
     if not role_reader_for_user:
       role_reader_for_user = UserRole(
-          person_id=current_user_id,
+          person_id=user.id,
           role=role_reader_role,
           context_id=1,
           )

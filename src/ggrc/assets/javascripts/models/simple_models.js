@@ -18,12 +18,23 @@ can.Model.Cacheable("CMS.Models.Program", {
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
   , attributes : {
-    controls : "CMS.Models.Control.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , program_directives : "CMS.Models.ProgramDirective.models"
+    //, directives : "CMS.Models.get_instances"
+    , program_controls : "CMS.Models.ProgramControl.models"
+    , controls : "CMS.Models.Control.models"
+    , cycles : "CMS.Models.Cycle.models"
   }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -53,15 +64,42 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
+
+  , model : function(params) {
+      if (this.shortName !== 'Directive')
+        return this._super(params);
+      if (!params)
+        return params;
+      params = this.object_from_resource(params);
+      if (!params.selfLink) {
+        if (params.type !== 'Directive')
+          return CMS.Models[params.type].model(params);
+      } else {
+        if (CMS.Models.Contract.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Contract.model(params);
+        else if (CMS.Models.Regulation.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Regulation.model(params);
+        else if (CMS.Models.Policy.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Policy.model(params);
+      }
+      console.debug("Invalid Directive:", params);
+    }
+
   , attributes : {
-    sections : "CMS.Models.Section.models"
-    , program : "CMS.Models.Program.model"
-    , controls : "CMS.Models.Control.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , program_directives : "CMS.Models.ProgramDirective.models"
+    , programs : "CMS.Models.Program.models"
+    , sections : "CMS.Models.Section.models"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -69,7 +107,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
   }
   , defaults : {
-    sections : []
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -115,14 +152,20 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     kind : "Regulation"
   }
   , attributes : {
-    sections : "CMS.Models.Section.models"
-    , program : "CMS.Models.Program.model"
-    , controls : "CMS.Models.Control.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , program_directives : "CMS.Models.ProgramDirective.models"
+    , programs : "CMS.Models.Program.models"
+    , sections : "CMS.Models.Section.models"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -150,14 +193,20 @@ CMS.Models.Directive("CMS.Models.Policy", {
     kind : "Company Policy"
   }
   , attributes : {
-    sections : "CMS.Models.Section.models"
-    , program : "CMS.Models.Program.model"
-    , controls : "CMS.Models.Control.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , program_directives : "CMS.Models.ProgramDirective.models"
+    , programs : "CMS.Models.Program.models"
+    , sections : "CMS.Models.Section.models"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -185,14 +234,20 @@ CMS.Models.Directive("CMS.Models.Contract", {
     kind : "Contract"
   }
   , attributes : {
-    sections : "CMS.Models.Section.models"
-    , program : "CMS.Models.Program.model"
-    , controls : "CMS.Models.Control.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , program_directives : "CMS.Models.ProgramDirective.models"
+    , programs : "CMS.Models.Program.models"
+    , sections : "CMS.Models.Section.models"
+    , controls : "CMS.Models.Control.models"
   }
   , serialize : {
     "CMS.Models.Program.model" : function(val, type) {
@@ -212,11 +267,20 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
   , attributes : {
-      people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -281,11 +345,20 @@ can.Model.Cacheable("CMS.Models.Project", {
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
   , attributes : {
-      people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -334,11 +407,20 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
   , attributes : {
-      people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -403,15 +485,24 @@ can.Model.Cacheable("CMS.Models.Product", {
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
   , attributes : {
-    type : "CMS.Models.Option.model"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , type : "CMS.Models.Option.model"
   }
   , defaults : {
-    type : {}
+    type : null
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -501,11 +592,20 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
   , attributes : {
-      people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -570,11 +670,20 @@ can.Model.Cacheable("CMS.Models.Market", {
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
   , attributes : {
-      people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -672,6 +781,22 @@ can.Model.Cacheable("CMS.Models.Risk", {
       , dataType : "json"
     });
   }
+  , attributes : {
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+  }
   , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
   , tree_view_options : {
     list_view : GGRC.mustache_path + "/risks/tree.mustache"
@@ -720,36 +845,85 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
-  , tree_view_options : {
-      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
-    , create_link : true
-    , draw_children : true
-    , start_expanded : false
-    , child_options : [{
-      model : can.Model.Cacheable
-      , property : "business_objects"
-      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
-      , title_plural : "Business Objects"
-    }]
-  }
   , links_to : {
       "Section" : "SectionObjective"
   }
   , attributes : {
-      sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
     , section_objectives : "CMS.Models.SectionObjective.models"
+    , sections : "CMS.Models.Section.models"
+    , objective_controls : "CMS.Models.ObjectiveControl.models"
     , controls : "CMS.Models.Control.models"
-    , objective_controls : "CMS.Models.ObjectiveControls.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
-    , people : "CMS.Models.Person.models"
-    , documents : "CMS.Models.Document.models"
+    //, people : "CMS.Models.Person.models"
+    //, documents : "CMS.Models.Document.models"
     , object_people : "CMS.Models.ObjectPerson.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
-    , owner : "CMS.Models.Person.model"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , objective_objects : "CMS.Models.ObjectObjective.models"
   }
+
   , defaults : {
-    object_objectives : []
   }
+
+  , mappings: {
+      people_mappings: {
+          attr: "object_people"
+        , target_attr: "person"
+      }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
+      }
+    , business_object_mappings: {
+          attr: "objective_objects"
+        , target_attr: "objectiveable"
+      }
+    , control_mappings: {
+          attr: "objective_controls"
+        , target_attr: "control"
+      }
+    , section_mappings: {
+          attr: "section_objectives"
+        , target_attr: "section"
+      }
+    }
+
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , create_link : true
+    //, draw_children : true
+    , start_expanded : false
+    , child_options : [{
+        model : "Control"
+      , property : "control_mappings"
+      , list_view : "/static/mustache/controls/tree.mustache"
+      , draw_children : false
+    }, {
+        model : "Person"
+      , property : "people_mappings"
+      , list_view : "/static/mustache/people/tree.mustache"
+      , draw_children : false
+    }, {
+        model : "Document"
+      , property : "document_mappings"
+      , list_view : "/static/mustache/documents/tree.mustache"
+      , draw_children : false
+/*    }, {
+        model : "Section"
+      , property : "section_mappings"
+      , list_view : "/static/mustache/sections/tree.mustache"
+*/    }, {
+        model : can.Model.Cacheable
+      , property : "business_object_mappings"
+      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , title_plural : "Business Objects"
+      , draw_children : false
+    }]
+  }
+
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
@@ -758,34 +932,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-    this.attr("business_objects", new can.Model.List(
-      can.map(
-        this.object_objectives,
-        function(os) {return os.objectiveable || new can.Model({ selfLink : "/" }); }
-      )
-    ));
-    this.object_objectives.bind("change", function(ev, attr, how) {
-      if(/^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-        that.business_objects.replace(
-          can.map(
-            that.object_objectives,
-            function(os, i) {
-              if(os.objectiveable) {
-                return os.objectiveable;
-              } else {
-                os.refresh({ "__include" : "objectiveable" }).done(function(d) {
-                  that.business_objects.attr(i, d.objectiveable);
-                  //can.Observe.stopBatch();
-                }).fail(function() {
-                  //can.Observe.stopBatch();
-                });
-                return new can.Model({ selfLink : "/"});
-              }
-          })
-        );
-      }
-    });
-
+    this._init_mappings();
   }
 });
 
@@ -801,7 +948,7 @@ can.Model.Cacheable("CMS.Models.Help", {
 can.Model.Cacheable("CMS.Models.Event", {
   root_object : "event"
   , root_collection : "events"
-  , findAll : "GET /api/events?__include=revisions,modified_by"
+  , findAll : "GET /api/events?__include=revisions,modified_by&__limit=50"
 }, {});
 
 can.Model.Cacheable("CMS.Models.Role", {
@@ -819,12 +966,26 @@ can.Model.Cacheable("CMS.Models.Role", {
         , "delete": []
       }
     }
-}, {});
+}, {
 
-CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
-  var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
-  return !!~can.inArray(cls.model_singular, this.permissions[operation]);
-};
+  allowed : function(operation, object_or_class) {
+    var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
+    return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+  }
+
+  , not_system_role : function() {
+    return can.inArray(
+        this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
+  }
+
+  , permission_summary : function() {
+    if (this.name == "ProgramOwner") return "Owner";
+    if (this.name == "ProgramEditor") return "Can Edit";
+    if (this.name == "ProgramReader") return "View Only";
+    return this.name;
+  }
+
+});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null;
@@ -834,7 +995,9 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
     params_or_object = object_type;
     if (!params_or_object)
       return null;
-    object_type = params_or_object.type
+    object_type =
+      (params_or_object.constructor && params_or_object.constructor.shortName)
+      || (!params_or_object.selfLink && params_or_object.type)
       || can.map(
           window.cms_singularize(
             /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
@@ -873,6 +1036,17 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
+CMS.Models.get_instances = function(objects) {
+  var i, instances = []
+  if (!objects)
+    return [];
+  for (i=0; i<objects.length; i++) {
+    instances[i] = CMS.Models.get_instance(objects[i]);
+  }
+  return instances;
+  //return can.map(instances, CMS.Models.get_instance);
+}
+
 CMS.Models.get_link_type = function(instance, attr) {
   var type
     , model
@@ -882,7 +1056,7 @@ CMS.Models.get_link_type = function(instance, attr) {
   if (!type) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
-      type = model.getRootModelName();
+      type = model.shortName;
     else if (instance[attr])
       type = instance[attr].type;
   }

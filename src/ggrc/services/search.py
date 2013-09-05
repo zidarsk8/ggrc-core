@@ -10,6 +10,8 @@ from ggrc.utils import DateTimeEncoder, url_for
 
 def search():
   terms = request.args.get('q')
+  permission_type = request.args.get('__permission_type', 'read')
+  permission_model = request.args.get('__permission_model', None)
   if terms is None:
     return current_app.make_response((
       'Query parameter "q" specifying search terms must be provided.',
@@ -31,7 +33,7 @@ def search():
     return do_counts(terms, types)
   if should_group_by_type:
     return group_by_type_search(terms, types)
-  return basic_search(terms, types)
+  return basic_search(terms, types, permission_type, permission_model)
 
 def do_counts(terms, types=None):
   indexer = get_indexer()
@@ -47,9 +49,13 @@ def do_counts(terms, types=None):
     [('Content-Type', 'application/json')],
     ))
 
-def do_search(terms, list_for_type, types=None):
+def do_search(
+    terms, list_for_type, types=None, permission_type='read',
+    permission_model=None):
   indexer = get_indexer()
-  results = indexer.search(terms, types=types)
+  results = indexer.search(
+      terms, types=types, permission_type=permission_type,
+      permission_model=permission_model)
   seen_results = {}
 
   for result in results:
@@ -76,10 +82,11 @@ def make_search_result(entries):
     [('Content-Type', 'application/json')],
     ))
 
-def basic_search(terms, types=None):
+def basic_search(
+    terms, types=None, permission_type='read', permission_model=None):
   entries = []
   list_for_type = lambda t: entries
-  do_search(terms, list_for_type, types)
+  do_search(terms, list_for_type, types, permission_type, permission_model)
   return make_search_result(entries)
 
 def group_by_type_search(terms, types=None):

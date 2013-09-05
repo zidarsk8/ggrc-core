@@ -1,5 +1,5 @@
 from .base import *
-from ggrc.models import Directive, Control
+from ggrc.models import Directive, Control, System, Process
 from .base_row import *
 from collections import OrderedDict
 from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
@@ -22,7 +22,6 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
     self.handle_text_or_html('description')
-    self.handle_text_or_html('documentation_description')
 
     self.handle_raw_attr('title')
     self.handle_raw_attr('url')
@@ -31,17 +30,18 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_option('means', role = 'control_means')
     self.handle_option('verify_frequency')
 
-    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'])
-    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'])
-    self.handle_boolean('active', truthy_values = ['active'])
+    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'], no_values = [])
+    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'], \
+      no_values = ['not fraud', 'not_fraud','not fraud_related', 'not fraud related'])
+    self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
     self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
     self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
     self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
     self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
-    self.handle('systems', LinkSystemsHandler, is_biz_process = False)
-    self.handle('processes', LinkSystemsHandler, association = 'systems', is_biz_process = True)
+    self.handle('systems', LinkObjectControl, model_class = System)
+    self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):
@@ -69,7 +69,6 @@ class ControlsConverter(BaseConverter):
     ('Map:Processes', 'processes'),
     ('Map:Categories', 'categories'),
     ('Map:Assertions', 'assertions'),
-    ('Documentation', 'documentation_description'),
     ('Frequency', 'verify_frequency'),
     ('References', 'documents'),
     ('Map:People;Responsible','people_responsible'),
@@ -82,6 +81,12 @@ class ControlsConverter(BaseConverter):
   ])
 
   row_converter = ControlRowConverter
+
+  # Creates the correct metadata_map for the specific directive kind.
+  def create_metadata_map(self):
+    if self.options.get('directive'):
+      self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().kind), v) \
+                          if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")

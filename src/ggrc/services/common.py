@@ -20,6 +20,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
+from ggrc.models.exceptions import ValidationError
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 import sqlalchemy.orm.exc
@@ -131,6 +132,12 @@ class ModelView(View):
             j_class.context_id.in_(j_contexts),
             j_class.context_id == None))
     query = query.order_by(self.modified_attr.desc())
+    if '__limit' in request.args:
+      try:
+        limit = int(request.args['__limit'])
+        query = query.limit(limit)
+      except (TypeError, ValueError):
+        pass
     return query
 
   def get_object(self, id):
@@ -295,7 +302,7 @@ class Resource(ModelView):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(object_for_json))]))
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj))
+      object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
     missing_headers = []
@@ -345,7 +352,12 @@ class Resource(ModelView):
     if new_context != obj.context_id \
         and not permissions.is_allowed_update(self.model.__name__, new_context):
       raise Forbidden()
-    self.json_update(obj, src)
+    try:
+      self.json_update(obj, src)
+    except ValidationError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
+
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
@@ -443,7 +455,11 @@ class Resource(ModelView):
       if not permissions.is_allowed_create(
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
-    self.json_create(obj, src)
+    try:
+      self.json_create(obj, src)
+    except ValidationError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
@@ -485,10 +501,9 @@ class Resource(ModelView):
     json_obj = ggrc.builder.json.publish(obj, properties_to_include or [])
     return { model_name: json_obj }
 
-  def get_properties_to_include(self):
+  def get_properties_to_include(self, inclusions):
     #FIXME This needs to be improved to deal with branching paths... if that's
     #desirable or needed.
-    inclusions = request.args.get('__include')
     if inclusions is not None:
       if len(inclusions) == 0:
         raise BadRequest(
@@ -534,7 +549,8 @@ class Resource(ModelView):
     for obj in objects:
       if not stubs:
         object_for_json = ggrc.builder.json.publish(
-            obj, self.get_properties_to_include())
+            obj,
+            self.get_properties_to_include(request.args.get('__include')))
       else:
         object_for_json = ggrc.builder.json.publish_stub(obj)
       objects_json.append(object_for_json)

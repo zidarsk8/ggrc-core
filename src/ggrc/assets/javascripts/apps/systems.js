@@ -14,7 +14,7 @@ if(!/^\/systems\/\d+/.test(window.location.pathname))
 
 
 $(function() {
-  var system = GGRC.make_model_instance(GGRC.page_object);
+  var system = GGRC.page_instance();
 
   var $top_tree = $("#system_widget .tree-structure").cms_controllers_tree_view({
     model : CMS.Models.System

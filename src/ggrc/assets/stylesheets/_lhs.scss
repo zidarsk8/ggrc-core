@@ -70,6 +70,7 @@
       @include background-size(368px 416px);
       background-position:-268px -195px;
       padding-left: 23px;
+      font-size:12px;
       
     }
   }
@@ -342,6 +343,10 @@
         a {
           color:#fff;
           background-color:$business;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
         }
       }
     }
@@ -351,6 +356,11 @@
         a {
           color:#fff;
           background-color:$governance;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
@@ -360,6 +370,11 @@
         a {
           color:#fff;
           background-color:$risk;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
@@ -369,6 +384,11 @@
         a {
           color:#fff;
           background-color:$programs;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
         }
       }
     }
@@ -386,12 +406,11 @@
   background:#fff;
   border:1px solid #ddd;
   &.fade {
-    @include opacity(0);
     display : none;
   }
   &.in {
-    @include opacity(0.95);
     display : block;
+    @include opacity(1);
   }
   span.error {
     font-size:12px;

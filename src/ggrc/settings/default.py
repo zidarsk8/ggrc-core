@@ -12,6 +12,7 @@ SQLALCHEMY_POOL_RECYCLE = 120
 # Settings in app.py
 AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
+DEBUG_ASSETS = False
 FULLTEXT_INDEXER = None
 USER_PERMISSIONS_PROVIDER = None
 EXTENSIONS = []
@@ -19,7 +20,7 @@ EXTENSIONS = []
 # Deployment-specific variables
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
-VERSION = "s9"
+VERSION = "s10"
 
 # Initialize from environment if present
 import os

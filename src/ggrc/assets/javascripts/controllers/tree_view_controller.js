@@ -26,16 +26,18 @@ can.Control("CMS.Controllers.TreeView", {
   //static properties
   defaults : {
     model : null
-    , list_view : "/static/mustache/controls/tree.mustache"
-    , show_view : "/static/mustache/controls/show.mustache"
+    , list_view : "/static/mustache/base_objects/tree.mustache"
     , parent : null
     , list : null
     , single_object : false
     , find_params : {}
     , start_expanded : false //true
+    , expanded : false
     , draw_children : true
     , find_function : null
     , options_property : "tree_view_options"
+    , allow_mapping : true
+    , allow_creating : true
     , child_options : [] //this is how we can make nested configs. if you want to use an existing 
     //example child option :
     // { property : "controls", model : CMS.Models.Control, }
@@ -49,6 +51,8 @@ can.Control("CMS.Controllers.TreeView", {
     if(opts instanceof can.Observe) {
 
       this.options = opts;
+      if (typeof(this.options.model) === "string")
+        this.options.attr("model", CMS.Models[this.options.model]);
       if(this.options.model) {
         can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function(v, k) {
           that.options.hasOwnProperty(k) || that.options.attr(k, v);
@@ -58,6 +62,8 @@ can.Control("CMS.Controllers.TreeView", {
         that.options.hasOwnProperty(k) || that.options.attr(k, v);
       });
     } else {
+      if (typeof(opts.model) === "string")
+        opts.model = CMS.Models[opts.model];
       this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
     }
   }
@@ -67,6 +73,7 @@ can.Control("CMS.Controllers.TreeView", {
     // Allow parent_instance even when there is no parent tree
     if (!this.options.parent_instance && this.options.parent)
       this.options.parent_instance = this.options.parent.instance;
+    this.element.trigger("loading");
     this.options.list ? this.draw_list() : this.fetch_list();
 
     var object_type = can.underscore(
@@ -80,32 +87,79 @@ can.Control("CMS.Controllers.TreeView", {
     this.element
       .attr("data-object-meta-type", object_meta_type)
       .data("object-meta-type", object_meta_type);
+
+    this.options.attr("allow_mapping_or_creating",
+      this.options.allow_mapping || this.options.allow_creating);
   }
 
   , fetch_list : function() {
-    if(can.isEmptyObject(this.options.find_params.serialize())) {
-      this.options.find_params.attr("id", this.options.parent ? this.options.parent.id : undefined);
-    }
-
     var find_function;
 
-    if (this.options.list_loader) {
-      this.find_all_deferred =
-        this.options.list_loader(this.options.parent_instance);
+    if (can.isFunction(this.options.find_params)) {
+      this.options.list = this.options.find_params();
+      this.draw_list();
     } else {
-      if (this.options.find_function)
-        find_function = this.options.find_function;
-      else
-        find_function = this.options.single_object ? "findOne" : "findAll";
-      this.find_all_deferred =
-        this.options.model[find_function](this.options.find_params.serialize());
-      if (this.options.fetch_post_process)
-        this.find_all_deferred =
-          this.find_all_deferred.then(this.options.fetch_post_process);
-    }
+      if(can.isEmptyObject(this.options.find_params.serialize())) {
+        this.options.find_params.attr(
+          "id", this.options.parent ? this.options.parent.id : undefined);
+      }
 
-    this.find_all_deferred.done(this.proxy("draw_list"));
+      if (this.options.list_loader) {
+        this.find_all_deferred =
+          this.options.list_loader(this.options.parent_instance);
+      } else {
+        if (this.options.find_function)
+          find_function = this.options.find_function;
+        else
+          find_function = this.options.single_object ? "findOne" : "findAll";
+        this.find_all_deferred =
+          this.options.model[find_function](this.options.find_params.serialize());
+        if (this.options.fetch_post_process)
+          this.find_all_deferred =
+            this.find_all_deferred.then(this.options.fetch_post_process);
+      }
+
+      this.find_all_deferred.done(this.proxy("draw_list"));
+    }
   }
+
+  , prepare_child_options: function(v) {
+    //  v may be any of:
+    //    <model_instance>
+    //    { instance: <model instance>, mappings: [...] }
+    //    <TreeOptions>
+    var tmp;
+    if(!(v instanceof can.Observe.TreeOptions)) {
+      tmp = v;
+      v = new can.Observe.TreeOptions();
+      v.attr("instance", tmp);
+      v.attr("start_expanded", this.options.start_expanded);
+    }
+    if (!(v.instance instanceof can.Model)) {
+      if (v.instance.instance instanceof can.Model) {
+        v.attr("mappings", v.instance.mappings);
+        v.attr("instance", v.instance.instance);
+      } else {
+        v.attr("instance", this.options.model.model(v.instance));
+      }
+    }
+    v.attr("child_count", can.compute(function() {
+      var total_children = 0;
+      if (v.attr("child_options")) {
+        can.each(v.attr("child_options"), function(child_options) {
+          var list = child_options.attr("list");
+          if (list)
+            total_children = total_children + list.length;
+        });
+      }
+      return total_children;
+    }));
+    if(!v.instance.selfLink) {
+      refresh_queue.enqueue(v.instance);
+    }
+    return v;
+  }
+
   , draw_list : function(list) {
     var that = this;
     if(list) {
@@ -125,27 +179,22 @@ can.Control("CMS.Controllers.TreeView", {
     refresh_queue = new RefreshQueue();
 
     can.each(list, function(v, i) {
-      if(!(v instanceof can.Observe.TreeOptions)) {
-        v = new can.Observe.TreeOptions().attr("instance", v).attr("start_expanded", that.options.start_expanded);
-      }
-      if(!(v.instance instanceof can.Model)) {
-        v.attr("instance", that.options.model.model(v.instance));
-      }
-      that.options.list.push(v);
-      if(!v.instance.selfLink) {
-        refresh_queue.enqueue(v.instance);
-      }
+      that.options.list.push(that.prepare_child_options(v));
     });
     refresh_queue.trigger().then(function() {
       can.Observe.stopBatch();
     });
     can.view(this.options.list_view, this.options, function(frag) {
-      GGRC.queue_event(function() {
-        that.element && that.element.html(frag);
+      if (that.element) {
+        that.element.html(frag);
+        that.element.trigger("updateCount", that.options.list.length);
+        that.element.trigger("loaded");
+      }
+      /*GGRC.queue_event(function() {
         if(that.options.start_expanded) {
           that.add_child_lists(that.options.attr("list")); //since the view is handling adding new controllers now, configure before rendering.
         }
-      });
+      });*/
     });
   }
 
@@ -154,7 +203,7 @@ can.Control("CMS.Controllers.TreeView", {
     can.each(newVals, function(newVal) {
       that.element.trigger("newChild", newVal);
     });
-    can.trigger(this.options, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
+    can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
@@ -166,7 +215,7 @@ can.Control("CMS.Controllers.TreeView", {
     //   }
     // });
     this.options.list.splice(index, oldVals.length);
-    can.trigger(this.options, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
+    can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} change" : function(list, ev, newVals, index) {
     var that = this;
@@ -180,6 +229,8 @@ can.Control("CMS.Controllers.TreeView", {
 
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
+    this.options.attr('expanded', true);
+    var that = this;
     var instance = el.data("model");
     var parent = can.reduce(this.options.list, function(a, b) {
       switch(true) {
@@ -193,8 +244,25 @@ can.Control("CMS.Controllers.TreeView", {
     }
   }
 
+  , ".tree-structure loaded" : function(el, ev) {
+    ev.stopPropagation();
+    var instance_id = el.closest(".tree-item").data("object-id");
+    var parent = can.reduce(this.options.list, function(a, b) {
+      switch(true) {
+        case !!a : return a;
+        case b.instance.id === instance_id: return b;
+        default: return null;
+      }
+    }, null);
+    if(parent.children_drawn)
+      return;
+    parent.attr("children_drawn", true);
+  }
+
   , ".openclose:not(.active) click" : function(el, ev) {
-    el.trigger("expand");
+    // Ignore unless it's a direct child
+    if (el.closest('.' + this.constructor._fullName).is(this.element))
+      el.trigger("expand");
   }
 
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
@@ -203,19 +271,21 @@ can.Control("CMS.Controllers.TreeView", {
     if(that.options.draw_children) {
       //Recursively define tree views anywhere we have subtree configs.
       can.each(list, function(item) {
-        GGRC.queue_event(function() {
-          that.add_child_lists_to_child(item);        
-        });
+        that.add_child_lists_to_child(item);
       });
     }
   }
 
   // add all child options to one TreeViewOptions object
   , add_child_lists_to_child : function(item) {
-    var that = this;
+    var that = this
+      , original_child_options = this.options.child_options;
+    if (original_child_options.length == null)
+      child_options = [original_child_options]
+
     if(!item.child_options)
       item.attr("child_options", new can.Observe.TreeOptions.List());
-    can.each(this.options.child_options.length != null ? this.options.child_options : [this.options.child_options], function(data) {
+    can.each(original_child_options, function(data, i) {
       var options = new can.Observe.TreeOptions();
       data.each(function(v, k) {
         options.attr(k, v);
@@ -223,7 +293,17 @@ can.Control("CMS.Controllers.TreeView", {
       that.add_child_list(item, options);
       options.attr("options_property", that.options.options_property);
       options.attr("single_object", false);
-      item.child_options.push(options);
+      options.attr("parent_item", item);
+      // Don't allow mapping or creating unless this is the last list
+      if (i < original_child_options.length - 1)
+        options.attr({
+          allow_mapping: false,
+          allow_creating: false,
+          allow_mapping_or_creating: false
+        });
+      GGRC.queue_event(function() {
+        item.child_options.push(options);
+      });
     });
   }
 
@@ -233,7 +313,14 @@ can.Control("CMS.Controllers.TreeView", {
     //var model = $(el).closest("[data-model]").data("model");
     data.attr({ start_expanded : false, parent : item });
     var find_params;
-    if(data.property) {
+    if(can.isFunction(item.instance[data.property])) {
+      // Special case for handling mappings which are functions until
+      // first requested, then set their name via .attr('...')
+      find_params = function() {
+        return item.instance[data.property]();
+      };
+      data.attr("find_params", find_params);
+    } else if(data.property) {
       find_params = item.instance[data.property];
       if(find_params && find_params.isComputed) {
         data.attr("original_list", find_params);
@@ -263,21 +350,15 @@ can.Control("CMS.Controllers.TreeView", {
   // There is no check for parentage anymore.  When this event is triggered, it needs to be triggered
   // at the appropriate level of the tree.
   , " newChild" : function(el, ev, data) {
-    var that = this;
-    var model = new can.Observe.TreeOptions({
-      instance : data instanceof this.options.model
-        ? data
-        : new this.options.model(data.serialize ? data.serialize() : data)
-    });
-    this.add_child_lists([model]);
-    this.options.list.push(model);
-    setTimeout(function() {
-      $("[data-object-id=" + data.id + "]").parents(".item-content").siblings(".item-main").openclose("open");
-    }, 10);
+    this.options.list.push(this.prepare_child_options(data));
     ev.stopPropagation();
   }
+
   , " removeChild" : function(el, ev, data) {
-    var that = this;
+    var that = this
+      , instance
+      , options = new can.Observe.TreeOptions();
+
     var model = data instanceof this.options.model
       ? data
       : new this.options.model(data.serialize ? data.serialize() : data);
@@ -292,6 +373,20 @@ can.Control("CMS.Controllers.TreeView", {
     );
     ev.stopPropagation();
   }
+
+  , " updateCount": function(el, ev) {
+      // Suppress events from sub-trees
+      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element)))
+        ev.stopPropagation();
+    }
+
+  , "{list} add": function() {
+      this.element.trigger('updateCount', this.options.list.length);
+    }
+
+  , "{list} remove": function() {
+      this.element.trigger('updateCount', this.options.list.length);
+    }
 
   , " click" : function() {
     if(~this.element.text().indexOf("@@!!@@")) {

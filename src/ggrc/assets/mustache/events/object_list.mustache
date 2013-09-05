@@ -1,7 +1,7 @@
 {{! dashboard object listing}}
 <ul class="tree-structure new-tree">
   {{#list}}
-    <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}> 
+    <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}>
       <div class="simple-link">
         <div class="row-fluid">
           <div class="span12">
@@ -20,7 +20,7 @@
                   {{/modified_by}}
                 </span>
                 <span class="event-time">
-                  on {{created_at}}
+                  on {{date created_at}}
                 </span>
               </div>
             </div>

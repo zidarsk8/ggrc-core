@@ -6,7 +6,12 @@
         </a>
       </div>
       <h2>
-        Map Object {{! modal_title }}
+        {{#if_equals option_type_count 1}}
+          Map {{#option_type_menu}}{{#items}}{{model_display}}{{/#items}}{{/option_type_menu}} to {{selected_object.constructor.title_singular}}
+          
+        {{else}}
+          Map Object {{! modal_title }}
+        {{/if_equals}}
       </h2>
     </div>
     <div class="modal-filter">
@@ -16,15 +21,17 @@
         </div>
         <div class="span6">
           {{#if option_type_menu}}
-          <select class="input-block-level option-type-selector">
-            {{#option_type_menu}}
-              <optgroup label="{{category}}">
-                {{#items}}
-                <option value="{{model_name}}" label="{{model_display}}"></option>
-                {{/items}}
-              </optgroup>
-            {{/option_type_menu}}
-          </select>
+            {{^if_equals option_type_count 1}}
+              <select class="input-block-level option-type-selector">
+                {{#option_type_menu}}
+                  <optgroup label="{{category}}">
+                    {{#items}}
+                    <option value="{{model_name}}" label="{{model_display}}" {{#if_equals model_name selected_option_type}}selected="selected"{{/if_equals}}></option>
+                    {{/items}}
+                  </optgroup>
+                {{/option_type_menu}}
+              </select>
+            {{/if_equals}}
           {{/if}}
         </div>
         <div class="span3">
@@ -43,12 +50,11 @@
     <div class="modal-content">
       <div class="row-fluid">
         <div class="span3">
-          {{#selected_object}}
+          {{#pack selected_object new_object_title=new_object_title title_singular=selected_object.constructor.title_singular table_singular=selected_object.constructor.table_singular related_table_singular=related_table_singular}}
             {{{ renderLive object_detail_view }}}
-          {{/selected_object}}
+          {{/pack}}
         </div>
         <div class="span6 option_column" {{data 'options'}}>
-          {{#if null}}
           <div class="search-title">
             <div class="row-fluid">
               <div class="span12">
@@ -56,12 +62,11 @@
                   <a class="btn btn-mini search-reset" href="#">
                     <i class="grcicon-x-grey"></i>
                   </a>
-                  <input class="input-block-level" placeholder="Search..." type="text">
+                  <input id="search" class="input-block-level" placeholder="Search..." value="{{option_search_term}}" type="text">
                 </div>
               </div>
             </div>
           </div>
-          {{/if}}
           {{#if option_column_view}}
             {{{ renderLive option_column_view }}}
           {{/if}}

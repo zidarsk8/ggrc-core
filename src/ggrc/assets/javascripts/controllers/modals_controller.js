@@ -30,23 +30,31 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
-
-    function after_preload(content) {
-      if(content) {
-        this.element.html(content);
-      }
-      this.options.$header = this.element.find(".modal-header");
-      this.options.$content = this.element.find(".modal-body");
-      this.options.$footer = this.element.find(".modal-footer");
-      this.on();
-      this.fetch_all();
-    }
-
     if(!this.element.find(".modal-body").length) {
-      can.view(this.options.preload_view, {}, this.proxy(after_preload));
+      can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
-      after_preload.call(this);
+      this.after_preload()
     }
+  }
+
+  , after_preload : function(content) {
+    if (content) {
+      this.element.html(content);
+    }
+    this.options.$header = this.element.find(".modal-header");
+    this.options.$content = this.element.find(".modal-body");
+    this.options.$footer = this.element.find(".modal-footer");
+    this.on();
+    this.fetch_all().then(this.proxy("apply_object_params"));
+  }
+
+  , apply_object_params : function() {
+    var self = this;
+
+    if (this.options.object_params)
+      can.each(this.options.object_params, function(value, key) {
+        self.set_value({ name: key, value: value });
+      });
   }
 
   , fetch_templates : function(dfd) {
@@ -160,7 +168,7 @@ can.Control("GGRC.Controllers.Modals", {
       value = item.value;
     }
 
-    if ($elem.is("[null-if-empty]") && value.length == 0)
+    if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
     if(name.length > 1) {
@@ -228,6 +236,12 @@ can.Control("GGRC.Controllers.Modals", {
         that.options.$content.find(".flash").append(tmpl);
       }
     });
+  }
+
+  , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
+    if (!this.options.instance.isNew()) {
+      this.options.instance.refresh();
+    }
   }
 
   , destroy : function() {

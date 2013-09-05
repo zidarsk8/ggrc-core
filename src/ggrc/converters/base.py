@@ -1,8 +1,26 @@
 import csv
 from .common import *
 from ggrc import db
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
+
+def get_objects_for_indexing(session):
+  return (list(session.new), list(session.dirty), list(session.deleted))
+
+def update_index_for_objects(session, created, updated, deleted):
+  indexer = get_indexer()
+  if created:
+    for obj in created:
+      indexer.create_record(fts_record_for(obj), commit=False)
+  if updated:
+    for obj in updated:
+      indexer.update_record(fts_record_for(obj), commit=False)
+  if deleted:
+    for obj in deleted:
+      indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+  session.commit()
 
 class BaseConverter(object):
 
@@ -22,11 +40,14 @@ class BaseConverter(object):
     self.import_exception = None
     self.import_slug = None
 
-    # Meta/object map changes (slightly) based on kind: section/control, system/process, etc....
-    if self.__class__.__name__ == 'SectionsConverter':
-      self.create_metadata_map()
-    elif self.__class__.__name__ == 'SystemsConverter' and options.get('is_biz_process'):
-      self.create_object_map()
+    self.create_metadata_map()
+    self.create_object_map()
+
+  def create_metadata_map(self):
+    self.metadata_map = self.metadata_map
+
+  def create_object_map(self):
+    self.object_map = self.object_map
 
   def results(self):
     return self.objects
@@ -86,13 +107,19 @@ class BaseConverter(object):
     attrs.pop(None, None) # None key could have been inserted in extreme edge case
     return attrs
 
-  def get_header_for_column(self, column_name):
-    for header in self.object_map:
-      if self.object_map[header] == column_name:
+  def get_header_for_column(self, header_map, column_name):
+    for header in header_map:
+      if header_map[header] == column_name:
         return header
     return ''
 
-  def read_headers(self, import_map, row):
+  def get_header_for_object_column(self, column_name):
+    return self.get_header_for_column(self.object_map, column_name)
+
+  def get_header_for_metadata_column(self, column_name):
+    return self.get_header_for_column(self.metadata_map, column_name)
+
+  def read_headers(self, import_map, row, required_headers = []):
     ignored_colums = []
     self.trim_list(row)
     keys = []
@@ -107,22 +134,24 @@ class BaseConverter(object):
       elif heading != "start_date" and heading != "end_date": #
         keys.append(import_map[heading])
 
-    if len(ignored_colums):
+    if any(ignored_colums):
       ignored_text = ", ".join(ignored_colums)
       self.warnings.append("Ignored column{plural}: {ignored_text}".format(
         plural='s' if len(ignored_colums) > 1 else '', ignored_text=ignored_text))
 
     missing_columns = import_map.values()
-    for element in keys:
-      if element is not None:
-        missing_columns.remove(element)
+    [missing_columns.remove(element) for element in keys if element]
 
-    # Created and Updated column headers should not thrown warnings on import
-    # because they are not used
-    missing_columns = [column for column in missing_columns if column != 'created_at' and column != 'updated_at']
+    optional_headers = ['created_at', 'updated_at']
+    missing_columns = [column for column in missing_columns if not (column in optional_headers)]
 
-    if len(missing_columns):
-      missing_headers = [self.get_header_for_column(temp) for temp in missing_columns if temp is not None]
+    for header in required_headers:
+      if header in missing_columns:
+        self.errors.append("Missing required column: {}".format(self.get_header_for_column(import_map, header)))
+        missing_columns.remove(header)
+
+    if any(missing_columns):
+      missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
       self.warnings.append("Missing column{plural}: {missing}".format(
         plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
@@ -138,7 +167,7 @@ class BaseConverter(object):
 
   def do_import(self, dry_run = True):
     self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0))
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers = ['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
       row = self.row_converter(self, row_attrs, index)
@@ -153,8 +182,10 @@ class BaseConverter(object):
   def save_import(self):
     for row_converter in self.objects:
       row_converter.save(db.session, **self.options)
+    objects_for_indexing = get_objects_for_indexing(db.session)
     log_event(db.session)
     db.session.commit()
+    update_index_for_objects(db.session, *objects_for_indexing)
 
   def read_objects(self, headers, rows):
     attrs_collection = []
@@ -168,6 +199,9 @@ class BaseConverter(object):
     if self.options.get('directive'):
       self.validate_metadata_type(attrs, self.directive().kind)
       self.validate_code(attrs)
+    elif self.__class__.__name__ == 'SystemsConverter':
+      model_name = "Processes" if self.options.get('is_biz_process') else "Systems"
+      self.validate_metadata_type(attrs, model_name)
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):

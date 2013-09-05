@@ -7,7 +7,7 @@ from behave import given, then, when
 from tests.ggrc.behave.utils import (
     handle_named_example_resource, get_service_endpoint_url,
     handle_get_resource_and_name_it, handle_get_example_resource,
-    handle_post_named_example_to_collection_endpoint,
+    handle_post_named_example,
     )
 
 @given('the following resources are POSTed')
@@ -21,7 +21,7 @@ def post_collection_of_resources(context):
     name = row[1]
     properties = dict([(heading, row[heading]) for heading in row.headings[2:]])
     handle_named_example_resource(context, resource_type, name, **properties)
-    handle_post_named_example_to_collection_endpoint(context, name)
+    handle_post_named_example(context, name)
     handle_get_example_resource(context, name)
 
 @when('fulltext search for "{terms}" as "{result_name}"')

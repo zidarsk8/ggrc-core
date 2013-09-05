@@ -15,8 +15,26 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , root_collection : "systems_or_processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
+
+    , model : function(params) {
+        if (this.shortName !== 'SystemOrProcess')
+          return this._super(params);
+        if (!params)
+          return params;
+        params = this.object_from_resource(params);
+        if (!params.selfLink) {
+          if (params.type !== 'SystemOrProcess')
+            return CMS.Models[params.type].model(params);
+        } else {
+          if (params.is_biz_process)
+            return CMS.Models.Process.model(params);
+          else
+            return CMS.Models.System.model(params);
+        }
+      }
+
     , tree_view_options : {
-      list_view : "/static/mustache/systems/tree.mustache"
+      list_view : "/static/mustache/base_objects/tree.mustache"
       , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
@@ -26,7 +44,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         , draw_children : false
       },{
         model : null ///filled in after init.
-        , list_view : "/static/mustache/systems/tree.mustache"
+        , list_view : "/static/mustache/base_objects/tree.mustache"
         , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]
@@ -80,6 +98,10 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Program" : {}
       , "Market" : {}
       , "Risk" : {}
+      , "Regulation" : {}
+      , "Policy" : {}
+      , "Contract" : {}
+      , "Objective" : {}
       }
 }, {
     system_or_process: function() {
@@ -103,18 +125,33 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , destroy : "DELETE /api/systems/{id}"
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , sub_systems : "can.Model.Cacheable"
-      , super_systems : "can.Model.Cacheable"
-      , documents : "CMS.Models.Document.models"
-      , people : "CMS.Models.Person.models"
-      , object_documents : "CMS.Models.ObjectDocument.models"
-      , object_people : "CMS.Models.ObjectPerson.models"
-      , owner : "CMS.Models.Person.model"
+  , attributes : {
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , response : "CMS.Models.Response.model"
+    , sub_system_systems : "CMS.Models.SystemSystem.models"
+    , sub_systems : "CMS.Models.get_instances"
+    , super_system_systems : "CMS.Models.SystemSystem.models"
+    , super_systems : "CMS.Models.get_instances"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
-    this._super && this._super();
+    this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
@@ -140,15 +177,31 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
-    , attributes : {
-      controls : "CMS.Models.Control.models"
-      , sub_systems : "can.Model.Cacheable"
-      , super_systems : "can.Model.Cacheable"
-      , documents : "CMS.Models.Document.models"
-      , people : "CMS.Models.Person.models"
-      , object_documents : "CMS.Models.ObjectDocument.models"
-      , object_people : "CMS.Models.ObjectPerson.models"
-      , owner : "CMS.Models.Person.model"
+  , attributes : {
+      owner : "CMS.Models.Person.model"
+    , modified_by : "CMS.Models.Person.model"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+    , object_documents : "CMS.Models.ObjectDocument.models"
+    , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
+    , object_objectives : "CMS.Models.ObjectObjective.models"
+    , objectives : "CMS.Models.Objective.models"
+    , object_controls : "CMS.Models.ObjectControl.models"
+    , controls : "CMS.Models.Control.models"
+    , object_sections : "CMS.Models.ObjectSection.models"
+    , sections : "CMS.Models.Section.models"
+    , network_zone : "CMS.Models.Option.model"
+    , response : "CMS.Models.Response.model"
+    , sub_system_systems : "CMS.Models.SystemSystem.models"
+    , sub_systems : "CMS.Models.get_instances"
+    , super_system_systems : "CMS.Models.SystemSystem.models"
+    , super_systems : "CMS.Models.get_instances"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);

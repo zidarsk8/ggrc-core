@@ -7,8 +7,6 @@ import json
 from collections import namedtuple
 from flask import request, flash, session
 from ggrc.app import app
-from ggrc.converters.common import ImportException
-from ggrc.converters.sections import SectionsConverter
 from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
 from . import filters
@@ -108,6 +106,7 @@ def allowed_file(filename):
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
 def import_controls(directive_id):
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
@@ -138,6 +137,11 @@ def import_controls(directive_id):
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect(directive_url)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+              directive_id = directive_id, exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -149,6 +153,7 @@ def import_controls(directive_id):
 @app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
@@ -177,6 +182,11 @@ def import_sections(directive_id):
           count = len(converter.objects)
           flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect(directive_url)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+              directive_id = directive_id, exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -187,6 +197,7 @@ def import_sections(directive_id):
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
@@ -209,6 +220,10 @@ def import_systems():
           count = len(converter.objects)
           flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml", exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
 
@@ -225,6 +240,7 @@ def import_redirect(location):
 @app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
   from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
@@ -247,6 +263,9 @@ def import_processes():
           count = len(converter.objects)
           flash(u'Successfully imported {} process{}'.format(count, 'es' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml", exception_message = file_msg)
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
 

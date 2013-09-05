@@ -135,13 +135,15 @@
     background-position:-200px -32px;
   }
 }
-.grcicon-user,
-.grcicon-person-color {
+.grcicon-user {
   background-position:-6px -32px;
-  .active & {
-    background-position:-6px -8px;
-  }
 }
+
+.grcicon-objectperson-color,
+.grcicon-person-color {
+  background-position:-6px -8px;
+}
+
 .grcicon-user-black {
   background-position:-6px -8px;
   .active & {
@@ -269,6 +271,7 @@
   background-position:-54px -104px;
 }
 .grcicon-document,
+.grcicon-document-color,
 .grcicon-objectdocument-color {
   background-position:-6px -176px;
 }

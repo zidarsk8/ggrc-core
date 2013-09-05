@@ -18,7 +18,7 @@ can.Model.Cacheable("CMS.Models.Person", {
    , create : "POST /api/people"
    , update : "PUT /api/people/{id}"
    , destroy : "DELETE /api/people/{id}"
-    , search : function(request, response) {
+   , search : function(request, response) {
         return $.ajax({
             type : "get"
             , url : "/api/people"
@@ -34,6 +34,11 @@ can.Model.Cacheable("CMS.Models.Person", {
             }
         });
     }
+    , attributes : {
+        modified_by : "CMS.Models.Person.model"
+      , object_people : "CMS.Models.ObjectPerson.models"
+      , language : "CMS.Models.Option.model"
+    }
     , defaults : {
       name : ""
       , email : ""
@@ -48,24 +53,17 @@ can.Model.Cacheable("CMS.Models.Person", {
       });
       return result;
     }
-}, {
-    init : function () {
-        this._super && this._super();
-        // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-        //     var obj;
-        //     if(obj = CMS.Models.ObjectPerson.findInCacheById(this.id) && attr !== "id") {
-        //         obj.attr(attr, newVal);
-        //     }
-        // });
-
-        var that = this;
-
-        this.each(function(value, name) {
-          if (value === null)
-            that.removeAttr(name);
-        });
+  , tree_view_options: {
+        list_view: GGRC.mustache_path + "/people/tree.mustache"
     }
-  , display_name : function() {
+  , init : function() {
+    this._super.apply(this, arguments);
+    //H/T to Sebastian Porto for the email validation regex
+    this.validatePresenceOf("email");
+    this.validateFormatOf("email", /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
+  }
+}, {
+  display_name : function() {
     return this.email;
   }
 });

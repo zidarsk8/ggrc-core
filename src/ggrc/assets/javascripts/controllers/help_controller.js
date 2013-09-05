@@ -21,6 +21,9 @@ GGRC.Controllers.Modals("GGRC.Controllers.Help", {
   }
 
   , "{$content} input.btn[name='commit'] click" : function(el, ev) {
+    if (!this.options.instance.context)
+      this.options.instance.attr('context', { id: 0 });
+
     this.bindXHRToButton(this.options.instance.save().done(function() {
       el.trigger("ajax:flash", { success : "Help content saved successfully"});
     }), el);

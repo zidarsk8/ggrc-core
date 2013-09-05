@@ -1,40 +1,27 @@
 <div class="selector-info" style="margin-right:-10%;">
-  {{!<div class="pull-right">
-    <a class="btn btn-mini" rel="tooltip" title="Edit">
-      <i class="grcicon-edit"></i>
-    </a>
-    <a class="btn btn-mini" rel="tooltip" title="Remove">
-      <i class="grcicon-remove"></i>
-    </a>
-  </div>
-  <p>
-    <img src="/static/images/sample/profile100.jpg" alt="">
-  </p>}}
-  <h4 class="oneline">
-    <i class="grcicon-{{constructor.table_singular}}-color"></i>
-    {{ title }}
-    {{!<small>
-      Google, inc
-    </small>
-    <small></small>
-    <br>
-    <a href="mailto:ernestmandel@gmail.com">
-      ernestmandel@gmail.com
-    </a>}}
+  <h4>
+    Map <i class="grcicon-{{related_table_singular}}-color"></i>
+    {{new_object_title}} to
+    <i class="grcicon-{{table_singular}}-color"></i>
+    {{ title }} {{title_singular}}
   </h4>
-  <div class="rtf">
-    {{{description}}}
-  </div>
+  {{#if description}}
+    <div class="rtf">
+      {{{description}}}
+    </div>
+  {{/if}}
   <div class="owner">
     <strong>Owner:</strong>
     {{#if owner}}
-    {{owner}}
+    {{#using owner}}
+    {{owner.name}}
+    {{/using}}
     {{/if}}
   </div>
   <div class="object-url">
     <strong>URL:</strong>
     {{#if url}}
-    <a href="{{url}}" target-"_blank">{{url}}</a>
+    <a href="{{schemed_url url}}" target="_blank">{{url}}</a>
     {{/if}}
   </div>
 </div>

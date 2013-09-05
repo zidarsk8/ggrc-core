@@ -88,25 +88,24 @@ class Categorizable(object):
         backref=BACKREF_NAME_FORMAT.format(type=cls.__name__, scope=scope),
         )
 
-  # Method seems to not work
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-    from sqlalchemy.sql.expression import and_, select
-    from ggrc.models import Category
-    query = super(Categorizable, cls).eager_query()
-    for r in cls._categorization_attrs():
-      scope_id = cls._categorization_scopes()[r]
-      subselect = select(
-          (Categorization.id, Categorization.category_id,
-            Categorization.categorizable_id, Categorization.categorizable_type),
-          and_(
-            Categorization.categorizable_type == cls.__name__,
-            Category.id == Categorization.category_id,
-            Category.scope_id == scope_id))
-      alias = orm.aliased(subselect)
-      query = query\
-          .outerjoin(alias, alias.c.categorizable_id == cls.id)\
-          .options(orm.contains_eager(getattr(cls, r), alias=alias))
-
-    return query
+  #@classmethod
+  #def eager_query(cls):
+  #  from sqlalchemy import orm
+  #  from sqlalchemy.sql.expression import and_, select
+  #  from ggrc.models import Category
+  #  query = super(Categorizable, cls).eager_query()
+  #  for r in cls._categorization_attrs():
+  #    scope_id = cls._categorization_scopes()[r]
+  #    subselect = select(
+  #        (Categorization.id, Categorization.category_id,
+  #          Categorization.categorizable_id, Categorization.categorizable_type),
+  #        and_(
+  #          Categorization.categorizable_type == cls.__name__,
+  #          Category.id == Categorization.category_id,
+  #          Category.scope_id == scope_id))
+  #    alias = orm.aliased(subselect)
+  #    query = query\
+  #        .outerjoin(alias, alias.c.categorizable_id == cls.id)\
+  #        .options(orm.contains_eager(getattr(cls, r), alias=alias))
+  #
+  #  return query

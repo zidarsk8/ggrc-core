@@ -52,8 +52,9 @@ Now you're in the VM and ready to rock. Get to work!
 Launching gGRC as Stand-alone Flask
 -----------------------------------
 
-We strive to make getting up and running as simple as possible; to that end,
-launching the application is simple:
+Most development is done in a stand-alone flask. We strive to make getting up 
+and running as simple as possible; to that end, launching the application is 
+simple:
 
 .. sourcecode:: bash
 
@@ -235,6 +236,16 @@ them as they change:
 .. sourcecode:: bash
 
   watch_assets
+
+Importing Example Data
+----------------------
+
+Example test data can be loaded by using the following command (with ``root`` 
+being the mysql password):
+
+.. sourcecode:: bash
+
+  mysql -u root -p ggrcdev < grc-dev-backup-20130801.sql
 
 Gotchas
 =======

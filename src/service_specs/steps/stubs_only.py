@@ -13,7 +13,6 @@ def check_for_stubs_only(context, resource_type):
   model_class = getattr(models, resource_type)
   for entry in collection[root][model_class._inflector.table_plural]:
     assert len(entry) in [2,3]
-    assert 'selfLink' in entry
+    assert 'type' in entry and entry['type'] == resource_type
+    assert 'href' in entry
     assert 'id' in entry
-    if len(entry) == 3:
-      assert 'viewLink' in entry

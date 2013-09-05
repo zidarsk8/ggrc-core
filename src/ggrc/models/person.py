@@ -7,6 +7,9 @@ from ggrc import db
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base
 from .reflection import PublishOnly
+from .utils import validate_option
+from .exceptions import ValidationError
+import re
 
 class Person(Base, db.Model):
   __tablename__ = 'people'
@@ -25,6 +28,11 @@ class Person(Base, db.Model):
       uselist=False,
       )
 
+  _fulltext_attrs = [
+      'company',
+      'email',
+      'name',
+      ]
   _publish_attrs = [
       'company',
       'email',
@@ -51,9 +59,15 @@ class Person(Base, db.Model):
     return unicode(self.id)
 
   @validates('language')
-  def validate_options(self, key, option):
-    assert option is None or option.role == 'person_language'
-    return option
+  def validate_person_options(self, key, option):
+    return validate_option(self.__class__.__name__, key, option, 'person_language')
+
+  @validates('email')
+  def validate_email(self, key, email):
+    if re.match("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", email) is None:
+      message = "Must provide a valid email address"
+      raise ValidationError(message)
+    return email
 
   @classmethod
   def eager_query(cls):

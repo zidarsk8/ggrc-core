@@ -251,7 +251,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       function sub_all(el, ev, newVal, oldVal) {
         var $el = $(el);
         can.each(attribs, function(attrib) {
-          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data.serialize ? data.serialize() : data)).html());
+          $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
         });
       }
 
@@ -291,15 +291,15 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       slugs.push.apply(slugs, controlslugs.call(this));
     });
     return slugs;
-  }
+  };
 
   var countcontrols = function() {
     var slugs = [];
     can.each(this.linked_controls, function() {
-      slugs.push.apply(slugs, controlslugs.apply(this)); 
+      slugs.push.apply(slugs, controlslugs.apply(this));
     });
     return slugs.length;
-  }
+  };
 
   Mustache.registerHelper("controlscount", countcontrols);
 
@@ -499,6 +499,8 @@ Mustache.registerHelper("if_page_type", function(page_type, options) {
     return options.inverse(this);
 });
 
+// Render a named template with the specified context, serialized and
+// augmented by 'options.hash'
 Mustache.registerHelper("render", function(template, context, options) {
   if(!options) {
     options = context;
@@ -513,9 +515,23 @@ Mustache.registerHelper("render", function(template, context, options) {
     template = template();
   }
 
-  return can.view.render(template, context.serialize ? context.serialize() : context);
+  context = $.extend({}, context.serialize ? context.serialize() : context);
+
+  if (options.hash) {
+    for(var k in options.hash) {
+      if(options.hash.hasOwnProperty(k)) {
+        context[k] = options.hash[k];
+        if (typeof context[k] == "function")
+          context[k] = context[k]();
+      }
+    }
+  }
+
+  return can.view.render(template, context);
 });
 
+// Like 'render', but doesn't serialize the 'context' object, and doesn't
+// apply options.hash
 Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
@@ -673,7 +689,7 @@ Mustache.registerHelper("with_page_object_as", function(name, options) {
     options = name;
     name = "page_object";
   }
-  var page_object = GGRC.make_model_instance(GGRC.page_object);
+  var page_object = GGRC.page_instance();
   if(page_object) {
     var p = {};
     p[name] = page_object;
@@ -701,7 +717,7 @@ Mustache.registerHelper("private_program", function(modal_title) {
     '<div class="span6">'
     , '<label>'
     , 'Privacy'
-    , '<i class="grcicon-help-black" rel="tooltip" title="Program won\'t be visible to others"></i>'
+    , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
     , '<input name="private" value="private" type="checkbox"> Private Program'
@@ -718,8 +734,16 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   }
 
   var page_type = GGRC.infer_object_type(GGRC.page_object);
-
-  if (GGRC.JoinDescriptor.by_object_option_models[page_type.shortName] && GGRC.JoinDescriptor.by_object_option_models[page_type.shortName][context.constructor.shortName]) {
+  var context_id = null;
+  if (page_type === CMS.Models.Program || !(context instanceof CMS.Models.Program)) {
+    context_id = GGRC.page_object[page_type.table_singular].context ?
+      GGRC.page_object[page_type.table_singular].context.id : null;
+  } else {
+    context_id = context.context ? context.context.id : null;
+  }
+  var join_model_name = GGRC.JoinDescriptor.join_model_name_for(
+      page_type.shortName, context.constructor.shortName);
+  if (join_model_name && Permission.is_allowed('create', join_model_name, context_id)) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -800,6 +824,221 @@ Mustache.registerHelper("category_select", function(object, attr_name, scope) {
   }
 
   return defer_render('select', get_select_html, options_dfd);
+});
+
+Mustache.registerHelper("schemed_url", function(url) {
+  if (url) {
+    url = url.isComputed? url(): url;
+    if (url && !url.match(/^[a-zA-Z]+:/)) {
+        return 'http://' + url;
+    }
+  }
+  return url;
+});
+
+function when_attached_to_dom(el, cb) {
+  // Trigger the "more" toggle if the height is the same as the scrollable area
+  el = $(el);
+  !function poll() {
+    if (el.closest(document.documentElement).length) {
+      cb();
+    }
+    else {
+      setTimeout(poll, 100);
+    }
+  }();
+}
+
+Mustache.registerHelper("trigger_created", function() {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).trigger("contentAttached");
+    });
+  };
+});
+
+Mustache.registerHelper("show_long", function() {
+  return  [
+      '<a href="javascript://" class="show-long"'
+    , can.view.hook(function(el, parent, view_id) {
+        el = $(el);
+
+        var content = el.prevAll('.short');
+        if (content.length) {
+          !function hide() {
+            // Trigger the "more" toggle if the height is the same as the scrollable area
+            if (el[0].offsetHeight) {
+              if (content[0].offsetHeight === content[0].scrollHeight) {
+                el.trigger('click');
+              }
+            }
+            else {
+              // If there is an open/close toggle, wait until that is triggered
+              var root = el.closest('.tree-item')
+                , toggle;
+              if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {
+                // Listen for the toggle instead of timeouts
+                toggle.one('click', function() {
+                  // Delay to ensure all event handlers have fired
+                  setTimeout(hide, 0);
+                });
+              }
+              // Otherwise just detect visibility
+              else {
+                setTimeout(hide, 100);
+              }
+            }
+          }();
+        }
+      })
+    , ">...more</a>"
+  ].join('');
+});
+
+Mustache.registerHelper("using", function(args, options) {
+  var refresh_queue = new RefreshQueue()
+    , context = this
+    , i, arg;
+
+  args = can.makeArray(arguments);
+  options = args.pop();
+
+  for (i=0; i<args.length; i++) {
+    arg = args[i];
+    if (can.isFunction(arg))
+      arg = arg();
+    args[i] = arg;
+  }
+  if (options.hash) {
+    for (i in options.hash) {
+      if (options.hash.hasOwnProperty(i)) {
+        arg = options.hash[i];
+        if (can.isFunction(arg))
+          arg = arg();
+        args.push(arg);
+      }
+    }
+  }
+
+  for (i=0; i<args.length; i++) {
+    arg = args[i];
+    if (arg)
+      refresh_queue.enqueue(args[i]);
+  }
+
+  function finish() {
+    return options.fn(this);
+  }
+
+  return defer_render('span', finish, refresh_queue.trigger());
+});
+
+Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
+  if (can.isFunction(instance))
+    instance = instance();
+  if (can.isFunction(mappings))
+    mappings = mappings();
+  if (mappings.indexOf(instance) > -1) {
+    if (mappings.length == 1)
+      return "Delete"
+    else
+      return "Unmap and Delete"
+  } else
+    return "Unmap"
+});
+
+Mustache.registerHelper("date", function(date) {
+  var m = moment(new Date(date.isComputed ? date() : date))
+    , dst = m.isDST()
+    ;
+  return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
+});
+
+/**
+ * Checks permissions. 
+ * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
+ * Usage:
+ *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION}} content {{/is_allowed}}
+ */
+var allowed_actions = [
+      "create", "read", "update", "delete",
+      "join_create", "join_read", "join_update", "join_delete"];
+Mustache.registerHelper("is_allowed", function() {
+  var allowed_page = GGRC.page_instance()
+    , args = Array.prototype.slice.call(arguments, 0)
+    , actions = []
+    , resource_type = allowed_page && allowed_page.constructor.shortName
+    , context_id = allowed_page && allowed_page.context && allowed_page.context.id
+    , options = args[args.length-1]
+    , passed = true
+    ;
+
+  // Resolve arguments
+  can.each(args, function(arg, i) {
+    arg = typeof arg === 'function' && arg.isComputed ? arg() : arg;
+
+    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
+      actions.push(arg);
+    }
+    else if (typeof arg === 'string') {
+      resource_type = arg;
+    }
+    else if (typeof arg === 'number') {
+      context_id = arg;
+    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+      if (GGRC.page_model instanceof CMS.Models.Program) {
+        resource_type = arg.kind;
+      } else {
+        resource_type = arg.type;
+        context_id = arg.context ? arg.context.id : null;
+      }
+    }
+  });
+  actions = actions.length ? actions : allowed_actions;
+
+  // Check permissions
+  can.each(actions, function(action) {
+    var actual_resource_type = resource_type;
+    var actual_action = action;
+    if (action.indexOf("join_") == 0) {
+      actual_action = action.slice(5);
+      actual_resource_type = GGRC.JoinDescriptor.join_model_name_for(
+        GGRC.page_model.constructor.shortName, resource_type);
+    }
+    passed = passed && (!window.Permission || Permission.is_allowed(actual_action, actual_resource_type, context_id));
+  });
+
+  return passed
+    ? options.fn(options.contexts || this) 
+    : options.inverse(options.contexts || this)
+    ;
+});
+
+function resolve_computed(maybe_computed) {
+  return (typeof maybe_computed === "function" && maybe_computed.isComputed) ? maybe_computed() : maybe_computed;
+}
+
+Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
+  spin_opts = resolve_computed(spin_opts);
+  styles = resolve_computed(styles);
+  spin_opts = typeof spin_opts === "string" ? JSON.parse(spin_opts) : {};
+  styles = typeof styles === "string" ? styles : "";
+  return function(el) {
+    var spinner = new Spinner(spin_opts).spin();
+    $(el).append($(spinner.el).attr("style", $(spinner.el).attr("style") + ";" + styles)).data("spinner", spinner);
+  };
+});
+
+Mustache.registerHelper("determine_context", function(page_object, target) {
+  if (page_object.constructor.shortName == "Program") {
+    return page_object.context ? page_object.context.id : null;
+  } else if (target.constructor.shortName == "Program") {
+    return target.context ? target.context.id : null;
+  }
+  return page_object.context ? page_object.context.id : null;
 });
 
 })(this, jQuery, can);

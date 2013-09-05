@@ -1,111 +1,119 @@
 {{#list}}
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-    {{#instance}}
-    <div class="item-main" {{data 'model'}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{^model.root_object}}
-                  {{!assume use of stub class or Cacheable here}}
-                  <i class="grcicon-{{constructor.table_singular}}-color"></i>
-                {{/model}}
-                {{#title}}
-                  {{title}}
-                {{/title}}
-                {{^title}}
-                  {{{firstnonempty description_inline ''}}}
-                {{/title}}
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
+                {{#instance.title}}
+                  {{instance.title}}
+                {{/instance.title}}
+                {{^instance.title}}
+                  {{{firstnonempty instance.description_inline ''}}}
+                {{/instance.title}}
               </div>
             </div>
           </div>
           <div class="span1">
             <div class="counter">
-              {{^owner}}
+              {{^instance.owner}}
                 <i class="grcicon-people-warning"></i>
-              {{/owner}}
+              {{/instance.owner}}
             </div>
           </div>
         </div>
       </a>
     </div>
+
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
         <div class="row-fluid">
 
           <div class="span6">
-            <a href="{{viewLink}}" class="info-action">
-              View {{constructor.title_singular}}
+          {{#if instance.viewLink}}
+            <a href="{{instance.viewLink}}" class="info-action">
+              View {{instance.constructor.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
+          {{/if}}
           </div>
 
-          {{! UNMAP
           <div class="span6">
-            <a href="javascript://" class="info-action unmap pull-right">
+          {{#is_allowed 'join_delete' instance}}
+          {{#if mappings}}
+            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/if}}
+          {{/is_allowed}}
           </div>
-          }}
 
         </div>
-        
-        {{#description}}
+
+        {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
               <div class="tree-description short">
-                {{{description}}}
+                {{{instance.description}}}
               </div>
-              <a href="javascript://" class="show-long">...more</a>
+              {{{show_long}}}
             </div>
           </div>
         </div>
-        {{/description}}
+        {{/instance.description}}
         
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
               <strong>Owner:</strong>
-              {{^owner}}
+              {{^instance.owner}}
                 <span class="error">
                   Not Assigned
                 </span>
-              {{/owner}}
-              {{#if owner}}
-                {{owner.name}}
+              {{/instance.owner}}
+              {{#if instance.owner}}
+                {{instance.owner.name}}
               {{/if}}
             </div>
           </div>
-          {{#url}}
+          {{#instance.url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              <a class="url" href="{{url}}" target="_blank">
-                {{url}}
+              <a class="url" href="{{schemed_url instance.url}}" target="_blank">
+                {{instance.url}}
               </a>
             </div>
           </div>
-          {{/url}}
+          {{/instance.url}}
         </div>
       </div>
+
+      {{#if draw_children}}
+        {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+            {{#child_options}}
+              <div class="inner-tree">
+                <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
+                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              </div>
+            {{/child_options}}
+        {{/if_null}}
+      {{/if}}
+
     </div>
-    {{/instance}}
-    {{#if draw_children}}
-      {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-          {{#child_options}}
-            <div class="inner-tree">
-              <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-            </div>
-          {{/child_options}}
-      {{/if_null}}
     {{/if}}
   </li>
 {{/list}}
+
+{{#is_allowed 'create' 'update' 'delete' model.shortName}}
+{{#if allow_mapping_or_creating}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -115,18 +123,19 @@
         href="javascript://"
         rel="tooltip"
         data-placement="left"
-        data-toggle="modal-selector"
-        data-modal-selector-options="{{parent_instance.constructor.table_singular}}_{{firstnonempty table_plural model.table_plural 'objects'}}"
-        data-modal-class="modal-wide"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'Object'}}"
+        data-toggle="multitype-modal-selector"
+        data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
-        data-join-object-type="{{parent_instance.constructor.model_singular}}">
-        + Object
+        data-join-object-type="{{parent_instance.constructor.shortName}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+        + {{model.title_singular}}
       </a>
+      {{#if null}}
       <a href="javascript://"class="control-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.constructor.model_singular}}" data-object-plural="{{parent_instance.constructor.table_plural}}" >
         <i class="grcicon-add-black"></i>
         Create Object
       </a>
+      {{/if}}
       {{else}}
       <a
         href="javascript://"
@@ -135,24 +144,12 @@
         data-toggle="multitype-modal-selector"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.contstructor.title_singular 'Object'}}">
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
         + Object
       </a>
       {{/if}}
-      &nbsp;
-      &nbsp;
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        <a href="{{parent_instance.viewLink}}/import_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Import Objects
-        </a>
-        &nbsp;
-        &nbsp;
-        <a href="{{parent_instance.viewLink}}/export_controls" class="{{parent_instance.constructor.table_singular}}-import">
-          <i class="grcicon-imp-exp"></i>
-          Export Objects
-        </a>
-      {{/if_match}}
     </div>
   </div>
 </li>
+{{/if}}
+{{/is_allowed}}

@@ -14,6 +14,7 @@ from .mixins import (
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
+from .utils import validate_option
 
 CATEGORY_CONTROL_TYPE_ID = 100
 CATEGORY_ASSERTION_TYPE_ID = 102
@@ -73,10 +74,6 @@ class Control(
       'ProgramControl', backref='control', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_controls', 'program', 'ProgramControl')
-  system_controls = db.relationship(
-      'SystemControl', backref='control', cascade='all, delete-orphan')
-  systems = association_proxy(
-      'system_controls', 'system', 'SystemControl')
   control_sections = db.relationship(
       'ControlSection', backref='control', cascade='all, delete-orphan')
   sections = association_proxy(
@@ -112,15 +109,15 @@ class Control(
   # REST properties
   _publish_attrs = [
       'active',
-      'categories',
-      'assertions',
+      #'categories',
+      #'assertions',
       'company_control',
       'control_assessments',
       'directive',
       'documentation_description',
       'fraud_related',
-      'implemented_controls',
-      'implementing_controls',
+      #'implemented_controls',
+      #'implementing_controls',
       'key_control',
       'kind',
       'means',
@@ -129,16 +126,14 @@ class Control(
       'sections',
       'objectives',
       'programs',
-      'systems',
       'type',
       'verify_frequency',
       'version',
-      PublishOnly('control_controls'),
+      #PublishOnly('control_controls'),
       PublishOnly('control_risks'),
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
-      PublishOnly('implementing_control_controls'),
-      PublishOnly('system_controls'),
+      #PublishOnly('implementing_control_controls'),
       PublishOnly('program_controls'),
       'object_controls',
       ]
@@ -149,10 +144,9 @@ class Control(
       ]
 
   @validates('type', 'kind', 'means', 'verify_frequency')
-  def validate_options(self, key, option):
+  def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
-    assert option is None or option.role == desired_role
-    return option
+    return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @classmethod
   def eager_query(cls):
@@ -167,6 +161,5 @@ class Control(
         orm.joinedload('control_sections'),
         orm.joinedload('objective_controls'),
         orm.joinedload('program_controls'),
-        orm.joinedload('system_controls'),
         orm.joinedload('object_controls'),
         )
