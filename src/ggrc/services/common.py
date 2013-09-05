@@ -355,7 +355,6 @@ class Resource(ModelView):
       current_app.logger.warn(v)
       return ((str(v), 403, []))
 
-    #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     log_event(db.session, obj)
