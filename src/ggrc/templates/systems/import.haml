@@ -10,13 +10,11 @@
   %h1.business
     .grcobject.business
       %i.grcicon-imp-exp-white
-      Import {{import_kind}}
+    Import {{import_kind}}
 
 -block main
   .clearfix
     .object-area.import-area
       .column-set
         .widget-area
-          %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'} 
-            -include 'systems/_import.haml'
-            #results-container    
+          -include 'systems/_import.haml'
