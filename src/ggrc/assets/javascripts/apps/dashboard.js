@@ -187,6 +187,89 @@ var model_descriptors = {
   */
 };
 
+var admin_list_descriptors = {
+  "people" : {
+      model : CMS.Models.Person
+    , object_type : "person"
+    , object_category : "governance"
+    , object_route : "people"
+    , object_display : "People"
+    , tooltip_view : "/static/mustache/people/object_tooltip.mustache"
+    , list_view : "/static/mustache/people/object_list.mustache"
+  }
+  , "roles" : {
+    model : CMS.Models.Role
+    , object_type : "role"
+    , object_category : "governance"
+    , object_route : "roles"
+    , object_display : "Roles"
+    , list_view : "/static/mustache/roles/object_list.mustache"
+  }
+  , "events" : {
+      model : CMS.Models.Event
+    , object_type : "event"
+    , object_category : "governance"
+    , object_route : "events"
+    , object_display : "Events"
+    , list_view : "/static/mustache/events/object_list.mustache"
+  }
+  /*, "system_process" : {
+    model : CMS.Models.System
+    , object_type : "system_process"
+    , object_category : "business"
+    , object_route : "systems"
+    , object_display : "Systems/Processes"
+    , widget_view : "/static/mustache/systems/object_widget.mustache"
+  }*/
+};
+
+var admin_widget_descriptors = {
+  "people" : {
+      "model" : CMS.Models.Person
+    , "content_controller": GGRC.Controllers.ListView
+    , "content_controller_options": admin_list_descriptors["people"]
+    , "widget_id" : "people_list"
+    , "widget_name" : "People"
+    , "widget_icon" : "person"
+    , "show_filter" : false
+    , widget_name: function() {
+      return "People";
+    }
+    , widget_info : function() {
+      return "";
+    }
+  }
+  , "roles" : {
+      "model" : CMS.Models.Role
+    , "content_controller": GGRC.Controllers.ListView
+    , "content_controller_options": admin_list_descriptors["roles"]
+    , "widget_id" : "roles_list"
+    , "widget_name" : "Roles"
+    , "widget_icon" : "role"
+    , "show_filter" : false
+    , widget_name: function() {
+      return "Roles";
+    }
+    , widget_info : function() {
+      return "";
+    }
+  }
+  , "events" : {
+      "model" : CMS.Models.Event
+    , "content_controller": GGRC.Controllers.ListView
+    , "content_controller_options": admin_list_descriptors["events"]
+    , "widget_id" : "events_list"
+    , "widget_name" : "Events"
+    , "widget_icon" : "event"
+    , widget_name: function() {
+      return "Events";
+    }
+    , widget_info : function() {
+      return "";
+    }
+  }
+};
+
 dashboard_menu_spec = [
   { title : "Governance / Compliance"
   , objects: [ "regulation", "policy", "contract", "control" ]
@@ -266,8 +349,9 @@ $(function() {
         })
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({
-          model_descriptors: model_descriptors
+          widget_descriptors: admin_widget_descriptors
         , menu_tree_spec: admin_menu_spec
+        , default_widgets : ["people", "roles", "events"]
       });
     } else {
       $area.cms_controllers_dashboard({ model_descriptors: [] });
