@@ -466,17 +466,17 @@ can.Control("CMS.Controllers.InnerNav", {
     });
   }
 
-  , update_scrollspy : function(init) {
-      var $body = $(".object-area")
-        , top = $body.scrollTop()
+  , update_scrollspy : function() {
+      var $area = $(".object-area")
+        , top = $area.scrollTop()
         ;
 
       // Some pages may not have scrollspy set up (e.g., dashboard)
-      if (!$body.data("scrollspy"))
+      if (!$area.data("scrollspy"))
         return
 
-      $body.data('scrollspy').activeTarget = null;
-      $body
+      $area.data('scrollspy').activeTarget = null;
+      $area
         .scrollspy('refresh')
         .scrollspy('process');
     }
