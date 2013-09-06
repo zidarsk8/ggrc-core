@@ -939,8 +939,12 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
   if (can.isFunction(mappings))
     mappings = mappings();
   if (mappings.indexOf(instance) > -1) {
-    if (mappings.length == 1)
-      return "Delete"
+    if (mappings.length == 1) {
+      if (mappings[0] instanceof CMS.Models.Control && GGRC.page_instance() instanceof CMS.Models.Directive)
+        return "Unmap"
+      else 
+        return "Delete"
+    }
     else
       return "Unmap and Delete"
   } else

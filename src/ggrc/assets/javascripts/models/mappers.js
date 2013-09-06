@@ -263,6 +263,10 @@
         model.bind("destroyed", function(ev, mapping) {
           self.remove_instance_from_mapping(binding, mapping);
         });
+
+        model.bind("orphaned", function(ev, mapping) {
+          self.remove_instance_from_mapping(binding, mapping);
+        });
       }
 
     , is_valid_mapping: function(binding, mapping) {
@@ -348,6 +352,10 @@
         });
 
         model.bind("destroyed", function(ev, mapping) {
+          self.remove_instance_from_mapping(binding, mapping);
+        });
+
+        model.bind("orphaned", function(ev, mapping) {
           self.remove_instance_from_mapping(binding, mapping);
         });
       }

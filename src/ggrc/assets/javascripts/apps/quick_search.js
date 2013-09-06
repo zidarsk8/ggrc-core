@@ -489,7 +489,14 @@ $(function() {
 
       if (mapping) {
         mapping.refresh().done(function() {
-          mapping.destroy();
+          // Never delete a control from a directive page, just remove the mapping
+          if (mapping instanceof CMS.Models.Control && GGRC.page_instance() instanceof CMS.Models.Directive) {
+            mapping.removeAttr('directive');
+            mapping.save();
+          }
+          else {
+            mapping.destroy();
+          }
         });
         //$mapping_el.remove();
       }
