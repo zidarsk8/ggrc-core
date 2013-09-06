@@ -223,6 +223,7 @@
   background-position:-6px -128px;
 }
 .grcicon-reg-map,
+.grcicon-programcontrol-color,
 .grcicon-relationship-color {
   background-position:-6px -56px;
   .active & {
@@ -436,7 +437,12 @@
 
 .grcicon-section { background-position:-198px -128px; }
 .grcicon-section-black { background-position:-198px -104px; }
-.grcicon-section-color { background-position:-102px -296px; }
+.grcicon-section-color,
+.grcicon-sectionobjective-color,
+.grcicon-objectsection-color,
+.grcicon-controlsection-color { 
+  background-position:-102px -296px;
+  }
 .grcicon-section-danger { background-position:-126px -320px; }
 .grcicon-clause { background-position:-198px -128px; }
 .grcicon-clause-black { background-position:-198px -104px; }
