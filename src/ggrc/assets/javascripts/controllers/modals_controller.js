@@ -191,7 +191,7 @@ can.Control("GGRC.Controllers.Modals", {
                   value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
                   instance.attr(name[0], value);
                 } else {
-                  that.element.trigger("ajax:flash", { warning : "user " + value + " not found"});
+                  that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
                   $elem.val($elem.attr("value"));
                 }
               }), this.options.$footer.find("a.btn[data-toggle='modal-submit']")
