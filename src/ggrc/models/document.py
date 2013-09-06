@@ -60,6 +60,11 @@ class Document(Base, db.Model):
       uselist=False,
       )
 
+  _fulltext_attrs = [
+      'title',
+      'link',
+      'description',
+      ]
   _publish_attrs = [
       'title',
       'link',

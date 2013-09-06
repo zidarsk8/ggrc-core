@@ -56,6 +56,12 @@ can.Model.Cacheable("CMS.Models.Person", {
   , tree_view_options: {
         list_view: GGRC.mustache_path + "/people/tree.mustache"
     }
+  , init : function() {
+    this._super.apply(this, arguments);
+    //H/T to Sebastian Porto for the email validation regex
+    this.validatePresenceOf("email");
+    this.validateFormatOf("email", /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
+  }
 }, {
   display_name : function() {
     return this.email;
