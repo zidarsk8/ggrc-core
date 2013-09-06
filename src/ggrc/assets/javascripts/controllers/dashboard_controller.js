@@ -30,6 +30,10 @@ can.Control("CMS.Controllers.Dashboard", {
       this.update_inner_nav();
       if (!this.add_widget_controller)
         this.init_add_widget();
+
+      // Before initializing widgets, hide the container to not show
+      // loading state of multiple widgets before reducing to one.
+      this.hide_widget_area();
       this.init_default_widgets();
       if (!this.widget_area_controller)
         this.init_widget_area();
@@ -128,6 +132,14 @@ can.Control("CMS.Controllers.Dashboard", {
       });
     }
 
+  , hide_widget_area: function() {
+      this.get_active_widget_containers().hide();
+    }
+
+  , show_widget_area: function() {
+      this.get_active_widget_containers().show();
+    }
+
   , " widgets_updated" : "update_inner_nav"
 
   , " inner_nav_sort_updated": function(el, ev, widget_ids) {
@@ -138,7 +150,7 @@ can.Control("CMS.Controllers.Dashboard", {
       var that = this
         ;
 
-      can.each(this.get_active_widget_container_elements(), function(elem) {
+      can.each(this.get_active_widget_containers().toArray(), function(elem) {
         $(elem).trigger("apply_widget_sort", [widget_ids])
       });
 
@@ -150,8 +162,8 @@ can.Control("CMS.Controllers.Dashboard", {
         this.get_active_widget_elements());
     }
 
-  , get_active_widget_container_elements: function() {
-      return this.element.find(".widget-area").toArray();
+  , get_active_widget_containers: function() {
+      return this.element.find(".widget-area");
     }
 
   , get_active_widget_elements: function() {
@@ -189,7 +201,7 @@ can.Control("CMS.Controllers.Dashboard", {
 
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
-      var $container = $(this.get_active_widget_container_elements()[0])
+      var $container = this.get_active_widget_containers().eq(0)
         , $last_widget = $container.find('section.widget').last()
         ;
 
@@ -357,7 +369,9 @@ can.Control("CMS.Controllers.InnerNav", {
         that.update_scrollspy();
       });
 
-      this.options.contexts = this.options.contexts instanceof can.Observe ? this.options.contexts : new can.Observe(this.options.contexts);
+      if (!(this.options.contexts instanceof can.Observe))
+        this.options.contexts = new can.Observe(this.options.contexts);
+
       this.on();
     }
 
@@ -416,6 +430,7 @@ can.Control("CMS.Controllers.InnerNav", {
     }
 
   , "{contexts} active_widget" : function(contexts, ev) {
+    this.options.dashboard_controller.show_widget_area();
     $(this.options.contexts.active_widget.selector).show().siblings().hide();
   }
 
