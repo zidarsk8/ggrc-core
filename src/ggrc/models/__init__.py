@@ -4,7 +4,6 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import bleach
 from .all_models import *
 
 """All gGRC model objects and associated utilities."""
@@ -57,18 +56,6 @@ def drop_db(use_migrations=False, quiet=False):
   else:
     drop_db_with_drop_all()
 
-# Set up custom tags/attributes for bleach
-bleach_tags = ['strong', 'em', 'b', 'i', 'p', 'code', 'pre', 'tt', 'samp', 
-    'kbd', 'var', 'sub', 'sup', 'dfn', 'cite', 'big', 'small', 'address', 
-    'hr', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 
-    'ol', 'li', 'dl', 'dt', 'dd', 'abbr', 'acronym', 'a', 'img', 
-    'blockquote', 'del', 'ins', 'table', 'tr', 'td', 'th'] + bleach.ALLOWED_TAGS
-bleach_attrs = {}
-attrs = ['href', 'src', 'width', 'height', 'alt', 'cite', 'datetime', 
-    'title', 'class', 'name', 'xml:lang', 'abbr']
-for tag in bleach_tags:
-  bleach_attrs[tag] = attrs
-
 def init_app(app):
   from .all_models import all_models
   [model._inflector for model in all_models]
@@ -77,6 +64,18 @@ def init_app(app):
   import bleach
   import sqlalchemy as sa
   from ggrc.models.reflection import SanitizeHtmlInfo
+
+  # Set up custom tags/attributes for bleach
+  bleach_tags = ['strong', 'em', 'b', 'i', 'p', 'code', 'pre', 'tt', 'samp', 
+      'kbd', 'var', 'sub', 'sup', 'dfn', 'cite', 'big', 'small', 'address', 
+      'hr', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 
+      'ol', 'li', 'dl', 'dt', 'dd', 'abbr', 'acronym', 'a', 'img', 
+      'blockquote', 'del', 'ins', 'table', 'tr', 'td', 'th'] + bleach.ALLOWED_TAGS
+  bleach_attrs = {}
+  attrs = ['href', 'src', 'width', 'height', 'alt', 'cite', 'datetime', 
+      'title', 'class', 'name', 'xml:lang', 'abbr']
+  for tag in bleach_tags:
+    bleach_attrs[tag] = attrs
   def cleaner(target, value, oldvalue, initiator):
     ret = bleach.clean(value, bleach_tags, bleach_attrs)
     return ret
