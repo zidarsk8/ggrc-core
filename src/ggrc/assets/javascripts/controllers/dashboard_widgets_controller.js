@@ -70,6 +70,11 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 
     var content = this.element
       , controller_content = null;
+    if(prefs.length < 1) {
+      prefs.push(new CMS.Models.DisplayPrefs());
+      prefs[0].save();
+    }
+
     if(prefs[0].getCollapsed(window.getPageToken(), this.element.attr("id"))) {
 
       this.element
