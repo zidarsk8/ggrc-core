@@ -101,6 +101,47 @@ def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
 
+@app.route("/admin/import_people", methods = ['GET', 'POST'])
+def import_people():
+
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.people import PeopleConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Person
+  import ggrc.views
+
+  if request.method == 'POST':
+    if 'cancel' in request.form:
+      return import_redirect("/admin")
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        options = {}
+        options['dry_run'] = dry_run
+        converter = handle_csv_import(PeopleConverter, csv_file, **options)
+        if dry_run:
+          options['converter'] = converter
+          options['results'] = converter.objects
+          options['heading_map'] = converter.object_map
+          return render_template("people/import_result.haml", **options)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+              directive_id = "People", exception_message = file_msg)
+
+    except ImportException as e:
+      return render_template("directives/import_errors.haml",
+            directive_id = "People", exception_message = str(e))
+
+  return render_template("people/import.haml", import_kind = 'People')
+
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
