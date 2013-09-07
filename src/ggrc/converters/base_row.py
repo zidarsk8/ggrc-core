@@ -78,9 +78,6 @@ class BaseRowConverter(object):
   def has_warnings(self):
     return any(self.warnings) or any([val.has_warnings() for val in self.handlers.values()])
 
-  def setup(self):
-    pass
-
   #TODO: changed_attributes on rails side needs to be converted
   def changed_attributes(self):
     pass
