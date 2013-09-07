@@ -95,7 +95,12 @@ class BaseConverter(object):
     if len(self.rows) < 6:
       self.errors.append("Could not import: verify the file is correctly formatted.")
       raise ImportException("Could not import: verify the file is correctly formatted.")
-    headers = self.read_headers(self.metadata_map, self.rows.pop(0))
+
+    optional_metadata = []
+    if hasattr(self, 'optional_metadata'):
+      optional_metadata = self.optional_metadata
+
+    headers = self.read_headers(self.metadata_map, self.rows.pop(0), optional_headers = optional_metadata)
     values = self.read_values(headers, self.rows.pop(0))
     self.import_slug = values.get('slug')
     self.rows.pop(0)
@@ -119,7 +124,7 @@ class BaseConverter(object):
   def get_header_for_metadata_column(self, column_name):
     return self.get_header_for_column(self.metadata_map, column_name)
 
-  def read_headers(self, import_map, row, required_headers = []):
+  def read_headers(self, import_map, row, required_headers = [], optional_headers = []):
     ignored_colums = []
     self.trim_list(row)
     keys = []
@@ -142,7 +147,7 @@ class BaseConverter(object):
     missing_columns = import_map.values()
     [missing_columns.remove(element) for element in keys if element]
 
-    optional_headers = ['created_at', 'updated_at']
+    optional_headers.extend(['created_at', 'updated_at'])
     missing_columns = [column for column in missing_columns if not (column in optional_headers)]
 
     for header in required_headers:
