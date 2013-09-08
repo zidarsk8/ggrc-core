@@ -328,6 +328,21 @@ def export_processes():
   filename = "PROCESSES.csv"
   return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
 
+@app.route("/admin/export_people", methods=['GET'])
+def export_people():
+  from ggrc.converters.people import PeopleConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Person
+
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
+  options = {}
+  options['export'] = True
+  people = Person.query.all()
+  filename = "PEOPLE.csv"
+  return handle_converter_csv_export(filename, people, PeopleConverter, **options)
+
 @app.route("/systems/export", methods=['GET'])
 def export_systems():
   from ggrc.converters.systems import SystemsConverter

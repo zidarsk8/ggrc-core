@@ -13,11 +13,13 @@ class PeopleRowConverter(BaseRowConverter):
       self.obj = Person.query.filter_by(email = person_email).first()
       self.obj = self.obj or self.importer.find_object(Person, person_email)
       self.obj = self.obj or Person()
-      self.obj.email = person_email
       self.importer.add_object(Person, person_email, self.obj)
+      if self.obj.id:
+        self.add_warning('email', "{} already exists and will be updated.".format(person_email))
       return self.obj
     else:
-      self.importer.errors.append('Unable to create person without email.')
+      self.obj = Person()
+      return self.obj
 
   def reify(self):
     self.handle_text_or_html('name')
