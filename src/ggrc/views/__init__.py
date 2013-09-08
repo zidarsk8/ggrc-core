@@ -111,6 +111,9 @@ def import_people():
   from ggrc.models import Person
   import ggrc.views
 
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+
   if request.method == 'POST':
     if 'cancel' in request.form:
       return import_redirect("/admin")

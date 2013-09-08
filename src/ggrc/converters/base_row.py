@@ -165,7 +165,7 @@ class BaseRowConverter(object):
   def set_attr(self, name, value):
     try:
       setattr(self.obj, name, value)
-    except ValidationError as e:
+    except ValidationError as e: # Validation taken care of in handlers
       pass
 
   def get_attr(self, name):
