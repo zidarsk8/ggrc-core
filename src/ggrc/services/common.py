@@ -6,12 +6,14 @@
 import datetime
 import ggrc.builder.json
 import hashlib
+import logging
 import time
 from blinker import Namespace
 from exceptions import TypeError
-from flask import url_for, request, current_app
+from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
 from ggrc import db
+from ggrc.models.cache import Cache
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
@@ -35,19 +37,33 @@ resources.
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
 
+def get_cache(create = False):
+  """
+  Retrieves the cache from the Flask global object. The create arg
+  indicates if a new cache should be created if none exists. If we
+  are not in a request context, no cache is created (return None).
+  """
+  if has_request_context():
+    cache = getattr(g, 'cache', None)
+    if cache is None and create:
+      cache = g.cache = Cache()
+    return cache
+  else:
+    logging.warning("No request context - no cache created")
+    return None
+
 def log_event(session, obj = None):
   revisions = []
-  new_objects = list(session.new) # Delay creation of revisions as ids are not available
+  session.flush()
   current_user = get_current_user_id()
-  for o in session.dirty:
-    if session.is_modified(o):
-      revision = Revision(o, current_user, 'modified', o.to_json())
-      revisions.append(revision)
-  for o in session.deleted:
+  cache = get_cache()
+  for o in cache.dirty:
+    revision = Revision(o, current_user, 'modified', o.to_json())
+    revisions.append(revision)
+  for o in cache.deleted:
     revision = Revision(o, current_user, 'deleted', o.to_json())
     revisions.append(revision)
-  session.flush() # this ensures that ids are available for new objects
-  for o in new_objects:
+  for o in cache.new:
     revision = Revision(o, current_user, 'created', o.to_json())
     revisions.append(revision)
   if obj is None:
@@ -299,7 +315,7 @@ class Resource(ModelView):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(object_for_json))]))
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj))
+      object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
     missing_headers = []
@@ -355,7 +371,6 @@ class Resource(ModelView):
       current_app.logger.warn(v)
       return ((str(v), 403, []))
 
-    #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     log_event(db.session, obj)

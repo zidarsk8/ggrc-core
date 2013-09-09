@@ -319,6 +319,11 @@ can.Control("CMS.Controllers.LHN_Search", {
             })
         };
 
+        // Refresh the counts whenever the lists change
+        self.options.results_lists[model_name].bind('change', function() {
+          self.refresh_counts();
+        })
+
         can.view(self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
         });

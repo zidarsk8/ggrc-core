@@ -152,6 +152,13 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     , by_option_model: {}
     , by_object_option_models: {}
     , by_option_object_models: {}
+    , join_model_name_for: function (model_name_a, model_name_b) {
+        if (this.by_object_option_models[model_name_a] &&
+            this.by_object_option_models[model_name_a][model_name_b]) {
+          return this.by_object_option_models[model_name_a][model_name_b][0].options.join_model_name;
+        }
+        return null;
+    }
 
     , from_arguments_list: function(args_list) {
         var self = this;
@@ -326,13 +333,13 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Control", business_object_types,
           "ObjectControl", "controllable", "control"]
       , [business_plus_program_object_types,
-          "Objective", "ObjectObjective", "objective", "objectiveable"]
+          "Objective", "ObjectObjective", "objective", "objectiveable", "object_objectives"]
       , ["Objective", business_plus_program_object_types,
-          "ObjectObjective", "objectiveable", "objective"]
-      , ["Objective", "Objective",
           "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , ["Objective", "Objective",
-          "ObjectObjective", "objective", "objectiveable"]
+          "ObjectObjective", "objective", "objectiveable", "object_objectives"]
+      , ["Objective", "Objective",
+          "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,
@@ -341,7 +348,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ObjectSection", "sectionable", "section"]
       , ["Control", "Program", "ProgramControl", "program", "control"]
       , ["Program", "Control", "ProgramControl", "control", "program"]
-      , ["Control", "Section", "ControlSection", "section", "control"]
+      // , ["Control", "Section", "ControlSection", "section", "control"]
       , ["Section", "Control", "ControlSection", "control", "section"]
       , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
       , ["Objective", "Control", "ObjectiveControl", "control", "objective"]

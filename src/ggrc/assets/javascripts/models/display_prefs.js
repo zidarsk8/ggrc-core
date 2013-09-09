@@ -15,10 +15,55 @@ var COLLAPSE = "collapse"
 , HEIGHTS = "heights"
 , COLUMNS = "columns"
 , PBC_LISTS = "pbc_lists"
-, path = window.location.pathname
+, path = window.location.pathname;
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
+  , version : 20130903
+
+  , findAll : function() {
+    var that = this;
+    var objs_dfd = this._super.apply(this, arguments)
+    .then(function(objs) {
+      var i;
+      for(i = objs.length; i--;) {
+        if(!objs[i].version || objs[i].version < that.version) {
+          objs[i].destroy();
+          objs.splice(i, 1);
+        }
+      }
+      return objs;
+    });
+    return objs_dfd;
+  }
+
+  , findOne : function() {
+    var that = this;
+    var obj_dfd = this._super.apply(this, arguments)
+    .then(function(obj) {
+      var dfd, p;
+      if(!obj.version || obj.version < that.version) {
+        obj.destroy();
+        dfd = new $.Deferred();
+        p = dfd.promise();
+        p.status = 404;
+        return dfd.reject(p, "error", "Object expired");
+      } else {
+        return obj;
+      }
+    });
+    return obj_dfd;
+  }
+
+  , create : function(opts) {
+    opts.version = this.version;
+    return this._super(opts);
+  }
+
+  , update : function(id, opts) {
+    opts.version = this.version;
+    return this._super(id, opts);
+  }
 }, {
   init : function() {
     this.autoupdate = this.constructor.autoupdate;

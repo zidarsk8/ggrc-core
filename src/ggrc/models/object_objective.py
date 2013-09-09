@@ -63,7 +63,6 @@ class Objectiveable(object):
         'object_objectives', 'objective',
         creator=lambda objective: ObjectObjective(
             objective=objective,
-            modified_by_id=1,
             objectiveable_type=cls.__name__,
             )
         )

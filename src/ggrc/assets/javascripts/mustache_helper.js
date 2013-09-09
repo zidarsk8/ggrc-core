@@ -734,8 +734,16 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   }
 
   var page_type = GGRC.infer_object_type(GGRC.page_object);
-
-  if (GGRC.JoinDescriptor.by_object_option_models[page_type.shortName] && GGRC.JoinDescriptor.by_object_option_models[page_type.shortName][context.constructor.shortName]) {
+  var context_id = null;
+  if (page_type === CMS.Models.Program || !(context instanceof CMS.Models.Program)) {
+    context_id = GGRC.page_object[page_type.table_singular].context ?
+      GGRC.page_object[page_type.table_singular].context.id : null;
+  } else {
+    context_id = context.context ? context.context.id : null;
+  }
+  var join_model_name = GGRC.JoinDescriptor.join_model_name_for(
+      page_type.shortName, context.constructor.shortName);
+  if (join_model_name && Permission.is_allowed('create', join_model_name, context_id)) {
     return options.fn(options.contexts);
   } else {
     return options.inverse(options.contexts);
@@ -955,7 +963,9 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION}} content {{/is_allowed}}
  */
-var allowed_actions = ["create","read","update","delete"];
+var allowed_actions = [
+      "create", "read", "update", "delete",
+      "join_create", "join_read", "join_update", "join_delete"];
 Mustache.registerHelper("is_allowed", function() {
   var allowed_page = GGRC.page_instance()
     , args = Array.prototype.slice.call(arguments, 0)
@@ -976,21 +986,101 @@ Mustache.registerHelper("is_allowed", function() {
     else if (typeof arg === 'string') {
       resource_type = arg;
     }
-    else if (typeof arg === 'number') {
+    else if (typeof arg === 'number' || arg == null) {
       context_id = arg;
+    } else if (typeof arg === 'object' && arg instanceof can.Model) {
+      if (GGRC.page_model instanceof CMS.Models.Program) {
+        resource_type = arg.constructor.shortName
+      } else {
+        resource_type = arg.constructor.shortName;
+        context_id = arg.context ? arg.context.id : null;
+      }
     }
   });
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
   can.each(actions, function(action) {
-    passed = passed && (!window.Permission || Permission.is_allowed(action, resource_type, context_id));
+    var actual_resource_type = resource_type;
+    var actual_action = action;
+    if (action.indexOf("join_") == 0) {
+      actual_action = action.slice(5);
+      actual_resource_type = GGRC.JoinDescriptor.join_model_name_for(
+        GGRC.page_model.constructor.shortName, resource_type);
+    }
+    passed = passed && Permission.is_allowed(actual_action, actual_resource_type, context_id);
   });
 
   return passed
     ? options.fn(options.contexts || this) 
     : options.inverse(options.contexts || this)
     ;
+});
+
+Mustache.registerHelper("is_allowed_for_all", function(action, instances, options) {
+  var passed = true;
+
+  action = resolve_computed(action);
+  instances = resolve_computed(instances);
+
+  can.each(instances, function(instance) {
+    var resource_type
+      , context_id
+      ;
+
+    resource_type = instance.constructor.shortName;
+    context_id = instance.context ? instance.context.id : null;
+
+    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+  });
+
+  if (passed)
+    return options.fn(options.contexts || this);
+  else
+    return options.inverse(options.contexts || this);
+});
+
+Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
+  //  For creating mappings, we only care if the user can create instances of
+  //  the join model.
+  //  - `source` must be a model instance
+  //  - `target` must be the name of the target model
+  //
+  //  FIXME: This should actually iterate through all applicable join models
+  //    and return success if any one matches.
+  var target_type
+    , resource_type
+    , context_id
+    ;
+
+  source = resolve_computed(source);
+  target = resolve_computed(target);
+
+  if (target instanceof can.Model)
+    target_type = target.constructor.shortName;
+  else
+    target_type = target;
+
+  //if (!(source instanceof can.Model)) {
+  //  //  If `source` is not a model instance, assume they want to link to the
+  //  //  page object.
+  //  options = target;
+  //  target = source;
+  //  source = GGRC.page_instance();
+  //}
+
+  resource_type = GGRC.JoinDescriptor.join_model_name_for(
+    source.constructor.shortName, target_type);
+
+  context_id = source.context ? source.context.id : null;
+  if (!(source instanceof CMS.Models.Program)
+      && target instanceof CMS.Models.Program)
+    context_id = target.context ? target.context.id : null;
+
+  if (Permission.is_allowed('create', resource_type, context_id))
+    return options.fn(options.contexts || this);
+  else
+    return options.inverse(options.contexts || this);
 });
 
 function resolve_computed(maybe_computed) {
@@ -1008,5 +1098,13 @@ Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
   };
 });
 
+Mustache.registerHelper("determine_context", function(page_object, target) {
+  if (page_object.constructor.shortName == "Program") {
+    return page_object.context ? page_object.context.id : null;
+  } else if (target.constructor.shortName == "Program") {
+    return target.context ? target.context.id : null;
+  }
+  return page_object.context ? page_object.context.id : null;
+});
 
 })(this, jQuery, can);
