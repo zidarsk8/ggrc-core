@@ -523,7 +523,8 @@ class Resource(ModelView):
 
   def build_page_object_for_json(self, paging):
     def page_args(next_num, per_page):
-      ret = dict(request.args)
+      # coerce the values to be plain strings, rather than unicode
+      ret = dict([(k,str(v)) for k,v in request.args.items()])
       ret['__page'] = next_num
       if '__page_size' in ret:
         ret['__page_size'] = per_page

@@ -51,6 +51,9 @@ can.Model("can.Model.Cacheable", {
       this.findAll = function() {
         throw "No default findAll() exists for subclasses of Cacheable";
       };
+      this.findPage = function() {
+        throw "No default findPage() exists for subclasses of Cacheable";
+      }
     }
     else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
       if(this.root_collection) {
@@ -68,6 +71,10 @@ can.Model("can.Model.Cacheable", {
       this.model_singular = statics.model_singular || this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
       this.title_singular = statics.title_singular || this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
       this.table_singular = statics.table_singular || this.root_object;
+    }
+
+    if (!can.isFunction(this.findAll)) {
+      this.findPage = this.makeFindPage(this.findAll);
     }
 
     var ret = this._super.apply(this, arguments);
@@ -420,6 +427,73 @@ can.Model("can.Model.Cacheable", {
           this[name] = new can.Observe.List();
         this[attr].bind("change", this.proxy(change_handler_name));
       });*/
+    }
+  , makeFindPage: function(findAllSpec) {
+      /* Create a findPage function that will return a paging object that will
+       * provide access to the model items provided in a single page as well
+       * as paging capability to retrieve the named pages provided in the
+       * resposne.
+       *
+       * findPage returns an object with two properties: models and paging.
+       * The models property will be an array of all model instances in the
+       * page retrieved for the collection. The paging property will be an
+       * object that can be used to retrieve other named pages from the
+       * collection.  The names of pages include first, prev, next, last. Named
+       * page properties will either be functions or the null value in the case
+       * where there is no link available in the collection under that name.
+       * Paging functions have the same type of return value as the findPage
+       * function.
+       *
+       * This method assumes that findAllSpec is a string like
+       * "GET /api/programs". If this assumption is invalid, this function
+       * WILL NOT work correctly.
+       */
+      var parts = findAllSpec.split(" ");
+      var method = parts.length == 2 ? parts[0] : "GET";
+      var collection_url = parts.length == 2 ? parts[1] : parts[0];
+      var base_params = {
+        type: method
+        , dataType: "json"
+      };
+
+      var findPageFunc = function(url, data){
+        return can.ajax(can.extend({
+          url: url
+          , data: data
+        }, base_params)).then(function(response_data) {
+            var collection = response_data[that.root_collection+"_collection"];
+            return {
+              models: that.models(collection[that.root_collection])
+              , paging: make_paginator(collection.paging)
+            };
+          });
+      };
+
+      var that = this;
+      var make_paginator = function(paging) {
+        var get_page = function(page_name) {
+          if (paging[page_name]) {
+            return function() { return findPageFunc(paging[page_name]); };
+          } else {
+            return null;
+          }
+        };
+
+        return {
+          first: get_page("first")
+          , prev: get_page("prev")
+          , next: get_page("next")
+          , last: get_page("last")
+        };
+      };
+
+      return function(params) {
+        params = params || {};
+        if (!params.__page) {
+          params.__page = 1;
+        }
+        return findPageFunc(collection_url, params);
+      };
     }
 }, {
   init : function() {
