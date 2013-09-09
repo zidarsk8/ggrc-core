@@ -185,10 +185,26 @@ can.Control("CMS.Controllers.TreeView", {
       can.Observe.stopBatch();
     });
     can.view(this.options.list_view, this.options, function(frag) {
+      function when_attached_to_dom(cb) {
+        // Trigger the "more" toggle if the height is the same as the scrollable area
+        !function poll() {
+          if (!that.element) {
+            return;
+          } else if (that.element.closest(document.documentElement).length) {
+            cb();
+          }
+          else {
+            setTimeout(poll, 100);
+          }
+        }();
+      }
+
       if (that.element) {
         that.element.html(frag);
-        that.element.trigger("updateCount", that.options.list.length);
-        that.element.trigger("loaded");
+        when_attached_to_dom(function() {
+          that.element.trigger("updateCount", that.options.list.length);
+          that.element.trigger("loaded");
+        });
       }
       /*GGRC.queue_event(function() {
         if(that.options.start_expanded) {
