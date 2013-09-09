@@ -64,6 +64,27 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
+
+  , model : function(params) {
+      if (this.shortName !== 'Directive')
+        return this._super(params);
+      if (!params)
+        return params;
+      params = this.object_from_resource(params);
+      if (!params.selfLink) {
+        if (params.type !== 'Directive')
+          return CMS.Models[params.type].model(params);
+      } else {
+        if (CMS.Models.Contract.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Contract.model(params);
+        else if (CMS.Models.Regulation.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Regulation.model(params);
+        else if (CMS.Models.Policy.meta_kinds.indexOf(params.kind) > -1)
+          return CMS.Models.Policy.model(params);
+      }
+      console.debug("Invalid Directive:", params);
+    }
+
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
@@ -86,7 +107,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
   }
   , defaults : {
-    sections : []
   }
   , init : function() {
     this.validatePresenceOf("title");
@@ -852,10 +872,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   }
 
   , defaults : {
-    object_objectives : []
-    , objective_controls : []
-    , section_objectives : []
-    , object_people : []
   }
 
   , mappings: {
@@ -868,7 +884,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         , target_attr: "document"
       }
     , business_object_mappings: {
-          attr: "object_objectives"
+          attr: "objective_objects"
         , target_attr: "objectiveable"
       }
     , control_mappings: {
@@ -891,14 +907,17 @@ can.Model.Cacheable("CMS.Models.Objective", {
         model : "Control"
       , property : "control_mappings"
       , show_view : "/static/mustache/controls/tree.mustache"
+      , draw_children : false
     }, {
         model : "Person"
       , property : "people_mappings"
       , show_view : "/static/mustache/people/tree.mustache"
+      , draw_children : false
     }, {
         model : "Document"
       , property : "document_mappings"
       , show_view : "/static/mustache/documents/tree.mustache"
+      , draw_children : false
 /*    }, {
         model : "Section"
       , property : "section_mappings"
@@ -908,6 +927,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
       , property : "business_object_mappings"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
+      , draw_children : false
     }]
   }
 
@@ -953,12 +973,26 @@ can.Model.Cacheable("CMS.Models.Role", {
         , "delete": []
       }
     }
-}, {});
+}, {
 
-CMS.Models.Role.prototype.allowed = function(operation, object_or_class) {
-  var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
-  return !!~can.inArray(cls.model_singular, this.permissions[operation]);
-};
+  allowed : function(operation, object_or_class) {
+    var cls = typeof object_or_class === "function" ? object_or_class : object_or_class.constructor;
+    return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+  }
+
+  , not_system_role : function() {
+    return can.inArray(
+        this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
+  }
+
+  , permission_summary : function() {
+    if (this.name == "ProgramOwner") return "Owner";
+    if (this.name == "ProgramEditor") return "Can Edit";
+    if (this.name == "ProgramReader") return "View Only";
+    return this.name;
+  }
+
+});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null;
@@ -1029,7 +1063,7 @@ CMS.Models.get_link_type = function(instance, attr) {
   if (!type) {
     model = instance[attr] && instance[attr].constructor;
     if (model)
-      type = model.getRootModelName();
+      type = model.shortName;
     else if (instance[attr])
       type = instance[attr].type;
   }

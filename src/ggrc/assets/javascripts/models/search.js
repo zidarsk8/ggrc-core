@@ -12,7 +12,7 @@ can.Model("GGRC.Models.Search", {
     return this.findOne($.extend({q : str}, params));
   }
   , search_for_types : function(str, types, params) {
-    if (!str || str.trim().length == 0)
+    if ((!str || str.trim().length == 0) && (!params || params.length == 0))
       // Empty search, so actually hit normal endpoints instead of search
       return this.load_via_model_endpoints(types);
     else

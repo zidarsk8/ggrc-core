@@ -47,23 +47,7 @@ can.Model.Cacheable("CMS.Models.Section", {
       title : ""
     , slug : ""
     , description : ""
-
-    , object_people : []
-    , people : []
-    , object_documents : []
-    , documents : []
-    , object_objectives : []
-    , objectives : []
-    , object_controls : []
-    , controls : []
-    , directive : null
-    //, parent : "CMS.Models.Section.model"
-    , children : []
-    , control_sections : []
-    , controls : []
-    , section_objectives : []
-    , objectives : []
-    , object_sections : []
+    , url : ""
   }
 
   , mappings: {
@@ -119,6 +103,7 @@ can.Model.Cacheable("CMS.Models.Section", {
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     }]
   }
 
@@ -223,15 +208,7 @@ can.Model.Cacheable("CMS.Models.Section", {
 }, {
 
   init : function() {
-
-    this._super();
-
-    var that = this;
-    this.each(function(value, name) {
-      if (value === null)
-        that.removeAttr(name);
-    });
-
+    this._super.apply(this, arguments);
     this._init_mappings();
   }
 

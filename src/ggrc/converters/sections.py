@@ -20,7 +20,6 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
     self.handle_text_or_html('description')
-    self.handle_text_or_html('notes')
     self.handle('controls', LinkControlsHandler)
     self.handle_raw_attr('title')
 
@@ -33,7 +32,6 @@ class SectionRowConverter(BaseRowConverter):
 class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
-
 
   metadata_map = OrderedDict([
     ('Type','type'),
@@ -52,7 +50,7 @@ class SectionsConverter(BaseConverter):
   ])
 
   object_export_order = [
-    'slug', 'title', 'description', 'notes',
+    'slug', 'title', 'description',
     'controls', 'created_at', 'updated_at'
   ]
 
@@ -60,7 +58,6 @@ class SectionsConverter(BaseConverter):
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
-    ('Abstract' , 'notes'),
     ('Controls', 'controls'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')

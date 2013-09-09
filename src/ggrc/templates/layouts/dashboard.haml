@@ -43,7 +43,7 @@
                     Google GRC
               %ul.menu
                 %li.black-link
-                  %a{ 'href': "javascript://", 'data-toggle': 'modal-ajax', 'data-modal-type': 'helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+                  %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax', 'data-modal-type': 'helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
                     %i.grcicon-help
                     %span
                       Help
@@ -78,7 +78,7 @@
     .area{ 'class': '={ model_display_class }' }
       .header-content
         .row-fluid
-          .span9
+          #page-header.span9
             -block header
           .span3
             -block subheader_extras
@@ -148,7 +148,7 @@
         #lhs.lhs.accordion
           -#NEW LHS
           .lhs-search
-            %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Type then press enter to search...' }
+            %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Enter text to search' }
           .lhs-bg
           .lhs-nav.emphesized
             %ul.top-level
@@ -159,8 +159,8 @@
               =search_result('Regulation', 'regulations', 'governance')
               =search_result('Contract', 'contracts', 'governance')
               =search_result('Policy', 'policies', 'governance')
-              =search_result('Control', 'controls', 'governance')
               =search_result('Objective', 'objectives', 'governance')
+              =search_result('Control', 'controls', 'governance')
             %h2.business Assets/Business
             %ul.top-level
               =search_result('System', 'systems', 'business')

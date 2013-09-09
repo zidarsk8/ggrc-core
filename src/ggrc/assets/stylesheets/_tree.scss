@@ -88,6 +88,9 @@ ul.new-tree {
   [class^="grcicon-"] {
     margin-top:7px;
   }
+  .parent {
+    @include opacity(0.6);
+  }
   .tree-description {
     line-height:18px;
     margin-right:60px;

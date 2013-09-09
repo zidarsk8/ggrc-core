@@ -229,7 +229,7 @@
           //join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.getRootModelName());
+          join = this.get_new_join(option.id, option.constructor.shortName);
           join.save().then(function() {
             //join.refresh().then(function() {
               self.options.join_list.push(join);
@@ -326,7 +326,7 @@
   });
 
   function get_page_object() {
-    return GGRC.make_model_instance(GGRC.page_object);
+    return GGRC.page_instance();
   }
 
   function get_option_set(name, data) {
@@ -342,6 +342,7 @@
 
         related_model_singular: "Document",
         related_table_plural: "documents",
+        related_table_singular: "document",
         related_title_singular: "Reference",
         related_title_plural: "References",
 
@@ -369,6 +370,7 @@
 
         related_model_singular: "Section",
         related_table_plural: "sections",
+        related_table_singluar: "section",
         related_title_singular: "Section",
         related_title_plural: "Sections",
 
@@ -395,6 +397,7 @@
 
         related_model_singular: "Objective",
         related_table_plural: "objectives",
+        related_table_singular: "objective",
         related_title_singular: "Objective",
         related_title_plural: "Objectives",
 
@@ -421,6 +424,7 @@
 
         related_model_singular: "Person",
         related_table_plural: "people",
+        related_table_singular: "person",
         related_title_singular: "Person",
         related_title_plural: "People",
 
@@ -474,6 +478,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -500,6 +505,7 @@
 
         related_model_singular: data.child_meta_type,
         related_table_plural: (CMS.Models[data.child_meta_type] || {}).table_plural,
+        related_table_singular: (CMS.Models[data.child_meta_type] || {}).table_singular,
         related_title_singular: "System",
         related_title_plural: "Systems",
 
@@ -526,6 +532,7 @@
 
         related_model_singular: "Objective",
         related_table_plural: "objectives",
+        related_table_singular: "objective",
         related_title_singular: "Objective",
         related_title_plural: "Objectives",
 
@@ -553,6 +560,7 @@
 
         related_model_singular: "Risk",
         related_table_plural: "risks",
+        related_table_singular: "risk",
         related_title_singular: "Risk",
         related_title_plural: "Risks",
 
@@ -579,6 +587,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -607,6 +616,7 @@
 
         related_model_singular: "Control",
         related_table_plural: "controls",
+        related_table_singular: "control",
         related_title_singular: "Control",
         related_title_plural: "Controls",
 
@@ -643,6 +653,7 @@
 
     options.related_model_singular = data.related_model_singular;
     options.related_table_plural = data.related_table_plural;
+    options.related_table_singular = data.related_table_singular;
     options.related_title_singular = data.related_title_singular;
     options.related_title_plural = data.related_title_plural;
 
@@ -704,6 +715,7 @@
           , related_title_singular: $this.data('related-title-singular')
           , related_title_plural: $this.data('related-title-plural')
           , related_table_plural: $this.data('related-table-plural')
+          , related_table_singular: $this.data('related-table-singular')
           , related_side: $this.data('related-side')
           , related_model: $this.data('related-model')
           , join_object_id: $this.data('join-object-id')
@@ -759,6 +771,10 @@
         , object_model: null
         , join_model: null
       }
+
+    , last_selected_option_type: null
+    , last_option_search_term: ""
+
     , launch: function($trigger, options) {
         // Extract parameters from data attributes
 
@@ -778,9 +794,14 @@
         this.options.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
 
+        this.options.option_search_term = this.constructor.last_option_search_term;
+
         this.init_menu();
         this.init_context();
-        this.set_option_descriptor(this.options.default_option_descriptor);
+        if (this.options.option_descriptors[this.constructor.last_selected_option_type])
+          this.set_option_descriptor(this.constructor.last_selected_option_type);
+        else
+          this.set_option_descriptor(this.options.default_option_descriptor);
         this.init_bindings();
         this.init_view();
         this.init_data()
@@ -819,6 +840,10 @@
           function(frag) {
             $(self.element).html(frag);
             deferred.resolve();
+            self.element.trigger('loaded');
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
           });
 
         // Start listening for events
@@ -855,6 +880,18 @@
         return this.context;
       }
 
+    , insert_options: function(options, prepend) {
+        var self = this;
+        can.view(this.options.option_items_view, { options: options }, function(frag) {
+          if (self.element) {
+            if (prepend)
+              self.element.find('.option_column ul').prepend(frag);
+            else
+              self.element.find('.option_column ul').append(frag);
+          }
+        });
+      }
+
     , refresh_option_list: function() {
         var self = this
           , visible_options
@@ -880,9 +917,7 @@
             if (self.element
                 && self.options.option_model === current_option_model
                 && self.options.option_search_term === current_search_term) {
-              can.view(self.options.option_items_view, { options: options }, function(frag) {
-                self.element && self.element.find('.option_column ul').append(frag);
-              });
+              self.insert_options(options);
               if (i < objects.length) {
                 setTimeout(function() {
                   refresh_up_to(objects.slice(i), request_limit, render_limit);
@@ -895,18 +930,33 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul').empty();
 
+        var join_model = GGRC.JoinDescriptor.join_model_name_for(
+              this.options.object_model, current_option_model_name);
         return GGRC.Models.Search
-          .search_for_types(current_search_term || '', [current_option_model_name])
+          .search_for_types(
+              current_search_term || '',
+              [current_option_model_name],
+              {
+                __permission_type: 'create'
+                , __permission_model: join_model
+              })
           .then(function(search_result) {
-            var options = search_result.getResultsForType(current_option_model_name);
-            self.option_list.push.apply(self.option_list, options);
-            return refresh_up_to(options, 50, 50);
+            var options;
+            if (self.element
+                && self.options.option_model === current_option_model
+                && self.options.option_search_term === current_search_term) {
+              options = search_result.getResultsForType(current_option_model_name);
+              self.option_list.push.apply(self.option_list, options);
+              return refresh_up_to(options, 50, 50);
+            }
           });
       }
 
     , set_option_descriptor: function(option_type) {
         var descriptor = this.options.option_descriptors[option_type]
           ;
+
+        this.constructor.last_selected_option_type = option_type;
 
         can.Model.startBatch();
 
@@ -916,11 +966,13 @@
         this.context.attr('option_descriptor', descriptor);
         this.context.attr('selected_option', null);
         this.context.attr('related_table_plural', descriptor.related_table_plural);
+        this.context.attr('related_table_singular', descriptor.related_table_singular);
         this.context.attr('related_model_singular', descriptor.related_model_singular);
         this.context.attr('new_object_title', descriptor.new_object_title);
         this.options.option_items_view = descriptor.items_view;
         this.options.option_model = descriptor.model;
-        this.options.option_search_term = '';
+        if (!this.options.option_search_term)
+          this.options.option_search_term = '';
 
         can.Model.stopBatch();
 
@@ -929,6 +981,7 @@
 
     , on_select_option_type: function(el, ev) {
         this.set_option_descriptor($(el).val());
+        this.element.find("#search").focus();
       }
 
     , "select.option-type-selector change": "on_select_option_type"
@@ -945,7 +998,7 @@
 
     , ".map-button click": "on_map"
 
-    , on_map: function(el, ev) {
+    , on_map: $.debounce(500, true, function(el, ev) {
         var that = this
           ;
 
@@ -956,12 +1009,23 @@
           .fail(function() {
             //alert("Fail");
           });
-      }
+      })
 
     , create_join: function() {
         if (this.context.selected_option) {
+          var context_id = null
+            , context_object
+            ;
+          if (this.context.selected_option.constructor.shortName == "Program") {
+            context_object = this.context.selected_option;
+          } else {
+            context_object = this.context.selected_object;
+          }
+          if (context_object.context && context_object.context.id) {
+            context_id = context_object.context.id;
+          }
           join = this.context.option_descriptor.get_new_join(
-              this.context.selected_object, this.context.selected_option, null);
+              this.context.selected_object, this.context.selected_option, context_id);
           //join = this.get_new_join(this.context.selected_option);
           return join.save();
         } else {
@@ -976,9 +1040,28 @@
       }
 
     , ".btn-add modal:success" : function(el, ev, data) {
-      this.option_list.unshift(data);
-      this.context.attr('selected_option', data);
-    }
+        this.option_list.unshift(data);
+        this.context.attr('selected_option', data);
+        this.insert_options([data], true);
+        // Scroll so the top element (the one just added) is in view
+        this.element.find(".option_column ul").parent().scrollTop(0);
+      }
+
+    , "#search keyup": function(el, ev) {
+        var self = this
+          , $el = $(el)
+          , term = $el.val()
+          ;
+        if (term !== this.options.option_search_term) {
+          this.options.option_search_term = term;
+          setTimeout(function() {
+            if (self.options.option_search_term === term) {
+              self.refresh_option_list();
+              self.constructor.last_option_search_term = term;
+            }
+          }, 200);
+        }
+      }
   });
 
   ModalOptionDescriptor = can.Construct({
@@ -1012,6 +1095,7 @@
           , model_display: model.title_plural
           , related_model_singular : model.model_singular
           , related_table_plural : model.table_plural
+          , related_table_singular : model.table_singular
           , new_object_title : model.title_singular
         }, options), {});
       }
@@ -1030,10 +1114,10 @@
 
         join_params[this.join_option_attr] = {};
         join_params[this.join_option_attr].id = option.id;
-        join_params[this.join_option_attr].type = option.constructor.getRootModelName();
+        join_params[this.join_option_attr].type = option.constructor.shortName;
         join_params[this.join_object_attr] = {};
         join_params[this.join_object_attr].id = object.id;
-        join_params[this.join_object_attr].type = object.constructor.getRootModelName();
+        join_params[this.join_object_attr].type = object.constructor.shortName;
         join_params.context = { id: context_id };
         return new (this.join_model)(join_params);
       }

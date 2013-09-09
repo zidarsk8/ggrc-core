@@ -60,34 +60,17 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "title" : ""
     , "slug" : ""
     , "description" : ""
-
-    , object_people : []
-    , people : []
-    , object_documents : []
-    , documents : []
-    , categories : []
-    , assertions : []
-    , control_controls : []
-    , implemented_controls : []
-    , implementing_control_controls : []
-    , implementing_controls : []
-    , objective_controls : []
-    , objectives : []
-    , control_sections : []
-    , sections : []
-    , program_controls : []
-    , programs : []
-    , system_controls : []
-    , systems : []
-    , control_risks : []
-    , risks : []
-    , object_controls : []
+    , "url" : ""
   }
 
   , mappings: {
       people_mappings: {
           attr: "object_people"
         , target_attr: "person"
+      }
+    , document_mappings: {
+          attr: "object_documents"
+        , target_attr: "document"
       }
     , business_object_mappings: {
           attr: "object_controls"
@@ -100,6 +83,10 @@ can.Model.Cacheable("CMS.Models.Control", {
     , objective_mappings: {
           attr: "objective_controls"
         , target_attr: "objective"
+      }
+    , program_mappings: {
+          attr: "program_controls"
+        , target_attr: "program"
       }
     }
 
@@ -115,15 +102,28 @@ can.Model.Cacheable("CMS.Models.Control", {
         model : "Person"
       , property : "people_mappings"
       , show_view : "/static/mustache/people/tree.mustache"
+      , draw_children : false
+    }, {
+        model : "Document"
+      , property : "document_mappings"
+      , show_view : "/static/mustache/documents/tree.mustache"
+      , draw_children : false
     }, {
         model : "Objective"
       , property : "objective_mappings"
       , show_view : "/static/mustache/objectives/tree.mustache"
+      , draw_children : false
+    }, {
+        model : "Program"
+      , property : "program_mappings"
+      , list_view : "/static/mustache/base_objects/tree.mustache"
+      , draw_children : false
     }, {
         model : can.Model.Cacheable
       , property : "business_object_mappings"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
+      , draw_children : false
     }]
   }
 
@@ -133,13 +133,8 @@ can.Model.Cacheable("CMS.Models.Control", {
   }
 }
 , {
-// prototype properties
   init : function() {
-    var that = this;
-    this.attr({
-      "content_id" : Math.floor(Math.random() * 10000000)
-    });
-    this._super();
+    this._super.apply(this, arguments);
     this._init_mappings();
   }
 

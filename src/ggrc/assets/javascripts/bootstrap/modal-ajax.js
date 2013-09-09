@@ -152,7 +152,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -170,7 +170,7 @@
 
       $target.on('modal:success', function(e, data) {
         var model_name = $trigger.attr("data-object-singular");
-        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.make_model_instance(GGRC.page_object))) {
+        if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
           window.location.assign('/dashboard');
         } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
           window.location.assign('/admin');
@@ -186,7 +186,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
-        instance = GGRC.make_model_instance(GGRC.page_object);
+        instance = GGRC.page_instance();
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
@@ -287,6 +287,9 @@
       _top = offsetParent.closest(".modal").offset().top - offsetParent.offset().top + header_height;
       _left = offsetParent.closest(".modal").offset().left + offsetParent.closest(".modal").width() / 2 - offsetParent.offset().left;
     }
+    if (_top < 0) {
+      _top = 0;
+    }
     modal
     .css("top", _top + "px")
     .css({"position" : "absolute", "margin-top" : 0, "left" : _left});
@@ -301,7 +304,7 @@
         || $(shownevents).filter(function() { 
             return $.inArray("arrange", this.namespace.split(".")) > -1; 
         }).length < 1) {
-          $el.on("shown.arrange", function(ev) {
+          $el.on("shown.arrange, loaded.arrange", function(ev) {
             if(ev.target === ev.currentTarget)
                 reconfigureModals.call(that);
           });

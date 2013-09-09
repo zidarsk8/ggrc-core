@@ -98,14 +98,14 @@ def handle_get_example_resource(context, name, expected_status=200):
         example.resource_type, response.json(), response=response)
     setattr(context, name, example)
 
-def handle_post_named_example_to_collection_endpoint(
-    context, name, expected_status=201):
-  """Create a new resource for the given example. Expects that there is a
-  `service_description` in `context` to use to lookup the endpoint url. The
-  created resource is added to the context as the attribute name given by
-  `name`.
-  """
-  handle_post_named_example(context, name, expected_status)
+def handle_post_fails_with_status_and_content(context, name, expected_status, content):
+  example = getattr(context, name)
+  response = post_example(
+      context, example.resource_type, example.value)
+  assert response.status_code == expected_status, \
+      'Expected status code {0}, received {1}'\
+        .format(expected_status, response.status_code)
+  assert response.text.find(content) != -1
 
 def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)

@@ -137,6 +137,11 @@ def import_controls(directive_id):
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect(directive_url)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+              directive_id = directive_id, exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -177,6 +182,11 @@ def import_sections(directive_id):
           count = len(converter.objects)
           flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect(directive_url)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+              directive_id = directive_id, exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
@@ -210,6 +220,10 @@ def import_systems():
           count = len(converter.objects)
           flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml", exception_message = file_msg)
+
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
 
@@ -249,6 +263,9 @@ def import_processes():
           count = len(converter.objects)
           flash(u'Successfully imported {} process{}'.format(count, 'es' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml", exception_message = file_msg)
     except ImportException as e:
       return render_template("directives/import_errors.haml", exception_message = str(e))
 

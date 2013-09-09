@@ -15,7 +15,7 @@ $(function() {
 
   var object_class = GGRC.infer_object_type(GGRC.page_object)
     , object_table = object_class.table_plural
-    , object = GGRC.make_model_instance(GGRC.page_object);
+    , object = GGRC.page_instance();
 
   var info_widget_views = {
     'programs': GGRC.mustache_path + "/programs/info.mustache"
@@ -61,6 +61,18 @@ $(function() {
                   widget_icon: 'grcicon-link'
               }
           }
+          , Contract : {
+            Section : {
+              widget_name : function() {
+                var $objectArea = $(".object-area");
+                if ( $objectArea.hasClass("dashboard-area") ) {
+                  return "Clauses";
+                } else {
+                  return "Mapped Clauses";
+                }
+              }
+            }
+          }
       }
     // Prevent widget creation with <model_name>: false
     // e.g. to prevent ever creating People widget:
@@ -92,6 +104,7 @@ $(function() {
                   .refresh_list();
               }
             , fetch_post_process : sort_sections
+            , draw_children : true
             }]
       }
     , extra_content_controller_options = {
@@ -99,10 +112,22 @@ $(function() {
               Regulation: program_directive_options
             , Policy: program_directive_options
             , Contract: program_directive_options
+            , Control: { draw_children : true }
+            , Objective: { draw_children : true }
           }
-        , Regulation: {}
+        , Regulation: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Policy: {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
+        , Contract : {
+          Section : program_directive_options.child_options[0]
+          , Control : { draw_children : true }
+        }
       }
-
     ;
 
   can.each(far_models, function(join_descriptors, model_name) {
@@ -122,7 +147,9 @@ $(function() {
     can.each(join_descriptors, function(join_descriptor) {
       sources.push(join_descriptor.get_loader());
     });
-    list_loader = new GGRC.ListLoaders.MultiListLoader(sources);
+    list_loader = new GGRC.ListLoaders.FilteredListLoader(
+      new GGRC.ListLoaders.MultiListLoader(sources),
+      function(result) { return !!result.instance.selfLink; })
     list_loader = list_loader.attach(object);
 
     var far_model = join_descriptor.get_model(model_name)

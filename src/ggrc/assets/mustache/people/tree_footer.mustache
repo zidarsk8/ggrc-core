@@ -1,4 +1,5 @@
 {{#if allow_mapping_or_creating}}
+{{#is_allowed_to_map parent_instance model.shortName}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -18,4 +19,5 @@
     </div>
   </div>
 </li>
+{{/is_allowed_to_map}}
 {{/if}}

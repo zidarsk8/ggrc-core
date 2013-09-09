@@ -7,7 +7,8 @@ import datetime
 import factory
 import random
 from factory.base import BaseFactory, FactoryMetaClass, CREATE_STRATEGY
-from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger
+from factory.fuzzy import (
+    BaseFuzzyAttribute, FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger)
 from factory.compat import UTC
 from ggrc import models
 from ggrc.models.reflection import AttributeInfo
@@ -20,6 +21,11 @@ def random_string(prefix=''):
 
 def random_string_attribute(prefix=''):
   return factory.LazyAttribute(lambda m: random_string(prefix))
+
+class FuzzyEmail(BaseFuzzyAttribute):
+  def fuzz(self):
+    return "{0}@{1}.{2}".format(
+        random_string('user-'), random_string('domain-'), 'com')
 
 class FactoryStubMarker(object):
   def __init__(self, class_):
@@ -187,3 +193,7 @@ class PolicyFactory(ModelFactory):
 class RegulationFactory(ModelFactory):
   MODEL = models.Regulation
   kind = FuzzyChoice(MODEL.valid_kinds)
+
+class PersonFactory(ModelFactory):
+  MODEL = models.Person
+  email = FuzzyEmail()

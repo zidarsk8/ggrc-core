@@ -173,6 +173,13 @@ jQuery.extend(GGRC, {
     }
   }
 
+  , page_instance : function() {
+    if (!GGRC._page_instance && GGRC.page_object) {
+      GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
+    }
+    return GGRC._page_instance;
+  }
+
   , queue_event : function(event) {
     var timegap = 100 //ms
     , currentTimeout = null;

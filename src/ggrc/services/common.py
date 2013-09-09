@@ -19,6 +19,7 @@ from ggrc.login import get_current_user_id
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
+from ggrc.models.exceptions import ValidationError
 from ggrc.rbac import permissions
 from sqlalchemy import or_
 import sqlalchemy.orm.exc
@@ -298,7 +299,7 @@ class Resource(ModelView):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(object_for_json))]))
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj))
+      object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
     missing_headers = []
@@ -348,7 +349,12 @@ class Resource(ModelView):
     if new_context != obj.context_id \
         and not permissions.is_allowed_update(self.model.__name__, new_context):
       raise Forbidden()
-    self.json_update(obj, src)
+    try:
+      self.json_update(obj, src)
+    except ValidationError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
+
     #FIXME Fake the modified_by_id until we have that information in session.
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
@@ -446,7 +452,11 @@ class Resource(ModelView):
       if not permissions.is_allowed_create(
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
-    self.json_create(obj, src)
+    try:
+      self.json_create(obj, src)
+    except ValidationError, v:
+      current_app.logger.warn(v)
+      return ((str(v), 403, []))
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)

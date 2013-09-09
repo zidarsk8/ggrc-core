@@ -238,6 +238,10 @@ blockquote {
     }
   }
 }
+// Disabled state
+.btn.disabled, .btn[disabled] {
+  @include opacity(0.25);
+}
 
 
 // removing outline on anchor element
@@ -559,6 +563,12 @@ select.multiple-selector {
 }
 
 // Tooltips
+.tooltip{
+  &.in {
+    @include opacity(1);
+  }
+}
+
 .tooltip-inner {
   text-align: left;
 }

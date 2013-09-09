@@ -54,26 +54,17 @@ can.Model.Cacheable("CMS.Models.Person", {
       return result;
     }
   , tree_view_options: {
-        list_view: GGRC.mustache_path + "/people/tree.mustache"
+        show_view: GGRC.mustache_path + "/people/tree.mustache"
+        , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }
+  , init : function() {
+    this._super.apply(this, arguments);
+    //H/T to Sebastian Porto for the email validation regex
+    this.validatePresenceOf("email");
+    this.validateFormatOf("email", /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
+  }
 }, {
-    init : function () {
-        this._super && this._super();
-        // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-        //     var obj;
-        //     if(obj = CMS.Models.ObjectPerson.findInCacheById(this.id) && attr !== "id") {
-        //         obj.attr(attr, newVal);
-        //     }
-        // });
-
-        var that = this;
-
-        this.each(function(value, name) {
-          if (value === null)
-            that.removeAttr(name);
-        });
-    }
-  , display_name : function() {
+  display_name : function() {
     return this.email;
   }
 });

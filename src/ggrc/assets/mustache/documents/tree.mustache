@@ -33,11 +33,13 @@
 
           <div class="span6">
           {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/is_allowed_all}}
           {{/if}}
           </div>
 

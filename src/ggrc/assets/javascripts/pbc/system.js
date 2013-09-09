@@ -15,6 +15,24 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     , root_collection : "systems_or_processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
+
+    , model : function(params) {
+        if (this.shortName !== 'SystemOrProcess')
+          return this._super(params);
+        if (!params)
+          return params;
+        params = this.object_from_resource(params);
+        if (!params.selfLink) {
+          if (params.type !== 'SystemOrProcess')
+            return CMS.Models[params.type].model(params);
+        } else {
+          if (params.is_biz_process)
+            return CMS.Models.Process.model(params);
+          else
+            return CMS.Models.System.model(params);
+        }
+      }
+
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
@@ -116,6 +134,8 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
     , objectives : "CMS.Models.Objective.models"
     , object_controls : "CMS.Models.ObjectControl.models"
@@ -127,7 +147,10 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , sub_systems : "CMS.Models.get_instances"
     , super_system_systems : "CMS.Models.SystemSystem.models"
     , super_systems : "CMS.Models.get_instances"
-    //, controls : "CMS.Models.Control.models"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -163,6 +186,8 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     , people : "CMS.Models.Person.models"
     , object_documents : "CMS.Models.ObjectDocument.models"
     , documents : "CMS.Models.Document.models"
+    , related_sources : "CMS.Models.Relationship.models"
+    , related_destinations : "CMS.Models.Relationship.models"
     , object_objectives : "CMS.Models.ObjectObjective.models"
     , objectives : "CMS.Models.Objective.models"
     , object_controls : "CMS.Models.ObjectControl.models"
@@ -175,7 +200,10 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     , sub_systems : "CMS.Models.get_instances"
     , super_system_systems : "CMS.Models.SystemSystem.models"
     , super_systems : "CMS.Models.get_instances"
-    //, controls : "CMS.Models.Control.models"
+    }
+  , defaults : {
+      title : ""
+    , url : ""
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);

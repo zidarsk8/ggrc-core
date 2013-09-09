@@ -71,6 +71,15 @@ can.Construct("ModelRefreshQueue", {
 });
 
 can.Construct("RefreshQueueManager", {
+    model_bases: {
+      // This won't work until Relatable/Documentable/etc mixins can handle
+      // queries with multiple `type` values.
+      //  Regulation: 'Directive'
+      //, Contract: 'Directive'
+      //, Policy: 'Directive'
+      //, System: 'SystemOrProcess'
+      //, Process: 'SystemOrProcess'
+    }
 }, {
     init: function() {
       this.null_queue = new ModelRefreshQueue(null);
@@ -84,6 +93,11 @@ can.Construct("RefreshQueueManager", {
         , found_queue = null
         , id = obj.id
         ;
+
+      if (this.constructor.model_bases[model_name]) {
+        model_name = this.constructor.model_bases[model_name];
+        model = CMS.Models[model_name];
+      }
 
       if (!force)
         // Check if the ID is already contained in another queue
@@ -171,61 +185,6 @@ can.Construct("RefreshQueue", {
 if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
-var program_id = /^\/programs\/(\d+)/.exec(window.location.pathname)[1];
-var spin_opts = { position : "absolute", top : 100, left : 100, height : 50, width : 50 };
-
-Permission = function(action, resource_type, context_id) {
-  return {
-    action: action,
-    resource_type: resource_type,
-    context_id: context_id
-  };
-};
-
-$.extend(Permission, (function() {
-  var _permission_match, _is_allowed, _admin_permission_for_context
-    , ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0)
-    ;
-
-  _admin_permission_for_context = function(context_id) {
-    return new Permission(
-      ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
-  };
-
-  _permission_match = function(permissions, permission) {
-    var resource_types = permissions[permission.action] || {}
-      , contexts = resource_types[permission.resource_type] || []
-      ;
-
-    return (contexts.indexOf(permission.context_id) > -1);
-  };
-
-  _is_allowed = function(permissions, permission) {
-    if (!permissions)
-      return false; //?
-    if (permission.context_id == null)
-      return true;
-    if (_permission_match(permissions, permission))
-      return true;
-    if (_permission_match(permissions, ADMIN_PERMISSION))
-      return true;
-    if (_permission_match(permissions,
-          _admin_permission_for_context(permission.context_id)))
-      return true;
-    return false;
-  };
-
-  is_allowed = function(action, resource_type, context_id) {
-    return _is_allowed(
-        GGRC.permissions, new Permission(action, resource_type, context_id));
-  };
-
-  return {
-    _is_allowed: _is_allowed,
-    is_allowed: is_allowed,
-  };
-})());
-
 function collated_user_roles_by_person(user_roles) {
   var person_roles = new can.Observe.List([])
     , refresh_queue = new RefreshQueue()
@@ -287,7 +246,7 @@ function collated_user_roles_by_person(user_roles) {
 }
 
 function authorizations_list_loader() {
-  var instance = GGRC.make_model_instance(GGRC.page_object)
+  var instance = GGRC.page_instance()
     , context_id = instance.context && instance.context.id
     ;
 
@@ -297,7 +256,7 @@ function authorizations_list_loader() {
 }
 
 function should_show_authorizations() {
-  var instance = GGRC.make_model_instance(GGRC.page_object)
+  var instance = GGRC.page_instance()
     , context_id = instance.context && instance.context.id
     ;
 

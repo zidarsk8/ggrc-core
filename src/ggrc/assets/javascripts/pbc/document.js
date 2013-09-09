@@ -47,32 +47,16 @@ can.Model.Cacheable("CMS.Models.Document", {
       , year : "CMS.Models.Option.model"
     }
   , tree_view_options: {
-        list_view: GGRC.mustache_path + "/documents/tree.mustache"
-    }
+    show_view: GGRC.mustache_path + "/documents/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+
+  }
   , init : function() {
     this.validatePresenceOf("link");
     this._super.apply(this, arguments);
   }
 
 }, {
-    init : function () {
-        this._super && this._super();
-        // this.bind("change", function(ev, attr, how, newVal, oldVal) {
-        //     var obj;
-        //     if(obj = CMS.Models.ObjectDocument.findInCacheById(this.id) && attr !== "id") {
-        //         obj.attr(attr, newVal);
-        //     }
-        // });
-
-        var that = this;
-
-        this.each(function(value, name) {
-          if (value === null)
-            that.attr(name, undefined);
-        });
-    }
-
 });
-
 
 })(this, can);

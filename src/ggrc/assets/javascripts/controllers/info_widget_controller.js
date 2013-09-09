@@ -12,7 +12,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
       if (GGRC.page_object) {
         $.extend(that.defaults, {
           model : GGRC.infer_object_type(GGRC.page_object)
-          , instance : GGRC.make_model_instance(GGRC.page_object)
+          , instance : GGRC.page_instance()
         });
       }
     });

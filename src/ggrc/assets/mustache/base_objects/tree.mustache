@@ -6,10 +6,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{^model.root_object}}
-                  {{!assume use of stub class or Cacheable here}}
-                  <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{/model}}
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{#instance.title}}
                   {{instance.title}}
                 {{/instance.title}}
@@ -47,11 +44,13 @@
 
           <div class="span6">
           {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/is_allowed_all}}
           {{/if}}
           </div>
 

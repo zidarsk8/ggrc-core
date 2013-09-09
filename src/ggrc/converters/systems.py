@@ -27,11 +27,13 @@ class SystemRowConverter(BaseRowConverter):
     self.handle('people_responsible', LinkPeopleHandler, role = 'responsible')
     self.handle('people_accountable', LinkPeopleHandler, role = 'accountable')
     self.handle('documents', LinkDocumentsHandler)
-    self.handle('sub_systems', LinkSystemsHandler, is_biz_process = False)
-    self.handle('sub_processes', LinkSystemsHandler, association = 'sub_systems',
-                is_biz_process = True)
+    self.handle('sub_systems', LinkRelationshipsHandler, model_class = System,
+        direction = 'from')
+    self.handle('sub_processes', LinkRelationshipsHandler, model_class = Process,
+        direction = 'from')
     self.handle_option('network_zone')
-    id_str = "org_group_is_responsible_for_{}".format("process" if self.options.get('is_biz_process') else "system")
+    id_str = "org_group_is_responsible_for_{}".format(
+        "process" if self.options.get('is_biz_process') else "system")
     self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
                 relationship_type_id = id_str, direction = 'from', model_human_name = 'Org Group')
     self.handle_date('start_date')
