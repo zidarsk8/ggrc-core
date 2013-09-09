@@ -1,7 +1,6 @@
 from .common import *
 from ggrc.models.all_models import *
 from ggrc.models.exceptions import ValidationError
-EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
 def unpack_list(vals):
   result = []
@@ -227,7 +226,7 @@ class ColumnHandler(object):
     if content or content == '':
       data = self.parse_item(content)
       self.validate(data)
-      if data:
+      if data is not None:
         self.value = data
         self.set_attr(data)
       return data
@@ -251,7 +250,7 @@ class TextOrHtmlColumnHandler(ColumnHandler):
     is_email = self.options.get('is_email')
     if is_email and value == '':
       self.add_error("A valid email address is required.")
-    elif is_email and not re.match(EMAIL_REGEX, value):
+    elif is_email and not re.match(Person.EMAIL_RE_STRING, value):
       self.add_error("{} is not a valid email. \
                   Please use following format: janedoe@example.com".format(value))
 
@@ -611,7 +610,7 @@ class LinkPeopleHandler(LinksHandler):
       data = { 'email' : value }
 
     if data:
-      if data.get('email') and not re.match(EMAIL_REGEX, data['email']):
+      if data.get('email') and not re.match(Person.EMAIL_RE_STRING, data['email']):
         self.add_link_warning("This email address is invalid and will not be mapped")
       else:
         return data

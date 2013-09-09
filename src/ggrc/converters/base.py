@@ -173,7 +173,7 @@ class BaseConverter(object):
 
   def do_import(self, dry_run = True):
     self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers = ['title'])
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
       row = self.row_converter(self, row_attrs, index)
