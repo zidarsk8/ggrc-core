@@ -38,6 +38,7 @@ UNIQUE_CONSTRAINTS = [('relationships', ['source_id', 'source_type', 'destinatio
                       ('object_objectives', ['objective_id', 'objectiveable_id', 'objectiveable_type']),
                       ('object_people', ['person_id', 'personable_id', 'personable_type']),
                       ('object_sections', ['section_id', 'sectionable_id', 'sectionable_type']),
+                      ('program_controls', ['program_id', 'control_id']),
 ]
 
 EXPLICIT_INDEXES = [('object_controls', 'control_id', 'controls', 'object_controls_ibfk_2'),
@@ -45,6 +46,8 @@ EXPLICIT_INDEXES = [('object_controls', 'control_id', 'controls', 'object_contro
                     ('object_objectives', 'objective_id', 'objectives', 'object_objectives_ibfk_2'),
                     ('object_people', 'person_id', 'people', 'object_people_ibfk_1'),
                     ('object_sections', 'section_id', 'sections', 'object_sections_ibfk_2'),
+                    ('program_controls', 'program_id', 'programs', 'fk_program_controls_program'),
+                    ('program_controls', 'control_id', 'controls', 'fk_program_controls_control'),
 ]
 
 def delete_duplicate_rows(table, columns):
