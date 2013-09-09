@@ -30,9 +30,13 @@ can.Control("CMS.Controllers.Dashboard", {
       this.update_inner_nav();
       if (!this.add_widget_controller)
         this.init_add_widget();
+
+      // Before initializing widgets, hide the container to not show
+      // loading state of multiple widgets before reducing to one.
+      this.hide_widget_area();
+      this.init_default_widgets();
       if (!this.widget_area_controller)
         this.init_widget_area();
-      this.init_default_widgets();
     }
 
   , init_page_title: function() {
@@ -128,6 +132,14 @@ can.Control("CMS.Controllers.Dashboard", {
       });
     }
 
+  , hide_widget_area: function() {
+      this.get_active_widget_containers().hide();
+    }
+
+  , show_widget_area: function() {
+      this.get_active_widget_containers().show();
+    }
+
   , " widgets_updated" : "update_inner_nav"
 
   , " inner_nav_sort_updated": function(el, ev, widget_ids) {
@@ -138,7 +150,7 @@ can.Control("CMS.Controllers.Dashboard", {
       var that = this
         ;
 
-      can.each(this.get_active_widget_container_elements(), function(elem) {
+      can.each(this.get_active_widget_containers().toArray(), function(elem) {
         $(elem).trigger("apply_widget_sort", [widget_ids])
       });
 
@@ -150,8 +162,8 @@ can.Control("CMS.Controllers.Dashboard", {
         this.get_active_widget_elements());
     }
 
-  , get_active_widget_container_elements: function() {
-      return this.element.find(".widget-area").toArray();
+  , get_active_widget_containers: function() {
+      return this.element.find(".widget-area");
     }
 
   , get_active_widget_elements: function() {
@@ -189,7 +201,7 @@ can.Control("CMS.Controllers.Dashboard", {
 
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
-      var $container = $(this.get_active_widget_container_elements()[0])
+      var $container = this.get_active_widget_containers().eq(0)
         , $last_widget = $container.find('section.widget').last()
         ;
 
@@ -228,7 +240,7 @@ can.Control("CMS.Controllers.Dashboard", {
         content_controller_selector: "ul",
         widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: descriptor.model.table_singular,
-        widget_name: function() {
+        widget_name: descriptor.widget_name || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
@@ -236,7 +248,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : function() {
+        widget_info : descriptor.widget_info || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return ""
@@ -254,7 +266,7 @@ can.Control("CMS.Controllers.Dashboard", {
         content_controller: GGRC.Controllers.ListView,
         content_controller_options: descriptor,
         widget_id: descriptor.model.table_singular,
-        widget_name: function() {
+        widget_name: descriptor.widget_name || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
@@ -262,7 +274,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : function() {
+        widget_info : descriptor.widget_info || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return ""
@@ -340,6 +352,7 @@ can.Control("CMS.Controllers.InnerNav", {
       internav_view : "/static/mustache/dashboard/internav_list.mustache"
     , widget_list : null
     , spinners : {}
+    , contexts : null
   }
 }, {
     init: function(options) {
@@ -355,6 +368,11 @@ can.Control("CMS.Controllers.InnerNav", {
         that.element.append(frag);
         that.update_scrollspy();
       });
+
+      if (!(this.options.contexts instanceof can.Observe))
+        this.options.contexts = new can.Observe(this.options.contexts);
+
+      this.on();
     }
 
   , sortable: function() {
@@ -406,7 +424,25 @@ can.Control("CMS.Controllers.InnerNav", {
           });
       });
       this.options.widget_list.replace(widget_list);
+      if(!this.options.contexts.active_widget) {
+        this.options.contexts.attr("active_widget", widget_list[0]);
+      }
     }
+
+  , "{contexts} active_widget" : function(contexts, ev) {
+    this.options.dashboard_controller.show_widget_area();
+    $(this.options.contexts.active_widget.selector).show().siblings().hide();
+  }
+
+  , "a click" : function(el, ev) {
+    var that = this;
+    can.each(this.options.widget_list, function(widget) {
+      if(widget.selector === el.attr("href")) {
+        that.options.contexts.attr("active_widget", widget);
+        return false;
+      }
+    });
+  }
 
   , "{document.body} loading" : function(body, ev) {
     var that = this;
@@ -430,17 +466,17 @@ can.Control("CMS.Controllers.InnerNav", {
     });
   }
 
-  , update_scrollspy : function(init) {
-      var $body = $(".object-area")
-        , top = $body.scrollTop()
+  , update_scrollspy : function() {
+      var $area = $(".object-area")
+        , top = $area.scrollTop()
         ;
 
       // Some pages may not have scrollspy set up (e.g., dashboard)
-      if (!$body.data("scrollspy"))
+      if (!$area.data("scrollspy"))
         return
 
-      $body.data('scrollspy').activeTarget = null;
-      $body
+      $area.data('scrollspy').activeTarget = null;
+      $area
         .scrollspy('refresh')
         .scrollspy('process');
     }

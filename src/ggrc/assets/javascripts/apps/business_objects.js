@@ -61,6 +61,18 @@ $(function() {
                   widget_icon: 'grcicon-link'
               }
           }
+          , Contract : {
+            Section : {
+              widget_name : function() {
+                var $objectArea = $(".object-area");
+                if ( $objectArea.hasClass("dashboard-area") ) {
+                  return "Clauses";
+                } else {
+                  return "Mapped Clauses";
+                }
+              }
+            }
+          }
       }
     // Prevent widget creation with <model_name>: false
     // e.g. to prevent ever creating People widget:

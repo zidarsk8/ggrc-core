@@ -42,15 +42,15 @@
           </div>
 
           <div class="span6">
-          {{#is_allowed 'join_delete' instance}}
           {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               {{unmap_or_delete instance mappings}}
             </a>
+          {{/is_allowed_all}}
           {{/if}}
-          {{/is_allowed}}
           </div>
 
         </div>
@@ -114,14 +114,13 @@
   </li>
 {{/list}}
 
-{{#is_allowed 'create' 'update' 'delete' model.shortName}}
 {{#if allow_mapping_or_creating}}
+{{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
+{{#if allow_creating}}
+{{#is_allowed 'create' model.shortName}}
 <li class="tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
-
-      {{#if allow_mapping}}
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
       <a href="javascript://" class="section-add">
         + {{model.title_singular}}
       </a>
@@ -129,7 +128,31 @@
         <i class="grcicon-add-black"></i>
         Create {{model.title_singular}}
       </a>
-      {{else}}
+      &nbsp;
+      &nbsp;
+      <a href="{{parent_instance.viewLink}}/import_controls" class="section-import">
+        <i class="grcicon-imp-exp"></i>
+        Import Controls
+      </a>
+      &nbsp;
+      &nbsp;
+      <a href="{{parent_instance.viewLink}}/export_controls" class="section-import">
+        <i class="grcicon-imp-exp"></i>
+        Export Controls
+      </a>
+    </div>
+  </div>
+</li>
+{{/is_allowed}}
+{{/if}}
+
+{{else}}
+
+{{#if allow_mapping}}
+{{#is_allowed_to_map parent_instance model.shortName}}
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
       <a
         href="javascript://"
         rel="tooltip"
@@ -141,88 +164,10 @@
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
         + {{model.title_singular}}
       </a>
-      {{/if_match}}
-      {{/if}}
-
-      {{#if null}}
-      {{#if_equals parent_instance.constructor.shortName "Section"}}
-        <a
-          href="javascript://"
-          rel="tooltip"
-          data-placement="left"
-          data-toggle="modal-selector"
-          data-modal-selector-options="section_controls"
-          data-modal-class="modal-wide"
-          data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.constructor.shortName}}">
-          + {{model.title_singular}}
-        </a>
-      {{else}}
-      {{#if_match parent_instance.constructor.shortName '^(System|Process)$'}}
-        <a
-          href="javascript://"
-          rel="tooltip"
-          data-placement="left"
-          data-toggle="modal-selector"
-          data-modal-selector-options="system_controls"
-          data-modal-class="modal-wide"
-          data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.constructor.shortName}}">
-          + {{model.title_singular}}
-        </a>
-      {{else}}
-      {{#if_equals parent_instance.constructor.shortName "Program"}}
-        <a
-          href="javascript://"
-          rel="tooltip"
-          data-placement="left"
-          data-toggle="modal-selector"
-          data-modal-selector-options="program_controls"
-          data-modal-class="modal-wide"
-          data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.constructor.shortName}}">
-          + {{model.title_singular}}
-        </a>
-      {{else}}
-        <a
-          href="javascript://"
-          class="section-create"
-          rel="tooltip"
-          data-placement="left"
-          data-toggle="modal-selector-dispatch"
-          data-modal-class="modal-wide"
-          data-original-title="Map {{model.title_singular}} to this {{parent_instance.constructor.shortName}}"
-          data-join-option-type="{{model.shortName}}"
-          data-join-object-id="{{parent_instance.id}}"
-          data-join-object-type="{{parent_instance.constructor.shortName}}">
-          + {{model.title_singular}}
-        </a>
-      {{/if_equals}}
-      {{/if_match}}
-      {{/if_equals}}
-      {{/if}}
-
-      {{#if allow_creating}}
-      {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-        &nbsp;
-        &nbsp;
-        <a href="{{parent_instance.viewLink}}/import_controls" class="section-import">
-          <i class="grcicon-imp-exp"></i>
-          Import Controls
-        </a>
-        &nbsp;
-        &nbsp;
-        <a href="{{parent_instance.viewLink}}/export_controls" class="section-import">
-          <i class="grcicon-imp-exp"></i>
-          Export Controls
-        </a>
-      {{/if_match}}
-      {{/if}}
     </div>
   </div>
 </li>
+{{/is_allowed_to_map}}
 {{/if}}
-{{/is_allowed}}
+{{/if_match}}
+{{/if}}

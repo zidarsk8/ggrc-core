@@ -5,21 +5,22 @@ from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
+from ggrc.services.common import get_cache
 
-def get_objects_for_indexing(session):
-  return (list(session.new), list(session.dirty), list(session.deleted))
+def get_modified_objects(session):
+  session.flush()
+  cache = get_cache()
+  if cache:
+    return cache.copy()
 
-def update_index_for_objects(session, created, updated, deleted):
+def update_index_for_objects(session, cache):
   indexer = get_indexer()
-  if created:
-    for obj in created:
-      indexer.create_record(fts_record_for(obj), commit=False)
-  if updated:
-    for obj in updated:
-      indexer.update_record(fts_record_for(obj), commit=False)
-  if deleted:
-    for obj in deleted:
-      indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+  for obj in cache.new:
+    indexer.create_record(fts_record_for(obj), commit=False)
+  for obj in cache.dirty:
+    indexer.update_record(fts_record_for(obj), commit=False)
+  for obj in cache.deleted:
+    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
   session.commit()
 
 class BaseConverter(object):
@@ -95,7 +96,12 @@ class BaseConverter(object):
     if len(self.rows) < 6:
       self.errors.append("Could not import: verify the file is correctly formatted.")
       raise ImportException("Could not import: verify the file is correctly formatted.")
-    headers = self.read_headers(self.metadata_map, self.rows.pop(0))
+
+    optional_metadata = []
+    if hasattr(self, 'optional_metadata'):
+      optional_metadata = self.optional_metadata
+
+    headers = self.read_headers(self.metadata_map, self.rows.pop(0), optional_headers = optional_metadata)
     values = self.read_values(headers, self.rows.pop(0))
     self.import_slug = values.get('slug')
     self.rows.pop(0)
@@ -119,7 +125,7 @@ class BaseConverter(object):
   def get_header_for_metadata_column(self, column_name):
     return self.get_header_for_column(self.metadata_map, column_name)
 
-  def read_headers(self, import_map, row, required_headers = []):
+  def read_headers(self, import_map, row, required_headers = [], optional_headers = []):
     ignored_colums = []
     self.trim_list(row)
     keys = []
@@ -142,7 +148,7 @@ class BaseConverter(object):
     missing_columns = import_map.values()
     [missing_columns.remove(element) for element in keys if element]
 
-    optional_headers = ['created_at', 'updated_at']
+    optional_headers.extend(['created_at', 'updated_at'])
     missing_columns = [column for column in missing_columns if not (column in optional_headers)]
 
     for header in required_headers:
@@ -182,10 +188,10 @@ class BaseConverter(object):
   def save_import(self):
     for row_converter in self.objects:
       row_converter.save(db.session, **self.options)
-    objects_for_indexing = get_objects_for_indexing(db.session)
+    modified_objects = get_modified_objects(db.session)
     log_event(db.session)
     db.session.commit()
-    update_index_for_objects(db.session, *objects_for_indexing)
+    update_index_for_objects(db.session, modified_objects)
 
   def read_objects(self, headers, rows):
     attrs_collection = []
@@ -220,7 +226,7 @@ class BaseConverter(object):
       row = self.row_converter(self, obj, i, export = True)
       row.setup()
       row.reify()
-      if row:
+      if row and any(row.attrs.values()):
         self.rows.append(row.attrs)
     row_header_map = self.object_map
     for row in self.rows:

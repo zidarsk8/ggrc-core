@@ -7,7 +7,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{firstexist name email}}
+                {{firstnonempty name email}}
               </div>
             </div>
           </div>
@@ -23,7 +23,8 @@
     </li>
   {{/list}}
   <li class="tree-item tree-item-add">
-    <a href="javascript://">
+
+    <a class="btn-add" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
       + Person
     </a>
   </li>

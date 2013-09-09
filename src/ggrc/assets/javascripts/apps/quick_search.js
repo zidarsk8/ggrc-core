@@ -348,7 +348,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ObjectSection", "sectionable", "section"]
       , ["Control", "Program", "ProgramControl", "program", "control"]
       , ["Program", "Control", "ProgramControl", "control", "program"]
-      , ["Control", "Section", "ControlSection", "section", "control"]
+      // , ["Control", "Section", "ControlSection", "section", "control"]
       , ["Section", "Control", "ControlSection", "control", "section"]
       , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
       , ["Objective", "Control", "ObjectiveControl", "control", "objective"]

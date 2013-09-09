@@ -33,6 +33,9 @@ class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
+  optional_metadata = ['title', 'description', 'start_date', 'end_date', 'kind',
+      'audit_start_date', 'audit_frequency', 'audit_duration', 'version']
+
   metadata_map = OrderedDict([
     ('Type','type'),
     ('Directive Code','slug'),

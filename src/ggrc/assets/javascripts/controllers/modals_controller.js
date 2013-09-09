@@ -181,9 +181,11 @@ can.Control("GGRC.Controllers.Modals", {
             name.pop(); //set the owner to null, not the email
             value = null;
           } else {
-            this.bindXHRToButton($.when(
+            // Search for the person
+            this._email_check = $.when(
                 CMS.Models.Person.findInCacheByEmail(value) || CMS.Models.Person.findAll({email : value})
               ).done(function(data) {
+                delete that._email_check;
                 if(data.length != null)
                   data = data[0];
 
@@ -191,12 +193,16 @@ can.Control("GGRC.Controllers.Modals", {
                   value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
                   instance.attr(name[0], value);
                 } else {
-                  that.element.trigger("ajax:flash", { warning : "user " + value + " not found"});
+                  that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
                   $elem.val($elem.attr("value"));
                 }
-              }), this.options.$footer.find("a.btn[data-toggle='modal-submit']")
-            );
-            return; //don't update the existing owner email if there is one.
+              });
+
+            // If this is already resolved (cached), there wasn't really an XHR to bind to
+            if (this._email_check.state() !== "resolved") {
+              that.bindXHRToButton(that._email_check, that.options.$footer.find("a.btn[data-toggle='modal-submit']"), undefined, false);
+              return; //don't update the existing owner email if there is one.
+            }
           }
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
@@ -206,19 +212,35 @@ can.Control("GGRC.Controllers.Modals", {
     instance.attr(name[0], value && value.serialize ? value.serialize() : value);
   }
 
-  , "{$footer} a.btn[data-toggle='modal-submit']:not(.disabled) click" : function(el, ev) {
-    var instance = this.options.instance
-    , that = this
-    , ajd;
+  , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
+    var that = this;
 
-    this.serialize_form();
+    // Queue a save if clicked after verifying the email address
+    if (this._email_check) {
+      this._email_check.done(function(data) {
+        if (data.length != null)
+          data = data[0];
+        if (data) {
+          setTimeout(function() {
+            el.trigger('click');
+          }, 0);
+        }
+      });
+    }
+    // Normal saving process
+    else if (el.is(':not(.disabled)')) {
+      var instance = this.options.instance
+      , ajd;
 
-    ajd = instance.save().done(function(obj) {
-      that.element.trigger("modal:success", obj).modal_form("hide");
-    }).fail(function(xhr, status) {
-      el.trigger("ajax:flash", { error : xhr.responseText });
-    });
-    this.bindXHRToButton(ajd, el, "Saving, please wait...");
+      this.serialize_form();
+
+      ajd = instance.save().done(function(obj) {
+        that.element.trigger("modal:success", obj).modal_form("hide");
+      }).fail(function(xhr, status) {
+        el.trigger("ajax:flash", { error : xhr.responseText });
+      });
+      this.bindXHRToButton(ajd, el, "Saving, please wait...");
+    }
   }
 
   , " ajax:flash" : function(el, ev, mesg) {
