@@ -213,14 +213,6 @@ var admin_list_descriptors = {
     , object_display : "Events"
     , list_view : "/static/mustache/events/object_list.mustache"
   }
-  /*, "system_process" : {
-    model : CMS.Models.System
-    , object_type : "system_process"
-    , object_category : "business"
-    , object_route : "systems"
-    , object_display : "Systems/Processes"
-    , widget_view : "/static/mustache/systems/object_widget.mustache"
-  }*/
 };
 
 var admin_widget_descriptors = {
