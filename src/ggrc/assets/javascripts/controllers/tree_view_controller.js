@@ -236,21 +236,33 @@ can.Control("CMS.Controllers.TreeView", {
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this;
     can.each(newVals, function(newVal) {
-      that.element.trigger("newChild", newVal);
+      var _newVal = newVal.instance ? newVal.instance : newVal;
+      if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
+        that.element.trigger("newChild", newVal);
+      } 
     });
+    delete that.oldList;
     can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
-    // can.each(oldVals, function(oldVal) {
-    //   for(var i = that.options.list.length - 1; i >= 0; i--) {
-    //     if(that.options.list[i].instance === oldVal) {
-    //       that.options.list.splice(i, 1);
-    //     }
-    //   }
-    // });
-    can.each(oldVals, function(v) {
-      that.element.trigger("removeChild", v);
+
+    //assume we are doing a replace
+    this.oldList = can.map(oldVals, function(v) { return v.instance ? v.instance : v; });
+    GGRC.queue_event(function() {
+      if(that.oldList) {
+        can.each(oldVals, function(v) {
+          that.element.trigger("removeChild", v);
+        });
+      } else {
+        list = can.map(list, function(l) { return l.instance || l});
+        can.each(oldVals, function(v) {
+          var _v = v.instance || v;
+          if(!~can.inArray(_v, list)) {
+            that.element.trigger("removeChild", v);
+          }
+        });
+      }
     });
     //this.options.list.splice(index, oldVals.length);
     can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
