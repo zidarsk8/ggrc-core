@@ -240,7 +240,7 @@ can.Control("CMS.Controllers.Dashboard", {
         content_controller_selector: "ul",
         widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
         widget_id: descriptor.model.table_singular,
-        widget_name: function() {
+        widget_name: descriptor.widget_name || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
@@ -248,7 +248,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : function() {
+        widget_info : descriptor.widget_info || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return ""
@@ -266,7 +266,7 @@ can.Control("CMS.Controllers.Dashboard", {
         content_controller: GGRC.Controllers.ListView,
         content_controller_options: descriptor,
         widget_id: descriptor.model.table_singular,
-        widget_name: function() {
+        widget_name: descriptor.widget_name || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
@@ -274,7 +274,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : function() {
+        widget_info : descriptor.widget_info || function() {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return ""

@@ -40,20 +40,27 @@
           %a{ 'href': "/processes/export" }
             %i.grcicon-process-color
             %span Export Processes
-        -#%li.divider
+        %li.divider
+        %li.title
+          People
+        %li
+          %a{ 'href': "/admin/import_people" }
+            %i.grcicon-user-black
+            %span Import People
+        %li
+          %a{ 'href': "/admin/export_people" }
+            %i.grcicon-user-black
+            %span Export People
+
         -#%li.title
-          Risks
+          risks
         -#%li
           %a{ 'href': "/risks/import" }
             %i.grcicon-risk-color
-            %span Import Risks
+            %span import risks
         -#%li
           %a{ "data-toggle": "modal-ajax", 'href': "/risks/export.html" }
             %i.grcicon-risk-color
-            %span Export Risks
+            %span export risks
 
 -block widget_area
-  -with widget_class = 'widget-tabs'
-    -include 'admin/_people.haml'
-    -include 'admin/_roles.haml'
-    -include 'admin/_events.haml'

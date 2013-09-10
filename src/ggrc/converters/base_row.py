@@ -1,6 +1,7 @@
 from .common import *
-#FIXME: Remove import of all model classes while we import
 from ggrc.models.all_models import *
+from ggrc.models.exceptions import ValidationError
+EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
 def unpack_list(vals):
   result = []
@@ -78,13 +79,6 @@ class BaseRowConverter(object):
   def has_warnings(self):
     return any(self.warnings) or any([val.has_warnings() for val in self.handlers.values()])
 
-  def setup(self):
-    pass
-
-  #TODO: changed_attributes on rails side needs to be converted
-  def changed_attributes(self):
-    pass
-
   def __getitem__(self, key):
     # Return generic handler if requested one is unavailable
     return self.handlers.get(key, ColumnHandler(self,''))
@@ -97,7 +91,8 @@ class BaseRowConverter(object):
       self.setup_object()
 
   def setup_export(self):
-    self.attrs['slug'] = self.obj.slug
+    if hasattr(self.obj, 'slug'):
+      self.attrs['slug'] = self.obj.slug
     self.options['export'] = True
 
   def clean_attrs(self):
@@ -167,9 +162,11 @@ class BaseRowConverter(object):
       target_class = self.model_class
     return target_class.query.filter_by(slug=slug).first()
 
-
   def set_attr(self, name, value):
-    setattr(self.obj, name, value)
+    try:
+      setattr(self.obj, name, value)
+    except ValidationError as e: # Validation taken care of in handlers
+      pass
 
   def get_attr(self, name):
     return getattr(self.obj, name, '') or ''
@@ -227,10 +224,10 @@ class ColumnHandler(object):
       return self.go_import(content)
 
   def go_import(self, content):
-    if content:
+    if content or content == '':
       data = self.parse_item(content)
       self.validate(data)
-      if data is not None:
+      if data:
         self.value = data
         self.set_attr(data)
       return data
@@ -250,6 +247,14 @@ class TextOrHtmlColumnHandler(ColumnHandler):
       if not isinstance(value, unicode):
         value = value.encode('utf-8')
         value = unicode(value, 'utf-8')
+
+    is_email = self.options.get('is_email')
+    if is_email and value == '':
+      self.add_error("A valid email address is required.")
+    elif is_email and not re.match(EMAIL_REGEX, value):
+      self.add_error("{} is not a valid email. \
+                  Please use following format: janedoe@example.com".format(value))
+
     return value or ''
 
 class SlugColumnHandler(ColumnHandler):
@@ -592,7 +597,6 @@ class LinkPeopleHandler(LinksHandler):
   from ggrc.models.all_models import ObjectPerson
   model_class = Person
   import re
-  EMAIL_REGEX = r"[^@]+@[^@]+\.[^@]+"
 
   def parse_item(self, value):
     data = {}
@@ -607,7 +611,7 @@ class LinkPeopleHandler(LinksHandler):
       data = { 'email' : value }
 
     if data:
-      if data.get('email') and not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
+      if data.get('email') and not re.match(EMAIL_REGEX, data['email']):
         self.add_link_warning("This email address is invalid and will not be mapped")
       else:
         return data

@@ -177,7 +177,7 @@ class ContextRBAC(object):
         db.Column(db.Integer, db.ForeignKey('contexts.id')), cls.__name__)
 
   @declared_attr
-  def context(self):
+  def context(cls):
     return db.relationship('Context', uselist=False)
 
   _publish_attrs = ['context']
@@ -263,7 +263,7 @@ class BusinessObject(Slugged, Described, Hyperlinked):
     return deferred(
         db.Column(db.Integer, db.ForeignKey('people.id')), cls.__name__)
   @declared_attr
-  def owner(self):
+  def owner(cls):
     return db.relationship('Person', uselist=False)
 
   _publish_attrs = ['owner']

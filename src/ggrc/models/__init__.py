@@ -1,4 +1,3 @@
-
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
@@ -59,6 +58,25 @@ def drop_db(use_migrations=False, quiet=False):
 def init_app(app):
   from .all_models import all_models
   [model._inflector for model in all_models]
+
+  from sqlalchemy.orm.session import Session
+  from sqlalchemy import event
+  from .cache import Cache
+  from ggrc.services.common import get_cache
+
+  def update_cache(session, flush_context):
+    cache = get_cache(create = True)
+    if cache:
+      cache.update(session)
+
+  def clear_cache(session):
+    cache = get_cache()
+    if cache:
+      cache.clear()
+
+  event.listen(Session, 'after_flush', update_cache)
+  event.listen(Session, 'after_commit', clear_cache)
+  event.listen(Session, 'after_rollback', clear_cache)
 
   # Register event listener on all String and Text attributes to sanitize them.
   import bleach

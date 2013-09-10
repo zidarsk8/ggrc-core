@@ -1,0 +1,20 @@
+-extends "layouts/dashboard.haml"
+
+-block title
+  Import/Export
+
+-block page_help
+  dashboard
+
+-block header
+  %h1.business
+    .grcobject.business
+      %i.grcicon-imp-exp-white
+    Import {{import_kind}}
+
+-block main
+  .clearfix
+    .object-area.import-area
+      .column-set
+        .widget-area
+          -include 'people/_import.haml'

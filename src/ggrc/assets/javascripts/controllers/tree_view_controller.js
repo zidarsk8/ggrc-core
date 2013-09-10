@@ -198,10 +198,30 @@ can.Control("CMS.Controllers.TreeView", {
     });
     refresh_queue.trigger().then(function() {
       can.Observe.stopBatch();
-
       that.add_child_lists(that.options.attr("list")); //since the view is handling adding new controllers now, configure before rendering.
       GGRC.queue_event(function() {
-        that.element && that.element.trigger("updateCount", that.options.list.length).trigger("loaded").find(".spinner").remove();
+        function when_attached_to_dom(cb) {
+          // Trigger the "more" toggle if the height is the same as the scrollable area
+          !function poll() {
+            if (!that.element) {
+              return;
+            } else if (that.element.closest(document.documentElement).length) {
+              cb();
+            }
+            else {
+              setTimeout(poll, 100);
+            }
+          }();
+        }
+
+        if (that.element) {
+          when_attached_to_dom(function() {
+            that.element.trigger("updateCount", that.options.list.length)
+            .trigger("loaded")
+            .trigger("subtree_loaded")
+            .find(".spinner").remove();
+          });
+        }
       });
 
       if(that.options.footer_view) {
@@ -245,7 +265,7 @@ can.Control("CMS.Controllers.TreeView", {
   //   this.options.list[index].attr("instance", newVal);
   // }
 
-  , ".tree-structure loaded" : function(el, ev) {
+  , ".tree-structure subtree_loaded" : function(el, ev) {
     ev.stopPropagation();
     var instance_id = el.closest(".tree-item").data("object-id");
     var parent = can.reduce(this.options.list, function(a, b) {
