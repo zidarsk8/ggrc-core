@@ -19,7 +19,7 @@ var COLLAPSE = "collapse"
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
-  , version : 20130903
+  , version : 20130909
 
   , findAll : function() {
     var that = this;

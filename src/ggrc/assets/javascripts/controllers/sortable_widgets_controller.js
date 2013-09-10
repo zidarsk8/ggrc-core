@@ -15,6 +15,7 @@
    , "regulation_widget"
    , "contract_widget"
    , "policy_widget"
+   , "section_widget"
    , "objective_widget"
    , "control_widget"
    , "system_widget"
