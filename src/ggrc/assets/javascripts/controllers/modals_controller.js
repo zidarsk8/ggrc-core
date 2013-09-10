@@ -185,7 +185,6 @@ can.Control("GGRC.Controllers.Modals", {
             this._email_check = $.when(
                 CMS.Models.Person.findInCacheByEmail(value) || CMS.Models.Person.findAll({email : value})
               ).done(function(data) {
-                delete that._email_check;
                 if(data.length != null)
                   data = data[0];
 
@@ -215,20 +214,8 @@ can.Control("GGRC.Controllers.Modals", {
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
     var that = this;
 
-    // Queue a save if clicked after verifying the email address
-    if (this._email_check) {
-      this._email_check.done(function(data) {
-        if (data.length != null)
-          data = data[0];
-        if (data) {
-          setTimeout(function() {
-            el.trigger('click');
-          }, 0);
-        }
-      });
-    }
     // Normal saving process
-    else if (el.is(':not(.disabled)')) {
+    if (el.is(':not(.disabled)')) {
       var instance = this.options.instance
       , ajd;
 
@@ -240,6 +227,19 @@ can.Control("GGRC.Controllers.Modals", {
         el.trigger("ajax:flash", { error : xhr.responseText });
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");
+    }
+    // Queue a save if clicked after verifying the email address
+    else if (this._email_check) {
+      this._email_check.done(function(data) {
+        if (data.length != null)
+          data = data[0];
+        if (data) {
+          setTimeout(function() {
+            delete that._email_check;
+            el.trigger('click');
+          }, 0);
+        }
+      });
     }
   }
 
