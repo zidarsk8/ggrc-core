@@ -119,6 +119,21 @@ def upgrade():
     for table, columns in UNIQUE_CONSTRAINTS:
         op.create_unique_constraint('uq_' + table, table, columns)
 
+    op.create_table('directive_controls',
+      sa.Column('id', sa.Integer(), nullable=False),
+      sa.Column('modified_by_id', sa.Integer(), nullable=True),
+      sa.Column('created_at', sa.DateTime(), nullable=True),
+      sa.Column('updated_at', sa.DateTime(), nullable=True),
+      sa.Column('directive_id', sa.Integer(), nullable=False),
+      sa.Column('control_id', sa.Integer(), nullable=False),
+      sa.Column('context_id', sa.Integer(), nullable=True),
+      sa.PrimaryKeyConstraint('id')
+    )
+    for column, referred_table in [('directive_id', 'directives'), ('control_id', 'controls'), ('context_id', 'contexts')]:
+      op.create_index('ix_' + column, 'directive_controls', [column])
+      op.create_foreign_key('fk_' + column, 'directive_controls', referred_table, [column], ['id'])
+    op.create_unique_constraint('uq_directive_controls', 'directive_controls', ['directive_id', 'control_id'])
+
 
 def downgrade():
     for table, columns in UNIQUE_CONSTRAINTS:
@@ -127,3 +142,4 @@ def downgrade():
         drop_explicit_index(table, column, referred_table, constraint_name) 
     for table, column, existing_type in NOT_NULL_COLS:
         op.alter_column(table, column, nullable=True, existing_type = existing_type)
+    op.drop_table('directive_controls')

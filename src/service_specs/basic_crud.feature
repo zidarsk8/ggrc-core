@@ -20,6 +20,7 @@ Feature: Basic RESTful CRUD Support
       | Cycle              |
       | DataAsset          |
       #| Directive          |
+      | DirectiveControl   |
       | Contract           |
       | Policy             |
       | Regulation         |

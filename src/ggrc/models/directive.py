@@ -30,6 +30,11 @@ class Directive(Timeboxed, BusinessObject, db.Model):
   sections = db.relationship(
       'Section', backref='directive', order_by='Section.slug', cascade='all, delete-orphan')
   controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')
+  directive_controls = db.relationship(
+      'DirectiveControl', backref='directive', cascade='all, delete-orphan')
+  # Not needed for the client at this time
+  #mapped_controls = association_proxy(
+  #    'directive_controls', 'control', 'DirectiveControl')
   program_directives = db.relationship('ProgramDirective', backref='directive', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_directives', 'program', 'ProgramDirective')
