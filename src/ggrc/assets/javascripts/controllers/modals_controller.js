@@ -89,14 +89,16 @@ can.Control("GGRC.Controllers.Modals", {
           queue.trigger().then(function(people) {
             response(can.map(people, function(person) { 
               return {
-                label: person.name ? person.name + " (" + person.email + ")" : person.email,
+                label: person.name ? person.name + " <span class=\"url-link\">" + person.email + "</span>" : person.email,
                 value: person.email
               }; 
             }));
           });
         });
       }
-    });
+    }).data('ui-autocomplete')._renderItem = function(ul, item) {
+      return $('<li>').append('<a>' + item.label + '</a>').appendTo(ul);
+    };
   }
 
   , fetch_templates : function(dfd) {

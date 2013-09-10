@@ -356,6 +356,13 @@ select.input-block-level {
   max-height: 7 * $baseFontSize * 1.5;
   overflow-y: auto;
   overflow-x: hidden;
+  li a {
+    color:$business;
+    .url-link {
+      color:#777;
+      font-size:11px;
+    } 
+  }
 }
 
 // always visible tip
