@@ -322,9 +322,11 @@ can.Control("CMS.Controllers.TreeView", {
       , instance
       , options = new can.Observe.TreeOptions();
 
-    var model = data instanceof this.options.model
+    var model = data.instance
+    ? data.instance
+    : (data instanceof this.options.model
       ? data
-      : new this.options.model(data.serialize ? data.serialize() : data);
+      : new this.options.model(data.serialize ? data.serialize() : data));
     that.options.list.replace(
       can.map(
         this.options.list
@@ -396,7 +398,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     } else {
       if (typeof(opts.model) === "string")
         opts.model = CMS.Models[opts.model];
-      this.options = new can.Observe(this.constructor.defaults)
+      this.options = new can.Observe.TreeOptions(this.constructor.defaults)
       //.attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {})
       .attr(opts);
     }
