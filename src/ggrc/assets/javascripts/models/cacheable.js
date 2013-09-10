@@ -320,6 +320,7 @@ can.Model("can.Model.Cacheable", {
     return m;
   }
   , tree_view_options : {}
+  , list_view_options : {}
   , risk_tree_options : {
     single_object : true
     , child_options : [{
@@ -434,15 +435,15 @@ can.Model("can.Model.Cacheable", {
        * as paging capability to retrieve the named pages provided in the
        * resposne.
        *
-       * findPage returns an object with two properties: models and paging.
-       * The models property will be an array of all model instances in the
-       * page retrieved for the collection. The paging property will be an
-       * object that can be used to retrieve other named pages from the
-       * collection.  The names of pages include first, prev, next, last. Named
-       * page properties will either be functions or the null value in the case
-       * where there is no link available in the collection under that name.
-       * Paging functions have the same type of return value as the findPage
-       * function.
+       * findPage returns an object with two properties:
+       * {this.options.model.root_collection}_collection and paging. The models
+       * property will be an array of all model instances in the page retrieved
+       * for the collection. The paging property will be an object that can be
+       * used to retrieve other named pages from the collection.  The names of
+       * pages include first, prev, next, last. Named page properties will
+       * either be functions or the null value in the case where there is no
+       * link available in the collection under that name.  Paging functions
+       * have the same type of return value as the findPage function.
        *
        * This method assumes that findAllSpec is a string like
        * "GET /api/programs". If this assumption is invalid, this function
@@ -462,10 +463,11 @@ can.Model("can.Model.Cacheable", {
           , data: data
         }, base_params)).then(function(response_data) {
             var collection = response_data[that.root_collection+"_collection"];
-            return {
-              models: that.models(collection[that.root_collection])
-              , paging: make_paginator(collection.paging)
+            var ret  = {
+              paging: make_paginator(collection.paging)
             };
+            ret[that.root_collection+"_collection"] = that.models(collection[that.root_collection]);
+            return ret;
           });
       };
 
@@ -484,6 +486,8 @@ can.Model("can.Model.Cacheable", {
           , prev: get_page("prev")
           , next: get_page("next")
           , last: get_page("last")
+          , has_next: function() { return this.next != null; }
+          , has_prev: function() { return this.prev != null; }
         };
       };
 

@@ -591,7 +591,7 @@ class Resource(ModelView):
     if page_number == 1 and len(items) < page_size:
       total = len(items)
     else:
-      total = query.order_by(None).count()
+      total = query.from_self().order_by(None).count()
     page = Pagination(query, page_number, page_size, total, items)
     return self.build_collection_for_json(
         page.items, model_plural, collection_name, paging=page)
