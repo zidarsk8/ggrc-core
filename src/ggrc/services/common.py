@@ -85,8 +85,8 @@ def log_event(session, obj = None):
     session.add(event)
 
 class ModelView(View):
-  DEFAULT_PAGE_SIZE = 7
-  MAX_PAGE_SIZE = 20
+  DEFAULT_PAGE_SIZE = 20
+  MAX_PAGE_SIZE = 100
   pk = 'id'
   pk_type = 'int'
 
