@@ -215,6 +215,11 @@ can.Control("CMS.Controllers.TreeView", {
 
         if (that.element) {
           when_attached_to_dom(function() {
+            if (that.element.children(".tree-item.cms_controllers_tree_view_node").length !== that.options.list.length) {
+              setTimeout(arguments.callee, 100);
+              return;
+            }
+
             that.element.trigger("updateCount", that.options.list.length)
             .trigger("loaded")
             .trigger("subtree_loaded")
