@@ -7,6 +7,7 @@
 
 # TODO: Implement with Authentication
 #from .account import Account
+from .audit import Audit
 from .categorization import Categorization
 from .category import Category
 from .context import Context
@@ -54,6 +55,7 @@ from .system_system import SystemSystem
 from .revision import Revision
 from .event import Event
 all_models = [
+  Audit,
   Categorization,
   Category,
   Context,

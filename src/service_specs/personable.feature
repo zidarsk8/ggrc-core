@@ -18,7 +18,7 @@ Feature: Some resources can be related to Person resources
   Examples:
       | personable_type |
       | Control         |
-      #| Audit           |
+      | Audit           |
       | DataAsset       |
       #| Directive       |
       | Contract        |

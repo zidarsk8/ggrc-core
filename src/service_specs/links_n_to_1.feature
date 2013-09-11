@@ -18,7 +18,7 @@ Feature: Many resources have links to other resources. This feature will
 
   Examples: n-ary Link Resources
     | parent_type       | child_type        | parent_property           | children_property                |
-    #| Program           | Audit             | program                   | audits                           |
+    | Program           | Audit             | program                   | audits                           |
     #| Response          | Meeting           | response                  | meetings                         |
     #| Document          | PopulationSample  | population_document       | population_worksheets_documented |
     #| Document          | PopulationSample  | sample_worksheet_document | sample_worksheets_documented     |

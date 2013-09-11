@@ -18,7 +18,6 @@ Feature: Some resources can be related to Document resources
   Examples:
       | documentable_type |
       | Control           |
-      #| Audit             |
       | DataAsset         |
       #| Directive         |
       | Contract          |
