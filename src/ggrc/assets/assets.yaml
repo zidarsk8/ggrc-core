@@ -36,6 +36,7 @@ dashboard-js-files:
   - tmpl.js
   - mustache_helper.js
   - models/mappers.js
+  - models/mappings.js
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js

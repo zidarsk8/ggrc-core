@@ -50,55 +50,32 @@ can.Model.Cacheable("CMS.Models.Section", {
     , url : ""
   }
 
-  , mappings: {
-      people_mappings: {
-          attr: "object_people"
-        , target_attr: "person"
-      }
-    , document_mappings: {
-          attr: "object_documents"
-        , target_attr: "document"
-      }
-    , business_object_mappings: {
-          attr: "object_sections"
-        , target_attr: "sectionable"
-      }
-    , control_mappings: {
-          attr: "control_sections"
-        , target_attr: "control"
-      }
-    , objective_mappings: {
-          attr: "section_objectives"
-        , target_attr: "objective"
-      }
-    }
-
   , tree_view_options : {
     list_view : "/static/mustache/sections/tree.mustache"
     , child_options : [{
         model : "Objective"
-      , property : "objective_mappings"
+      , mapping : "objectives"
       , list_view : "/static/mustache/objectives/tree.mustache"
       , draw_children : false
     }, {
         model : "Control"
-      , property : "control_mappings"
+      , mapping : "controls"
       , list_view : "/static/mustache/controls/tree.mustache"
       , draw_children : false
     //}, {
     //  model : CMS.Models.Section
-    //  , property : "children"
+    //  , mapping : "children"
     }, {
         model : "Document"
-      , property : "document_mappings"
+      , mapping : "documents"
       , list_view : "/static/mustache/documents/tree.mustache"
     }, {
         model : "Person"
-      , property : "people_mappings"
+      , mapping : "people"
       , list_view : "/static/mustache/people/tree.mustache"
     }, {
         model : can.Model.Cacheable
-      , property : "business_object_mappings"
+      , mapping : "related_objects"
       , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
@@ -204,13 +181,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     return this.map_object(p, section);
   }
 }, {
-
-  init : function() {
-    this._super.apply(this, arguments);
-    this._init_mappings();
-  }
-
-  , map_control : function(params) {
+  map_control : function(params) {
     return this.constructor.map_control(
       can.extend({}, params, { section : this })
       , this);

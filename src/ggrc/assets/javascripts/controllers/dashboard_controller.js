@@ -248,14 +248,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : descriptor.widget_info || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return ""
-          } else {
-            return "Does not include mappings to Directives, Objectives and Controls"
-          }
-        },
+        widget_info : descriptor.widget_info,
         widget_icon: descriptor.model.table_singular,
         object_category: descriptor.model.category || descriptor.object_category
       }
@@ -274,14 +267,7 @@ can.Control("CMS.Controllers.Dashboard", {
             return "Mapped " + descriptor.model.title_plural;
           }
         },
-        widget_info : descriptor.widget_info || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return ""
-          } else {
-            return "Does not include mappings to Directives, Objectives and Controls"
-          }
-        },
+        widget_info : descriptor.widget_info,
         widget_icon: descriptor.model.table_singular,
         object_category: descriptor.model.category || descriptor.object_category
       }

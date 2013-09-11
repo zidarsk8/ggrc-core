@@ -104,7 +104,10 @@ can.Control("CMS.Controllers.TreeView", {
           "id", this.options.parent ? this.options.parent.id : undefined);
       }
 
-      if (this.options.list_loader) {
+      if (this.options.mapping) {
+        this.find_all_deferred =
+          this.options.parent_instance.get_list_loader(this.options.mapping);
+      } else if (this.options.list_loader) {
         this.find_all_deferred =
           this.options.list_loader(this.options.parent_instance);
       } else {

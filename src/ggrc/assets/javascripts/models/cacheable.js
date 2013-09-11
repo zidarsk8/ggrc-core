@@ -135,8 +135,6 @@ can.Model("can.Model.Cacheable", {
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
     });
-
-    this.init_mappings();
   }
 
   , findInCacheById : function(id) {
@@ -252,7 +250,7 @@ can.Model("can.Model.Cacheable", {
           if (changed !== false) {
             var p = val && val.serialize ? val.serialize() : val;
             p = p.slice(changed);
-            m[key].splice.apply(m[key], [changed, 0].concat(
+            m[key].splice.apply(m[key], [changed, m[key].length - changed].concat(
               m[key].constructor.models ?
                 can.makeArray(m[key].constructor.models(p))
                 : p));
@@ -335,92 +333,6 @@ can.Model("can.Model.Cacheable", {
   , getRootModelName: function() {
     return this.root_model || this.shortName;
   }
-
-  , init_mappings: function() {
-      var self = this;
-      can.each(this.mappings, function(options, name) {
-        self.define_association_proxy(name, options);
-      });
-    }
-
-  , define_association_proxy: function(name, options) {
-      /* Adds association proxy methods to prototype
-       */
-      var attr = options.attr
-        , target_attr = options.target_attr
-        , update_function_name = "_update_" + name
-        , update_function
-        , change_handler_name = "_handle_changed_" + name
-        , change_handler
-        , init_flag_name = "_initialized_" + name
-        ;
-
-      update_function = function() {
-        var self = this
-          , refresh_queue = new RefreshQueue()
-          ;
-
-        can.each(self[attr], function(mapping) {
-          refresh_queue.enqueue(mapping);
-        });
-        return refresh_queue.trigger()
-          .then(function(mappings) {
-            var refresh_queue = new RefreshQueue();
-            can.each(mappings, function(mapping) {
-              refresh_queue.enqueue(mapping[target_attr]);
-            });
-            return refresh_queue.trigger()
-              .then(function(mapped_objects) {
-                self[name].replace(
-                  can.map(mappings, function(mapping) {
-                    if (mapping[target_attr] && mapping[target_attr].selfLink)
-                      return {
-                          instance: mapping[target_attr]
-                        , mappings: [mapping]
-                      };
-                  }));
-              });
-          });
-      };
-
-      this.prototype[update_function_name] = update_function;
-
-      change_handler = function(ev, attr, how) {
-        var self = this;
-        if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-          //self[update_function_name]();
-          setTimeout(self.proxy(update_function_name), 10);
-        }
-      };
-
-      this.prototype[change_handler_name] = change_handler;
-
-      if (!this.prototype._init_mappings) {
-        this.prototype._init_mappings = function() {
-          var self = this;
-          can.each(this.constructor.mappings_init_functions, function(fn) {
-            fn.apply(self);
-          });
-        }
-      }
-
-      this.prototype[name] = function() {
-        this[init_flag_name] = true;
-        if (!this.attr(name))
-          this[name] = new can.Observe.List();
-        this[update_function_name]();
-        this[attr].bind("change", this.proxy(change_handler_name));
-        return this[name];
-      }
-      /*if (!this.mappings_init_functions)
-        this.mappings_init_functions = [];
-
-      this.mappings_init_functions.push(function() {
-        if (!this[name])
-          this[name] = new can.Observe.List();
-        this[attr].bind("change", this.proxy(change_handler_name));
-      });*/
-    }
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true);
@@ -432,6 +344,57 @@ can.Model("can.Model.Cacheable", {
         , compute = can.compute(function() { return that.errors(); });
       return compute;
     }
+
+  , get_list_loader: function(name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_list().then(function() { return binding.list; });
+    }
+
+  , get_mapping: function(name) {
+      var binding = this.get_binding(name);
+      binding.refresh_list();
+      return binding.list;
+    }
+
+  , _get_binding_attr: function(mapper) {
+      if (typeof(mapper) === "string")
+        return "_" + mapper + "_binding";
+    }
+
+  , get_binding: function(mapper) {
+      var mappings
+        , mapping
+        , binding
+        , binding_attr = this._get_binding_attr(mapper)
+        ;
+
+      if (!binding_attr) {
+        binding = this[binding_attr];
+      }
+
+      if (!binding) {
+        if (typeof(mapper) === "string") {
+          // Lookup and attach named mapper
+          mappings = GGRC.Mappings[this.constructor.shortName];
+          mapping = mappings && mappings[mapper];
+          if (!mapping)
+            console.debug("No such mapper:  " + this.constructor.shortName + "." + mapper);
+          else
+            binding = mapping.attach(this);
+        } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
+          // Loader directly provided, so just attach
+          binding = mapper.attach(this);
+        } else {
+          console.debug("Invalid mapper specified:", mapper);
+        }
+        if (binding && binding_attr) {
+          this[binding_attr] = binding;
+          binding.name = this.constructor.shortName + "." + mapper;
+        }
+      }
+      return binding;
+    }
+
   , addElementToChildList : function(attrName, new_element) {
     this[attrName].push(new_element);
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));

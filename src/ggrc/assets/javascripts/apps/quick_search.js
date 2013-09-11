@@ -488,6 +488,8 @@ $(function() {
         , mapping = $mapping_el.data('mapping');
 
       if (mapping) {
+        if (mapping.instance)
+          mapping = mapping.instance;
         mapping.refresh().done(function() {
           // Never delete a control from a directive page, just remove the mapping
           if (mapping instanceof CMS.Models.Control && GGRC.page_instance() instanceof CMS.Models.Directive) {

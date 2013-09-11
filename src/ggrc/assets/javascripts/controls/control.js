@@ -63,63 +63,36 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "url" : ""
   }
 
-  , mappings: {
-      people_mappings: {
-          attr: "object_people"
-        , target_attr: "person"
-      }
-    , document_mappings: {
-          attr: "object_documents"
-        , target_attr: "document"
-      }
-    , business_object_mappings: {
-          attr: "object_controls"
-        , target_attr: "controllable"
-      }
-    , section_mappings: {
-          attr: "control_sections"
-        , target_attr: "section"
-      }
-    , objective_mappings: {
-          attr: "objective_controls"
-        , target_attr: "objective"
-      }
-    , program_mappings: {
-          attr: "program_controls"
-        , target_attr: "program"
-      }
-    }
-
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/controls/tree.mustache"
     , draw_children : true
     , child_options : [{
     /*    model : "Section"
-      , property : "section_mappings"
+      , mapping : "sections"
       , list_view : "/static/mustache/sections/tree.mustache"
     }, {*/
         model : "Person"
-      , property : "people_mappings"
+      , mapping : "people"
       , list_view : "/static/mustache/people/tree.mustache"
       , draw_children : false
     }, {
         model : "Document"
-      , property : "document_mappings"
+      , mapping : "documents"
       , list_view : "/static/mustache/documents/tree.mustache"
       , draw_children : false
     }, {
         model : "Objective"
-      , property : "objective_mappings"
+      , mapping : "objectives"
       , list_view : "/static/mustache/objectives/tree.mustache"
       , draw_children : false
     }, {
         model : "Program"
-      , property : "program_mappings"
+      , mapping : "programs"
       , list_view : "/static/mustache/base_objects/tree.mustache"
       , draw_children : false
     }, {
         model : can.Model.Cacheable
-      , property : "business_object_mappings"
+      , mapping : "related_objects"
       , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
@@ -135,7 +108,6 @@ can.Model.Cacheable("CMS.Models.Control", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-    this._init_mappings();
 
     this.bind("change", function(ev, attr, how, newVal, oldVal) {
       // Emit the "orphaned" event when the directive attribute is removed

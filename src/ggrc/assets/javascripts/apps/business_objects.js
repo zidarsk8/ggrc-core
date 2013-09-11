@@ -61,7 +61,7 @@ $(function() {
                   widget_icon: 'grcicon-link'
               }
           }
-          , Contract : {
+        , Contract : {
             Section : {
               widget_name : function() {
                 var $objectArea = $(".object-area");
@@ -109,10 +109,48 @@ $(function() {
     , extra_content_controller_options = {
           Program: {
               Regulation: program_directive_options
-            , Policy: program_directive_options
             , Contract: program_directive_options
-            , Control: { draw_children : true }
-            , Objective: { draw_children : true }
+            , Policy: program_directive_options
+            , Objective: {
+                mapping: "extended_related_objectives"
+              , draw_children : true
+              }
+            , Control: {
+                mapping: "extended_related_controls"
+              , draw_children : true
+              }
+
+            , DataAsset: {
+                mapping: "extended_related_data_assets"
+              }
+            , Facility: {
+                mapping: "extended_related_facilities"
+              }
+            , Market: {
+                mapping: "extended_related_markets"
+              }
+            , OrgGroup: {
+                mapping: "extended_related_org_groups"
+              }
+            , Process: {
+                mapping: "extended_related_processes"
+              }
+            , Product: {
+                mapping: "extended_related_products"
+              }
+            , Project: {
+                mapping: "extended_related_projects"
+              }
+            , System: {
+                mapping: "extended_related_systems"
+              }
+
+            , Person: {
+                mapping: "extended_related_people"
+              }
+            , Document: {
+                mapping: "extended_related_documents"
+              }
           }
         , Regulation: {
           Section : program_directive_options.child_options[0]
@@ -163,15 +201,6 @@ $(function() {
                 return far_model.title_plural;
               } else {
                 return "Mapped " + far_model.title_plural;
-              }
-            }
-
-          , widget_info : function() {
-              var $objectArea = $(".object-area");
-              if ( $objectArea.hasClass("dashboard-area") ) {
-                return ""
-              } else {
-                return "Does not include mappings to Directives, Objectives and Controls"
               }
             }
           , widget_icon: far_model.table_singular
