@@ -1082,7 +1082,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     context_id = target.context ? target.context.id : null;
 
   // We should only map objects that have join models
-  if (resource_type && Permission.is_allowed('create', resource_type, context_id))
+  if ((!(options.hash && options.hash.join) || resource_type) && Permission.is_allowed('create', resource_type, context_id))
     return options.fn(options.contexts || this);
   else
     return options.inverse(options.contexts || this);
