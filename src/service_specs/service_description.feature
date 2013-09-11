@@ -7,11 +7,11 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
     When GET of "/api" as "service_description"
     Then all expected endpoints are listed and GETtable in "service_description"
       | endpoint           | max_query_count |
+      | Audit              | 14              |
       | Categorization     | -1              |
       | Category           | -1              |
       | Control            | 12              |
       | ControlRisk        | 10              |
-      #| Audit              | 10              |
       | DataAsset          | 10              |
       | Directive          | -1              |
       | DirectiveControl   | 10              |

@@ -197,3 +197,8 @@ class RegulationFactory(ModelFactory):
 class PersonFactory(ModelFactory):
   MODEL = models.Person
   email = FuzzyEmail()
+
+class AuditFactory(ModelFactory):
+  MODEL = models.Audit
+  status = FuzzyChoice([u'Planned', u'In Progress', u'Manager Review', u'Ready for External Review', u'Completed'])
+

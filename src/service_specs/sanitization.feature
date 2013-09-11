@@ -19,7 +19,7 @@ Feature: String and Text column HTML sanitization
       | Category          | name |
       | Context           | description, name |
       | Control           | description, title, documentation_description, version, notes |
-      #| Audit             | description, title, audit_firm, audit_lead, status, notes |
+      | Audit             | description, title, audit_firm |
       | DataAsset         | title, description |
       | Contract          | title, version, scope, description, organization |
       | Policy            | title, version, scope, description, organization |

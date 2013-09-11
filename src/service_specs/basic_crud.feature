@@ -13,10 +13,10 @@ Feature: Basic RESTful CRUD Support
 
   Examples: Resources
       | resource_type      |
+      | Audit              |
       | Category           |
       | Control            |
       | ControlRisk        |
-      #| Audit              |
       | DataAsset          |
       #| Directive          |
       | DirectiveControl   |

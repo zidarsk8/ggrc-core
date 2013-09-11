@@ -405,12 +405,12 @@ def tooltip_view(model_class, base_service_class=TooltipView):
 def all_object_views():
   from ggrc import models
   return [
+      object_view(models.Audit),
       object_view(models.Program),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
       object_view(models.Policy),
       object_view(models.Regulation),
-      #object_view(models.Audit),
       object_view(models.Control),
       object_view(models.Objective),
       object_view(models.System),
@@ -429,11 +429,11 @@ def all_object_views():
 def all_tooltip_views():
   from ggrc import models
   return [
+      tooltip_view(models.Audit),
       tooltip_view(models.Program),
       tooltip_view(models.Contract),
       tooltip_view(models.Policy),
       tooltip_view(models.Regulation),
-      #tooltip_view(models.Audit),
       tooltip_view(models.Control),
       tooltip_view(models.Objective),
       tooltip_view(models.System),

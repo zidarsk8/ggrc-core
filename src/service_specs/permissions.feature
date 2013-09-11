@@ -44,7 +44,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Category           |
       | Control            |
       | ControlRisk        |
-      #| Audit              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
@@ -116,7 +116,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Category           |
       | Control            |
       | ControlRisk        |
-      #| Audit              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
@@ -196,7 +196,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Category           |
       | Control            |
       | ControlRisk        |
-      #| Audit              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
@@ -276,7 +276,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Category           |
       | Control            |
       | ControlRisk        |
-      #| Audit              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
@@ -491,5 +491,5 @@ Feature: RBAC Permissions enforcement for REST API
       | Category      | scope_id      | 3                   |
       | Help          | title         | foo                 |
       | Program       | start_date    | 2013-06-03T00:00:00 |
-      #| Audit         | start_at      | 2013-06-03          |
+      | Audit         | start_at      | 2013-06-03          |
 

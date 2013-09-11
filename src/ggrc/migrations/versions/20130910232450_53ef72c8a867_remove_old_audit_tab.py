@@ -14,6 +14,40 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
+NOT_NULL_COLS = [
+                     ('control_assessments', 'pbc_list_id'),
+                     ('control_assessments', 'control_id'),
+                     ('system_controls', 'system_id'),
+                     ('system_controls', 'control_id'),
+                     ('responses', 'request_id'),
+                     ('responses', 'system_id'),
+]
+
+EXPLICIT_INDEXES = [
+                    ('control_assessments', 'control_id', 'controls', 'control_assessments_ibfk_1'),
+                    ('control_assessments', 'pbc_list_id', 'pbc_lists', 'control_assessments_ibfk_2'),
+                    ('system_controls', 'system_id', 'systems', 'system_controls_ibfk_3'),
+                    ('system_controls', 'control_id', 'controls', 'system_controls_ibfk_1'),
+                    ('responses', 'request_id', 'requests', 'responses_ibfk_1'),
+                    ('responses', 'system_id', 'systems', 'responses_ibfk_2'),
+]
+
+UNIQUE_CONSTRAINTS = [('control_assessments', ['pbc_list_id', 'control_id']),
+                      ('system_controls', ['system_id', 'control_id']),
+                      ('responses', ['request_id', 'system_id']),
+]
+
+def create_explicit_index(table, column, referred_table, constraint_name):
+    " Explicit indexes need to be created to work around http://bugs.mysql.com/bug.php?id=21395 "
+    op.drop_constraint(constraint_name, table, type_='foreignkey')
+    op.create_index('ix_' + column, table, [column])
+    op.create_foreign_key(constraint_name, table, referred_table, [column], ['id'])
+
+def drop_explicit_index(table, column, referred_table, constraint_name):
+    op.drop_constraint(constraint_name, table, type_='foreignkey')
+    op.drop_index('ix_' + column, table)
+    op.create_foreign_key(constraint_name, table, referred_table, [column], ['id'])
+
 def upgrade():
     op.drop_table(u'system_controls')
     op.drop_table(u'meetings')
@@ -195,3 +229,10 @@ def downgrade():
     mysql_default_charset=u'utf8',
     mysql_engine=u'InnoDB'
     )
+
+    for table, column in NOT_NULL_COLS:
+        op.alter_column(table, column, nullable=False, existing_type = sa.INTEGER)
+    for table, column, referred_table, constraint_name in EXPLICIT_INDEXES:
+        create_explicit_index(table, column, referred_table, constraint_name) 
+    for table, columns in UNIQUE_CONSTRAINTS:
+        op.create_unique_constraint('uq_' + table, table, columns)
