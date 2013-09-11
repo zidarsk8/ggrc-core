@@ -25,17 +25,11 @@ Feature: A Relationship models a relation between two resources. Relationships
   Examples:
       | type_a            | type_b           |
       | Control           | System           |
-      | ControlAssessment | Section          |
-      | Cycle             | RiskyAttribute   |
       | DataAsset         | Risk             |
-      | Regulation        | Response         |
-      | Document          | Request          |
+      #| Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |
-      | Meeting           | Product          |
-      | Option            | PopulationSample |
       | OrgGroup          | Person           |
-      | PbcList           | PbcList          |
 
   Scenario Outline: Symmetric relations
     Given a new "<type_a>" named "resource_a"
@@ -55,15 +49,9 @@ Feature: A Relationship models a relation between two resources. Relationships
   Examples:
       | type_a            | type_b           |
       | Control           | System           |
-      | ControlAssessment | Section          |
-      | Cycle             | RiskyAttribute   |
       | DataAsset         | Risk             |
-      | Regulation        | Response         |
-      | Document          | Request          |
+      #| Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |
-      | Meeting           | Product          |
-      | Option            | PopulationSample |
       | OrgGroup          | Person           |
-      | PbcList           | PbcList          |
 

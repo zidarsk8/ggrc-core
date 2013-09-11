@@ -19,8 +19,7 @@ Feature: String and Text column HTML sanitization
       | Category          | name |
       | Context           | description, name |
       | Control           | description, title, documentation_description, version, notes |
-      | ControlAssessment | control_version, notes |
-      | Cycle             | description, title, audit_firm, audit_lead, status, notes |
+      #| Audit             | description, title, audit_firm, audit_lead, status, notes |
       | DataAsset         | title, description |
       | Contract          | title, version, scope, description, organization |
       | Policy            | title, version, scope, description, organization |
@@ -36,8 +35,8 @@ Feature: String and Text column HTML sanitization
       | Product           | title, version, description |
       | Program           | title, description |
       | Project           | title, description |
-      | Request           | pbc_control_desc, company_responsible, auditor_responsible, test, status, notes, request, pbc_control_code |
-      | Response          | status |
+      #| Request           | pbc_control_desc, company_responsible, auditor_responsible, test, status, notes, request, pbc_control_code |
+      #| Response          | status |
       | Risk              | residual_risk, description, impact, title, trigger, preconditions, risk_mitigation, likelihood, kind, threat_vector, inherent_risk |
       | RiskyAttribute    | title, type_string, description |
       | Section           | title, description, notes |
