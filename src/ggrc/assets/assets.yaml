@@ -91,6 +91,8 @@ dashboard-js-files:
   - jquery.remotipart-patched.js
   #- d3.v2.js
   - related_graph.js
+  # below this line refactor into GDrive integration plugin
+  - models/gdrive_models.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
@@ -190,6 +192,9 @@ dashboard-js-spec-files:
   - controllers/resize_widgets_spec.js
   - models/local_storage_spec.js
   - models/display_prefs_spec.js
+  # below this line refactor into GDrive integration plugin
+  - models/gdrive_models_spec.js
+
 
 dashboard-js-spec-helpers:
   - jasmine-fixture.js
