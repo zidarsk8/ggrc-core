@@ -410,7 +410,7 @@ def all_object_views():
       object_view(models.Contract),
       object_view(models.Policy),
       object_view(models.Regulation),
-      object_view(models.Cycle),
+      #object_view(models.Audit),
       object_view(models.Control),
       object_view(models.Objective),
       object_view(models.System),
@@ -424,7 +424,6 @@ def all_object_views():
       object_view(models.RiskyAttribute),
       object_view(models.Risk),
       object_view(models.Person),
-      object_view(models.PbcList),
       ]
 
 def all_tooltip_views():
@@ -434,7 +433,7 @@ def all_tooltip_views():
       tooltip_view(models.Contract),
       tooltip_view(models.Policy),
       tooltip_view(models.Regulation),
-      tooltip_view(models.Cycle),
+      #tooltip_view(models.Audit),
       tooltip_view(models.Control),
       tooltip_view(models.Objective),
       tooltip_view(models.System),

@@ -15,9 +15,8 @@ Feature: Basic RESTful CRUD Support
       | resource_type      |
       | Category           |
       | Control            |
-      | ControlAssessment  |
       | ControlRisk        |
-      | Cycle              |
+      #| Audit              |
       | DataAsset          |
       #| Directive          |
       | DirectiveControl   |
@@ -28,23 +27,22 @@ Feature: Basic RESTful CRUD Support
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       #| ObjectDocument     |
       #| ObjectPerson       |
       | Objective          |
       | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Product            |
       | Project            |
       | Program            |
       | ProgramDirective   |
       #| Relationship       |
-      | Request            |
-      | Response           |
+      #| Request            |
+      #| Response           |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
