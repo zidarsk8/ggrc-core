@@ -43,11 +43,11 @@ can.Control("GGRC.Controllers.Modals", {
     }, options))
     .on('click', 'a.btn[data-method=confirm]', function(e) { 
       $target.modal('hide').remove();
-      success();
+      success && success();
     })
     .on('click.modal-form.close', '[data-dismiss="modal"]', function() {
       $target.modal('hide').remove();
-      dismiss();
+      dismiss && dismiss();
     });
   }
 }, {
