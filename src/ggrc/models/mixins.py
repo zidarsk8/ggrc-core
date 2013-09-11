@@ -204,7 +204,10 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   @computed_property
   def display_name(self):
-    return self._display_name()
+    try:
+      return self._display_name()
+    except Exception:
+      return ""
 
   def _display_name(self):
     return getattr(self, "title", None) or getattr(self, "name", "")

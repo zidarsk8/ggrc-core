@@ -18,6 +18,7 @@ from .control_section import ControlSection
 from .cycle import Cycle
 from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract
+from .directive_control import DirectiveControl
 from .document import Document
 from .facility import Facility
 from .help import Help
@@ -75,6 +76,7 @@ all_models = [
     Contract,
     Policy,
     Regulation,
+  DirectiveControl,
   Document,
   Facility,
   Help,

@@ -15,6 +15,7 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Cycle              | 10              |
       | DataAsset          | 10              |
       | Directive          | -1              |
+      | DirectiveControl   | 10              |
       | Contract           | 10              |
       | Policy             | 10              |
       | Regulation         | 10              |

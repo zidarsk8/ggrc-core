@@ -105,6 +105,11 @@ class Control(
       'ControlAssessment', backref='control', cascade='all, delete-orphan')
   object_controls = db.relationship(
       'ObjectControl', backref='control', cascade='all, delete-orphan')
+  directive_controls = db.relationship(
+      'DirectiveControl', backref='control', cascade='all, delete-orphan')
+  # Not needed for the client at this time
+  #mapped_directives = association_proxy(
+  #    'directive_controls', 'directive', 'DirectiveControl')
 
   # REST properties
   _publish_attrs = [
