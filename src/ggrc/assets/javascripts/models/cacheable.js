@@ -252,7 +252,7 @@ can.Model("can.Model.Cacheable", {
           if (changed !== false) {
             var p = val && val.serialize ? val.serialize() : val;
             p = p.slice(changed);
-            m[key].splice.apply(m[key], [changed, 0].concat(
+            m[key].splice.apply(m[key], [changed, m[key].length - changed].concat(
               m[key].constructor.models ?
                 can.makeArray(m[key].constructor.models(p))
                 : p));
