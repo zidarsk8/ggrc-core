@@ -235,6 +235,8 @@ can.Control("CMS.Controllers.LHN_Search", {
         if(visible_model_names.indexOf(model_name) > -1) {
           self.options.visible_lists[model_name].unshift(instance);
           self.options.results_lists[model_name].unshift(instance);
+          // Refresh the counts whenever the lists change
+          self.refresh_counts();
         }
       });
     }
@@ -318,11 +320,6 @@ can.Control("CMS.Controllers.LHN_Search", {
               return self.options.results_lists[model_name].attr('length');
             })
         };
-
-        // Refresh the counts whenever the lists change
-        self.options.results_lists[model_name].bind('change', function() {
-          self.refresh_counts();
-        })
 
         can.view(self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
