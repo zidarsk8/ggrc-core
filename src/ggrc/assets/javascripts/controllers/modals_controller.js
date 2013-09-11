@@ -59,7 +59,7 @@ can.Control("GGRC.Controllers.Modals", {
 
   , autocomplete : function() {
     // Add autocomplete to the owner field
-    this.element.find('input[name="owner.email"]').autocomplete({
+    var ac = this.element.find('input[name="owner.email"]').autocomplete({
       // Ensure that the input.change event still occurs
       change : function(event, ui) {
         $(event.target).trigger("change");
@@ -91,14 +91,17 @@ can.Control("GGRC.Controllers.Modals", {
               return {
                 label: person.name ? person.name + " <span class=\"url-link\">" + person.email + "</span>" : person.email,
                 value: person.email
-              }; 
+              };
             }));
           });
         });
       }
-    }).data('ui-autocomplete')._renderItem = function(ul, item) {
-      return $('<li>').append('<a>' + item.label + '</a>').appendTo(ul);
-    };
+    }).data('ui-autocomplete');
+    if(ac) {
+      ac._renderItem = function(ul, item) {
+        return $('<li>').append('<a>' + item.label + '</a>').appendTo(ul);
+      };
+    }
   }
 
   , fetch_templates : function(dfd) {
@@ -237,7 +240,7 @@ can.Control("GGRC.Controllers.Modals", {
                   value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
                   instance.attr(name[0], value);
                 } else {
-                  that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
+                  that.element && that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
                   $elem.val($elem.attr("value"));
                 }
               });
