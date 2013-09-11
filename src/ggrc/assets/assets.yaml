@@ -125,6 +125,8 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - markets/modal_content.mustache
   - modals/close_buttons.mustache
+  - modals/confirm.mustache
+  - modals/confirm_buttons.mustache
   - modals/delete_cancel_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
