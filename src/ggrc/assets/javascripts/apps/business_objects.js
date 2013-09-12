@@ -92,7 +92,8 @@ $(function() {
     , directive_section_descriptor =
         GGRC.JoinDescriptor.by_object_option_models.Regulation.Section[0]
     , program_directive_options = {
-          list_view : GGRC.mustache_path + "/directives/tree.mustache"
+          show_view : GGRC.mustache_path + "/directives/tree.mustache"
+        , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
         , draw_children : true
         , child_options : [{
               model : CMS.Models.Section

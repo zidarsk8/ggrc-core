@@ -79,7 +79,7 @@ can.Model.Cacheable("CMS.Models.Category", {
     }
   }
   , tree_view_options : {
-    list_view : "/static/mustache/controls/categories_tree.mustache"
+    show_view : "/static/mustache/controls/categories_tree.mustache"
     , start_expanded : false
     , child_options : [{
       model : null
@@ -87,7 +87,7 @@ can.Model.Cacheable("CMS.Models.Category", {
     }, {
       model : CMS.Models.Control
       , property : "controls"
-      , list_view : "/static/mustache/controls/tree_with_section_mappings.mustache"
+      , show_view : "/static/mustache/controls/tree_with_section_mappings.mustache"
     }]
 
   }

@@ -124,7 +124,7 @@ can.Model("can.Model.Cacheable", {
     var that = this;
     this.risk_tree_options = can.extend(true, {}, this.risk_tree_options); //for subclasses
     var risk_child_options = that.risk_tree_options.child_options[0];
-    this.risk_tree_options.list_view = GGRC.mustache_path + "/base_objects/tree.mustache";
+    this.risk_tree_options.show_view = GGRC.mustache_path + "/base_objects/tree.mustache";
     if(risk_child_options) {
       risk_child_options.find_params.destination_type = that.shortName;
       risk_child_options.find_params.relationship_type_id = "risk_is_a_threat_to_" + this.root_object;
@@ -252,7 +252,7 @@ can.Model("can.Model.Cacheable", {
           if (changed !== false) {
             var p = val && val.serialize ? val.serialize() : val;
             p = p.slice(changed);
-            m[key].splice.apply(m[key], [changed, 0].concat(
+            m[key].splice.apply(m[key], [changed, m[key].length - changed].concat(
               m[key].constructor.models ?
                 can.makeArray(m[key].constructor.models(p))
                 : p));
@@ -317,7 +317,7 @@ can.Model("can.Model.Cacheable", {
     single_object : true
     , child_options : [{
       model : null
-      , list_view : GGRC.mustache_path + "/risks/tree.mustache"
+      , show_view : GGRC.mustache_path + "/risks/tree.mustache"
       , draw_children : false
       , find_params : {
         source_type : "Risk"
