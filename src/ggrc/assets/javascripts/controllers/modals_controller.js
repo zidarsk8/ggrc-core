@@ -68,9 +68,11 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.$content = this.element.find(".modal-body");
     this.options.$footer = this.element.find(".modal-footer");
     this.on();
+    this.fetch_all().then(this.proxy("apply_object_params"));
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
-      .then(function() { that.element.trigger('preload') });
+      .then(function() { that.element.trigger('preload') })
+      .then(this.proxy("autocomplete"));
   }
 
   , apply_object_params : function() {
@@ -80,6 +82,53 @@ can.Control("GGRC.Controllers.Modals", {
       can.each(this.options.object_params, function(value, key) {
         self.set_value({ name: key, value: value });
       });
+  }
+
+  , autocomplete : function() {
+    // Add autocomplete to the owner field
+    var ac = this.element.find('input[name="owner.email"]').autocomplete({
+      // Ensure that the input.change event still occurs
+      change : function(event, ui) {
+        $(event.target).trigger("change");
+      }
+
+      // Search for the people based on the term
+      , source : function(request, response) {
+        var query = request.term;
+
+        GGRC.Models.Search
+        .search_for_types(
+            request.term || '',
+            ["Person"],
+            {
+              __permission_type: 'create'
+              , __permission_model: 'ObjectPerson'
+            })
+        .then(function(search_result) {
+          var people = search_result.getResultsForType('Person')
+            , queue = new RefreshQueue()
+            ;
+
+          // Retrieve full people data
+          can.each(people, function(person) {
+            queue.enqueue(person);
+          });
+          queue.trigger().then(function(people) {
+            response(can.map(people, function(person) { 
+              return {
+                label: person.name ? person.name + " <span class=\"url-link\">" + person.email + "</span>" : person.email,
+                value: person.email
+              };
+            }));
+          });
+        });
+      }
+    }).data('ui-autocomplete');
+    if(ac) {
+      ac._renderItem = function(ul, item) {
+        return $('<li>').append('<a>' + item.label + '</a>').appendTo(ul);
+      };
+    }
   }
 
   , fetch_templates : function(dfd) {
@@ -217,7 +266,7 @@ can.Control("GGRC.Controllers.Modals", {
                   value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
                   instance.attr(name[0], value);
                 } else {
-                  that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
+                  that.element && that.element.trigger("ajax:flash", { warning : "user: " + value + " not found.  Please enter valid email address."});
                   $elem.val($elem.attr("value"));
                 }
               });

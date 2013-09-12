@@ -15,10 +15,8 @@ class ObjectSection(Base, Timeboxed, db.Model):
   role = deferred(db.Column(db.String), 'ObjectSection')
   notes = deferred(db.Column(db.Text), 'ObjectSection')
   section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable=False)
-
-  # TODO: Polymorphic relationship
-  sectionable_id = db.Column(db.Integer)
-  sectionable_type = db.Column(db.String)
+  sectionable_id = db.Column(db.Integer, nullable=False)
+  sectionable_type = db.Column(db.String, nullable=False)
 
   @property
   def sectionable_attr(self):
@@ -34,6 +32,10 @@ class ObjectSection(Base, Timeboxed, db.Model):
     self.sectionable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.sectionable_attr, value)
+
+  __table_args__ = (
+    db.UniqueConstraint('section_id', 'sectionable_id', 'sectionable_type'),
+  )
 
   _publish_attrs = [
       'role',
