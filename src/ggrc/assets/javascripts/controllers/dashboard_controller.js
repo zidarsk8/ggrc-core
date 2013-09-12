@@ -424,14 +424,20 @@ can.Control("CMS.Controllers.InnerNav", {
           });
       });
       this.options.widget_list.replace(widget_list);
-      if(!this.options.contexts.active_widget) {
-        this.options.contexts.attr("active_widget", widget_list[0]);
-      }
+
+      // When replacing the list, the original widget object is no longer 
+      // identical to the one that it is getting replaced with, so find the 
+      // new widget with the same selector.
+      var active_widget = this.options.contexts.active_widget && can.map(this.options.widget_list, function(widget) { 
+          return that.options.contexts.active_widget.selector === widget.selector ? widget : undefined;
+        })[0];
+      this.options.contexts.attr("active_widget", active_widget ? active_widget : this.options.widget_list[0]);
     }
 
   , "{contexts} active_widget" : function(contexts, ev) {
     this.options.dashboard_controller.show_widget_area();
     $(this.options.contexts.active_widget.selector).show().siblings().hide();
+    this.update_scrollspy(this.options.contexts.active_widget.selector);
   }
 
   , "a click" : function(el, ev) {
@@ -466,7 +472,7 @@ can.Control("CMS.Controllers.InnerNav", {
     });
   }
 
-  , update_scrollspy : function() {
+  , update_scrollspy : function(target) {
       var $area = $(".object-area")
         , top = $area.scrollTop()
         ;
@@ -475,10 +481,19 @@ can.Control("CMS.Controllers.InnerNav", {
       if (!$area.data("scrollspy"))
         return
 
-      $area.data('scrollspy').activeTarget = null;
-      $area
-        .scrollspy('refresh')
-        .scrollspy('process');
+      // Activate the target if one is specified
+      if (target) {
+        $area
+          .scrollspy('refresh')
+          .scrollspy('activate', target);
+      }
+      // Otherwise clear and recompute based on scrolling
+      else {
+        $area.data('scrollspy').activeTarget = null; 
+        $area
+          .scrollspy('refresh')
+          .scrollspy('process');
+      }
     }
 
   , update_widget_list : function(widget_elements) {

@@ -34,17 +34,19 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       }
 
     , tree_view_options : {
-      list_view : "/static/mustache/base_objects/tree.mustache"
+      show_view : "/static/mustache/base_objects/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , link_buttons : true
       , child_options : [{
         model : CMS.Models.Control
-        , list_view : "/static/mustache/controls/tree.mustache"
+        , show_view : "/static/mustache/controls/tree.mustache"
         , parent_find_param : "system_controls.system_id"
         , link_buttons : true
         , draw_children : false
       },{
         model : null ///filled in after init.
-        , list_view : "/static/mustache/base_objects/tree.mustache"
+        , show_view : "/static/mustache/base_objects/tree.mustache"
+        , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
         , parent_find_param : "super_system_systems.parent_id"
         , link_buttons: true
       }]

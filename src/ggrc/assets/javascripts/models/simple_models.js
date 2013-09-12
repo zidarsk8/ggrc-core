@@ -283,7 +283,8 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -361,7 +362,8 @@ can.Model.Cacheable("CMS.Models.Project", {
     , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -423,7 +425,8 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -505,7 +508,8 @@ can.Model.Cacheable("CMS.Models.Product", {
     type : null
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -608,7 +612,8 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -686,7 +691,8 @@ can.Model.Cacheable("CMS.Models.Market", {
     , sections : "CMS.Models.Section.models"
   }
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , child_options : [{
       model : null
       , find_params : {
@@ -797,9 +803,9 @@ can.Model.Cacheable("CMS.Models.Risk", {
     , object_sections : "CMS.Models.ObjectSection.models"
     , sections : "CMS.Models.Section.models"
   }
-  , risk_tree_options : { list_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
+  , risk_tree_options : { show_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
   , tree_view_options : {
-    list_view : GGRC.mustache_path + "/risks/tree.mustache"
+    show_view : GGRC.mustache_path + "/risks/tree.mustache"
     , child_options : [{
       model : null
       , property : "controls"
@@ -892,33 +898,34 @@ can.Model.Cacheable("CMS.Models.Objective", {
     }
 
   , tree_view_options : {
-      list_view : GGRC.mustache_path + "/objectives/tree.mustache"
+      show_view : GGRC.mustache_path + "/objectives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
     , child_options : [{
         model : "Control"
       , property : "control_mappings"
-      , list_view : "/static/mustache/controls/tree.mustache"
+      , show_view : "/static/mustache/controls/tree.mustache"
       , draw_children : false
     }, {
         model : "Person"
       , property : "people_mappings"
-      , list_view : "/static/mustache/people/tree.mustache"
+      , show_view : "/static/mustache/people/tree.mustache"
       , draw_children : false
     }, {
         model : "Document"
       , property : "document_mappings"
-      , list_view : "/static/mustache/documents/tree.mustache"
+      , show_view : "/static/mustache/documents/tree.mustache"
       , draw_children : false
 /*    }, {
         model : "Section"
       , property : "section_mappings"
-      , list_view : "/static/mustache/sections/tree.mustache"
+      , show_view : "/static/mustache/sections/tree.mustache"
 */    }, {
         model : can.Model.Cacheable
       , property : "business_object_mappings"
-      , list_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]
