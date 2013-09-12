@@ -28,6 +28,28 @@ can.Control("GGRC.Controllers.Modals", {
   , init : function() {
     this.defaults.button_view = this.BUTTON_VIEW_DONE;
   }
+
+  , confirm : function(options, success, dismiss) {
+    var $target = $('<div class="modal hide"></div>');
+    $target
+    .modal({ backdrop: "static" })
+    .ggrc_controllers_modals(can.extend({
+      new_object_form : false
+      , button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache"
+      , modal_confirm : "Confirm"
+      , modal_description : "description"
+      , modal_title : "Confirm"
+      , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
+    }, options))
+    .on('click', 'a.btn[data-method=confirm]', function(e) { 
+      $target.modal('hide').remove();
+      success && success();
+    })
+    .on('click.modal-form.close', '[data-dismiss="modal"]', function() {
+      $target.modal('hide').remove();
+      dismiss && dismiss();
+    });
+  }
 }, {
   init : function() {
     if(!this.element.find(".modal-body").length) {
@@ -38,6 +60,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , after_preload : function(content) {
+    var that = this;
     if (content) {
       this.element.html(content);
     }
@@ -45,7 +68,11 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.$content = this.element.find(".modal-body");
     this.options.$footer = this.element.find(".modal-footer");
     this.on();
-    this.fetch_all().then(this.proxy("apply_object_params")).then(this.proxy("autocomplete"));
+    this.fetch_all().then(this.proxy("apply_object_params"));
+    this.fetch_all()
+      .then(this.proxy("apply_object_params"))
+      .then(function() { that.element.trigger('preload') })
+      .then(this.proxy("autocomplete"));
   }
 
   , apply_object_params : function() {
@@ -308,7 +335,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
-    if (!this.options.instance.isNew()) {
+    if (this.options.instance instanceof can.Model && !this.options.instance.isNew()) {
       this.options.instance.refresh();
     }
   }

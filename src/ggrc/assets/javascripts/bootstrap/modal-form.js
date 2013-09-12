@@ -29,9 +29,12 @@
   $.extend(ModalForm.prototype, {
 
     init: function() {
-      var that = this;
-      var $form;
+      var that = this
+        , $form;
       this.$element
+        .on('preload', function() {
+          that.is_form_dirty(true);
+        })
         .on('keypress', 'form', $.proxy(this.keypress_submit, this))
         .on('keyup', 'form', $.proxy(this.keyup_escape, this))
         .on('click.modal-form.close', '[data-dismiss="modal"]', $.proxy(this.hide, this))
@@ -47,8 +50,6 @@
         .on('delete-object', $.proxy(this.delete_object, this))
         .draggable({ handle: '.modal-header' });
         ;
-
-
     }
 
   , doNothing: function(e) {
@@ -82,6 +83,31 @@
 
   , $form: function() {
       return this.$element.find('form').first();
+    }
+
+  , is_form_dirty: function(cache_values) {
+      var that = this
+        , cache = {}
+        , dirty = false
+        ;
+
+      // Generate a hash of the form values
+      can.each(this.$form().serializeArray(), function(field) {
+        cache[field.name] = cache[field.name] ? cache[field.name] + ',' + field.value : field.value;
+      });
+
+      // Cache the initial form values as requested
+      if (cache_values || !this._cached_values) {
+        this._cached_values = cache;
+      }
+      // Otherwise compute a diff to determine whether the form is dirty
+      else {
+        can.each(cache, function(value, key) {
+          dirty = dirty || (value !== that._cached_values[key] && (!!value || that._cached_values[key] !== undefined));
+        });
+      }
+
+      return dirty;
     }
 
   , submit: function(e) {
@@ -129,6 +155,22 @@
     }
 
   , hide: function(e) {
+      var that = this;
+
+      // If the hide was initiated by the backdrop, check for dirty form data before continuing
+      if (e && $(e.target).is('.modal-backdrop') && this.is_form_dirty()) {
+        // Confirm that the user wants to lose the data prior to hiding
+        GGRC.Controllers.Modals.confirm({
+          modal_title : "Discard Changes"
+          , modal_description : "Are you sure that you want to discard your changes?"
+          , modal_confirm : "Discard"
+        }, function() {
+          that.hide();
+        });
+        return;
+      }
+
+      // Hide the modal like normal
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
       this.$element.off('modal_form');
     }
