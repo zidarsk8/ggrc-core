@@ -54,6 +54,7 @@ def all_collections():
     service('program_controls', models.ProgramControl),
     service('program_directives', models.ProgramDirective),
     service('relationships', models.Relationship),
+    service('requests', models.Request),
     service('revisions', models.Revision, ReadOnlyResource),
     service('risks', models.Risk),
     service('risky_attributes', models.RiskyAttribute),

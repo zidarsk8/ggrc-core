@@ -37,7 +37,7 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Program            | 10              |
       | ProgramDirective   | 10              |
       | Relationship       | -1              |
-      #| Request            | 10              |
+      | Request            | 10              |
       #| Response           | 10              |
       | Risk               | 10              |
       | RiskyAttribute     | 10              |

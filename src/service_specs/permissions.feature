@@ -66,7 +66,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Project            |
       | Program            |
       | ProgramDirective   |
-      #| Request            |
+      | Request            |
       #| Response           |
       | Risk               |
       | RiskyAttribute     |
@@ -138,7 +138,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Project            |
       | Program            |
       | ProgramDirective   |
-      #| Request            |
+      | Request            |
       #| Response           |
       | Risk               |
       | RiskyAttribute     |
@@ -218,7 +218,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Project            |
       | Program            |
       | ProgramDirective   |
-      #| Request            |
+      | Request            |
       #| Response           |
       | Risk               |
       | RiskyAttribute     |
@@ -298,7 +298,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Project            |
       | Program            |
       | ProgramDirective   |
-      #| Request            |
+      | Request            |
       #| Response           |
       | Risk               |
       | RiskyAttribute     |

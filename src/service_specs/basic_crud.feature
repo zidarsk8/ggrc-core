@@ -41,7 +41,7 @@ Feature: Basic RESTful CRUD Support
       | Program            |
       | ProgramDirective   |
       #| Relationship       |
-      #| Request            |
+      | Request            |
       #| Response           |
       | Risk               |
       | RiskyAttribute     |

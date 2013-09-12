@@ -16,10 +16,10 @@ Feature: String and Text column HTML sanitization
 
   Examples:
       | resource_type     | properties |
+      | Audit             | description, title, audit_firm, gdrive_evidence_folder |
       | Category          | name |
       | Context           | description, name |
       | Control           | description, title, documentation_description, version, notes |
-      | Audit             | description, title, audit_firm |
       | DataAsset         | title, description |
       | Contract          | title, version, scope, description, organization |
       | Policy            | title, version, scope, description, organization |
@@ -35,7 +35,7 @@ Feature: String and Text column HTML sanitization
       | Product           | title, version, description |
       | Program           | title, description |
       | Project           | title, description |
-      #| Request           | pbc_control_desc, company_responsible, auditor_responsible, test, status, notes, request, pbc_control_code |
+      | Request           | gdrive_upload_path |
       #| Response          | status |
       | Risk              | residual_risk, description, impact, title, trigger, preconditions, risk_mitigation, likelihood, kind, threat_vector, inherent_risk |
       | RiskyAttribute    | title, type_string, description |
