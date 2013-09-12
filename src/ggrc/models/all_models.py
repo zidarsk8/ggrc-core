@@ -38,6 +38,7 @@ from .program_control import ProgramControl
 from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
+from .request import Request
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -90,6 +91,7 @@ all_models = [
   Project,
   Relationship,
   RelationshipType,
+  Request,
   Risk,
   RiskRiskyAttribute,
   RiskyAttribute,

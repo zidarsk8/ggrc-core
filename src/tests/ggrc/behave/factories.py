@@ -200,5 +200,9 @@ class PersonFactory(ModelFactory):
 
 class AuditFactory(ModelFactory):
   MODEL = models.Audit
-  status = FuzzyChoice([u'Planned', u'In Progress', u'Manager Review', u'Ready for External Review', u'Completed'])
+  status = FuzzyChoice(MODEL.VALID_STATES)
 
+class RequestFactory(ModelFactory):
+  MODEL = models.Request
+  status = FuzzyChoice(MODEL.VALID_STATES)
+  request_type = FuzzyChoice(MODEL.VALID_TYPES)
