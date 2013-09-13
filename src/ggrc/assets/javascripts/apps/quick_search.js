@@ -267,7 +267,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
         join_attrs[this.options.join_option_attr] = option_attrs;
         join_attrs[this.options.join_object_attr] = object_attrs;
 
-        return new join_model(join_attrs);
+        return join_model && (new join_model(join_attrs));
       }
 
     , get_loader: function() {
@@ -517,22 +517,37 @@ $(function() {
       link = GGRC.Models[link] || CMS.Models[link];
     }
 
-    function triggerFlash() {
+    function triggerFlash(type) {
       $(ev.target).trigger(
         "ajax:flash"
-        , {
-          success : [
-            "Mapped"
-            , inst.constructor.title_singular
-            , "<strong>"
-            , inst.title
-            , "</strong> to"
-            , page_model.title_singular
-            , "<strong>"
-            , page_instance.title
-            , "</strong>"
-            ].join(" ")
-          });
+        , type === "error" 
+          ? {
+            error : [
+              "Failed to map"
+              , inst.constructor.title_singular
+              , "<strong>"
+              , inst.title
+              , "</strong> to"
+              , page_model.title_singular
+              , "<strong>"
+              , page_instance.title
+              , "</strong>"
+              ].join(" ")
+            }
+          : {
+            success : [
+              "Mapped"
+              , inst.constructor.title_singular
+              , "<strong>"
+              , inst.title
+              , "</strong> to"
+              , page_model.title_singular
+              , "<strong>"
+              , page_instance.title
+              , "</strong>"
+              ].join(" ")
+            }
+        );
     }
 
     /*if(can.isPlainObject(link)) {
@@ -560,7 +575,14 @@ $(function() {
     } else {*/
       join_object = join_descriptor.make_join_object(
           page_instance, inst, { context: page_instance.context || { id : null } });
-      join_object.save().done(triggerFlash);
+      // Map the object if we're able to
+      if (join_object) {
+        join_object.save().done(triggerFlash);
+      }
+      // Otherwise throw a warning
+      else {
+        triggerFlash("error");
+      }
       //params[page_model.root_object] = { id : page_instance.id };
       //params[inst.constructor.root_object] = { id : inst.id };
       //params.context = page_instance.context || { id : null };

@@ -101,7 +101,8 @@ class BaseConverter(object):
     if hasattr(self, 'optional_metadata'):
       optional_metadata = self.optional_metadata
 
-    headers = self.read_headers(self.metadata_map, self.rows.pop(0), optional_headers = optional_metadata)
+    headers = self.read_headers(self.metadata_map, self.rows.pop(0),
+                                optional_headers=optional_metadata)
     values = self.read_values(headers, self.rows.pop(0))
     self.import_slug = values.get('slug')
     self.rows.pop(0)
@@ -125,7 +126,8 @@ class BaseConverter(object):
   def get_header_for_metadata_column(self, column_name):
     return self.get_header_for_column(self.metadata_map, column_name)
 
-  def read_headers(self, import_map, row, required_headers = [], optional_headers = []):
+  def read_headers(
+      self, import_map, row, required_headers=[], optional_headers=[]):
     ignored_colums = []
     self.trim_list(row)
     keys = []
@@ -173,7 +175,7 @@ class BaseConverter(object):
 
   def do_import(self, dry_run = True):
     self.import_metadata()
-    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers = ['title'])
+    object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
       row = self.row_converter(self, row_attrs, index)

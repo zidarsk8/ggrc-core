@@ -95,6 +95,8 @@ $(function() {
           model : CMS.Models.Section
         , mapping : "sections"
         , fetch_post_process : sort_sections
+        , show_view : GGRC.mustache_path + "/directives/tree.mustache"
+        , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
         , draw_children : true
       }]
     , extra_content_controller_options = {

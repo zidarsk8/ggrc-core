@@ -13,6 +13,7 @@ import re
 
 class Person(Base, db.Model):
   __tablename__ = 'people'
+  EMAIL_RE_STRING = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
 
   email = deferred(db.Column(db.String), 'Person')
   name = deferred(db.Column(db.String), 'Person')
@@ -64,7 +65,7 @@ class Person(Base, db.Model):
 
   @validates('email')
   def validate_email(self, key, email):
-    if re.match("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", email) is None:
+    if re.match(Person.EMAIL_RE_STRING, email) is None:
       message = "Must provide a valid email address"
       raise ValidationError(message)
     return email
@@ -74,7 +75,7 @@ class Person(Base, db.Model):
     from sqlalchemy import orm
 
     #query = super(Person, cls).eager_query()
-    # Completely overriding eager_query to avoid eager loading of the 
+    # Completely overriding eager_query to avoid eager loading of the
     # modified_by relationship
     return db.session.query(cls).options(
         orm.undefer('id'),

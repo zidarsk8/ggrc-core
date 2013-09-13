@@ -1,4 +1,4 @@
-{{#list}}
+
   <li class="tree-item" data-id="{{instance.id}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.shortName.toLowerCase}}">
     <div class='item-main' {{data 'model'}}>
       <a href="javascript://" class="openclose">
@@ -74,28 +74,3 @@
 
     </div>
   </li>
-{{/list}}
-
-{{#if allow_mapping_or_creating}}
-{{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-item tree-item-add">
-  <div class="row-fluid">
-    <div class="span12">
-
-      <a
-        href="javascript://"
-        rel="tooltip"
-        data-placement="left"
-        data-toggle="multitype-modal-selector"
-        data-join-option-type="{{model.shortName}}"
-        data-join-object-id="{{parent_instance.id}}"
-        data-join-object-type="{{parent_instance.constructor.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
-        + {{model.title_singular}}
-      </a>
-
-    </div>
-  </div>
-</li>
-{{/is_allowed_to_map}}
-{{/if}}
