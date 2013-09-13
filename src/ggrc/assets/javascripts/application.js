@@ -95,6 +95,7 @@ jQuery.extend(GGRC, {
   infer_object_type : function(data) {
     var decision_tree = {
       "program" : CMS.Models.Program
+      , "audit" : CMS.Models.Audit
       /*, "directive" : {
         _discriminator: function(data) {
           var model_i, model;

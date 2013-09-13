@@ -216,6 +216,12 @@ $(function() {
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
+            , Audit : { 
+              mapping: "audits"
+              , allow_mapping : false
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+            }
           }
 
         , directive: {
