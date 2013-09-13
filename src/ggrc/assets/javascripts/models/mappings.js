@@ -201,6 +201,10 @@
           "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")*/
       , directives: Proxy(
           null, "directive", "ProgramDirective", "program", "program_directives")
+      , contracts: TypeFilter("directives", "Contract")
+      , policies: TypeFilter("directives", "Policy")
+      , regulations: TypeFilter("directives", "Regulation")
+
       , sections_via_directives: Cross("directives", "sections")
       , sections_via_controls: Cross("controls", "sections")
       , sections: Multi(["sections_via_controls", "sections_via_directives"])

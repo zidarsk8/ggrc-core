@@ -140,7 +140,8 @@ can.Control("CMS.Controllers.TreeView", {
     }
     if (!(v.instance instanceof can.Model)) {
       if (v.instance.instance instanceof can.Model) {
-        v.attr("mappings", v.instance.mappings);
+        v.attr("result", v.instance);
+        v.attr("mappings", v.instance.mappings_compute());
         v.attr("instance", v.instance.instance);
       } else {
         v.attr("instance", this.options.model.model(v.instance));

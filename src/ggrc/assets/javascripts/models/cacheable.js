@@ -347,7 +347,7 @@ can.Model("can.Model.Cacheable", {
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
-      return binding.refresh_list().then(function() { return binding.list; });
+      return binding.refresh_list(); //.then(function() { return binding.list; });
     }
 
   , get_mapping: function(name) {
@@ -368,7 +368,7 @@ can.Model("can.Model.Cacheable", {
         , binding_attr = this._get_binding_attr(mapper)
         ;
 
-      if (!binding_attr) {
+      if (binding_attr) {
         binding = this[binding_attr];
       }
 

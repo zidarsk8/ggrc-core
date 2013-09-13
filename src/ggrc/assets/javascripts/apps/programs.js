@@ -56,11 +56,11 @@ can.Construct("ModelRefreshQueue", {
       return this.deferred;
     }
 
-  , trigger_with_debounce: function(delay) {
+  , trigger_with_debounce: function(delay, manager) {
       var ms_to_wait = (delay || 0) + this.updated_at - Date.now();
 
       if (!this.triggered) {
-        if (ms_to_wait < 0)
+        if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6))
           this.trigger();
         else
           setTimeout(this.proxy("trigger_with_debounce", delay), ms_to_wait);
@@ -86,6 +86,13 @@ can.Construct("RefreshQueueManager", {
       this.queues = [];
     }
 
+  , triggered_queues: function() {
+      return can.map(this.queues, function(queue) {
+        if (queue.triggered)
+          return queue;
+      });
+    }
+
   , enqueue: function(obj, force) {
       var self = this
         , model = obj.constructor
@@ -109,9 +116,10 @@ can.Construct("RefreshQueueManager", {
 
       if (!found_queue) {
         can.each(this.queues, function(queue) {
-          if (!found_queue
-              && queue.model === model && !queue.triggered)
+          if (!found_queue && queue.model === model && !queue.triggered) {
             found_queue = queue.enqueue(id);
+            return false;
+          }
         });
         if (!found_queue) {
           found_queue = new ModelRefreshQueue(model);
@@ -165,7 +173,8 @@ can.Construct("RefreshQueue", {
 
       this.triggered = true;
       can.each(this.queues, function(queue) {
-        deferreds.push(queue.trigger_with_debounce(50));
+        deferreds.push(queue.trigger_with_debounce(
+            50, this.constructor.refresh_queue_manager));
       });
 
       if (deferreds.length > 0)

@@ -91,26 +91,30 @@ $(function() {
 
     , directive_section_descriptor =
         GGRC.JoinDescriptor.by_object_option_models.Regulation.Section[0]
-    , program_directive_options = {
-          list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , section_child_options = [{
+          model : CMS.Models.Section
+        , mapping : "sections"
+        , fetch_post_process : sort_sections
         , draw_children : true
-        , child_options : [{
-              model : CMS.Models.Section
-            , list_loader : function(directive) {
-                return directive_section_descriptor
-                  .get_loader()
-                  .attach(directive)
-                  .refresh_list();
-              }
-            , fetch_post_process : sort_sections
-            , draw_children : true
-            }]
-      }
+      }]
     , extra_content_controller_options = {
           Program: {
-              Regulation: program_directive_options
-            , Contract: program_directive_options
-            , Policy: program_directive_options
+              Regulation: {
+                mapping: "regulations"
+              , draw_children: true
+              , child_options: section_child_options
+              }
+            , Contract: {
+                mapping: "contracts"
+              , draw_children: true
+              , child_options: section_child_options
+              }
+            , Policy: {
+                mapping: "policies"
+              , draw_children: true
+              , child_options: section_child_options
+              }
+
             , Objective: {
                 mapping: "extended_related_objectives"
               , draw_children : true
@@ -153,17 +157,17 @@ $(function() {
               }
           }
         , Regulation: {
-          Section : program_directive_options.child_options[0]
-          , Control : { draw_children : true }
-        }
+              Section : section_child_options
+            , Control : { draw_children : true }
+          }
         , Policy: {
-          Section : program_directive_options.child_options[0]
-          , Control : { draw_children : true }
-        }
+              Section : section_child_options
+            , Control : { draw_children : true }
+          }
         , Contract : {
-          Section : program_directive_options.child_options[0]
-          , Control : { draw_children : true }
-        }
+              Section : section_child_options
+            , Control : { draw_children : true }
+          }
       }
     ;
 

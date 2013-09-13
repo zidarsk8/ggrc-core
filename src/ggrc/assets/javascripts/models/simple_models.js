@@ -151,6 +151,9 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , defaults : {
     kind : "Regulation"
   }
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    }
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
@@ -192,6 +195,9 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , defaults : {
     kind : "Company Policy"
   }
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    }
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
@@ -233,6 +239,9 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , defaults : {
     kind : "Contract"
   }
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    }
   , attributes : {
       owner : "CMS.Models.Person.model"
     , modified_by : "CMS.Models.Person.model"
