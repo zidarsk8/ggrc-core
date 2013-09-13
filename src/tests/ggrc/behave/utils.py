@@ -220,6 +220,7 @@ def get_service_endpoint_url(context, endpoint_name):
   `service_description` in the `context` to ues to lookup the endpoint url.
   """
   endpoint_name = resource_type_string(endpoint_name)
+  print endpoint_name
   return context.service_description.get(u'service_description')\
       .get(u'endpoints').get(unicode(endpoint_name)).get(u'href')
 

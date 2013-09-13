@@ -21,7 +21,7 @@ class Request(Base, db.Model):
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True), 'Request')
 
-  #responses = db.relationship('Response', backref='request', cascade='all, delete-orphan')
+  responses = db.relationship('Response', backref='request', cascade='all, delete-orphan')
 
   _publish_attrs = [
       'assignee',
@@ -32,7 +32,7 @@ class Request(Base, db.Model):
       'status',
       'audit',
       'objective',
-#      'responses',
+      'responses',
   ]
   _sanitize_html = [
       'gdrive_upload_path',

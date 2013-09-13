@@ -20,12 +20,14 @@ Feature: Basic RESTful CRUD Support
       | DataAsset          |
       #| Directive          |
       | DirectiveControl   |
+      | DocumentationResponse   |
       | Contract           |
       | Policy             |
       | Regulation         |
       | Document           |
       | Facility           |
       | Help               |
+      | InterviewResponse  |
       | Market             |
       #| Meeting            |
       #| ObjectDocument     |
@@ -35,7 +37,7 @@ Feature: Basic RESTful CRUD Support
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
+      | PopulationSampleResponse   |
       | Product            |
       | Project            |
       | Program            |
