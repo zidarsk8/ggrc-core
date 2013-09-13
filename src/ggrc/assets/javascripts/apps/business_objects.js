@@ -190,7 +190,7 @@ $(function() {
     });
     list_loader = new GGRC.ListLoaders.FilteredListLoader(
       new GGRC.ListLoaders.MultiListLoader(sources),
-      function(result) { return !!result.instance.selfLink; })
+      function(result) { return !!result.instance.selfLink && result.instance instanceof CMS.Models[model_name]; })
     list_loader = list_loader.attach(object);
 
     var far_model = join_descriptor.get_model(model_name)
