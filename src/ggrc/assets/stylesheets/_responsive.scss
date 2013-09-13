@@ -255,15 +255,30 @@
   .content {
     background: $white;
   }
-  .modal {
-    width: auto !important;
-    margin-left: 0 !important;
-    left: 10px !important;
-    right: 10px !important;
-    top: 30px !important;
-    .modal-footer {
-      .confirm-buttons {
-        text-align: left;
+  
+  .lhs-nav {
+    ul.sub-level {
+      li {
+        a {
+          min-height: 24px !important;
+          @include clearfix();
+          &:hover {
+            text-decoration: none;
+          }
+          .lhs-main-title {
+            float: left;
+            width: 141px;
+          }
+          .lhs-private {
+            float: left;
+            width: 20px;
+            margin-right: 14px;
+          }
+          .lhs-people {
+            float: left;
+            width: 20px;
+          }
+        }
       }
     }
   }
