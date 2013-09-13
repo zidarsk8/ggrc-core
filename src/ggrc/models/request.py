@@ -13,7 +13,7 @@ class Request(Base, db.Model):
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request', u'Updated Response', u'Accepted')
   assignee_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
   assignee = db.relationship('Person')
-  request_type = deferred(db.Column(db.Enum( VALID_TYPES), nullable = False), 'Request')
+  request_type = deferred(db.Column(db.Enum(VALID_TYPES), nullable = False), 'Request')
   status = deferred(db.Column(db.Enum(VALID_STATES), nullable = False), 'Request')
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
@@ -45,5 +45,5 @@ class Request(Base, db.Model):
     query = super(Request, cls).eager_query()
     return query.options(
         orm.joinedload('audit'),
-        orm.joinedload('objective'))
-        #orm.subqueryload('responses'))
+        orm.joinedload('objective'),
+        orm.subqueryload('responses'))

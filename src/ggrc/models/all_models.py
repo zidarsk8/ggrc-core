@@ -19,6 +19,7 @@ from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract
 from .directive_control import DirectiveControl
 from .document import Document
+from .evidence import Evidence
 from .facility import Facility
 from .help import Help
 from .market import Market
@@ -72,6 +73,7 @@ all_models = [
     Regulation,
   DirectiveControl,
   Document,
+  Evidence,
   Facility,
   Help,
   Market,

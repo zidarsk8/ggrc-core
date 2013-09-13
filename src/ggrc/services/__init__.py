@@ -34,6 +34,7 @@ def all_collections():
       service('regulations', models.Regulation),
     service('directive_controls', models.DirectiveControl),
     service('documents', models.Document),
+    service('evidence', models.Evidence),
     service('events', models.Event, ReadOnlyResource),
     service('facilities', models.Facility),
     service('help', models.Help),

@@ -17,6 +17,7 @@ def upgrade():
     op.create_table('responses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('request_id', sa.Integer(), nullable=False),
+    sa.Column('response_type', sa.Enum(u'documentation', u'interview', u'population sample'), nullable=False),
     sa.Column('status', sa.Enum(u'Assigned', u'Accepted', u'Completed'), nullable=False),
     sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.Column('title', sa.String(length=250), nullable=False),
@@ -37,6 +38,19 @@ def upgrade():
     sa.ForeignKeyConstraint(['request_id'], ['requests.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('evidence',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('url', sa.String(length=250), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('modified_by_id', sa.Integer(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('context_id', sa.Integer(), nullable=True),
+    sa.Column('response_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['context_id'], ['contexts.id'], ),
+    sa.ForeignKeyConstraint(['response_id'], ['responses.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
 
 def downgrade():
+    op.drop_table('evidence')
     op.drop_table('responses')
