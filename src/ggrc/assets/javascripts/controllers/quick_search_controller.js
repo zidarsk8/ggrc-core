@@ -321,7 +321,7 @@ can.Control("CMS.Controllers.LHN_Search", {
             })
         };
 
-        can.view(self.options.list_view, context, function(frag, xhr) {
+        can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
         });
       });
