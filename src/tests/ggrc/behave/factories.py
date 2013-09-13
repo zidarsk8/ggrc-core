@@ -212,10 +212,11 @@ class ResponseFactory(ModelFactory):
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 class DocumentationResponseFactory(ResponseFactory):
-  pass
+  response_type = 'documentation'
 
 class InterviewResponseFactory(ResponseFactory):
-  pass
+  response_type = 'interview'
 
 class PopulationSampleResponseFactory(ResponseFactory):
-  pass
+  response_type = 'population sample'
+

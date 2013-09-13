@@ -51,6 +51,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -68,6 +69,9 @@ Feature: RBAC Permissions enforcement for REST API
       | ProgramDirective   |
       | Request            |
       #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -123,6 +127,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -140,6 +145,9 @@ Feature: RBAC Permissions enforcement for REST API
       | ProgramDirective   |
       | Request            |
       #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -203,6 +211,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -220,6 +229,9 @@ Feature: RBAC Permissions enforcement for REST API
       | ProgramDirective   |
       | Request            |
       #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -283,6 +295,7 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -300,6 +313,9 @@ Feature: RBAC Permissions enforcement for REST API
       | ProgramDirective   |
       | Request            |
       #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |

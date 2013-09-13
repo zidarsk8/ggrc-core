@@ -19,6 +19,7 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Policy             | 10              |
       | Regulation         | 10              |
       | Document           | 10              |
+      | Evidence           | 10              |
       | Facility           | 10              |
       | Market             | 10              |
 #      | Meeting            | 10              |
@@ -37,8 +38,11 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | Program            | 10              |
       | ProgramDirective   | 10              |
       | Relationship       | -1              |
-      | Request            | 10              |
-      #| Response           | 10              |
+      | Request            | 12              |
+      | Response           | 10              |
+      | DocumentationResponse    | 12        |
+      | InterviewResponse        | 12        |
+      | PopulationSampleResponse | 12        |
       | Risk               | 10              |
       | RiskyAttribute     | 10              |
       | RiskRiskyAttribute | 10              |

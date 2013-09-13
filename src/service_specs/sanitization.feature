@@ -37,6 +37,9 @@ Feature: String and Text column HTML sanitization
       | Project           | title, description |
       | Request           | gdrive_upload_path |
       #| Response          | status |
+      | DocumentationResponse     | title, description |
+      | InterviewResponse         | title, description |
+      | PopulationSampleResponse  | title, description |
       | Risk              | residual_risk, description, impact, title, trigger, preconditions, risk_mitigation, likelihood, kind, threat_vector, inherent_risk |
       | RiskyAttribute    | title, type_string, description |
       | Section           | title, description, notes |

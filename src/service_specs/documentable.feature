@@ -31,6 +31,9 @@ Feature: Some resources can be related to Document resources
       | Program           |
       | Project           |
       #| Response          |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk              |
       | RiskyAttribute    |
       | System            |
