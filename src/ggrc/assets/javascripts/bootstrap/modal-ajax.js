@@ -183,6 +183,7 @@
 
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
+      , object_params = $trigger.data('object-params')
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
@@ -194,15 +195,21 @@
         instance.owner.refresh({ "__include" : "owner" });
       }
 
+      var modal_title = (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"));
+      // If this was initiated via quick join link
+      if (object_params && object_params.section) {
+        modal_title = "Map " + modal_title + " to " + object_params.section.title;
+      }
+      
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
           new_object_form : !$trigger.attr('data-object-id')
-        , object_params : $trigger.data('object-params')
+        , object_params : object_params
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
-        , modal_title : (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"))
+        , modal_title : modal_title
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       });
 

@@ -68,7 +68,6 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.$content = this.element.find(".modal-body");
     this.options.$footer = this.element.find(".modal-footer");
     this.on();
-    this.fetch_all().then(this.proxy("apply_object_params"));
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
       .then(function() { that.element.trigger('preload') })

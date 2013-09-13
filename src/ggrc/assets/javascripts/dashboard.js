@@ -768,13 +768,15 @@ jQuery(function($) {
     $importLink.fadeIn();
   });
 
-  $('body').on('mouseenter', '.objective-create:hidden + .object-create', function(e) {
+  $('body').on('mouseenter', '.object-create', function(e) {
     var $this = $(this)
       , $objectiveLink = $this.closest('div').find('.objective-create')
       ;
-    $this.hide();
-    $objectiveLink.fadeIn();
-    $this.fadeIn();
+    if ($objectiveLink.is(":hidden")) {
+      $this.hide();
+      $objectiveLink.fadeIn();
+      $this.fadeIn();
+    }
   });
   
   $('body').on('click', '.show-long', function(e) {
