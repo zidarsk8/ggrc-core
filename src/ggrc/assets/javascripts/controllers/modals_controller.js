@@ -218,6 +218,9 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
   , set_value: function(item) {
+    // Don't set `_wysihtml5_mode` on the instances
+    if (item.name === '_wysihtml5_mode')
+      return;
     var instance = this.options.instance
       , that = this;
     if(!(instance instanceof this.options.model)) {
@@ -294,6 +297,12 @@ can.Control("GGRC.Controllers.Modals", {
       , ajd;
 
       this.serialize_form();
+
+      // Special case to handle context outside the form itself
+      // - this avoids duplicated change events, and the API requires
+      //   `context` to be present even if `null`, unlike other attributes
+      if (!instance.context)
+        instance.attr('context', { id: null });
 
       ajd = instance.save().done(function(obj) {
         that.element.trigger("modal:success", obj).modal_form("hide");

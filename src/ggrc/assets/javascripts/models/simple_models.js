@@ -57,6 +57,10 @@ can.Model.Cacheable("CMS.Models.Program", {
   }
 }, {});
 
+can.Model.Cacheable("CMS.Models.Cycle", {
+}, {
+});
+
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
   , root_collection : "directives"

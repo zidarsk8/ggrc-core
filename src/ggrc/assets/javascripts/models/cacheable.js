@@ -233,6 +233,9 @@ can.Model("can.Model.Cacheable", {
         //m.removeAttr('href');
       }
       fn(params, function(val, key) {
+        // Special case to avoid constant replacement of `null` contexts
+        if (key === 'context' && val == null && m[key] && m[key].id == null)
+          return;
         var i = 0, j = 0, k, changed = false;
         if(m[key] instanceof can.Observe.List) {
           if (changed === false) {
