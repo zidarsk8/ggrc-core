@@ -278,6 +278,10 @@ ul.new-tree {
   @include opacity(0.5);
 }
 
+.objective-create {
+  display:none;
+}
+
 .section-create,
 .section-import {
   display:none;
