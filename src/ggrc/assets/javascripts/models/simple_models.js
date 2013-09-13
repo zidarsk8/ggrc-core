@@ -34,7 +34,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     //, directives : "CMS.Models.get_instances"
     , program_controls : "CMS.Models.ProgramControl.models"
     , controls : "CMS.Models.Control.models"
-    , cycles : "CMS.Models.Cycle.models"
+    , audits : "CMS.Models.Audit.models"
   }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -991,6 +991,19 @@ can.Model.Cacheable("CMS.Models.Role", {
     if (this.name == "ProgramReader") return "View Only";
     return this.name;
   }
+
+});
+
+can.Model.Cacheable("CMS.Models.Audit", {
+  root_object : "audit"
+  , root_collection : "audits"
+  , update : "PUT /api/audits/{id}"
+  , destroy : "DELETE /api/audits/{id}"
+  , create : "POST /api/audits"
+  , attributes : {
+      program: "CMS.Models.Program.model"
+  }
+}, {
 
 });
 

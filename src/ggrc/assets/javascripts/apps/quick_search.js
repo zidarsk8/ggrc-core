@@ -359,6 +359,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["System", "Control", "SystemControl", "control", "system"]
       //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
+      , ["Program", "Audit", null, null, "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , [directive_object_types, "Section", null, null, "directive"]
       , [directive_object_types, "Control", null, null, "directive"]

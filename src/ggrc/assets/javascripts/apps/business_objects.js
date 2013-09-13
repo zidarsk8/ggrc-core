@@ -114,6 +114,18 @@ $(function() {
             , Contract: program_directive_options
             , Control: { draw_children : true }
             , Objective: { draw_children : true }
+            , Audit : { 
+              allow_creating : true
+              , allow_mapping : false
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+              , list_loader : function(program) {
+                return GGRC.JoinDescriptor.by_object_option_models.Program.Audit[0]
+                  .get_loader()
+                  .attach(program)
+                  .refresh_list();
+              }
+            }
           }
         , Regulation: {
           Section : program_directive_options.child_options[0]

@@ -179,6 +179,9 @@ dashboard-js-template-files:
   - sections/tree_footer.mustache
   - people/tree_footer.mustache
   - documents/tree_footer.mustache
+  - audits/modal_content.mustache
+  - audits/tree.mustache
+  - audits/tree_footer.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
