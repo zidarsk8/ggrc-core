@@ -1,4 +1,5 @@
 import csv
+import chardet
 import os
 from ggrc.models import Directive, Section
 from StringIO import StringIO
@@ -18,8 +19,7 @@ def handle_csv_import(converter_class, filepath, **options):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
 
   try:
-    csv_reader = unicode_csv_reader(csv_file.read().splitlines(True))
-    rows = [row for row in csv_reader]
+    rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
   except UnicodeDecodeError: # Decode error occurs when a special character symbol is inserted in excel.
     raise ImportException("Could not import: invalid character encountered, verify the file is correctly formatted.")
 
@@ -27,14 +27,27 @@ def handle_csv_import(converter_class, filepath, **options):
   converter = converter_class.from_rows(rows, **options)
   return converter.do_import(options.get('dry_run', True))
 
-def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
-  csv_reader = csv.reader(utf_8_encoder(unicode_csv_data), dialect=dialect, **kwargs)
-  for row in csv_reader:
+def csv_reader(csv_data, dialect=csv.excel, **kwargs):
+  reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
+  for row in reader:
     yield [unicode(cell, 'utf-8') for cell in row]
 
-def utf_8_encoder(unicode_csv_data):
-  for line in unicode_csv_data:
-    yield line.encode('utf-8')
+def utf_8_encoder(csv_data):
+  """This function is a generator that attempts to encode the string as utf-8.
+  It is assumed that the data is likely to be encoded in ascii. If encoding
+  fails, however, the function will attempt to guess the encoding and convert
+  it to utf-8.
+
+  Guessing is only done when a line fails to encode as there may be characters
+  further in the stream that aren't valid ascii and encoding is performed per
+  line yielded; guessing is the fallback on a per-line basis.
+  """
+  for line in csv_data:
+    try:
+      yield line.encode('utf-8')
+    except UnicodeDecodeError:
+      encoding_guess = chardet.detect(line)['encoding']
+      yield line.decode(encoding_guess).encode('utf-8')
 
 def handle_converter_csv_export(filename, objects, converter_class, **options):
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
