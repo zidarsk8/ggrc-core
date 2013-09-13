@@ -182,6 +182,8 @@ dashboard-js-template-files:
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/tree_footer.mustache
+  - audits/search_result.mustache
+  - audits/extended_info.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

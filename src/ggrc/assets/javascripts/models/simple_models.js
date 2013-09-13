@@ -1001,7 +1001,30 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
   , attributes : {
-      program: "CMS.Models.Program.model"
+    program: "CMS.Models.Program.model"
+    , requests : "CMS.Models.Request.models"
+    , modified_by : "CMS.Models.Person.model"
+    , start_date : "date"
+    , end_date : "date"
+    , report_start_date : "date"
+    , report_end_date : "date"
+    , object_people : "CMS.Models.ObjectPerson.models"
+    , people : "CMS.Models.Person.models"
+  }
+  , defaults : {
+    status : "Draft"
+  }
+}, {
+
+});
+
+can.Model.Cacheable("CMS.Models.Request", {
+  root_object : "request"
+  , root_collection : "requests"
+  , create : "POST /api/reqeusts"
+  , attributes : {
+    audit : "CMS.Models.Audits.model"
+    , responses : "CMS.Models.Response.models"
   }
 }, {
 
