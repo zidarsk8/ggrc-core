@@ -7,6 +7,12 @@
 }
 
 @media (max-width: 767px) {
+  
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
   .header-bar {
     .menu {
       li.black-link {
@@ -247,7 +253,18 @@
   }
   
   .content {
-    padding-top: 20px;
     background: $white;
+  }
+  .modal {
+    width: auto !important;
+    margin-left: 0 !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: 30px !important;
+    .modal-footer {
+      .confirm-buttons {
+        text-align: left;
+      }
+    }
   }
 }
