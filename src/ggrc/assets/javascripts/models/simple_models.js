@@ -1021,10 +1021,17 @@ can.Model.Cacheable("CMS.Models.Audit", {
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
   , root_collection : "requests"
-  , create : "POST /api/reqeusts"
+  , create : "POST /api/requests"
+  , destroy : "DELETE /api/requests/{id}"
   , attributes : {
     audit : "CMS.Models.Audits.model"
     , responses : "CMS.Models.Response.models"
+    , assignee : "CMS.Models.Person.model"
+    , requested_on : "date"
+    , due_on : "date"
+  }
+  , defaults : {
+    status : "Draft"
   }
 }, {
 

@@ -33,6 +33,28 @@ var makeFindRelated = function(thistype, othertype) {
   };
 };
 
+function dateConverter(d) {
+  var conversion = "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  if(typeof d === "object") {
+    d = d.getTime();
+  }
+  if(typeof d === "number") {
+    d /= 1000;
+    conversion = "X";
+  }
+  return moment(d.toString(), conversion).zone(new Date().getTimezoneOffset()).toDate();
+}
+
+function makeDateSerializer(type) {
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  return function(d) {
+    if(typeof d !== "number") {
+      d = d.getTime();
+    }
+    return moment((d / 1000).toString(), "X").utc().format(conversion);
+  };
+}
+
 
 can.Model("can.Model.Cacheable", {
 
@@ -73,6 +95,13 @@ can.Model("can.Model.Cacheable", {
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
       this.findAll = can.Model.Cacheable.findAll;
+
+    //set up default attribute converters/serializers for all classes
+    can.extend(this.attributes, {
+      created_at : "datetime"
+      , updated_at : "datetime"
+    });
+
     return ret;
   }
   , init : function() {
@@ -312,6 +341,14 @@ can.Model("can.Model.Cacheable", {
     }
     return m;
   }
+  , convert : {
+    "date" : dateConverter
+    , "datetime" : dateConverter
+  }
+  , serialize : {
+    "datetime" : makeDateSerializer("datetime")
+    , "date" : makeDateSerializer("date")
+  }
   , tree_view_options : {}
   , risk_tree_options : {
     single_object : true
@@ -465,6 +502,11 @@ can.Model("can.Model.Cacheable", {
   , attr : function() {
     if(arguments.length < 1) {
       return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
+    } else if(arguments[0] instanceof can.Observe) {
+      if(arguments[0] === this)
+        return this;
+      else
+        return this._super(arguments[0].serialize());
     } else {
       return this._super.apply(this, arguments);
     }
