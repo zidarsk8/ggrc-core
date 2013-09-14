@@ -768,7 +768,7 @@ jQuery(function($) {
       , end = out ? width : 0
       ;
 
-    out && $this.fadeOut();
+    out && $this.fadeOut(200);
 
     // Process animation
     $expander.css({
