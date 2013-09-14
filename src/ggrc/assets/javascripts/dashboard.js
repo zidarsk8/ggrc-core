@@ -758,14 +758,51 @@ function resize_areas() {
 
 jQuery(function($) {
 
-  $('body').on('mouseenter', '.section-add', function(e) {
-    var $this = $(this)
-      , $createLink = $this.closest('div').find('.section-create')
-      , $importLink = $this.closest('div').find('.section-import')
+  function expander(toggle, direction) {
+    var $this = $(toggle)
+      , $expander = $this.closest('div').find('.section-expander')
+      , out = direction === "out"
+      , height = $expander.outerHeight()
+      , width = $expander.outerWidth()
+      , start = out ? 0 : width
+      , end = out ? width : 0
       ;
-    $this.hide();
-    $createLink.fadeIn();
-    $importLink.fadeIn();
+
+    out && $this.fadeOut();
+
+    // Process animation
+    $expander.css({
+      display: 'inline-block'
+      , marginRight: end + 'px'
+      , clip: 'rect(0px, ' + start + 'px, ' + height + 'px, 0px)'
+    }).animate({
+      marginRight: start + 'px'
+    }, {
+      duration: 500,
+      easing: "easeInOutExpo",
+      step: function(now, fx) {
+        $(this).css('clip', 'rect(0px, '+ (width - now) +'px, ' + height + 'px, 0px)')
+      },
+      complete: function() {
+        if (!out) {
+          $this.fadeIn();
+          $(this).hide(); 
+        }
+        $(this).css({
+          marginRight: '0px'
+          , clip: 'auto'
+        })
+      }
+    });
+
+    // Queue the reverse on mouseout
+    out && $this.closest('li').one("mouseleave", function() {
+      expander($this, "in");
+    })
+  };
+
+  $('body').on('mouseenter', '.section-add', function(e) {
+    expander(this, "out")
   });
 
   $('body').on('mouseenter', '.object-create', function(e) {

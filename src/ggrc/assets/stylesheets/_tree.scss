@@ -282,17 +282,22 @@ ul.new-tree {
   display:none;
 }
 
-.section-create,
-.section-import {
-  display:none;
-  i {
-    @include opacity(0.3);
-  }
-  &:hover {
-   text-decoration:none;
-   i {
-     @include opacity(0.6);
-   } 
+.section-expandable {
+  position:relative;
+  .section-expander {
+    display:none;
+    position:absolute;
+    left:0;
+    top:0;
+    i {
+      @include opacity(0.3);
+    }
+    &:hover {
+     text-decoration:none;
+     i {
+       @include opacity(0.6);
+     } 
+    }
   }
 }
 
