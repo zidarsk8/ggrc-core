@@ -1203,6 +1203,8 @@
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
 
+      options.object_params = $this.data("object-params");
+
       e.preventDefault();
 
       // Trigger the controller
