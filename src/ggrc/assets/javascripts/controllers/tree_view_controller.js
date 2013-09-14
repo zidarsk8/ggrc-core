@@ -283,6 +283,7 @@ can.Control("CMS.Controllers.TreeView", {
         can.each(oldVals, function(v) {
           that.element && that.element.trigger("removeChild", v);
         });
+        delete that.oldList;
       } else {
         list = can.map(list, function(l) { return l.instance || l});
         can.each(oldVals, function(v) {
