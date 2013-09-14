@@ -342,8 +342,8 @@ $.each({
 Mustache.registerHelper("if_equals", function(val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
-    if(_val1 == _val2) return options.fn(that);
-    else return options.inverse(that);
+    if(_val1 == _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
   }
     if(typeof val1 === "function") { 
       if(val1.isComputed) {
