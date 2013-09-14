@@ -1,0 +1,5 @@
+dashboard-js-files:
+  - models/gdrive_models.js
+
+dashboard-js-spec-files:
+  - models/gdrive_models_spec.js

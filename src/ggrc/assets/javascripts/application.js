@@ -207,7 +207,6 @@ jQuery.extend(GGRC, {
 var etags = {};
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   var data;
-  jqXHR.setRequestHeader("X-Requested-By", "gGRC");
   if ( /^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
     data = originalOptions.data;
     options.dataType = "json";
@@ -220,6 +219,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     options.cache = false;
   }
   if( /^\/api\/\w+/.test(options.url)) {
+    jqXHR.setRequestHeader("X-Requested-By", "gGRC");
     jqXHR.done(function(data, status, xhr) {
       if(!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
         return;

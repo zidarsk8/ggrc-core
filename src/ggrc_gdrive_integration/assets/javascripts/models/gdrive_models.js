@@ -5,14 +5,16 @@
  * Maintained By: Bradley Momberger
  */
 
+(function(can) {
+
 can.Model("GGRC.Models.GDriveFolder", {
 
   findAll : function(params) {
     if(!params || !params.parentfolderid) {
-      throw "ERROR: parentfolderid is required for GDriveFolder.findAll";
+      params = { parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER };
     }
     return $.ajax({
-      url : /* "https://script.google.com/" + */ "/macros/s/AKfycbxb-W3rUBTKFF6Ua_eJ5PH9RAvGVL7W3aDqtmnbnUc7PD0FY3zo/exec?command=listfolders"
+      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=listfolders"
       , type : "get"
       , dataType : "json"
       , data : { parameters : JSON.stringify(params) }
@@ -35,3 +37,5 @@ can.Model("GGRC.Models.GDriveFolder", {
   }
 
 });
+
+})(window.can);

@@ -91,8 +91,6 @@ dashboard-js-files:
   - jquery.remotipart-patched.js
   #- d3.v2.js
   - related_graph.js
-  # below this line refactor into GDrive integration plugin
-  - models/gdrive_models.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
