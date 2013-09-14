@@ -7,6 +7,17 @@
 
 //= require can.jquery-all
 
+function _firstElementChild(el) {
+  if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    for (i=0; i<el.childNodes.length; i++) {
+      if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
+        return el.childNodes[i];
+    }
+  } else {
+    return el;
+  }
+}
+
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
@@ -73,6 +84,7 @@ can.Control("CMS.Controllers.TreeView", {
   , init : function(el, opts) {
     this.element.uniqueId();
     this.element.trigger("loading");
+    this.init_view();
     this.options.list ? this.draw_list() : this.fetch_list();
 
     var object_type = can.underscore(
@@ -90,6 +102,25 @@ can.Control("CMS.Controllers.TreeView", {
     this.options.attr("allow_mapping_or_creating",
       this.options.allow_mapping || this.options.allow_creating);
   }
+
+  , init_view : function() {
+      var that = this;
+
+      if(this.options.header_view) {
+        header_dfd = can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+          that.options.attr("$header", $(_firstElementChild(frag)));
+          that.element && that.element.append(frag);
+        });
+      }
+
+      if(this.options.footer_view) {
+        can.view(this.options.footer_view, this.options, function(frag) {
+          that.options.attr("$footer", $(_firstElementChild(frag)));
+          that.element && that.element.append(frag);
+        });
+      }
+
+    }
 
   , fetch_list : function() {
     var find_function;
@@ -182,14 +213,6 @@ can.Control("CMS.Controllers.TreeView", {
     this.options.attr("list", []);
     this.on();
 
-
-    if(this.options.header_view) {
-      header_dfd = can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
-        that.options.attr("$header", $(frag.children));
-        that.element.append(frag);
-      });
-    }
-
     var temp_list = [];
     can.each(list, function(v, i) {
       var item = that.prepare_child_options(v);
@@ -224,20 +247,13 @@ can.Control("CMS.Controllers.TreeView", {
               return;
             }
 
-            that.element.trigger("updateCount", that.options.list.length)
+            that.element && that.element.trigger("updateCount", that.options.list.length)
             .trigger("loaded")
             .trigger("subtree_loaded")
             .find(".spinner").remove();
           });
         }
       });
-
-      if(that.options.footer_view) {
-        can.view(that.options.footer_view, that.options, function(frag) {
-          that.options.attr("$footer", $(frag.children));
-          that.element && that.element.append(frag);
-        });
-      }
     });
   }
 
@@ -246,7 +262,7 @@ can.Control("CMS.Controllers.TreeView", {
     can.each(newVals, function(newVal) {
       var _newVal = newVal.instance ? newVal.instance : newVal;
       if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
-        that.element.trigger("newChild", newVal);
+        that.element && that.element.trigger("newChild", newVal);
       } 
     });
     delete that.oldList;
@@ -260,14 +276,14 @@ can.Control("CMS.Controllers.TreeView", {
     GGRC.queue_event(function() {
       if(that.oldList) {
         can.each(oldVals, function(v) {
-          that.element.trigger("removeChild", v);
+          that.element && that.element.trigger("removeChild", v);
         });
       } else {
         list = can.map(list, function(l) { return l.instance || l});
         can.each(oldVals, function(v) {
           var _v = v.instance || v;
           if(!~can.inArray(_v, list)) {
-            that.element.trigger("removeChild", v);
+            that.element && that.element.trigger("removeChild", v);
           }
         });
       }
@@ -515,20 +531,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
     , firstchild
     ;
 
-    if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-      for (i=0; !firstchild && i<el.childNodes.length; i++) {
-        if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
-          firstchild = $(el.childNodes[i]);
-      }
-    } else {
-      firstchild = $el.first();
-    }
+    firstchild = $(_firstElementChild(el));
 
     old_data.controls = old_data.controls.slice(0);
     old_el.data("controls", []);
-    el = $el.get(0);
     this.off();
-    old_el.replaceWith($el);
+    old_el.replaceWith(el);
     this.element = firstchild.addClass(this.constructor._fullName).data(old_data);
     this.on();
   }
@@ -536,7 +544,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
     this.options.attr('expanded', true);
-    var instance = el.data("model");
     if(!this.options.child_options && this.options.draw_children) {
       this.add_child_lists_to_child();
     }

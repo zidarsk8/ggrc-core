@@ -94,9 +94,8 @@ $(function() {
     , section_child_options = [{
           model : CMS.Models.Section
         , mapping : "sections"
-        , fetch_post_process : sort_sections
-        , show_view : GGRC.mustache_path + "/directives/tree.mustache"
-        , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
+        , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+        , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
         , draw_children : true
       }]
     , extra_content_controller_options = {
@@ -105,25 +104,38 @@ $(function() {
                 mapping: "regulations"
               , draw_children: true
               , child_options: section_child_options
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Contract: {
                 mapping: "contracts"
               , draw_children: true
               , child_options: section_child_options
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Policy: {
                 mapping: "policies"
               , draw_children: true
               , child_options: section_child_options
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
 
             , Objective: {
                 mapping: "extended_related_objectives"
-              , draw_children : true
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
               }
             , Control: {
                 mapping: "extended_related_controls"
-              , draw_children : true
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
               }
 
             , DataAsset: {

@@ -916,6 +916,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
         model : can.Model.Cacheable
       , mapping : "related_objects"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]
