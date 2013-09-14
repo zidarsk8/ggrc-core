@@ -63,7 +63,7 @@ can.Construct("ModelRefreshQueue", {
         if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6))
           this.trigger();
         else
-          setTimeout(this.proxy("trigger_with_debounce", delay), ms_to_wait);
+          setTimeout(this.proxy("trigger_with_debounce", delay, manager), ms_to_wait);
       }
 
       return this.deferred;
@@ -174,7 +174,7 @@ can.Construct("RefreshQueue", {
       this.triggered = true;
       can.each(this.queues, function(queue) {
         deferreds.push(queue.trigger_with_debounce(
-            50, this.constructor.refresh_queue_manager));
+            50, self.constructor.refresh_queue_manager));
       });
 
       if (deferreds.length > 0)
