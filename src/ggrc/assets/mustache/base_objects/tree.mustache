@@ -79,7 +79,9 @@
                 </span>
               {{/instance.owner}}
               {{#if instance.owner}}
-                {{instance.owner.name}}
+                {{#using owner=instance.owner}}
+                {{owner.name}}
+                {{/using}}
               {{/if}}
             </div>
           </div>
