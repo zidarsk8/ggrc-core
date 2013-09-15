@@ -651,11 +651,11 @@
 
         return (mapping.constructor === model
                 && mapping[this.object_attr]
-                && (mapping[this.object_attr] === binding.instance
-                    || (mapping[this.object_attr].constructor == object_model &&
+                && (mapping[this.object_attr].reify() === binding.instance
+                    || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
                 && (!option_model
-                    || mapping[this.option_attr] instanceof option_model));
+                    || mapping[this.option_attr].reify() instanceof option_model));
       }
 
     , filter_and_insert_instances_from_mappings: function(binding, mappings) {
@@ -693,7 +693,7 @@
 
     , get_result_from_mapping: function(binding, mapping) {
         return this.make_result({
-            instance: mapping[this.option_attr]
+            instance: mapping[this.option_attr].reify()
           , mappings: [{
                 instance: mapping
               , mappings: [{
@@ -706,7 +706,7 @@
       }
 
     , get_instance_from_mapping: function(binding, mapping) {
-        return mapping[this.option_attr];
+        return mapping[this.option_attr].reify();
       }
 
     , find_result_from_mapping: function(binding, mapping) {
@@ -731,7 +731,7 @@
           , object_join_attr = this.object_join_attr || model.table_plural
           ;
 
-        can.each(binding.instance[object_join_attr], function(mapping) {
+        can.each(binding.instance[object_join_attr].reify(), function(mapping) {
           refresh_queue.enqueue(mapping);
         });
 
@@ -801,8 +801,8 @@
 
         return (mapping.constructor === model
                 && mapping[this.object_attr]
-                && (mapping[this.object_attr] === binding.instance
-                    || (mapping[this.object_attr].constructor == object_model &&
+                && (mapping[this.object_attr].reify() === binding.instance
+                    || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id)));
       }
 
@@ -871,7 +871,7 @@
         var self = this
           , model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr];
+          , mappings = binding.instance[object_join_attr].reify();
           ;
 
         binding._refresh_stubs_deferred =

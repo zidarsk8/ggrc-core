@@ -342,11 +342,11 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
-  , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
-    if (this.options.instance instanceof can.Model && !this.options.instance.isNew()) {
-      this.options.instance.refresh();
+  , " hide" : function() {
+      if (this.options.instance instanceof can.Model && !this.options.instance.isNew()) {
+        this.options.instance.refresh();
+      }
     }
-  }
 
   , destroy : function() {
     if(this.options.model && this.options.model.cache) {

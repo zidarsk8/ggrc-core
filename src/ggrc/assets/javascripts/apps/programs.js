@@ -101,6 +101,16 @@ can.Construct("RefreshQueueManager", {
         , id = obj.id
         ;
 
+      if (!obj.selfLink) {
+        if (obj instanceof can.Model) {
+          model_name = obj.constructor.shortName;
+        } else if (obj.type) {
+          // FIXME: obj.kind is to catch invalid stubs coming from Directives
+          model_name = obj.type || obj.kind;
+        }
+      }
+      model = CMS.Models[model_name];
+
       if (this.constructor.model_bases[model_name]) {
         model_name = this.constructor.model_bases[model_name];
         model = CMS.Models[model_name];
@@ -179,7 +189,9 @@ can.Construct("RefreshQueue", {
 
       if (deferreds.length > 0)
         $.when.apply($, deferreds).then(function() {
-          self.deferred.resolve(self.objects);
+          self.deferred.resolve(can.map(self.objects, function(obj) {
+            return obj.reify();
+          }));
         });
       else
         return this.deferred.resolve(this.objects);

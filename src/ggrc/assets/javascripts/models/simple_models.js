@@ -134,9 +134,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }));*/
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
-  , stub : function() {
-    return $.extend(this._super(), {kind : this.kind });
-  }
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
@@ -1027,6 +1024,14 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
         });
   }
   return instance;
+};
+
+CMS.Models.get_stub = function(object) {
+  return CMS.Models.get_instance(object).stub();
+}
+
+CMS.Models.get_stubs = function(objects) {
+  return CMS.Models.get_instances(objects).stubs();
 };
 
 CMS.Models.get_instances = function(objects) {

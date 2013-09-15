@@ -190,9 +190,6 @@
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
-      if(instance && instance.owner && !instance.owner.selfLink) {
-        instance.owner.refresh({ "__include" : "owner" });
-      }
 
       $target
       .modal_form(option, $trigger)
