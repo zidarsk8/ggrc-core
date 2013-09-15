@@ -55,7 +55,7 @@ can.Control("CMS.Controllers.TreeView", {
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
   }
-  , do_not_propagate : ["$header", "$footer", "header_view", "footer_view", "list", "original_list", "single_object", "find_function"]
+  , do_not_propagate : ["header_view", "footer_view", "list", "original_list", "single_object", "find_function"]
 }, {
   //prototype properties
   setup : function(el, opts) {
@@ -83,14 +83,15 @@ can.Control("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     this.element.uniqueId();
-    this.element.trigger("loading");
-    this.init_view();
     var that = this;
 
     // In some cases, this controller is immediately replaced
     setTimeout(function() {
-      if (that.element)
+      if (that.element) {
+        that.element.trigger("loading");
+        that.init_view();
         that.options.list ? that.draw_list() : that.fetch_list();
+      }
     }, 100);
 
     var object_type = can.underscore(
@@ -113,19 +114,20 @@ can.Control("CMS.Controllers.TreeView", {
       var that = this;
 
       if(this.options.header_view) {
-        header_dfd = can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
-          that.options.attr("$header", $(_firstElementChild(frag)));
-          that.element && that.element.append(frag);
+        can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+          if (that.element) {
+            that.element.prepend(frag);
+          }
         });
       }
 
       if(this.options.footer_view) {
         can.view(this.options.footer_view, this.options, function(frag) {
-          that.options.attr("$footer", $(_firstElementChild(frag)));
-          that.element && that.element.append(frag);
+          if (that.element) {
+            that.element.append(frag);
+          }
         });
       }
-
     }
 
   , fetch_list : function() {
@@ -326,8 +328,8 @@ can.Control("CMS.Controllers.TreeView", {
 
   , draw_item : function(options) {
     var $li = $("<li>");
-    if(this.options.$footer && this.options.$footer.length) {
-      $li.insertBefore(this.options.$footer);
+    if(this.element.find('.tree-footer').length) {
+      $li.insertBefore(this.element.find('.tree-footer'));
     } else {
       $li.appendTo(this.element);
     }

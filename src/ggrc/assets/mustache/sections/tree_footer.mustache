@@ -2,7 +2,7 @@
 {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName parent_instance.context.id}}
-<li class="tree-item tree-item-add">
+<li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
       <a href="javascript://" class="section-add">
@@ -34,7 +34,7 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-item tree-item-add">
+<li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
       <a
