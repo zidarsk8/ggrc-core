@@ -220,7 +220,7 @@ class ColumnHandler(object):
   def do_import(self, content):
     self.original = content
     if not self.options.get('no_import'):
-      return self.go_import(content)
+      self.go_import(content)
 
   def go_import(self, content):
     if content or content == '':
@@ -229,8 +229,6 @@ class ColumnHandler(object):
       if data is not None:
         self.value = data
         self.set_attr(data)
-      return data
-    return ''
 
   def set_attr(self, value):
     self.importer.set_attr(self.key, value)
@@ -327,7 +325,7 @@ class DateColumnHandler(ColumnHandler):
         date_result = datetime.strptime(value, "%m/%d/%y")
       elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
         date_result = datetime.strptime(value, "%y/%m/%d")
-      else:
+      elif value:
         raise ValueError("Error parsing the date string")
 
       if date_result:
@@ -506,8 +504,6 @@ class LinksHandler(ColumnHandler):
     if self.options.get('append_only'):
       # Save old links plus new links
       if self.save_linked_objects():
-        #new_objects = self.created_links - self.get_existing_items()
-        #updated_total = self.created_links() + self.get_existing_items()
         if hasattr(obj, self.options.get('association')):
           target_attr = getattr(obj, self.options['association'])
           target_attr.extend([item for item in self.created_links() if item not in self.get_existing_items()])
