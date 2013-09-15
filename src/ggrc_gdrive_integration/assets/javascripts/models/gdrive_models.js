@@ -20,7 +20,28 @@ can.Model("GGRC.Models.GDriveFolder", {
       , data : { parameters : JSON.stringify(params) }
     });
   }
-  , create : "GET " + /* "https://script.google.com/" + */ "/macros/s/AKfycbxb-W3rUBTKFF6Ua_eJ5PH9RAvGVL7W3aDqtmnbnUc7PD0FY3zo/exec?command=addfolder"
+  , create : "POST https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=addfolder"
+  , removeFromParent : function(object, parent_id) {
+    if(typeof object === "object") {
+      object = this.store[object];
+    }
+    return $.ajax({
+      type : "POST"
+      , url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=deletefolder"
+      , dataType : "json"
+      , data : {
+        parameters : JSON.stringify({
+          folderid : id
+          , parentfolderid : parent_id
+        })
+      }
+    }).done(function(parents) {
+      obj.attr("parents", parents);
+    });
+  }
+  , destroy : function() {
+    throw "Destroy not supported for GDrive Folders. Use removeFromParent";
+  }
   , findChildFolders : function(params) {
     if(typeof params !== "string") {
       params = params.id;
@@ -36,6 +57,38 @@ can.Model("GGRC.Models.GDriveFolder", {
     return this.constructor.findChildFolders(this);
   }
 
+  //No longer a destroy per se, but rather unlinking from all parent folders.
+  , destroy : function() {
+    var that = this;
+    if(this.isNew())
+      return;
+    can.each(this.parents, function(parent) {
+      that.constructor.removeFromParent(that, parent.parentId);
+    });
+  }
+
 });
+
+can.Model("GGRC.Models.GDriveFile", {
+
+  findAll : function(params) {
+    if(!params || !params.folderid) {
+      params = { folderid : GGRC.config.GDRIVE_ROOT_FOLDER };
+    }
+    return $.ajax({
+      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=listfiles"
+      , type : "get"
+      , dataType : "json"
+      , data : { parameters : JSON.stringify(params) }
+    });
+  }
+
+  , destroy : function() {
+    throw "Destroy is not supported for GDrive Files. Use removeFromParent";
+  }
+
+}, {});
+
+
 
 })(window.can);

@@ -12,3 +12,6 @@ blueprint = Blueprint(
 
 for key in settings.exports:
   app.config.public_config[key] = app.config[key]
+
+# Initialize views
+import ggrc_gdrive_integration.views

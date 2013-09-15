@@ -1,0 +1,77 @@
+-extends 'layouts/dashboard.haml'
+
+-block extra_javascript
+  GGRC.page_object = ={ instance_json()|safe };
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.config = ={config_json()|safe};
+
+-block header
+  %script#folder_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <ul class="folders-list">
+        {{#this}}
+        <li> 
+          <a class="list-folders" href='javascript://' data-folder-id='{{id}}'>
+          {{name}}
+          </a>
+          <a href="{{url}}" target="_blank">Go to folder</a>
+        </li>
+        {{/this}} 
+      </ul>
+    -endraw
+
+  %script#file_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      {{#this}}
+      <li> 
+        <a href="{{url}}" target="_blank">{{name}}</a>
+      </li>
+      {{/this}} 
+    -endraw
+
+
+-block main
+  .clearfix
+    .object-area
+      %h2 Folders on GDrive
+      %a.go-up{ 'style' : "display: none "}      
+      %div#folders{"style" : "border : 1px solid black"} &nbsp;
+
+      %h2 Files on GDrive
+      %a.go-up{ 'style' : "display: none "}
+      %div#files{"style" : "border : 1px solid black"} &nbsp;
+
+      %br
+      %a.list-folders{ 'href' : 'javascript://'} List top level folders
+      %br
+      %a.list-files{ 'href' : 'javascript://'} List top level files
+
+      %h2 Add a folder
+      %div#add_file{'style' : 'border : 1px solid black'}
+        %label{ 'for' : '#foldername'} Folder name
+        %input#foldername{ 'type' : 'text', 'name' : 'name', 'value' : ''}
+  :javascript
+    $(function() {
+      $(document.body).on("click", ".list-folders", function(ev) {
+        var folder_id = $(this).data('folder-id');
+        can.view(
+          "#folder_tmpl"
+          , GGRC.Models.GDriveFolder.findAll({parentfolderid : folder_id})
+        ).done(function(frag) {
+          $("#folders").html(frag).data("folder-id", folder_id);
+        });
+      }).on("click", ".add-folder", function(ev) {
+
+      }).on("click", ".list-files", function(ev) {
+        var folder_id = $(this).data('folder-id');
+        can.view(
+          "#file_tmpl"
+          , GGRC.Models.GDriveFile.findAll({folderid : folder_id})
+        ).done(function(frag) {
+          $("#files").html(frag).data("folder-id", folder_id);
+        });
+      }).on("click", ".add-folder", function(ev) {
+
+      });
+
+    });

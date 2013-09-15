@@ -30,9 +30,8 @@ jQuery(document).ready(function($) {
   }).next().hide();
 });*/
 
-var GGRC = {
-  mustache_path: '/static/mustache'
-};
+var GGRC = window.GGRC || {};
+GGRC.mustache_path = '/static/mustache';
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
