@@ -76,8 +76,14 @@ class SectionsConverter(BaseConverter):
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().kind), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
+  # Called in case the object_map headers change amongst similar imports
+  def create_object_map(self):
+    if self.directive().kind == "Contract":
+      self.object_map = OrderedDict( [(k.replace("Section", "Clause"), v) \
+                          if 'Section' in k else (k, v) for k, v in self.object_map.items()] )
+
   def directive(self):
-    return self.options['directive']
+    return self.options.get('directive')
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()

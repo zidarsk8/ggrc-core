@@ -35,7 +35,8 @@ class SystemRowConverter(BaseRowConverter):
     id_str = "org_group_is_responsible_for_{}".format(
         "process" if self.options.get('is_biz_process') else "system")
     self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
-                relationship_type_id = id_str, direction = 'from', model_human_name = 'Org Group')
+                relationship_type_id = id_str, direction = 'from',
+                model_human_name = 'Org Group')
     self.handle_date('start_date')
     self.handle_date('created_at', no_import = True)
     self.handle_date('updated_at', no_import = True)
@@ -45,7 +46,6 @@ class SystemRowConverter(BaseRowConverter):
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
-
 
 class SystemsConverter(BaseConverter):
 
