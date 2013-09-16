@@ -7,6 +7,12 @@
 }
 
 @media (max-width: 767px) {
+  
+  body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
   .header-bar {
     .menu {
       li.black-link {
@@ -247,7 +253,33 @@
   }
   
   .content {
-    padding-top: 20px;
     background: $white;
+  }
+  
+  .lhs-nav {
+    ul.sub-level {
+      li {
+        a {
+          min-height: 24px !important;
+          @include clearfix();
+          &:hover {
+            text-decoration: none;
+          }
+          .lhs-main-title {
+            float: left;
+            width: 141px;
+          }
+          .lhs-private {
+            float: left;
+            width: 20px;
+            margin-right: 14px;
+          }
+          .lhs-people {
+            float: left;
+            width: 20px;
+          }
+        }
+      }
+    }
   }
 }
