@@ -11,12 +11,10 @@
       </label>
       <input id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
     </div>
-    {{#with_page_object_as "page_object"}}
-      <div class="span6">
-        &nbsp;
-        <input id="directive.id" name="directive" type="hidden" model="Directive" value="{{directive.id}}">
-      </div>
-    {{/with_page_object_as}}
+    <div class="span6">
+      &nbsp;
+      <input id="directive.id" name="directive" type="hidden" model="Directive" value="{{directive.id}}">
+    </div>
   </div>
   <div class="row-fluid">
     <div class="span12">

@@ -18,12 +18,13 @@
         </label>
         <input id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty directive.id ''}}">
         <p class="modal-value">
-          {{#directive}}
-            {{title}}
-          {{/directive}}
-          {{^directive}}
+          {{#if directive}}
+            {{#using directive=directive}}
+            {{directive.title}}
+            {{/using}}
+          {{else}}
             <i>No directive</i>
-          {{/directive}}
+          {{/if}}
         </p>
       </div>
     {{/with_page_object_as}}
