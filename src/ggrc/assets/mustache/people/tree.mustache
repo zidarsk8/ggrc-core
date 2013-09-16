@@ -7,12 +7,7 @@
             <div class='item-data'>
               <div class='tree-title-area'>
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{#instance.name}}
-                  {{trim}}
-                {{/instance.name}}
-                {{^instance.name}}
-                  {{instance.email}}
-                {{/instance.name}}
+                {{firstnonempty instance.name instance.email}}
               </div>
             </div>
           </div>

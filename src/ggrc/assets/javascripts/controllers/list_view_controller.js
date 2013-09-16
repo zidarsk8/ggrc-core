@@ -75,10 +75,45 @@ can.Control("GGRC.Controllers.ListView", {
       this.draw_list(this.options.list);
     } else {
       if (!this.options.list_loader) {
-        if (this.options.is_related)
+        if (this.options.is_related) {
           this.options.list_loader = related_model_list_loader;
-        else
+        } else if (this.options.model.list_view_options.find_function) {
+          var that = this;
+          this.options.list_loader = function(controller) {
+            var list = new can.Observe.List();
+
+            function insert_instance(instance) {
+              if (list.indexOf(instance) == -1) {
+                list.unshift(instance);
+              }
+            }
+
+            function remove_instance(instance) {
+              var index = list.indexOf(instance);
+
+              if (index > -1)
+                list.splice(index, 1);
+            }
+
+            controller.options.model.bind("created", function(ev, instance) {
+              if (instance.constructor == controller.options.model) {
+                insert_instance(instance);
+              }
+            });
+
+            var collection_name = that.options.model.root_collection+"_collection";
+            return that.options.model[that.options.model.list_view_options.find_function]().then(function(result) {
+              can.each(result[collection_name].reverse(), function(instance) {
+                if (instance.constructor == controller.options.model)
+                  insert_instance(instance);
+              });
+              that.options.pager = result.paging;
+              return result[collection_name];
+            });
+          };
+        } else {
           this.options.list_loader = model_list_loader;
+        }
       }
       this.fetch_list({});
     }
@@ -108,6 +143,19 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
   , "{list} change": "update_count"
-});
+  , ".view-more-paging click" : function(el, ev) {
+      var that = this;
+      var collection_name = that.options.model.root_collection+"_collection";
+      if (that.options.pager.has_next()) {
+        that.options.pager.next().done(function(data) {
+          if (data[collection_name] && data[collection_name].length > 0) {
+            that.options.list.push.apply(that.options.list, data[collection_name]);
+          }
+          that.options.pager = data.paging;
+        });
+      }
+    }
+  }
+);
 
 })(this.can, this.can.$);
