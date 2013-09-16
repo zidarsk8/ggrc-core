@@ -11,15 +11,10 @@
                   {{#person}}
                   {{#if email}}
                   <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">
-                    {{#name}}
-                      {{trim}}
-                    {{/name}}
-                    {{^name}}
-                      {{email}}
-                    {{/name}}
+                    {{firstnonempty name email}}
                   </a>
                   {{else}}
-                    {{name}}
+                    {{firstnonempty name email}}
                   {{/if}}
                   {{/person}}
                 </div>
