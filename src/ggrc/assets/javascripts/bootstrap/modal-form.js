@@ -159,12 +159,20 @@
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop') && this.is_form_dirty()) {
+        // Copy some base options from the original modal, 
+        // otherwise the form won't be properly reset on discard
+        var options = that.$element.control().options;
+
         // Confirm that the user wants to lose the data prior to hiding
         GGRC.Controllers.Modals.confirm({
           modal_title : "Discard Changes"
           , modal_description : "Are you sure that you want to discard your changes?"
           , modal_confirm : "Discard"
+          , instance : options.instance
+          , model : options.model
+          , skip_refresh : true
         }, function() {
+          that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
           that.hide();
         });
         return;

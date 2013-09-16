@@ -143,7 +143,10 @@ can.Control("GGRC.Controllers.Modals", {
   , fetch_data : function(params) {
     var that = this;
     var dfd;
-    if (this.options.instance) {
+    if (this.options.skip_refresh && this.options.instance) {
+      return new $.Deferred().resolve(this.options.instance);
+    }
+    else if (this.options.instance) {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
@@ -343,7 +346,9 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , " hide" : function() {
-      if (this.options.instance instanceof can.Model && !this.options.instance.isNew()) {
+      if (this.options.instance instanceof can.Model
+          && !this.options.skip_refresh
+          && !this.options.instance.isNew()) {
         this.options.instance.refresh();
       }
     }
