@@ -327,9 +327,12 @@ can.Control("CMS.Controllers.TreeView", {
   }
 
   , draw_item : function(options) {
-    var $li = $("<li>");
-    if(this.element.find('.tree-footer').length) {
-      $li.insertBefore(this.element.find('.tree-footer'));
+    var $li = $("<li>")
+      , $footer = this.element.children('.tree-footer')
+      ;
+
+    if($footer.length) {
+      $li.insertBefore($footer);
     } else {
       $li.appendTo(this.element);
     }
@@ -428,9 +431,11 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , init : function(el, opts) {
     var that = this;
     this.add_child_lists_to_child();
-    can.view(this.options.show_view, this.options, function(frag) {
-      that.replace_element(frag);
-    });
+    setTimeout(function() {
+      can.view(that.options.show_view, that.options, function(frag) {
+        that.replace_element(frag);
+      });
+    }, 20);
   }
 
   // add all child options to one TreeViewOptions object
