@@ -7,34 +7,45 @@
 
 (function(can) {
 
+$.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
+
+  if(/^https:\/\/script.google.com/.test(opts.url)) {
+    opts.data = opts.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(orig_opts.data);
+  }
+
+});
+
 can.Model("GGRC.Models.GDriveFolder", {
 
-  findAll : function(params) {
-    if(!params || !params.parentfolderid) {
-      params = { parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER };
-    }
-    return $.ajax({
-      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=listfolders"
-      , type : "get"
+  findAll : {
+    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
+    , type : "post"
+    , dataType : "json"
+    , data : { command : 'listfolders', parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER }
+  }
+  , create : function(params) {
+      params.id = params.parentfolderid;
+      delete params.parentfolderid;
+      return $.ajax({
+      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
+      , type : "post"
       , dataType : "json"
-      , data : { parameters : JSON.stringify(params) }
+      , data : { command : "addfolders", params : [params] }
     });
   }
-  , create : "POST https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=addfolder"
   , removeFromParent : function(object, parent_id) {
     if(typeof object === "object") {
       object = this.store[object];
     }
     return $.ajax({
       type : "POST"
-      , url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=deletefolder"
+      , url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?"
       , dataType : "json"
-      , data : {
-        parameters : JSON.stringify({
-          folderid : id
-          , parentfolderid : parent_id
-        })
-      }
+      , data : JSON.stringify({
+        command : "deletefolder"
+        , folderid : id
+        , parentfolderid : parent_id
+      })
     }).done(function(parents) {
       obj.attr("parents", parents);
     });
@@ -71,16 +82,11 @@ can.Model("GGRC.Models.GDriveFolder", {
 
 can.Model("GGRC.Models.GDriveFile", {
 
-  findAll : function(params) {
-    if(!params || !params.folderid) {
-      params = { folderid : GGRC.config.GDRIVE_ROOT_FOLDER };
-    }
-    return $.ajax({
-      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?command=listfiles"
-      , type : "get"
-      , dataType : "json"
-      , data : { parameters : JSON.stringify(params) }
-    });
+  findAll : {
+    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
+    , type : "post"
+    , dataType : "json"
+    , data : { command : 'listfiles', id : GGRC.config.GDRIVE_ROOT_FOLDER }
   }
 
   , destroy : function() {

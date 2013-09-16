@@ -8,15 +8,18 @@
 -block header
   %script#folder_tmpl{ 'type' : 'text/mustache' }
     -raw
+      <h3> Current folder : {{#if_equals parent ''}}Root folder{{else}}{{parent.name}}{{/if_equals}} </h3>
+      <a href="javascript://" class='list-folders go-up' style='{{#if_equals parent ''}}display: none{{/if_equals}}' data-folder-id="{{parent_id}}">Go up one level</a>
       <ul class="folders-list">
-        {{#this}}
+        {{#list}}
         <li> 
-          <a class="list-folders" href='javascript://' data-folder-id='{{id}}'>
+          <a class="list-folders" href='javascript://' {{data 'folder'}}>
           {{name}}
           </a>
+          |
           <a href="{{url}}" target="_blank">Go to folder</a>
         </li>
-        {{/this}} 
+        {{/list}} 
       </ul>
     -endraw
 
@@ -34,44 +37,81 @@
   .clearfix
     .object-area
       %h2 Folders on GDrive
-      %a.go-up{ 'style' : "display: none "}      
-      %div#folders{"style" : "border : 1px solid black"} &nbsp;
+      %div#folders{"style" : "border : 1px solid black; width: 400px"} &nbsp;
 
-      %h2 Files on GDrive
+      %h2 Files in the current folder
       %a.go-up{ 'style' : "display: none "}
-      %div#files{"style" : "border : 1px solid black"} &nbsp;
+      %div#files{"style" : "border : 1px solid black; width: 400px"} &nbsp;
 
       %br
-      %a.list-folders{ 'href' : 'javascript://'} List top level folders
-      %br
-      %a.list-files{ 'href' : 'javascript://'} List top level files
+      %a#load_top.list-folders{ 'href' : 'javascript://', 'style' : 'display:none'} List top level folders
 
       %h2 Add a folder
-      %div#add_file{'style' : 'border : 1px solid black'}
-        %label{ 'for' : '#foldername'} Folder name
-        %input#foldername{ 'type' : 'text', 'name' : 'name', 'value' : ''}
+      %div#add_folder{'style' : 'border : 1px solid black; width : 400px'}
+        %form{ 'action' : 'javascript://'}
+          %label{ 'for' : '#foldername'} Folder name
+          %input#foldername{ 'type' : 'text', 'name' : 'name', 'value' : ''}
+          %input.add-folder{ 'type' : 'button', 'value' : 'Add folder'}
   :javascript
     $(function() {
+      var folderstack = [GGRC.config.GDRIVE_ROOT_FOLDER];
+      var lblist = null;
+      var folderspinner, filespinner;
       $(document.body).on("click", ".list-folders", function(ev) {
-        var folder_id = $(this).data('folder-id');
+        var folder = $(this).data('folder')
+        , folder_id = folder ? folder.id : GGRC.config.GDRIVE_ROOT_FOLDER;
+        if($(this).is(".go-up")) {
+          folderstack.shift();
+          folder_id = folderstack[0];
+        } else {
+          folderstack.unshift(folder_id);
+        }
+        $("#folders").html((folderspinner = new Spinner({ length : 5, width : 2, radius : 2, y: 14, x: 15}).spin()).el).append("&nbsp;");
         can.view(
           "#folder_tmpl"
           , GGRC.Models.GDriveFolder.findAll({parentfolderid : folder_id})
+            .then(function(list) {
+              if(list.status && list.status() === 0) {
+              } else {
+                lblist = list;
+                return { 
+                  list : list, 
+                  parent : folder_id === GGRC.config.GDRIVE_ROOT_FOLDER ? null : folder
+                };
+              }
+            }, function(xhr, status) {
+              folderspinner.stop();
+              $("folders").html("error: " + e);
+              return new $.Deferred().reject();
+            })
         ).done(function(frag) {
           $("#folders").html(frag).data("folder-id", folder_id);
         });
-      }).on("click", ".add-folder", function(ev) {
 
-      }).on("click", ".list-files", function(ev) {
-        var folder_id = $(this).data('folder-id');
+        $("#files").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#file_tmpl"
-          , GGRC.Models.GDriveFile.findAll({folderid : folder_id})
+          , GGRC.Models.GDriveFile.findAll({id : folder_id}).fail(function(e) {
+            filespinner.stop();
+            $("#files").html("error: " + e);
+            return new $.Deferred().reject();
+          })
         ).done(function(frag) {
           $("#files").html(frag).data("folder-id", folder_id);
         });
       }).on("click", ".add-folder", function(ev) {
-
+        var that = this;
+        new GGRC.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]"), parentfolderid : folderstack[0], allowduplicatenames : false })
+        .save()
+        .fail(function(xhr, status){
+          $(document.body).trigger("ajax:flash", { error : [status]});
+        })
+        .done(function(noob) {
+          lblist.push(noob);
+          $(that).closest("form").reset();
+        })
       });
+
+      $("#load_top").click();
 
     });
