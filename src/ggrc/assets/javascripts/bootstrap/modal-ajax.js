@@ -183,7 +183,7 @@
 
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
-      , object_params = $trigger.data('object-params')
+      , object_params = $trigger.attr('data-object-params')
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
@@ -193,6 +193,9 @@
       }
       if(instance && instance.owner && !instance.owner.selfLink) {
         instance.owner.refresh({ "__include" : "owner" });
+      }
+      if (object_params) {
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
       }
 
       var modal_title = (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"));

@@ -1112,4 +1112,8 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
   return page_object.context ? page_object.context.id : null;
 });
 
+Mustache.registerHelper("json_escape", function(obj, options) {
+  return (""+resolve_computed(obj)).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+});
+
 })(this, jQuery, can);
