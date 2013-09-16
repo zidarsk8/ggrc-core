@@ -32,6 +32,17 @@
       {{/this}} 
     -endraw
 
+  %script#permissions_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      {{#if_equals status -1}}
+        Error: {{message}}
+      {{else}}
+      <h3>permissions</h3>
+      {{shareablepermissions}}
+      <h3>users</h3>
+      {{viewers}}
+      {{/if_equals}}
+    -endraw
 
 -block main
   .clearfix
@@ -40,8 +51,10 @@
       %div#folders{"style" : "border : 1px solid black; width: 400px"} &nbsp;
 
       %h2 Files in the current folder
-      %a.go-up{ 'style' : "display: none "}
       %div#files{"style" : "border : 1px solid black; width: 400px"} &nbsp;
+
+      %h2 Permissions on the current folder
+      %div#permissions{"style" : "border : 1px solid black; width: 400px"} &nbsp;
 
       %br
       %a#load_top.list-folders{ 'href' : 'javascript://', 'style' : 'display:none'} List top level folders
@@ -81,7 +94,7 @@
               }
             }, function(xhr, status) {
               folderspinner.stop();
-              $("folders").html("error: " + e);
+              $("folders").html("error: " + xhr.statusText);
               return new $.Deferred().reject();
             })
         ).done(function(frag) {
@@ -93,15 +106,27 @@
           "#file_tmpl"
           , GGRC.Models.GDriveFile.findAll({id : folder_id}).fail(function(e) {
             filespinner.stop();
-            $("#files").html("error: " + e);
+            $("#files").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
           })
         ).done(function(frag) {
           $("#files").html(frag).data("folder-id", folder_id);
         });
+
+        $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
+        can.view(
+          "#permissions_tmpl"
+          , GGRC.Models.GDriveFolderPermission.findAll({id : folder_id}).fail(function(e) {
+            filespinner.stop();
+            $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
+            return new $.Deferred().reject();
+          })
+        ).done(function(frag) {
+          $("#permissions").html(frag).data("folder-id", folder_id);
+        });
       }).on("click", ".add-folder", function(ev) {
         var that = this;
-        new GGRC.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]"), parentfolderid : folderstack[0], allowduplicatenames : false })
+        new GGRC.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]").val(), parentfolderid : folderstack[0], allowduplicatenames : false })
         .save()
         .fail(function(xhr, status){
           $(document.body).trigger("ajax:flash", { error : [status]});

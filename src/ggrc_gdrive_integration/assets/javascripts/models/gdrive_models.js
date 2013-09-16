@@ -95,6 +95,15 @@ can.Model("GGRC.Models.GDriveFile", {
 
 }, {});
 
+can.Model("GGRC.Models.GDriveFolderPermission", {
 
+  findAll : {
+    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
+    , type : "post"
+    , dataType : "json"
+    , data : { command : 'getFolderPermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+  }
+
+}, {});
 
 })(window.can);
