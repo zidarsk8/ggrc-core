@@ -273,6 +273,19 @@
   }
   .modal-body {
     max-height:none;
+    .small {
+      font-size:$f-small;
+      display: inline-block;
+      margin-left: 6px;
+    }
+    .large {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .icon-field {
+      margin-right: 4px;
+      margin-top: 6px;
+    }
     input,
     textarea {
       @include placeholder($footerBorder);
