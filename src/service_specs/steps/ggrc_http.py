@@ -9,6 +9,7 @@ import ggrc.app
 from behave import given, when, then
 from iso8601 import parse_date
 from sqlalchemy.orm.properties import RelationshipProperty
+from time import sleep, time
 
 from tests.ggrc.behave.utils import (
     Example, handle_example_resource, handle_named_example_resource,
@@ -94,6 +95,14 @@ def simple_post_of_named(context, name, url):
       'Expected status code {0}, received {1}'.format(
           200, response.status_code)
   context.response = response
+
+@given('wait')
+@then('wait')
+@when('wait')
+def do_wait(context):
+  t = time()
+  if time() - t < 1:
+    sleep(1)
 
 @given('HTTP POST to endpoint "{endpoint}"')
 def post_to_named_endpoint(context, endpoint):
