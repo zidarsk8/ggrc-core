@@ -20,13 +20,17 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 def get_permissions_json():
   return json.dumps(session['permissions'])
 
+def get_config_json():
+  return json.dumps(app.config.public_config)
+
 @app.context_processor
 def base_context():
   from ggrc.models import get_model
   return dict(
       get_model=get_model,
       permissions_json=get_permissions_json,
-      permissions=permissions
+      permissions=permissions,
+      config_json=get_config_json
       )
 
 from flask import render_template
