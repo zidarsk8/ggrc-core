@@ -286,6 +286,47 @@
       margin-right: 4px;
       margin-top: 6px;
     }
+    .objective-selector {
+      .audit-selector {
+        border: 1px solid $warmGray;
+        @include border-radius(3px);
+        padding: 4px;
+        min-height: 28px;
+        float: none;
+        clear: both;
+        display: inline-block;
+        color: $subTitle;
+        text-decoration: none;
+      }
+      .sub-level {
+        width: 400px;
+        &.in {
+          border: 1px solid $tabTitle;
+        }
+        li {
+          border-bottom: 1px solid $dropPlaceholder;
+          line-height: 28px;
+          a {
+            display: block;
+            color: $subTitle;
+            text-decoration: none;
+            padding-left: 4px;
+            &:hover {
+              background: $lightGray;
+            }
+          }
+          &:last-child {
+            border-bottom: none;
+          }
+          &.add-new {
+            a {
+              background: $dropPlaceholder;
+              color: $text;
+            }
+          }
+        }
+      }
+    }
     input,
     textarea {
       @include placeholder($footerBorder);
