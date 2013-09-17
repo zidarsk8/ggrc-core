@@ -99,14 +99,68 @@
         <label>
           Audit Lead
         </label>
-        <i class="grcicon-person-color pull-left icon-field"></i>
-        <input type="text" class="span8" name="owner_id">
+        <i class="grcicon-person-green pull-left icon-field"></i>
+        <div class="objective-selector">
+          <a href="#audit-lead" data-toggle="collapse" class="span8 audit-selector">Predrag Kanazir</a>
+          <ul id="audit-lead" class="sub-level collapse">
+            <li>
+              <a href="#">
+                Predrag Kanazir <span class="small">predrag@reciprocitylabs.com</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Vladan Mitevski <span class="small">vladan@reciprocitylabs.com</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Brad Momberger <span class="small">brad@reciprocitylabs.com</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Dan Ring <span class="small">dan@reciprocitylabs.com</span>
+              </a>
+            </li>
+            <li class="add-new">
+              <a href="#">+ Create New</a>
+            </li>
+          </ul>
+        </div>
         
         <label>
           Audit Firm
         </label>
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
-        <input type="text" class="span8" name="audit_firm">
+        <div class="objective-selector">
+          <a href="#audit-firm" data-toggle="collapse" class="span8 audit-selector">Silverboots & Friends</a>
+          <ul id="audit-firm" class="sub-level collapse">
+            <li>
+              <a href="#">
+                Silverboots & Friends
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Iron Man & Dart Wader
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Batman inc.
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Berlusconi Club
+              </a>
+            </li>
+            <li class="add-new">
+              <a href="#">+ Create New</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="row-fluid">
@@ -126,6 +180,8 @@
   <input type="hidden" name="context_id" value="">
   <input type="hidden" name="gdrive_evidence_folder" value="">
   <input type="hidden" name="url" value="">
+  <input type="hidden" name="owner_id" value="">
+  <input type="hidden" name="audit_firm" value="">
 </form>
 {{/instance}}
 {{!/div}}
