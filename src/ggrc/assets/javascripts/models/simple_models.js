@@ -18,23 +18,23 @@ can.Model.Cacheable("CMS.Models.Program", {
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
-    , program_directives : "CMS.Models.ProgramDirective.models"
-    //, directives : "CMS.Models.get_instances"
-    , program_controls : "CMS.Models.ProgramControl.models"
-    , controls : "CMS.Models.Control.models"
-    , cycles : "CMS.Models.Cycle.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , directives : "CMS.Models.Directive.stubs"
+    , program_controls : "CMS.Models.ProgramControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , cycles : "CMS.Models.Cycle.stubs"
   }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -56,6 +56,10 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {});
+
+can.Model.Cacheable("CMS.Models.Cycle", {
+}, {
+});
 
 can.Model.Cacheable("CMS.Models.Directive", {
   root_object : "directive"
@@ -86,25 +90,20 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
 
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , program_directives : "CMS.Models.ProgramDirective.models"
-    , programs : "CMS.Models.Program.models"
-    , sections : "CMS.Models.Section.models"
-    , controls : "CMS.Models.Control.models"
-  }
-  , serialize : {
-    "CMS.Models.Program.model" : function(val, type) {
-      return {id : val.id, href : val.selfLink || val.href};
-    }
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , defaults : {
   }
@@ -130,9 +129,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }));*/
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
-  , stub : function() {
-    return $.extend(this._super(), {kind : this.kind });
-  }
 });
 
 CMS.Models.Directive("CMS.Models.Regulation", {
@@ -151,26 +147,24 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , defaults : {
     kind : "Regulation"
   }
-  , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , program_directives : "CMS.Models.ProgramDirective.models"
-    , programs : "CMS.Models.Program.models"
-    , sections : "CMS.Models.Section.models"
-    , controls : "CMS.Models.Control.models"
-  }
-  , serialize : {
-    "CMS.Models.Program.model" : function(val, type) {
-      return {id : val.id, href : val.selfLink || val.href};
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
     }
+  , attributes : {
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -192,26 +186,24 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , defaults : {
     kind : "Company Policy"
   }
-  , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , program_directives : "CMS.Models.ProgramDirective.models"
-    , programs : "CMS.Models.Program.models"
-    , sections : "CMS.Models.Section.models"
-    , controls : "CMS.Models.Control.models"
-  }
-  , serialize : {
-    "CMS.Models.Program.model" : function(val, type) {
-      return {id : val.id, href : val.selfLink || val.href};
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
     }
+  , attributes : {
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -233,26 +225,24 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , defaults : {
     kind : "Contract"
   }
-  , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , program_directives : "CMS.Models.ProgramDirective.models"
-    , programs : "CMS.Models.Program.models"
-    , sections : "CMS.Models.Section.models"
-    , controls : "CMS.Models.Control.models"
-  }
-  , serialize : {
-    "CMS.Models.Program.model" : function(val, type) {
-      return {id : val.id, href : val.selfLink || val.href};
+  , tree_view_options : {
+      list_view : GGRC.mustache_path + "/directives/tree.mustache"
     }
+  , attributes : {
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -267,20 +257,20 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -346,20 +336,20 @@ can.Model.Cacheable("CMS.Models.Project", {
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -409,20 +399,20 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -488,21 +478,21 @@ can.Model.Cacheable("CMS.Models.Product", {
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
-    , type : "CMS.Models.Option.model"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , type : "CMS.Models.Option.stub"
   }
   , defaults : {
     type : null
@@ -596,20 +586,20 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -675,20 +665,20 @@ can.Model.Cacheable("CMS.Models.Market", {
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -788,20 +778,20 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
   }
   , risk_tree_options : { show_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
   , tree_view_options : {
@@ -855,47 +845,24 @@ can.Model.Cacheable("CMS.Models.Objective", {
       "Section" : "SectionObjective"
   }
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , section_objectives : "CMS.Models.SectionObjective.models"
-    , sections : "CMS.Models.Section.models"
-    , objective_controls : "CMS.Models.ObjectiveControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    //, people : "CMS.Models.Person.models"
-    //, documents : "CMS.Models.Document.models"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , objective_objects : "CMS.Models.ObjectObjective.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , section_objectives : "CMS.Models.SectionObjective.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , objective_controls : "CMS.Models.ObjectiveControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    //, people : "CMS.Models.Person.stubs"
+    //, documents : "CMS.Models.Document.stubs"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , objective_objects : "CMS.Models.ObjectObjective.stubs"
   }
 
   , defaults : {
   }
-
-  , mappings: {
-      people_mappings: {
-          attr: "object_people"
-        , target_attr: "person"
-      }
-    , document_mappings: {
-          attr: "object_documents"
-        , target_attr: "document"
-      }
-    , business_object_mappings: {
-          attr: "objective_objects"
-        , target_attr: "objectiveable"
-      }
-    , control_mappings: {
-          attr: "objective_controls"
-        , target_attr: "control"
-      }
-    , section_mappings: {
-          attr: "section_objectives"
-        , target_attr: "section"
-      }
-    }
 
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
@@ -905,27 +872,28 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , start_expanded : false
     , child_options : [{
         model : "Control"
-      , property : "control_mappings"
+      , mapping : "controls"
       , show_view : "/static/mustache/controls/tree.mustache"
       , draw_children : false
     }, {
         model : "Person"
-      , property : "people_mappings"
+      , mapping : "people"
       , show_view : "/static/mustache/people/tree.mustache"
       , draw_children : false
     }, {
         model : "Document"
-      , property : "document_mappings"
+      , mapping : "documents"
       , show_view : "/static/mustache/documents/tree.mustache"
       , draw_children : false
 /*    }, {
         model : "Section"
-      , property : "section_mappings"
+      , mapping : "sections"
       , show_view : "/static/mustache/sections/tree.mustache"
 */    }, {
         model : can.Model.Cacheable
-      , property : "business_object_mappings"
+      , mapping : "related_objects"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]
@@ -936,11 +904,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
     this._super.apply(this, arguments);
   }
 }, {
-  init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this._init_mappings();
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Help", {
@@ -1044,6 +1007,14 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
+CMS.Models.get_stub = function(object) {
+  return CMS.Models.get_instance(object).stub();
+}
+
+CMS.Models.get_stubs = function(objects) {
+  return CMS.Models.get_instances(objects).stubs();
+};
+
 CMS.Models.get_instances = function(objects) {
   var i, instances = []
   if (!objects)
@@ -1053,7 +1024,7 @@ CMS.Models.get_instances = function(objects) {
   }
   return instances;
   //return can.map(instances, CMS.Models.get_instance);
-}
+};
 
 CMS.Models.get_link_type = function(instance, attr) {
   var type

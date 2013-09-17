@@ -31,14 +31,15 @@
     <div class="span6">
       <div class="info">
         <strong>Owner:</strong>
-        {{^owner}}
+        {{#using owner=owner}}
+        {{#if owner}}
+          {{owner.name}}
+        {{else}}
         <span class="error">
           Not Assigned
         </span>
-        {{/owner}}
-        {{#if owner}}
-          {{owner.name}}
         {{/if}}
+        {{/using}}
       </div>
     </div>
     <div class="span6">

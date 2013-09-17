@@ -45,7 +45,7 @@
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
+              {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
               <i class="grcicon-remove"></i>
               {{unmap_or_delete instance mappings}}
             </a>
@@ -78,7 +78,9 @@
                 </span>
               {{/instance.owner}}
               {{#if instance.owner}}
-                {{instance.owner.name}}
+                {{#using owner=instance.owner}}
+                {{owner.name}}
+                {{/using}}
               {{/if}}
             </div>
           </div>

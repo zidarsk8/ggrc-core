@@ -15,6 +15,7 @@
       </a>
     </div>
 
+    {{#if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
 
@@ -49,7 +50,7 @@
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
-              {{#mappings}}<span class="mapping" {{data 'mapping'}}></span>{{/mappings}}
+              {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
@@ -75,5 +76,6 @@
       {{/if}}
 
     </div>
+    {{/if}}
   </li>
 

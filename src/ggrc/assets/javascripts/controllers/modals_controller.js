@@ -41,7 +41,7 @@ can.Control("GGRC.Controllers.Modals", {
       , modal_title : "Confirm"
       , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
     }, options))
-    .on('click', 'a.btn[data-method=confirm]', function(e) { 
+    .on('click', 'a.btn[data-toggle=confirm]', function(e) {
       $target.modal('hide').remove();
       success && success();
     })
@@ -220,6 +220,9 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
   , set_value: function(item) {
+    // Don't set `_wysihtml5_mode` on the instances
+    if (item.name === '_wysihtml5_mode')
+      return;
     var instance = this.options.instance
       , that = this;
     if(!(instance instanceof this.options.model)) {
@@ -297,6 +300,12 @@ can.Control("GGRC.Controllers.Modals", {
 
       this.serialize_form();
 
+      // Special case to handle context outside the form itself
+      // - this avoids duplicated change events, and the API requires
+      //   `context` to be present even if `null`, unlike other attributes
+      if (!instance.context)
+        instance.attr('context', { id: null });
+
       ajd = instance.save().done(function(obj) {
         function finish() {
           that.element.trigger("modal:success", obj).modal_form("hide");
@@ -351,11 +360,13 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
-  , "[data-dismiss='modal'], [data-dismiss='modal-reset'] click": function() {
-    if (this.options.instance instanceof can.Model && !this.options.skip_refresh && !this.options.instance.isNew()) {
-      this.options.instance.refresh();
+  , " hide" : function() {
+      if (this.options.instance instanceof can.Model
+          && !this.options.skip_refresh
+          && !this.options.instance.isNew()) {
+        this.options.instance.refresh();
+      }
     }
-  }
 
   , destroy : function() {
     if(this.options.model && this.options.model.cache) {
