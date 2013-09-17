@@ -912,7 +912,7 @@
       }
 
     , _refresh_stubs: function(binding) {
-        return this.source.refresh_stubs(binding);
+        return binding.source_binding.refresh_stubs(binding);
       }
   });
 })(GGRC, can);
