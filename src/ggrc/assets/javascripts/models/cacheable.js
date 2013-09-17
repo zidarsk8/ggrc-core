@@ -35,6 +35,7 @@ var makeFindRelated = function(thistype, othertype) {
 
 function dateConverter(d) {
   var conversion = "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var ret;
   if(typeof d === "object") {
     d = d.getTime();
   }
@@ -42,7 +43,8 @@ function dateConverter(d) {
     d /= 1000;
     conversion = "X";
   }
-  return moment(d.toString(), conversion).zone(new Date().getTimezoneOffset()).toDate();
+  ret = moment(d.toString(), conversion);
+  return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
 }
 
 function makeDateSerializer(type) {
