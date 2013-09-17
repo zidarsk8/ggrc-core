@@ -342,8 +342,8 @@ $.each({
 Mustache.registerHelper("if_equals", function(val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
-    if(_val1 == _val2) return options.fn(that);
-    else return options.inverse(that);
+    if(_val1 == _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
   }
     if(typeof val1 === "function") { 
       if(val1.isComputed) {
@@ -1110,6 +1110,10 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
     return target.context ? target.context.id : null;
   }
   return page_object.context ? page_object.context.id : null;
+});
+
+Mustache.registerHelper("json_escape", function(obj, options) {
+  return (""+resolve_computed(obj)).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 });
 
 })(this, jQuery, can);

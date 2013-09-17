@@ -68,7 +68,6 @@ can.Control("GGRC.Controllers.Modals", {
     this.options.$content = this.element.find(".modal-body");
     this.options.$footer = this.element.find(".modal-footer");
     this.on();
-    this.fetch_all().then(this.proxy("apply_object_params"));
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
       .then(function() { that.element.trigger('preload') })
@@ -299,7 +298,22 @@ can.Control("GGRC.Controllers.Modals", {
       this.serialize_form();
 
       ajd = instance.save().done(function(obj) {
-        that.element.trigger("modal:success", obj).modal_form("hide");
+        function finish() {
+          that.element.trigger("modal:success", obj).modal_form("hide");
+        };
+
+        // If this was an Objective created directly from a Section, create a join
+        var params = that.options.object_params;
+        if (obj instanceof CMS.Models.Objective && params && params.section) {
+          new CMS.Models.SectionObjective({
+            objective: obj
+            , section: CMS.Models.Section.findInCacheById(params.section.id)
+            , context: { id: null }
+          }).save().done(finish);
+        }
+        else {
+          finish();
+        }
       }).fail(function(xhr, status) {
         el.trigger("ajax:flash", { error : xhr.responseText });
       });
