@@ -768,13 +768,14 @@ jQuery(function($) {
       , end = out ? width : 0
       ;
 
-    out && $this.fadeOut(200);
+    out && $this.filter(':not(.section-sticky)').fadeOut(200);
 
     // Process animation
     $expander.css({
       display: 'inline-block'
       , marginRight: end + 'px'
       , clip: 'rect(0px, ' + start + 'px, ' + height + 'px, 0px)'
+      , left: $this.is('.section-sticky') ? $this.outerWidth() : 0
     }).animate({
       marginRight: start + 'px'
     }, {
@@ -785,7 +786,7 @@ jQuery(function($) {
       },
       complete: function() {
         if (!out) {
-          $this.fadeIn();
+          $this.filter(':not(.section-sticky)').fadeIn();
           $(this).hide(); 
         }
         $(this).css({
@@ -803,17 +804,6 @@ jQuery(function($) {
 
   $('body').on('mouseenter', '.section-add', function(e) {
     expander(this, "out")
-  });
-
-  $('body').on('mouseenter', '.object-create', function(e) {
-    var $this = $(this)
-      , $objectiveLink = $this.closest('div').find('.objective-create')
-      ;
-    if ($objectiveLink.is(":hidden")) {
-      $this.hide();
-      $objectiveLink.fadeIn();
-      $this.fadeIn();
-    }
   });
   
   $('body').on('click', '.show-long', function(e) {
