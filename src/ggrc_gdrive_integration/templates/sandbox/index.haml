@@ -17,7 +17,9 @@
           {{name}}
           </a>
           |
-          <a href="{{url}}" target="_blank">Go to folder</a>
+          <a href="{{url}}" target="_blank">[Go to folder]</a>
+          |
+          <a href="javascript://" class="delete-folder" {{data 'folder'}}>[Delete]</a>
         </li>
         {{/list}} 
       </ul>
@@ -25,23 +27,36 @@
 
   %script#file_tmpl{ 'type' : 'text/mustache' }
     -raw
-      {{#this}}
-      <li> 
-        <a href="{{url}}" target="_blank">{{name}}</a>
-      </li>
-      {{/this}} 
+      <ul class="files-list">
+        {{#this}}
+        <li> 
+          <a href="{{url}}" target="_blank">{{name}}</a>
+        </li>
+        {{/this}}
+        {{^this}}
+          <li>No files</li>
+        {{/this}}
+      </ul>
     -endraw
 
   %script#permissions_tmpl{ 'type' : 'text/mustache' }
     -raw
+      <h3>permissions</h3>
+      {{#this}}
       {{#if_equals status -1}}
         Error: {{message}}
       {{else}}
-      <h3>permissions</h3>
       {{shareablepermissions}}
+      {{/if_equals}}
+      {{/this}}
       <h3>users</h3>
+      {{#this}}
+      {{#if_equals status -1}}
+        Error: {{message}}
+      {{else}}
       {{viewers}}
       {{/if_equals}}
+      {{/this}}
     -endraw
 
 -block main
@@ -71,25 +86,25 @@
       var lblist = null;
       var folderspinner, filespinner;
       $(document.body).on("click", ".list-folders", function(ev) {
-        var folder = $(this).data('folder')
-        , folder_id = folder ? folder.id : GGRC.config.GDRIVE_ROOT_FOLDER;
+        var folder = $(this).data('folder') || GGRC.config.GDRIVE_ROOT_FOLDER;
         if($(this).is(".go-up")) {
           folderstack.shift();
-          folder_id = folderstack[0];
+          folder = folderstack[0];
         } else {
-          folderstack.unshift(folder_id);
+          folderstack.unshift(folder);
         }
+        console.log(folderstack);
         $("#folders").html((folderspinner = new Spinner({ length : 5, width : 2, radius : 2, y: 14, x: 15}).spin()).el).append("&nbsp;");
         can.view(
           "#folder_tmpl"
-          , GGRC.Models.GDriveFolder.findAll({parentfolderid : folder_id})
+          , GGRC.Models.GDriveFolder.findAll({parentfolderid : folder.id || folder})
             .then(function(list) {
               if(list.status && list.status() === 0) {
               } else {
                 lblist = list;
                 return { 
                   list : list, 
-                  parent : folder_id === GGRC.config.GDRIVE_ROOT_FOLDER ? null : folder
+                  parent : folder === GGRC.config.GDRIVE_ROOT_FOLDER ? null : folder
                 };
               }
             }, function(xhr, status) {
@@ -98,31 +113,31 @@
               return new $.Deferred().reject();
             })
         ).done(function(frag) {
-          $("#folders").html(frag).data("folder-id", folder_id);
+          $("#folders").html(frag).data("folder-id", folder.id || folder);
         });
 
         $("#files").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#file_tmpl"
-          , GGRC.Models.GDriveFile.findAll({id : folder_id}).fail(function(e) {
+          , GGRC.Models.GDriveFile.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
             filespinner.stop();
             $("#files").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
           })
         ).done(function(frag) {
-          $("#files").html(frag).data("folder-id", folder_id);
+          $("#files").html(frag).data("folder-id", folder.id || folder);
         });
 
         $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#permissions_tmpl"
-          , GGRC.Models.GDriveFolderPermission.findAll({id : folder_id}).fail(function(e) {
+          , GGRC.Models.GDriveFolderPermission.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
             filespinner.stop();
             $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
           })
         ).done(function(frag) {
-          $("#permissions").html(frag).data("folder-id", folder_id);
+          $("#permissions").html(frag).data("folder-id", folder.id || folder);
         });
       }).on("click", ".add-folder", function(ev) {
         var that = this;
@@ -131,12 +146,24 @@
         .fail(function(xhr, status){
           $(document.body).trigger("ajax:flash", { error : [status]});
         })
-        .done(function(noob) {
-          lblist.push(noob);
-          $(that).closest("form").reset();
+        .done(function(noobs) {
+          lblist.push.apply(lblist, noobs);
+          $(that).closest("form")[0].reset();
+        });
+      }).on("click", ".delete-folder", function(ev) {
+        var that = this
+        , folder = $(this).data("folder");
+
+        GGRC.Models.GDriveFolder.removeFromParent(folder, folderstack[0])
+        .fail(function(xhr, status){
+          $(document.body).trigger("ajax:flash", { error : [status]});
         })
+        .done(function(noob) {
+          lblist.replace(can.map(lblist, function(l) {
+            return l === folder ? l : undefined;
+          }));
+        });
       });
 
       $("#load_top").click();
-
     });

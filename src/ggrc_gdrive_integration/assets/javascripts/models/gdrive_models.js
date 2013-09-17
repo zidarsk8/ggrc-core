@@ -34,20 +34,20 @@ can.Model("GGRC.Models.GDriveFolder", {
     });
   }
   , removeFromParent : function(object, parent_id) {
-    if(typeof object === "object") {
+    if(typeof object !== "object") {
       object = this.store[object];
     }
     return $.ajax({
       type : "POST"
       , url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?"
       , dataType : "json"
-      , data : JSON.stringify({
-        command : "deletefolder"
-        , folderid : id
+      , data : {
+        command : "deletefolders"
+        , folderid : object.id
         , parentfolderid : parent_id
-      })
+      }
     }).done(function(parents) {
-      obj.attr("parents", parents);
+      object.attr("parents", parents);
     });
   }
   , destroy : function() {
@@ -86,7 +86,7 @@ can.Model("GGRC.Models.GDriveFile", {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
     , type : "post"
     , dataType : "json"
-    , data : { command : 'listfiles', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , data : { command : 'listfiles', parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER }
   }
 
   , destroy : function() {
