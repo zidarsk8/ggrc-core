@@ -160,7 +160,8 @@
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_delete({
-        new_object_form : false
+          $trigger : $trigger
+        , new_object_form : false
         , button_view : GGRC.mustache_path + "/modals/delete_cancel_buttons.mustache"
         , model : model
         , instance : instance

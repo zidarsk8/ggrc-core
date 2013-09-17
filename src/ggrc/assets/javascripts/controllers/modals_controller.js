@@ -41,7 +41,7 @@ can.Control("GGRC.Controllers.Modals", {
       , modal_title : "Confirm"
       , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
     }, options))
-    .on('click', 'a.btn[data-method=confirm]', function(e) { 
+    .on('click', 'a.btn[data-toggle=confirm]', function(e) {
       $target.modal('hide').remove();
       success && success();
     })
