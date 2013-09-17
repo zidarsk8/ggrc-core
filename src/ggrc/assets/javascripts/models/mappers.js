@@ -890,7 +890,6 @@
     , init_listeners: function(binding) {
         var self = this;
 
-        debugger
         binding.source_binding = binding.instance.get_binding(this.source);
 
         binding.source_binding.list.bind("add", function(ev, results) {
