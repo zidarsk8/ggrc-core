@@ -15,8 +15,8 @@
       <label>
         Program
       </label>
-      <select class="input-block-level" name="program_id" disabled>
-        <option value="{{object_params.program}}">Program Title</option>
+      <select class="input-block-level" name="program.id" disabled>
+        <option value="{{object_params.program}}">{{program.title}}</option>
       </select>
     </div>
     <div class="span3">
@@ -42,13 +42,13 @@
       <label>
         Planned Start Date 
       </label>
-      <input class="input-block-level date" name="start_date" placeholder="MM/DD/YYYY" type="text" value="{{start_date}}">
+      <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
     </div>
     <div class="span3">
       <label>
         Planned End Date 
       </label>
-      <input class="input-block-level date" name="end_date" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
+      <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
     </div>
     <div class="span6">
       <label>
@@ -56,10 +56,10 @@
       </label>
       <div class="row-fluid">
         <div class="span6">
-          <input class="input-block-level date" name="report_start_date" placeholder="MM/DD/YYYY" type="text" value="{{report_start_date}}">
+          <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
         </div>
         <div class="span6">
-          <input class="input-block-level date" name="report_end_date" placeholder="MM/DD/YYYY" type="text" value="{{report_end_date}}">
+          <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
         </div>
       </div>
     </div>
@@ -173,15 +173,15 @@
       </div>
     </div>
   </div>
-  <input type="hidden" name="slug" value="">
-  <input type="hidden" name="created_at" value="">
-  <input type="hidden" name="modified_by_id" value="">
-  <input type="hidden" name="updated_at" value="">
-  <input type="hidden" name="context_id" value="">
-  <input type="hidden" name="gdrive_evidence_folder" value="">
-  <input type="hidden" name="url" value="">
-  <input type="hidden" name="owner_id" value="">
-  <input type="hidden" name="audit_firm" value="">
+  <input type="hidden" name="program.id" value='1'>
+  <input type="hidden" name="slug" value="1">
+  <input type="hidden" name="created_at" value="1">
+  <input type="hidden" name="modified_by_id" value="1">
+  <input type="hidden" name="updated_at" value="1">
+  <input type="hidden" name="gdrive_evidence_folder" value="1">
+  <input type="hidden" name="url" value="1">
+  <input type="hidden" name="owner_id" value="1">
+  <input type="hidden" name="audit_firm" value="1">
 </form>
 {{/instance}}
 {{!/div}}
