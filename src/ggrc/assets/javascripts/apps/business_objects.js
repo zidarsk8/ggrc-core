@@ -48,6 +48,43 @@ $(function() {
     return can.makeArray(sections).sort(window.natural_comparator);
   }
 
+  function apply_mixins(definitions) {
+    var mappings = {};
+
+    // Recursively handle mixins
+    function reify_mixins(definition) {
+      var final_definition = {};
+      if (definition._mixins) {
+        can.each(definition._mixins, function(mixin) {
+          if (typeof(mixin) === "string") {
+            // If string, recursive lookup
+            if (!definitions[mixin])
+              console.debug("Undefined mixin: " + mixin, definitions);
+            else
+              can.extend(final_definition, reify_mixins(definitions[mixin]));
+          } else if (can.isFunction(mixin)) {
+            // If function, call with current definition state
+            mixin(final_definition);
+          } else {
+            // Otherwise, assume object and extend
+            can.extend(final_definition, mixin);
+          }
+        });
+      }
+      can.extend(final_definition, definition);
+      delete final_definition._mixins;
+      return final_definition;
+    }
+
+    can.each(definitions, function(definition, name) {
+      // Only output the mappings if it's a model, e.g., uppercase first letter
+      if (name[0] === name[0].toUpperCase())
+        mappings[name] = reify_mixins(definition);
+    });
+
+    return mappings;
+  }
+
   var far_models = GGRC.JoinDescriptor
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
@@ -89,21 +126,76 @@ $(function() {
           }
       }
 
-    , directive_section_descriptor =
-        GGRC.JoinDescriptor.by_object_option_models.Regulation.Section[0]
-    , section_child_options = [{
+    , section_child_options = {
           model : CMS.Models.Section
         , mapping : "sections"
         , show_view : GGRC.mustache_path + "/sections/tree.mustache"
         , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
         , draw_children : true
-      }]
-    , extra_content_controller_options = {
-          Program: {
-              Regulation: {
+      }
+
+    , extra_content_controller_options = apply_mixins({
+          extended_objectives: {
+              Objective: {
+                  mapping: "extended_related_objectives"
+                , draw_children: true
+                , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+                }
+            }
+        , extended_controls: {
+              Control: {
+                  mapping: "extended_related_controls"
+                , draw_children: true
+                , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+                }
+            }
+        , extended_business_objects: {
+              DataAsset: {
+                  mapping: "extended_related_data_assets"
+                }
+            , Facility: {
+                  mapping: "extended_related_facilities"
+                }
+            , Market: {
+                  mapping: "extended_related_markets"
+                }
+            , OrgGroup: {
+                  mapping: "extended_related_org_groups"
+                }
+            , Process: {
+                  mapping: "extended_related_processes"
+                }
+            , Product: {
+                  mapping: "extended_related_products"
+                }
+            , Project: {
+                  mapping: "extended_related_projects"
+                }
+            , System: {
+                  mapping: "extended_related_systems"
+                }
+
+            , Person: {
+                  mapping: "extended_related_people"
+                }
+            , Document: {
+                  mapping: "extended_related_documents"
+                }
+            }
+
+        , Program: {
+              _mixins: [
+                  "extended_objectives"
+                , "extended_controls"
+                , "extended_business_objects"
+                ]
+
+            , Regulation: {
                 mapping: "regulations"
               , draw_children: true
-              , child_options: section_child_options
+              , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
@@ -111,7 +203,7 @@ $(function() {
             , Contract: {
                 mapping: "contracts"
               , draw_children: true
-              , child_options: section_child_options
+              , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
@@ -119,70 +211,32 @@ $(function() {
             , Policy: {
                 mapping: "policies"
               , draw_children: true
-              , child_options: section_child_options
+              , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
-
-            , Objective: {
-                mapping: "extended_related_objectives"
-              , draw_children: true
-              , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
-              }
-            , Control: {
-                mapping: "extended_related_controls"
-              , draw_children: true
-              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-              }
-
-            , DataAsset: {
-                mapping: "extended_related_data_assets"
-              }
-            , Facility: {
-                mapping: "extended_related_facilities"
-              }
-            , Market: {
-                mapping: "extended_related_markets"
-              }
-            , OrgGroup: {
-                mapping: "extended_related_org_groups"
-              }
-            , Process: {
-                mapping: "extended_related_processes"
-              }
-            , Product: {
-                mapping: "extended_related_products"
-              }
-            , Project: {
-                mapping: "extended_related_projects"
-              }
-            , System: {
-                mapping: "extended_related_systems"
-              }
-
-            , Person: {
-                mapping: "extended_related_people"
-              }
-            , Document: {
-                mapping: "extended_related_documents"
-              }
           }
+
+        , directive: {
+              _mixins: [
+                  "extended_objectives"
+                , "extended_controls"
+                , "extended_business_objects"
+                ]
+            , Section : section_child_options
+            }
+
         , Regulation: {
-              Section : section_child_options
-            , Control : { draw_children : true }
-          }
+              _mixins: ["directive"]
+            }
         , Policy: {
-              Section : section_child_options
-            , Control : { draw_children : true }
-          }
+              _mixins: ["directive"]
+            }
         , Contract : {
-              Section : section_child_options
-            , Control : { draw_children : true }
-          }
-      }
+              _mixins: ["directive"]
+            }
+        })
     ;
 
   can.each(far_models, function(join_descriptors, model_name) {

@@ -259,11 +259,48 @@
       }
 
     , directive_object: {
-        _mixins: ["related_object"]
+        _mixins: [
+          "related_object", "personable", "documentable"//, "objectiveable"
+          , extended_related("data_assets")
+          , extended_related("facilities")
+          , extended_related("markets")
+          , extended_related("org_groups")
+          , extended_related("processes")
+          , extended_related("products")
+          , extended_related("projects")
+          , extended_related("systems")
+          ]
       , sections: Direct("Section", "directive")
       , controls: Direct("Control", "directive")
+
+      , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
+      , extended_related_controls: Multi(["controls_via_sections", "controls"])
+      , extended_related_objectives: Multi(["objectives_via_sections"])//, "objectives"])
+
       , related_objects_via_sections: Cross("sections", "related_objects")
+
+      , related_documents_via_sections: Cross("sections", "documents")
+      , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
+      , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
+      , extended_related_documents:
+          Multi([
+              "documents"
+            , "related_documents_via_extended_controls"
+            , "related_documents_via_extended_objectives"
+            , "related_documents_via_sections"
+            ])
+
+      , related_people_via_sections: Cross("sections", "people")
+      , related_people_via_extended_controls: Cross("extended_related_controls", "people")
+      , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
+      , extended_related_people:
+          Multi([
+              "people"
+            , "related_people_via_extended_controls"
+            , "related_people_via_extended_objectives"
+            , "related_people_via_sections"
+            ])
       }
 
     // Directives
