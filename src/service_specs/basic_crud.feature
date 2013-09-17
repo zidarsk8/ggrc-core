@@ -24,6 +24,7 @@ Feature: Basic RESTful CRUD Support
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -35,7 +36,6 @@ Feature: Basic RESTful CRUD Support
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Product            |
       | Project            |
       | Program            |
@@ -43,6 +43,9 @@ Feature: Basic RESTful CRUD Support
       #| Relationship       |
       | Request            |
       #| Response           |
+      | DocumentationResponse   |
+      | InterviewResponse  |
+      | PopulationSampleResponse   |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |

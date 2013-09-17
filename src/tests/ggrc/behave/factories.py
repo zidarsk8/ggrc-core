@@ -206,3 +206,17 @@ class RequestFactory(ModelFactory):
   MODEL = models.Request
   status = FuzzyChoice(MODEL.VALID_STATES)
   request_type = FuzzyChoice(MODEL.VALID_TYPES)
+
+class ResponseFactory(ModelFactory):
+  MODEL = models.Response
+  status = FuzzyChoice(MODEL.VALID_STATES)
+
+class DocumentationResponseFactory(ResponseFactory):
+  response_type = 'documentation'
+
+class InterviewResponseFactory(ResponseFactory):
+  response_type = 'interview'
+
+class PopulationSampleResponseFactory(ResponseFactory):
+  response_type = 'population sample'
+

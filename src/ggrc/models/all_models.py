@@ -19,6 +19,7 @@ from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract
 from .directive_control import DirectiveControl
 from .document import Document
+from .evidence import Evidence
 from .facility import Facility
 from .help import Help
 from .market import Market
@@ -39,6 +40,7 @@ from .program_directive import ProgramDirective
 from .project import Project
 from .relationship import Relationship, RelationshipType
 from .request import Request
+from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -71,6 +73,7 @@ all_models = [
     Regulation,
   DirectiveControl,
   Document,
+  Evidence,
   Facility,
   Help,
   Market,
@@ -92,6 +95,10 @@ all_models = [
   Relationship,
   RelationshipType,
   Request,
+  Response,
+    DocumentationResponse,
+    InterviewResponse,
+    PopulationSampleResponse,
   Risk,
   RiskRiskyAttribute,
   RiskyAttribute,
