@@ -202,7 +202,7 @@ $(function() {
     can.each(join_descriptors, function(join_descriptor) {
       sources.push(join_descriptor.get_loader());
     });
-    list_loader = new GGRC.ListLoaders.FilteredListLoader(
+    list_loader = new GGRC.ListLoaders.StubFilteredListLoader(
       new GGRC.ListLoaders.MultiListLoader(sources),
       function(result) { return !!result.instance.selfLink && result.instance instanceof CMS.Models[model_name]; })
     list_loader = list_loader.attach(object);

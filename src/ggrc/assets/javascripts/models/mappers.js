@@ -142,8 +142,18 @@
         //this.listeners = {};
       }
 
+    , refresh_stubs: function() {
+        return this.loader.refresh_stubs(this);
+      }
+
+    , refresh_instances: function() {
+        return this.loader.refresh_instances(this);
+      }
+
     , refresh_list: function() {
-        return this.loader.refresh_list(this);
+        // Returns a list which will *only* ever contain fully loaded instances
+        var loader = new GGRC.ListLoaders.ReifyingListLoader(this.loader);
+        return loader.attach(this.instance).refresh_instances(this);
       }
 
     , refresh_instance: function() {
@@ -291,9 +301,23 @@
         });
       }
 
+    , refresh_stubs: function(binding) {
+        if (!binding._refresh_stubs_deferred) {
+          binding._refresh_stubs_deferred = $.when(this._refresh_stubs(binding));
+        }
+        return binding._refresh_stubs_deferred;
+      }
+
     , refresh_instances: function(binding) {
+        if (!binding._refresh_instances_deferred) {
+          binding._refresh_instances_deferred =
+            $.when(this._refresh_instances(binding));
+        }
+        return binding._refresh_instances_deferred;
+      }
+
+    , _refresh_instances: function(binding) {
         return this.refresh_stubs(binding)
-          .then(function() { return binding.pending_deferred; })
           .then(function() {
             var refresh_queue = new RefreshQueue();
             can.each(binding.list, function(result) {
@@ -303,14 +327,9 @@
           })
           .then(function() { return binding.list; });
       }
-
-    , refresh_list: function(binding) {
-        return this.refresh_instances(binding)
-          .then(function() { return binding.list; });
-      }
   });
 
-  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.FilteredListLoader", {
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.StubFilteredListLoader", {
   }, {
       init: function(source, filter_fn) {
         this._super();
@@ -339,34 +358,19 @@
         });
       }
 
-    , refresh_stubs: function(binding) {
+    , _refresh_stubs: function(binding) {
         var self = this
           ;
 
-        return binding.source_binding.refresh_list()
+        return binding.source_binding.refresh_stubs()
           .then(function(results) {
             var matching_results = can.map(can.makeArray(results), function(result) {
               if (self.filter_fn(result))
                 return self.make_result(result.instance, [result], binding);
             });
             self.insert_results(binding, matching_results);
-          });
-      }
-
-    , refresh_list: function(binding) {
-        var self = this
-          , deferreds = []
-          ;
-
-        return binding.source_binding.refresh_list().then(function(results) {
-          var matching_results = can.map(can.makeArray(results), function(result) {
-            if (self.filter_fn(result))
-              return self.make_result(result.instance, [result], binding);
-          });
-          self.insert_results(binding, matching_results);
-        })
-        .then(function() { return binding.refresh_queue.trigger(); })
-        .then(function() { return binding.list; });
+          })
+          .then(function() { return binding.list; });
       }
   });
 
@@ -400,7 +404,11 @@
     , insert_from_source_binding: function(binding, ev, local_results, index) {
         var self = this;
         can.each(local_results, function(local_result) {
-          self.insert_local_result(binding, local_result);
+          // FIXME: This is identical to code in _refresh_stubs
+          var remote_binding = self.insert_local_result(binding, local_result);
+          remote_binding.refresh_instance().then(function() {
+            remote_binding.refresh_stubs();
+          });
         });
       }
 
@@ -434,9 +442,6 @@
         remote_binding.bound_remove_from_remote_binding =
           this.proxy("remove_from_remote_binding", binding, remote_binding);
 
-        if (!binding.deferreds)
-          binding.deferreds = [];
-
         binding.remote_bindings.push(remote_binding);
 
         remote_binding.list.bind(
@@ -448,10 +453,6 @@
           return self.make_result(result.instance, [result], binding);
         });
         self.insert_results(binding, local_results);
-
-        remote_binding.refresh_instance().then(function() {
-          binding.deferreds.push(remote_binding.refresh_list());
-        });
 
         return remote_binding;
       }
@@ -506,22 +507,30 @@
         });
       }
 
-    , refresh_list: function(binding) {
+    , _refresh_stubs: function(binding) {
         var self = this
-          , deferreds = []
           ;
 
-        return binding.source_binding.refresh_list().then(function(local_results) {
+        return binding.source_binding.refresh_stubs().then(function(local_results) {
+          var deferreds = [];
+
           can.each(local_results, function(local_result) {
-            self.insert_local_result(binding, local_result);
+            var remote_binding = self.insert_local_result(binding, local_result)
+              , deferred = remote_binding.refresh_instance().then(function() {
+                  return remote_binding.refresh_stubs();
+                })
+              ;
+
+            deferreds.push(deferred);
           });
+
+          return $.when.apply($, deferreds);
         })
-        .then(function() { return $.when.apply($, binding.deferreds); })
         .then(function() { return binding.list; });
       }
   });
 
-  GGRC.ListLoaders.FilteredListLoader("GGRC.ListLoaders.TypeFilteredListLoader", {
+  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.TypeFilteredListLoader", {
   }, {
       init: function(source, model_names) {
         var filter_fn = function(result) {
@@ -582,17 +591,14 @@
         });
       }
 
-    , refresh_list: function(binding) {
-        var self = this
-          , deferreds = []
-          ;
+    , _refresh_stubs: function(binding) {
+        var deferreds = [];
 
         can.each(binding.source_bindings, function(source) {
-          deferreds.push(source.refresh_list());
+          deferreds.push(source.refresh_stubs());
         });
 
         return $.when.apply($, deferreds)
-          .then(function() { return binding.refresh_queue.trigger(); })
           .then(function() { return binding.list; });
       }
   });
@@ -721,10 +727,7 @@
         }
       }
 
-    , refresh_stubs: function(binding) {
-        if (binding._refresh_stubs_deferred)
-          return binding._refresh_stubs_deferred;
-
+    , _refresh_stubs: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
           , refresh_queue = new RefreshQueue()
@@ -735,10 +738,10 @@
           refresh_queue.enqueue(mapping);
         });
 
-        binding._refresh_stubs_deferred = refresh_queue.trigger()
+        return refresh_queue.trigger()
           .then(this.proxy("filter_for_valid_mappings", binding))
-          .then(this.proxy("insert_instances_from_mappings", binding));
-        return binding._refresh_stubs_deferred;
+          .then(this.proxy("insert_instances_from_mappings", binding))
+          .then(function() { return binding.list; });
       }
 
     , filter_for_valid_mappings: function(binding, mappings) {
@@ -864,19 +867,53 @@
         }
       }
 
-    , refresh_stubs: function(binding) {
-        if (binding._refresh_stubs_deferred)
-          return binding._refresh_stubs_deferred;
-
+    , _refresh_stubs: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
           , mappings = binding.instance[object_join_attr].reify();
           ;
 
-        binding._refresh_stubs_deferred =
-          $.when(this.insert_instances_from_mappings(binding, mappings));
-        return binding._refresh_stubs_deferred;
+        this.insert_instances_from_mappings(binding, mappings);
+        return binding.list;
+      }
+  });
+
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.ReifyingListLoader", {
+  }, {
+      init: function(source) {
+        this._super();
+
+        this.source = source;
+      }
+
+    , init_listeners: function(binding) {
+        var self = this;
+
+        debugger
+        binding.source_binding = binding.instance.get_binding(this.source);
+
+        binding.source_binding.list.bind("add", function(ev, results) {
+          var refresh_queue = new RefreshQueue()
+            , new_results = [];
+          can.each(results, function(result) {
+            refresh_queue.enqueue(result.instance);
+            new_results.push(self.make_result(result.instance, [result], binding));
+          });
+          refresh_queue.trigger().then(function() {
+            self.insert_results(binding, new_results);
+          });
+        });
+
+        binding.source_binding.list.bind("remove", function(ev, results) {
+          can.each(results, function(result) {
+            self.remove_instance(binding, result.instance, result);
+          });
+        });
+      }
+
+    , _refresh_stubs: function(binding) {
+        return this.source.refresh_stubs(binding);
       }
   });
 })(GGRC, can);
