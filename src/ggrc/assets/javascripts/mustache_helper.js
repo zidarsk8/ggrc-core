@@ -1107,7 +1107,16 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+resolve_computed(obj)).replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+  return (""+resolve_computed(obj))
+    .replace(/"/g, '\\"')
+    //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
+    //    thus does not allow backslash-escaped single quotes within strings.
+    //    E.g., make sure attributes use double quotes, or use character
+    //    entities instead -- but these aren't replaced by the JSON parser, so
+    //    the output is not identical to input (hence, not using them now.)
+    //.replace(/'/g, "\\'")
+    //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
+    .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 });
 
 })(this, jQuery, can);

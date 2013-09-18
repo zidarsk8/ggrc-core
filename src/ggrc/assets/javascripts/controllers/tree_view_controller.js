@@ -515,11 +515,17 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
   , replace_element : function(el) {
     var old_el = this.element
-    , $el = $(el)
-    , old_data = $.extend({}, old_el.data())
-    , i
-    , firstchild
-    ;
+      , $el
+      , old_data
+      , i
+      , firstchild
+      ;
+
+    if (!this.element)
+      return;
+
+    $el = $(el)
+    old_data = $.extend({}, old_el.data())
 
     firstchild = $(_firstElementChild(el));
 
