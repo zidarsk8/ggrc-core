@@ -758,6 +758,7 @@ function resize_areas() {
 
 jQuery(function($) {
 
+  // Footer expander animation helper
   function expander(toggle, direction) {
     var $this = $(toggle)
       , $expander = $this.closest('div').find('.section-expander')
@@ -766,34 +767,47 @@ jQuery(function($) {
       , width = $expander.outerWidth()
       , start = out ? 0 : width
       , end = out ? width : 0
+      , duration = 500
       ;
 
     out && $this.filter(':not(.section-sticky)').fadeOut(200);
 
+    // Check for intermediate animation
+    // Update the starting point and duration as appropriate
+    if ($expander.is(':animated')) {
+      $expander.stop();
+      var clip = $expander.css('clip').match(/^rect\(([0-9.-]+)px,?\s+([0-9.-]+)px,?\s+([0-9.-]+)px,?\s+([0-9.-]+)px\)$/);
+      if (clip) {
+        // Start or end is always zero, so we can use some shortcuts
+        start = parseFloat(clip[2]);
+        duration = ~~((end ? end - start : start) / width * duration);
+      }
+    }
+
     // Process animation
     $expander.css({
-      display: 'inline-block'
+        display: 'inline-block'
       , marginRight: end + 'px'
       , clip: 'rect(0px, ' + start + 'px, ' + height + 'px, 0px)'
       , left: $this.is('.section-sticky') ? $this.outerWidth() : 0
     }).animate({
-      marginRight: start + 'px'
+        marginRight: start + 'px'
     }, {
-      duration: 500,
-      easing: "easeInOutExpo",
-      step: function(now, fx) {
-        $(this).css('clip', 'rect(0px, '+ (width - now) +'px, ' + height + 'px, 0px)')
-      },
-      complete: function() {
-        if (!out) {
-          $this.filter(':not(.section-sticky)').fadeIn();
-          $(this).hide(); 
+        duration: duration
+      , easing: "easeInOutExpo"
+      , step: function(now, fx) {
+          $(this).css('clip', 'rect(0px, '+ (width - now + (out ? start : end)) +'px, ' + height + 'px, 0px)')
         }
-        $(this).css({
-          marginRight: '0px'
-          , clip: 'auto'
-        })
-      }
+      , complete: function() {
+          if (!out) {
+            $this.filter(':not(.section-sticky)').fadeIn();
+            $(this).hide(); 
+          }
+          $(this).css({
+              marginRight: '0px'
+            , clip: 'auto'
+          })
+        }
     });
 
     // Queue the reverse on mouseout
@@ -802,8 +816,10 @@ jQuery(function($) {
     })
   };
 
-  $('body').on('mouseenter', '.section-add', function(e) {
-    expander(this, "out")
+  // Footer expander animations (verify that an expander exists)
+  $('body').on('mouseenter', '.section-add:has(+ .section-expander), .section-expander:visible:animated', function(e) {
+    var $this = $(this);
+    expander($this.hasClass('section-add') ? $this : $this.prev('.section-add'), "out");
   });
   
   $('body').on('click', '.show-long', function(e) {
