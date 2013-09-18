@@ -745,11 +745,6 @@ jQuery(function($){
 can.reduce ||
   (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 
-
-  $(document.body).on("change", "[id$=_start_date]", function(ev) { 
-    var start_date = $(this).datepicker('getDate');
-    $("[id$=_stop_date]").datepicker().datepicker("option", "minDate", start_date); 
-  });
   $(document.body).on("change", ".rotate_control_assessment", function(ev) { 
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
