@@ -2,7 +2,7 @@
 {{#if_equals parent_instance.constructor.shortName 'Program'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName}}
-<li class="tree-item tree-item-add">
+<li class="tree-item tree-item-add tree-footer">
   <div class="row-fluid">
     <div class="span12">
       <a href="javascript://" class="section-add">
@@ -22,7 +22,7 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
-<li class="tree-item tree-item-add">
+<li class="tree-item tree-item-add tree-footer">
   <div class="row-fluid">
     <div class="span12">
       <a

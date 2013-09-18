@@ -204,6 +204,7 @@
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
       , regulations: TypeFilter("directives", "Regulation")
+      , audits: Direct("Audit", "program")
 
       , sections_via_directives: Cross("directives", "sections")
       , sections_via_controls: Cross("controls", "sections")
