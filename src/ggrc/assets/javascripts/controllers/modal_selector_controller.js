@@ -1001,15 +1001,25 @@
 
     , on_map: $.debounce(500, true, function(el, ev) {
         var that = this
+          , join_instance = this.create_join()
           ;
 
-        this.create_join()
-          .done(function() {
-            $(that.element).modal_form('hide');
-          })
-          .fail(function(xhr) {
-            that.element.trigger("ajax:flash", { error : xhr.responseText });
-          });
+        if (!join_instance) {
+          that.element.trigger("ajax:flash", {
+            error: "Select an object to map" });
+        } else {
+          join_instance.save()
+            .done(function() {
+              $(that.element).modal_form('hide');
+            })
+            .fail(function(xhr) {
+              // Currently, the only error we encounter here is uniqueness
+              // constraint violations.  Let's use a nicer message!
+              //that.element.trigger("ajax:flash", { error : xhr.responseText });
+              var message = "That object is already mapped";
+              that.element.trigger("ajax:flash", { error: message });
+            });
+        }
       })
 
     , create_join: function() {
@@ -1027,10 +1037,7 @@
           }
           join = this.context.option_descriptor.get_new_join(
               this.context.selected_object, this.context.selected_option, context_id);
-          //join = this.get_new_join(this.context.selected_option);
-          return join.save();
-        } else {
-          return (new $.Deferred()).reject();
+          return join;
         }
       }
 
