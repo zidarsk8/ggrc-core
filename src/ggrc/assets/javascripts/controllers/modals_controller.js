@@ -347,6 +347,8 @@ can.Control("GGRC.Controllers.Modals", {
     var that = this;
     this.options.$content.find(".flash").length || that.options.$content.prepend("<div class='flash'>");
 
+    ev.stopPropagation();
+
     can.each(["success", "warning", "error"], function(type) {
       var tmpl;
       if(mesg[type]) {

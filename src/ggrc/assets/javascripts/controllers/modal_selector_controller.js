@@ -838,7 +838,8 @@
           this.options.base_modal_view,
           this.context,
           function(frag) {
-            $(self.element).html(frag);
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
             deferred.resolve();
             self.element.trigger('loaded');
             setTimeout(function() {
@@ -1006,8 +1007,8 @@
           .done(function() {
             $(that.element).modal_form('hide');
           })
-          .fail(function() {
-            //alert("Fail");
+          .fail(function(xhr) {
+            that.element.trigger("ajax:flash", { error : xhr.responseText });
           });
       })
 
@@ -1062,6 +1063,30 @@
           }, 200);
         }
       }
+
+  , " ajax:flash" : function(el, ev, mesg) {
+      var that = this
+        , $flash = this.options.$header.find(".flash")
+        ;
+
+      if (!$flash.length)
+        $flash = $('<div class="flash" />').prependTo(that.options.$header);
+
+      ev.stopPropagation();
+
+      can.each(["success", "warning", "error"], function(type) {
+        var tmpl;
+        if(mesg[type]) {
+          tmpl = '<div class="alert alert-'
+          + type
+          +'"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
+          + mesg[type]
+          + '</span></div>';
+          $flash.append(tmpl);
+        }
+      });
+    }
+
   });
 
   ModalOptionDescriptor = can.Construct({
