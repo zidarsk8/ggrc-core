@@ -287,19 +287,13 @@
       margin-top: 6px;
     }
     .objective-selector {
-      .audit-selector {
-        border: 1px solid $warmGray;
-        @include border-radius(3px);
-        padding: 4px;
-        min-height: 28px;
-        float: none;
-        clear: both;
-        display: inline-block;
-        color: $subTitle;
-        text-decoration: none;
-      }
+      position: relative;
       .sub-level {
-        width: 400px;
+        width: 300px;
+        position: absolute;
+        top: 28px;
+        left: 0;
+        z-index: 1000;
         &.in {
           border: 1px solid $tabTitle;
         }
@@ -311,6 +305,7 @@
             color: $subTitle;
             text-decoration: none;
             padding-left: 4px;
+            background: $white;
             &:hover {
               background: $lightGray;
             }

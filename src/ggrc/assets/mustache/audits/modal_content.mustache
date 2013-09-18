@@ -32,8 +32,8 @@
         Status
       </label>
       <select class="input-block-level" name="status" disabled>
-        <option>Not Started</option>
-        <option>Started</option>
+        <option>Planned</option>
+        <option>In Progress</option>
       </select>
     </div>
   </div>
@@ -109,25 +109,25 @@
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          <a href="#audit-lead" data-toggle="collapse" class="span8 audit-selector">Predrag Kanazir</a>
+          <input href="#audit-lead" type="text" name="owner_id" data-toggle="collapse" class="span8 audit-selector" value="Predrag Kanazir">
           <ul id="audit-lead" class="sub-level collapse">
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Predrag Kanazir <span class="small">predrag@reciprocitylabs.com</span>
               </a>
             </li>
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Vladan Mitevski <span class="small">vladan@reciprocitylabs.com</span>
               </a>
             </li>
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Brad Momberger <span class="small">brad@reciprocitylabs.com</span>
               </a>
             </li>
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Dan Ring <span class="small">dan@reciprocitylabs.com</span>
               </a>
             </li>
@@ -142,25 +142,25 @@
         </label>
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
         <div class="objective-selector">
-          <a href="#audit-firm" data-toggle="collapse" class="span8 audit-selector">Silverboots & Friends</a>
+          <input href="#audit-firm" type="text" name="audit_firm" data-toggle="collapse" class="span8 audit-selector" value="Silverboots & Friends">
           <ul id="audit-firm" class="sub-level collapse">
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Silverboots & Friends
               </a>
             </li>
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Iron Man & Dart Wader
               </a>
             </li>
-            <li>
-              <a href="#">
-                Batman inc.
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
+                Batman, Inc.
               </a>
             </li>
-            <li>
-              <a href="#">
+            <li data-model="true" {{data 'model'}}>
+              <a href="{{viewLink}}" class="show-extended">
                 Berlusconi Club
               </a>
             </li>
@@ -177,7 +177,6 @@
           gDrive Evidence Folder
         </label>
         <span class="large">/GRC Programs/SOX Compliance Audits/2013 Compliance Audit</span>
-        <span class="small"><a href="#">change</a></span>
       </div>
     </div>
   </div>
@@ -188,8 +187,6 @@
   <input type="hidden" name="updated_at" value="1">
   <input type="hidden" name="gdrive_evidence_folder" value="1">
   <input type="hidden" name="url" value="1">
-  <input type="hidden" name="owner_id" value="1">
-  <input type="hidden" name="audit_firm" value="1">
 </form>
 {{/instance}}
 {{!/div}}
