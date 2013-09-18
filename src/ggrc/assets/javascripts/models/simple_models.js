@@ -552,12 +552,6 @@ can.Model.Cacheable("CMS.Models.Product", {
     this.validatePresenceOf("title");
   }
 }, {
-  attr : function(key, val) {
-    if(key === "type" && typeof val === "undefined" && this[key] && !this[key].selfLink) {
-      this[key].refresh();
-    }
-    return this._super.apply(this, arguments);
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Option", {
