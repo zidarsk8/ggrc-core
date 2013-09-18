@@ -351,8 +351,20 @@ can.Control("CMS.Controllers.InnerNav", {
       this.sortable();
 
       can.view(this.options.internav_view, this.options, function(frag) {
+        // Check for a recent import, activating the appropriate widget
+        // Otherwise default to the hash
+        var imported = $('.content .flash').text().match(/successfully imported \d+ (.+?)\b/i)
+          , target = window.location.hash || (imported && imported[1]);
+        if (imported) {
+          if (target === "controls")
+            target = "#control_widget";
+          else if (target === "sections")
+            target = "#section_widget"; 
+        }
+
         that.element.append(frag);
-        that.update_scrollspy();
+        that.update_scrollspy(target);
+        window.location.hash = target;
       });
 
       if (!(this.options.contexts instanceof can.Observe))
@@ -381,7 +393,7 @@ can.Control("CMS.Controllers.InnerNav", {
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
 
-  , replace_widget_list : function(widget_elements) {
+  , replace_widget_list : function(widget_elements, target) {
       var widget_list = []
         , that = this
         ;
@@ -415,7 +427,7 @@ can.Control("CMS.Controllers.InnerNav", {
       // identical to the one that it is getting replaced with, so find the 
       // new widget with the same selector.
       var active_widget = this.options.contexts.active_widget && can.map(this.options.widget_list, function(widget) { 
-          return that.options.contexts.active_widget.selector === widget.selector ? widget : undefined;
+          return (target || that.options.contexts.active_widget.selector) === widget.selector ? widget : undefined;
         })[0];
       this.options.contexts.attr("active_widget", active_widget ? active_widget : this.options.widget_list[0]);
     }
@@ -489,8 +501,8 @@ can.Control("CMS.Controllers.InnerNav", {
         return;
 
       this._update_timeout = setTimeout(function() {
-        that.replace_widget_list(widget_elements);
-        that.update_scrollspy();
+        that.replace_widget_list(widget_elements, window.location.hash);
+        that.update_scrollspy(window.location.hash);
         that._update_timeout = null;
       }, 100);
     }
