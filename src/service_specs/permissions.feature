@@ -43,33 +43,35 @@ Feature: RBAC Permissions enforcement for REST API
       | resource_type      |
       | Category           |
       | Control            |
-      | ControlAssessment  |
       | ControlRisk        |
-      | Cycle              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       | Objective          |
       | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
       | Program            |
       | ProgramDirective   |
       | Request            |
-      | Response           |
+      #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -117,33 +119,35 @@ Feature: RBAC Permissions enforcement for REST API
       | resource_type      |
       | Category           |
       | Control            |
-      | ControlAssessment  |
       | ControlRisk        |
-      | Cycle              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       | Objective          |
       | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
       | Program            |
       | ProgramDirective   |
       | Request            |
-      | Response           |
+      #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -199,33 +203,35 @@ Feature: RBAC Permissions enforcement for REST API
       | resource_type      |
       | Category           |
       | Control            |
-      | ControlAssessment  |
       | ControlRisk        |
-      | Cycle              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       | Objective          |
       | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
       | Program            |
       | ProgramDirective   |
       | Request            |
-      | Response           |
+      #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -281,33 +287,35 @@ Feature: RBAC Permissions enforcement for REST API
       | resource_type      |
       | Category           |
       | Control            |
-      | ControlAssessment  |
       | ControlRisk        |
-      | Cycle              |
+      | Audit              |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
       | Document           |
+      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       | Objective          |
       | ObjectiveControl   |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
       | Program            |
       | ProgramDirective   |
       | Request            |
-      | Response           |
+      #| Response           |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -499,5 +507,5 @@ Feature: RBAC Permissions enforcement for REST API
       | Category      | scope_id      | 3                   |
       | Help          | title         | foo                 |
       | Program       | start_date    | 2013-06-03T00:00:00 |
-      | Cycle         | start_at      | 2013-06-03          |
+      | Audit         | start_at      | 2013-06-03          |
 

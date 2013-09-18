@@ -76,6 +76,11 @@ ul.new-tree {
         color:$programs;
       }
     }
+    .small {
+      font-size:$f-small;
+      display: inline-block;
+      margin-left: 6px;
+    }
   }
   li.tree-item-add {
     padding-left:20px;
@@ -122,6 +127,13 @@ ul.new-tree {
   .tree-info {
     @include oneline();
     font-size:13px;
+    .tree-info-list {
+      @include reset-list();
+      margin: 6px 0 2px 0;
+      li {
+        padding-bottom: 4px;
+      }
+    }
   }
   // reduce visibility of closed tree-items
   &.tree-open {
@@ -185,6 +197,20 @@ ul.new-tree {
       //  border-bottom:1px solid #ccc;
       //}
     }
+    &.pbc-list {
+      li.tree-item {
+        a {
+          .row-fluid {
+            padding-top: 6px;
+            padding-bottom: 3px;
+          }
+        }
+        input,
+        select {
+          margin-bottom: 0;
+        }
+      }
+    }
   }
 }
 
@@ -204,6 +230,30 @@ ul.new-tree {
 .tier-2-info-content {
   padding:0 20px;
   position:relative;
+  .info-audit {
+    @include reset-list();
+    @include clearfix();
+    margin: 10px 0;
+    li {
+      float: left;
+      margin-right: 20px;
+      a {
+        font-size:11px;
+        font-weight:bold;
+        color:#111;
+        text-transform:uppercase;
+        @include opacity(0.4);
+        @include transition(opacity 0.2s);
+        &:hover {
+          @include opacity(1);
+          text-decoration:none;
+        }
+      }
+    }
+    [class^="grcicon-"] {
+      margin-top: 0;
+    }
+  }
 }
 
 .item-data {
@@ -276,6 +326,10 @@ ul.new-tree {
 .counter {
   color:#000;
   @include opacity(0.5);
+}
+
+.objective-create {
+  display:none;
 }
 
 .section-create,

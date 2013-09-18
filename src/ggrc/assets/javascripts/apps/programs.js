@@ -56,14 +56,14 @@ can.Construct("ModelRefreshQueue", {
       return this.deferred;
     }
 
-  , trigger_with_debounce: function(delay) {
+  , trigger_with_debounce: function(delay, manager) {
       var ms_to_wait = (delay || 0) + this.updated_at - Date.now();
 
       if (!this.triggered) {
-        if (ms_to_wait < 0)
+        if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6))
           this.trigger();
         else
-          setTimeout(this.proxy("trigger_with_debounce", delay), ms_to_wait);
+          setTimeout(this.proxy("trigger_with_debounce", delay, manager), ms_to_wait);
       }
 
       return this.deferred;
@@ -86,6 +86,13 @@ can.Construct("RefreshQueueManager", {
       this.queues = [];
     }
 
+  , triggered_queues: function() {
+      return can.map(this.queues, function(queue) {
+        if (queue.triggered)
+          return queue;
+      });
+    }
+
   , enqueue: function(obj, force) {
       var self = this
         , model = obj.constructor
@@ -93,6 +100,16 @@ can.Construct("RefreshQueueManager", {
         , found_queue = null
         , id = obj.id
         ;
+
+      if (!obj.selfLink) {
+        if (obj instanceof can.Model) {
+          model_name = obj.constructor.shortName;
+        } else if (obj.type) {
+          // FIXME: obj.kind is to catch invalid stubs coming from Directives
+          model_name = obj.type || obj.kind;
+        }
+      }
+      model = CMS.Models[model_name];
 
       if (this.constructor.model_bases[model_name]) {
         model_name = this.constructor.model_bases[model_name];
@@ -109,9 +126,10 @@ can.Construct("RefreshQueueManager", {
 
       if (!found_queue) {
         can.each(this.queues, function(queue) {
-          if (!found_queue
-              && queue.model === model && !queue.triggered)
+          if (!found_queue && queue.model === model && !queue.triggered) {
             found_queue = queue.enqueue(id);
+            return false;
+          }
         });
         if (!found_queue) {
           found_queue = new ModelRefreshQueue(model);
@@ -165,12 +183,15 @@ can.Construct("RefreshQueue", {
 
       this.triggered = true;
       can.each(this.queues, function(queue) {
-        deferreds.push(queue.trigger_with_debounce(50));
+        deferreds.push(queue.trigger_with_debounce(
+            50, self.constructor.refresh_queue_manager));
       });
 
       if (deferreds.length > 0)
         $.when.apply($, deferreds).then(function() {
-          self.deferred.resolve(self.objects);
+          self.deferred.resolve(can.map(self.objects, function(obj) {
+            return obj.reify();
+          }));
         });
       else
         return this.deferred.resolve(this.objects);

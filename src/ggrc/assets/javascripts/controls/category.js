@@ -68,15 +68,8 @@ can.Model.Cacheable("CMS.Models.Category", {
     });
   }
   , attributes : {
-    children : "CMS.Models.Category.models"
-    , controls : "CMS.Models.Control.models"
-  }
-  , serialize : {
-    "CMS.Models.Category.models" : function(val, type) {
-      return can.map(val, function(v) {
-        return {id : v.id, href : v.selfLink || v.href};
-      });
-    }
+      children : "CMS.Models.Category.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , tree_view_options : {
     show_view : "/static/mustache/controls/categories_tree.mustache"

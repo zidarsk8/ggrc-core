@@ -33,6 +33,30 @@ var makeFindRelated = function(thistype, othertype) {
   };
 };
 
+function dateConverter(d) {
+  var conversion = "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var ret;
+  if(typeof d === "object") {
+    d = d.getTime();
+  }
+  if(typeof d === "number") {
+    d /= 1000;
+    conversion = "X";
+  }
+  ret = moment(d.toString(), conversion);
+  return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
+}
+
+function makeDateSerializer(type) {
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  return function(d) {
+    if(typeof d !== "number") {
+      d = d.getTime();
+    }
+    return moment((d / 1000).toString(), "X").utc().format(conversion);
+  };
+}
+
 
 can.Model("can.Model.Cacheable", {
 
@@ -51,6 +75,9 @@ can.Model("can.Model.Cacheable", {
       this.findAll = function() {
         throw "No default findAll() exists for subclasses of Cacheable";
       };
+      this.findPage = function() {
+        throw "No default findPage() exists for subclasses of Cacheable";
+      }
     }
     else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
       if(this.root_collection) {
@@ -70,9 +97,20 @@ can.Model("can.Model.Cacheable", {
       this.table_singular = statics.table_singular || this.root_object;
     }
 
+    if (!can.isFunction(this.findAll)) {
+      this.findPage = this.makeFindPage(this.findAll);
+    }
+
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
       this.findAll = can.Model.Cacheable.findAll;
+
+    //set up default attribute converters/serializers for all classes
+    can.extend(this.attributes, {
+      created_at : "datetime"
+      , updated_at : "datetime"
+    });
+
     return ret;
   }
   , init : function() {
@@ -135,8 +173,6 @@ can.Model("can.Model.Cacheable", {
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
     });
-
-    this.init_mappings();
   }
 
   , findInCacheById : function(id) {
@@ -213,6 +249,17 @@ can.Model("can.Model.Cacheable", {
       }
       return params;
     }
+
+  , stubs : function(params) {
+      return can.map(this.models(params), function(instance) {
+        return instance.stub();
+      });
+    }
+
+  , stub : function(params) {
+      return this.model(params).stub();
+    }
+
   , model : function(params) {
     var m, that = this;
     params = this.object_from_resource(params);
@@ -235,84 +282,71 @@ can.Model("can.Model.Cacheable", {
         //m.removeAttr('href');
       }
       fn(params, function(val, key) {
-        var i = 0, j = 0, k, changed = false;
-        if(m[key] instanceof can.Observe.List) {
-          if (changed === false) {
-            for (i=0; changed === false && i < m[key].length; i++) {
-              // If m[key][i] === val[i] then they're the same
-              // If val[i] is a stub of m[key][i], then it provides no new data
-              if (!(m[key][i] === val[i]
-                    || (val[i] && !val[i].selfLink && m[key][i].id === val[i].id
-                        && m[key][i].constructor.shortName === val[i].type)))
-                changed = i;
-            }
-          }
-          if (changed === false && m[key].length < val.length)
-            changed = m[key].length;
-          if (changed !== false) {
-            var p = val && val.serialize ? val.serialize() : val;
-            p = p.slice(changed);
-            m[key].splice.apply(m[key], [changed, m[key].length - changed].concat(
-              m[key].constructor.models ?
-                can.makeArray(m[key].constructor.models(p))
-                : p));
-          }
-          // TODO -- experimental list optimization below -- BM 7/15/2013
-          // p = m[key].constructor.models ? m[key].constructor.models(p) : p;
-          // while(i < m[key].length && j < p.length) {
-          //   if(m[key][i] === p[j]) {
-          //     i++; j++;
-          //   } else if((k = can.inArray(m[key][i], p)) > j) {
-          //     m[key].splice(i, 0, p.slice(j, k - j));
-          //     i += k - j + 1;
-          //     j = k + 1;
-          //   } else if((k = can.inArray(p[j], m[key])) > i) {
-          //     m[key].splice(i, k - i);
-          //     i++;
-          //     j++;
-          //   } else {
-          //     m[key].splice(i, 1);
-          //   }
-          // }
-          // i = m[key].length;
-          // j = p.length;
-          // if(i < j) {
-          //   m[key].splice(i, 0, p.slice(i, j - i));
-          // } else if(j < i) {
-          //   m[key].splice(j, i - j);
-          // }
-        } else if(m[key] instanceof can.Model) {
-          if (!(m[key] === val
-              || (val && !val.selfLink && m[key].id === val.id
-                  && m[key].constructor.shortName === val.type))) {
-            if (val == null)
-              m.removeAttr(key);
-            else
-              m[key].constructor.model(params[key] || {});
-          }
-        } else {
-          if (val == null)
-            m.removeAttr(key)
-          else
-            m.attr(key, val && val.serialize ? val.serialize() : val);
-        }
+        if (key === 'context' && val == null && m[key] && m[key].id == null)
+          return;
+        val = that.get_attr(key, val);
+        if (val == null)
+          m.removeAttr(key)
+        else
+          m.attr(key, val);// && val.serialize ? val.serialize() : val);
       });
       delete m._init;
       }
     } else {
       fn(params, function(val, key) {
+        val = that.get_attr(key, val);
         if (val == null) {
           if (params.removeAttr)
             params.removeAttr(key);
           else
             delete params[key];
+        } else {
+          if (params.attr) {
+            params.attr(key, val);
+          } else {
+            params[key] = val;
+          }
         }
       });
       m = this._super(params);
     }
     return m;
   }
+
+  , get_attr: function(key, val) {
+      // Special case to avoid constant replacement of `null` contexts
+      var i = 0, j = 0, k, changed = false;
+      converter = this.constructor.attributes && this.constructor.attributes[name];
+      if (converter) {
+        function_name = converter.substr(fun_name.lastIndexOf(".") + 1);
+        converted_value = can.getObject(converter)(val);
+        if (function_name === "stub"
+            || function_name == "models"
+            || function_name == "get_instances") {
+          return can.map(converted_value, function(item) {
+            return item.stub();
+          });
+        } else if (function_name === "stub"
+                   || function_name == "model"
+                   || function_name == "get_instance") {
+          return converted_value.stub();
+        } else {
+          return converted_value;
+        }
+      } else {
+        return val;
+      }
+    }
+  , convert : {
+    "date" : dateConverter
+    , "datetime" : dateConverter
+  }
+  , serialize : {
+    "datetime" : makeDateSerializer("datetime")
+    , "date" : makeDateSerializer("date")
+  }
   , tree_view_options : {}
+  , list_view_options : {}
   , risk_tree_options : {
     single_object : true
     , child_options : [{
@@ -336,90 +370,75 @@ can.Model("can.Model.Cacheable", {
     return this.root_model || this.shortName;
   }
 
-  , init_mappings: function() {
-      var self = this;
-      can.each(this.mappings, function(options, name) {
-        self.define_association_proxy(name, options);
-      });
-    }
-
-  , define_association_proxy: function(name, options) {
-      /* Adds association proxy methods to prototype
+  , makeFindPage: function(findAllSpec) {
+      /* Create a findPage function that will return a paging object that will
+       * provide access to the model items provided in a single page as well
+       * as paging capability to retrieve the named pages provided in the
+       * resposne.
+       *
+       * findPage returns an object with two properties:
+       * {this.options.model.root_collection}_collection and paging. The models
+       * property will be an array of all model instances in the page retrieved
+       * for the collection. The paging property will be an object that can be
+       * used to retrieve other named pages from the collection.  The names of
+       * pages include first, prev, next, last. Named page properties will
+       * either be functions or the null value in the case where there is no
+       * link available in the collection under that name.  Paging functions
+       * have the same type of return value as the findPage function.
+       *
+       * This method assumes that findAllSpec is a string like
+       * "GET /api/programs". If this assumption is invalid, this function
+       * WILL NOT work correctly.
        */
-      var attr = options.attr
-        , target_attr = options.target_attr
-        , update_function_name = "_update_" + name
-        , update_function
-        , change_handler_name = "_handle_changed_" + name
-        , change_handler
-        , init_flag_name = "_initialized_" + name
-        ;
+      var parts = findAllSpec.split(" ");
+      var method = parts.length == 2 ? parts[0] : "GET";
+      var collection_url = parts.length == 2 ? parts[1] : parts[0];
+      var base_params = {
+        type: method
+        , dataType: "json"
+      };
 
-      update_function = function() {
-        var self = this
-          , refresh_queue = new RefreshQueue()
-          ;
-
-        can.each(self[attr], function(mapping) {
-          refresh_queue.enqueue(mapping);
-        });
-        return refresh_queue.trigger()
-          .then(function(mappings) {
-            var refresh_queue = new RefreshQueue();
-            can.each(mappings, function(mapping) {
-              refresh_queue.enqueue(mapping[target_attr]);
-            });
-            return refresh_queue.trigger()
-              .then(function(mapped_objects) {
-                self[name].replace(
-                  can.map(mappings, function(mapping) {
-                    if (mapping[target_attr] && mapping[target_attr].selfLink)
-                      return {
-                          instance: mapping[target_attr]
-                        , mappings: [mapping]
-                      };
-                  }));
-              });
+      var findPageFunc = function(url, data){
+        return can.ajax(can.extend({
+          url: url
+          , data: data
+        }, base_params)).then(function(response_data) {
+            var collection = response_data[that.root_collection+"_collection"];
+            var ret  = {
+              paging: make_paginator(collection.paging)
+            };
+            ret[that.root_collection+"_collection"] = that.models(collection[that.root_collection]);
+            return ret;
           });
       };
 
-      this.prototype[update_function_name] = update_function;
+      var that = this;
+      var make_paginator = function(paging) {
+        var get_page = function(page_name) {
+          if (paging[page_name]) {
+            return function() { return findPageFunc(paging[page_name]); };
+          } else {
+            return null;
+          }
+        };
 
-      change_handler = function(ev, attr, how) {
-        var self = this;
-        if(this[init_flag_name] && /^(?:\d+)?(?:\.updated)?$/.test(attr)) {
-          //self[update_function_name]();
-          setTimeout(self.proxy(update_function_name), 10);
-        }
+        return {
+          first: get_page("first")
+          , prev: get_page("prev")
+          , next: get_page("next")
+          , last: get_page("last")
+          , has_next: function() { return this.next != null; }
+          , has_prev: function() { return this.prev != null; }
+        };
       };
 
-      this.prototype[change_handler_name] = change_handler;
-
-      if (!this.prototype._init_mappings) {
-        this.prototype._init_mappings = function() {
-          var self = this;
-          can.each(this.constructor.mappings_init_functions, function(fn) {
-            fn.apply(self);
-          });
+      return function(params) {
+        params = params || {};
+        if (!params.__page) {
+          params.__page = 1;
         }
-      }
-
-      this.prototype[name] = function() {
-        this[init_flag_name] = true;
-        if (!this.attr(name))
-          this[name] = new can.Observe.List();
-        this[update_function_name]();
-        this[attr].bind("change", this.proxy(change_handler_name));
-        return this[name];
-      }
-      /*if (!this.mappings_init_functions)
-        this.mappings_init_functions = [];
-
-      this.mappings_init_functions.push(function() {
-        if (!this[name])
-          this[name] = new can.Observe.List();
-        this[attr].bind("change", this.proxy(change_handler_name));
-      });*/
+        return findPageFunc(collection_url, params);
+      };
     }
 }, {
   init : function() {
@@ -432,6 +451,57 @@ can.Model("can.Model.Cacheable", {
         , compute = can.compute(function() { return that.errors(); });
       return compute;
     }
+
+  , get_list_loader: function(name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_list();
+    }
+
+  , get_mapping: function(name) {
+      var binding = this.get_binding(name);
+      binding.refresh_list();
+      return binding.list;
+    }
+
+  , _get_binding_attr: function(mapper) {
+      if (typeof(mapper) === "string")
+        return "_" + mapper + "_binding";
+    }
+
+  , get_binding: function(mapper) {
+      var mappings
+        , mapping
+        , binding
+        , binding_attr = this._get_binding_attr(mapper)
+        ;
+
+      if (binding_attr) {
+        binding = this[binding_attr];
+      }
+
+      if (!binding) {
+        if (typeof(mapper) === "string") {
+          // Lookup and attach named mapper
+          mappings = GGRC.Mappings[this.constructor.shortName];
+          mapping = mappings && mappings[mapper];
+          if (!mapping)
+            console.debug("No such mapper:  " + this.constructor.shortName + "." + mapper);
+          else
+            binding = mapping.attach(this);
+        } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
+          // Loader directly provided, so just attach
+          binding = mapper.attach(this);
+        } else {
+          console.debug("Invalid mapper specified:", mapper);
+        }
+        if (binding && binding_attr) {
+          this[binding_attr] = binding;
+          binding.name = this.constructor.shortName + "." + mapper;
+        }
+      }
+      return binding;
+    }
+
   , addElementToChildList : function(attrName, new_element) {
     this[attrName].push(new_element);
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
@@ -457,14 +527,21 @@ can.Model("can.Model.Cacheable", {
       , dataType : "json"
     })
     .then(can.proxy(this.constructor, "model"))
-    /*.done(function(d) {
+    .done(function(d) {
       d.updated();
-      //can.trigger(d, "change", "*"); //more complete refresh than triggering "updated" like we used to, but will performance suffer?
-    });*/
+      //  Trigger complete refresh of object -- slow, but fixes live-binding
+      //  redraws in some cases
+      can.trigger(d, "change", "*");
+    });
   }
   , attr : function() {
     if(arguments.length < 1) {
       return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
+    } else if(arguments[0] instanceof can.Observe) {
+      if(arguments[0] === this)
+        return this;
+      else
+        return this._super(arguments[0].serialize());
     } else {
       return this._super.apply(this, arguments);
     }
@@ -479,21 +556,20 @@ can.Model("can.Model.Cacheable", {
       if(that.constructor.attributes && that.constructor.attributes[name]) {
         fun_name = that.constructor.attributes[name];
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
-        if(fun_name === "models" || fun_name === "get_instances") {
-          serial[name] = [];
-          for(var i = 0; i < val.length; i++) {
-            serial[name].push(val[i].stub());
-          }
-        } else if(fun_name === "model" || fun_name === "get_instance") {
-          serial[name] = (val ? val.stub() : null);
+        if (fun_name === "stubs" || fun_name === "get_stubs"
+            ||fun_name === "models" || fun_name === "get_instances") {
+          serial[name] = val.stubs().serialize();
+        } else if (fun_name === "stub" || fun_name === "get_stub"
+                   || fun_name === "model" || fun_name === "get_instance") {
+          serial[name] = (val ? val.stub().serialize() : null);
         } else {
           serial[name] = that._super(name);
         }
       } else if(val && typeof val.save === "function") {
-        serial[name] = val.stub();
+        serial[name] = val.stub().serialize();
       } else if(typeof val === "object" && val != null && val.length != null) {
         serial[name] = can.map(val, function(v) {
-          return (v && typeof v.save === "function") ? v.stub() : (v.serialize ? v.serialize() : v);
+          return (v && typeof v.save === "function") ? v.stub().serialize() : (v.serialize ? v.serialize() : v);
         });
       } else if(typeof val !== 'function') {
         serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
@@ -506,6 +582,17 @@ can.Model("can.Model.Cacheable", {
   }
 });
 
+_old_attr = can.Observe.prototype.attr;
+can.Observe.prototype.attr = function(key, val) {
+  if(key instanceof can.Observe) {
+    if(arguments[0] === this)
+      return this;
+    else
+      return _old_attr.apply(this, [key.serialize()]);
+  } else {
+    return _old_attr.apply(this, arguments);
+  }
+}
 can.Observe.prototype.stub = function() {
   var type;
 
@@ -517,11 +604,40 @@ can.Observe.prototype.stub = function() {
   if (!this.id)
     return null;
 
-  return {
+  return new can.Observe({
     id : this.id,
     href : this.selfLink || this.href,
     type : type
-  };
+  });
 };
+
+can.Observe.List.prototype.stubs = function() {
+  return new can.Observe.List(can.map(this, function(obj) {
+    return obj.stub();
+  }));
+}
+
+can.Observe.prototype.reify = function() {
+  var type = this.constructor.shortName || this.type;
+  if (this.selfLink) {
+    return this;
+  } else if (CMS.Models[type]) {
+    if (CMS.Models[type].cache
+        && CMS.Models[type].cache[this.id]) {
+        //&& CMS.Models[this.type].cache[this.id].selfLink) {
+      return CMS.Models[type].cache[this.id];
+    } else {
+      return null;
+    }
+  } else {
+    console.debug("`reify()` called on non-stub, non-instance object", this);
+  }
+};
+
+can.Observe.List.prototype.reify = function() {
+  return new can.Observe.List(can.map(this, function(obj) {
+    return obj.reify();
+  }));
+}
 
 })(window.can);

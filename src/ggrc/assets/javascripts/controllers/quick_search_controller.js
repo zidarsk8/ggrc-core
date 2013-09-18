@@ -321,7 +321,7 @@ can.Control("CMS.Controllers.LHN_Search", {
             })
         };
 
-        can.view(self.options.list_view, context, function(frag, xhr) {
+        can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
         });
       });
@@ -491,9 +491,6 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         // If tooltip is already showing, show new content without delay
         if (this.options.$extended.hasClass('in'))
           delay = 0;
-        if(instance.owner && !instance.owner.selfLink) {
-          instance.owner.refresh();
-        }
         this.fade_in_timeout = setTimeout(
             this.proxy('on_fade_in_timeout', el, instance), delay);
         clearTimeout(this.fade_out_timeout);

@@ -160,7 +160,8 @@
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_delete({
-        new_object_form : false
+          $trigger : $trigger
+        , new_object_form : false
         , button_view : GGRC.mustache_path + "/modals/delete_cancel_buttons.mustache"
         , model : model
         , instance : instance
@@ -183,6 +184,7 @@
 
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
+      , object_params = $trigger.attr('data-object-params')
       , model = CMS.Models[$trigger.attr("data-object-singular")]
       , instance;
       if($trigger.attr('data-object-id') === "page") {
@@ -190,19 +192,25 @@
       } else {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
-      if(instance && instance.owner && !instance.owner.selfLink) {
-        instance.owner.refresh({ "__include" : "owner" });
+      if (object_params) {
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
       }
 
+      var modal_title = (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"));
+      // If this was initiated via quick join link
+      if (object_params && object_params.section) {
+        modal_title = "Map " + modal_title + " to " + object_params.section.title;
+      }
+      
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
           new_object_form : !$trigger.attr('data-object-id')
-        , object_params : $trigger.data('object-params')
+        , object_params : object_params
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
         , instance : instance
-        , modal_title : (instance ? "Edit " : "New ") + ($trigger.attr("data-object-singular-override") || model.title_singular || $trigger.attr("data-object-singular"))
+        , modal_title : modal_title
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       });
 

@@ -18,7 +18,7 @@ Feature: Return collections that only provide stub representations
       | resource_type      |
       | Category           |
       | Control            |
-      | Cycle              |
+      | Audit              |
       | DataAsset          |
       | Contract           |
       | Policy             |
@@ -27,18 +27,17 @@ Feature: Return collections that only provide stub representations
       | Facility           |
       | Help               |
       | Market             |
-      | Meeting            |
+      #| Meeting            |
       | Objective          |
       | Option             |
       | OrgGroup           |
-      | PbcList            |
       | Person             |
-      | PopulationSample   |
+      #| PopulationSample   |
       | Product            |
       | Project            |
       | Program            |
-      | Request            |
-      | Response           |
+      #| Request            |
+      #| Response           |
       | Risk               |
       | RiskyAttribute     |
       | Section            |

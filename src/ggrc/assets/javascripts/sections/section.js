@@ -25,22 +25,22 @@ can.Model.Cacheable("CMS.Models.Section", {
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , directive : "CMS.Models.get_instance"
-    //, parent : "CMS.Models.Section.model"
-    , children : "CMS.Models.Section.models"
-    , control_sections : "CMS.Models.ControlSection.models"
-    , controls : "CMS.Models.Control.models"
-    , section_objectives : "CMS.Models.SectionObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , directive : "CMS.Models.get_stub"
+    //, parent : "CMS.Models.Section.stub"
+    , children : "CMS.Models.Section.stubs"
+    , control_sections : "CMS.Models.ControlSection.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , section_objectives : "CMS.Models.SectionObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
   }
 
   , defaults : {
@@ -50,56 +50,33 @@ can.Model.Cacheable("CMS.Models.Section", {
     , url : ""
   }
 
-  , mappings: {
-      people_mappings: {
-          attr: "object_people"
-        , target_attr: "person"
-      }
-    , document_mappings: {
-          attr: "object_documents"
-        , target_attr: "document"
-      }
-    , business_object_mappings: {
-          attr: "object_sections"
-        , target_attr: "sectionable"
-      }
-    , control_mappings: {
-          attr: "control_sections"
-        , target_attr: "control"
-      }
-    , objective_mappings: {
-          attr: "section_objectives"
-        , target_attr: "objective"
-      }
-    }
-
   , tree_view_options : {
     show_view : "/static/mustache/sections/tree.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
     , child_options : [{
         model : "Objective"
-      , property : "objective_mappings"
+      , mapping : "objectives"
       , show_view : "/static/mustache/objectives/tree.mustache"
       , draw_children : false
     }, {
         model : "Control"
-      , property : "control_mappings"
+      , mapping : "controls"
       , show_view : "/static/mustache/controls/tree.mustache"
       , draw_children : false
     //}, {
     //  model : CMS.Models.Section
-    //  , property : "children"
+    //  , mapping : "children"
     }, {
         model : "Document"
-      , property : "document_mappings"
+      , mapping : "documents"
       , show_view : "/static/mustache/documents/tree.mustache"
     }, {
         model : "Person"
-      , property : "people_mappings"
+      , mapping : "people"
       , show_view : "/static/mustache/people/tree.mustache"
     }, {
         model : can.Model.Cacheable
-      , property : "business_object_mappings"
+      , mapping : "related_objects"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
@@ -206,13 +183,7 @@ can.Model.Cacheable("CMS.Models.Section", {
     return this.map_object(p, section);
   }
 }, {
-
-  init : function() {
-    this._super.apply(this, arguments);
-    this._init_mappings();
-  }
-
-  , map_control : function(params) {
+  map_control : function(params) {
     return this.constructor.map_control(
       can.extend({}, params, { section : this })
       , this);

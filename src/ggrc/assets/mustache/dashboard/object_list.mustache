@@ -58,7 +58,9 @@
                 </span>
               {{/owner}}
               {{#if owner}}
+                {{#using owner=owner}}
                 {{owner.name}}
+                {{/using}}
               {{/if}}
             </div>
           </div>

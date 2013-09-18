@@ -273,6 +273,55 @@
   }
   .modal-body {
     max-height:none;
+    .small {
+      font-size:$f-small;
+      display: inline-block;
+      margin-left: 6px;
+    }
+    .large {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .icon-field {
+      margin-right: 4px;
+      margin-top: 6px;
+    }
+    .objective-selector {
+      position: relative;
+      .sub-level {
+        width: 300px;
+        position: absolute;
+        top: 28px;
+        left: 0;
+        z-index: 1000;
+        &.in {
+          border: 1px solid $tabTitle;
+        }
+        li {
+          border-bottom: 1px solid $dropPlaceholder;
+          line-height: 28px;
+          a {
+            display: block;
+            color: $subTitle;
+            text-decoration: none;
+            padding-left: 4px;
+            background: $white;
+            &:hover {
+              background: $lightGray;
+            }
+          }
+          &:last-child {
+            border-bottom: none;
+          }
+          &.add-new {
+            a {
+              background: $dropPlaceholder;
+              color: $text;
+            }
+          }
+        }
+      }
+    }
     input,
     textarea {
       @include placeholder($footerBorder);

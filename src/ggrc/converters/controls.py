@@ -14,6 +14,8 @@ class ControlRowConverter(BaseRowConverter):
           self.importer.errors.append('Slug code is already used.')
     else:
       self.obj.directive = self.importer.options.get('directive')
+      if self.obj.id is not None:
+        self.add_warning('slug', "Control already exists and will be updated")
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
