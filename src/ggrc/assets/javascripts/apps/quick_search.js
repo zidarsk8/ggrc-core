@@ -367,6 +367,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
+      , ["Audit", "Request", null, null, "audit"]
+      , ["Request", "Objective", null, null, "objective"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];

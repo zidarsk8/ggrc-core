@@ -219,6 +219,7 @@ $(function() {
             , Audit : { 
               mapping: "audits"
               , allow_mapping : false
+              , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
             }

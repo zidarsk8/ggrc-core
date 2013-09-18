@@ -959,18 +959,25 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
   , attributes : {
-    program: "CMS.Models.Program.model"
-    , requests : "CMS.Models.Request.models"
-    , modified_by : "CMS.Models.Person.model"
+    program: "CMS.Models.Program.stub"
+    , requests : "CMS.Models.Request.stubs"
+    , modified_by : "CMS.Models.Person.stub"
     , start_date : "date"
     , end_date : "date"
     , report_start_date : "date"
     , report_end_date : "date"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
   }
   , defaults : {
     status : "Draft"
+  }
+  , tree_view_options : {
+    draw_children : true
+    , child_options : [{
+      model : "Request"
+      , allow_creating : true
+    }]
   }
 }, {
 
@@ -982,14 +989,19 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , destroy : "DELETE /api/requests/{id}"
   , attributes : {
-    audit : "CMS.Models.Audits.model"
-    , responses : "CMS.Models.Response.models"
-    , assignee : "CMS.Models.Person.model"
+    audit : "CMS.Models.Audits.stub"
+    , responses : "CMS.Models.Response.stubs"
+    , assignee : "CMS.Models.Person.stub"
+    , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"
   }
   , defaults : {
     status : "Draft"
+  }
+  , tree_view_options : {
+    show_view : GGRC.mustache_path + "/requests/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
   }
 }, {
 
