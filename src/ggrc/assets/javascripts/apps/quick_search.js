@@ -548,6 +548,12 @@ $(function() {
               ].join(" ")
             }
         );
+
+      // Switch the active widget view
+      if (type !== "error") {
+        window.location.hash = '#' + inst.constructor.root_object + '_widget';
+        $('a[href="' + window.location.hash + '"]').trigger("click");
+      }
     }
 
     /*if(can.isPlainObject(link)) {
