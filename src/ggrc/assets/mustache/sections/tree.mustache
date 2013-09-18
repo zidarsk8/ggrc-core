@@ -27,10 +27,10 @@
           {{/pack}}
           </div>
           <div class="span1">
-          {{#pack list=instance.controls na=na id=id}}
+          {{#pack list=instance.objectives na=na id=id}}
             {{#with list}}
               <div class="counter">
-                <i class="grcicon-control-black"></i>
+                <i class="grcicon-objective-black"></i>
                   {{#if length}} 
                     <span>{{length}}</span>
                   {{else}}
@@ -41,10 +41,10 @@
           {{/pack}}
           </div>
           <div class="span1">
-          {{#pack list=instance.objectives na=na id=id}}
+          {{#pack list=instance.controls na=na id=id}}
             {{#with list}}
               <div class="counter">
-                <i class="grcicon-objective-black"></i>
+                <i class="grcicon-control-black"></i>
                   {{#if length}} 
                     <span>{{length}}</span>
                   {{else}}
