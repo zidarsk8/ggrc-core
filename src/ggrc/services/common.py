@@ -22,9 +22,10 @@ from ggrc.login import get_current_user_id
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
-from ggrc.models.exceptions import ValidationError
+from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 from wsgiref.handlers import format_date_time
@@ -281,22 +282,27 @@ class Resource(ModelView):
         and 'X-Requested-By' not in request.headers:
       raise BadRequest('X-Requested-By header is REQUIRED.')
 
-    if method == 'GET':
-      if self.pk in kwargs and kwargs[self.pk] is not None:
-        return self.get(*args, **kwargs)
+    try:
+      if method == 'GET':
+        if self.pk in kwargs and kwargs[self.pk] is not None:
+          return self.get(*args, **kwargs)
+        else:
+          return self.collection_get()
+      elif method == 'POST':
+        if self.pk in kwargs and kwargs[self.pk] is not None:
+          return self.post(*args, **kwargs)
+        else:
+          return self.collection_post()
+      elif method == 'PUT':
+        return self.put(*args, **kwargs)
+      elif method == 'DELETE':
+        return self.delete(*args, **kwargs)
       else:
-        return self.collection_get()
-    elif method == 'POST':
-      if self.pk in kwargs and kwargs[self.pk] is not None:
-        return self.post(*args, **kwargs)
-      else:
-        return self.collection_post()
-    elif method == 'PUT':
-      return self.put(*args, **kwargs)
-    elif method == 'DELETE':
-      return self.delete(*args, **kwargs)
-    else:
-      raise NotImplementedError()
+        raise NotImplementedError()
+    except (IntegrityError, ValidationError) as v:
+      message = translate_message(v)
+      current_app.logger.warn(message)
+      return ((message, 403, []))
 
   def post(*args, **kwargs):
     raise NotImplementedError()
@@ -368,12 +374,7 @@ class Resource(ModelView):
     if new_context != obj.context_id \
         and not permissions.is_allowed_update(self.model.__name__, new_context):
       raise Forbidden()
-    try:
-      self.json_update(obj, src)
-    except ValidationError, v:
-      current_app.logger.warn(v)
-      return ((str(v), 403, []))
-
+    self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     log_event(db.session, obj)
@@ -470,11 +471,7 @@ class Resource(ModelView):
       if not permissions.is_allowed_create(
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
-    try:
-      self.json_create(obj, src)
-    except ValidationError, v:
-      current_app.logger.warn(v)
-      return ((str(v), 403, []))
+    self.json_create(obj, src)
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
