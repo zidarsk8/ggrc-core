@@ -492,8 +492,7 @@ $(function() {
 
       can.each(mappings, function(mapping) {
         mapping.refresh().done(function() {
-          if (mapping instanceof CMS.Models.Control
-              && GGRC.page_instance() instanceof CMS.Models.Directive) {
+          if (mapping instanceof CMS.Models.Control) {
             mapping.removeAttr('directive');
             mapping.save();
           }
