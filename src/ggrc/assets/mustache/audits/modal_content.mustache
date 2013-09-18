@@ -42,13 +42,13 @@
       <label>
         Planned Start Date 
       </label>
-      <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
+      <input class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="">
     </div>
     <div class="span3">
       <label>
         Planned End Date 
       </label>
-      <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
+      <input class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="">
     </div>
     <div class="span6">
       <label>
@@ -56,10 +56,10 @@
       </label>
       <div class="row-fluid">
         <div class="span6">
-          <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
+          <input class="input-block-level date" name="report_start_date" data-toggle="datepicker" data-before="report_end_date" placeholder="MM/DD/YYYY" type="text" value="">
         </div>
         <div class="span6">
-          <input class="input-block-level date" placeholder="MM/DD/YYYY" type="text" value="">
+          <input class="input-block-level date" name="report_end_date" data-toggle="datepicker" data-after="report_start_date" placeholder="MM/DD/YYYY" type="text" value="">
         </div>
       </div>
     </div>

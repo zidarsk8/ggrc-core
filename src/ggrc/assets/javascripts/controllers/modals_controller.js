@@ -285,6 +285,12 @@ can.Control("GGRC.Controllers.Modals", {
     instance.attr(name[0], value && value.serialize ? value.serialize() : value);
   }
 
+  , "[data-before], [data-after] change" : function(el, ev) {
+    var start_date = el.datepicker('getDate');
+    this.element.find("[name=" + $(this).data("before") + "]").datepicker().datepicker("option", "minDate", start_date);
+    this.element.find("[name=" + $(this).data("after") + "]").datepicker().datepicker("option", "maxDate", start_date);
+  }
+
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
     var that = this;
 
