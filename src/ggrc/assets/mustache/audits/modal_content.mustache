@@ -15,9 +15,17 @@
       <label>
         Program
       </label>
+      {{#if object_params.program}}
       <select class="input-block-level" name="program.id" disabled>
-        <option value="{{object_params.program}}">{{program.title}}</option>
+        <option value="{{object_params.program}}">{{object_params.program_title}}</option>
       </select>
+      {{else}}
+      <select class="input-block-level" name="program.id">
+        {{#all 'Program'}}
+        <option value="{{id}}">{{title}}</option>
+        {{/all}}
+      </select>
+      {{/if}}
     </div>
     <div class="span3">
       <label>

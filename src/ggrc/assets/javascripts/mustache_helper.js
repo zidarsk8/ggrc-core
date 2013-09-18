@@ -661,11 +661,7 @@ Mustache.registerHelper("all", function(type, options) {
     $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function(s) { return s.replace(/'|"| /, "");}));
   }
 
-  if(model.cache) {
-    items_dfd = $.when(can.map(Object.keys(model.cache), function(idx) { return model.cache[idx]; }));
-  } else {
-    items_dfd = model.findAll();
-  }
+  items_dfd = model.findAll();
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
