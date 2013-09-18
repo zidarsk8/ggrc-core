@@ -43,6 +43,7 @@ class DocumentationResponse(Documentable, Personable, Response):
   _table_plural = 'documentation_responses'
 
   evidence = db.relationship('Evidence', backref='response', cascade='all, delete-orphan')
+
   _publish_attrs = [
     'evidence',
       ]
@@ -90,29 +91,29 @@ class PopulationSampleResponse(Documentable, Personable, Response):
       }
   _table_plural = 'population_sample_responses'
 
-#  population_worksheet = deferred(db.Column(db.String, nullable=True), 'PopulationSampleResponse')
-#  population_count = deferred(db.Column(db.Integer, nullable=True), 'PopulationSampleResponse')
-#  sample_worksheet = deferred(db.Column(db.String, nullable=True), 'PopulationSampleResponse')
-#  sample_count = deferred(db.Column(db.Integer, nullable=True), 'PopulationSampleResponse')
-#  sample_evidence = deferred(db.Column(db.String, nullable=True), 'PopulationSampleResponse')
+  population_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
+  population_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  sample_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
+  sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  sample_evidence = deferred(db.Column(db.String, nullable=True), 'Response')
 
   @validates('response_type')
   def validates_response_type(self, key, value):
     return 'population sample'
 
   _publish_attrs = [
-#      'population_worksheet',
-#      'population_count',
-#      'sample_worksheet',
-#      'sample_count',
-#      'sample_evidence',
+      'population_worksheet',
+      'population_count',
+      'sample_worksheet',
+      'sample_count',
+      'sample_evidence',
       ]
   _sanitize_html = [
-#      'population_worksheet',
-#      'population_count',
-#      'sample_worksheet',
-#      'sample_count',
-#      'sample_evidence',
+      'population_worksheet',
+      'population_count',
+      'sample_worksheet',
+      'sample_count',
+      'sample_evidence',
       ]
 
   @classmethod

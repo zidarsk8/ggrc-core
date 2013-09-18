@@ -32,12 +32,14 @@ Feature: Return collections that only provide stub representations
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Product            |
       | Project            |
       | Program            |
-      #| Request            |
+      | Request            |
       #| Response           |
+      | DocumentationResponse    |
+      | InterviewResponse        |
+      | PopulationSampleResponse |
       | Risk               |
       | RiskyAttribute     |
       | Section            |
