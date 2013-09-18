@@ -152,8 +152,12 @@
 
     , refresh_list: function() {
         // Returns a list which will *only* ever contain fully loaded instances
-        var loader = new GGRC.ListLoaders.ReifyingListLoader(this.loader);
-        return loader.attach(this.instance).refresh_instances(this);
+        var loader = new GGRC.ListLoaders.ReifyingListLoader(this.loader)
+          , binding = loader.attach(this.instance)
+          ;
+
+        binding.name = this.name + "_instances";
+        return binding.refresh_instances(this);
       }
 
     , refresh_instance: function() {
@@ -305,7 +309,8 @@
         if (!binding._refresh_stubs_deferred) {
           binding._refresh_stubs_deferred = $.when(this._refresh_stubs(binding));
         }
-        return binding._refresh_stubs_deferred;
+        return binding._refresh_stubs_deferred
+          .then(function() { return binding.list; });
       }
 
     , refresh_instances: function(binding) {
@@ -313,7 +318,8 @@
           binding._refresh_instances_deferred =
             $.when(this._refresh_instances(binding));
         }
-        return binding._refresh_instances_deferred;
+        return binding._refresh_instances_deferred
+          .then(function() { return binding.list; });
       }
 
     , _refresh_instances: function(binding) {
@@ -324,8 +330,7 @@
               refresh_queue.enqueue(result.instance);
             });
             return refresh_queue.trigger();
-          })
-          .then(function() { return binding.list; });
+          });
       }
   });
 
@@ -369,8 +374,7 @@
                 return self.make_result(result.instance, [result], binding);
             });
             self.insert_results(binding, matching_results);
-          })
-          .then(function() { return binding.list; });
+          });
       }
   });
 
@@ -574,17 +578,27 @@
         });
       }
 
-    , init_source_listeners: function(binding, source) {
+    , insert_from_source_binding: function(binding, results, index) {
+        var self = this
+          , new_results
+          ;
+
+        new_results = can.map(results, function(result) {
+          return self.make_result(result.instance, [result], binding);
+        });
+        self.insert_results(binding, new_results);
+      }
+
+    , init_source_listeners: function(binding, source_binding) {
         var self = this;
 
-        source.list.bind("add", function(ev, results) {
-          results = can.map(results, function(result) {
-            return self.make_result(result.instance, [result], binding);
-          });
-          self.insert_results(binding, results);
+        self.insert_from_source_binding(binding, source_binding.list);
+
+        source_binding.list.bind("add", function(ev, results) {
+          self.insert_from_source_binding(binding, results);
         });
 
-        source.list.bind("remove", function(ev, results) {
+        source_binding.list.bind("remove", function(ev, results) {
           can.each(results, function(result) {
             self.remove_instance(binding, result.instance, result);
           });
@@ -594,12 +608,11 @@
     , _refresh_stubs: function(binding) {
         var deferreds = [];
 
-        can.each(binding.source_bindings, function(source) {
-          deferreds.push(source.refresh_stubs());
+        can.each(binding.source_bindings, function(source_binding) {
+          deferreds.push(source_binding.refresh_stubs());
         });
 
-        return $.when.apply($, deferreds)
-          .then(function() { return binding.list; });
+        return $.when.apply($, deferreds);
       }
   });
 
@@ -740,8 +753,7 @@
 
         return refresh_queue.trigger()
           .then(this.proxy("filter_for_valid_mappings", binding))
-          .then(this.proxy("insert_instances_from_mappings", binding))
-          .then(function() { return binding.list; });
+          .then(this.proxy("insert_instances_from_mappings", binding));
       }
 
     , filter_for_valid_mappings: function(binding, mappings) {
@@ -868,14 +880,12 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var self = this
-          , model = CMS.Models[this.model_name]
+        var model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
           , mappings = binding.instance[object_join_attr].reify();
           ;
 
         this.insert_instances_from_mappings(binding, mappings);
-        return binding.list;
       }
   });
 
@@ -887,24 +897,32 @@
         this.source = source;
       }
 
+    , insert_from_source_binding: function(binding, results, index) {
+        var self = this
+          , refresh_queue = new RefreshQueue()
+          , new_results = []
+          ;
+
+        can.each(results, function(result) {
+          refresh_queue.enqueue(result.instance);
+          new_results.push(self.make_result(result.instance, [result], binding));
+        });
+        refresh_queue.trigger().then(function() {
+          self.insert_results(binding, new_results);
+        });
+      }
+
     , init_listeners: function(binding) {
         var self = this;
 
         binding.source_binding = binding.instance.get_binding(this.source);
+        this.insert_from_source_binding(binding, binding.source_binding.list, 0);
 
-        binding.source_binding.list.bind("add", function(ev, results) {
-          var refresh_queue = new RefreshQueue()
-            , new_results = [];
-          can.each(results, function(result) {
-            refresh_queue.enqueue(result.instance);
-            new_results.push(self.make_result(result.instance, [result], binding));
-          });
-          refresh_queue.trigger().then(function() {
-            self.insert_results(binding, new_results);
-          });
+        binding.source_binding.list.bind("add", function(ev, results, index) {
+          self.insert_from_source_binding(binding, results, index);
         });
 
-        binding.source_binding.list.bind("remove", function(ev, results) {
+        binding.source_binding.list.bind("remove", function(ev, results, index) {
           can.each(results, function(result) {
             self.remove_instance(binding, result.instance, result);
           });
