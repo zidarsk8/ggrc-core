@@ -223,7 +223,8 @@
       , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
       , extended_related_documents:
           Multi([
-              "related_documents_via_extended_controls"
+              "documents"
+            , "related_documents_via_extended_controls"
             , "related_documents_via_extended_objectives"
             , "related_documents_via_sections"
             ])
@@ -233,7 +234,8 @@
       , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
       , extended_related_people:
           Multi([
-              "related_people_via_extended_controls"
+              "people"
+            , "related_people_via_extended_controls"
             , "related_people_via_extended_objectives"
             , "related_people_via_sections"
             ])
