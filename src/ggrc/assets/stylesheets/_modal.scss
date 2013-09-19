@@ -288,6 +288,7 @@
     }
     .objective-selector {
       position: relative;
+      width: 100%;
       .sub-level {
         width: 300px;
         position: absolute;
@@ -309,6 +310,23 @@
             &:hover {
               background: $lightGray;
             }
+          }
+          &.active {
+            position: relative;
+            .extended-content {
+              position:absolute;
+              top:-1px;
+              right:-100%;
+              width:288px;
+              padding:2px 10px;
+              background:#fff;
+              border:1px solid #ddd;
+              display: block;
+              z-index: 9999;
+            }
+          }
+          .extended-content {
+            display: none;
           }
           &:last-child {
             border-bottom: none;

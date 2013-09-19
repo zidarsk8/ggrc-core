@@ -838,7 +838,19 @@ jQuery(function($) {
     if( $this.hasClass("widget-active") ) {
       $this.removeClass("widget-active");
     }
-  });    
+  });
+  
+  // show/hide audit lead and firm
+  $('body').on('mouseover', '.objective-selector .sub-level li a', function(e) {
+    var $this = $(this);
+    $this.addClass("active");
+    $this.closest('li').addClass("active");
+  });
+  $('body').on('mouseleave', '.objective-selector .sub-level li a', function(e) {
+    var $this = $(this);
+    $this.removeClass("active");
+    $this.closest('li').removeClass("active");
+  });
   
 });
 
