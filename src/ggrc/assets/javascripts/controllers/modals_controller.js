@@ -199,6 +199,11 @@ can.Control("GGRC.Controllers.Modals", {
       this.set_value_from_element(el);
   }
 
+  , "input, textarea, select keyup" : function(el, ev) {
+      if ($(el).is(':not([name="owner.email"])') || !$(el).val())
+        this.set_value_from_element(el);
+  }
+
   , serialize_form : function() {
       var $form = this.options.$content.find("form")
         , $elements = $form.find(":input")
