@@ -390,9 +390,17 @@ can.Model("can.Model.Cacheable", {
        * "GET /api/programs". If this assumption is invalid, this function
        * WILL NOT work correctly.
        */
-      var parts = findAllSpec.split(" ");
-      var method = parts.length == 2 ? parts[0] : "GET";
-      var collection_url = parts.length == 2 ? parts[1] : parts[0];
+      var parts, method, collection_url;
+      if(typeof findAllSpec === "string") {
+        parts = findAllSpec.split(" ");
+        method = parts.length == 2 ? parts[0] : "GET";
+        collection_url = parts.length == 2 ? parts[1] : parts[0];
+      } else if(typeof findAllSpec === "object") {
+        method = findAllSpec.type || "GET";
+        collection_url = findAllSpec.url;
+      } else {
+        return; // TODO make a pager if findAllSpec is a function.
+      }
       var base_params = {
         type: method
         , dataType: "json"

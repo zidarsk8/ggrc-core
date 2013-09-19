@@ -15,13 +15,21 @@ $.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
 
 });
 
-can.Model("GGRC.Models.GDriveFolder", {
+can.Model.Cacheable("GGRC.Models.GDriveFolder", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
     , type : "post"
     , dataType : "json"
-    , data : { command : 'listfolders', parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , data : { command : 'listfolders', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , beforeSend : function(xhr, s) {
+      var data = JSON.parse(s.data);
+      if(data.parentfolderid) {
+        data.id = data.parentfolderid;
+        delete data.parentfolderid;
+      }
+      s.data = JSON.stringify(data);
+    }
   }
   , create : function(params) {
       params.id = params.parentfolderid;
@@ -80,7 +88,7 @@ can.Model("GGRC.Models.GDriveFolder", {
 
 });
 
-can.Model("GGRC.Models.GDriveFile", {
+can.Model.Cacheable("GGRC.Models.GDriveFile", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
@@ -95,13 +103,52 @@ can.Model("GGRC.Models.GDriveFile", {
 
 }, {});
 
-can.Model("GGRC.Models.GDriveFolderPermission", {
+can.Model.Cacheable("GGRC.Models.GDriveFolderPermission", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
     , type : "post"
     , dataType : "json"
     , data : { command : 'getFolderPermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+  }
+
+}, {});
+
+
+can.Model.Join("CMS.Models.ObjectFolder", {
+  root_object : "object_folder"
+  , root_collection : "object_folders"
+  , findAll: "GET /api/object_folders?__include=folder"
+  , create : "POST /api/object_folders"
+  , update : "PUT /api/object_folders/{id}"
+  , destroy : "DELETE /api/object_folders/{id}"
+  , join_keys : {
+    folderable : can.Model.Cacheable
+    , folder_id : GGRC.Models.GDriveFolder
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , folder_id : "String"
+    , folderable : "CMS.Models.get_stub"
+  }
+
+}, {});
+
+can.Model.Join("CMS.Models.ObjectFile", {
+  root_object : "object_file"
+  , root_collection : "object_files"
+  , findAll: "GET /api/object_people?__include=person"
+  , create : "POST /api/object_people"
+  , update : "PUT /api/object_people/{id}"
+  , destroy : "DELETE /api/object_people/{id}"
+  , join_keys : {
+    fileable : can.Model.Cacheable
+    , file_id : GGRC.Models.GDriveFile
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , file_id : "String"
+    , fileable : "CMS.Models.get_stub"
   }
 
 }, {});

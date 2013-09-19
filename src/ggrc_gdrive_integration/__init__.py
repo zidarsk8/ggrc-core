@@ -13,5 +13,14 @@ blueprint = Blueprint(
 for key in settings.exports:
   app.config.public_config[key] = app.config[key]
 
+import ggrc_gdrive_integration.models
+
 # Initialize views
 import ggrc_gdrive_integration.views
+
+from ggrc.services.registry import service
+
+all_collections = [
+  service('object_folders', models.ObjectFolder),
+  service('object_files', models.ObjectFile)
+]
