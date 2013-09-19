@@ -76,6 +76,11 @@ ul.new-tree {
         color:$programs;
       }
     }
+    .section-item-count {
+      float: right;
+      max-width: 3.5em;
+      margin-left: 0.5em;
+    }
   }
   li.tree-item-add {
     padding-left:20px;
