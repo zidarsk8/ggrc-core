@@ -351,20 +351,8 @@ can.Control("CMS.Controllers.InnerNav", {
       this.sortable();
 
       can.view(this.options.internav_view, this.options, function(frag) {
-        // Check for a recent import, activating the appropriate widget
-        // Otherwise default to the hash
-        var imported = $('.content .flash').text().match(/successfully imported \d+ (.+?)\b/i)
-          , target = window.location.hash || (imported && imported[1]);
-        if (imported) {
-          if (target === "controls")
-            target = "#control_widget";
-          else if (target === "sections")
-            target = "#section_widget"; 
-        }
-
         that.element.append(frag);
-        that.update_scrollspy(target);
-        window.location.hash = target;
+        that.update_scrollspy(window.location.hash);
       });
 
       if (!(this.options.contexts instanceof can.Observe))
