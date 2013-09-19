@@ -1,1 +1,221 @@
-{{!modal content for create request}}
+{{!div class="modal-body"}}
+{{#instance}}
+<form action="javascript://">
+  {{{ handle_context }}}
+  <div class="row-fluid">
+    <div class="span6">
+      <label>
+        PBC Request
+        <span class="required">*</span>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="request_description" class="span12 double wysihtml5" name="request" placeholder="Request Description">{{{description}}}</textarea>
+      </div>
+    </div>
+    <div class="span3">
+      <label>
+        Request Type
+        <span class="required">*</span>
+      </label>
+      <select class="input-block-level">
+        <option value="">Documentation</option>
+        <option value="">Images</option>
+        <option value="">Contracts</option>
+      </select>
+      <label>
+        Requested On
+      </label>
+      <input class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="">
+    </div>
+    <div class="span3">
+      <label>
+        Status
+      </label>
+      <select class="input-block-level" name="status" disabled>
+        <option>Draft</option>
+        <option>Requested</option>
+        <option>Responded</option>
+        <option>Ammended Request</option>
+        <option>Updated Response</option>
+        <option>Accepted</option>
+      </select>
+      <label>
+        Due On
+      </label>
+      <input class="input-block-level date" name="end_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="">
+    </div>
+  </div>
+  
+  <div class="row-fluid">
+    <div class="span6">
+      <label>
+        Objective
+      </label>
+      <i class="grcicon-objective-color pull-left icon-field"></i>
+      <div class="objective-selector">
+        <input href="#objective" type="text" name="objective" data-toggle="collapse" class="span10" value="Password Protection">
+        <ul id="objective" class="sub-level collapse">
+          <li>
+            <a href="#">
+              Password Protection
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Password Protection
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <a href="#">
+              Generic Request 1
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Generic Request 1
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="add-new">
+            <a href="#">+ Create New</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="span6">
+      <label>
+        Assignee
+      </label>
+      <i class="grcicon-person-green pull-left icon-field"></i>
+      <div class="objective-selector">
+        <input href="#assignee" type="text" name="assignee" data-toggle="collapse" class="span10" value="Predrag Kanazir">
+        <ul id="assignee" class="sub-level collapse">
+          <li>
+            <a href="#">
+              Predrag Kanazir <span class="small">predrag@reciprocitylabs.com</span>
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Predrag Kanazir
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  predrag@reciprocitylabs.com
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <a href="#">
+              Vladan Mitevski <span class="small">vladan@reciprocitylabs.com</span>
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Vladan Mitevski
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  vladan@reciprocitylabs.com
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <a href="#">
+              Brad Momberger <span class="small">brad@reciprocitylabs.com</span>
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Brad Momberger
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  brad@reciprocitylabs.com
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <a href="#">
+              Dan Ring <span class="small">dan@reciprocitylabs.com</span>
+            </a>
+            <div class="extended-content">
+              <div class="row-fluid">
+                <div class="span12">
+                  Dan Ring
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  dan@reciprocitylabs.com
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="add-new">
+            <a href="#">+ Create New</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="expand-link">
+        <a class="show-hidden-fields" href="javascript://">
+          <span class="out">
+            <i class="grcicon-show"></i>
+            Show 
+          </span>
+          <span class="in">
+            <i class="grcicon-hide"></i>
+            Hide
+          </span>
+          Advanced
+          <span class="hidden-fields out">
+            Test, Notes, Auditor Contact
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="hidden-fields-area" style="display:none">
+    <div class="row-fluid">
+      <div class="span6">
+        <label>
+          Test
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{description}}}</textarea>
+        </div>
+      </div>
+      <div class="span6">
+        <label>
+          Notes
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{description}}}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <label>
+          Audit Contact
+        </label>
+        <input class="span6" name="audit_contact" type="text" placeholder="Enter Auditor's contact email" value="">
+      </div>
+    </div>
+  </div>
+</form>
+{{/instance}}
+{{!/div}}

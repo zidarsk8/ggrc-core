@@ -8,7 +8,7 @@
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
               {{instance.title}}
-              <span class="small">created on 09/09/2013</span>
+              <span class="small gray">Planned</span>
             </div>
           </div>
         </div>
@@ -120,9 +120,12 @@
         </div>
         {{/instance.url}}
         <div class="span2">
-          <select class="input-block-level" name="status">
+          <select class="input-block-level top-space" name="status">
             <option>Planned</option>
             <option>In Progress</option>
+            <option>Manager review</option>
+            <option>Ready for external review</option>
+            <option>Completed</option>
           </select>
         </div>
       </div>

@@ -81,6 +81,9 @@ ul.new-tree {
       display: inline-block;
       margin-left: 6px;
     }
+    .gray {
+      color: $gray;
+    }
   }
   li.tree-item-add {
     padding-left:20px;
@@ -230,6 +233,9 @@ ul.new-tree {
 .tier-2-info-content {
   padding:0 20px;
   position:relative;
+  .top-space {
+    margin-top: 6px;
+  }
   .info-audit {
     @include reset-list();
     @include clearfix();
