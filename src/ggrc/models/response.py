@@ -7,17 +7,19 @@ from ggrc import db
 from .mixins import deferred, BusinessObject
 from .object_document import Documentable
 from .object_person import Personable
-from sqlalchemy.orm import validates
 
 class Response(BusinessObject, db.Model):
   __tablename__ = 'responses'
+  __mapper_args__ = {
+      'polymorphic_on': 'response_type',
+      }
 
   VALID_STATES = (u'Assigned', u'Accepted', u'Completed')
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   request_id = deferred(
       db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
       'Response')
-  response_type = deferred(db.Column(db.Enum(VALID_TYPES), nullable = False), 'Response')
+  response_type = db.Column(db.Enum(VALID_TYPES), nullable = False)
   status = deferred(db.Column(db.Enum(VALID_STATES), nullable = False), 'Response')
 
   _publish_attrs = [
@@ -50,9 +52,6 @@ class DocumentationResponse(Documentable, Personable, Response):
   _sanitize_html = [
       ]
 
-  @validates('response_type')
-  def validates_response_type(self, key, value):
-    return 'population sample'
 
   @classmethod
   def eager_query(cls):
@@ -73,10 +72,6 @@ class InterviewResponse(Documentable, Personable, Response):
   _sanitize_html = [
       ]
 
-  @validates('response_type')
-  def validates_response_type(self, key, value):
-    return 'population sample'
-
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
@@ -96,10 +91,6 @@ class PopulationSampleResponse(Documentable, Personable, Response):
   sample_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
   sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
   sample_evidence = deferred(db.Column(db.String, nullable=True), 'Response')
-
-  @validates('response_type')
-  def validates_response_type(self, key, value):
-    return 'population sample'
 
   _publish_attrs = [
       'population_worksheet',
