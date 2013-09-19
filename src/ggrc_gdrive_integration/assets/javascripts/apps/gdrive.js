@@ -22,8 +22,8 @@
   });
 
   GGRC.JoinDescriptor.from_arguments_list([
-    [["Program", "Audit", "Request"], GGRC.Models.GDriveFolder, "ObjectFolder", "folderable", "folder_id"]
-    , ["Response", GGRC.Models.GDriveFile, "ObjectFile", "fileable", "file_id"]
+    [["Program", "Audit", "Request"], GGRC.Models.GDriveFolder, "ObjectFolder", "folder", "folderable"]
+    , ["Response", GGRC.Models.GDriveFile, "ObjectFile", "file", "fileable"]
   ]);
 
 

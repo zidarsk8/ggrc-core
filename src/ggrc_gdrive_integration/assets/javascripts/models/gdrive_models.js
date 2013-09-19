@@ -30,6 +30,11 @@ can.Model.Cacheable("GGRC.Models.GDriveFolder", {
       }
       s.data = JSON.stringify(data);
     }
+    , success : function(objs) {
+      can.each(objs, function(obj) {
+        obj.selfLink = "#";
+      });
+    }
   }
   , create : function(params) {
       params.id = params.parentfolderid;
@@ -70,6 +75,15 @@ can.Model.Cacheable("GGRC.Models.GDriveFolder", {
   , addChildFolder : function(parent, params) {
     return this.create($.extend({ parentfolderid : parent.id }, params));
   }
+  , from_id : function(id) {
+    return new this({ id : id });
+  }
+  , model : function(params) {
+    if(params.url) {
+      params.selfLink = "#";
+    }
+    return this._super.apply(this, arguments);
+  }
 }, {
 
   findChildFolders : function() {
@@ -101,6 +115,10 @@ can.Model.Cacheable("GGRC.Models.GDriveFile", {
     throw "Destroy is not supported for GDrive Files. Use removeFromParent";
   }
 
+  , from_id : function(id) {
+    return new this({ id : id });
+  }
+
 }, {});
 
 can.Model.Cacheable("GGRC.Models.GDriveFolderPermission", {
@@ -124,14 +142,23 @@ can.Model.Join("CMS.Models.ObjectFolder", {
   , destroy : "DELETE /api/object_folders/{id}"
   , join_keys : {
     folderable : can.Model.Cacheable
-    , folder_id : GGRC.Models.GDriveFolder
+    , folder : GGRC.Models.GDriveFolder
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , folder_id : "String"
+    , folder : "GGRC.Models.GDriveFolder.stub"
     , folderable : "CMS.Models.get_stub"
   }
 
+  , model : function(params) {
+    if(typeof params === "object") {
+      params.folder = {
+        id : params.folder_id
+        , parentfolderid : params.parent_folder_id
+      };
+    }
+    return this._super(params);
+  }
 }, {});
 
 can.Model.Join("CMS.Models.ObjectFile", {
@@ -143,14 +170,23 @@ can.Model.Join("CMS.Models.ObjectFile", {
   , destroy : "DELETE /api/object_people/{id}"
   , join_keys : {
     fileable : can.Model.Cacheable
-    , file_id : GGRC.Models.GDriveFile
+    , file : GGRC.Models.GDriveFile
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , file_id : "String"
+    , file : "GGRC.Models.GDriveFile.stub"
     , fileable : "CMS.Models.get_stub"
   }
 
+  , model : function(params) {
+    if(typeof params === "object") {
+      params.folder = {
+        id : params.file_id
+        , parentfolderid : params.folder_id
+      };
+    }
+    return this._super(params);
+  }
 }, {});
 
 })(window.can);

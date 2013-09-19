@@ -627,13 +627,14 @@ can.Observe.List.prototype.stubs = function() {
 
 can.Observe.prototype.reify = function() {
   var type = this.constructor.shortName || this.type;
+  var model;
   if (this.selfLink) {
     return this;
-  } else if (CMS.Models[type]) {
-    if (CMS.Models[type].cache
-        && CMS.Models[type].cache[this.id]) {
+  } else if (model = (CMS.Models[type] || GGRC.Models[type])) {
+    if (model.cache
+        && model.cache[this.id]) {
         //&& CMS.Models[this.type].cache[this.id].selfLink) {
-      return CMS.Models[type].cache[this.id];
+      return model.cache[this.id];
     } else {
       return null;
     }
