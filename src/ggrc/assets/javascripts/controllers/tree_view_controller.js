@@ -7,6 +7,17 @@
 
 //= require can.jquery-all
 
+function _firstElementChild(el) {
+  if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    for (i=0; i<el.childNodes.length; i++) {
+      if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
+        return el.childNodes[i];
+    }
+  } else {
+    return el;
+  }
+}
+
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
@@ -44,7 +55,7 @@ can.Control("CMS.Controllers.TreeView", {
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
   }
-  , do_not_propagate : ["$header", "$footer", "header_view", "footer_view", "list", "original_list", "single_object", "find_function"]
+  , do_not_propagate : ["header_view", "footer_view", "list", "original_list", "single_object", "find_function"]
 }, {
   //prototype properties
   setup : function(el, opts) {
@@ -72,8 +83,16 @@ can.Control("CMS.Controllers.TreeView", {
 
   , init : function(el, opts) {
     this.element.uniqueId();
-    this.element.trigger("loading");
-    this.options.list ? this.draw_list() : this.fetch_list();
+    var that = this;
+
+    // In some cases, this controller is immediately replaced
+    setTimeout(function() {
+      if (that.element) {
+        that.element.trigger("loading");
+        that.init_view();
+        that.options.list ? that.draw_list() : that.fetch_list();
+      }
+    }, 100);
 
     var object_type = can.underscore(
           this.options.model ? this.options.model.shortName : "Object")
@@ -91,6 +110,26 @@ can.Control("CMS.Controllers.TreeView", {
       this.options.allow_mapping || this.options.allow_creating);
   }
 
+  , init_view : function() {
+      var that = this;
+
+      if(this.options.header_view) {
+        can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+          if (that.element) {
+            that.element.prepend(frag);
+          }
+        });
+      }
+
+      if(this.options.footer_view) {
+        can.view(this.options.footer_view, this.options, function(frag) {
+          if (that.element) {
+            that.element.append(frag);
+          }
+        });
+      }
+    }
+
   , fetch_list : function() {
     var find_function;
 
@@ -103,7 +142,10 @@ can.Control("CMS.Controllers.TreeView", {
           "id", this.options.parent_instance ? this.options.parent_instance.id : undefined);
       }
 
-      if (this.options.list_loader) {
+      if (this.options.mapping) {
+        this.find_all_deferred =
+          this.options.parent_instance.get_list_loader(this.options.mapping);
+      } else if (this.options.list_loader) {
         this.find_all_deferred =
           this.options.list_loader(this.options.parent_instance);
       } else {
@@ -138,7 +180,8 @@ can.Control("CMS.Controllers.TreeView", {
     }
     if (!(v.instance instanceof can.Model)) {
       if (v.instance.instance instanceof can.Model) {
-        v.attr("mappings", v.instance.mappings);
+        v.attr("result", v.instance);
+        v.attr("mappings", v.instance.mappings_compute());
         v.attr("instance", v.instance.instance);
       } else {
         v.attr("instance", this.options.model.model(v.instance));
@@ -150,7 +193,7 @@ can.Control("CMS.Controllers.TreeView", {
         can.each(v.attr("child_options"), function(child_options) {
           var list = child_options.attr("list");
           if (list)
-            total_children = total_children + list.length;
+            total_children = total_children + list.attr('length');
         });
       }
       return total_children;
@@ -178,14 +221,6 @@ can.Control("CMS.Controllers.TreeView", {
     this.options.attr("list", []);
     this.on();
 
-
-    if(this.options.header_view) {
-      header_dfd = can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
-        that.options.attr("$header", $(frag.children));
-        that.element.append(frag);
-      });
-    }
-
     var temp_list = [];
     can.each(list, function(v, i) {
       var item = that.prepare_child_options(v);
@@ -196,7 +231,7 @@ can.Control("CMS.Controllers.TreeView", {
     });
     refresh_queue.trigger().then(function() {
       can.Observe.stopBatch();
-      that.options.attr('list', temp_list);
+      that.options.list.replace(temp_list);
       that.add_child_lists(that.options.attr("list")); //since the view is handling adding new controllers now, configure before rendering.
       GGRC.queue_event(function() {
         function when_attached_to_dom(cb) {
@@ -220,20 +255,13 @@ can.Control("CMS.Controllers.TreeView", {
               return;
             }
 
-            that.element.trigger("updateCount", that.options.list.length)
+            that.element && that.element.trigger("updateCount", that.options.list.length)
             .trigger("loaded")
             .trigger("subtree_loaded")
             .find(".spinner").remove();
           });
         }
       });
-
-      if(that.options.footer_view) {
-        can.view(that.options.footer_view, that.options, function(frag) {
-          that.options.attr("$footer", $(frag.children));
-          that.element && that.element.append(frag);
-        });
-      }
     });
   }
 
@@ -242,11 +270,10 @@ can.Control("CMS.Controllers.TreeView", {
     can.each(newVals, function(newVal) {
       var _newVal = newVal.instance ? newVal.instance : newVal;
       if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
-        that.element.trigger("newChild", newVal);
+        that.element && that.element.trigger("newChild", newVal);
       } 
     });
     delete that.oldList;
-    can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
@@ -256,30 +283,20 @@ can.Control("CMS.Controllers.TreeView", {
     GGRC.queue_event(function() {
       if(that.oldList) {
         can.each(oldVals, function(v) {
-          that.element.trigger("removeChild", v);
+          that.element && that.element.trigger("removeChild", v);
         });
+        delete that.oldList;
       } else {
         list = can.map(list, function(l) { return l.instance || l});
         can.each(oldVals, function(v) {
           var _v = v.instance || v;
           if(!~can.inArray(_v, list)) {
-            that.element.trigger("removeChild", v);
+            that.element && that.element.trigger("removeChild", v);
           }
         });
       }
     });
-    //this.options.list.splice(index, oldVals.length);
-    can.trigger(this.options.list, "change", "*"); //live binding isn't updating the count properly.  this forces the issue
   }
-  , "{original_list} change" : function(list, ev, newVals, index) {
-    var that = this;
-    if(list.isComputed) {
-      this.draw_list(list());
-    }
-  }
-  // , "{original_list} set" : function(list, ev, newVal, index) {
-  //   this.options.list[index].attr("instance", newVal);
-  // }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {
     ev.stopPropagation();
@@ -296,12 +313,6 @@ can.Control("CMS.Controllers.TreeView", {
     parent.attr("children_drawn", true);
   }
 
-  , ".openclose:not(.active) click" : function(el, ev) {
-    // Ignore unless it's a direct child
-    if (el.closest('.' + this.constructor._fullName).is(this.element))
-      el.trigger("expand");
-  }
-
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   , add_child_lists : function(list) {
     var that = this;
@@ -316,9 +327,12 @@ can.Control("CMS.Controllers.TreeView", {
   }
 
   , draw_item : function(options) {
-    var $li = $("<li>");
-    if(this.options.$footer && this.options.$footer.length) {
-      $li.insertBefore(this.options.$footer);
+    var $li = $("<li>")
+      , $footer = this.element.children('.tree-footer')
+      ;
+
+    if($footer.length) {
+      $li.insertBefore($footer);
     } else {
       $li.appendTo(this.element);
     }
@@ -372,12 +386,6 @@ can.Control("CMS.Controllers.TreeView", {
       this.element.trigger('updateCount', this.options.list.length);
     }
 
-  , " click" : function() {
-    if(~this.element.text().indexOf("@@!!@@")) {
-      this.draw_list();
-    }
-  }
-
   , ".edit-object modal:success" : function(el, ev, data) {
     var model = el.closest("[data-model]").data("model");
     model.attr(data[model.constructor.root_object] || data);
@@ -423,9 +431,11 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , init : function(el, opts) {
     var that = this;
     this.add_child_lists_to_child();
-    can.view(this.options.show_view, this.options, function(frag) {
-      that.replace_element(frag);
-    });
+    setTimeout(function() {
+      can.view(that.options.show_view, that.options, function(frag) {
+        that.replace_element(frag);
+      });
+    }, 20);
   }
 
   // add all child options to one TreeViewOptions object
@@ -505,26 +515,24 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
   , replace_element : function(el) {
     var old_el = this.element
-    , $el = $(el)
-    , old_data = $.extend({}, old_el.data())
-    , i
-    , firstchild
-    ;
+      , $el
+      , old_data
+      , i
+      , firstchild
+      ;
 
-    if (el.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-      for (i=0; !firstchild && i<el.childNodes.length; i++) {
-        if (el.childNodes[i].nodeType !== Node.TEXT_NODE)
-          firstchild = $(el.childNodes[i]);
-      }
-    } else {
-      firstchild = $el.first();
-    }
+    if (!this.element)
+      return;
+
+    $el = $(el)
+    old_data = $.extend({}, old_el.data())
+
+    firstchild = $(_firstElementChild(el));
 
     old_data.controls = old_data.controls.slice(0);
     old_el.data("controls", []);
-    el = $el.get(0);
     this.off();
-    old_el.replaceWith($el);
+    old_el.replaceWith(el);
     this.element = firstchild.addClass(this.constructor._fullName).data(old_data);
     this.on();
   }
@@ -532,7 +540,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
     this.options.attr('expanded', true);
-    var instance = el.data("model");
     if(!this.options.child_options && this.options.draw_children) {
       this.add_child_lists_to_child();
     }

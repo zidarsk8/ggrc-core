@@ -54,7 +54,7 @@ can.Control("CMS.Controllers.PBCModals", {
       this.selected_response_id = el.closest("[data-id]").data("id");
     }
 
-    , "a[data-method=delete][href*=responses] click" : function(el, ev) {
+    , "a[data-toggle=delete][href*=responses] click" : function(el, ev) {
       var modal = el.closest(".modal")
       , options = modal.data("modal_form").options;
 

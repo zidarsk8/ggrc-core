@@ -18,7 +18,6 @@ Feature: Some resources can be related to Document resources
   Examples:
       | documentable_type |
       | Control           |
-      | Cycle             |
       | DataAsset         |
       #| Directive         |
       | Contract          |
@@ -31,7 +30,10 @@ Feature: Some resources can be related to Document resources
       | Product           |
       | Program           |
       | Project           |
-      | Response          |
+      #| Response          |
+      | DocumentationResponse     |
+      | InterviewResponse         |
+      | PopulationSampleResponse  |
       | Risk              |
       | RiskyAttribute    |
       | System            |

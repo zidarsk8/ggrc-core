@@ -51,8 +51,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         , link_buttons: true
       }]
     }
-    , serialize : {
-    }
     , bind_object_star_events: function() {
         var that = this;
 
@@ -128,25 +126,25 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
-    , response : "CMS.Models.Response.model"
-    , sub_system_systems : "CMS.Models.SystemSystem.models"
-    , sub_systems : "CMS.Models.get_instances"
-    , super_system_systems : "CMS.Models.SystemSystem.models"
-    , super_systems : "CMS.Models.get_instances"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , response : "CMS.Models.Response.stub"
+    , sub_system_systems : "CMS.Models.SystemSystem.stubs"
+    , sub_systems : "CMS.Models.get_stubs"
+    , super_system_systems : "CMS.Models.SystemSystem.stubs"
+    , super_systems : "CMS.Models.get_stubs"
     }
   , defaults : {
       title : ""
@@ -180,26 +178,26 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , related_sources : "CMS.Models.Relationship.models"
-    , related_destinations : "CMS.Models.Relationship.models"
-    , object_objectives : "CMS.Models.ObjectObjective.models"
-    , objectives : "CMS.Models.Objective.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , controls : "CMS.Models.Control.models"
-    , object_sections : "CMS.Models.ObjectSection.models"
-    , sections : "CMS.Models.Section.models"
-    , network_zone : "CMS.Models.Option.model"
-    , response : "CMS.Models.Response.model"
-    , sub_system_systems : "CMS.Models.SystemSystem.models"
-    , sub_systems : "CMS.Models.get_instances"
-    , super_system_systems : "CMS.Models.SystemSystem.models"
-    , super_systems : "CMS.Models.get_instances"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_objectives : "CMS.Models.ObjectObjective.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+    , object_sections : "CMS.Models.ObjectSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , network_zone : "CMS.Models.Option.stub"
+    , response : "CMS.Models.Response.stub"
+    , sub_system_systems : "CMS.Models.SystemSystem.stubs"
+    , sub_systems : "CMS.Models.get_stubs"
+    , super_system_systems : "CMS.Models.SystemSystem.stubs"
+    , super_systems : "CMS.Models.get_stubs"
     }
   , defaults : {
       title : ""

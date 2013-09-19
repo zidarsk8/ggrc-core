@@ -25,20 +25,22 @@ can.Control("GGRC.Controllers.InfoWidget", {
       this.options.widget_view = GGRC.mustache_path + this.element.data('widget-view');
     }
 
-    if(this.options.instance 
-        && this.options.instance.owner 
-        && !this.options.instance.owner.selfLink
-    ) {
-      this.options.instance.owner.refresh();
-    }
-
     this.options.context = new can.Observe({
         model : this.options.model
       , instance : this.options.instance
       });
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       that.element.html(frag);
+      CMS.Models.ObjectFolder.findAll({folderable_type : that.options.model.shortName, folderable_id : that.options.instance.id })
+      .done(function(d) {
+        GGRC.Models.GDriveFolder.findAll({}).done(function(f) {
+          can.each(d, function(of) {
+            that.element.append($("<p>").html("GDrive Folder: ").append($("<a>").attr("href", of.folder.reify().url).text(of.folder.reify().name)));
+          });
+        });
+      });
     });
+
   }
 
   , get_widget_view: function(el) {

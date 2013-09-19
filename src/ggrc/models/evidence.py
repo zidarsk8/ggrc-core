@@ -4,27 +4,25 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Base
+from .mixins import deferred, Base, Hyperlinked
 
-class Meeting(Base, db.Model):
-  __tablename__ = 'meetings'
+class Evidence(Hyperlinked, Base, db.Model):
+  __tablename__ = 'evidence'
 
   response_id = deferred(
       db.Column(db.Integer, db.ForeignKey('responses.id'), nullable=False),
-      'Meeting')
-  start_at = deferred(db.Column(db.DateTime), 'Meeting')
-  calendar_url = deferred(db.Column(db.String), 'Meeting')
+      'Evidence')
 
   _publish_attrs = [
-      'response',
-      'start_at',
-      'calendar_url',
-      ]
+    'response',
+  ]
+  _sanitize_html = [
+  ]
 
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
-    query = super(Meeting, cls).eager_query()
-    return query.options(
-        orm.joinedload('response'))
+    query = super(Evidence, cls).eager_query()
+    return query.options()
+        #orm.joinedload('response'))

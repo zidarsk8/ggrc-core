@@ -35,9 +35,9 @@ can.Model.Cacheable("CMS.Models.Person", {
         });
     }
     , attributes : {
-        modified_by : "CMS.Models.Person.model"
-      , object_people : "CMS.Models.ObjectPerson.models"
-      , language : "CMS.Models.Option.model"
+        modified_by : "CMS.Models.Person.stub"
+      , object_people : "CMS.Models.ObjectPerson.stubs"
+      , language : "CMS.Models.Option.stub"
     }
     , defaults : {
       name : ""

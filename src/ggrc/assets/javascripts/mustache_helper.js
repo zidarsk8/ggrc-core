@@ -342,8 +342,8 @@ $.each({
 Mustache.registerHelper("if_equals", function(val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
-    if(_val1 == _val2) return options.fn(that);
-    else return options.inverse(that);
+    if(_val1 == _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
   }
     if(typeof val1 === "function") { 
       if(val1.isComputed) {
@@ -661,11 +661,7 @@ Mustache.registerHelper("all", function(type, options) {
     $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function(s) { return s.replace(/'|"| /, "");}));
   }
 
-  if(model.cache) {
-    items_dfd = $.when(can.map(Object.keys(model.cache), function(idx) { return model.cache[idx]; }));
-  } else {
-    items_dfd = model.findAll();
-  }
+  items_dfd = model.findAll();
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
@@ -897,37 +893,31 @@ Mustache.registerHelper("show_long", function() {
 
 Mustache.registerHelper("using", function(args, options) {
   var refresh_queue = new RefreshQueue()
-    , context = this
+    , context
+    , frame = new can.Observe()
     , i, arg;
 
   args = can.makeArray(arguments);
   options = args.pop();
+  context = options.contexts || this;
 
-  for (i=0; i<args.length; i++) {
-    arg = args[i];
-    if (can.isFunction(arg))
-      arg = arg();
-    args[i] = arg;
-  }
   if (options.hash) {
     for (i in options.hash) {
       if (options.hash.hasOwnProperty(i)) {
         arg = options.hash[i];
-        if (can.isFunction(arg))
-          arg = arg();
-        args.push(arg);
+        arg = Mustache.resolve(arg);
+        if (arg && arg.reify) {
+          refresh_queue.enqueue(arg.reify());
+          frame.attr(i, arg.reify());
+        } else {
+          frame.attr(i, arg);
+        }
       }
     }
   }
 
-  for (i=0; i<args.length; i++) {
-    arg = args[i];
-    if (arg)
-      refresh_queue.enqueue(args[i]);
-  }
-
   function finish() {
-    return options.fn(this);
+    return options.fn(frame);
   }
 
   return defer_render('span', finish, refresh_queue.trigger());
@@ -1110,6 +1100,19 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
     return target.context ? target.context.id : null;
   }
   return page_object.context ? page_object.context.id : null;
+});
+
+Mustache.registerHelper("json_escape", function(obj, options) {
+  return (""+resolve_computed(obj))
+    .replace(/"/g, '\\"')
+    //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
+    //    thus does not allow backslash-escaped single quotes within strings.
+    //    E.g., make sure attributes use double quotes, or use character
+    //    entities instead -- but these aren't replaced by the JSON parser, so
+    //    the output is not identical to input (hence, not using them now.)
+    //.replace(/'/g, "\\'")
+    //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
+    .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 });
 
 })(this, jQuery, can);

@@ -359,6 +359,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["System", "Control", "SystemControl", "control", "system"]
       //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
+      , ["Program", "Audit", null, null, "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , [directive_object_types, "Section", null, null, "directive"]
       , [directive_object_types, "Control", null, null, "directive"]
@@ -366,6 +367,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Objective", "Section", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
+      , ["Audit", "Request", null, null, "audit"]
+      , ["Request", "Objective", null, null, "objective"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];
@@ -483,14 +486,17 @@ $(function() {
     var $el = $(this)
       ;
 
-    $el.children("span").each(function(i, mapping_el) {
-      var $mapping_el = $(mapping_el)
-        , mapping = $mapping_el.data('mapping');
+    $el.children(".result").each(function(i, result_el) {
+      var $result_el = $(result_el)
+        , result = $result_el.data('result')
+        , mappings = result && result.get_mappings()
+        , i
+        ;
 
-      if (mapping) {
+      can.each(mappings, function(mapping) {
         mapping.refresh().done(function() {
-          // Never delete a control from a directive page, just remove the mapping
-          if (mapping instanceof CMS.Models.Control && GGRC.page_instance() instanceof CMS.Models.Directive) {
+          if (mapping instanceof CMS.Models.Control
+              && GGRC.page_instance() instanceof CMS.Models.Directive) {
             mapping.removeAttr('directive');
             mapping.save();
           }
@@ -498,8 +504,7 @@ $(function() {
             mapping.destroy();
           }
         });
-        //$mapping_el.remove();
-      }
+      });
     });
   });
 

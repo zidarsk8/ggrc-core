@@ -1,0 +1,58 @@
+<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <a href="javascript://" class="openclose">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="item-data">
+            <div class="tree-title-area">
+              <i class="grcicon-chevron-right"></i>
+              {{#using objective=instance.objective}}
+                {{objective.title}}
+              {{/using}}
+            </div>
+          </div>
+        </div>
+        <div class="span3">
+          <i class="grcicon-person-green pull-left"></i>
+          <div class="objective-selector">
+            <input type="text" name="owner_id" class="span8" value="Predrag Kanazir">
+          </div>
+        </div>
+        <div class="span3">
+          <span class="pull-left">type:</span>
+          <select class="span10">
+            <option>documentation</option>
+            <option>images</option>
+            <option>files</option>
+          </select>
+        </div>
+        <div class="span3">
+          <select class="span10">
+            <option>draft</option>
+          </select>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-content">
+      {{! request info in expanded state goes here }}
+    </div>
+
+    {{#if draw_children}}
+    {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+        {{#child_options}}
+          <div class="inner-tree">
+            <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
+            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+          </div>
+        {{/child_options}}
+    {{/if_null}}
+    {{/if}}
+
+  </div>
+  {{/if}}
+
+</li>

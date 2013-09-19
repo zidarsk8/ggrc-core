@@ -127,9 +127,9 @@ can.Model.Join("CMS.Models.Relationship", {
     root_object: "relationship"
   , root_collection: "relationships"
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , source : "CMS.Models.get_instance"
-    , destination : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , source : "CMS.Models.get_stub"
+    , destination : "CMS.Models.get_stub"
   }
   , join_keys : {
     source : can.Model.Cacheable
@@ -174,9 +174,9 @@ can.Model.Join("CMS.Models.ObjectSection", {
     , "sectionable" : can.Model.Cacheable
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , section : "CMS.Models.Section.model"
-    , sectionable : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , section : "CMS.Models.Section.stub"
+    , sectionable : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/object_sections"
   , create: "POST /api/object_sections"
@@ -195,9 +195,9 @@ can.Model.Join("CMS.Models.ObjectControl", {
     , "controllable" : can.Model.Cacheable
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , control : "CMS.Models.Control.model"
-    , controllable : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , control : "CMS.Models.Control.stub"
+    , controllable : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/object_controls"
   , create: "POST /api/object_controls"
@@ -216,9 +216,9 @@ can.Model.Join("CMS.Models.ObjectObjective", {
     , "objectiveable" : can.Model.Cacheable
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , objective : "CMS.Models.Objective.model"
-    , objectiveable : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , objective : "CMS.Models.Objective.stub"
+    , objectiveable : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/object_objectives"
   , create: "POST /api/object_objectives"
@@ -237,9 +237,9 @@ can.Model.Join("CMS.Models.ProgramDirective", {
     , directive : CMS.Models.Directive
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , program : "CMS.Models.Program.model"
-    , directive : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , program : "CMS.Models.Program.stub"
+    , directive : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/program_directives"
   , create: "POST /api/program_directives"
@@ -251,9 +251,9 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
   root_object : "objective_control"
   , root_collection : "objective_controls"
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , objective : "CMS.Models.Objective.model"
-    , control : "CMS.Models.Control.model"
+      modified_by : "CMS.Models.Person.stub"
+    , objective : "CMS.Models.Objective.stub"
+    , control : "CMS.Models.Control.stub"
     }
   , join_keys : {
       "objective" : CMS.Models.Objective
@@ -269,9 +269,9 @@ can.Model.Join("CMS.Models.SystemControl", {
   root_object : "system_control"
   , root_collection : "system_controls"
   , attributes: {
-      modified_by : "CMS.Models.Person.model"
-    , system : "CMS.Models.System.model"
-    , control : "CMS.Models.Control.model"
+      modified_by : "CMS.Models.Person.stub"
+    , system : "CMS.Models.System.stub"
+    , control : "CMS.Models.Control.stub"
   }
   , join_keys : {
     "system" : CMS.Models.System
@@ -287,9 +287,9 @@ can.Model.Join("CMS.Models.SystemSystem", {
   root_object : "system_system"
   , root_collection : "system_systems"
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , parent : "CMS.Models.System.model"
-    , child : "CMS.Models.System.model"
+      modified_by : "CMS.Models.Person.stub"
+    , parent : "CMS.Models.System.stub"
+    , child : "CMS.Models.System.stub"
   }
   , join_keys : {
     "parent" : can.Model.Cacheable
@@ -309,39 +309,15 @@ can.Model.Join("CMS.Models.UserRole", {
   , create : "POST /api/user_roles"
   , destroy : "DELETE /api/user_roles/{id}"
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , person : "CMS.Models.Person.model"
-    , role : "CMS.Models.Role.model"
+      modified_by : "CMS.Models.Person.stub"
+    , person : "CMS.Models.Person.stub"
+    , role : "CMS.Models.Role.stub"
   }
   , join_keys : {
       person : CMS.Models.Person
     , role : CMS.Models.Role
   }
 }, {
-/*  init : function() {
-    var _super = this._super;
-    function reinit() {
-      var that = this;
-
-      typeof _super === "function" && _super.call(this);
-      this.attr("person", CMS.Models.get_instance(
-        "Person",
-        this.person_id || (this.person && this.person.id), this.person));
-      this.attr("role", CMS.Models.get_instance(
-        "Role",
-        this.role_id || (this.role && this.role.id), this.role));
-
-      this.each(function(value, name) {
-        if (value === null)
-        that.removeAttr(name);
-      });
-    }
-
-    this.bind("created", can.proxy(reinit, this));
-
-    reinit.call(this);
-  }*/
-
 });
 
 
@@ -352,42 +328,15 @@ can.Model.Join("CMS.Models.ControlSection", {
   , create : "POST /api/control_sections"
   , destroy : "DELETE /api/control_sections/{id}"
   , join_keys : {
-    section : CMS.Models.Section
+      section : CMS.Models.Section
     , control : CMS.Models.Control
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , section : "CMS.Models.Section.model"
-    , control : "CMS.Models.Control.model"
-  }/*
-  , init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this.bind("created destroyed", function(ev, inst) {
-      if(that !== inst.constructor) return;
-      var section =
-        CMS.Models.Section.findInCacheById(inst.section.id)
-        || CMS.Models.Section.findInCacheById(inst.section.id);
-      var control = 
-        CMS.Models.RegControl.findInCacheById(inst.control.id)
-        || CMS.Models.Control.findInCacheById(inst.control.id);
-
-      section && section.refresh();
-      control && control.refresh();
-    });
-  }*/
-}, {
-  serialize : function(name) {
-    var serial;
-    if(!name) {
-      serial = this._super();
-      serial.section && (serial.section = this.section.stub());
-      serial.control && (serial.control = this.control.stub());
-      return serial;
-    } else {
-      return this._super.apply(this, arguments);
-    }
+      modified_by : "CMS.Models.Person.stub"
+    , section : "CMS.Models.Section.stub"
+    , control : "CMS.Models.Control.stub"
   }
+}, {
 });
 
 can.Model.Join("CMS.Models.SectionObjective", {
@@ -401,40 +350,11 @@ can.Model.Join("CMS.Models.SectionObjective", {
     , objective : CMS.Models.Objective
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , section : "CMS.Models.Section.model"
-    , objective : "CMS.Models.Objective.model"
+      modified_by : "CMS.Models.Person.stub"
+    , section : "CMS.Models.Section.stub"
+    , objective : "CMS.Models.Objective.stub"
   }
-  /*, init : function() {
-    var that = this;
-    this._super.apply(this, arguments);
-    this.bind("created destroyed", function(ev, inst) {
-      if(that !== inst.constructor) return;
-      var section =
-        CMS.Models.Section.findInCacheById(inst.section.id)
-        || CMS.Models.Section.findInCacheById(inst.section.id);
-      var objective = 
-        CMS.Models.Objective.findInCacheById(inst.objective.id);
-
-      section && section.refresh();
-      objective && objective.refresh();
-    });
-  }*/
 }, {
-/*    init: function() {
-      this.setup_reinit(this._super);
-    }*/
-/*  , serialize : function(name) {
-    var serial;
-    if(!name) {
-      serial = this._super();
-      serial.section && (serial.section = this.section.stub());
-      serial.objective && (serial.objective = this.objective.stub());
-      return serial;
-    } else {
-      return this._super.apply(this, arguments);
-    }
-  }*/
 });
 
 can.Model.Join("CMS.Models.DirectiveControl", {
@@ -469,9 +389,9 @@ can.Model.Join("CMS.Models.ProgramControl", {
     , control : CMS.Models.Control
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , program : "CMS.Models.Program.model"
-    , control : "CMS.Models.Control.model"
+      modified_by : "CMS.Models.Person.stub"
+    , program : "CMS.Models.Program.stub"
+    , control : "CMS.Models.Control.stub"
   }
   , findAll : "GET /api/program_controls"
   , create : "POST /api/program_controls"
@@ -488,9 +408,9 @@ can.Model.Join("CMS.Models.ControlControl", {
     , implemented_control : CMS.Models.Control
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , control : "CMS.Models.Control.model"
-    , implemented_control : "CMS.Models.Control.model"
+      modified_by : "CMS.Models.Person.stub"
+    , control : "CMS.Models.Control.stub"
+    , implemented_control : "CMS.Models.Control.stub"
   }
   , findAll : "GET /api/control_controls"
   , create : "POST /api/control_controls"
@@ -507,9 +427,9 @@ can.Model.Join("CMS.Models.ControlRisk", {
     , risk : CMS.Models.Risk
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , control : "CMS.Models.Control.model"
-    , risk : "CMS.Models.Risk.model"
+      modified_by : "CMS.Models.Person.stub"
+    , control : "CMS.Models.Control.stub"
+    , risk : "CMS.Models.Risk.stub"
   }
   , findAll : "GET /api/control_risks"
   , create : "POST /api/control_risks"
@@ -530,9 +450,9 @@ can.Model.Join("CMS.Models.ObjectPerson", {
     , person : CMS.Models.Person
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , person : "CMS.Models.Person.model"
-    , personable : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , person : "CMS.Models.Person.stub"
+    , personable : "CMS.Models.get_stub"
   }
 
 }, {});
@@ -548,9 +468,9 @@ can.Model.Join("CMS.Models.ObjectDocument", {
     , document : CMS.Models.Document
   }
   , attributes : {
-      modified_by : "CMS.Models.Person.model"
-    , document : "CMS.Models.Document.model"
-    , documentable : "CMS.Models.get_instance"
+      modified_by : "CMS.Models.Person.stub"
+    , document : "CMS.Models.Document.stub"
+    , documentable : "CMS.Models.get_stub"
   }
 }, {});
 

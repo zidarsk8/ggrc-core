@@ -767,6 +767,17 @@ jQuery(function($) {
     $createLink.fadeIn();
     $importLink.fadeIn();
   });
+
+  $('body').on('mouseenter', '.object-create', function(e) {
+    var $this = $(this)
+      , $objectiveLink = $this.closest('div').find('.objective-create')
+      ;
+    if ($objectiveLink.is(":hidden")) {
+      $this.hide();
+      $objectiveLink.fadeIn();
+      $this.fadeIn();
+    }
+  });
   
   $('body').on('click', '.show-long', function(e) {
     var $this = $(this)

@@ -7,15 +7,24 @@
 
 (function(can, $) {
 
-GGRC.Controllers.Modals("GGRC.Controllers.Delete", {},
-  {
+GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
+    defaults: {
+        skip_refresh: true
+    }
+}, {
   init : function() {
     this._super();
   }
 
-  , "{$footer} a.btn[data-method=delete] click" : function(el, ev) {
+  , "{$footer} a.btn[data-toggle=delete] click" : function(el, ev) {
     var that = this;
     this.bindXHRToButton(this.options.instance.destroy().done(function(instance) {
+      // If this modal is spawned from an edit modal, make sure that one does
+      // not refresh the instance post-delete.
+      var parent_controller = $(that.options.$trigger).closest('.modal').control();
+      if (parent_controller)
+        parent_controller.options.skip_refresh = true;
+
       el.trigger("ajax:flash", { success : instance.display_name() +  ' deleted successfully'});
       that.element.trigger("modal:success", that.options.instance);
     }), el);

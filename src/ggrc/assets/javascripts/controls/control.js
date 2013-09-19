@@ -17,34 +17,34 @@ can.Model.Cacheable("CMS.Models.Control", {
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.model"
-    , modified_by : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , categories : "CMS.Models.Category.models"
-    , assertions : "CMS.Models.Category.models"
-    , control_controls : "CMS.Models.ControlControl.models"
-    , implemented_controls : "CMS.Models.Control.models"
-    , implementing_control_controls : "CMS.Models.ControlControl.models"
-    , implementing_controls : "CMS.Models.Control.models"
-    , objective_controls : "CMS.Models.ObjectiveControl.models"
-    , objectives : "CMS.Models.Objective.models"
-    , directive : "CMS.Models.Directive.model"
-    , control_sections : "CMS.Models.ControlSection.models"
-    , sections : "CMS.Models.Section.models"
-    , program_controls : "CMS.Models.ProgramControl.models"
-    , programs : "CMS.Models.Program.models"
-    , system_controls : "CMS.Models.SystemControl.models"
-    , systems : "CMS.Models.System.models"
-    , control_risks : "CMS.Models.ControlRisk.models"
-    , risks : "CMS.Models.Risk.models"
-    , object_controls : "CMS.Models.ObjectControl.models"
-    , type : "CMS.Models.Option.model"
-    , kind : "CMS.Models.Option.model"
-    , means : "CMS.Models.Option.model"
-    , verify_frequency : "CMS.Models.Option.model"
+      owner : "CMS.Models.Person.stub"
+    , modified_by : "CMS.Models.Person.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
+    , documents : "CMS.Models.Document.stubs"
+    , categories : "CMS.Models.Category.stubs"
+    , assertions : "CMS.Models.Category.stubs"
+    , control_controls : "CMS.Models.ControlControl.stubs"
+    , implemented_controls : "CMS.Models.Control.stubs"
+    , implementing_control_controls : "CMS.Models.ControlControl.stubs"
+    , implementing_controls : "CMS.Models.Control.stubs"
+    , objective_controls : "CMS.Models.ObjectiveControl.stubs"
+    , objectives : "CMS.Models.Objective.stubs"
+    , directive : "CMS.Models.Directive.stub"
+    , control_sections : "CMS.Models.ControlSection.stubs"
+    , sections : "CMS.Models.Section.stubs"
+    , program_controls : "CMS.Models.ProgramControl.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , system_controls : "CMS.Models.SystemControl.stubs"
+    , systems : "CMS.Models.System.stubs"
+    , control_risks : "CMS.Models.ControlRisk.stubs"
+    , risks : "CMS.Models.Risk.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    //, type : "CMS.Models.Option.stub"
+    , kind : "CMS.Models.Option.stub"
+    , means : "CMS.Models.Option.stub"
+    , verify_frequency : "CMS.Models.Option.stub"
   }
   , links_to : {
     "Section" : "ControlSection"
@@ -63,65 +63,39 @@ can.Model.Cacheable("CMS.Models.Control", {
     , "url" : ""
   }
 
-  , mappings: {
-      people_mappings: {
-          attr: "object_people"
-        , target_attr: "person"
-      }
-    , document_mappings: {
-          attr: "object_documents"
-        , target_attr: "document"
-      }
-    , business_object_mappings: {
-          attr: "object_controls"
-        , target_attr: "controllable"
-      }
-    , section_mappings: {
-          attr: "control_sections"
-        , target_attr: "section"
-      }
-    , objective_mappings: {
-          attr: "objective_controls"
-        , target_attr: "objective"
-      }
-    , program_mappings: {
-          attr: "program_controls"
-        , target_attr: "program"
-      }
-    }
-
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/controls/tree.mustache"
     , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
     /*    model : "Section"
-      , property : "section_mappings"
+      , mapping : "sections"
       , show_view : "/static/mustache/sections/tree.mustache"
     }, {*/
         model : "Person"
-      , property : "people_mappings"
+      , mapping : "people"
       , show_view : "/static/mustache/people/tree.mustache"
       , draw_children : false
     }, {
         model : "Document"
-      , property : "document_mappings"
+      , mapping : "documents"
       , show_view : "/static/mustache/documents/tree.mustache"
       , draw_children : false
     }, {
         model : "Objective"
-      , property : "objective_mappings"
+      , mapping : "objectives"
       , show_view : "/static/mustache/objectives/tree.mustache"
       , draw_children : false
     }, {
         model : "Program"
-      , property : "program_mappings"
+      , mapping : "programs"
       , list_view : "/static/mustache/base_objects/tree.mustache"
       , draw_children : false
     }, {
         model : can.Model.Cacheable
-      , property : "business_object_mappings"
+      , mapping : "related_objects"
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
     }]
@@ -136,7 +110,6 @@ can.Model.Cacheable("CMS.Models.Control", {
   init : function() {
     var that = this;
     this._super.apply(this, arguments);
-    this._init_mappings();
 
     this.bind("change", function(ev, attr, how, newVal, oldVal) {
       // Emit the "orphaned" event when the directive attribute is removed
@@ -205,7 +178,7 @@ CMS.Models.ImplementedControl("CMS.Models.ImplementingControl", {
 CMS.Models.Control("CMS.Models.RegControl", {
 	findAll : "GET /api/programs/{id}/controls"
   , attributes : {
-    implementing_controls : "CMS.Models.ImplementingControl.models"
+    implementing_controls : "CMS.Models.ImplementingControl.stubs"
   }
 	, map_ccontrol : function(params, control) {
 		return can.ajax({

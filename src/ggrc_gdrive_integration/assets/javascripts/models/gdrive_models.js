@@ -15,13 +15,26 @@ $.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
 
 });
 
-can.Model("GGRC.Models.GDriveFolder", {
+can.Model.Cacheable("GGRC.Models.GDriveFolder", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
     , type : "post"
     , dataType : "json"
-    , data : { command : 'listfolders', parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , data : { command : 'listfolders', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , beforeSend : function(xhr, s) {
+      var data = JSON.parse(s.data);
+      if(data.parentfolderid) {
+        data.id = data.parentfolderid;
+        delete data.parentfolderid;
+      }
+      s.data = JSON.stringify(data);
+    }
+    , success : function(objs) {
+      can.each(objs, function(obj) {
+        obj.selfLink = "#";
+      });
+    }
   }
   , create : function(params) {
       params.id = params.parentfolderid;
@@ -62,6 +75,15 @@ can.Model("GGRC.Models.GDriveFolder", {
   , addChildFolder : function(parent, params) {
     return this.create($.extend({ parentfolderid : parent.id }, params));
   }
+  , from_id : function(id) {
+    return new this({ id : id });
+  }
+  , model : function(params) {
+    if(params.url) {
+      params.selfLink = "#";
+    }
+    return this._super.apply(this, arguments);
+  }
 }, {
 
   findChildFolders : function() {
@@ -80,7 +102,7 @@ can.Model("GGRC.Models.GDriveFolder", {
 
 });
 
-can.Model("GGRC.Models.GDriveFile", {
+can.Model.Cacheable("GGRC.Models.GDriveFile", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
@@ -93,9 +115,13 @@ can.Model("GGRC.Models.GDriveFile", {
     throw "Destroy is not supported for GDrive Files. Use removeFromParent";
   }
 
+  , from_id : function(id) {
+    return new this({ id : id });
+  }
+
 }, {});
 
-can.Model("GGRC.Models.GDriveFolderPermission", {
+can.Model.Cacheable("GGRC.Models.GDriveFolderPermission", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
@@ -104,6 +130,63 @@ can.Model("GGRC.Models.GDriveFolderPermission", {
     , data : { command : 'getFolderPermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
   }
 
+}, {});
+
+
+can.Model.Join("CMS.Models.ObjectFolder", {
+  root_object : "object_folder"
+  , root_collection : "object_folders"
+  , findAll: "GET /api/object_folders?__include=folder"
+  , create : "POST /api/object_folders"
+  , update : "PUT /api/object_folders/{id}"
+  , destroy : "DELETE /api/object_folders/{id}"
+  , join_keys : {
+    folderable : can.Model.Cacheable
+    , folder : GGRC.Models.GDriveFolder
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , folder : "GGRC.Models.GDriveFolder.stub"
+    , folderable : "CMS.Models.get_stub"
+  }
+
+  , model : function(params) {
+    if(typeof params === "object") {
+      params.folder = {
+        id : params.folder_id
+        , parentfolderid : params.parent_folder_id
+      };
+    }
+    return this._super(params);
+  }
+}, {});
+
+can.Model.Join("CMS.Models.ObjectFile", {
+  root_object : "object_file"
+  , root_collection : "object_files"
+  , findAll: "GET /api/object_people?__include=person"
+  , create : "POST /api/object_people"
+  , update : "PUT /api/object_people/{id}"
+  , destroy : "DELETE /api/object_people/{id}"
+  , join_keys : {
+    fileable : can.Model.Cacheable
+    , file : GGRC.Models.GDriveFile
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , file : "GGRC.Models.GDriveFile.stub"
+    , fileable : "CMS.Models.get_stub"
+  }
+
+  , model : function(params) {
+    if(typeof params === "object") {
+      params.folder = {
+        id : params.file_id
+        , parentfolderid : params.folder_id
+      };
+    }
+    return this._super(params);
+  }
 }, {});
 
 })(window.can);

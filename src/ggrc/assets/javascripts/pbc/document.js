@@ -41,10 +41,10 @@ can.Model.Cacheable("CMS.Models.Document", {
         });
     }
     , attributes : {
-        object_documents : "CMS.Models.ObjectDocument.models"
-      , type : "CMS.Models.Option.model"
-      , kind : "CMS.Models.Option.model"
-      , year : "CMS.Models.Option.model"
+        object_documents : "CMS.Models.ObjectDocument.stubs"
+      , type : "CMS.Models.Option.stub"
+      , kind : "CMS.Models.Option.stub"
+      , year : "CMS.Models.Option.stub"
     }
   , tree_view_options: {
     show_view: GGRC.mustache_path + "/documents/tree.mustache"
