@@ -83,9 +83,14 @@ can.Control("GGRC.Controllers.Modals", {
       });
   }
 
-  , autocomplete : function() {
+  , "input[data-lookup] focus" : function(el, ev) {
+    this.autocomplete(el);
+  }
+
+  , autocomplete : function(el) {
+    var ctl = this;
     // Add autocomplete to the owner field
-    var acs = this.element.find('input[data-lookup]').map(function() {
+    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
       var $that = $(this);
       var prop = $that.attr("name").substr($that.attr("name").lastIndexOf(".") + 1);
       return $that.autocomplete({
@@ -96,7 +101,8 @@ can.Control("GGRC.Controllers.Modals", {
 
         // Search for the people based on the term
         , source : function(request, response) {
-          var query = request.term;
+          var query = request.term
+          , that = this;
 
           GGRC.Models.Search
           .search_for_types(
@@ -116,20 +122,39 @@ can.Control("GGRC.Controllers.Modals", {
               queue.enqueue(object);
             });
             queue.trigger().then(function(objs) {
-              response(can.map(objs, function(obj) {
-                return {
-                  label: obj.autocomplete_label(),
-                  value: obj[prop]
-                };
-              }));
+              if(objs.length) {
+                response(objs);
+              } else {
+                that._suggest( [] );
+                that._trigger( "open" );
+              }
             });
           });
         }
+        , select : function(event, ui) {
+          if(ui.item) {
+            var path = $that.attr("name").split(".");
+            path.pop();
+            path = path.join(".");
+            ctl.options.instance.attr(path, ui.item.stub());
+          } else {
+            $(event.currentTarget).one("modal:success", function(ev, new_obj) {
+              $that.data("ui-autocomplete").options.select(event, {item : new_obj});
+            });
+            return false;
+          }
+        }
+        , close : function() {
+          $that.val($that.attr("value"));
+        }
       }).data('ui-autocomplete');
     });
-    can.each(acs, function(ac) {
-      ac._renderItem = function(ul, item) {
-        return $('<li>').append('<a>' + item.label + '</a>').appendTo(ul);
+    acs.each(function(i, ac) {
+      ac._renderMenu = function(ul, items) {
+        var model = CMS.Models[ac.element.data("lookup")] || GGRC.Models[ac.element.data("lookup")]
+        can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', items, function(frag) {
+          $(ul).html(frag);
+        });
       };
     });
   }
@@ -264,29 +289,8 @@ can.Control("GGRC.Controllers.Modals", {
             name.pop(); //set the owner to null, not the email
             value = null;
           } else {
-            var _params = {};
-            _params[name[name.length - 1]] = value;
-            // Search for the person
-            this._email_check = $.when(
-                CMS.Models[$elem.data("lookup")].findAll(_params)
-              ).done(function(data) {
-                if(data.length != null)
-                  data = data[0];
-
-                if(data) {
-                  value = name.length > 2 ? new can.Observe({}).attr(name.slice(1, name.length - 1).join("."), data) : data;
-                  instance.attr(name[0], value);
-                } else {
-                  that.element && that.element.trigger("ajax:flash", { warning : name[name.length - 1] + " " + value + " not found.  Please try again."});
-                  $elem.val($elem.attr("value"));
-                }
-              });
-
-            // If this is already resolved (cached), there wasn't really an XHR to bind to
-            if (this._email_check.state() !== "resolved") {
-              that.bindXHRToButton(that._email_check, that.options.$footer.find("a.btn[data-toggle='modal-submit']"), undefined, false);
-              return; //don't update the existing owner email if there is one.
-            }
+            // Setting a "lookup field is handled in the autocomplete() method"
+            return;
           }
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
