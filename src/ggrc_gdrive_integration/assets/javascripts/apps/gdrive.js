@@ -12,16 +12,20 @@
   });
   GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
 
-
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
   });
+  can.getObject("GGRC.Mappings.Audit", true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+
   $.extend(true, CMS.Models.Request.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
   });
+  can.getObject("GGRC.Mappings.Request", true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+
   $.extend(true, CMS.Models.Response.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"
   });
+  can.getObject("GGRC.Mappings.Response", true).object_files = new GGRC.ListLoaders.DirectListLoader("ObjectFile", "fileable");
 
   // GGRC.JoinDescriptor.from_arguments_list([
   //   [["Program", "Audit", "Request"], "GDriveFolder", "ObjectFolder", "folder", "folderable"]
