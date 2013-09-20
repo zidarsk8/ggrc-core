@@ -54,19 +54,20 @@ def get_cache(create = False):
     logging.warning("No request context - no cache created")
     return None
 
-def log_event(session, obj = None):
+def log_event(session, obj=None, current_user_id=None):
   revisions = []
   session.flush()
-  current_user = get_current_user_id()
+  if current_user_id is None:
+    current_user_id = get_current_user_id()
   cache = get_cache()
   for o in cache.dirty:
-    revision = Revision(o, current_user, 'modified', o.to_json())
+    revision = Revision(o, current_user_id, 'modified', o.to_json())
     revisions.append(revision)
   for o in cache.deleted:
-    revision = Revision(o, current_user, 'deleted', o.to_json())
+    revision = Revision(o, current_user_id, 'deleted', o.to_json())
     revisions.append(revision)
   for o in cache.new:
-    revision = Revision(o, current_user, 'created', o.to_json())
+    revision = Revision(o, current_user_id, 'created', o.to_json())
     revisions.append(revision)
   if obj is None:
     resource_id = 0
@@ -78,7 +79,7 @@ def log_event(session, obj = None):
     action = request.method
   if revisions:
     event = Event(
-      modified_by_id = current_user,
+      modified_by_id = current_user_id,
       action = action,
       resource_id = resource_id,
       resource_type = resource_type)
