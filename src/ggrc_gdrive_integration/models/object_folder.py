@@ -53,25 +53,20 @@ class ObjectFolder(Base, db.Model):
     return self.folderable.display_name + '<->' + self.folder.display_name
 
 class Folderable(object):
-  @declared_attr
-  def object_folders(cls):
-    joinstr = 'and_(foreign(ObjectFolder.folderable_id) == {type}.id, '\
-                   'foreign(ObjectFolder.folderable_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
-    return db.relationship(
-        'ObjectFolder',
-        primaryjoin=joinstr,
-        backref='{0}_folderable'.format(cls.__name__),
-        cascade='all, delete-orphan',
-        )
+  @classmethod
+  def late_init_folderable(cls):
+    def make_object_folders(cls):
+      joinstr = 'and_(foreign(ObjectFolder.folderable_id) == {type}.id, '\
+                     'foreign(ObjectFolder.folderable_type) == "{type}")'
+      joinstr = joinstr.format(type=cls.__name__)
+      return db.relationship(
+          'ObjectFolder',
+          primaryjoin=joinstr,
+          backref='{0}_folderable'.format(cls.__name__),
+          cascade='all, delete-orphan',
+          )
+    cls.object_folders = make_object_folders(cls)
 
   _publish_attrs = [
       'object_folders',
       ]
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(Folderable, cls).eager_query()
-    return query.options(orm.joinedload('object_folders'))

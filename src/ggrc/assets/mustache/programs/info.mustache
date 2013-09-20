@@ -26,6 +26,17 @@
     {{/if}}
     {{/using}}
   </p>
+  {{#object_folders}}
+    {{#using object_folder=this}}
+      <p>
+        GDriveFolder: 
+        {{#using folder=object_folder.folder}}
+          <a href="{{folder.url}}">{{folder.name}}</a>
+        {{/using}}
+      <p>
+    {{/using}}
+  {{/object_folders}}
+
   {{#is_allowed 'update' model.shortName}}
   <p>
     <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">

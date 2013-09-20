@@ -97,7 +97,7 @@
         $("#folders").html((folderspinner = new Spinner({ length : 5, width : 2, radius : 2, y: 14, x: 15}).spin()).el).append("&nbsp;");
         can.view(
           "#folder_tmpl"
-          , GGRC.Models.GDriveFolder.findAll({parentfolderid : folder.id || folder})
+          , CMS.Models.GDriveFolder.findAll({parentfolderid : folder.id || folder})
             .then(function(list) {
               if(list.status && list.status() === 0) {
               } else {
@@ -119,7 +119,7 @@
         $("#files").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#file_tmpl"
-          , GGRC.Models.GDriveFile.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+          , CMS.Models.GDriveFile.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
             filespinner.stop();
             $("#files").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
@@ -131,7 +131,7 @@
         $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#permissions_tmpl"
-          , GGRC.Models.GDriveFolderPermission.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+          , CMS.Models.GDriveFolderPermission.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
             filespinner.stop();
             $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
@@ -141,7 +141,7 @@
         });
       }).on("click", ".add-folder", function(ev) {
         var that = this;
-        new GGRC.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]").val(), parentfolderid : folderstack[0], allowduplicatenames : false })
+        new CMS.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]").val(), parentfolderid : folderstack[0], allowduplicatenames : false })
         .save()
         .fail(function(xhr, status){
           $(document.body).trigger("ajax:flash", { error : [status]});
@@ -154,7 +154,7 @@
         var that = this
         , folder = $(this).data("folder");
 
-        GGRC.Models.GDriveFolder.removeFromParent(folder, folderstack[0])
+        CMS.Models.GDriveFolder.removeFromParent(folder, folderstack[0])
         .fail(function(xhr, status){
           $(document.body).trigger("ajax:flash", { error : [status]});
         })

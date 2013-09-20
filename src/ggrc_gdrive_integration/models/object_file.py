@@ -53,25 +53,20 @@ class ObjectFile(Base, db.Model):
     return self.fileable.display_name + '<->' + self.file.display_name
 
 class Fileable(object):
-  @declared_attr
-  def object_files(cls):
-    joinstr = 'and_(foreign(ObjectFile.fileable_id) == {type}.id, '\
-                   'foreign(ObjectFile.fileable_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
-    return db.relationship(
-        'ObjectFile',
-        primaryjoin=joinstr,
-        backref='{0}_fileable'.format(cls.__name__),
-        cascade='all, delete-orphan',
-        )
+  @classmethod
+  def late_init_fileable(cls):
+    def make_object_files(cls):
+      joinstr = 'and_(foreign(ObjectFile.fileable_id) == {type}.id, '\
+                     'foreign(ObjectFile.fileable_type) == "{type}")'
+      joinstr = joinstr.format(type=cls.__name__)
+      return db.relationship(
+          'ObjectFile',
+          primaryjoin=joinstr,
+          backref='{0}_fileable'.format(cls.__name__),
+          cascade='all, delete-orphan',
+          )
+    cls.object_files = make_object_files(cls)
 
   _publish_attrs = [
       'object_files',
       ]
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(Fileable, cls).eager_query()
-    return query.options(orm.joinedload('object_files'))

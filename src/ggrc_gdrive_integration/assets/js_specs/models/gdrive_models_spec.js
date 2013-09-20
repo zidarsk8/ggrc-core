@@ -9,14 +9,14 @@ GGRC.config.GDRIVE_SCRIPT_ID = 'AKfycbxb-W3rUBTKFF6Ua_eJ5PH9RAvGVL7W3aDqtmnbnUc7
 
 describe("GDrive integration models", function() {
 
-  describe("GGRC.Models.GDriveFolder", function() {
+  describe("CMS.Models.GDriveFolder", function() {
 
     describe("::findAll", function() {
 
       it("takes a parent folder id as a required parameter", function() {
         var returned;
         function ajaxtoreturn() { return returned; }
-        GGRC.Models.GDriveFolder.findAll({parentfolderid : '0ByeYJ052BwIZb2hoTWtjcDV2dTg'}).done(function(d) {
+        CMS.Models.GDriveFolder.findAll({parentfolderid : '0ByeYJ052BwIZb2hoTWtjcDV2dTg'}).done(function(d) {
           expect(d.length).toBeGreaterThan(0);
         }).always(function() {
           returned = true;
@@ -27,22 +27,22 @@ describe("GDrive integration models", function() {
       it("calls the root when parentfolderid is not supplied", function() {
         var returned;
         spyOn($, 'ajax').andReturn(new $.Deferred().resolve());
-        GGRC.Models.GDriveFolder.findAll();
+        CMS.Models.GDriveFolder.findAll();
         expect($.ajax.mostRecentCall.args[0].data.parameters).toMatch(new RegExp(GGRC.config.GDRIVE_ROOT_FOLDER));
       });
     });
 
     describe("::findChildFolders", function() {
       beforeEach(function() {
-        spyOn(GGRC.Models.GDriveFolder, "findAll");
+        spyOn(CMS.Models.GDriveFolder, "findAll");
       });
       it("performs a findAll with a supplied string as parentfolderid", function() {
-        GGRC.Models.GDriveFolder.findChildFolders("foo");
-        expect(GGRC.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "foo" });
+        CMS.Models.GDriveFolder.findChildFolders("foo");
+        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "foo" });
       });
       it("performs a findAll with a supplied object's id as parentfolderid", function() {
-        GGRC.Models.GDriveFolder.findChildFolders({id : "bar"});
-        expect(GGRC.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "bar" });
+        CMS.Models.GDriveFolder.findChildFolders({id : "bar"});
+        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "bar" });
       });
     });
   });

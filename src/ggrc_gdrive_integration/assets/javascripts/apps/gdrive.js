@@ -5,11 +5,13 @@
  * Maintained By: Bradley Momberger
  */
 
-(function() {
+(function($, CMS, GGRC) {
 
   $.extend(true, CMS.Models.Program.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
   });
+  GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+
 
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
@@ -21,10 +23,10 @@
     "object_files" : "CMS.Models.ObjectFile.stubs"
   });
 
-  GGRC.JoinDescriptor.from_arguments_list([
-    [["Program", "Audit", "Request"], GGRC.Models.GDriveFolder, "ObjectFolder", "folder", "folderable"]
-    , ["Response", GGRC.Models.GDriveFile, "ObjectFile", "file", "fileable"]
-  ]);
+  // GGRC.JoinDescriptor.from_arguments_list([
+  //   [["Program", "Audit", "Request"], "GDriveFolder", "ObjectFolder", "folder", "folderable"]
+  //   , ["Response", "GDriveFile", "ObjectFile", "file", "fileable"]
+  // ]);
 
 
-})();
+})(this.can.$, this.CMS, this.GGRC);
