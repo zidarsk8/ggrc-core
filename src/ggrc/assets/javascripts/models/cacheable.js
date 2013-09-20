@@ -43,12 +43,15 @@ function dateConverter(d) {
     d /= 1000;
     conversion = "X";
   }
+  if(typeof d === "string" && ~d.indexOf("/")) {
+    conversion = "MM/DD/YYYY";
+  }
   ret = moment(d.toString(), conversion);
   return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
 }
 
 function makeDateSerializer(type) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = /*type === "date" ? "YYYY-MM-DD" :*/ "YYYY-MM-DD\\Thh:mm:ss\\Z";
   return function(d) {
     if(typeof d !== "number") {
       d = d.getTime();

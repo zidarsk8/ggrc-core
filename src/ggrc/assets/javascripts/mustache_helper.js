@@ -680,20 +680,22 @@ Mustache.registerHelper("handle_context", function() {
     ].join("\n");
 });
 
-Mustache.registerHelper("with_page_object_as", function(name, options) {
-  if(!options) {
-    options = name;
-    name = "page_object";
-  }
-  var page_object = GGRC.page_instance();
-  if(page_object) {
-    var p = {};
-    p[name] = page_object;
-    options.contexts.push(p);
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
+can.each(["page_object", "current_user"], function(fname) {
+  Mustache.registerHelper("with_" + fname + "_as", function(name, options) {
+    if(!options) {
+      options = name;
+      name = fname;
+    }
+    var page_object = (fname === "current_user" ? CMS.Models.Person.model(GGRC.current_user) : GGRC.page_instance());
+    if(page_object) {
+      var p = {};
+      p[name] = page_object;
+      options.contexts.push(p);
+      return options.fn(options.contexts);
+    } else {
+      return options.inverse(options.contexts);
+    }
+  });
 });
 
 Mustache.registerHelper("role_checkbox", function(role, model, operation) {
@@ -1113,6 +1115,11 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     //.replace(/'/g, "\\'")
     //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
     .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+});
+
+Mustache.registerHelper("localize_date", function(date) {
+  date = resolve_computed(date);
+  return date ? moment(date).format("MM/DD/YYYY") : "";
 });
 
 })(this, jQuery, can);

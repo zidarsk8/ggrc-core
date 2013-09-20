@@ -8,6 +8,9 @@ from collections import namedtuple
 from flask import request, flash, session
 from ggrc.app import app
 from ggrc.rbac import permissions
+from ggrc.login import get_current_user
+from ggrc.utils import as_json
+from ggrc.builder.json import publish
 from werkzeug.exceptions import Forbidden
 from . import filters
 from .common import BaseObjectView, RedirectedPolymorphView
@@ -20,13 +23,18 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 def get_permissions_json():
   return json.dumps(session['permissions'])
 
+def get_current_user_json():
+  current_user = get_current_user()
+  return as_json(current_user.to_json())
+
 @app.context_processor
 def base_context():
   from ggrc.models import get_model
   return dict(
       get_model=get_model,
       permissions_json=get_permissions_json,
-      permissions=permissions
+      permissions=permissions,
+      current_user=get_current_user_json
       )
 
 from flask import render_template
