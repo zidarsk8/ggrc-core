@@ -51,8 +51,11 @@ function dateConverter(d) {
 }
 
 function makeDateSerializer(type) {
-  var conversion = /*type === "date" ? "YYYY-MM-DD" :*/ "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
   return function(d) {
+    if(d == null) {
+      return "";
+    }
     if(typeof d !== "number") {
       d = d.getTime();
     }
@@ -196,6 +199,8 @@ can.Model("can.Model.Cacheable", {
   , process_args : function(args, names) {
     var pargs = {};
     var obj = pargs;
+    // NB possible improvement for the next line:
+    //if(this.root_object && (!(this.root_object in args) || typeof args[this.root_object] !== "object")) {
     if(this.root_object && !(this.root_object in args)) {
       obj = pargs[this.root_object] = {};
     }
@@ -582,6 +587,9 @@ can.Model("can.Model.Cacheable", {
   }
   , display_name : function() {
     return this.title || this.name;
+  }
+  , autocomplete_label : function() {
+    return this.title;
   }
 });
 

@@ -114,7 +114,7 @@
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using owner=owner}}
-          <input type="text" name="owner.email" class="span8 audit-selector" value="{{firstnonempty owner.email ''}}">
+          <input type="text" name="owner.email" data-lookup="Person" class="span8 audit-selector" value="{{firstnonempty owner.email ''}}">
           {{/using}}
         </div>
         

@@ -962,8 +962,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
     , modified_by : "CMS.Models.Person.stub"
-    , start_date : "date"
-    , end_date : "date"
+    , start_date : "datetime"
+    , end_date : "datetime"
     , report_start_date : "date"
     , report_end_date : "date"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -976,7 +976,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
     draw_children : true
     , child_options : [{
       model : "Request"
+      , mapping: "requests"
       , allow_creating : true
+      , parent_find_param : "audit.id"
     }]
   }
 }, {
@@ -989,7 +991,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , destroy : "DELETE /api/requests/{id}"
   , attributes : {
-    audit : "CMS.Models.Audits.stub"
+    audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
     , objective : "CMS.Models.Objective.stub"
@@ -998,6 +1000,8 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , defaults : {
     status : "Draft"
+    , requested_on : new Date()
+    , due_on : new Date()
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"

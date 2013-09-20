@@ -355,5 +355,13 @@
     , Process: {
         _mixins: ["business_object"]
       }
+
+    , Audit : {
+      requests: Direct("Request", "audit")
+    }
+    , Request : {
+      responses: Direct("Response", "request")
+    }
+
   });
 })(GGRC, can);
