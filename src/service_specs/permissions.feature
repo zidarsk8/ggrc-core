@@ -61,7 +61,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
@@ -137,7 +136,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
@@ -221,7 +219,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |
@@ -305,7 +302,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Option             |
       | OrgGroup           |
       | Person             |
-      #| PopulationSample   |
       | Process            |
       | Product            |
       | Project            |

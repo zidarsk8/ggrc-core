@@ -8,7 +8,7 @@
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
               {{instance.title}}
-              <span class="small">created on 09/09/2013</span>
+              <span class="small gray">Planned</span>
             </div>
           </div>
         </div>
@@ -120,9 +120,12 @@
         </div>
         {{/instance.url}}
         <div class="span2">
-          <select class="input-block-level" name="status">
+          <select class="input-block-level top-space" name="status">
             <option>Planned</option>
             <option>In Progress</option>
+            <option>Manager review</option>
+            <option>Ready for external review</option>
+            <option>Completed</option>
           </select>
         </div>
       </div>
@@ -138,7 +141,10 @@
       
       <ul class="info-audit">
         <li>
-          <a href="#"><i class="grcicon-edit"></i> Edit {{model.title_singular}}</a>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {{parent_instance.id}}, "{{parent_instance.constructor.table_singular}}_title" : "{{parent_instance.title}}" }'>
+            <i class="grcicon-edit"></i>
+            Edit {{model.title_singular}}
+          </a>
         </li>
         <li>
           <a href="#"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>

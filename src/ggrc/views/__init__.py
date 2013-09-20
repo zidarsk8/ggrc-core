@@ -8,6 +8,9 @@ from collections import namedtuple
 from flask import request, flash, session
 from ggrc.app import app
 from ggrc.rbac import permissions
+from ggrc.login import get_current_user
+from ggrc.utils import as_json
+from ggrc.builder.json import publish
 from werkzeug.exceptions import Forbidden
 from . import filters
 from .common import BaseObjectView, RedirectedPolymorphView
@@ -23,6 +26,10 @@ def get_permissions_json():
 def get_config_json():
   return json.dumps(app.config.public_config)
 
+def get_current_user_json():
+  current_user = get_current_user()
+  return as_json(current_user.to_json())
+
 @app.context_processor
 def base_context():
   from ggrc.models import get_model
@@ -30,7 +37,8 @@ def base_context():
       get_model=get_model,
       permissions_json=get_permissions_json,
       permissions=permissions,
-      config_json=get_config_json
+      config_json=get_config_json,
+      current_user=get_current_user_json
       )
 
 from flask import render_template
