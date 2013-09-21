@@ -113,8 +113,8 @@ class UserPermissions(DefaultUserPermissions):
           for action, resource_types in user_role.role.permissions.items():
             for resource_type in resource_types:
               session['permissions'].setdefault(action, {})\
-                  .setdefault(resource_type, [])\
-                  .append(user_role.context_id)
+                  .setdefault(resource_type, set())\
+                  .add(user_role.context_id)
       #grab personal context
       personal_context = db.session.query(Context).filter(
           Context.related_object_id == user.id,
