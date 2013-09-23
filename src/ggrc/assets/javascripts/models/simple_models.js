@@ -1008,6 +1008,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
   }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("due_on");
+    this.validatePresenceOf("assignee");
+    this.validatePresenceOf("objective");
+  }
 }, {
 
 });
