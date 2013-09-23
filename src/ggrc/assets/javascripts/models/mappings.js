@@ -101,6 +101,15 @@
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
           "Section", "section", "ControlSection", "control", "control_sections")
+      //  FIXME: Cannot currently represent singular foreign-key references
+      //    with Mappers/ListLoaders
+      //, direct_directives: ForeignKey("Directive", "directive", "controls")
+      , joined_directives: Proxy(
+          "Directive", "directive", "DirectiveControl", "control", "directive_controls")
+      , directives: Multi(["joined_directives"]) // "direct_directives"
+      , contracts: TypeFilter("directives", "Contract")
+      , policies: TypeFilter("directives", "Policy")
+      , regulations: TypeFilter("directives", "Regulation")
       }
     , Objective: {
         _mixins: ["personable", "documentable"] //objectiveable
@@ -218,7 +227,8 @@
             "controls_via_extended_objectives"
           , "controls_via_sections"
           , "controls_via_directives"
-          , "controls"])
+          , "controls"
+          ])
 
       , related_documents_via_sections: Cross("sections", "documents")
       , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
@@ -279,7 +289,10 @@
           , extended_related("systems")
           ]
       , sections: Direct("Section", "directive")
-      , controls: Direct("Control", "directive")
+      , direct_controls: Direct("Control", "directive")
+      , joined_controls: Proxy(
+          "Control", "control", "DirectiveControl", "directive", "directive_controls")
+      , controls: Multi(["direct_controls", "joined_controls"])
 
       , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
@@ -288,7 +301,8 @@
       , extended_related_controls: Multi([
             "controls_via_extended_objectives"
           , "controls_via_sections"
-          , "controls"])
+          , "controls"
+          ])
 
       , related_objects_via_sections: Cross("sections", "related_objects")
 
