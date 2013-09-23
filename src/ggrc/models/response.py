@@ -19,8 +19,9 @@ class Response(BusinessObject, db.Model):
   request_id = deferred(
       db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
       'Response')
-  response_type = db.Column(db.Enum(VALID_TYPES), nullable = False)
-  status = deferred(db.Column(db.Enum(VALID_STATES), nullable = False), 'Response')
+  response_type = db.Column(db.Enum(VALID_TYPES), nullable=False)
+  status = deferred(db.Column(db.Enum(VALID_STATES), nullable=False),
+    'Response')
 
   _publish_attrs = [
       'request',
@@ -44,7 +45,8 @@ class DocumentationResponse(Documentable, Personable, Response):
       }
   _table_plural = 'documentation_responses'
 
-  evidence = db.relationship('Evidence', backref='response', cascade='all, delete-orphan')
+  evidence = db.relationship('Evidence', backref='response',
+    cascade='all, delete-orphan')
 
   _publish_attrs = [
     'evidence',
@@ -86,8 +88,10 @@ class PopulationSampleResponse(Documentable, Personable, Response):
       }
   _table_plural = 'population_sample_responses'
 
-  population_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
-  population_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  population_worksheet = deferred(db.Column(db.String, nullable=True),
+    'Response')
+  population_count = deferred(db.Column(db.Integer, nullable=True),
+    'Response')
   sample_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
   sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
   sample_evidence = deferred(db.Column(db.String, nullable=True), 'Response')
