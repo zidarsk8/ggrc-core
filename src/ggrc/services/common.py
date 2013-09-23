@@ -476,7 +476,8 @@ class Resource(ModelView):
     if not permissions.is_allowed_create(
         self.model.__name__, self.get_context_id_from_json(src)):
       raise Forbidden()
-    if 'private' in src and src.get('context') is not None:
+    if src.get('private') == True and src.get('context') is not None \
+        and src['context'].get('id') is not None:
       raise BadRequest(
         'context MUST be "null" when creating a private resource.')
     elif 'context' not in src:
