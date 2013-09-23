@@ -989,6 +989,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
   , root_collection : "requests"
   , create : "POST /api/requests"
+  , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
   , attributes : {
     audit : "CMS.Models.Audit.stub"
