@@ -584,7 +584,14 @@ $(function() {
           page_instance, inst, { context: page_instance.context || { id : null } });
       // Map the object if we're able to
       if (join_object) {
-        join_object.save().done(triggerFlash);
+        join_object.save()
+          .done(triggerFlash)
+          .fail(function(xhr) {
+            // Currently, the only error we encounter here is uniqueness
+            // constraint violations.  Let's use a nicer message!
+            var message = "That object is already mapped";
+            $(ev.target).trigger("ajax:flash", { error: message });
+          });
       }
       // Otherwise throw a warning
       else {
