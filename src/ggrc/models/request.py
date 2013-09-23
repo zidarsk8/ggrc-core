@@ -4,9 +4,9 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Base
+from .mixins import deferred, Base, Described
 
-class Request(Base, db.Model):
+class Request(Described, Base, db.Model):
   __tablename__ = 'requests'
 
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
@@ -20,6 +20,9 @@ class Request(Base, db.Model):
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable=False)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True), 'Request')
+  test = deferred(db.Column(db.Text, nullable=True), 'Request')
+  notes = deferred(db.Column(db.Text, nullable=True), 'Request')
+  auditor_contact = deferred(db.Column(db.String, nullable=True), 'Request')
 
   responses = db.relationship('Response', backref='request', cascade='all, delete-orphan')
 
@@ -33,9 +36,15 @@ class Request(Base, db.Model):
       'audit',
       'objective',
       'responses',
+      'test',
+      'notes',
+      'auditor_contact',
   ]
   _sanitize_html = [
       'gdrive_upload_path',
+      'test',
+      'notes',
+      'auditor_contact',
   ]
 
   @classmethod

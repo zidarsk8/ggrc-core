@@ -7,7 +7,7 @@ from ggrc import db
 from .mixins import deferred, BusinessObject, Timeboxed
 from .object_person import Personable
 
-class Audit(BusinessObject, Personable, Timeboxed, db.Model):
+class Audit(Personable, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'audits'
 
   VALID_STATES = (u'Planned', u'In Progress', u'Manager Review', u'Ready for External Review', u'Completed')
