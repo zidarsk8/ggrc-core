@@ -95,13 +95,12 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='checkbox'] change": "change_option",
+    ".option_column li input[type='checkbox'] click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
-      this.join_list.bind("change", this.proxy("update_list_target"))
-      this.join_list.bind("change", this.proxy("update_option_checkboxes"));
-      this.context.bind('selected_object', this.proxy("refresh_join_list"));
+      this.context.bind("selected_object", this.proxy("refresh_join_list"));
+      this.option_list.bind("change", this.proxy("update_option_checkboxes"));
     },
 
     init_view: function() {
@@ -160,18 +159,6 @@
         }));
     },
 
-    update_list_target: function() {
-      // FIXME: This is to update the Document and Person lists when the
-      //   selected items change -- that list should be Can-ified.
-      var list_target = this.options.$trigger.data('list-target');
-      if (list_target)
-        $(list_target)
-          .tmpl_setitems(this.join_list)
-          .closest(":has(.grc-badge)")
-          .find(".grc-badge")
-          .text("(" + this.join_list.length + ")");
-    },
-
     refresh_object_list: function() {
       var self = this
         ;
@@ -211,7 +198,8 @@
           $.extend({}, join_query),
           function(joins) {
             self.join_list.replace(joins);
-          })
+            self.update_option_checkboxes();
+          });
       } else {
         return $.Deferred().resolve();
       }
@@ -254,7 +242,9 @@
       this.context.attr('selected_option', el.data('option'));
     },
 
-    change_option: function(el) {
+    change_option: function(el, ev) {
+      ev.preventDefault();
+
       var self = this
         , option = el.closest('li').data('option')
         , join = this.find_join(option.id)
@@ -271,7 +261,7 @@
           join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.getRootModelName());
+          join = this.get_new_join(option.id, option.constructor.shortName);
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
@@ -358,7 +348,7 @@
 
     get_join_object_type: function() {
       var join_object = this.get_join_object();
-      return (join_object ? join_object.constructor.getRootModelName() : null);
+      return (join_object ? join_object.constructor.shortName : null);
     }
   });
 
