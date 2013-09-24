@@ -945,6 +945,73 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap"
 });
 
+Mustache.registerHelper("if_result_has_extended_mappings", function(result, parent_instance, options) {
+  //  Render the `true` / `fn` block if the `result` exists (in this list)
+  //  due to mappings other than directly to the `parent_instance`.  Otherwise
+  //  Render the `false` / `inverse` block.
+  result = Mustache.resolve(result);
+  parent_instance = Mustache.resolve(parent_instance);
+  var has_extended_mappings = false;
+  result.walk_instances(function(instance, result, depth) {
+    if (depth === 1 && result.binding.instance !== parent_instance)
+      has_extended_mappings = true;
+  });
+  if (has_extended_mappings)
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
+  //  Iterate over `list` and render the provided block with additional
+  //  variables available in the context, specifically to enable joining with
+  //  commas and using "and" in the right place.
+  //
+  //  * `<name>`: Instead of rendering with the item as the current context,
+  //      make the item available at the specified `name`
+  //  * index
+  //  * length
+  //  * isFirst
+  //  * isLast
+  name = Mustache.resolve(name);
+  list = Mustache.resolve(list);
+  list = resolve_computed(list);
+  var i
+    , output = []
+    , frame
+    , length = list.length
+    ;
+  for (i=0; i<length; i++) {
+    frame = {}
+    frame.index = i;
+    frame.isFirst = i == 0;
+    frame.isLast = i == length - 1;
+    frame.length = length;
+    frame[name] = list[i];
+    output.push(options.fn(new can.Observe(frame)));
+    //  FIXME: Is this legit?  It seems necessary in some cases.
+    //contexts = options.contexts.concat([frame]);
+    //contexts.___st4ck3d = true;
+    //output.push(options.fn(contexts));
+  }
+  return output.join("");
+});
+
+Mustache.registerHelper("link_to_tree", function(options) {
+  var args = [].slice.apply(arguments)
+    , options = args.pop()
+    , link = []
+    ;
+
+  args = can.map(args, Mustache.resolve);
+  args = can.map(args, function(stub) { return stub.reify(); });
+  link.push("#" + args[0].constructor.table_singular + "_widget");
+  //  FIXME: Add this back when extended-tree-routing is enabled
+  //for (i=0; i<args.length; i++)
+  //  link.push(args[i].constructor.table_singular + "-" + args[i].id);
+  return link.join("/");
+});
+
 Mustache.registerHelper("date", function(date) {
   var m = moment(new Date(date.isComputed ? date() : date))
     , dst = m.isDST()

@@ -139,6 +139,7 @@ class Control(
       PublishOnly('control_sections'),
       PublishOnly('objective_controls'),
       #PublishOnly('implementing_control_controls'),
+      PublishOnly('directive_controls'),
       PublishOnly('program_controls'),
       'object_controls',
       ]
@@ -165,6 +166,7 @@ class Control(
         orm.joinedload('control_risks'),
         orm.joinedload('control_sections'),
         orm.joinedload('objective_controls'),
+        orm.joinedload('directive_controls'),
         orm.joinedload('program_controls'),
         orm.joinedload('object_controls'),
         )

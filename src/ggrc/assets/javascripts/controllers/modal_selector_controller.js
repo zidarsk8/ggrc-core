@@ -1016,8 +1016,10 @@
               // Currently, the only error we encounter here is uniqueness
               // constraint violations.  Let's use a nicer message!
               //that.element.trigger("ajax:flash", { error : xhr.responseText });
-              var message = "That object is already mapped";
-              that.element.trigger("ajax:flash", { error: message });
+              if (that.element) {
+                var message = "That object is already mapped";
+                that.element.trigger("ajax:flash", { error: message });
+              }
             });
         }
       })
