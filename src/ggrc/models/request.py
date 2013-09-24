@@ -15,9 +15,9 @@ class Request(Described, Base, db.Model):
   assignee_id = db.Column(db.Integer, db.ForeignKey('people.id'),
     nullable=False)
   assignee = db.relationship('Person')
-  request_type = deferred(db.Column(db.Enum(VALID_TYPES), nullable=False),
+  request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
     'Request')
-  status = deferred(db.Column(db.Enum(VALID_STATES), nullable=False),
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
     'Request')
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')

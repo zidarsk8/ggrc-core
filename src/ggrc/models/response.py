@@ -19,8 +19,8 @@ class Response(BusinessObject, db.Model):
   request_id = deferred(
       db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
       'Response')
-  response_type = db.Column(db.Enum(VALID_TYPES), nullable=False)
-  status = deferred(db.Column(db.Enum(VALID_STATES), nullable=False),
+  response_type = db.Column(db.Enum(*VALID_TYPES), nullable=False)
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
     'Response')
 
   _publish_attrs = [
