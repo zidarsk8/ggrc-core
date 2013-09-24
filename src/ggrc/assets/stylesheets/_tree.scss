@@ -304,6 +304,25 @@ ul.new-tree {
       margin-top: 0;
     }
   }
+  .population-upload {
+    @include reset-list();
+    li {
+      margin-bottom: 20px;
+      label {
+        margin-bottom: 3px;
+      }
+      [class^="grcicon-"] {
+        margin-top: 0;
+      }
+      .choose {
+        margin: 6px 0 0 0;
+        display: inline-block;
+      }
+      .span2 {
+        margin-left: 0;
+      }
+    }
+  }
 }
 
 .item-data {

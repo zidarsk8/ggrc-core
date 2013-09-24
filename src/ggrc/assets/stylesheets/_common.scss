@@ -189,6 +189,12 @@ blockquote {
       }
     }
   }
+  .population-upload & {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 1px;
+    padding-right: 3px;
+  }
   &.pending-ajax {
     cursor: default;
     background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
