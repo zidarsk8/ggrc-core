@@ -32,8 +32,11 @@ user_roles_table = table('user_roles',
 
 def upgrade():
   users = select([person_table.c.id])
-  user_role = select([role_table.c.id])\
-      .where(role_table.c.name == 'User')\
+  object_editor = select([role_table.c.id])\
+      .where(role_table.c.name == 'ObjectEditor')\
+      .limit(1)
+  program_creator = select([role_table.c.id])\
+      .where(role_table.c.name == 'ProgramCreator')\
       .limit(1)
   #FIXME this could be done better in a more recent version of sqlalchemy
   #once 0.8.3 is released
@@ -46,10 +49,12 @@ def upgrade():
   #statement
   connection = op.get_bind()
   users = connection.execute(users).fetchall()
-  user_role = connection.execute(user_role).fetchone()
+  object_editor = connection.execute(object_editor).fetchone()
   for user in users:
     op.execute(user_roles_table.insert().values(
-      person_id=user['id'], role_id=user_role['id'], context_id=None))
+      person_id=user['id'], role_id=object_editor['id'], context_id=None))
+    op.execute(user_roles_table.insert().values(
+      person_id=user['id'], role_id=program_creator['id'], context_id=None))
 
 def downgrade():
   '''Intentionally does nothing as we can't distinguish between migration
