@@ -26,6 +26,7 @@ class Role(Base, Described, db.Model):
 
   name = db.Column(db.String(128), nullable=False)
   permissions_json = db.Column(db.Text(), nullable=False)
+  scope = db.Column(db.String(64), nullable=False)
 
   @simple_property
   def permissions(self):

@@ -88,6 +88,8 @@ def upgrade():
           'permissions_json': json.dumps({
             'read': basic_objects_readable,
             }),
+          'created_at': current_datetime,
+          'updated_at': current_datetime,
         },
         { 'name': 'ObjectEditor',
           'description': 'This role grants a user basic object creation and '\
@@ -98,14 +100,18 @@ def upgrade():
             'update': basic_objects_editable,
             'delete': basic_objects_editable,
             }),
+          'created_at': current_datetime,
+          'updated_at': current_datetime,
         },
         { 'name': 'ProgramCreator',
           'description': 'This role grants a user the permission to create '\
               'public and private programs.',
           'permissions_json': json.dumps({
             'create': ['Program',],
-            })
-        }
+            }),
+          'created_at': current_datetime,
+          'updated_at': current_datetime,
+        },
       ])
 
 def downgrade():

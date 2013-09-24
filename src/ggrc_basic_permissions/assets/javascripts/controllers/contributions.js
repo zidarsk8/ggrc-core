@@ -342,8 +342,8 @@
       }
       $.extend(join_params, this.options.extra_join_fields);
       // FIXME: context_id must get a real value
-      if (!join_params.context || !join_params.context.id)
-        join_params.context = { id: 0 }
+      //if (!join_params.context || !join_params.context.id)
+        //join_params.context = { id: 0 }
 
       return new (this.options.join_model)(join_params);
     },
@@ -368,10 +368,16 @@
 
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
-    var context = GGRC.make_model_instance(GGRC.page_object).context;
-    if (!context)
-      throw new Error("`context` is required for Assignments model");
-    context = context.stub();
+    var context;
+    debugger;
+    if (GGRC.page_object) {
+      context = GGRC.make_model_instance(GGRC.page_object).context;
+      if (!context)
+        throw new Error("`context` is required for Assignments model");
+      context = context.stub();
+    } else {
+      context = {id: null};
+    }
 
     return {
         base_modal_view: "/static/ggrc_basic_permissions/mustache/people_roles/base_modal.mustache"
