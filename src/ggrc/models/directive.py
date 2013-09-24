@@ -64,6 +64,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
       'organization',
       'programs',
       PublishOnly('program_directives'),
+      PublishOnly('directive_controls'),
       'scope',
       'sections',
       'version',
@@ -96,6 +97,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
         orm.joinedload('audit_duration'),
         orm.subqueryload('controls'),
         orm.subqueryload_all('program_directives.program'),
+        orm.subqueryload_all('directive_controls'),
         orm.subqueryload('sections'))
 
 # FIXME: For subclasses, restrict kind
