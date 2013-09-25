@@ -50,6 +50,7 @@ def upgrade():
   connection = op.get_bind()
   users = connection.execute(users).fetchall()
   object_editor = connection.execute(object_editor).fetchone()
+  program_creator = connection.execute(program_creator).fetchone()
   for user in users:
     op.execute(user_roles_table.insert().values(
       person_id=user['id'], role_id=object_editor['id'], context_id=None))
