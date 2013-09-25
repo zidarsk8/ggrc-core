@@ -12,6 +12,7 @@ down_revision = '1afc3824d35b'
 
 import sqlalchemy as sa
 from alembic import op
+from datetime import datetime
 from sqlalchemy.sql import table, column, select
 
 person_table = table('people',
@@ -28,6 +29,9 @@ user_roles_table = table('user_roles',
     column('role_id', sa.Integer),
     column('person_id', sa.Integer),
     column('context_id', sa.Integer),
+    column('modified_by_id', sa.Integer),
+    column('created_at', sa.DateTime),
+    column('updated_at', sa.DateTime),
     )
 
 def upgrade():
@@ -51,11 +55,22 @@ def upgrade():
   users = connection.execute(users).fetchall()
   object_editor = connection.execute(object_editor).fetchone()
   program_creator = connection.execute(program_creator).fetchone()
+  current_datetime = datetime.now()
   for user in users:
     op.execute(user_roles_table.insert().values(
-      person_id=user['id'], role_id=object_editor['id'], context_id=None))
+      person_id=user['id'],
+      role_id=object_editor['id'],
+      context_id=None,
+      created_at=current_datetime,
+      modified_at=curent_datetime,
+      ))
     op.execute(user_roles_table.insert().values(
-      person_id=user['id'], role_id=program_creator['id'], context_id=None))
+      person_id=user['id'],
+      role_id=program_creator['id'],
+      context_id=None,
+      created_at=current_datetime,
+      modified_at=curent_datetime,
+      ))
 
 def downgrade():
   '''Intentionally does nothing as we can't distinguish between migration
