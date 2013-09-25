@@ -62,14 +62,14 @@ def upgrade():
       role_id=object_editor['id'],
       context_id=None,
       created_at=current_datetime,
-      modified_at=curent_datetime,
+      updated_at=current_datetime,
       ))
     op.execute(user_roles_table.insert().values(
       person_id=user['id'],
       role_id=program_creator['id'],
       context_id=None,
       created_at=current_datetime,
-      modified_at=curent_datetime,
+      updated_at=current_datetime,
       ))
 
 def downgrade():
