@@ -321,6 +321,9 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
+  business_plus_program_and_directive_object_types =
+    business_plus_program_object_types.concat(directive_object_types);
+
   governance_object_types =
     directive_object_types.concat(["Control", "Section", "Objective"]);
 
@@ -332,9 +335,9 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "Control", "ObjectControl", "control", "controllable"]
       , ["Control", business_object_types,
           "ObjectControl", "controllable", "control"]
-      , [business_plus_program_object_types,
+      , [business_plus_program_and_directive_object_types,
           "Objective", "ObjectObjective", "objective", "objectiveable", "object_objectives"]
-      , ["Objective", business_plus_program_object_types,
+      , ["Objective", business_plus_program_and_directive_object_types,
           "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , ["Objective", "Objective",
           "ObjectObjective", "objective", "objectiveable", "object_objectives"]

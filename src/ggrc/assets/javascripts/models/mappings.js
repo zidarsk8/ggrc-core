@@ -278,7 +278,7 @@
 
     , directive_object: {
         _mixins: [
-          "related_object", "personable", "documentable"//, "objectiveable"
+          "related_object", "personable", "documentable", "objectiveable"
           , extended_related("data_assets")
           , extended_related("facilities")
           , extended_related("markets")
@@ -296,7 +296,7 @@
 
       , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
-      , extended_related_objectives: Multi(["objectives_via_sections"])//, "objectives"])
+      , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
       , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
       , extended_related_controls: Multi([
             "controls_via_extended_objectives"
