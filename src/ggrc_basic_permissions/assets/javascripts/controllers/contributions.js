@@ -95,7 +95,7 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='checkbox'] click": "change_option",
+    ".option_column li input[type='checkbox'] change": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
@@ -243,8 +243,6 @@
     },
 
     change_option: function(el, ev) {
-      ev.preventDefault();
-
       var self = this
         , option = el.closest('li').data('option')
         , join = this.find_join(option.id)
