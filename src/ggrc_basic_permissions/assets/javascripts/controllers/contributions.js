@@ -135,12 +135,13 @@
     init_context: function() {
       if (!this.context) {
         this.context = new can.Observe($.extend({
-          objects: this.object_list,
-          options: this.option_list,
-          joins: this.join_list,
-          actives: this.active_list,
-          selected_object: null,
-          selected_option: null,
+            objects: this.object_list
+          , options: this.option_list
+          , joins: this.join_list
+          , actives: this.active_list
+          , selected_object: null
+          , selected_option: null
+          , page_model: GGRC.page_model
         }, this.options));
       }
       return this.context;
@@ -185,10 +186,23 @@
 
     refresh_option_list: function() {
       var self = this
+        , instance = GGRC.page_instance()
+        , params = {}
         ;
 
+      // If this is a private model, set the scope
+      if (instance && instance.constructor.shortName === "Program" && instance.context) {
+        params.scope = "Private Program";
+      }
+      else if (/admin/.test(window.location)) {
+        params.scope = "System";
+      }
+      else if (instance) {
+        params.scope = instance.constructor.shortName;
+      }
+
       return this.options.option_model.findAll(
-        $.extend({}, this.option_query),
+        $.extend(params, this.option_query),
         function(options) {
           self.option_list.replace(options)
         });
@@ -369,7 +383,6 @@
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
     var context;
-    debugger;
     if (GGRC.page_object) {
       context = GGRC.make_model_instance(GGRC.page_object).context;
       if (!context)
