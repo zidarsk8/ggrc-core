@@ -1,5 +1,4 @@
-  {{#using request=instance.request}}
-  {{#if_equals request.type 'documentation'}}
+  {{!#if_equals type 'documentation'}}
   <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
@@ -86,8 +85,8 @@
     </div>
     
   </li>
-  {{/if_equals}}
-  {{#if_equals request.type 'interview'}}
+  {{!/if_equals}}
+  {{!#if_equals type 'interview'}}
   <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
@@ -193,8 +192,8 @@
     </div>
     
   </li>
-  {{/if_equals}}
-  {{#if_equals request.type 'population sample'}}
+  {{!/if_equals}}
+  {{!#if_equals type 'population sample'}}
   <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
@@ -329,5 +328,4 @@
       
     </div>
   </li>
-  {{/if_equals}}
-{{/using}}
+  {{!/if_equals}}

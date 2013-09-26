@@ -89,7 +89,10 @@
       </div>
     </div>
   </div>
-  <input type="hidden" name="res  <input type="hidden" name="response.id" value="{{response.id}}">
+  {{#using request=request}}
+  <input type="hidden" name="request.id" value="{{request.id}}">
+  <input type="hidden" name="response_type" value="{{request.request_type}}">
+  {{/using}}
 </form>
 {{/instance}}
 {{!/div}}
