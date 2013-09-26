@@ -101,6 +101,10 @@
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
           "Section", "section", "ControlSection", "control", "control_sections")
+      , implemented_controls: Proxy(
+          "Control", "implemented_control", "ControlControl", "control", "control_controls")
+      , implementing_controls: Proxy(
+          "Control", "control", "ControlControl", "implemented_control", "implementing_control_controls")
       //  FIXME: Cannot currently represent singular foreign-key references
       //    with Mappers/ListLoaders
       //, direct_directives: ForeignKey("Directive", "directive", "controls")
