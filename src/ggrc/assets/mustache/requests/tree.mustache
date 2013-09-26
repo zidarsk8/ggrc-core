@@ -1,5 +1,5 @@
 <li class="tree-item programs request-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
         <div class="span3">
@@ -12,28 +12,25 @@
             </div>
           </div>
         </div>
-        <div class="span3">
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <i class="grcicon-person-green pull-left"></i>
           <div class="objective-selector">
-            <input type="text" name="owner_id" class="span8 short-field" value="Predrag Kanazir">
+            <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.assignee.name instance.assignee.email ''}}">
           </div>
         </div>
-        <div class="span3">
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <span class="pull-left request-type">type:</span>
-          <select class="span9 short-field">
-            <option>Documentation</option>
-            <option>Interview</option>
-            <option>Population Sample</option>
+          <select name="request_type" class="span9 short-field">
+            {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+            <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
-        <div class="span3">
-          <select class="span9 short-field">
-            <option>Draft</option>
-            <option>Requested</option>
-            <option>Responded</option>
-            <option>Ammended Request</option>
-            <option>Updated Response</option>
-            <option>Accepted</option>
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <select name="status" class="span9 short-field">
+            {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
       </div>
@@ -70,358 +67,13 @@
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         {{#child_options}}
           <div class="inner-tree">
-            <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
+            <h6>PBC {{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
             <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
           </div>
         {{/child_options}}
       {{/if_null}}
     {{/if}}
     
-    <div class="inner-tree">
-      <h6>PBC Responses (1)</h6>
-      <ul class="tree-structure new-tree">
-        <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-          <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-            <a href="javascript://" class="openclose">
-              <div class="row-fluid">
-                <div class="span6">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      Documentation Response
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <i class="grcicon-person-green pull-left"></i>
-                  <div class="objective-selector">
-                    <input type="text" name="owner_id" class="span8 short-field" value="Predrag Kanazir">
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <select class="span10 short-field">
-                    <option>Draft</option>
-                    <option>Requested</option>
-                    <option>Responded</option>
-                    <option>Ammended Request</option>
-                    <option>Updated Response</option>
-                    <option>Accepted</option>
-                  </select>
-                </div>
-              </div>
-            </a>
-          </div>
-          
-          <div class="tier-2-info item-content">
-            <div class="tier-2-info-content">
-              <div class="row-fluid">
-                <div class="span12">
-                  <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}" data-object-params='{ "{{instance.constructor.table_singular}}": {{instance.id}}, "{{instance.constructor.table_singular}}_title" : "{{instance.title}}" }'>
-                    <i class="grcicon-edit"></i>
-                    Edit PBC Response
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Mapped Objects (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Object
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Object
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Evidence (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Evidence
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Evidence
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-          </div>
-          
-        </li>
-        <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-          <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-            <a href="javascript://" class="openclose">
-              <div class="row-fluid">
-                <div class="span6">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      Interview Response
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <i class="grcicon-person-green pull-left"></i>
-                  <div class="objective-selector">
-                    <input type="text" name="owner_id" class="span8 short-field" value="Predrag Kanazir">
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <select class="span10 short-field">
-                    <option>Draft</option>
-                    <option>Requested</option>
-                    <option>Responded</option>
-                    <option>Ammended Request</option>
-                    <option>Updated Response</option>
-                    <option>Accepted</option>
-                  </select>
-                </div>
-              </div>
-            </a>
-          </div>
-          
-          <div class="tier-2-info item-content">
-            <div class="tier-2-info-content">
-              <div class="row-fluid">
-                <div class="span12">
-                  <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}" data-object-params='{ "{{instance.constructor.table_singular}}": {{instance.id}}, "{{instance.constructor.table_singular}}_title" : "{{instance.title}}" }'>
-                    <i class="grcicon-edit"></i>
-                    Edit PBC Response
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Mapped Objects (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Object
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Object
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Participants (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Participant
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Participant
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Meetings (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Meeting
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Meeting
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-          </div>
-          
-        </li>
-        <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-          <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-            <a href="javascript://" class="openclose">
-              <div class="row-fluid">
-                <div class="span6">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      Population Sample Response
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <i class="grcicon-person-green pull-left"></i>
-                  <div class="objective-selector">
-                    <input type="text" name="owner_id" class="span8 short-field" value="Predrag Kanazir">
-                  </div>
-                </div>
-                
-                <div class="span3">
-                  <select class="span10 short-field">
-                    <option>Draft</option>
-                    <option>Requested</option>
-                    <option>Responded</option>
-                    <option>Ammended Request</option>
-                    <option>Updated Response</option>
-                    <option>Accepted</option>
-                  </select>
-                </div>
-              </div>
-            </a>
-          </div>
-          
-          <div class="tier-2-info item-content">
-            <div class="tier-2-info-content">
-              <div class="row-fluid">
-                <div class="span12">
-                  <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}" data-object-params='{ "{{instance.constructor.table_singular}}": {{instance.id}}, "{{instance.constructor.table_singular}}_title" : "{{instance.title}}" }'>
-                    <i class="grcicon-edit"></i>
-                    Edit PBC Response
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <div class="inner-tree">
-              <h6>Mapped Objects (0)</h6>
-              <ul class="tree-structure new-tree">
-                <li class="tree-item tree-item-add tree-footer">
-                  <div class="row-fluid">
-                    <div class="span12">
-                      <a href="javascript://" class="section-add">
-                        + Object
-                      </a>
-                      <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                        <i class="grcicon-add-black"></i>
-                        Object
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            <div class="tier-2-info-content population-content">
-              <ul class="population-upload">
-                <li>
-                  <div class="row-fluid">
-                    <div class="span8">
-                      <label>Population worksheet</label>
-                      <div class="row-fluid">
-                        <div class="span9">
-                          <input type="text" name="population.worksheet" class="input-block-level" placeholder="Enter URL">
-                        </div>
-                        <div class="span1">
-                          <span class="choose">OR</span>
-                        </div>
-                        <div class="span2">
-                          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" class="btn btn-add" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{instance.constructor.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.constructor.model_singular}}" } }'><i class="grcicon-upload"></i> Upload</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="span4">
-                      <label>Population #</label>
-                      <input type="text" name="population.number" class="input-block-level" placeholder="example: 1000">
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="row-fluid">
-                    <div class="span8">
-                      <label>Sample worksheet</label>
-                      <div class="row-fluid">
-                        <div class="span9">
-                          <input type="text" name="sample.worksheet" class="input-block-level" placeholder="Enter URL">
-                        </div>
-                        <div class="span1">
-                          <span class="choose">OR</span>
-                        </div>
-                        <div class="span2">
-                          <a href="#" class="btn btn-add"><i class="grcicon-upload"></i> Upload</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="span4">
-                      <label>Sample #</label>
-                      <input type="text" name="sample.number" class="input-block-level" placeholder="example: 1000">
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div class="row-fluid">
-                    <div class="span8">
-                      <label>Sample evidence</label>
-                      <div class="row-fluid">
-                        <div class="span9">
-                          <input type="text" name="sample.evidence" class="input-block-level" placeholder="Enter URL">
-                        </div>
-                        <div class="span1">
-                          <span class="choose">OR</span>
-                        </div>
-                        <div class="span2">
-                          <span class="btn btn-add"><i class="grcicon-upload"></i> Upload</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="span4">&nbsp;</div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-          </div>
-          
-        </li>
-        <li class="tree-item tree-item-add tree-footer">
-          <div class="row-fluid">
-            <div class="span12">
-              <a href="javascript://" class="section-add">
-                + PBC Response
-              </a>
-              <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-params='{ "{{instance.constructor.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.constructor.model_singular}}" } }'>
-                <i class="grcicon-add-black"></i>
-                Create PBC Response
-              </a>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-
   </div>
   {{/if}}
 

@@ -62,6 +62,7 @@ dashboard-js-files:
   - controls/control.js
   - controls/controls_controller.js
   - controllers/dashboard_controller.js
+  - controllers/quick_form_controller.js
   - apps/controls.js
   - sections/section.js
   - pbc/system.js
@@ -190,6 +191,9 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - people/autocomplete_result.mustache
   - objectives/autocomplete_result.mustache
+  - responses/tree.mustache
+  - responses/tree_footer.mustache
+  - responses/modal_content.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

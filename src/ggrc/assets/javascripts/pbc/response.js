@@ -30,12 +30,17 @@ can.Model.Cacheable("CMS.Models.Response", {
   , destroy : "DELETE /responses/{id}"
   , attributes : {
     owner : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.models"
-    , people : "CMS.Models.Person.models"
-    , object_documents : "CMS.Models.ObjectDocument.models"
-    , documents : "CMS.Models.Document.models"
-    , population_sample : "CMS.Models.PopulationSample.model"
-    , meetings : "CMS.Models.Meeting.models"
+    , object_people : "CMS.Models.ObjectPerson.stub"
+    , people : "CMS.Models.Person.stub"
+    , object_documents : "CMS.Models.ObjectDocument.stub"
+    , documents : "CMS.Models.Document.stub"
+    , population_sample : "CMS.Models.PopulationSample.stub"
+    , meetings : "CMS.Models.Meeting.stub"
+    , request : "CMS.Models.Request.stub"
+  }
+  , tree_view_options : {
+    show_view : GGRC.mustache_path + "/responses/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
   }
 }, {
 });

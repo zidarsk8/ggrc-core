@@ -994,7 +994,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
-    , assignee : "CMS.Models.Person.stub"
+    , assignee : "CMS.Models.Person.model"
     , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"
@@ -1007,6 +1007,12 @@ can.Model.Cacheable("CMS.Models.Request", {
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+    , draw_children : true
+    , child_options : [{
+      model : "Response"
+      , mapping : "responses"
+      , allow_creating : true
+    }]
   }
   , init : function() {
     this._super.apply(this, arguments);

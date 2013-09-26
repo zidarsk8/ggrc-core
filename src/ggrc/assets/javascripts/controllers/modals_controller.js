@@ -96,6 +96,8 @@ can.Control("GGRC.Controllers.Modals", {
       return $that.autocomplete({
         // Ensure that the input.change event still occurs
         change : function(event, ui) {
+          if(!$(event.target).parents(document.body).length)
+            console.log("FOO!");
           $(event.target).trigger("change");
         }
 
@@ -131,19 +133,7 @@ can.Control("GGRC.Controllers.Modals", {
             });
           });
         }
-        , select : function(event, ui) {
-          if(ui.item) {
-            var path = $that.attr("name").split(".");
-            path.pop();
-            path = path.join(".");
-            ctl.options.instance.attr(path, ui.item.stub());
-          } else {
-            $(event.currentTarget).one("modal:success", function(ev, new_obj) {
-              $that.data("ui-autocomplete").options.select(event, {item : new_obj});
-            });
-            return false;
-          }
-        }
+        , select : ctl.proxy("autocomplete_select", $that)
         , close : function() {
           $that.val($that.attr("value"));
         }
@@ -157,6 +147,20 @@ can.Control("GGRC.Controllers.Modals", {
         });
       };
     });
+  }
+
+  , autocomplete_select : function(el, event, ui) {
+    if(ui.item) {
+      var path = el.attr("name").split(".");
+      path.pop();
+      path = path.join(".");
+      this.options.instance.attr(path, ui.item.stub());
+    } else {
+      $(event.currentTarget).one("modal:success", function(ev, new_obj) {
+        el.data("ui-autocomplete").options.select(event, {item : new_obj});
+      });
+      return false;
+    }
   }
 
   , fetch_templates : function(dfd) {

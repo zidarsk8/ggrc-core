@@ -557,8 +557,9 @@ function defer_render(tag_name, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      frag_or_html = func.apply(this, arguments);
+      var frag_or_html = func.apply(this, arguments);
       $(element).after(frag_or_html).remove();
+      //can.view.hookup(parent);
     };
     if (deferred)
       deferred.done(f)
@@ -749,11 +750,13 @@ Mustache.registerHelper("can_link_to_page_object", function(context, options) {
 });
 
 Mustache.registerHelper("iterate", function() {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 2)
-  , options = arguments[arguments.length - 1];
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1)
+  , options = arguments[arguments.length - 1]
 
   return can.map(args, function(arg) {
-    return options.fn(options.contexts.concat([{iterator : arg}]));
+    var ctx = $.extend([], options.contexts);
+    ctx.push({iterator : arg});
+    return options.fn(ctx);
   }).join("");
 });
 
@@ -871,7 +874,7 @@ Mustache.registerHelper("show_long", function() {
               }
             }
             else {
-              // If there is an open/close toggle, wait until that is triggered
+              // If there is an open/close toggle, wait until "that" is triggered
               var root = el.closest('.tree-item')
                 , toggle;
               if (root.length && !root.hasClass('item-open') && (toggle = root.find('.openclose')) && toggle.length) {

@@ -361,6 +361,7 @@
     }
     , Request : {
       responses: Direct("Response", "request")
+      , assignee : Direct("Person", null)
     }
 
   });
