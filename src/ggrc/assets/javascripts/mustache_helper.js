@@ -1062,6 +1062,9 @@ Mustache.registerHelper("is_allowed", function() {
       }
     }
   });
+  if (options.hash && typeof options.hash.context !== undefined && !options.hash.context) {
+    context_id = null;
+  }
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
