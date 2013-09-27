@@ -8,14 +8,14 @@
 
 -macro search_result(type, type_plural, li_class='', tooltip_view='')
   %li{ 'class': ['{{ li_class }}', 'accordion-group'], 'data-model-name': '={type}', 'data-tooltip-view' : '={tooltip_view}' }
-    %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-toggle' : "collapse", 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
+    %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
       {{ type_plural|title }}
       %small
         (
         %span.item-count> ...
         )
-    %ul.sub-level.collapse{ 'id' : '={ type_plural|underscore }_sub_level'}
+    %ul.sub-level{ 'id' : '={ type_plural|underscore }_sub_level' }
 -endmacro
 
 -block page_help scoped

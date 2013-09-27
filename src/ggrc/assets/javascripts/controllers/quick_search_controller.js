@@ -215,7 +215,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , count_selector: '.item-count'
       , list_content_selector: 'ul'
       , spinner_selector: '.spinner'
-      , limit : 6
+      , limit : 20
       , observer : null
     }
 }, {
@@ -257,7 +257,22 @@ can.Control("CMS.Controllers.LHN_Search", {
       return spinner.el;
     }
 
-  , "{list_selector} {list_content_selector} show": "on_show_list"
+  , "{list_selector} > a click": "toggle_list_visibility"
+
+  , toggle_list_visibility: function(el, ev) {
+      var $ul = el.parent().find("ul").first()
+        ;
+
+      if ($ul.is(":visible")) {
+        $ul.slideUp().removeClass("in");
+      } else {
+        $ul.closest(".lhs").find("ul.sub-level")
+          .slideUp().removeClass("in");
+        $ul.slideDown().addClass("in");
+        this.on_show_list($ul);
+      }
+      ev.preventDefault();
+    }
 
   , on_show_list: function(el, ev) {
       var $list = $(el).closest(this.get_lists())
@@ -272,22 +287,79 @@ can.Control("CMS.Controllers.LHN_Search", {
       //this.element.trigger('kill-all-popovers');
     }
 
-  , ".view-more click" : function(el, ev) {
-      var self = this
-        , $list = $(el).closest(this.get_lists())
+  , show_more: function($el) {
+      if (this._show_more_pending)
+        return;
+
+      var that = this
+        , $list = $el.closest(this.get_lists())
         , model_name = this.get_list_model($list)
         , visible_list = this.options.visible_lists[model_name]
         , results_list = this.options.results_lists[model_name]
+        , refresh_queue
+        , new_visible_list
         ;
 
-      var refresh_queue = new RefreshQueue()
-        , new_visible_list = results_list.slice(0, visible_list.length * 2);
+      if (visible_list.length >= results_list.length)
+        return;
+
+      this._show_more_pending = true;
+      refresh_queue = new RefreshQueue();
+      new_visible_list =
+        //results_list.slice(0, visible_list.length + this.options.limit);
+        results_list.slice(visible_list.length, visible_list.length + this.options.limit);
+
       can.each(new_visible_list, function(item) {
         refresh_queue.enqueue(item);
       });
       refresh_queue.trigger().then(function() {
-        visible_list.replace(new_visible_list);
+        visible_list.push.apply(visible_list, new_visible_list);
+        //visible_list.replace(new_visible_list);
+        delete that._show_more_pending;
       });
+    }
+
+  , ".sub-level DOMMouseScroll": "prevent_overscroll"
+  , ".sub-level mousewheel": "prevent_overscroll"
+
+  , prevent_overscroll: function($el, ev) {
+      // Based on Troy Alford's response on StackOverflow:
+      //   http://stackoverflow.com/a/16324762
+      var scrollTop = $el[0].scrollTop
+        , scrollHeight = $el[0].scrollHeight
+        , height = $el.height()
+        , scrollTopMax = scrollHeight - height
+        , delta
+        , up
+        , loadTriggerOffset = 50
+        ;
+
+      if (ev.type === "DOMMouseScroll")
+        delta = ev.originalEvent.detail * -40;
+      else
+        delta = ev.originalEvent.wheelDelta;
+
+      up = delta > 0;
+
+      var prevent = function() {
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.returnValue = false;
+        return false;
+      }
+
+      if (!up && scrollTop - delta > scrollTopMax) {
+        // Scrolling down, but this will take us past the bottom.
+        $el.scrollTop(scrollHeight);
+        return prevent();
+      } else if (up && delta > scrollTop) {
+        // Scrolling up, but this will take us past the top.
+        $el.scrollTop(0);
+        return prevent();
+      } else if (!up && scrollTop - delta > scrollTopMax - loadTriggerOffset) {
+        // Scrolling down, close to bottom, so start loading more
+        this.show_more($el);
+      }
     }
 
   , init_object_lists: function() {
