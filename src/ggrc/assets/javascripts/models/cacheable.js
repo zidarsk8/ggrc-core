@@ -385,6 +385,7 @@ can.Model("can.Model.Cacheable", {
 
         return {
             count: paging.count
+          , total: paging.total
           , first: get_page("first")
           , prev: get_page("prev")
           , next: get_page("next")

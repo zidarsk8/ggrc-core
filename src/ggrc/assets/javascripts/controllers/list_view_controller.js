@@ -141,7 +141,7 @@ can.Control("GGRC.Controllers.ListView", {
   , update_count: function() {
       if (this.element) {
         if (this.options.pager)
-          this.element.trigger("updateCount", this.options.pager.count);
+          this.element.trigger("updateCount", this.options.pager.total);
         else
           this.element.trigger("updateCount", this.options.list.length);
         this.element.trigger("widget_updated");
