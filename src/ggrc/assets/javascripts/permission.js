@@ -50,7 +50,11 @@ $.extend(Permission, (function() {
   };
 
   return {
-    _is_allowed: _is_allowed,
-    is_allowed: is_allowed,
+      _is_allowed: _is_allowed
+    , is_allowed: is_allowed
+    , page_context_id: function() {
+        var page_instance = GGRC.page_instance();
+        return (page_instance && page_instance.context && page_instance.context.id) || null;
+      }
   };
 })());
