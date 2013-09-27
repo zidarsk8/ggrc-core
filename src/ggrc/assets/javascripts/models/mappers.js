@@ -194,9 +194,7 @@
         var i;
         if (depth == null)
           depth = 0;
-        //  Skip when `this.instance === true`, since it's not a real instance,
-        //    just a beacon
-        if (this.instance !== last_instance && this.instance !== true) {
+        if (this.instance !== last_instance) {
           fn(this.instance, this, depth);
           depth++;
         }
@@ -796,6 +794,7 @@
               , mappings: [{
                     instance: true
                   , mappings: []
+                  , binding: binding
                   }]
               , binding: binding
               }]
@@ -938,6 +937,7 @@
           , mappings: [{
                 instance: true
               , mappings: []
+              , binding: binding
               }]
           , binding: binding
           });
