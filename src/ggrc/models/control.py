@@ -160,13 +160,13 @@ class Control(
     query = super(Control, cls).eager_query()
     return query.options(
         orm.joinedload('directive'),
-        orm.joinedload('control_assessments'),
-        orm.joinedload('control_controls'),
-        orm.joinedload('implementing_control_controls'),
-        orm.joinedload('control_risks'),
-        orm.joinedload('control_sections'),
-        orm.joinedload('objective_controls'),
-        orm.joinedload('directive_controls'),
-        orm.joinedload('program_controls'),
-        orm.joinedload('object_controls'),
+        orm.subqueryload('control_assessments'),
+        orm.subqueryload('control_controls'),
+        orm.subqueryload('implementing_control_controls'),
+        orm.subqueryload('control_risks'),
+        orm.subqueryload('control_sections'),
+        orm.subqueryload('objective_controls'),
+        orm.subqueryload('directive_controls'),
+        orm.subqueryload('program_controls'),
+        orm.subqueryload('object_controls'),
         )
