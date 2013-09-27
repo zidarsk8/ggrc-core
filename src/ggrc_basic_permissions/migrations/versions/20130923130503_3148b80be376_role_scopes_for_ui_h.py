@@ -28,7 +28,7 @@ def upgrade():
       .values(scope='Private Program'))
   op.execute(roles_table.update()\
       .where(roles_table.c.name.in_(
-        ['User', 'ObjectEditor', 'ProgramCreator',]))\
+        ['Reader', 'ObjectEditor', 'ProgramCreator',]))\
       .values(scope='System'))
 
 def downgrade():

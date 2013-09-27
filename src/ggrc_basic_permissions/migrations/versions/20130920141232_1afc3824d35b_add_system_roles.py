@@ -82,7 +82,7 @@ def upgrade():
   current_datetime = datetime.now()
   op.bulk_insert(roles_table,
       [
-        { 'name': 'User',
+        { 'name': 'Reader',
           'description': 'This role grants a user basic, read-only, access '\
               'permission to a gGRC instance.',
           'permissions_json': json.dumps({
@@ -118,7 +118,7 @@ def downgrade():
   op.execute('SET FOREIGN_KEY_CHECKS = 0')
   op.execute(roles_table.delete().where(
     roles_table.c.name.in_(
-      [ op.inline_literal('User'),
+      [ op.inline_literal('Reader'),
         op.inline_literal('ObjectEditor'),
         op.inline_literal('ProgramCreator'),
       ])))
