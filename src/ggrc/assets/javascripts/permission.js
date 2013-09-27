@@ -34,8 +34,6 @@ $.extend(Permission, (function() {
   _is_allowed = function(permissions, permission) {
     if (!permissions)
       return false; //?
-    if (permission.context_id == null)
-      return true;
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
