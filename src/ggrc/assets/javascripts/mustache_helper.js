@@ -940,7 +940,7 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
         return "Delete"
     }
     else
-      return "Unmap and Delete"
+      return "Unmap" // "Unmap and Delete"
   } else
     return "Unmap"
 });
