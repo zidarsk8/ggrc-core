@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 """Remove obsolete log events table for LogEvents model
 
 Revision ID: 5459dba4c5e9

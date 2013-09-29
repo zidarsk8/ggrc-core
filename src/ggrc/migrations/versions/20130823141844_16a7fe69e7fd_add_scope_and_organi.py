@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 """Add scope and organization
 
 Revision ID: 16a7fe69e7fd

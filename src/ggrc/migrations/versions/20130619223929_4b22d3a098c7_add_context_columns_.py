@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 """Add context columns for RBAC
 
 Revision ID: 4b22d3a098c7
