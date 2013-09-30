@@ -56,7 +56,7 @@
                 <a href="javascript://" class="section-add">
                   + Object
                 </a>
-                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
+                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Object" data-object-plural="objects" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
                   <i class="grcicon-add-black"></i>
                   Object
                 </a>
@@ -71,7 +71,21 @@
       {{#child_options.1}}
       <div class="inner-tree">
         <h6>Evidence ({{list.length}})</h6>
-        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}></ul>
+        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
+          <li class="tree-item tree-item-add tree-footer">
+            <div class="row-fluid">
+              <div class="span12">
+                <a href="javascript://" class="section-add">
+                  + Evidence
+                </a>
+                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Object" data-object-plural="objects" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
+                  <i class="grcicon-add-black"></i>
+                  Evidence
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
       {{/child_options.1}}
       {{/if_equals}}
@@ -112,6 +126,18 @@
                 </a>
               </div>
             </div>
+            <!--
+              <div class="row-fluid">
+                <div class="span12">
+                  <i class="grcicon-person-green pull-left icon-field"></i>
+                  <div class="objective-selector">
+                    {{#using owner=owner}}
+                    <input type="text" name="owner.email" data-lookup="Person" class="span4 audit-selector" value="{{firstnonempty owner.email ''}}">
+                    {{/using}}
+                  </div>
+                </div>
+              </div>
+            -->
           </li>
         </ul>
       </div>
@@ -129,12 +155,14 @@
                   <div class="span9">
                     <input type="text" name="population.worksheet" class="input-block-level" placeholder="Enter URL">
                   </div>
-                  <div class="span1">
-                    <span class="choose">OR</span>
-                  </div>
-                  <div class="span2">
-                    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" class="btn btn-add" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{instance.constructor.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.constructor.model_singular}}" } }'><i class="grcicon-upload"></i> Upload</a>
-                  </div>
+                  <!--
+                    <div class="span1">
+                      <span class="choose">OR</span>
+                    </div>
+                    <div class="span2">
+                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" class="btn btn-add" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{instance.constructor.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.constructor.model_singular}}" } }'><i class="grcicon-upload"></i> Upload</a>
+                    </div>
+                  -->
                 </div>
               </div>
               <div class="span4">
@@ -151,12 +179,14 @@
                   <div class="span9">
                     <input type="text" name="sample.worksheet" class="input-block-level" placeholder="Enter URL">
                   </div>
-                  <div class="span1">
-                    <span class="choose">OR</span>
-                  </div>
-                  <div class="span2">
-                    <a href="#" class="btn btn-add"><i class="grcicon-upload"></i> Upload</a>
-                  </div>
+                  <!--
+                    <div class="span1">
+                      <span class="choose">OR</span>
+                    </div>
+                    <div class="span2">
+                      <a href="#" class="btn btn-add"><i class="grcicon-upload"></i> Upload</a>
+                    </div>
+                  -->
                 </div>
               </div>
               <div class="span4">
@@ -173,12 +203,14 @@
                   <div class="span9">
                     <input type="text" name="sample.evidence" class="input-block-level" placeholder="Enter URL">
                   </div>
-                  <div class="span1">
-                    <span class="choose">OR</span>
-                  </div>
-                  <div class="span2">
-                    <span class="btn btn-add"><i class="grcicon-upload"></i> Upload</span>
-                  </div>
+                  <!--
+                    <div class="span1">
+                      <span class="choose">OR</span>
+                    </div>
+                    <div class="span2">
+                      <span class="btn btn-add"><i class="grcicon-upload"></i> Upload</span>
+                    </div>
+                  -->
                 </div>
               </div>
               <div class="span4">&nbsp;</div>

@@ -118,6 +118,15 @@ ul.new-tree {
           text-decoration:none;
         }
       }
+      .request-read-only {
+        .small {
+          font-size: 11px;
+        }
+        .request-status {
+          font-size: 11px;
+          font-style: italic;
+        }
+      }
     }
     &.responses-list {
       .utility-link {
