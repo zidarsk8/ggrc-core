@@ -18,6 +18,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 def get_permissions_json():
+  permissions.permissions_for(permissions.get_user())
   return json.dumps(session['permissions'])
 
 @app.context_processor

@@ -30,7 +30,12 @@ class CompletePermissionsProvider(object):
     pass
 
   def permissions_for(self, user):
-    return UserPermissions()
+    ret = UserPermissions()
+    # force the permissions to be loaded into session, otherwise templates
+    # that depend on the permissions being available in session may assert
+    # the user has no permissions!
+    ret.check_permissions()
+    return ret
 
   def handle_admin_user(self, user):
     pass

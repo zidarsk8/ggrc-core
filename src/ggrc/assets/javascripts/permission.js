@@ -41,6 +41,10 @@ $.extend(Permission, (function() {
     if (_permission_match(permissions,
           _admin_permission_for_context(permission.context_id)))
       return true;
+    // Check for System Admin permission
+    if (_permission_match(permissions,
+          _admin_permission_for_context(0)))
+      return true;
     return false;
   };
 
