@@ -20,3 +20,5 @@ In this, the Created/Maintained fields, where empty, were populated with names, 
 (This part did not need to distinguish between the different types of commenting syntax for the different file types because it just had to swap out the already-in-comments entry for Created By and Maintained By.)
 
 I then used the script ``uncreditedfiles.sh``, which I wrote to be more generalized than ``badfiles.sh`` above. It takes the regex matcher file as the first argument and the person to credit as the second argument. I then just had to run it with the argument sets (``frontend.grep``, ``brad@reciprocitylabs.com``) and (``backend.grep``, ``dan@reciprocitylabs.com``).
+
+Note: some file types did not exist in large enough number to automate, and for these I manually added the notice using best judgment as to who to credit.
