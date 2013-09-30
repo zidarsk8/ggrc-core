@@ -1,7 +1,7 @@
 --Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 --Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
---Created By: 
---Maintained By: 
+--Created By: dan@reciprocitylabs.com
+--Maintained By: dan@reciprocitylabs.com
 
 -- MySQL dump 10.13  Distrib 5.5.31, for Linux (x86_64)
 --
