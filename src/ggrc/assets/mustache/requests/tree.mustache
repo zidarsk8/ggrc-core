@@ -15,7 +15,13 @@
         <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <i class="grcicon-person-green pull-left"></i>
           <div class="objective-selector">
-            <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.assignee.name instance.assignee.email ''}}">
+            {{!autocmplete doesn't work for now.  just display the name and force popping up the edit modal to change assignee}}
+            <!--
+              <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.assignee.name instance.assignee.email ''}}">
+            -->
+            {{#using assignee=instance.assignee}}
+              {{firstnonempty assignee.name assignee.email}}
+            {{/using}}
           </div>
         </div>
         <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
@@ -67,11 +73,8 @@
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         {{#child_options}}
           <div class="inner-tree">
-            <h6>PBC {{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
-            <ul class="tree-structure new-tree" {{data 'options'}} {{! (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
-            {{#instance.responses}}
-            {{> /static/mustache/responses/tree.mustache}}
-            {{/instance.responses}}
+            <h6>PBC {{firstnonempty title_plural model.title_plural}} ({{child_count}})</h6>
+            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
             </ul>
           </div>
         {{/child_options}}

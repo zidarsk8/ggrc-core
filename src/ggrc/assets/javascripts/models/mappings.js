@@ -387,7 +387,10 @@
     }
     , Request : {
       responses: Direct("Response", "request")
-      , assignee : Direct("Person", null)
+    }
+    , Response : {
+      _mixins : ["personable", "documentable"]
+      , meetings: Direct("Meeting", "response")
     }
 
   });
