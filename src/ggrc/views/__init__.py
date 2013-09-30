@@ -170,14 +170,14 @@ def import_controls(directive_id):
 
   if request.method == 'POST':
     if 'cancel' in request.form:
-      return import_redirect(directive_url)
+      return import_redirect(directive_url + "#control_widget")
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         options = {}
-        options['directive_id'] = directive_id
+        options['directive_id'] = int(directive_id)
         options['dry_run'] = dry_run
         converter = handle_csv_import(ControlsConverter, csv_file, **options)
         if dry_run:
@@ -188,7 +188,7 @@ def import_controls(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url)
+          return import_redirect(directive_url + "#control_widget")
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
@@ -218,7 +218,7 @@ def import_sections(directive_id):
   if request.method == 'POST':
 
     if 'cancel' in request.form:
-      return import_redirect(directive_url)
+      return import_redirect(directive_url + "#section_widget")
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -233,7 +233,7 @@ def import_sections(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url)
+          return import_redirect(directive_url + "#section_widget")
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
@@ -390,14 +390,19 @@ def export_sections(directive_id):
 def export_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive
+  from ggrc.models.all_models import Directive, Control
 
   options = {}
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   options['directive'] = directive
-  options['export'] = True
   filename = "{}-controls.csv".format(directive.slug)
-  return handle_converter_csv_export(filename, directive.controls, ControlsConverter, **options)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    controls = Control.query.filter(Control.id.in_(ids))
+  else:
+    controls = directive.controls
+  options['export'] = True
+  return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
 ViewEntry = namedtuple('ViewEntry', 'url model_class service_class')
 

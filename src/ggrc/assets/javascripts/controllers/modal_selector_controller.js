@@ -838,7 +838,8 @@
           this.options.base_modal_view,
           this.context,
           function(frag) {
-            $(self.element).html(frag);
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
             deferred.resolve();
             self.element.trigger('loaded');
             setTimeout(function() {
@@ -1000,15 +1001,27 @@
 
     , on_map: $.debounce(500, true, function(el, ev) {
         var that = this
+          , join_instance = this.create_join()
           ;
 
-        this.create_join()
-          .done(function() {
-            $(that.element).modal_form('hide');
-          })
-          .fail(function() {
-            //alert("Fail");
-          });
+        if (!join_instance) {
+          that.element.trigger("ajax:flash", {
+            error: "Select an object to map" });
+        } else {
+          join_instance.save()
+            .done(function() {
+              $(that.element).modal_form('hide');
+            })
+            .fail(function(xhr) {
+              // Currently, the only error we encounter here is uniqueness
+              // constraint violations.  Let's use a nicer message!
+              //that.element.trigger("ajax:flash", { error : xhr.responseText });
+              if (that.element) {
+                var message = "That object is already mapped";
+                that.element.trigger("ajax:flash", { error: message });
+              }
+            });
+        }
       })
 
     , create_join: function() {
@@ -1026,10 +1039,7 @@
           }
           join = this.context.option_descriptor.get_new_join(
               this.context.selected_object, this.context.selected_option, context_id);
-          //join = this.get_new_join(this.context.selected_option);
-          return join.save();
-        } else {
-          return (new $.Deferred()).reject();
+          return join;
         }
       }
 
@@ -1062,6 +1072,30 @@
           }, 200);
         }
       }
+
+  , " ajax:flash" : function(el, ev, mesg) {
+      var that = this
+        , $flash = this.options.$header.find(".flash")
+        ;
+
+      if (!$flash.length)
+        $flash = $('<div class="flash" />').prependTo(that.options.$header);
+
+      ev.stopPropagation();
+
+      can.each(["success", "warning", "error"], function(type) {
+        var tmpl;
+        if(mesg[type]) {
+          tmpl = '<div class="alert alert-'
+          + type
+          +'"><a href="#" class="close" data-dismiss="alert">&times;</a><span>'
+          + mesg[type]
+          + '</span></div>';
+          $flash.append(tmpl);
+        }
+      });
+    }
+
   });
 
   ModalOptionDescriptor = can.Construct({
@@ -1156,14 +1190,13 @@
         , extra_options = modal_descriptor_view_options[option_model_name]
         ;
 
-      /*if (option_descriptors[option_model_name])
-        console.debug(
-            "Found duplicate option descriptors for"
-          , option_model_name
-          , join_descriptors);*/
-
       if (!option_set.default_option_descriptor)
         option_set.default_option_descriptor = option_model_name;
+
+      //  If we have duplicate options, we want to use the first, so return
+      //    early.
+      if (option_descriptors[option_model_name])
+        return;
 
       if (!extra_options)
         extra_options = {

@@ -559,7 +559,6 @@ function defer_render(tag_name, func, deferred) {
     var f = function() {
       var frag_or_html = func.apply(this, arguments);
       $(element).after(frag_or_html).remove();
-      //can.view.hookup(parent);
     };
     if (deferred)
       deferred.done(f)
@@ -935,15 +934,88 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     mappings = mappings();
   if (mappings.indexOf(instance) > -1) {
     if (mappings.length == 1) {
-      if (mappings[0] instanceof CMS.Models.Control && GGRC.page_instance() instanceof CMS.Models.Directive)
+      if (mappings[0] instanceof CMS.Models.Control)
         return "Unmap"
       else 
         return "Delete"
     }
     else
-      return "Unmap and Delete"
+      return "Unmap" // "Unmap and Delete"
   } else
     return "Unmap"
+});
+
+Mustache.registerHelper("if_result_has_extended_mappings", function(
+    bindings, parent_instance, options) {
+  //  Render the `true` / `fn` block if the `result` exists (in this list)
+  //  due to mappings other than directly to the `parent_instance`.  Otherwise
+  //  Render the `false` / `inverse` block.
+  bindings = Mustache.resolve(bindings);
+  bindings = resolve_computed(bindings);
+  parent_instance = Mustache.resolve(parent_instance);
+  var has_extended_mappings = false
+    , i
+    ;
+
+  for (i=0; i<bindings.length; i++) {
+    if (bindings[i].instance !== parent_instance)
+      has_extended_mappings = true;
+  }
+
+  if (has_extended_mappings)
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
+  //  Iterate over `list` and render the provided block with additional
+  //  variables available in the context, specifically to enable joining with
+  //  commas and using "and" in the right place.
+  //
+  //  * `<name>`: Instead of rendering with the item as the current context,
+  //      make the item available at the specified `name`
+  //  * index
+  //  * length
+  //  * isFirst
+  //  * isLast
+  name = Mustache.resolve(name);
+  list = Mustache.resolve(list);
+  list = resolve_computed(list);
+  var i
+    , output = []
+    , frame
+    , length = list.length
+    ;
+  for (i=0; i<length; i++) {
+    frame = {}
+    frame.index = i;
+    frame.isFirst = i == 0;
+    frame.isLast = i == length - 1;
+    frame.length = length;
+    frame[name] = list[i];
+    output.push(options.fn(new can.Observe(frame)));
+    //  FIXME: Is this legit?  It seems necessary in some cases.
+    //contexts = options.contexts.concat([frame]);
+    //contexts.___st4ck3d = true;
+    //output.push(options.fn(contexts));
+  }
+  return output.join("");
+});
+
+Mustache.registerHelper("link_to_tree", function(options) {
+  var args = [].slice.apply(arguments)
+    , options = args.pop()
+    , link = []
+    ;
+
+  args = can.map(args, Mustache.resolve);
+  args = can.map(args, function(stub) { return stub.reify(); });
+  link.push("#" + args[0].constructor.table_singular + "_widget");
+  //  FIXME: Add this back when extended-tree-routing is enabled
+  //for (i=0; i<args.length; i++)
+  //  link.push(args[i].constructor.table_singular + "-" + args[i].id);
+  return link.join("/");
 });
 
 Mustache.registerHelper("date", function(date) {
@@ -1123,6 +1195,19 @@ Mustache.registerHelper("json_escape", function(obj, options) {
 Mustache.registerHelper("localize_date", function(date) {
   date = resolve_computed(date);
   return date ? moment(date).format("MM/DD/YYYY") : "";
+});
+
+Mustache.registerHelper("instance_ids", function(list, options) {
+  //  `instance_ids` is used only to extract a comma-separated list of
+  //  instance `id` values for use by `Export Controls` link in
+  //  `assets/mustache/controls/tree_footer.mustache`
+  var ids;
+  list = resolve_computed(Mustache.resolve(list));
+  if (list)
+    ids = can.map(list, function(result) { return result.attr("instance.id"); });
+  else
+    ids = [];
+  return ids.join(",");
 });
 
 })(this, jQuery, can);
