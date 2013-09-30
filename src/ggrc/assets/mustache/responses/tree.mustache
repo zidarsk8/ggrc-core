@@ -25,7 +25,7 @@
           
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
             <select name="status" class="span10 short-field">
-              {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+              {{#iterate 'Assigned' 'Accepted' 'Completed'}}
               <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
               {{/iterate}}
             </select>
@@ -49,20 +49,7 @@
       {{#child_options.0}}
       <div class="inner-tree">
         <h6>Mapped Objects ({{child_count}})</h6>
-        <ul class="tree-structure new-tree">
-          <li class="tree-item tree-item-add tree-footer">
-            <div class="row-fluid">
-              <div class="span12">
-                <a href="javascript://" class="section-add">
-                  + Object
-                </a>
-                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Object" data-object-plural="objects" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                  <i class="grcicon-add-black"></i>
-                  Object
-                </a>
-              </div>
-            </div>
-          </li>
+        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
         </ul>
       </div>
       {{/child_options.0}}
@@ -70,18 +57,20 @@
       {{#if_equals instance.response_type 'documentation'}}
       {{#child_options.1}}
       <div class="inner-tree">
-        <h6>Evidence ({{list.length}})</h6>
+        <h6>Evidence ({{child_count}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
           <li class="tree-item tree-item-add tree-footer">
             <div class="row-fluid">
-              <div class="span12">
+              <div class="span12 section-expandable">
                 <a href="javascript://" class="section-add">
                   + Evidence
                 </a>
-                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Object" data-object-plural="objects" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                  <i class="grcicon-add-black"></i>
-                  Evidence
-                </a>
+                <span class="section-expander">
+                  <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Document" data-object-plural="Documents" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
+                    <i class="grcicon-add-black"></i>
+                    Evidence
+                  </a>
+                </span>
               </div>
             </div>
           </li>
@@ -92,18 +81,20 @@
       {{#if_equals instance.response_type 'interview'}}
       {{#child_options.2}}
       <div class="inner-tree">
-        <h6>Meetings (0)</h6>
+        <h6>Meetings ({{child_count}})</h6>
         <ul class="tree-structure new-tree">
           <li class="tree-item tree-item-add tree-footer">
             <div class="row-fluid">
-              <div class="span12">
+              <div class="span12 section-expandable">
                 <a href="javascript://" class="section-add">
                   + Meeting
                 </a>
-                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                  <i class="grcicon-add-black"></i>
-                  Meeting
-                </a>
+                <span class="section-expander">
+                  <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
+                    <i class="grcicon-add-black"></i>
+                    Meeting
+                  </a>
+                </span>
               </div>
             </div>
           </li>
@@ -112,18 +103,20 @@
       {{/child_options.2}}
       {{#child_options.3}}
       <div class="inner-tree">
-        <h6>Participants (0)</h6>
+        <h6>Participants ({{child_count}})</h6>
         <ul class="tree-structure new-tree">
           <li class="tree-item tree-item-add tree-footer">
             <div class="row-fluid">
-              <div class="span12">
+              <div class="span12 section-expandable">
                 <a href="javascript://" class="section-add">
                   + Participant
                 </a>
-                <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
-                  <i class="grcicon-add-black"></i>
-                  Participant
-                </a>
+                <span class="section-expander">
+                  <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.constructor.model_singular}}" } }'>
+                    <i class="grcicon-add-black"></i>
+                    Participant
+                  </a>
+                </span>
               </div>
             </div>
             <!--

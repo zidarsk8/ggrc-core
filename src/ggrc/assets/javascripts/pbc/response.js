@@ -36,7 +36,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       return params;
     params = this.object_from_resource(params);
     if (!params.selfLink) {
-      if (params.type !== 'Response')
+      if (params.type && params.type !== 'Response')
         return CMS.Models[params.type].model(params);
     } else {
       if (CMS.Models.DocumentationResponse.root_object === params.response_type + "_response")
@@ -66,11 +66,14 @@ can.Model.Cacheable("CMS.Models.Response", {
     , draw_children : true
     , child_options : [{
       //0: mapped objects
-      mapper : "Relationships"
-      , model : can.Model.Cacheable
+      //mapping : "related_objects"
+       model : "System"
+      , property : "related_objects"
+      , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     }, {
       //1: Document Evidence
       model : "Document"
+      , property : "documents"
     }, {
       //2: Meetings
       model : "Meeting"

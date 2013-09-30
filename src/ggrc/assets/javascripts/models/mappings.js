@@ -389,7 +389,7 @@
       responses: Direct("Response", "request")
     }
     , Response : {
-      _mixins : ["personable", "documentable"]
+      _mixins : ["business_object"]
       , meetings: Direct("Meeting", "response")
     }
 
