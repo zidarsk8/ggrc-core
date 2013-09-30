@@ -59,6 +59,8 @@ can.Model.Cacheable("CMS.Models.Response", {
     , participants : "CMS.Models.Person.stubs"
     , request : "CMS.Models.Request.stub"
     , assignee : "CMS.Models.Person.stub"
+    , related_sources : "CMS.Models.Relationship.stubs"
+    , related_destinations : "CMS.Models.Relationship.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
@@ -66,10 +68,11 @@ can.Model.Cacheable("CMS.Models.Response", {
     , draw_children : true
     , child_options : [{
       //0: mapped objects
-      //mapping : "related_objects"
-       model : "System"
-      , property : "related_objects"
+      mapping : "related_objects"
+      , model : can.Model.Cacheable
+      , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , allow_mapping : true
     }, {
       //1: Document Evidence
       model : "Document"

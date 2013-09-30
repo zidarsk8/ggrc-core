@@ -5,6 +5,7 @@
 
 from ggrc import db
 from .mixins import deferred, BusinessObject
+from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
 
@@ -39,7 +40,7 @@ class Response(BusinessObject, db.Model):
     return query.options(
         orm.joinedload('request'))
 
-class DocumentationResponse(Documentable, Personable, Response):
+class DocumentationResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
       }
@@ -63,7 +64,7 @@ class DocumentationResponse(Documentable, Personable, Response):
     return query.options(
         orm.subqueryload('evidence'))
 
-class InterviewResponse(Documentable, Personable, Response):
+class InterviewResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
       }
@@ -82,7 +83,7 @@ class InterviewResponse(Documentable, Personable, Response):
     return query.options()
         #orm.subqueryload('meetings'))
 
-class PopulationSampleResponse(Documentable, Personable, Response):
+class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'
       }

@@ -390,7 +390,16 @@
     }
     , Response : {
       _mixins : ["business_object"]
+    }
+    , DocumentationResponse : {
+      _mixins : ["business_object"]
+    }
+    , InterviewResponse : {
+      _mixins : ["business_object"]
       , meetings: Direct("Meeting", "response")
+    }
+    , PopulationSampleResponse : {
+      _mixins : ["business_object"]
     }
 
   });
