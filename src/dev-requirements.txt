@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 Jinja2==2.6
 # Use `behave` library from github for --junit support of ScenarioOutline
 # This will be unnecessary when behave==1.2.2.16 is released to PyPI

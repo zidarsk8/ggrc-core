@@ -2,13 +2,11 @@ doc/copyright_add
 /ggrc/.sass-cache/e
 \.git
 \.DS_Store
-.*\.swp$
 cookbooks/
 \.vagrant.*
 Cheffile\.lock
 src/requirements\.txt\.md5
 src/packages\.zip
-.*\.pyc
 src/instance
 \.DS_Store
 site-cookbooks/ggrc/recipes/local\.rb
@@ -30,3 +28,6 @@ COMMIT_MSG
 \.jpeg$
 \.gif$
 \.ico$
+\.diff$
+.*\.swp$
+.*\.pyc
