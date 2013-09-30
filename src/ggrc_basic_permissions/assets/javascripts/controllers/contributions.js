@@ -134,12 +134,13 @@
     init_context: function() {
       if (!this.context) {
         this.context = new can.Observe($.extend({
-          objects: this.object_list,
-          options: this.option_list,
-          joins: this.join_list,
-          actives: this.active_list,
-          selected_object: null,
-          selected_option: null,
+            objects: this.object_list
+          , options: this.option_list
+          , joins: this.join_list
+          , actives: this.active_list
+          , selected_object: null
+          , selected_option: null
+          , page_model: GGRC.page_model
         }, this.options));
       }
       return this.context;
@@ -172,10 +173,23 @@
 
     refresh_option_list: function() {
       var self = this
+        , instance = GGRC.page_instance()
+        , params = {}
         ;
 
+      // If this is a private model, set the scope
+      if (instance && instance.constructor.shortName === "Program" && instance.context) {
+        params.scope = "Private Program";
+      }
+      else if (/admin/.test(window.location)) {
+        params.scope = "System";
+      }
+      else if (instance) {
+        params.scope = instance.constructor.shortName;
+      }
+
       return this.options.option_model.findAll(
-        $.extend({}, this.option_query),
+        $.extend(params, this.option_query),
         function(options) {
           self.option_list.replace(options)
         });
@@ -330,8 +344,8 @@
       }
       $.extend(join_params, this.options.extra_join_fields);
       // FIXME: context_id must get a real value
-      if (!join_params.context || !join_params.context.id)
-        join_params.context = { id: 0 }
+      //if (!join_params.context || !join_params.context.id)
+        //join_params.context = { id: 0 }
 
       return new (this.options.join_model)(join_params);
     },
@@ -356,10 +370,15 @@
 
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
-    var context = GGRC.make_model_instance(GGRC.page_object).context;
-    if (!context)
-      throw new Error("`context` is required for Assignments model");
-    context = context.stub();
+    var context;
+    if (GGRC.page_object) {
+      context = GGRC.make_model_instance(GGRC.page_object).context;
+      if (!context)
+        throw new Error("`context` is required for Assignments model");
+      context = context.stub();
+    } else {
+      context = {id: null};
+    }
 
     return {
         base_modal_view: "/static/ggrc_basic_permissions/mustache/people_roles/base_modal.mustache"
