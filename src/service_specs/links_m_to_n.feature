@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 Feature: Many resources type pairs reference each other M x N relations. This 
   feature will exercise the cases where the linking between resources is M x N.
 

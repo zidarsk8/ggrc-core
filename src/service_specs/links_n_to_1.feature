@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: 
+# Maintained By: 
+
 Feature: Many resources have links to other resources. This feature will
   exercise the cases where the linking is n to 1, such as in a child to parent
   relationship.
