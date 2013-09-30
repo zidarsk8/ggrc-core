@@ -2,10 +2,10 @@ Feature: Private Programs
 
   Background:
     Given service description
-    And User "secretive.user@example.com" has "User" role
+    And User "secretive.user@example.com" has "Reader" role
     And User "secretive.user@example.com" has "ObjectEditor" role
     And User "secretive.user@example.com" has "ProgramCreator" role
-    And User "example.user2@example.com" has "User" role
+    And User "example.user2@example.com" has "Reader" role
 
   Scenario: A logged in user can create a private program that another logged in user cannot see or otherwise access.
     Given the current user
