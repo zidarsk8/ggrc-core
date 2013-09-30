@@ -940,22 +940,28 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
         return "Delete"
     }
     else
-      return "Unmap and Delete"
+      return "Unmap" // "Unmap and Delete"
   } else
     return "Unmap"
 });
 
-Mustache.registerHelper("if_result_has_extended_mappings", function(result, parent_instance, options) {
+Mustache.registerHelper("if_result_has_extended_mappings", function(
+    bindings, parent_instance, options) {
   //  Render the `true` / `fn` block if the `result` exists (in this list)
   //  due to mappings other than directly to the `parent_instance`.  Otherwise
   //  Render the `false` / `inverse` block.
-  result = Mustache.resolve(result);
+  bindings = Mustache.resolve(bindings);
+  bindings = resolve_computed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
-  var has_extended_mappings = false;
-  result.walk_instances(function(instance, result, depth) {
-    if (depth === 1 && result.binding.instance !== parent_instance)
+  var has_extended_mappings = false
+    , i
+    ;
+
+  for (i=0; i<bindings.length; i++) {
+    if (bindings[i].instance !== parent_instance)
       has_extended_mappings = true;
-  });
+  }
+
   if (has_extended_mappings)
     return options.fn(options.contexts);
   else
@@ -1187,6 +1193,19 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     //.replace(/'/g, "\\'")
     //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
     .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+});
+
+Mustache.registerHelper("instance_ids", function(list, options) {
+  //  `instance_ids` is used only to extract a comma-separated list of
+  //  instance `id` values for use by `Export Controls` link in
+  //  `assets/mustache/controls/tree_footer.mustache`
+  var ids;
+  list = resolve_computed(Mustache.resolve(list));
+  if (list)
+    ids = can.map(list, function(result) { return result.attr("instance.id"); });
+  else
+    ids = [];
+  return ids.join(",");
 });
 
 })(this, jQuery, can);

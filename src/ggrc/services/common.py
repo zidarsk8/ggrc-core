@@ -568,6 +568,7 @@ class Resource(ModelView):
     paging_obj['first'] = page_url(page_args(1, paging.per_page))
     paging_obj['last'] = page_url(page_args(paging.pages, paging.per_page))
     paging_obj['count'] = paging.pages
+    paging_obj['total'] = paging.total
     return paging_obj
 
   def build_collection_for_json(
