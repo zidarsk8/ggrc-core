@@ -15,28 +15,66 @@ $.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
 
 });
 
+var google_oauth = null;
+var oauth_dfd = new $.Deferred();
+
+window.doGAuth = function(use_popup) {
+  window.gapi.client.load('drive', 'v2');
+  window.gapi.auth.authorize({
+    'client_id': "831270113958.apps.googleusercontent.com",
+    'scope': 'https://www.googleapis.com/auth/drive',
+    'immediate': !use_popup
+  },
+  function(authresult){  //success
+    if(!authresult && !use_popup) {
+      doGAuth(true);
+    } else if(!authresult) {
+      oauth_dfd.reject("auth failed");
+    } else {
+      google_oauth = authresult;
+      oauth_dfd.resolve(authresult);
+      oauth_dfd = null;
+    }
+  });
+};
+
 can.Model.Cacheable("CMS.Models.GDriveFolder", {
 
-  findAll : {
-    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-    , type : "post"
-    , dataType : "json"
-    , data : { command : 'listfolders', id : GGRC.config.GDRIVE_ROOT_FOLDER }
-    , beforeSend : function(xhr, s) {
-      if(!s || !s.data)
-        return;
-      var data = JSON.parse(s.data);
-      if(data.parentfolderid) {
-        data.id = data.parentfolderid;
-        delete data.parentfolderid;
+  findAll : function(params) {
+
+    var dfd = new $.Deferred();
+    function doFind() {
+      //url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
+      if(params.parentfolderid) {
+        params.id = params.parentfolderid;
+        delete params.parentfolderid;
       }
-      s.data = JSON.stringify(data);
-    }
-    , success : function(objs) {
-      can.each(objs, function(obj) {
-        obj.selfLink = "#";
+      if(!params.id) {
+        params.id = GGRC.config.GDRIVE_ROOT_FOLDER;
+      }
+      var q = "'" + params.id + "' in parents and mimeType = 'application/vnd.google-apps.folder'";
+      gapi.client.request({
+        path : "/drive/v2/files?q=" + encodeURI(q)
+        , method : "get" //"post"
+        , callback : function(result) {
+          if(!result) {
+            dfd.reject(JSON.parse(arguments[1]));
+          } else {
+            var objs = result.items;
+            can.each(objs, function(obj) {
+              obj.selfLink = obj.selfLink || "#";
+            });
+            dfd.resolve(objs);
+          }
+        }
       });
     }
+    if(oauth_dfd) {
+      oauth_dfd.done(doFind);
+    } else {
+      doFind();
+    }
+    return dfd;
   }
   , findOne : function(params, success, error) {
     return this.findAll(params, success, error).then(function(data) {
