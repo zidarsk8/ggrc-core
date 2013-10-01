@@ -36,6 +36,14 @@ def search():
   return basic_search(terms, types, permission_type, permission_model)
 
 def do_counts(terms, types=None):
+  from ggrc.rbac import permissions
+  
+  # Remove types that the user can't read
+  for type in types:
+    if not permissions.is_allowed_read(type, None):
+      types.remove(type)
+
+  # current_app.logger.warn(pprint(types))
   indexer = get_indexer()
   results = indexer.counts(terms, types=types)
 
