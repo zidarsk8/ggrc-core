@@ -104,10 +104,14 @@ class ControlsConverter(BaseConverter):
   def directive(self):
     return self.options['directive']
 
-  def do_export_metadata(self):
+  def do_export_metadata(self, is_template=False):
     yield self.metadata_map.keys()
     yield ['Controls', self.directive().slug]
-    yield[]
-    yield[]
+    if is_template:
+      yield ["This would have useful info"]
+      yield ["And this too"]
+    else:
+      yield []
+      yield []
     yield self.object_map.keys()
 
