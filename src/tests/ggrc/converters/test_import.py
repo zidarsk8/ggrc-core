@@ -11,6 +11,7 @@ from mock import patch
 from ggrc import db
 from ggrc.converters.import_helper import handle_csv_import
 from ggrc.converters.controls import ControlsConverter
+from ggrc.fulltext.mysql import MysqlRecordProperty
 from ggrc.models import Control, Category, Policy, System
 from tests.ggrc import TestCase
 
@@ -67,6 +68,18 @@ class TestImport(TestCase):
         "Control slugs not imported correctly"
     )
     self.mock_log.assert_called_once_with(db.session)
+    # check that imported items appear in index
+    results = MysqlRecordProperty.query.filter(
+        MysqlRecordProperty.type == 'Control',
+        MysqlRecordProperty.content.match('Minimal Control')
+    ).all()
+    index_results = set([x.content for x in results])
+    for title in expected_titles:
+      self.assertIn(
+          title,
+          index_results,
+          "{0} not indexed".format(title)
+      )
 
   def test_mappings(self):
     sys1 = System(slug="ACLS", title="System1")
@@ -118,3 +131,15 @@ class TestImport(TestCase):
           ),
       )
     self.mock_log.assert_called_once_with(db.session)
+    # check that imported items appear in index
+    results = MysqlRecordProperty.query.filter(
+        MysqlRecordProperty.type == 'Control',
+        MysqlRecordProperty.content.match('Complex Control 2')
+    ).all()
+    index_results = set([x.content for x in results])
+    for title in expected_titles:
+      self.assertIn(
+          title,
+          index_results,
+          "{0} not indexed".format(title)
+      )
