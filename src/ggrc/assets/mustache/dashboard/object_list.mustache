@@ -5,11 +5,18 @@
     <div class="item-main" {{data 'model'}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span11">
+          <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
                 {{title}}
               </div>
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              {{#is_private}}
+                <i class="grcicon-private"></i>
+              {{/is_private}}
             </div>
           </div>
           <div class="span1">
