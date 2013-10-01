@@ -122,6 +122,39 @@ ul.new-tree {
         }
       }
     }
+    &.new-event-tree {
+      .item-data {
+        padding-right:70px;
+        position:relative;
+        .tree-title-area {
+          position:static;
+          padding: 0;
+          display:inline-block !important;
+          overflow: hidden !important;
+          white-space: nowrap !important;
+          text-overflow: ellipsis !important;
+          width:100% !important;
+        }
+        .event-more {
+          position: absolute;
+          top: 0;
+          right: 20px;
+          z-index: 2000;
+        }
+      }
+      .events-content {
+        p {
+          @include oneline();
+          .event-action {
+            margin:0 20px;
+          }
+        }
+        .deleted-info {
+          @include opacity(0.4);
+          font-weight:bold;
+        }
+      }
+    }
   }
   
   a.simple-link {
@@ -354,13 +387,12 @@ ul.new-tree {
       font-size:13px;
       color:#777;
     }
-    .event-more {
-      float:right;
-      color:$blue;
-      margin-right:0;
-      font-size:13px;
-    }
-
+  }
+  .event-more {
+    float:right;
+    color:$blue;
+    margin-right:0;
+    font-size:13px;
   }
   .tree-code {
     font-weight:bold;
