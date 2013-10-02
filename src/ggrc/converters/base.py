@@ -15,9 +15,9 @@ def get_modified_objects(session):
 
 def update_index_for_objects(session, cache):
   indexer = get_indexer()
-  for obj in cache.new - cache.dirty - cache.deleted:
+  for obj in cache.new:
     indexer.create_record(fts_record_for(obj), commit=False)
-  for obj in cache.dirty - cache.deleted:
+  for obj in cache.dirty:
     indexer.update_record(fts_record_for(obj), commit=False)
   for obj in cache.deleted:
     indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
