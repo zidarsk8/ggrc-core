@@ -380,16 +380,12 @@ def export_sections(directive_id):
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
-@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
 def export_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Directive, Control
 
   options = {}
-  # re-using export function to make template for import
-  if request.path.endswith("import_controls_template"):
-      options['is_template'] = True
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   options['directive'] = directive
   filename = "{}-controls.csv".format(directive.slug)

@@ -57,8 +57,7 @@ def handle_converter_csv_export(filename, objects, converter_class, **options):
   output_buffer = StringIO()
   writer = csv.writer(output_buffer)
 
-  is_template = options.get('is_template', False)
-  for metadata_row in exporter.do_export_metadata(is_template=is_template):
+  for metadata_row in exporter.do_export_metadata():
     writer.writerow([ line.encode("utf-8") for line in metadata_row ])
 
   exporter.do_export(writer)
