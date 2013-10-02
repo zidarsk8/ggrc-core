@@ -233,7 +233,7 @@ var admin_list_descriptors = {
     //, object_category : "governance"
     //, object_route : "authorizations"
     //, object_display : "Authorizations"
-    //, list_view : "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_by_person_list.mustache"
+    //, list_view : GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
     //, list_loader : authorizations_list_loader
   //}
 };
@@ -352,14 +352,14 @@ var admin_widget_descriptors = {
   , "authorizations" : {
       "content_controller": GGRC.Controllers.ListView
     , "content_controller_options": {
-        list_view: "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_by_person_list.mustache"
+        list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
       , list_loader: authorizations_list_loader
       , fetch_post_process : sort_by_name_email
     }
     , "widget_id" : "authorizations_list"
     , "widget_name" : "Authorizations"
     , "widget_icon" : "authorization"
-    , extra_widget_actions_view : "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_modal_actions.mustache"
+    , extra_widget_actions_view : GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache"
   }
 };
 
