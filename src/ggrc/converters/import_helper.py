@@ -65,22 +65,3 @@ def handle_converter_csv_export(filename, objects, converter_class, **options):
   output_buffer.close()
   return current_app.make_response((body, 200, headers))
 
-def render_import_template(filename, converter_class, **options):
-  from os.path import abspath, dirname, join
-  THIS_ABS_PATH = abspath(dirname(__file__))
-  CSV_FILE = join(THIS_ABS_PATH, filename)
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  status_code = 200
-
-  exporter = converter_class([], **options)
-  output_buffer = StringIO()
-  writer = csv.writer(output_buffer)
-  reader = csv.reader(CSV_FILE)
-  #for metadata_row in exporter.do_export_metadata():
-  for row in reader
-    writer.writerow([ line.encode("utf-8") for line in metadata_row ])
-
-  body = output_buffer.getvalue()
-  output_buffer.close()
-  return current_app.make_response((body, 200, headers))
-
