@@ -126,6 +126,8 @@ ul.new-tree {
       .item-data {
         padding-right:70px;
         position:relative;
+        min-height: 31px;
+        height: 31px;
         .tree-title-area {
           position:static;
           padding: 0;
@@ -149,9 +151,29 @@ ul.new-tree {
             margin:0 20px;
           }
         }
+        .full-info {
+          padding-top: 16px;
+          p {
+            overflow: auto !important;
+            white-space: normal;
+            text-overflow: inherit;
+            width: 100%;
+            font-size: 13px;
+            line-height: 18px;
+          }
+        }
         .deleted-info {
           @include opacity(0.4);
           font-weight:bold;
+        }
+        .info-action {
+          text-transform: uppercase;
+          font-size: 11px;
+          @include opacity(0.6);
+          &:hover {
+            @include opacity(1);
+            text-decoration:none;
+          }
         }
       }
     }
