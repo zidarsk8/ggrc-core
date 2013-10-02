@@ -278,6 +278,11 @@
   }
   .modal-body {
     max-height:none;
+    .grc-path {
+      @include oneline();
+      font-size: 13px;
+      color: #777;
+    }
     .small {
       font-size:$f-small;
       display: inline-block;
@@ -301,8 +306,11 @@
       }
     }
     .option-word {
-      display: inline-block;
-      margin-right: 10px;
+      float: left;
+      margin-right: 13px;
+      margin-left: -8px;
+      line-height: 27px;
+      padding-top: 1px;
       text-transform: uppercase;
     }
     .btn {
@@ -331,8 +339,12 @@
       &.vertical-align-label {
         margin-bottom: 0;
         line-height: 28px;
+        font-size: 13px;
         input[type="checkbox"] {
           margin-top: 0;
+        }
+        i {
+          margin-top: 6px;
         }
       }
     }
