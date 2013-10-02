@@ -39,7 +39,7 @@ resources.
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
 
-def get_cache(create = False):
+def get_cache(create=False):
   """
   Retrieves the cache from the Flask global object. The create arg
   indicates if a new cache should be created if none exists. If we
@@ -53,6 +53,25 @@ def get_cache(create = False):
   else:
     logging.warning("No request context - no cache created")
     return None
+
+def get_modified_objects(session):
+  session.flush()
+  cache = get_cache()
+  if cache:
+    return cache.copy()
+  else:
+    return None
+
+def update_index(session, cache):
+  if cache:
+    indexer = get_indexer()
+    for obj in cache.new:
+      indexer.create_record(fts_record_for(obj), commit=False)
+    for obj in cache.dirty:
+      indexer.update_record(fts_record_for(obj), commit=False)
+    for obj in cache.deleted:
+      indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+    session.commit()
 
 def log_event(session, obj=None, current_user_id=None):
   revisions = []
@@ -79,10 +98,10 @@ def log_event(session, obj=None, current_user_id=None):
     action = request.method
   if revisions:
     event = Event(
-      modified_by_id = current_user_id,
-      action = action,
-      resource_id = resource_id,
-      resource_type = resource_type)
+      modified_by_id=current_user_id,
+      action=action,
+      resource_id=resource_id,
+      resource_type=resource_type)
     event.revisions = revisions
     session.add(event)
 
@@ -378,10 +397,11 @@ class Resource(ModelView):
     self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     db.session.commit()
     obj = self.get_object(id)
-    get_indexer().update_record(fts_record_for(obj))
+    update_index(db.session, modified_objects)
     return self.json_success_response(
         self.object_for_json(obj), self.modified_at(obj))
 
@@ -396,9 +416,10 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
     db.session.delete(obj)
+    modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     db.session.commit()
-    get_indexer().delete_record(id, self.model.__name__)
+    update_index(db.session, modified_objects)
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj))
 
@@ -476,9 +497,10 @@ class Resource(ModelView):
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     db.session.commit()
-    get_indexer().create_record(fts_record_for(obj))
+    update_index(db.session, modified_objects)
     return self.json_success_response(
       self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
 
