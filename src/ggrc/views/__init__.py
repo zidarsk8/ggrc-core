@@ -238,6 +238,13 @@ def import_sections(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Sections')
 
+@app.route("/systems/import_template", methods=['GET'])
+def system_import_template():
+  from flask import current_app
+  filename = "System_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  body = render_template("csv_files/" + filename)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
@@ -281,6 +288,13 @@ def import_redirect(location):
     '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
       json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
 
+@app.route("/processes/import_template", methods=['GET'])
+def process_import_template():
+  from flask import current_app
+  filename = "Process_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  body = render_template("csv_files/" + filename)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
