@@ -181,6 +181,7 @@ class ColumnHandler(object):
   def __init__(self, importer, key, **options):
     options.setdefault('no_import', False)
     self.importer = importer
+    self.base_importer = importer.importer
     self.key = key
     self.options = options
 
@@ -213,7 +214,11 @@ class ColumnHandler(object):
     return value
 
   def validate(self, data):
-    pass
+    if self.options.get('is_required') and data in ("", None):
+      obj_map = self.base_importer.object_map
+      missing_column = self.base_importer.get_header_for_column(
+                        self.base_importer.object_map, self.key)
+      self.add_error("{} is required.".format(missing_column))
 
   def do_import(self, content):
     self.original = content
@@ -221,7 +226,7 @@ class ColumnHandler(object):
       self.go_import(content)
 
   def go_import(self, content):
-    if content or content == '':
+    if content is not None:
       data = self.parse_item(content)
       self.validate(data)
       if data is not None:
@@ -258,10 +263,10 @@ class SlugColumnHandler(ColumnHandler):
   def go_import(self, content):
     if content:
       self.value = content
-      if self.value in self.importer.importer.get_slugs():
+      if self.value in self.base_importer.get_slugs():
         self.add_error('Slug Code is duplicated in CSV')
       else:
-        self.importer.importer.add_slug_to_slugs(self.value)
+        self.base_importer.add_slug_to_slugs(self.value)
       self.validate(content)
     else:
       self.add_error('Code is required')
@@ -273,7 +278,7 @@ class OptionColumnHandler(ColumnHandler):
   def parse_item(self, value):
     if value:
       role = self.options.get('role') or self.key
-      option = Option.query.filter_by(role = role.lower(), title = value.lower()).first()
+      option = Option.query.filter_by(role=role.lower(), title=value.lower()).first()
       if not option and self.key != 'network_zone':
         self.warnings.append(
           'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
@@ -467,11 +472,11 @@ class LinksHandler(ColumnHandler):
 
   def create_item(self, data):
     where_params = self.get_where_params(data)
-    obj = self.importer.importer.find_object(self.model_class, where_params.get('slug'))
+    obj = self.base_importer.find_object(self.model_class, where_params.get('slug'))
     if not obj and data:
       create_params = self.get_create_params(data)
       obj = self.create_with_params(self.model_class, **create_params)
-      self.importer.importer.add_object(self.model_class, where_params.get('slug'), obj)
+      self.base_importer.add_object(self.model_class, where_params.get('slug'), obj)
 
     if data:
       self.create_item_warnings(obj, data)
