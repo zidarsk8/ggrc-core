@@ -44,6 +44,12 @@ class BaseConverter(object):
     self.create_metadata_map()
     self.create_object_map()
 
+  def _csv_file_to_list(self, filename):
+    """helper function for extracting rows from csv"""
+    csv_obj = csv.reader(filename)
+    return [line for line in csv_obj]
+    
+
   def create_metadata_map(self):
     self.metadata_map = self.metadata_map
 
