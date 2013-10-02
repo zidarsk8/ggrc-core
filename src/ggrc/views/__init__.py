@@ -74,9 +74,26 @@ def generate_query_chunks(query):
 def admin_reindex():
   """Simple re-index of all indexable objects
   """
+  from ggrc import settings
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
+  if getattr(settings, 'APP_ENGINE', False):
+    from google.appengine.api import taskqueue
+    task = taskqueue.add(url=url_for('reindex'))
+    return app.make_response((
+      'scheduled ' + task.name, 200, [('Content-Type', 'text/html')]))
+  else:
+    reindex()
+    return app.make_response((
+      'success', 200, [('Content-Type', 'text/html')]))
 
+
+# Needs to be secured as we are removing @login_required
+@app.route("/tasks/reindex", methods=["POST"])
+def reindex():
+  """
+  Web hook to update the full text search index
+  """
   from ggrc.fulltext import get_indexer
   from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
 
