@@ -380,9 +380,7 @@ def export_sections(directive_id):
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
-@app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/contracts/<directive_id>/import_controls_template", methods=['GET'])
 def export_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export

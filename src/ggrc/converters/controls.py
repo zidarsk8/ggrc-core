@@ -59,10 +59,6 @@ class ControlRowConverter(BaseRowConverter):
 
 class ControlsConverter(BaseConverter):
 
-  def __init__(self, *args):
-    super(BaseConverter, self).__init__(*args)
-    self.template_filename = "Control_Import_Template.csv"
-
   metadata_map = OrderedDict([
     ('Type', 'type'),
     ('Directive Code', 'slug')
@@ -109,17 +105,11 @@ class ControlsConverter(BaseConverter):
     return self.options['directive']
 
   def do_export_metadata(self, is_template=False):
-    from os.path import abspath, dirname, join
     yield self.metadata_map.keys()
     yield ['Controls', self.directive().slug]
     if is_template:
-      THIS_ABS_PATH = abspath(dirname(__file__))
-      CSV_DIR = join(THIS_ABS_PATH, 'templates/')
-      CSV_FILE_PATH = join(CSV_DIR, self.template_filename)
-      # representation as list
-      csv_list_rep = self._csv_file_to_list(CSV_FILE_PATH)
-      yield csv_list_rep[2]
-      yield csv_list_rep[3]
+      yield ["This would have useful info"]
+      yield ["And this too"]
     else:
       yield []
       yield []
