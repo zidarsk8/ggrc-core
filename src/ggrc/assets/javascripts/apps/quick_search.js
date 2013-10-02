@@ -133,6 +133,33 @@ var RELATIONSHIP_TYPES = {
     , "Regulation": []
     , "Policy" : []
     , "Contract" : []
+  }, "DocumentationResponse" : {
+      "System": []
+    , "Process": []
+    , "DataAsset": []
+    , "Facility": []
+    , "Product": []
+    , "Project": []
+    , "Market": []
+    , "OrgGroup": []
+  }, "InterviewnResponse" : {
+      "System": []
+    , "Process": []
+    , "DataAsset": []
+    , "Facility": []
+    , "Product": []
+    , "Project": []
+    , "Market": []
+    , "OrgGroup": []
+  }, "PopulationSampleResponse" : {
+      "System": []
+    , "Process": []
+    , "DataAsset": []
+    , "Facility": []
+    , "Product": []
+    , "Project": []
+    , "Market": []
+    , "OrgGroup": []
 }};
 
 GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
@@ -321,6 +348,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
+  response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationsSampleResponse"];
+
   business_plus_program_and_directive_object_types =
     business_plus_program_object_types.concat(directive_object_types);
 
@@ -380,6 +409,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Request", "Objective", null, null, "objective"]
       , ["Request", "Response", null, null, "request"]
       , ["Person", "Request", null, null, "assignee"]
+      , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
+      , ["DocumentationResponse", "Document", "ObjectDocument", "document", "documentable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];

@@ -14,22 +14,22 @@ can.Model.Cacheable("CMS.Models.Response", {
 
   root_object : "response"
   , root_collection : "responses"
+  , subclasses : []
   , init : function() {
     this._super && this._super.apply(this, arguments);
 
-    CMS.Models.Meeting.bind("destroyed", function(ev, mtg){
-      can.each(CMS.Models.Response.cache, function(response) {
-        response.removeElementFromChildList("meetings", mtg);
-      });
-    });
     this.cache = {};
+    if(this !== CMS.Models.Response) {
+      CMS.Models.Response.subclasses.push(this);
+    }
   }
   , create : "POST /api/responses"
   , update : "PUT /api/responses/{id}"
 
   , findAll : "GET /api/responses"
-  , destroy : "DELETE /responses/{id}"
+  , destroy : "DELETE /api/responses/{id}"
   , model : function(params) {
+    var found = false;
     if (this.shortName !== 'Response')
       return this._super(params);
     if (!params)
@@ -39,14 +39,23 @@ can.Model.Cacheable("CMS.Models.Response", {
       if (params.type && params.type !== 'Response')
         return CMS.Models[params.type].model(params);
     } else {
-      if (CMS.Models.DocumentationResponse.root_object === params.response_type + "_response")
-        return CMS.Models.DocumentationResponse.model(params);
-      else if (CMS.Models.InterviewResponse.root_object === params.response_type + "_response")
-        return CMS.Models.InterviewResponse.model(params);
-      else if (CMS.Models.PopulationSampleResponse.root_object === params.response_type + "_response")
-        return CMS.Models.PopulationSampleResponse.model(params);
+      can.each(this.subclasses, function(m) {
+        if(m.root_object === params.response_type) {
+          params = m.model(params);
+          found = true;
+          return false;
+        } else if(m.root_object in params) {
+          params = m.model(m.object_from_resource(params));
+          found = true;
+          return false;
+        }
+      });
     }
-    console.debug("Invalid Response:", params);
+    if(found) {
+      return params;
+    } else {
+      console.debug("Invalid Response:", params);
+    }
   }
   , attributes : {
     owner : "CMS.Models.Person.model"
@@ -76,7 +85,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     }, {
       //1: Document Evidence
       model : "Document"
-      , property : "documents"
+      , mapping : "documents"
     }, {
       //2: Meetings
       model : "Meeting"
@@ -96,6 +105,7 @@ CMS.Models.Response("CMS.Models.DocumentationResponse", {
   , create : "POST /api/documentation_responses"
   , update : "PUT /api/documentation_responses/{id}"
   , findAll : "GET /api/documentation_responses"
+  , destroy : "DELETE /api/documentation_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -110,6 +120,7 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   , create : "POST /api/interview_responses"
   , update : "PUT /api/interview_responses/{id}"
   , findAll : "GET /api/interview_responses"
+  , destroy : "DELETE /api/interview_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
@@ -124,6 +135,7 @@ CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
   , create : "POST /api/population_sample_responses"
   , update : "PUT /api/population_sample_responses/{id}"
   , findAll : "GET /api/population_sample_responses"
+  , destroy : "DELETE /api/population_sample_responses/{id}"
   , attributes : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
