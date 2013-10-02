@@ -213,6 +213,8 @@ class BaseConverter(object):
     elif self.__class__.__name__ == 'SystemsConverter':
       model_name = "Processes" if self.options.get('is_biz_process') else "Systems"
       self.validate_metadata_type(attrs, model_name)
+    elif self.__class__.__name__ == "PeopleConverter":
+      self.validate_metadata_type(attrs, "People")
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):

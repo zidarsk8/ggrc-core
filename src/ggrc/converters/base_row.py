@@ -279,10 +279,15 @@ class OptionColumnHandler(ColumnHandler):
     if value:
       role = self.options.get('role') or self.key
       option = Option.query.filter_by(role=role.lower(), title=value.lower()).first()
-      if not option:
+      if not option and self.key != 'network_zone':
         self.warnings.append(
           'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
             role, value.lower()))
+      elif not option and self.key == "network_zone":
+        self.warnings.append(
+          "{} is an illegal value. 'prod' or 'corp' are legal values. If you "
+          "proceed with import, the current data will be ignored.".format(
+          value.lower()))
       return option
 
   def display(self):
