@@ -1208,4 +1208,33 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   return ids.join(",");
 });
 
+Mustache.registerHelper("extended_mapping_count", function(instance, mapping, options) {
+  var root = options.contexts[0];
+
+  if (!root[mapping]) {
+    instance = resolve_computed(instance);
+    root.attr(mapping, new can.Observe.List());
+    root[mapping].attr('loading', true);
+    instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
+      full_instance.get_list_loader(mapping).then(function(list) {
+        root.attr(mapping, list);
+      })
+    });
+  }
+
+  return '' + (root[mapping].attr('loading') ? '...' : root[mapping].attr('length'));
+});
+
+Mustache.registerHelper("visibility_delay", function(delay, options) {
+  delay = resolve_computed(delay);
+
+  return function(el) {
+    setTimeout(function() {
+      if ($(el.parentNode).is(':visible'))
+        $(el).append(options.fn(options.contexts));
+    }, delay);
+    return el;
+  };
+});
+
 })(this, jQuery, can);
