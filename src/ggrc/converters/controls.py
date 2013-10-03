@@ -21,20 +21,23 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('slug', SlugColumnHandler)
     self.handle_date('start_date')
     self.handle_date('end_date')
-    self.handle_date('created_at', no_import = True)
-    self.handle_date('updated_at', no_import = True)
+    self.handle_date('created_at', no_import=True)
+    self.handle_date('updated_at', no_import=True)
     self.handle_text_or_html('description')
 
-    self.handle_raw_attr('title')
+    self.handle_raw_attr('title', is_required=True)
     self.handle_raw_attr('url')
 
-    self.handle_option('kind', role = 'control_kind')
-    self.handle_option('means', role = 'control_means')
+    self.handle_option('kind', role='control_kind')
+    self.handle_option('means', role='control_means')
     self.handle_option('verify_frequency')
 
-    self.handle_boolean('key_control', truthy_values = ['key', 'key_control', 'key control'], no_values = [])
-    self.handle_boolean('fraud_related', truthy_values = ['fraud', 'fraud_related', 'fraud related'], \
-      no_values = ['not fraud', 'not_fraud','not fraud_related', 'not fraud related'])
+    self.handle_boolean('key_control', truthy_values=['key', 'key_control',
+                        'key control'], no_values=[])
+    fraud_truthy = ['fraud', 'fraud_related', 'fraud related']
+    fraud_falses = ['not fraud', 'not_fraud','not fraud_related', 'not fraud related']
+    self.handle_boolean('fraud_related', truthy_values=fraud_truthy,
+      no_values=fraud_falses)
     self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
