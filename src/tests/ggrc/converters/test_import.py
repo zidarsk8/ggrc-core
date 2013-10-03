@@ -143,3 +143,65 @@ class TestImport(TestCase):
           index_results,
           "{0} not indexed".format(title)
       )
+
+  def test_mismatch(self):
+    sys1 = System(slug="ACLS", title="System1")
+    db.session.add(sys1)
+    expected_titles = set([
+      "Complex Control 2",
+    ])
+    expected_slugs = set([
+      "CTRL-2345",
+    ])
+    csv_filename = join(CSV_DIR, "mappings_import_mismatch.csv")
+    pol1 = Policy(
+      kind="Company Policy",
+      title="Example Policy",
+      slug="POL-123",
+    )
+    db.session.add(pol1)
+    db.session.commit()
+    options = {'directive_id': pol1.id, 'dry_run': False}
+    handle_csv_import(
+        ControlsConverter,
+        csv_filename,
+        **options
+    )
+    actual_titles = set()
+    actual_slugs = set()
+    for control in pol1.controls:
+      print control.directive.slug
+      actual_titles.add(control.title)
+      actual_slugs.add(control.slug)
+    self.assertEqual(
+        expected_titles,
+        actual_titles,
+        "Control titles not imported correctly"
+    )
+    self.assertEqual(
+        expected_slugs,
+        actual_slugs,
+        "Control slugs not imported correctly"
+    )
+    systems = System.query.all()
+    for system in systems:
+      self.assertEqual(
+          system.controls,
+          pol1.controls,
+          "System {0} not connected to controls on import".format(
+              system.slug
+          ),
+      )
+    self.mock_log.assert_called_once_with(db.session)
+    # check that imported items appear in index
+    results = MysqlRecordProperty.query.filter(
+        MysqlRecordProperty.type == 'Control',
+        MysqlRecordProperty.content.match('Complex Control 2')
+    ).all()
+    index_results = set([x.content for x in results])
+    for title in expected_titles:
+      self.assertIn(
+          title,
+          index_results,
+          "{0} not indexed".format(title)
+      )
