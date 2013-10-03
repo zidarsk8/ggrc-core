@@ -36,6 +36,9 @@ ul.new-tree {
       line-height: 31px;
       min-height: 31px;
       padding-left: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
       [class^="grcicon-"] {
         margin-top: 7px;
       }
@@ -43,23 +46,20 @@ ul.new-tree {
     .item-data {
       padding-right: 20px;
       .tree-title-area {
-        position: relative;
         overflow: auto;
         white-space: normal;
         text-overflow: inherit;
         width: auto;
-        padding-right: 50px;
         ul {
           @include reset-list();
           li {
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 5px;
             line-height: 18px;
+            padding-right: 8px;
+            border-right: 1px solid #111;
             &:last-child {
               margin-right: 0;
-            }
-            &.event-icon {
-              margin-right: 16px;
             }
             &.governance,
             &.control,
