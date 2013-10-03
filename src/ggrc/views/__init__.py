@@ -238,6 +238,13 @@ def import_sections(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Sections')
 
+@app.route("/systems/import_template", methods=['GET'])
+def system_import_template():
+  from flask import current_app
+  filename = "System_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  body = render_template("csv_files/" + filename)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
@@ -281,6 +288,13 @@ def import_redirect(location):
     '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
       json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
 
+@app.route("/processes/import_template", methods=['GET'])
+def process_import_template():
+  from flask import current_app
+  filename = "Process_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  body = render_template("csv_files/" + filename)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
@@ -377,6 +391,48 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
+@app.route("/contracts/<directive_id>/import_sections_template", methods=['GET'])
+def import_contract_clauses_template(directive_id):
+  from flask import current_app
+  from ggrc.models.all_models import Directive
+  filename = "Contract_Clause_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options = {
+    # (Policy/Regulation/Contract) Code
+    'directive_slug': directive.slug,
+  }
+  body = render_template("csv_files/" + filename, **options)
+  return current_app.make_response((body, 200, headers))
+
+@app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
+def import_regulation_sections_template(directive_id):
+  from flask import current_app
+  from ggrc.models.all_models import Directive
+  filename = "Regulation_Section_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options = {
+    'directive_slug': directive.slug,
+  }
+  body = render_template("csv_files/" + filename, **options)
+  return current_app.make_response((body, 200, headers))
+
+
+@app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
+def import_policy_sections_template(directive_id):
+  from flask import current_app
+  from ggrc.models.all_models import Directive
+  filename = "Policy_Section_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options = {
+    'directive_slug': directive.slug,
+  }
+  body = render_template("csv_files/" + filename, **options)
+  return current_app.make_response((body, 200, headers))
+
+
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
@@ -396,6 +452,23 @@ def export_controls(directive_id):
     controls = directive.controls
   options['export'] = True
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
+
+@app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
+@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
+@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
+def import_controls_template(directive_id):
+  from flask import current_app
+  from ggrc.models.all_models import Directive
+  filename = "Control_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options = {
+    # (Policy/Regulation/Contract) Code
+    'directive_kind': directive.meta_kind,
+    'directive_slug': directive.slug,
+  }
+  body = render_template("csv_files/" + filename, **options)
+  return current_app.make_response((body, 200, headers))
 
 ViewEntry = namedtuple('ViewEntry', 'url model_class service_class')
 
