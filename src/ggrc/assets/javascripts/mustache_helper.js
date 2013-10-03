@@ -1208,21 +1208,38 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   return ids.join(",");
 });
 
-Mustache.registerHelper("extended_mapping_count", function(instance, mapping, options) {
-  var root = options.contexts[0];
+Mustache.registerHelper("mapping_count", function() {
+  var args = can.makeArray(arguments)
+    , mappings = args.slice(1, args.length - 1)
+    , options = args[args.length-1]
+    , root = options.contexts[0]
+    , mapping
+    ;
+  instance = resolve_computed(args[0]);
+
+  // Find the most appropriate mapping
+  for (var i = 0; i < mappings.length; i++) {
+    if (instance.get_binding(mappings[i])) {
+      mapping = mappings[i];
+      break;
+    }
+  }
 
   if (!root[mapping]) {
-    instance = resolve_computed(instance);
     root.attr(mapping, new can.Observe.List());
-    root[mapping].attr('loading', true);
+    root.attr(mapping).attr('loading', true);
     instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
-      full_instance.get_list_loader(mapping).then(function(list) {
-        root.attr(mapping, list);
-      })
+      if (full_instance.get_binding(mapping)) {
+        full_instance.get_list_loader(mapping).done(function(list) {
+          root.attr(mapping, list);
+        })
+      }
+      else
+        root.attr(mapping).attr('loading', false);
     });
   }
 
-  return '' + (root[mapping].attr('loading') ? '...' : root[mapping].attr('length'));
+  return '' + (root.attr(mapping).attr('loading') ? '...' : root.attr(mapping).attr('length'));
 });
 
 Mustache.registerHelper("visibility_delay", function(delay, options) {
