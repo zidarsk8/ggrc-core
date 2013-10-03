@@ -38,7 +38,7 @@ can.Control("CMS.Controllers.TreeView", {
   defaults : {
     model : null
     , header_view : null
-    , show_view : "/static/mustache/base_objects/tree.mustache"
+    , show_view : null
     , footer_view : null
     , parent : null
     , list : null
@@ -93,18 +93,6 @@ can.Control("CMS.Controllers.TreeView", {
         that.options.list ? that.draw_list() : that.fetch_list();
       }
     }, 100);
-
-    var object_type = can.underscore(
-          this.options.model ? this.options.model.shortName : "Object")
-      , object_meta_type = can.underscore(window.cms_singularize(
-          this.options.model ? this.options.model.root_object : "Object"))
-      ;
-    this.element
-      .attr("data-object-type", object_type)
-      .data("object-type", object_type);
-    this.element
-      .attr("data-object-meta-type", object_meta_type)
-      .data("object-meta-type", object_meta_type);
 
     this.options.attr("allow_mapping_or_creating",
       this.options.allow_mapping || this.options.allow_creating);
@@ -278,6 +266,10 @@ can.Control("CMS.Controllers.TreeView", {
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
 
+    //  FIXME: This assumes we're replacing the entire list, and corrects for
+    //    instances being removed and immediately re-added.  This should be
+    //    changed to support exact mirroring of the order of
+    //    `this.options.list`.
     //assume we are doing a replace
     this.oldList = can.map(oldVals, function(v) { return v.instance ? v.instance : v; });
     GGRC.queue_event(function() {
@@ -342,6 +334,8 @@ can.Control("CMS.Controllers.TreeView", {
   // There is no check for parentage anymore.  When this event is triggered, it needs to be triggered
   // at the appropriate level of the tree.
   , " newChild" : function(el, ev, data) {
+    //  FIXME: This should be done with indices so the elements exactly
+    //    mirror the order of `this.options.list`.
     var prepped = this.prepare_child_options(data)
     this.options.list.push(prepped);
     this.add_child_lists([prepped]);
@@ -351,24 +345,29 @@ can.Control("CMS.Controllers.TreeView", {
   , " removeChild" : function(el, ev, data) {
     var that = this
       , instance
-      , options = new can.Observe.TreeOptions();
+      ;
 
-    var model = data.instance
-    ? data.instance
-    : (data instanceof this.options.model
-      ? data
-      : new this.options.model(data.serialize ? data.serialize() : data));
+    if (data.instance && data.instance instanceof this.options.model)
+      instance = data.instance;
+    else
+      instance = data;
+
+    //  FIXME: This should be done using indices, when the order of elements
+    //    is guaranteed to mirror the order of `this.options.list`.
+
+    //  Replace the list with the list sans the removed instance
     that.options.list.replace(
-      can.map(
-        this.options.list
-        , function(v, i) {
-          if(v.instance.id !== model.id) {
-            return v;
-          } else {
-          }
-        })
-    );
-    that.element.children("[data-object-id=" + model.id + "]").remove();
+      can.map(this.options.list, function(options, i) {
+        if (options.instance !== instance)
+          return options;
+      }));
+
+    //  Remove items by data attributes
+    that.element.children([
+        "[data-object-id=" + instance.id + "]"
+      , "[data-object-type=" + instance.constructor.table_singular + "]"
+      ].join("")
+    ).remove();
     ev.stopPropagation();
   }
 
@@ -398,7 +397,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
   defaults : {
     model : null
     , parent : null
-    , show_view : "/static/mustache/base_objects/tree.mustache"
+    , instance : null
+    , options_property : "tree_view_options"
+    , show_view : null
     , expanded : false
     , draw_children : true
     , child_options : []
@@ -430,6 +431,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
   }
   , init : function(el, opts) {
     var that = this;
+    if(that.options.instance && !that.options.show_view) {
+      that.options.show_view =
+        that.options.instance.constructor[that.options.options_property].show_view
+        || that.options.model[that.options.options_property].show_view
+        || GGRC.mustache_path + "/base_objects/tree.mustache";
+    }
     this.add_child_lists_to_child();
     setTimeout(function() {
       can.view(that.options.show_view, that.options, function(frag) {
@@ -460,13 +467,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
           //, "parent": that.options
           , "parent_instance": that.options.instance
         });
-        // Don't allow mapping or creating unless this is the last list
-        if (i < original_child_options.length - 1)
-          options.attr({
-            allow_mapping: false,
-            allow_creating: false,
-            allow_mapping_or_creating: false
-          });
         new_child_options.push(options);
       });
       that.options.attr("child_options", new_child_options);

@@ -5,6 +5,7 @@
 
 from ggrc import db
 from .mixins import deferred, BusinessObject
+from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
 
@@ -19,8 +20,9 @@ class Response(BusinessObject, db.Model):
   request_id = deferred(
       db.Column(db.Integer, db.ForeignKey('requests.id'), nullable=False),
       'Response')
-  response_type = db.Column(db.Enum(VALID_TYPES), nullable = False)
-  status = deferred(db.Column(db.Enum(VALID_STATES), nullable = False), 'Response')
+  response_type = db.Column(db.Enum(*VALID_TYPES), nullable=False)
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
+    'Response')
 
   _publish_attrs = [
       'request',
@@ -38,13 +40,14 @@ class Response(BusinessObject, db.Model):
     return query.options(
         orm.joinedload('request'))
 
-class DocumentationResponse(Documentable, Personable, Response):
+class DocumentationResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
       }
   _table_plural = 'documentation_responses'
 
-  evidence = db.relationship('Evidence', backref='response', cascade='all, delete-orphan')
+  evidence = db.relationship('Evidence', backref='response',
+    cascade='all, delete-orphan')
 
   _publish_attrs = [
     'evidence',
@@ -61,7 +64,7 @@ class DocumentationResponse(Documentable, Personable, Response):
     return query.options(
         orm.subqueryload('evidence'))
 
-class InterviewResponse(Documentable, Personable, Response):
+class InterviewResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
       }
@@ -80,14 +83,16 @@ class InterviewResponse(Documentable, Personable, Response):
     return query.options()
         #orm.subqueryload('meetings'))
 
-class PopulationSampleResponse(Documentable, Personable, Response):
+class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'
       }
   _table_plural = 'population_sample_responses'
 
-  population_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
-  population_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  population_worksheet = deferred(db.Column(db.String, nullable=True),
+    'Response')
+  population_count = deferred(db.Column(db.Integer, nullable=True),
+    'Response')
   sample_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
   sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
   sample_evidence = deferred(db.Column(db.String, nullable=True), 'Response')

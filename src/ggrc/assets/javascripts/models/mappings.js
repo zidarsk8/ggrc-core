@@ -63,12 +63,12 @@
 
   function extended_related(name) {
     return function(definition) {
-      definition["related_" + name + "_via_sections"] = Cross("sections", "related_" + name);
+      definition["related_" + name + "_via_extended_sections"] = Cross("extended_related_sections", "related_" + name);
       definition["related_" + name + "_via_extended_controls"] = Cross("extended_related_controls", "related_" + name);
       definition["related_" + name + "_via_extended_objectives"] = Cross("extended_related_objectives", "related_" + name);
 
       definition["extended_related_" + name] = Multi([
-            "related_" + name + "_via_sections"
+            "related_" + name + "_via_extended_sections"
           , "related_" + name + "_via_extended_controls"
           , "related_" + name + "_via_extended_objectives"
           , "related_" + name
@@ -85,6 +85,7 @@
         _mixins: ["personable", "documentable"] //controllable
       , related_objects: Proxy(
           null, "controllable", "ObjectControl", "control", "object_controls") //control_objects
+      , related_and_able_objects : Multi(["objectives", "implemented_controls", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -101,11 +102,25 @@
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
           "Section", "section", "ControlSection", "control", "control_sections")
+      , implemented_controls: Proxy(
+          "Control", "implemented_control", "ControlControl", "control", "control_controls")
+      , implementing_controls: Proxy(
+          "Control", "control", "ControlControl", "implemented_control", "implementing_control_controls")
+      //  FIXME: Cannot currently represent singular foreign-key references
+      //    with Mappers/ListLoaders
+      //, direct_directives: ForeignKey("Directive", "directive", "controls")
+      , joined_directives: Proxy(
+          "Directive", "directive", "DirectiveControl", "control", "directive_controls")
+      , directives: Multi(["joined_directives"]) // "direct_directives"
+      , contracts: TypeFilter("directives", "Contract")
+      , policies: TypeFilter("directives", "Policy")
+      , regulations: TypeFilter("directives", "Regulation")
       }
     , Objective: {
         _mixins: ["personable", "documentable"] //objectiveable
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
+      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -125,6 +140,7 @@
         _mixins: ["personable", "documentable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
+      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -207,40 +223,47 @@
       , audits: Direct("Audit", "program")
 
       , sections_via_directives: Cross("directives", "sections")
-      , sections_via_controls: Cross("controls", "sections")
-      , sections: Multi(["sections_via_controls", "sections_via_directives"])
+      , controls_via_directives: Cross("directives", "controls")
 
-      , controls_via_sections: Cross("sections", "controls")
-      , objectives_via_sections: Cross("sections", "objectives")
+      , sections_via_directive_controls: Cross("controls_via_directives", "sections")
+      , extended_related_sections: Multi([
+          "sections_via_directive_controls", "sections_via_directives"])
+
+      , controls_via_directive_sections: Cross("sections_via_directives", "controls")
+      , objectives_via_sections: Cross("extended_related_sections", "objectives")
       , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
       , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
       , extended_related_controls: Multi([
             "controls_via_extended_objectives"
-          , "controls_via_sections"
-          , "controls"])
+          , "controls_via_directive_sections"
+          , "controls_via_directives"
+          , "controls"
+          ])
 
-      , related_documents_via_sections: Cross("sections", "documents")
+      , related_documents_via_sections: Cross("extended_related_sections", "documents")
       , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
       , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
       , extended_related_documents:
           Multi([
-              "related_documents_via_extended_controls"
+              "documents"
+            , "related_documents_via_extended_controls"
             , "related_documents_via_extended_objectives"
             , "related_documents_via_sections"
             ])
 
-      , related_people_via_sections: Cross("sections", "people")
+      , related_people_via_sections: Cross("extended_related_sections", "people")
       , related_people_via_extended_controls: Cross("extended_related_controls", "people")
       , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
       , extended_related_people:
           Multi([
-              "related_people_via_extended_controls"
+              "people"
+            , "related_people_via_extended_controls"
             , "related_people_via_extended_objectives"
             , "related_people_via_sections"
             ])
 
       , related_objects_via_sections:
-          Cross("sections", "related_objects")
+          Cross("extended_related_sections", "related_objects")
       , related_objects_via_extended_controls:
           Cross("extended_related_controls", "related_objects")
       , related_objects_via_extended_objectives:
@@ -265,7 +288,7 @@
 
     , directive_object: {
         _mixins: [
-          "related_object", "personable", "documentable"//, "objectiveable"
+          "related_object", "personable", "documentable", "objectiveable"
           , extended_related("data_assets")
           , extended_related("facilities")
           , extended_related("markets")
@@ -276,16 +299,22 @@
           , extended_related("systems")
           ]
       , sections: Direct("Section", "directive")
-      , controls: Direct("Control", "directive")
+      , extended_related_sections: Multi(["sections"])
+
+      , direct_controls: Direct("Control", "directive")
+      , joined_controls: Proxy(
+          "Control", "control", "DirectiveControl", "directive", "directive_controls")
+      , controls: Multi(["direct_controls", "joined_controls"])
 
       , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
-      , extended_related_objectives: Multi(["objectives_via_sections"])//, "objectives"])
+      , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
       , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
       , extended_related_controls: Multi([
             "controls_via_extended_objectives"
           , "controls_via_sections"
-          , "controls"])
+          , "controls"
+          ])
 
       , related_objects_via_sections: Cross("sections", "related_objects")
 
@@ -361,6 +390,19 @@
     }
     , Request : {
       responses: Direct("Response", "request")
+    }
+    , Response : {
+      _mixins : ["business_object"]
+    }
+    , DocumentationResponse : {
+      _mixins : ["business_object"]
+    }
+    , InterviewResponse : {
+      _mixins : ["business_object"]
+      , meetings: Direct("Meeting", "response")
+    }
+    , PopulationSampleResponse : {
+      _mixins : ["business_object"]
     }
 
   });

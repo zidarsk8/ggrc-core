@@ -1,5 +1,5 @@
-<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+<li class="tree-item programs request-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
         <div class="span3">
@@ -12,23 +12,31 @@
             </div>
           </div>
         </div>
-        <div class="span3">
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <i class="grcicon-person-green pull-left"></i>
           <div class="objective-selector">
-            <input type="text" name="owner_id" class="span8" value="Predrag Kanazir">
+            {{!autocmplete doesn't work for now.  just display the name and force popping up the edit modal to change assignee}}
+            <!--
+              <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.assignee.name instance.assignee.email ''}}">
+            -->
+            {{#using assignee=instance.assignee}}
+              {{firstnonempty assignee.name assignee.email}}
+            {{/using}}
           </div>
         </div>
-        <div class="span3">
-          <span class="pull-left">type:</span>
-          <select class="span10">
-            <option>documentation</option>
-            <option>images</option>
-            <option>files</option>
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <span class="pull-left request-type">type:</span>
+          <select name="request_type" class="span9 short-field">
+            {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+            <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
-        <div class="span3">
-          <select class="span10">
-            <option>draft</option>
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <select name="status" class="span9 short-field">
+            {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
       </div>
@@ -37,21 +45,42 @@
 
   {{#if expanded}}
   <div class="tier-2-info item-content">
-    <div class="tier-2-content">
-      {{! request info in expanded state goes here }}
+    <div class="tier-2-info-content">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="show-description">
+            <div class="row-fluid">
+              <div class="span12">
+                {{{firstnonempty instance.description '<i>No description</i>'}}}
+              </div>
+            </div>
+          </div>
+          
+          {{#if instance.requested_on}}
+            {{#using requested_on=instance.requested_on}}
+            <p><strong>requested on: </strong>{{localize_date requested_on}}</p>
+            {{/using}}
+          {{/if}}
+          <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            Edit PBC {{model.title_singular}}
+          </a>
+        </div>
+      </div>
     </div>
 
     {{#if draw_children}}
-    {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+      {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         {{#child_options}}
           <div class="inner-tree">
-            <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
-            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            <h6>PBC {{firstnonempty title_plural model.title_plural}} ({{child_count}})</h6>
+            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            </ul>
           </div>
         {{/child_options}}
-    {{/if_null}}
+      {{/if_null}}
     {{/if}}
-
+    
   </div>
   {{/if}}
 

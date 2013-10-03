@@ -103,7 +103,7 @@ can.Control("GGRC.Controllers.ListView", {
 
             var collection_name = that.options.model.root_collection+"_collection";
             return that.options.model[that.options.model.list_view_options.find_function]().then(function(result) {
-              can.each(result[collection_name].reverse(), function(instance) {
+              can.each(result[collection_name], function(instance) {
                 if (instance.constructor == controller.options.model)
                   insert_instance(instance);
               });
@@ -133,13 +133,19 @@ can.Control("GGRC.Controllers.ListView", {
     can.view(this.options.list_view, this.options, function(frag) {
       that.element
         .html(frag)
-        .trigger("loaded")
-        .trigger("updateCount", that.options.list.length);
+        .trigger("loaded");
+      that.update_count();
     });
   }
 
   , update_count: function() {
-      this.element.trigger("updateCount", this.options.list.length).trigger("widget_updated");
+      if (this.element) {
+        if (this.options.pager)
+          this.element.trigger("updateCount", this.options.pager.total);
+        else
+          this.element.trigger("updateCount", this.options.list.length);
+        this.element.trigger("widget_updated");
+      }
     }
 
   , "{list} change": "update_count"

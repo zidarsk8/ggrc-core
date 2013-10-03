@@ -101,6 +101,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
@@ -162,6 +163,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
@@ -201,6 +203,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
@@ -240,6 +243,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
+    , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
@@ -865,28 +869,8 @@ can.Model.Cacheable("CMS.Models.Objective", {
     //, draw_children : true
     , start_expanded : false
     , child_options : [{
-        model : "Control"
-      , mapping : "controls"
-      , show_view : "/static/mustache/controls/tree.mustache"
-      , draw_children : false
-    }, {
-        model : "Person"
-      , mapping : "people"
-      , show_view : "/static/mustache/people/tree.mustache"
-      , draw_children : false
-    }, {
-        model : "Document"
-      , mapping : "documents"
-      , show_view : "/static/mustache/documents/tree.mustache"
-      , draw_children : false
-/*    }, {
-        model : "Section"
-      , mapping : "sections"
-      , show_view : "/static/mustache/sections/tree.mustache"
-*/    }, {
         model : can.Model.Cacheable
-      , mapping : "related_objects"
-      , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , title_plural : "Business Objects"
       , draw_children : false
@@ -989,11 +973,12 @@ can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
   , root_collection : "requests"
   , create : "POST /api/requests"
+  , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
-    , assignee : "CMS.Models.Person.stub"
+    , assignee : "CMS.Models.Person.model"
     , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"
@@ -1006,6 +991,18 @@ can.Model.Cacheable("CMS.Models.Request", {
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
+    , draw_children : true
+    , child_options : [{
+      model : "Response"
+      , mapping : "responses"
+      , allow_creating : true
+    }]
+  }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("due_on");
+    this.validatePresenceOf("assignee");
+    this.validatePresenceOf("objective");
   }
 }, {
 

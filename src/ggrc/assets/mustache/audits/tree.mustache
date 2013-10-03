@@ -1,6 +1,6 @@
 {{!tree node mustache}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
-  <div class="item-main" {{data 'model'}}>
+  <div class="item-main" data-model="true" {{data 'model'}}>
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
         <div class="span11">
@@ -84,48 +84,64 @@
               </li>
               <li>
                 <strong>Planned Start date: </strong>
-                06/01/12
+                {{localize_date instance.start_date}}
               </li>
               <li>
                 <strong>Planned End date: </strong>
-                12/31/12
+                {{localize_date instance.end_date}}
               </li>
               <li>
                 <strong>Planned Report period: </strong>
-                03/01/13-03/31/13
+                {{#if instance.report_start_date}}
+                  {{#if instance.report_end_date}}
+                    {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+                  {{else}}
+                    Starts {{localize_date instance.report_start_date}}
+                  {{/if}}
+                {{else}}
+                  {{#if instance.report_end_date}}
+                    Ends {{localize_date instance.report_end_date}}
+                  {{else}}
+                    Not set
+                  {{/if}}
+                {{/if}}
               </li>
             </ul>
           </div>
         </div>
-        {{#instance.url}}
         <div class="span5">
           <div class="tree-info">
             <ul class="tree-info-list">
               <li>
-                <strong>URL:</strong>
-                <a class="url" href="{{schemed_url instance.url}}" target="_blank">
-                  {{instance.url}}
-                </a>
+                {{#instance.url}}
+                  <strong>URL:</strong>
+                  <a class="url" href="{{schemed_url instance.url}}" target="_blank">
+                    {{instance.url}}
+                  </a>
+                {{/instance.url}}
               </li>
               <li>
                 <strong>Audit Lead: </strong>
-                Predrag Kanazir
+                {{#if instance.owner}}
+                  {{#using owner=instance.owner}}
+                  {{owner.name}}
+                  {{/using}}
+                {{else}}
+                  None
+                {{/if}}
               </li>
               <li>
                 <strong>Audit Firm: </strong>
-                Silverboots & Friends
+                {{{firstnonempty instance.audit_firm 'None'}}}
               </li>
             </ul>
           </div>
         </div>
-        {{/instance.url}}
-        <div class="span2">
+        <div class="span2" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
           <select class="input-block-level top-space" name="status">
-            <option>Planned</option>
-            <option>In Progress</option>
-            <option>Manager review</option>
-            <option>Ready for external review</option>
-            <option>Completed</option>
+            {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
+            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
       </div>
@@ -134,7 +150,7 @@
         <div class="span12">
           <div class="tree-info">
             <strong>gDrive Evidence Folder: </strong>
-            /GRC/Programs/Lorem Ipsum/2013 Lorem Ipsum Audit
+            /{{parent_instance.title}}/{{instance.title}}
           </div>
         </div>
       </div>

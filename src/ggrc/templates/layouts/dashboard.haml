@@ -18,6 +18,9 @@
     %ul.sub-level.collapse{ 'id' : '={ type_plural|underscore }_sub_level'}
 -endmacro
 
+-block extra_javascript
+  GGRC.current_user = ={ current_user()|safe };
+
 -block page_help scoped
 
 -block body
