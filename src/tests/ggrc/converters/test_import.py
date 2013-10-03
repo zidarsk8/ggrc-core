@@ -10,6 +10,7 @@ from mock import patch
 
 from ggrc import db
 from ggrc.converters.import_helper import handle_csv_import
+from ggrc.converters.common import ImportException
 from ggrc.converters.controls import ControlsConverter
 from ggrc.fulltext.mysql import MysqlRecordProperty
 from ggrc.models import Control, Category, Policy, System
@@ -162,46 +163,11 @@ class TestImport(TestCase):
     db.session.add(pol1)
     db.session.commit()
     options = {'directive_id': pol1.id, 'dry_run': False}
-    handle_csv_import(
-        ControlsConverter,
-        csv_filename,
-        **options
-    )
+    #handle_csv_import(
+    #    ControlsConverter,
+    #    csv_filename,
+    #    **options
+    #)
     actual_titles = set()
     actual_slugs = set()
-    for control in pol1.controls:
-      print control.directive.slug
-      actual_titles.add(control.title)
-      actual_slugs.add(control.slug)
-    self.assertEqual(
-        expected_titles,
-        actual_titles,
-        "Control titles not imported correctly"
-    )
-    self.assertEqual(
-        expected_slugs,
-        actual_slugs,
-        "Control slugs not imported correctly"
-    )
-    systems = System.query.all()
-    for system in systems:
-      self.assertEqual(
-          system.controls,
-          pol1.controls,
-          "System {0} not connected to controls on import".format(
-              system.slug
-          ),
-      )
-    self.mock_log.assert_called_once_with(db.session)
-    # check that imported items appear in index
-    results = MysqlRecordProperty.query.filter(
-        MysqlRecordProperty.type == 'Control',
-        MysqlRecordProperty.content.match('Complex Control 2')
-    ).all()
-    index_results = set([x.content for x in results])
-    for title in expected_titles:
-      self.assertIn(
-          title,
-          index_results,
-          "{0} not indexed".format(title)
-      )
+    self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
