@@ -36,6 +36,9 @@ ul.new-tree {
       line-height: 31px;
       min-height: 31px;
       padding-left: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
       [class^="grcicon-"] {
         margin-top: 7px;
       }
@@ -43,23 +46,20 @@ ul.new-tree {
     .item-data {
       padding-right: 20px;
       .tree-title-area {
-        position: relative;
         overflow: auto;
         white-space: normal;
         text-overflow: inherit;
         width: auto;
-        padding-right: 50px;
         ul {
           @include reset-list();
           li {
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 5px;
             line-height: 18px;
+            padding-right: 8px;
+            border-right: 1px solid #111;
             &:last-child {
               margin-right: 0;
-            }
-            &.event-icon {
-              margin-right: 16px;
             }
             &.governance,
             &.control,
@@ -126,6 +126,8 @@ ul.new-tree {
       .item-data {
         padding-right:70px;
         position:relative;
+        min-height: 31px;
+        height: 31px;
         .tree-title-area {
           position:static;
           padding: 0;
@@ -134,6 +136,16 @@ ul.new-tree {
           white-space: nowrap !important;
           text-overflow: ellipsis !important;
           width:100% !important;
+          ul {
+            li {
+              margin-right: 10px;
+              padding-right: 0;
+              border-right: none;
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+          }
         }
         .event-more {
           position: absolute;
@@ -149,9 +161,29 @@ ul.new-tree {
             margin:0 20px;
           }
         }
+        .full-info {
+          padding-top: 16px;
+          p {
+            overflow: auto !important;
+            white-space: normal;
+            text-overflow: inherit;
+            width: 100%;
+            font-size: 13px;
+            line-height: 18px;
+          }
+        }
         .deleted-info {
           @include opacity(0.4);
           font-weight:bold;
+        }
+        .info-action {
+          text-transform: uppercase;
+          font-size: 11px;
+          @include opacity(0.6);
+          &:hover {
+            @include opacity(1);
+            text-decoration:none;
+          }
         }
       }
     }
