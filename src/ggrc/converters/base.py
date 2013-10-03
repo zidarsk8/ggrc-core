@@ -5,23 +5,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
-from ggrc.services.common import get_cache
-
-def get_modified_objects(session):
-  session.flush()
-  cache = get_cache()
-  if cache:
-    return cache.copy()
-
-def update_index_for_objects(session, cache):
-  indexer = get_indexer()
-  for obj in cache.new:
-    indexer.create_record(fts_record_for(obj), commit=False)
-  for obj in cache.dirty:
-    indexer.update_record(fts_record_for(obj), commit=False)
-  for obj in cache.deleted:
-    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
-  session.commit()
+from ggrc.services.common import get_modified_objects, update_index
 
 class BaseConverter(object):
 
@@ -196,7 +180,7 @@ class BaseConverter(object):
     modified_objects = get_modified_objects(db.session)
     log_event(db.session)
     db.session.commit()
-    update_index_for_objects(db.session, modified_objects)
+    update_index(db.session, modified_objects)
 
   def read_objects(self, headers, rows):
     attrs_collection = []
