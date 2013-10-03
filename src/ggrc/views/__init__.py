@@ -50,6 +50,12 @@ def dashboard():
   """
   return render_template("dashboard/index.haml")
 
+def generate_query_chunks(query):
+  CHUNK_SIZE = 100
+  count = query.count()
+  for offset in range(0, count, CHUNK_SIZE):
+    yield query.order_by('id').limit(CHUNK_SIZE).offset(offset).all()
+
 @app.route("/admin/reindex", methods=["POST"])
 @login_required
 def admin_reindex():
@@ -75,9 +81,10 @@ def admin_reindex():
     query = model.query.options(
         db.undefer_group(mapper_class.__name__+'_complete'),
         )
-    for instance in query.all():
-      indexer.create_record(fts_record_for(instance), False)
-  db.session.commit()
+    for query_chunk in generate_query_chunks(query):
+      for instance in query_chunk:
+        indexer.create_record(fts_record_for(instance), False)
+      db.session.commit()
 
   return app.make_response((
     'success', 200, [('Content-Type', 'text/html')]))
