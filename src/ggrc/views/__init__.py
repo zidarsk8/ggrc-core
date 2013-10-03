@@ -6,6 +6,7 @@
 import json
 from collections import namedtuple
 from flask import request, flash, session
+from flask.views import View
 from ggrc.app import app
 from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
@@ -108,13 +109,22 @@ def styleguide():
 def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
-@app.route("/admin/import_template", methods=['GET'])
-def people_import_template():
+ADMIN_KIND_TEMPLATES = {
+  "processes": "Process_Import_Template.csv",
+  "systems": "System_Import_Template.csv",
+  "admin": "People_Import_Template.csv",
+}
+
+@app.route("/<admin_kind>/import_template", methods=['GET'])
+def process_import_template(admin_kind):
   from flask import current_app
-  filename = "People_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  body = render_template("csv_files/" + filename)
-  return current_app.make_response((body, 200, headers))
+  if admin_kind in ADMIN_KIND_TEMPLATES:
+    filename = ADMIN_KIND_TEMPLATES[admin_kind]
+    headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+    body = render_template("csv_files/" + filename)
+    return current_app.make_response((body, 200, headers))
+  return current_app.make_response((
+      "No template for that type.", 404, []))
 
 @app.route("/admin/import_people", methods = ['GET', 'POST'])
 def import_people():
@@ -267,14 +277,6 @@ def import_sections(directive_id):
 
   return render_template("directives/import.haml", directive_id=directive_id, import_kind='Sections')
 
-@app.route("/systems/import_template", methods=['GET'])
-def system_import_template():
-  from flask import current_app
-  filename = "System_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  body = render_template("csv_files/" + filename)
-  return current_app.make_response((body, 200, headers))
-
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
   from werkzeug import secure_filename
@@ -320,14 +322,6 @@ def import_redirect(location):
   return app.make_response((
     '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
       json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
-
-@app.route("/processes/import_template", methods=['GET'])
-def process_import_template():
-  from flask import current_app
-  filename = "Process_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  body = render_template("csv_files/" + filename)
-  return current_app.make_response((body, 200, headers))
 
 @app.route("/processes/import", methods=['GET', 'POST'])
 def import_processes():
