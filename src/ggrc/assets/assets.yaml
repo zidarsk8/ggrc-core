@@ -195,6 +195,9 @@ dashboard-js-template-files:
   - responses/tree.mustache
   - responses/tree_footer.mustache
   - responses/modal_content.mustache
+  - meetings/modal_content.mustache
+  - meetings/tree_footer.mustache
+  - meetings/tree.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
