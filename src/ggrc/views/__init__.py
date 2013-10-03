@@ -108,6 +108,13 @@ def styleguide():
 def allowed_file(filename):
   return filename.rsplit('.',1)[1] == 'csv'
 
+@app.route("/admin/import_template", methods=['GET'])
+def people_import_template():
+  from flask import current_app
+  filename = "People_Import_Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  body = render_template("csv_files/" + filename)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/admin/import_people", methods = ['GET', 'POST'])
 def import_people():
