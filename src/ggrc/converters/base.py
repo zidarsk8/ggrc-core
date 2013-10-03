@@ -207,7 +207,7 @@ class BaseConverter(object):
       self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
   def validate_metadata_type(self, attrs, required_type):
-    if not attrs.get('type'):
+    if attrs.get('type') is None:
       self.errors.append('Missing "Type" heading')
     elif attrs['type'] != required_type:
       self.errors.append('Type must be "{}"'.format(required_type))
