@@ -95,8 +95,8 @@
       , related_systems:     TypeFilter("related_objects", "System")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
-      //, controls: Proxy(
-      //    "Control", "control", "ObjectControl", "controllable", "object_controls")
+      , controls: Proxy(
+         "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
