@@ -43,7 +43,7 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('documents', LinkDocumentsHandler)
     self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
     self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
-    self.handle_text_or_html('owner', is_email=True, is_person_contact=True)
+    self.handle('owner', ContactEmailHandler, person_must_exist=True)
     self.handle('systems', LinkObjectControl, model_class = System)
     self.handle('processes', LinkObjectControl, model_class = Process)
 
