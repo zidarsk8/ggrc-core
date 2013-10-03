@@ -1,6 +1,6 @@
-Type,,,,,,,,,,,,
-Processes,,,,,,,,,,,,
-*Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  For Process import, Type should be ""Process"", in cell A2.",,,,,,,,,,,
+Type,,,,,,,,,,,
+Processes,,,,,,,,,,,
+*Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  For Process import, Type should be ""Process"", in cell A2.",,,,,,,,,,
 "*Optional
 
 If you leave this field blank, the gGRC system will generate Codes automatically upon creation of the new object.  If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.  Otherwise, we recommend you leave this blank.
@@ -16,12 +16,6 @@ Example:
 
 jeff@reciprocitylabs.com
 ","*Optional.  
-
-You can assign Categories to your Process on import by specifying the names of the Categories.  Use <option><return> to delineate between Categories and use only Categories that already exist in gGRC.
-Example:
-
-AUTHORIZATION
-TRAINING","*Optional.  
 
 You can map Controls to Processes on import by specifying the Control code.  Use <option><return> to delineate between Control Codes.
 Example:
@@ -54,5 +48,4 @@ reciprocitynow.com/about","*Can be ""Corp"" or ""Prod""","*Optional.
 Can be ""Yes"", ""True"", or ""1"" to result in the System being labeled as ""Infrastructure"".
 
 Can be ""No"", ""False"", ""0"" to result in System being labeled as ""Not Infrastructure"""
-Process Code,Title,Description,Effective Date,Map:Person of Contact,Map:Categories,Map:Controls,Map:System,Map:Process,Map:Org Group,Map:References,Network Zone,Infrastructure
-,,,,,,,,,,,,
+Process Code,Title,Description,Effective Date,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Map:References,Network Zone,Infrastructure
