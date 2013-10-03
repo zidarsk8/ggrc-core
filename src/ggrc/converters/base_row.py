@@ -242,24 +242,25 @@ class ColumnHandler(object):
 class TextOrHtmlColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
+    if value:
+      value = value.strip()
+    return value or ''
+
+class ContactEmailHandler(ColumnHandler):
+
+  def parse_item(self, value):
     value = value.strip()
-    if not isinstance(value, unicode):
-      value = value.encode('utf-8')
-      value = unicode(value, 'utf-8')
-
-    is_email = self.options.get('is_email')
     is_required = self.options.get('is_required')
-    contact_must_exist = self.options.get('is_person_contact')
+    person_must_exist = self.options.get('person_must_exist')
 
-    if is_email and is_required and not value:
+    if is_required and not value:
       self.add_error("A valid email address is required")
-    elif is_email and contact_must_exist:
-      return self.find_contact(value, is_required=is_required)
-    elif is_email and value and not re.match(Person.EMAIL_RE_STRING, value):
+    elif person_must_exist:
+      value = self.find_contact(value, is_required=is_required)
+    elif value and not re.match(Person.EMAIL_RE_STRING, value):
       message = "{} is not a valid email. \
                 Plerse use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
-
     return value
 
   def find_contact(self, email_str, is_required=False):
@@ -275,10 +276,20 @@ class TextOrHtmlColumnHandler(ColumnHandler):
     return existing_person
 
   def display(self):
-    value = getattr(self.importer.obj, self.key) or ''
-    if type(value) is Person: # In the case import used person of contact
+    value = getattr(self.importer.obj, self.key, '') or ''
+    # In the case import was used to add a person of contact
+    if type(value) is Person:
       return value.email
     return value if value != 'null' else ''
+
+  def export(self):
+    attr = getattr(self.importer.obj, self.key, '') or ''
+    if type(attr) is Person:
+      return attr.email
+    return attr
+
+  def validate(self, data):
+    pass
 
 class SlugColumnHandler(ColumnHandler):
 

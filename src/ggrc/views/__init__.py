@@ -141,8 +141,12 @@ def import_people():
               directive_id = "People", exception_message = file_msg)
 
     except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("people/import_result.haml", exception_message=e,
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-            directive_id = "People", exception_message = str(e))
+            directive_id="People", exception_message=str(e))
 
   return render_template("people/import.haml", import_kind = 'People')
 
@@ -188,6 +192,11 @@ def import_controls(directive_id):
               directive_id = directive_id, exception_message = file_msg)
 
     except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("directives/import_controls_result.haml",
+            exception_message=e, converter=converter, results=converter.objects,
+            directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
             directive_id = directive_id, exception_message = str(e))
 
@@ -221,8 +230,9 @@ def import_sections(directive_id):
           directive_id = directive_id, dry_run = dry_run)
 
         if dry_run:
-          return render_template("directives/import_result.haml",directive_id = directive_id,
-          converter = converter, results=converter.objects, heading_map = converter.object_map)
+          return render_template("directives/import_result.haml",
+              directive_id=int(directive_id), converter=converter,
+              results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
@@ -233,10 +243,15 @@ def import_sections(directive_id):
               directive_id = directive_id, exception_message = file_msg)
 
     except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("directives/import_result.haml", exception_message=e,
+            converter=converter, results=converter.objects,
+            directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = str(e))
+            directive_id=int(directive_id), exception_message=e)
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Sections')
+  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Sections')
 
 @app.route("/systems/import_template", methods=['GET'])
 def system_import_template():
@@ -264,22 +279,26 @@ def import_systems():
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SystemsConverter, csv_file, dry_run = dry_run)
+        converter = handle_csv_import(SystemsConverter, csv_file, dry_run=dry_run)
         if dry_run:
           return render_template("systems/import_result.haml",
-            converter = converter, results=converter.objects, heading_map=converter.object_map)
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
       else:
         file_msg = "Could not import: invalid csv file."
-        return render_template("directives/import_errors.haml", exception_message = file_msg)
+        return render_template("directives/import_errors.haml", exception_message=file_msg)
 
     except ImportException as e:
-      return render_template("directives/import_errors.haml", exception_message = str(e))
+      if e.show_preview:
+        converter = e.converter
+        return render_template("systems/import_result.haml", exception_message=e,
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
+      return render_template("directives/import_errors.haml", exception_message=e)
 
-  return render_template("systems/import.haml", import_kind = 'Systems')
+  return render_template("systems/import.haml", import_kind='Systems')
 
 def import_redirect(location):
   # The textarea here is a custom response for 'remoteipart' to
@@ -314,21 +333,25 @@ def import_processes():
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SystemsConverter, csv_file, dry_run = dry_run, is_biz_process='1')
+        converter = handle_csv_import(SystemsConverter, csv_file, dry_run=dry_run, is_biz_process='1')
         if dry_run:
           return render_template("systems/import_result.haml",
-            converter = converter, results=converter.objects, heading_map=converter.object_map)
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} process{}'.format(count, 'es' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
       else:
         file_msg = "Could not import: invalid csv file."
-        return render_template("directives/import_errors.haml", exception_message = file_msg)
+        return render_template("directives/import_errors.haml", exception_message=file_msg)
     except ImportException as e:
-      return render_template("directives/import_errors.haml", exception_message = str(e))
+      if e.show_preview:
+        converter = e.converter
+        return render_template("systems/import_result.haml", exception_message=e,
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
+      return render_template("directives/import_errors.haml", exception_message=e)
 
-  return render_template("systems/import.haml", import_kind = 'Processes')
+  return render_template("systems/import.haml", import_kind='Processes')
 
 @app.route("/processes/export", methods=['GET'])
 def export_processes():
