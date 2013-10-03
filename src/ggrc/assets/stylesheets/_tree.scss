@@ -136,6 +136,16 @@ ul.new-tree {
           white-space: nowrap !important;
           text-overflow: ellipsis !important;
           width:100% !important;
+          ul {
+            li {
+              margin-right: 10px;
+              padding-right: 0;
+              border-right: none;
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+          }
         }
         .event-more {
           position: absolute;
