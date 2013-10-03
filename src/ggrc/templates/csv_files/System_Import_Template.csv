@@ -55,5 +55,5 @@ reciprocitynow.com/about","*Can be ""Corp"" or ""Prod""","*Optional.
 Can be ""Yes"", ""True"", or ""1"" to result in the System being labeled as ""Infrastructure"".
 
 Can be ""No"", ""False"", ""0"" to result in System being labeled as ""Not Infrastructure"""
-System Code,Title,Description,Effective Date,Map: Person of Contact,Map:Categories,Map:Controls,Map:System,Map:Process,Map:Org Group,Map:References,Network Zone,Infrastructure
+System Code,Title,Description,Effective Date,Map:Person of Contact,Map:Categories,Map:Controls,Map:System,Map:Process,Map:Org Group,Map:References,Network Zone,Infrastructure
 ,,,,jeff@reciprocitylabs.com,,,,,,,,

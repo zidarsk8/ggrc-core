@@ -68,6 +68,4 @@ Can be ""No"", ""False"", or ""0"" to result in control being labeled as ""Not A
 Can be ""Yes"", ""True"", or ""1"" to result in the control being labeled as Fraud Related.
 
 Can be ""No"", ""False"", or ""0"" to result in control being labeled as Not Fraud Related.",*Not yet implemented.  Ignore for now.
-Control Code,Title,Description,Kind,Means,Start Date,Stop Date,URL,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,References,Map: Person of Contact,Key Control,Active,Fraud Related,Version
-JCR-TEST-Oct2,Control Import Template Test,Final touches to the S13a release,Preventative,Manual,10/1/2013,,www.reciprocitylabs.com,BUGANIZER,HIRE,Training,"OCCURANCE
-UNDERSTANDABILITY",ad-hoc,http://en.wikipedia.org/wiki/PCI-DSS,jeff@reciprocitylabs.com,Yes,No,No,
+Control Code,Title,Description,Kind,Means,Start Date,Stop Date,URL,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,References,Map:Person of Contact,Key Control,Active,Fraud Related,Version
