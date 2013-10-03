@@ -41,12 +41,11 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
-    self.handle('categories', LinkCategoriesHandler, scope_id=CATEGORY_CONTROL_TYPE_ID)
-    self.handle('assertions', LinkCategoriesHandler, scope_id=CATEGORY_ASSERTION_TYPE_ID)
-    self.handle('people_responsible', LinkPeopleHandler, role='responsible')
-    self.handle('people_accountable', LinkPeopleHandler, role='accountable')
-    self.handle('systems', LinkObjectControl, model_class=System)
-    self.handle('processes', LinkObjectControl, model_class=Process)
+    self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
+    self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
+    self.handle_text_or_html('owner', is_email=True, is_person_contact=True)
+    self.handle('systems', LinkObjectControl, model_class = System)
+    self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
     if options.get('directive_id'):
@@ -83,8 +82,7 @@ class ControlsConverter(BaseConverter):
     ('Map:Assertions', 'assertions'),
     ('Frequency', 'verify_frequency'),
     ('References', 'documents'),
-    ('Map:People;Responsible','people_responsible'),
-    ('Map:People;Accountable', 'people_accountable'),
+    ('Map:Person of Contact', 'owner'),
     ('Key Control', 'key_control'),
     ('Active', 'active'),
     ('Fraud Related', 'fraud_related'),

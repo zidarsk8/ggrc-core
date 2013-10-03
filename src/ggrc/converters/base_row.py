@@ -242,20 +242,43 @@ class ColumnHandler(object):
 class TextOrHtmlColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
-    if value:
-      value = value.strip()
-      if not isinstance(value, unicode):
-        value = value.encode('utf-8')
-        value = unicode(value, 'utf-8')
+    value = value.strip()
+    if not isinstance(value, unicode):
+      value = value.encode('utf-8')
+      value = unicode(value, 'utf-8')
 
     is_email = self.options.get('is_email')
-    if is_email and value == '':
-      self.add_error("A valid email address is required.")
-    elif is_email and not re.match(Person.EMAIL_RE_STRING, value):
-      self.add_error("{} is not a valid email. \
-                  Please use following format: janedoe@example.com".format(value))
+    is_required = self.options.get('is_required')
+    contact_must_exist = self.options.get('is_person_contact')
 
-    return value or ''
+    if is_email and is_required and not value:
+      self.add_error("A valid email address is required")
+    elif is_email and contact_must_exist:
+      return self.find_contact(value, is_required=is_required)
+    elif is_email and value and not re.match(Person.EMAIL_RE_STRING, value):
+      message = "{} is not a valid email. \
+                Plerse use following format: user@example.com".format(value)
+      self.add_error(message) if is_required else self.add_warning(message)
+
+    return value
+
+  def find_contact(self, email_str, is_required=False):
+    from ggrc.models.person import Person
+
+    existing_person = Person.query.filter_by(email=email_str).first()
+    if not existing_person and is_required:
+      self.add_error("{} was not found. Please enter a valid email address"
+                     .format(email_str))
+    elif not existing_person and email_str:
+      self.add_warning("{} was not found and will not be entered"
+                       .format(email_str))
+    return existing_person
+
+  def display(self):
+    value = getattr(self.importer.obj, self.key) or ''
+    if type(value) is Person: # In the case import used person of contact
+      return value.email
+    return value if value != 'null' else ''
 
 class SlugColumnHandler(ColumnHandler):
 
@@ -428,7 +451,8 @@ class LinksHandler(ColumnHandler):
       self.link_index = i
       self.link_values[self.link_index] = value
       data = self.parse_item(value)
-      if not data: next
+      if not data:
+        next
 
       linked_object = self.find_existing_item(data)
 
@@ -722,7 +746,6 @@ class LinkRelationshipsHandler(LinksHandler):
       where_params['source_type'] = model_class.__name__
       relationships = Relationship.query.filter_by(**where_params).all()
       objects = [rel.source for rel in relationships]
-
     return objects
 
   def model_human_name(self):
