@@ -1239,7 +1239,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
     });
   }
 
-  return '' + (root.attr(mapping).attr('loading') ? '...' : root.attr(mapping).attr('length'));
+  return (root.attr(mapping).attr('loading') ? options.inverse(options.contexts) : options.fn(''+root.attr(mapping).attr('length')));
 });
 
 Mustache.registerHelper("visibility_delay", function(delay, options) {
@@ -1293,7 +1293,7 @@ Mustache.registerHelper("delete_counts", function(instance, options) {
     , mappings = root.attr('orphaned_mappings')
     ;
   if (root.attr('orphaned_status') === 'loading') {
-    return '...';
+    return options.inverse(options.contexts);
   }
   else if (root.attr('orphaned_status') === 'failed' || (!objects.attr('length') && !mappings.attr('length'))) {
     return '';
@@ -1330,7 +1330,7 @@ Mustache.registerHelper("delete_counts", function(instance, options) {
     parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',',''));
     parts >= 2 && result.splice(result.length - 1, 0, 'and');
 
-    return result.join(' ') + (objects.attr('length') || mappings.attr('length') ? '.' : '');
+    return options.fn(result.join(' ') + (objects.attr('length') || mappings.attr('length') ? '.' : ''));
   }
 });
 function is_join(mapping) {
