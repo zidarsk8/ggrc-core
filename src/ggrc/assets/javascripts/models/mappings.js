@@ -304,6 +304,9 @@
           "Control", "control", "DirectiveControl", "directive", "directive_controls")
       , controls: Multi(["direct_controls", "joined_controls"])
 
+      , programs: Proxy(
+          "Program", "program", "ProgramDirective", "directives", "program_directives")
+
       , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
       , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
@@ -337,6 +340,12 @@
             , "related_people_via_extended_objectives"
             , "related_people_via_sections"
             ])
+
+      , orphaned_objects: Multi([
+          "sections"
+        , "controls"
+        , "programs"
+        ])
       }
 
     // Directives

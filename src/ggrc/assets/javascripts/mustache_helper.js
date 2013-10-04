@@ -1208,7 +1208,7 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   return ids.join(",");
 });
 
-Mustache.registerHelper("mapping_count", function() {
+Mustache.registerHelper("mapping_count", function(instance) {
   var args = can.makeArray(arguments)
     , mappings = args.slice(1, args.length - 1)
     , options = args[args.length-1]
@@ -1253,5 +1253,94 @@ Mustache.registerHelper("visibility_delay", function(delay, options) {
     return el;
   };
 });
+
+// This retrieves the potential orphan stats for a given instance
+// Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
+Mustache.registerHelper("delete_counts", function(instance, options) {
+  instance = resolve_computed(instance)
+  var root = options.contexts[0];
+
+  // Retrieve the orphan stats
+  if (!root.attr('orphaned_status')) {
+    root.attr('orphaned_status', 'loading');
+    instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
+      if (full_instance.get_binding('orphaned_objects')) {
+        full_instance.get_list_loader('orphaned_objects').done(function(list) {
+          var objects = new can.Observe.List()
+            , mappings = new can.Observe.List()
+            ;
+          can.each(list, function(mapping) {
+            var inst;
+            if (inst = is_join(mapping))
+              mappings.push(inst);
+            else
+              objects.push(mapping.instance);
+          })
+          root.attr({
+              orphaned_objects: objects
+            , orphaned_mappings: mappings
+            , orphaned_status: 'loaded'
+          });
+        })
+      }
+      else
+        root.attr('orphaned_status', 'failed');
+    });
+  }
+
+  // Return the dynamic result
+  if (root.attr('orphaned_status') === 'loading') {
+    return '...';
+  }
+  else if (root.attr('orphaned_status') === 'failed') {
+    return '';
+  }
+  else {
+    var objects = root.attr('orphaned_objects')
+      , mappings = root.attr('orphaned_mappings')
+      , counts = {}
+      , result = []
+      , parts = 0
+      ;
+
+    // Generate the summary
+    result.push('This may also delete');
+    if (objects.attr('length')) {
+      can.each(objects, function(instance) {
+        var title = instance.constructor.title_singular;
+        counts[title] = counts[title] || {
+            model: instance.constructor
+          , count: 0
+          };
+        counts[title].count++;
+      });
+      can.each(counts, function(count, i) {
+        parts++;
+        result.push(count.count + ' ' + (count.count === 1 ? count.model.title_singular : count.model.title_plural) + ',')
+      });
+    }
+    if (mappings.attr('length')) {
+      parts++;
+      result.push(mappings.attr('length') + ' object mapping' + (mappings.attr('length') !== 1 ? 's' : ''));
+    }
+
+    // Clean up commas, add an "and" if appropriate
+    parts >= 1 && parts <= 2 && (result[result.length - 1] = result[result.length - 1].replace(',',''));
+    parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',',''));
+    parts >= 2 && result.splice(result.length - 1, 0, 'and');
+
+    return result.join(' ') + (objects.attr('length') || mappings.attr('length') ? '.' : '');
+  }
+});
+function is_join(mapping) {
+  if (mapping.mappings.length > 0) {
+    for (var i = 0, child; child = mapping.mappings[i]; i++) {
+      if (child = is_join(child)) {
+        return child;
+      }
+    }
+  }
+  return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
+}
 
 })(this, jQuery, can);
