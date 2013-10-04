@@ -713,7 +713,7 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
 });
 
 Mustache.registerHelper("private_program", function(modal_title) {
-  return modal_title.indexOf("New ") !=0 ? '' : [
+  return resolve_computed(modal_title).indexOf("New ") !=0 ? '' : [
     '<div class="span6">'
     , '<label>'
     , 'Privacy'
@@ -1289,16 +1289,17 @@ Mustache.registerHelper("delete_counts", function(instance, options) {
   }
 
   // Return the dynamic result
+  var objects = root.attr('orphaned_objects')
+    , mappings = root.attr('orphaned_mappings')
+    ;
   if (root.attr('orphaned_status') === 'loading') {
     return '...';
   }
-  else if (root.attr('orphaned_status') === 'failed') {
+  else if (root.attr('orphaned_status') === 'failed' || (!objects.attr('length') && !mappings.attr('length'))) {
     return '';
   }
   else {
-    var objects = root.attr('orphaned_objects')
-      , mappings = root.attr('orphaned_mappings')
-      , counts = {}
+    var counts = {}
       , result = []
       , parts = 0
       ;

@@ -115,6 +115,20 @@
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
       , regulations: TypeFilter("directives", "Regulation")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "sections"
+        , "controls"
+        , "programs"
+        , "objectives"
+        , "implemented_controls"
+        , "implementing_controls"
+        , "joined_directives"
+        // These don't exist client-side yet:
+        // , "risks"
+        // , "control_risks"
+        // , "control_assessments"
+        ])
       }
     , Objective: {
         _mixins: ["personable", "documentable"] //objectiveable
@@ -135,6 +149,11 @@
           "Control", "control", "ObjectiveControl", "objective", "objective_controls")
       , sections: Proxy(
           "Section", "section", "SectionObjective", "objective", "section_objectives")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "controls"
+        , "sections"
+        ])
       }
     , Section: {
         _mixins: ["personable", "documentable"] //sectionable
@@ -155,6 +174,11 @@
           "Objective", "objective", "SectionObjective", "section", "section_objectives")
       , controls: Proxy(
           "Control", "control", "ControlSection", "section", "control_sections")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "controls"
+        , "objectives"
+        ])
       }
 
     , controllable: {
@@ -282,6 +306,11 @@
       , extended_related_products:    TypeFilter("extended_related_objects", "Product")
       , extended_related_projects:    TypeFilter("extended_related_objects", "Project")
       , extended_related_systems:     TypeFilter("extended_related_objects", "System")
+      , orphaned_objects: Multi([
+          "controls"
+        , "directives"
+        // , "cycles"
+        ])
       }
 
     , directive_object: {

@@ -21,6 +21,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   , category : "governance"
   , root_model : "Section"
   , findAll : "GET /api/sections"
+  , findOne : "GET /api/sections/{id}"
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"
