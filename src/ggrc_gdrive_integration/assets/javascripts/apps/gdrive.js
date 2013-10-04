@@ -7,6 +7,48 @@
 
 (function($, CMS, GGRC) {
 
+  $.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
+
+    if(/^https:\/\/script.google.com/.test(opts.url)) {
+      opts.data = opts.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(orig_opts.data);
+    }
+
+  });
+
+  var google_oauth = null;
+  window.oauth_dfd = new $.Deferred();
+
+  window.doGAuth = function(use_popup) {
+    if(window.oauth_dfd.state() !== "pending") {
+      window.oauth_dfd = new $.Deferred();
+    }
+    window.gapi.client.load('drive', 'v2');
+    window.gapi.auth.authorize({
+      'client_id': "831270113958.apps.googleusercontent.com",
+      'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar'],
+      'immediate': !use_popup
+    },
+    function(authresult){  //success
+      if(!authresult && !use_popup) {
+        doGAuth(true);
+      } else if(!authresult) {
+        oauth_dfd.reject("auth failed");
+      } else {
+        google_oauth = authresult;
+        oauth_dfd.resolve(authresult);
+      }
+    });
+  };
+
+  GGRC.config = GGRC.config || {};
+  CMS.Models.GCal.getPrimary().done(function(d) {
+    GGRC.config.USER_PRIMARY_CALENDAR = d;
+    if(!GGRC.config.DEFAULT_CALENDAR) {
+      GGRC.config.DEFAULT_CALENDAR = d;
+    }
+  });
+
+
   $.extend(true, CMS.Models.Program.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
   });

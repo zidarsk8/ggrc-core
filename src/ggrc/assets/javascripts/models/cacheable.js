@@ -50,7 +50,13 @@ function dateConverter(d) {
   return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
 }
 
-function makeDateSerializer(type) {
+function makeDateUnpacker(key) {
+  return function(d) {
+    return dateConverter(d[key] ? d[key] : d);
+  };
+}
+
+function makeDateSerializer(type, key) {
   var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
   return function(d) {
     if(d == null) {
@@ -59,7 +65,15 @@ function makeDateSerializer(type) {
     if(typeof d !== "number") {
       d = d.getTime();
     }
-    return moment((d / 1000).toString(), "X").utc().format(conversion);
+    var retstr = moment((d / 1000).toString(), "X").utc().format(conversion);
+    var retval;
+    if(key) {
+      retval = {};
+      retval[key] = retstr;
+    } else {
+      retval = retstr;
+    }
+    return retval;
   };
 }
 
@@ -348,10 +362,12 @@ can.Model("can.Model.Cacheable", {
   , convert : {
     "date" : dateConverter
     , "datetime" : dateConverter
+    , "packaged_datetime" : makeDateUnpacker("dateTime")
   }
   , serialize : {
     "datetime" : makeDateSerializer("datetime")
     , "date" : makeDateSerializer("date")
+    , "packaged_datetime" : makeDateSerializer("datetime", "dateTime")
   }
   , tree_view_options : {}
   , list_view_options : {}

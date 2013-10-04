@@ -7,77 +7,61 @@
 
 (function(can) {
 
-$.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
-
-  if(/^https:\/\/script.google.com/.test(opts.url)) {
-    opts.data = opts.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(orig_opts.data);
-  }
-
-});
-
-var google_oauth = null;
-var oauth_dfd = new $.Deferred();
-
-window.doGAuth = function(use_popup) {
-  window.gapi.client.load('drive', 'v2');
-  window.gapi.auth.authorize({
-    'client_id': "831270113958.apps.googleusercontent.com",
-    'scope': 'https://www.googleapis.com/auth/drive',
-    'immediate': !use_popup
-  },
-  function(authresult){  //success
-    if(!authresult && !use_popup) {
-      doGAuth(true);
-    } else if(!authresult) {
-      oauth_dfd.reject("auth failed");
-    } else {
-      google_oauth = authresult;
-      oauth_dfd.resolve(authresult);
-      oauth_dfd = null;
+window.process_gapi_query = function(params) {
+  var qstr = [];
+  for(var i in params) {
+    switch(i) {
+      case 'parents' :
+        qstr.push("'" + params[i] + "' in " + i);
+        break;
+      case 'mimeType' :
+        qstr.push(i + " = '" + params[i] + "'");
+        break;
+      case 'mimeTypeNot' :
+        qstr.push("mimeType != '" + params[i] + "'");
+        break;
     }
-  });
+  }
+  return qstr.join(" and ");
 };
 
+var gdrive_findAll;
 can.Model.Cacheable("CMS.Models.GDriveFolder", {
 
-  findAll : function(params) {
-
-    var dfd = new $.Deferred();
-    function doFind() {
-      //url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-      if(params.parentfolderid) {
-        params.id = params.parentfolderid;
-        delete params.parentfolderid;
-      }
-      if(!params.id) {
-        params.id = GGRC.config.GDRIVE_ROOT_FOLDER;
-      }
-      var q = "'" + params.id + "' in parents and mimeType = 'application/vnd.google-apps.folder'";
-      gapi.client.request({
-        path : "/drive/v2/files?q=" + encodeURI(q)
-        , method : "get" //"post"
-        , callback : function(result) {
-          if(!result) {
-            dfd.reject(JSON.parse(arguments[1]));
-          } else {
-            var objs = result.items;
-            can.each(objs, function(obj) {
-              obj.selfLink = obj.selfLink || "#";
-            });
-            dfd.resolve(objs);
-          }
+  findAll : (gdrive_findAll = function(extra_params) {
+    return function(params) {
+      return window.oauth_dfd.then(function() {
+        var dfd = new $.Deferred();
+        if(params.parentfolderid) {
+          params.parents = params.parentfolderid ;
+          delete params.parentfolderid;
         }
+        if(!params.parents) {
+          params.parents = GGRC.config.GDRIVE_ROOT_FOLDER;
+        }
+        $.extend(params, extra_params);
+        var q = process_gapi_query(params);
+        gapi.client.request({
+          path : "/drive/v2/files" + (params.id ? ("/" + params.id) : "") + "?q=" + encodeURIComponent(q)
+          , method : "get" //"post"
+          , callback : function(result) {
+            if(!result) {
+              dfd.reject(JSON.parse(arguments[1]));
+            } else {
+              var objs = result.items;
+              can.each(objs, function(obj) {
+                obj.selfLink = obj.selfLink || "#";
+              });
+              dfd.resolve(objs);
+            }
+          }
+        });
+        return dfd;
       });
-    }
-    if(oauth_dfd) {
-      oauth_dfd.done(doFind);
-    } else {
-      doFind();
-    }
-    return dfd;
-  }
+    };
+  })({ mimeType : "application/vnd.google-apps.folder"})
   , findOne : function(params, success, error) {
-    return this.findAll(params, success, error).then(function(data) {
+    return this.findAll(params).then(function(data) {
       return data[0];
     });
   }
@@ -149,12 +133,7 @@ can.Model.Cacheable("CMS.Models.GDriveFolder", {
 
 can.Model.Cacheable("CMS.Models.GDriveFile", {
 
-  findAll : {
-    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-    , type : "post"
-    , dataType : "json"
-    , data : { command : 'listfiles', parentfolderid : GGRC.config.GDRIVE_ROOT_FOLDER }
-  }
+  findAll : gdrive_findAll({ mimeTypeNot : "application/vnd.google-apps.folder" })
 
   , destroy : function() {
     throw "Destroy is not supported for GDrive Files. Use removeFromParent";
@@ -170,9 +149,9 @@ can.Model.Cacheable("CMS.Models.GDriveFolderPermission", {
 
   findAll : {
     url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-    , type : "post"
-    , dataType : "json"
-    , data : { command : 'getFolderPermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
+    , type : "get"
+    , dataType : "jsonp"
+    , data : { command : 'getfolderpermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
   }
 
 }, {});
