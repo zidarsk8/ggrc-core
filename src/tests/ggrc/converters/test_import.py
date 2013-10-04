@@ -145,7 +145,7 @@ class TestImport(TestCase):
           "{0} not indexed".format(title)
       )
 
-  def test_mismatch(self):
+  def test_directive_slug_mismatch(self):
     sys1 = System(slug="ACLS", title="System1")
     db.session.add(sys1)
     expected_titles = set([
@@ -163,11 +163,7 @@ class TestImport(TestCase):
     db.session.add(pol1)
     db.session.commit()
     options = {'directive_id': pol1.id, 'dry_run': False}
-    #handle_csv_import(
-    #    ControlsConverter,
-    #    csv_filename,
-    #    **options
-    #)
     actual_titles = set()
     actual_slugs = set()
     self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
+
