@@ -43,18 +43,18 @@
       </div>
     </div>
     <div class="span6">
-      <!--
+      {{#visibility_delay 500}}
       <div class="info">
         <i class="grcicon-control-color"></i>
-        {{!controls.length}}
+        {{mapping_count instance 'extended_related_controls' 'related_controls' 'controls'}}
         &nbsp;&nbsp;
         <i class="grcicon-process-color"></i>
-        {{!processes.length}}
+        {{mapping_count instance 'extended_related_processes' 'related_processes' 'processes'}}
         &nbsp;&nbsp;
         <i class="grcicon-system-color"></i>
-        {{!systems.length}}
+        {{mapping_count instance 'extended_related_systems' 'related_systems' 'systems'}}
       </div>
-      -->
+      {{/visibility_delay}}
     </div>
   </div>
   <div class="row-fluid">

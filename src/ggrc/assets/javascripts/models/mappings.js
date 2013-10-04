@@ -96,8 +96,8 @@
       , related_systems:     TypeFilter("related_objects", "System")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
-      //, controls: Proxy(
-      //    "Control", "control", "ObjectControl", "controllable", "object_controls")
+      , controls: Proxy(
+         "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
@@ -274,7 +274,7 @@
             , "related_objects_via_sections"
             , "related_objects"
             ])
-      /*, extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
+      , extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
       , extended_related_facilities:  TypeFilter("extended_related_objects", "Facility")
       , extended_related_markets:     TypeFilter("extended_related_objects", "Market")
       , extended_related_org_groups:  TypeFilter("extended_related_objects", "OrgGroup")
@@ -282,7 +282,6 @@
       , extended_related_products:    TypeFilter("extended_related_objects", "Product")
       , extended_related_projects:    TypeFilter("extended_related_objects", "Project")
       , extended_related_systems:     TypeFilter("extended_related_objects", "System")
-      */
       }
 
     , directive_object: {

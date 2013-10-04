@@ -489,6 +489,10 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         , delay = this.options.fade_in_delay
         ;
 
+      // There isn't tooltip data available for recently viewed objects
+      if (instance instanceof GGRC.Models.RecentlyViewedObject)
+        return;
+
       if (this.options.$extended.data('model') !== instance) {
         clearTimeout(this.fade_in_timeout);
         // If tooltip is already showing, show new content without delay
@@ -536,7 +540,7 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         ;
 
       this.fade_in_timeout = null;
-      can.view(tooltip_view, instance, function(frag) {
+      can.view(tooltip_view, new can.Observe({ instance: instance }), function(frag) {
         self.options.$extended
           .html(frag)
           .addClass('in')
