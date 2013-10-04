@@ -136,15 +136,49 @@ ul.new-tree {
           white-space: nowrap !important;
           text-overflow: ellipsis !important;
           width:100% !important;
-          ul {
-            li {
+          .event-main-title {
+            @include oneline();
+            height: 31px;
+            min-height: 31px;
+            span {
               margin-right: 10px;
-              padding-right: 0;
-              border-right: none;
               &:last-child {
                 margin-right: 0;
               }
+              i {
+                margin-top: 7px;
+              }
+              &.governance,
+              &.control,
+              &.objective,
+              &.contract,
+              &.policy,
+              &.regulation {
+                color:$governance;
+              }
+              &.business,
+              &.process,
+              &.system,
+              &.orggroup,
+              &.project,
+              &.facility,
+              &.product,
+              &.dataasset,
+              &.market {
+                color:$business;
+              }
+              &.risk,
+              &.riskyattribute {
+                color:$risk;
+              }
+              &.program {
+                color:$programs;
+              }
             }
+          }
+          .event-date {
+            @include oneline();
+            text-align: right;
           }
         }
         .event-more {
@@ -170,6 +204,9 @@ ul.new-tree {
             width: 100%;
             font-size: 13px;
             line-height: 18px;
+            .changed {
+              color: #f08925;
+            }
           }
         }
         .deleted-info {
