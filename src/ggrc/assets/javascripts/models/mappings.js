@@ -124,6 +124,8 @@
         , "implemented_controls"
         , "implementing_controls"
         , "joined_directives"
+        , "people"
+        , "documents"
         // These don't exist client-side yet:
         // , "risks"
         // , "control_risks"
@@ -153,6 +155,8 @@
           "related_objects"
         , "controls"
         , "sections"
+        , "people"
+        , "documents"
         ])
       }
     , Section: {
@@ -178,6 +182,8 @@
           "related_objects"
         , "controls"
         , "objectives"
+        , "people"
+        , "documents"
         ])
       }
 
@@ -307,8 +313,11 @@
       , extended_related_projects:    TypeFilter("extended_related_objects", "Project")
       , extended_related_systems:     TypeFilter("extended_related_objects", "System")
       , orphaned_objects: Multi([
-          "controls"
+          "related_objects"
+        , "controls"
         , "directives"
+        , "people"
+        , "documents"
         // , "cycles"
         ])
       }
@@ -372,8 +381,11 @@
 
       , orphaned_objects: Multi([
           "sections"
+        , "people"
+        , "documents"
         , "controls"
         , "programs"
+        , "documents"
         ])
       }
 
@@ -394,6 +406,14 @@
             "related_object", "personable", "documentable"
           , "controllable", "objectiveable", "sectionable"
           ]
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "people"
+        , "documents"
+        , "controls"
+        , "objectives"
+        , "sections"
+        ])
       }
 
     , DataAsset: {
