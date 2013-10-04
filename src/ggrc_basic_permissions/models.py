@@ -50,6 +50,10 @@ class Role(Base, Described, db.Model):
     #   the wrong place to filter it.
     return query.filter(not_(cls.name == 'RoleReader'))
 
+  def _display_name(self):
+    return self.name
+
+
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
 
@@ -81,3 +85,6 @@ class UserRole(Base, db.Model):
     return query.options(
         orm.subqueryload('role'),
         orm.subqueryload('person'))
+
+  def _display_name(self):
+    return self.person.display_name + '<->' + self.role.display_name

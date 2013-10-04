@@ -15,7 +15,7 @@ class Audit(Personable, Timeboxed, BusinessObject, db.Model):
   report_start_date = deferred(db.Column(db.Date), 'Audit')
   report_end_date = deferred(db.Column(db.Date), 'Audit')
   audit_firm = deferred(db.Column(db.String), 'Audit')
-  status = deferred(db.Column(db.Enum(VALID_STATES), nullable=False),
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
     'Audit')
   gdrive_evidence_folder = deferred(db.Column(db.String), 'Audit')
   program_id = deferred(db.Column(db.Integer, db.ForeignKey('programs.id'),

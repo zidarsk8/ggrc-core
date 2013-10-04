@@ -16,4 +16,11 @@ def gdrive_context():
 def sandbox():
   """A demo page for GDrive integration models
   """
-  return render_template("sandbox/index.haml")
+  return render_template("sandbox/gdrive.haml")
+
+@app.route("/gcal_sandbox")
+@login_required
+def sandbox_gcal():
+  """A demo page for GDrive integration models
+  """
+  return render_template("sandbox/gcal.haml")

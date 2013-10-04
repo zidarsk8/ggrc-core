@@ -84,6 +84,11 @@ ul.new-tree {
     .gray {
       color: $gray;
     }
+    .section-item-count {
+      float: right;
+      max-width: 3.5em;
+      margin-left: 0.5em;
+    }
     &.request-list {
       .short-field {
         min-height: 23px;
@@ -111,6 +116,15 @@ ul.new-tree {
         &:hover {
           @include opacity(1);
           text-decoration:none;
+        }
+      }
+      .request-read-only {
+        .small {
+          font-size: 11px;
+        }
+        .request-status {
+          font-size: 11px;
+          font-style: italic;
         }
       }
     }
@@ -304,6 +318,25 @@ ul.new-tree {
       margin-top: 0;
     }
   }
+  .population-upload {
+    @include reset-list();
+    li {
+      margin-bottom: 20px;
+      label {
+        margin-bottom: 3px;
+      }
+      [class^="grcicon-"] {
+        margin-top: 0;
+      }
+      .choose {
+        margin: 6px 0 0 0;
+        display: inline-block;
+      }
+      .span2 {
+        margin-left: 0;
+      }
+    }
+  }
 }
 
 .item-data {
@@ -378,21 +411,22 @@ ul.new-tree {
   @include opacity(0.5);
 }
 
-.objective-create {
-  display:none;
-}
-
-.section-create,
-.section-import {
-  display:none;
-  i {
-    @include opacity(0.3);
-  }
-  &:hover {
-   text-decoration:none;
-   i {
-     @include opacity(0.6);
-   } 
+.section-expandable {
+  position:relative;
+  .section-expander {
+    display:none;
+    position:absolute;
+    left:0;
+    top:0;
+    i {
+      @include opacity(0.3);
+    }
+    &:hover {
+     text-decoration:none;
+     i {
+       @include opacity(0.6);
+     } 
+    }
   }
 }
 

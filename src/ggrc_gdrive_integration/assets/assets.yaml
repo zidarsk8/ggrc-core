@@ -1,5 +1,6 @@
 dashboard-js-files:
   - models/gdrive_models.js
+  - models/gcal_models.js
   - apps/gdrive.js
 
 dashboard-js-spec-files:

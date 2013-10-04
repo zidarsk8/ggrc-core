@@ -6,18 +6,20 @@
   GGRC.config = ={config_json()|safe};
 
 -block header
+  %script{ 'type' : "text/javascript", 'src' : "https://apis.google.com/js/client.js?onload=doGAuth" }
+
   %script#folder_tmpl{ 'type' : 'text/mustache' }
     -raw
-      <h3> Current folder : {{#if_equals parent ''}}Root folder{{else}}{{parent.name}}{{/if_equals}} </h3>
+      <h3> Current folder : {{#if_equals parent ''}}Root folder{{else}}{{parent.title}}{{/if_equals}} </h3>
       <a href="javascript://" class='list-folders go-up' style='{{#if_equals parent ''}}display: none{{/if_equals}}' data-folder-id="{{parent_id}}">Go up one level</a>
       <ul class="folders-list">
         {{#list}}
         <li> 
           <a class="list-folders" href='javascript://' {{data 'folder'}}>
-          {{name}}
+          {{title}}
           </a>
           |
-          <a href="{{url}}" target="_blank">[Go to folder]</a>
+          <a href="{{alternateLink}}" target="_blank">[Go to folder]</a>
           |
           <a href="javascript://" class="delete-folder" {{data 'folder'}}>[Delete]</a>
         </li>
@@ -30,7 +32,7 @@
       <ul class="files-list">
         {{#this}}
         <li> 
-          <a href="{{url}}" target="_blank">{{name}}</a>
+          <a href="{{alternateLink}}" target="_blank">{{title}}</a>
         </li>
         {{/this}}
         {{^this}}
@@ -131,7 +133,7 @@
         $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
         can.view(
           "#permissions_tmpl"
-          , CMS.Models.GDriveFolderPermission.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+          , CMS.Models.GDriveFolderPermission.findAll({id : folder.id || folder}).fail(function(e) {
             filespinner.stop();
             $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
             return new $.Deferred().reject();
