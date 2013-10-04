@@ -5,6 +5,9 @@
 
 -block page_help
   admin
+  
+-block extra_javascript
+  GGRC.permissions = ={ permissions_json()|safe };
 
 -block header
   %h1.dashboard-title
