@@ -33,7 +33,7 @@ class TestImport(TestCase):
     super(TestImport, self).tearDown()
 
   def test_simple(self):
-    csv_filename = join(CSV_DIR, "minimal_export2.csv")
+    csv_filename = join(CSV_DIR, "minimal_import.csv")
     expected_titles = set([
       "Minimal Control 1",
       "Minimal Control 2",

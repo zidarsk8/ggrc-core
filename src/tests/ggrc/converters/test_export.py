@@ -39,7 +39,8 @@ class TestExport(TestCase):
   def test_simple(self, mock_response):
     with open(join(CSV_DIR, "minimal_export.csv"), "r") as f:
       expected_csv = f.read()
-    sample_day = datetime(2013, 9, 25)
+    date1 = datetime(2013, 9, 25)
+    date2 = datetime(2013, 9, 26)
     pol1 = Policy(
       kind="Company Policy",
       title="Example Policy",
@@ -49,15 +50,17 @@ class TestExport(TestCase):
       directive=pol1,
       title="Minimal Control 1",
       slug="CTRL-1",
-      created_at=sample_day,
-      updated_at=sample_day,
+      created_at=date1,
+      updated_at=date1,
+      start_date=date1,
+      end_date=date2
     )
     cont2 = Control(
       directive=pol1,
       title="Minimal Control 2",
       slug="CTRL-2",
-      created_at=sample_day,
-      updated_at=sample_day,
+      created_at=date1,
+      updated_at=date1
     )
     options = {'directive': pol1, 'export': True}
     handle_converter_csv_export(
