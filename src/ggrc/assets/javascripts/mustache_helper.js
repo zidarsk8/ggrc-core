@@ -1042,7 +1042,7 @@ Mustache.registerHelper("is_allowed", function() {
     , args = Array.prototype.slice.call(arguments, 0)
     , actions = []
     , resource_type = allowed_page && allowed_page.constructor.shortName
-    , context_id = allowed_page && allowed_page.context && allowed_page.context.id
+    , context_id = (allowed_page && allowed_page.context && allowed_page.context.id) || null
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1068,6 +1068,9 @@ Mustache.registerHelper("is_allowed", function() {
       }
     }
   });
+  if (options.hash && typeof options.hash.context !== undefined && !options.hash.context) {
+    context_id = null;
+  }
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
@@ -1088,7 +1091,7 @@ Mustache.registerHelper("is_allowed", function() {
     ;
 });
 
-Mustache.registerHelper("is_allowed_for_all", function(action, instances, options) {
+Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
   var passed = true;
 
   action = resolve_computed(action);

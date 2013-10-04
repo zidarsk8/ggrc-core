@@ -824,9 +824,12 @@
           , object_join_attr = this.object_join_attr || model.table_plural
           ;
 
-        can.each(binding.instance[object_join_attr].reify(), function(mapping) {
-          refresh_queue.enqueue(mapping);
-        });
+        // These properties only exist if the user has read access
+        if (binding.instance[object_join_attr]) {
+          can.each(binding.instance[object_join_attr].reify(), function(mapping) {
+            refresh_queue.enqueue(mapping);
+          });
+        }
 
         return refresh_queue.trigger()
           .then(this.proxy("filter_for_valid_mappings", binding))
@@ -960,7 +963,7 @@
     , _refresh_stubs: function(binding) {
         var model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr].reify();
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
           ;
 
         this.insert_instances_from_mappings(binding, mappings);
