@@ -300,7 +300,7 @@ function collated_user_roles_by_person(user_roles) {
 
 function authorizations_list_loader() {
   return CMS.Models.UserRole
-    .findAll({ context_id: null })
+    .findAll({ context_id__in: [null,0] })
     .then(collated_user_roles_by_person);
 }
 
