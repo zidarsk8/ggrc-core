@@ -85,6 +85,21 @@ class TestImport(TestCase):
     #    actual_start_dates,
     #    "Control start dates not imported correctly"
     #)
+    self.assertEqual(
+        expected_slugs,
+        actual_slugs,
+        "Control slugs not imported correctly"
+    )
+    self.assertEqual(
+        expected_end_dates,
+        actual_end_dates,
+        "Control end dates not imported correctly"
+    )
+    self.assertEqual(
+        expected_start_dates,
+        actual_start_dates,
+        "Control start dates not imported correctly"
+    )
     self.mock_log.assert_called_once_with(db.session)
     # check that imported items appear in index
     results = MysqlRecordProperty.query.filter(
