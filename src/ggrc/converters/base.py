@@ -77,12 +77,9 @@ class BaseConverter(object):
     return cls(rows, **options)
 
   def import_metadata(self):
-    if len(self.rows) == 0:
-      self.errors.append("There is no data in the CSV file that is being imported.")
+    if len(self.rows) < 6:
+      self.errors.append("There is no data to import in this CSV file")
       raise ImportException("", show_preview=True, converter=self)
-    elif len(self.rows) < 6:
-      self.errors.append("Could not import: verify the file is correctly formatted.")
-      raise ImportException("Could not import: verify the file is correctly formatted.")
 
     optional_metadata = []
     if hasattr(self, 'optional_metadata'):

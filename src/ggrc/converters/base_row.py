@@ -741,7 +741,7 @@ class LinkRelationshipsHandler(LinksHandler):
       return {'slug' : value.upper()}
 
   def get_existing_items(self):
-    where_params= {'relationship_type_id' : self.options.get('relationship_type_id')}
+    where_params= {}
     objects = []
     model_class = self.options.get('model_class') or self.model_class
     importer_cls_name = self.importer.obj.__class__.__name__
