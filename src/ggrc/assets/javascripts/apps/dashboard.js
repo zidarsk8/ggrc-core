@@ -191,8 +191,8 @@ var sort_by_name_email = function(list) {
   return new list.constructor(can.makeArray(list).sort(function(a,b) {
     a = a.person || a;
     b = b.person || b;
-    a = can.trim(a.name) || can.trim(a.email);
-    b = can.trim(b.name) || can.trim(b.email);
+    a = (can.trim(a.name) || can.trim(a.email)).toLowerCase();
+    b = (can.trim(b.name) || can.trim(b.email)).toLowerCase();
     if (a > b) return 1;
     if (a < b) return -1;
     return 0;
