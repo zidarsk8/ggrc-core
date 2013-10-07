@@ -12,6 +12,7 @@ can.Model.Cacheable("CMS.Models.Category", {
   root_object : "category"
   , root_collection : "categories"
   , findAll : "GET /api/categories"
+  , findOne : "GET /api/categories/{id}"
   , cache_by_scope: {}
   , for_scope: function(scope) {
       var self = this;
