@@ -13,13 +13,12 @@
 #    Created By: 
 #    Maintained By:
 #*/
-#for x in `grep -rlI --include=*.mustache --exclude-dir=tmp "<\!--" . | grep -v --file=doc/copyright_add/excludes.grep`
-for x in "src/ggrc/assets/javascripts/application.js"
+for x in `grep -rlI --include=*.js --exclude-dir=tmp "*" . | grep -v --file=doc/copyright_add/excludes.grep`
 # save the seventh line on (tail -n +7), do swap on lines before that (head -6)
 do
     tail -n +7 $x > temporary_file
     head -6 $x \
-    | sed -e 's/^\/\*/\/\*!/' \
+    | sed -e 's/^\/\*!*/\/\*!/' \
     | sed -e 's/^ \* /    /' \
     | sed -e 's/^ \*\//*\//' \
     > temporary_file2
