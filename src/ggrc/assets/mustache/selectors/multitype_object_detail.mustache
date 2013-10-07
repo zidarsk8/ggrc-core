@@ -1,6 +1,6 @@
 <div class="selector-info" style="margin-right:-10%;">
   <h4>
-    Map <i class="grcicon-{{related_table_singular}}-color"></i>
+    {{#if_equals new_object_title 'Reference'}}Link{{else}}Map{{/if_equals}} <i class="grcicon-{{related_table_singular}}-color"></i>
     {{new_object_title}} to
     <i class="grcicon-{{table_singular}}-color"></i>
     {{ title }} {{title_singular}}

@@ -400,7 +400,7 @@ can.Control("CMS.Controllers.InnerNav", {
           , count = match[2]
           ;
 
-        if (title.substr(0, 6) === "Mapped")
+        if (title.substr(0, 6).match(/(Mapped|Linked)/))
           title = title.slice(6);
 
         widget_list.push({
