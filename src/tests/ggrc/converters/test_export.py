@@ -121,7 +121,11 @@ class TestExport(TestCase):
         ControlsConverter,
         **options
     )
-    args, kwargs = mock_response.call_args
+    #args, kwargs = mock_response.call_args
+    #function_name, args, kwargs = mock_response.mock_calls[0]
+    #test_csv = args[0][0]
+    #with open(join(CSV_DIR, "test_result.csv"), "w") as f:
+    #  f.write(test_csv)
     mock_response.assert_called_once_with((
         expected_csv,
         self.expected_status_code,
