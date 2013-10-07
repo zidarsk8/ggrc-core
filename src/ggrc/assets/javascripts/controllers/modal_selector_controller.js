@@ -812,15 +812,19 @@
 
         if (!this.options.option_type_menu) {
           menu = [
-            { category: "Assets/Business"
-            , items: []
-            }];
-          menu[0].items = can.map(this.options.option_descriptors, function(descriptor) {
-            return {
+              { category: "Governance"
+              , items: []
+              }
+            , { category: "Assets/Business"
+              , items: []
+              }
+            ];
+          can.each(this.options.option_descriptors, function(descriptor) {
+            menu[descriptor.model.category === "governance" ? 0 : 1].items.push({
                 model_name: descriptor.model.shortName
               , model_display: descriptor.model.title_plural
-            };
-          });
+            })
+          })
 
           this.options.option_type_menu = menu;
         }
