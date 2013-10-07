@@ -549,9 +549,9 @@ class Resource(ModelView):
       for p in paths:
         path = p.split('.')
         if len(path) == 1:
-          inclusions.append(path)
+          inclusions.append(tuple(path))
         else:
-          inclusions.append((path[0], path[1:]))
+          inclusions.append((path[0], tuple(path[1:])))
     else:
       inclusions = ()
     return inclusions
