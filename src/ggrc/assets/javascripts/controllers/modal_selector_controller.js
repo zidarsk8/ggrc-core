@@ -820,7 +820,6 @@
               }
             ];
           can.each(this.options.option_descriptors, function(descriptor) {
-            console.log(!descriptor.model.category && console.dir(descriptor))
             menu[descriptor.model.category === "governance" ? 0 : 1].items.push({
                 model_name: descriptor.model.shortName
               , model_display: descriptor.model.title_plural
