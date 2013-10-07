@@ -7,8 +7,13 @@
       </div>
       <h2>
         {{#if_equals option_type_count 1}}
-          Map {{#option_type_menu}}{{#items}}{{model_display}}{{/#items}}{{/option_type_menu}} to {{selected_object.constructor.title_singular}}
-          
+          {{#option_type_menu}}{{#items}}
+            {{#if_equals model_display 'References'}}
+              Link {{model_display}} to {{selected_object.constructor.title_singular}}
+            {{else}}
+              Map {{model_display}} to {{selected_object.constructor.title_singular}}
+            {{/if_equals}}
+          {{/#items}}{{/option_type_menu}}
         {{else}}
           Map Object {{! modal_title }}
         {{/if_equals}}

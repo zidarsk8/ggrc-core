@@ -271,7 +271,7 @@ $(function() {
               if ( $objectArea.hasClass("dashboard-area") ) {
                 return far_model.title_plural;
               } else {
-                return "Mapped " + far_model.title_plural;
+                return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
               }
             }
           , widget_icon: far_model.table_singular
