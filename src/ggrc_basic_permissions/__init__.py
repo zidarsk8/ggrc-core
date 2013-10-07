@@ -138,9 +138,10 @@ class UserPermissions(DefaultUserPermissions):
             )
         db.session.add(personal_context)
         db.session.commit()
-      session['permissions']['__GGRC_ADMIN__'] = {
-          '__GGRC_ALL__': [personal_context.id,],
-          }
+      session['permissions']\
+          .setdefault('__GGRC_ADMIN__',{})\
+          .setdefault('__GGRC_ALL__',[])\
+          .append(personal_context.id)
 
 def all_collections():
   """The list of all collections provided by this extension."""
