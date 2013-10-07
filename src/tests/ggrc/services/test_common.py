@@ -25,15 +25,8 @@ class ServicesTestMockModel(Base, ggrc.db.Model):
   _publish_attrs = ['modified_by_id', 'foo']
   _update_attrs = ['foo']
 
-#class MockResourceService(Resource):
-  #_model = MockModel
-
-  #def update_object(self, obj, src):
-    #obj.foo = src.get('foo', '')
-
 URL_MOCK_COLLECTION = '/api/mock_resources'
 URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
-#MockResourceService.add_to(ggrc.app, URL_MOCK_COLLECTION)
 Resource.add_to(
     ggrc.app.app, URL_MOCK_COLLECTION, model_class=ServicesTestMockModel)
 
@@ -46,10 +39,8 @@ class TestResource(TestCase):
     # Explicitly create test tables
     if not ServicesTestMockModel.__table__.exists(db.engine):
       ServicesTestMockModel.__table__.create(db.engine)
-    #ggrc.services.MockModel = MockResourceService
 
   def tearDown(self):
-    #delattr(ggrc.services, 'MockModel')
     super(TestResource, self).tearDown()
     # Explicitly destroy test tables
     # Note: This must be after the 'super()', because the session is

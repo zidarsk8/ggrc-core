@@ -52,6 +52,10 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
+    if (!(this.options instanceof can.Observe)) {
+      this.options = new can.Observe(this.options);
+    }
+
     if(!this.element.find(".modal-body").length) {
       can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
