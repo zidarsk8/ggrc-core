@@ -95,13 +95,17 @@
         <div class="span6">
           <div class="confirm-buttons">
             <a class="btn btn-primary preventdoubleclick {{^if selected_option}}disabled {{/if}}map-button" href="javascript://">
-              {{#option_type_menu}}{{#items}}
-                {{#if_equals model_display 'References'}}
-                  Link
-                {{else}}
-                  Map
-                {{/if_equals}}
-              {{/#items}}{{/option_type_menu}}
+              {{#if_equals option_type_count 1}}
+                {{#option_type_menu}}{{#items}}
+                  {{#if_equals model_display 'References'}}
+                    Link
+                  {{else}}
+                    Map
+                  {{/if_equals}}
+                {{/#items}}{{/option_type_menu}}
+              {{else}}
+                Map
+              {{/if_equals}}
             </a>
           </div>
         </div>
