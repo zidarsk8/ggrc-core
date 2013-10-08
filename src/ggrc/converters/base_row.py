@@ -628,7 +628,7 @@ class LinkDocumentsHandler(LinksHandler):
     self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
 
   def render_item(self, item):
-    return "[{} {}] {}".format(item.link, item.title, item.description)
+    return u"[{} {}] {}".format(item.link, item.title, item.description)
 
 class LinkPeopleHandler(LinksHandler):
   from ggrc.models.person import Person
