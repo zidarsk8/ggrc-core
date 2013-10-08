@@ -1202,7 +1202,7 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+resolve_computed(obj))
+  return (""+(resolve_computed(obj) || ""))
     .replace(/"/g, '\\"')
     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
     //    thus does not allow backslash-escaped single quotes within strings.
