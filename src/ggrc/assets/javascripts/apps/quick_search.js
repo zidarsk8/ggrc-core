@@ -180,9 +180,11 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     , by_object_option_models: {}
     , by_option_object_models: {}
     , join_model_name_for: function (model_name_a, model_name_b) {
+        var join_descriptor = null;
         if (this.by_object_option_models[model_name_a] &&
             this.by_object_option_models[model_name_a][model_name_b]) {
-          return this.by_object_option_models[model_name_a][model_name_b][0].options.join_model_name;
+          join_descriptor = this.by_object_option_models[model_name_a][model_name_b][0];
+          return join_descriptor.get_join_model_name();
         }
         return null;
     }
@@ -282,6 +284,15 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
         if (!this.options.join_model)
           this.options.join_model = this.get_model(this.options.join_model_name);
         return this.options.join_model;
+      }
+
+    , get_join_model_name: function() {
+        if (this.options.join_model_name)
+          return this.options.join_model_name;
+        else
+          // FIXME: This is only used for Section, since it has a foreign key
+          //   relationship to Directive.
+          return this.options.option_model_name;
       }
 
     , make_join_object: function(object, option, join_attrs) {
@@ -634,8 +645,16 @@ $(function() {
         })
         .one("modal:success", triggerFlash);
     } else {*/
+      // Mappings to/from a program should be in the context of the program.
+      // Otherwise, default to the page_instance context then default context.
+      var join_context;
+      if (inst instanceof CMS.Models.Program) {
+        join_context = { id : inst.context.id };
+      } else {
+        join_context = page_instance.context || { id : null };
+      }
       join_object = join_descriptor.make_join_object(
-          page_instance, inst, { context: page_instance.context || { id : null } });
+          page_instance, inst, { context : join_context });
       // Map the object if we're able to
       if (join_object) {
         join_object.save()

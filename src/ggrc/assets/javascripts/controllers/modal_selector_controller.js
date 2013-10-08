@@ -937,14 +937,18 @@
 
         var join_model = GGRC.JoinDescriptor.join_model_name_for(
               this.options.object_model, current_option_model_name);
+        var permission_parms = { __permission_type: 'read' };
+        if (current_option_model_name == 'Program') {
+          permission_parms = {
+            __permission_type: 'create'
+            , __permission_model: join_model
+          };
+        }
         return GGRC.Models.Search
           .search_for_types(
               current_search_term || '',
               [current_option_model_name],
-              {
-                __permission_type: 'create'
-                , __permission_model: join_model
-              })
+              permission_parms)
           .then(function(search_result) {
             var options;
             if (self.element
