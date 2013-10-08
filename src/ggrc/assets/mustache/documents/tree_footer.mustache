@@ -12,7 +12,7 @@
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+        data-original-title="{{#if_equals model.title_singular 'Reference'}}Link non-gGRC URLs as References{{else}}Map {{firstnonempty title_singular model.title_singular 'Object'}}{{/if_equals}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
         + {{model.title_singular}}
       </a>
 
