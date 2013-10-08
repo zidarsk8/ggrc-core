@@ -66,7 +66,7 @@ class TestConsistency(TestCase):
     # then export right back
     handle_converter_csv_export(
         "dummy_filename.csv",
-        pol1.controls,
+        [x.control for x in pol1.directive_controls],
         ControlsConverter,
         **export_options
     )
@@ -76,7 +76,7 @@ class TestConsistency(TestCase):
     # called with one argument, which is a tuple w/ csv as first arg
     # so access first/only argument, then first arg of tuple
     actual_csv = AbstractCSV(args[0][0])
-    #with open(join(CSV_DIR, "test_output.csv"), "w") as f:
-    #  f.write(args[0][0])
-    compare = compare_csvs(actual_csv, expected_csv)
+    with open(join(CSV_DIR, "test_output.csv"), "w") as f:
+      f.write(args[0][0])
+    compare = compare_csvs(expected_csv, actual_csv)
     self.assertEqual(True, compare, compare)
