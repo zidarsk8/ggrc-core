@@ -411,6 +411,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Person", "Request", null, null, "assignee"]
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
       , ["DocumentationResponse", "Document", "ObjectDocument", "document", "documentable"]
+      , ["InterviewResponse", "Person", "ObjectPerson", "person", "personable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];

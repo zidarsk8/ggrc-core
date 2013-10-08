@@ -11,15 +11,13 @@
 can.Model.Cacheable("CMS.Models.Meeting", {
   root_collections : "meetings"
   , root_object : "meeting"
-  /*
-  Meetings are not implemented on the GGRC server yet.
   , findAll : "GET /api/meetings"
   , create : "POST /api/meetings"
   , update : "PUT /api/meetings/{id}"
   , destroy : "DELETE /api/meetings/{id}"
-  */
   , attributes : {
     response : "CMS.Models.Response.stub"
+    , people : "CMS.Models.Person.stubs"
   }
 }, {
   init : function () {

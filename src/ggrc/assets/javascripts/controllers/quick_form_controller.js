@@ -15,17 +15,22 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     this.options.instance.refresh();
   }
 
-  , "input, select, textarea change" : function(el, ev) {
+  , "input, textarea, select change" : function(el, ev) {
     var that = this;
-    this.set_value_from_element(el);
-    setTimeout(function() {
-      that.options.instance.save();
-    }, 100);
+    if(!el.is("[data-lookup]")) {
+      this.set_value_from_element(el);
+      setTimeout(function() {
+        that.options.instance.save();
+      }, 100);
+    }
   }
 
   , autocomplete_select : function(el, event, ui) {
+    var that = this;
     if(this._super.apply(this, arguments) !== false) {
-      this.options.instance.save();
+      setTimeout(function() {
+        that.options.instance.save();
+      }, 100);
     } else {
       return false;
     }

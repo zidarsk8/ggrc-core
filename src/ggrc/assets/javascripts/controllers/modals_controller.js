@@ -135,7 +135,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
         , select : ctl.proxy("autocomplete_select", $that)
         , close : function() {
-          $that.val($that.attr("value"));
+          //$that.val($that.attr("value"));
         }
       }).data('ui-autocomplete');
     });
@@ -237,9 +237,8 @@ can.Control("GGRC.Controllers.Modals", {
       this.set_value_from_element(el);
   }
 
-  , "input, textarea, select keyup" : function(el, ev) {
-      if ($(el).is(':not([name="owner.email"])') || !$(el).val())
-        this.set_value_from_element(el);
+  , "input:not([data-lookup]), textarea, select keyup" : function(el, ev) {
+    this.set_value_from_element(el);
   }
 
   , serialize_form : function() {
@@ -254,12 +253,19 @@ can.Control("GGRC.Controllers.Modals", {
       var $el = $(el)
         , name = $el.attr('name')
         , value = $el.val()
+        , that = this;
         ;
 
       if ($el.is('select[multiple]'))
         value = value || [];
       if (name)
         this.set_value({ name: name, value: value });
+
+      if($el.is("[data-also-set]")) {
+        can.each($el.data("also-set").split(","), function(oname) {
+          that.set_value({ name : oname, value : value});
+        });
+      }
     }
 
   , set_value: function(item) {
@@ -306,6 +312,27 @@ can.Control("GGRC.Controllers.Modals", {
             // Setting a "lookup field is handled in the autocomplete() method"
             return;
           }
+        } else if(name[name.length - 1] === "date") {
+          name.pop(); //date is a pseudoproperty of datetime objects
+          if(!value) {
+            value = null;
+          } else {
+            value = this.options.model.convert.date(value);
+            if(this.options.$content.find("[name='" + item.name + ".time']").length) {
+              value = this.options.model.convert.datetime(
+                this.options.model.serialize.date(value) 
+                + "T"
+                + this.options.$content.find("[name='" + item.name + ".time']").val()
+              );
+            }
+          }
+        } else if(name[name.length - 1] === "time") {
+          name.pop(); //time is a pseudoproperty of datetime objects
+          value = this.options.model.convert.datetime(
+            this.options.model.serialize.date(this.options.instance.attr(name.join(".")))
+            + "T"
+            + value
+          );
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
         }

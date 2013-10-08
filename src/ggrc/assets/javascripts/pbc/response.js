@@ -59,13 +59,12 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , attributes : {
     owner : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
     , object_documents : "CMS.Models.ObjectDocument.stubs"
     , documents : "CMS.Models.Document.stubs"
     , population_sample : "CMS.Models.PopulationSample.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
     , meetings : "CMS.Models.Meeting.stubs"
-    , participants : "CMS.Models.Person.stubs"
     , request : "CMS.Models.Request.stub"
     , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
@@ -89,11 +88,15 @@ can.Model.Cacheable("CMS.Models.Response", {
     }, {
       //2: Meetings
       model : "Meeting"
+      , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
     }, {
       //3: Meeting participants
       model : "Person"
+      , mapping : "people"
+      , show_view : GGRC.mustache_path + "/people/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }]
   }
 }, {

@@ -955,6 +955,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , report_end_date : "date"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
+    , owner : "CMS.Models.Person.stub"
   }
   , defaults : {
     status : "Draft"
@@ -981,7 +982,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
-    , assignee : "CMS.Models.Person.model"
+    , assignee : "CMS.Models.Person.stub"
     , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"

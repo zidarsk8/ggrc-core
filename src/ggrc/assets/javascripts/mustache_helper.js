@@ -558,10 +558,11 @@ function defer_render(tag_name, func, deferred) {
   function hookup(element, parent, view_id) {
     var f = function() {
       var frag_or_html = func.apply(this, arguments);
-      $(element).after(frag_or_html).remove();
+      $(element).html(frag_or_html);
     };
-    if (deferred)
-      deferred.done(f)
+    if (deferred) {
+      deferred.done(f);
+    }
     else
       setTimeout(f, 13);
   }
@@ -1211,6 +1212,17 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   else
     ids = [];
   return ids.join(",");
+});
+
+Mustache.registerHelper("local_time_range", function(start, end, options) {
+  var tokens = [];
+  start = moment(start, "HH:mm");
+  end = moment(end, "HH:mm");
+  while(start < end) {
+    tokens.push("<option value='", start.format("HH:mm:ss\\Z"), "'>", start.format("hh:mm A"), "</option>\n");
+    start.add(1, "hour");
+  }
+  return new String(tokens.join(""));
 });
 
 })(this, jQuery, can);

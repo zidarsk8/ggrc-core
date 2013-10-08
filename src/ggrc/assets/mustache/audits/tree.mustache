@@ -72,23 +72,20 @@
           <div class="tree-info">
             <ul class="tree-info-list">
               <li>
-                <strong>Owner:</strong>
-                {{^instance.owner}}
-                  <span class="error">
-                    Not Assigned
-                  </span>
-                {{/instance.owner}}
-                {{#instance.owner}}
-                  {{instance.owner.name}}
-                {{/}}
-              </li>
-              <li>
                 <strong>Planned Start date: </strong>
-                {{localize_date instance.start_date}}
+                  {{#if instance.start_date}}
+                    {{localize_date instance.start_date}}
+                  {{else}}
+                    Not set
+                  {{/if}}
               </li>
               <li>
                 <strong>Planned End date: </strong>
-                {{localize_date instance.end_date}}
+                  {{#if instance.end_date}}
+                    {{localize_date instance.end_date}}
+                  {{else}}
+                    Not set
+                  {{/if}}
               </li>
               <li>
                 <strong>Planned Report period: </strong>

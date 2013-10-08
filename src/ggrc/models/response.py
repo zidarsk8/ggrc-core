@@ -69,8 +69,10 @@ class InterviewResponse(Relatable, Documentable, Personable, Response):
       'polymorphic_identity': 'interview'
       }
   _table_plural = 'interview_responses'
+
+  meetings = db.relationship('Meeting')
   _publish_attrs = [
-    #'meetings',
+    'meetings',
       ]
   _sanitize_html = [
       ]
@@ -80,8 +82,8 @@ class InterviewResponse(Relatable, Documentable, Personable, Response):
     from sqlalchemy import orm
 
     query = super(InterviewResponse, cls).eager_query()
-    return query.options()
-        #orm.subqueryload('meetings'))
+    return query.options(
+      orm.subqueryload('meetings'))
 
 class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
   __mapper_args__ = {
