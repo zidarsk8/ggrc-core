@@ -1129,6 +1129,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
   var target_type
     , resource_type
     , context_id
+    , can_map
     ;
 
   source = resolve_computed(source);
@@ -1147,16 +1148,30 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
   //  source = GGRC.page_instance();
   //}
 
-  resource_type = GGRC.JoinDescriptor.join_model_name_for(
-    source.constructor.shortName, target_type);
+  if (target_type === 'Cacheable') {
+    //  FIXME: This will *not* work for customizable roles -- this *only* works
+    //    for the limited default roles as of 2013-10-07, and assumes that:
+    //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
+    //        to a single object) are in the `null` context; and
+    //    2.  If a user has permission for creating `Relationship` objects in
+    //        the `null` context, they have permission for creating all mapping
+    //        objects in `null` context.
+    can_map = Permission.is_allowed('create', 'Relationship', null);
+  }
+  else {
+    resource_type = GGRC.JoinDescriptor.join_model_name_for(
+      source.constructor.shortName, target_type);
 
-  context_id = source.context ? source.context.id : null;
-  if (!(source instanceof CMS.Models.Program)
-      && target instanceof CMS.Models.Program)
-    context_id = target.context ? target.context.id : null;
+    context_id = source.context ? source.context.id : null;
+    if (!(source instanceof CMS.Models.Program)
+        && target instanceof CMS.Models.Program)
+      context_id = target.context ? target.context.id : null;
 
-  // We should only map objects that have join models
-  if ((!(options.hash && options.hash.join) || resource_type) && Permission.is_allowed('create', resource_type, context_id))
+    // We should only map objects that have join models
+    can_map = (!(options.hash && options.hash.join) || resource_type)
+      && Permission.is_allowed('create', resource_type, context_id);
+  }
+  if (can_map)
     return options.fn(options.contexts || this);
   else
     return options.inverse(options.contexts || this);
