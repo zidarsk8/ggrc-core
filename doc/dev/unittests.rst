@@ -21,6 +21,11 @@ To attach Controls to Categories:
 - Append category object(s) to .categories attribute of Control object
 - Add and commit control object if not already
 
+To look up a Directive's controls (NEW as of late Sept 2013):
+
+- Look up the ``.control`` attribute of every item in the Directive's ``.directive_control`` attribute
+- Useful idiom for getting all of a directive's controls: ``[x.control for x in directive_object.directive_controls``
+
 
 Expected Behavior Clarification
 -------------------
