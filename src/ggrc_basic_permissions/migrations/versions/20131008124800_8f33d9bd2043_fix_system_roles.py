@@ -68,7 +68,7 @@ def upgrade():
         'System',
         'Process',
       'SystemControl',
-      'SystemSysetm',
+      'SystemSystem',
       ]
 
   basic_objects_readable = list(basic_objects_editable)
