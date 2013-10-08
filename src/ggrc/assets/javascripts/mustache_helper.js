@@ -714,14 +714,12 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
 
 Mustache.registerHelper("private_program", function(modal_title) {
   return resolve_computed(modal_title).indexOf("New ") !=0 ? '' : [
-    '<div class="span6">'
-    , '<label>'
+      '<label>'
     , 'Privacy'
     , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
     , '<input name="private" value="private" type="checkbox"> Private Program'
-    , '</div>'
     , '</div>'
   ].join("");
 });

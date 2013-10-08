@@ -13,6 +13,9 @@
       <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
       {{/if_null}}
     </div>
+    <div class="span6">
+      {{#private_program modal_title}}{{/private_program}}
+    </div>
   </div>
   <div class="row-fluid">
     <div class="span6">
@@ -84,7 +87,6 @@
         </label>
         <input class="input-block-level" name="scope" placeholder="Enter Scope" type="text" value="{{scope}}">
       </div>
-      {{#private_program modal_title}}{{/private_program}}
     </div>
   </div>
 </form>

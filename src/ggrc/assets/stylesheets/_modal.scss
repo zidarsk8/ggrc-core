@@ -350,6 +350,10 @@
         height: 120px;
         @include input-block-level();
       }
+      .quadruple {
+        height: 150px;
+        @include input-block-level();
+      }
       iframe {
         width: 100% !important;
       }
