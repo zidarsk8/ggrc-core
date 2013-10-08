@@ -45,7 +45,9 @@ class TestCSVCompare(unittest.TestCase):
     self.assertEqual(
       True,
       comp,
-      "Difference detected that should have been ignored."
+      "Difference detected that should have been ignored: {0}.".format(
+          comp
+      )
     )
 
   def test_missing_rows(self):
