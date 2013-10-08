@@ -942,8 +942,8 @@
               current_search_term || '',
               [current_option_model_name],
               {
-                __permission_type: 'create'
-                , __permission_model: join_model
+                __permission_type: 'read'
+                //, __permission_model: join_model
               })
           .then(function(search_result) {
             var options;
