@@ -416,8 +416,8 @@ Feature: RBAC Permissions enforcement for REST API
     When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
     Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
-    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 2"
-    And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0] != 'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][1]"
+    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 1"
+    And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0]"
     Given the current user
     """
     { "email": "alicetester@testertester.com",
