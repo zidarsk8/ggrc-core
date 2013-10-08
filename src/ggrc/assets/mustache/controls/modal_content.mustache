@@ -16,10 +16,10 @@
           Directive
           <i class="grcicon-help-black" rel="tooltip" title="Contract, Policy or Regulation Code"></i>
         </label>
-        <input id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty directive.id ''}}">
+        <input id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty instance.directive.id ''}}">
         <p class="modal-value">
-          {{#if directive}}
-            {{#using directive=directive}}
+          {{#if instance.directive}}
+            {{#using directive=instance.directive}}
             {{directive.title}}
             {{/using}}
           {{else}}
