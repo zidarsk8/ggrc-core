@@ -9,6 +9,7 @@ TEST_FILE1 = join(CSV_DIR, "helper_test1.csv")
 TEST_FILE2 = join(CSV_DIR, "helper_test2.csv")
 # file with an irrelevant difference from TEST_FILE1
 IRREL_DIF_FILE = join(CSV_DIR, "irrel_diff.csv")
+NO_ROWS = join(CSV_DIR, "helper_test_no_row.csv")
 
 class TestCSVCompare(unittest.TestCase):
   def setUp(self):
@@ -20,13 +21,15 @@ class TestCSVCompare(unittest.TestCase):
       self.csv2 = AbstractCSV(f.read())
     with open(IRREL_DIF_FILE, "r") as f:
       self.csv3 = AbstractCSV(f.read())
+    with open(NO_ROWS, "r") as f:
+      self.csv4 = AbstractCSV(f.read())
 
   def tearDown(self):
     pass
 
   def test_same_file(self):
     comp = compare_csvs(self.csv1a, self.csv1b)
-    self.assertTrue(comp, "file not equal to itself")
+    self.assertEqual(True, comp, "file not equal to a copy")
 
   def test_different_file(self):
     comp = compare_csvs(self.csv1a, self.csv2)
@@ -37,8 +40,19 @@ class TestCSVCompare(unittest.TestCase):
     )
 
   def test_irrelevant_difference(self):
+    #comp = compare_csvs(self.csv1a, self.csv3)
     comp = compare_csvs(self.csv1a, self.csv3)
-    self.assertTrue(
+    self.assertEqual(
+      True,
       comp,
       "Difference detected that should have been ignored."
+    )
+
+  def test_missing_rows(self):
+    comp = compare_csvs(self.csv2, self.csv4)
+    expected = ('Row 5', None)
+    self.assertEqual(
+        expected,
+        comp,
+        "Failed to notice missing row"
     )
