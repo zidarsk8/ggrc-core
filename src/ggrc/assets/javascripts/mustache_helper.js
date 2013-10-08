@@ -1071,6 +1071,10 @@ Mustache.registerHelper("is_allowed", function() {
   if (options.hash && typeof options.hash.context !== undefined && !options.hash.context) {
     context_id = null;
   }
+  // This happens for Section widget, when GGRC.page_instance().context is null
+  if (typeof(context_id) === 'undefined') {
+    context_id = null;
+  }
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
