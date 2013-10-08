@@ -597,8 +597,16 @@ $(function() {
         })
         .one("modal:success", triggerFlash);
     } else {*/
+      // Mappings to/from a program should be in the context of the program.
+      // Otherwise, default to the page_instance context then default context.
+      var join_context;
+      if (inst instanceof CMS.Models.Program) {
+        join_context = { id : inst.context.id };
+      } else {
+        join_context = page_instance.context || { id : null };
+      }
       join_object = join_descriptor.make_join_object(
-          page_instance, inst, { context: page_instance.context || { id : null } });
+          page_instance, inst, { context : join_context });
       // Map the object if we're able to
       if (join_object) {
         join_object.save()
