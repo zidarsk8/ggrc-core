@@ -26,6 +26,7 @@ class TestImport(TestCase):
     self.mock_log = self.patcher.start()
     self.date1 = datetime(2013, 9, 25)
     self.date2 = datetime(2013, 9, 26)
+    self.date3 = datetime(2013, 9, 5)
     super(TestImport, self).setUp()
 
   def tearDown(self):
@@ -236,6 +237,72 @@ class TestImport(TestCase):
     #    actual_start_dates,
     #    "Control start dates not imported correctly"
     #)
+    self.mock_log.assert_called_once_with(db.session)
+    # check that imported items appear in index
+    results = MysqlRecordProperty.query.filter(
+        MysqlRecordProperty.type == 'Control',
+        MysqlRecordProperty.content.match('Minimal Control')
+    ).all()
+    index_results = set([x.content for x in results])
+    for title in expected_titles:
+      self.assertIn(
+          title,
+          index_results,
+          "{0} not indexed".format(title)
+      )
+
+  def test_dates_with_dashes(self):
+    csv_filename = join(CSV_DIR, "minimal_import_dates_dashes.csv")
+    expected_titles = set([
+      "Minimal Control 1",
+    ])
+    # should fail to import dates
+    expected_start_dates = set([self.date3])
+    expected_end_dates = set([self.date2])
+    expected_slugs = set(["CTRL-1"])
+    pol1 = Policy(
+      kind="Company Policy",
+      title="Example Policy",
+      slug="POL-123",
+    )
+    db.session.add(pol1)
+    db.session.commit()
+    options = {'directive_id': pol1.id, 'dry_run': False}
+    handle_csv_import(
+        ControlsConverter,
+        csv_filename,
+        **options
+    )
+    actual_titles = set()
+    actual_slugs = set()
+    actual_start_dates = set()
+    actual_end_dates = set()
+    controls = [x.control for x in pol1.directive_controls]
+    for control in controls:
+      actual_titles.add(control.title)
+      actual_slugs.add(control.slug)
+      actual_start_dates.add(control.start_date)
+      actual_end_dates.add(control.end_date)
+    self.assertEqual(
+        expected_titles,
+        actual_titles,
+        "Control titles not imported correctly"
+    )
+    self.assertEqual(
+        expected_slugs,
+        actual_slugs,
+        "Control slugs not imported correctly"
+    )
+    self.assertEqual(
+        expected_end_dates,
+        actual_end_dates,
+        "Control end dates not imported correctly"
+    )
+    self.assertEqual(
+        expected_start_dates,
+        actual_start_dates,
+        "Control start dates not imported correctly"
+    )
     self.mock_log.assert_called_once_with(db.session)
     # check that imported items appear in index
     results = MysqlRecordProperty.query.filter(
