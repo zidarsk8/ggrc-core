@@ -33,8 +33,7 @@ class TestImport(TestCase):
     super(TestImport, self).tearDown()
 
   def test_simple(self):
-    #csv_filename = join(CSV_DIR, "minimal_import.csv")
-    csv_filename = join(CSV_DIR, "minimal_export2.csv")
+    csv_filename = join(CSV_DIR, "minimal_import.csv")
     expected_titles = set([
       "Minimal Control 1",
       "Minimal Control 2",
@@ -70,21 +69,6 @@ class TestImport(TestCase):
         actual_titles,
         "Control titles not imported correctly"
     )
-    #self.assertEqual(
-    #    expected_slugs,
-    #    actual_slugs,
-    #    "Control slugs not imported correctly"
-    #)
-    #self.assertEqual(
-    #    expected_end_dates,
-    #    actual_end_dates,
-    #    "Control end dates not imported correctly"
-    #)
-    #self.assertEqual(
-    #    expected_start_dates,
-    #    actual_start_dates,
-    #    "Control start dates not imported correctly"
-    #)
     self.assertEqual(
         expected_slugs,
         actual_slugs,
@@ -141,7 +125,8 @@ class TestImport(TestCase):
     )
     actual_titles = set()
     actual_slugs = set()
-    for control in pol1.controls:
+    controls = [x.control for x in pol1.directive_controls]
+    for control in controls:
       actual_titles.add(control.title)
       actual_slugs.add(control.slug)
     self.assertEqual(
@@ -158,7 +143,7 @@ class TestImport(TestCase):
     for system in systems:
       self.assertEqual(
           system.controls,
-          pol1.controls,
+          controls,
           "System {0} not connected to controls on import".format(
               system.slug
           ),
@@ -226,7 +211,9 @@ class TestImport(TestCase):
     actual_slugs = set()
     actual_start_dates = set()
     actual_end_dates = set()
-    for control in pol1.controls:
+    ctrls = Control.query.all()
+    for directive_control in pol1.directive_controls:
+      control = directive_control.control
       actual_titles.add(control.title)
       actual_slugs.add(control.slug)
       actual_start_dates.add(control.start_date)
