@@ -185,15 +185,14 @@ class TestImport(TestCase):
     self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
 
   def test_invalid_dates(self):
-    #csv_filename = join(CSV_DIR, "minimal_import_dashes.csv")
-    csv_filename = join(CSV_DIR, "minimal_import_dashes.csv")
+    csv_filename = join(CSV_DIR, "minimal_import_bad_dates.csv")
     expected_titles = set([
       "Minimal Control 1",
-      "Minimal Control 2",
     ])
-    expected_start_dates = set([None, self.date1])
-    expected_end_dates = set([None, self.date2])
-    expected_slugs = set(["CTRL-1", "CTRL-2"])
+    # should fail to import dates
+    expected_start_dates = set([None])
+    expected_end_dates = set([None])
+    expected_slugs = set(["CTRL-1"])
     pol1 = Policy(
       kind="Company Policy",
       title="Example Policy",
@@ -211,9 +210,8 @@ class TestImport(TestCase):
     actual_slugs = set()
     actual_start_dates = set()
     actual_end_dates = set()
-    ctrls = Control.query.all()
-    for directive_control in pol1.directive_controls:
-      control = directive_control.control
+    controls = [x.control for x in pol1.directive_controls]
+    for control in controls:
       actual_titles.add(control.title)
       actual_slugs.add(control.slug)
       actual_start_dates.add(control.start_date)
@@ -251,25 +249,3 @@ class TestImport(TestCase):
           index_results,
           "{0} not indexed".format(title)
       )
-
-  #def test_system_mismatch(self):
-  #  sys1 = System(slug="ACLS", title="System1")
-  #  db.session.add(sys1)
-  #  expected_titles = set([
-  #    "Complex Control 2",
-  #  ])
-  #  expected_slugs = set([
-  #    "CTRL-2345",
-  #  ])
-  #  csv_filename = join(CSV_DIR, "mappings_import.csv")
-  #  pol1 = Policy(
-  #    kind="Company Policy",
-  #    title="Example Policy",
-  #    slug="POL-123",
-  #  )
-  #  db.session.add(pol1)
-  #  db.session.commit()
-  #  options = {'directive_id': pol1.id, 'dry_run': False}
-  #  actual_titles = set()
-  #  actual_slugs = set()
-  #  self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
