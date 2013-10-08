@@ -154,20 +154,20 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
-          ? $.when(this.options.instance = new this.options.model(params || this.find_params()))
+          ? $.when(this.options.attr("instance", new this.options.model(params || this.find_params())))
           : this.options.model.findAll(params || this.find_params()).then(function(data) {
             var h;
             if(data.length) {
-              that.options.instance = data[0];
+              that.options.attr("instance", data[0]);
               return data[0].refresh(); //have to refresh (get ETag) to be editable.
             } else {
               that.options.new_object_form = true;
-              that.options.instance = new that.options.model(params || that.find_params());
+              that.options.attr("instance", new that.options.model(params || that.find_params()));
               return that.options.instance;
             }
           });
     } else {
-      this.options.instance = new can.Observe(params || this.find_params());
+      this.options.attr("instance", new can.Observe(params || this.find_params()));
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
