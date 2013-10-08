@@ -51,12 +51,17 @@ class Program(
       'organization',
       ]
 
+  _include_links = [
+      'program_controls',
+      'program_directives',
+      ]
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
     query = super(Program, cls).eager_query()
-    return query.options(
+    return cls.eager_inclusions(query, Program._include_links).options(
         orm.subqueryload_all('program_directives.directive'),
-        orm.subqueryload('audits'),
-        orm.subqueryload_all('program_controls.control'))
+        #orm.joinedload('program_controls'),
+        orm.subqueryload('audits'))

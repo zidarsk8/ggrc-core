@@ -2,6 +2,11 @@
 <p>
 {{#instance}}
 Are you sure you want to delete {{display_name}}?
+{{#delete_counts instance}}
+	<br/>{{.}}
+{{else}}
+	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
+{{/delete_counts}}
 {{/instance}}
 </p>
 </div>
