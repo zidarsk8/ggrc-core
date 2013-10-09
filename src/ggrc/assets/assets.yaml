@@ -76,6 +76,7 @@ dashboard-js-files:
   - pbc/response.js
   - pbc/responses_controller.js
   - pbc/modals_controller.js
+  - pbc/workflow_controller.js
   - apps/pbc.js
   - products/routes_controller.js
   - apps/products.js

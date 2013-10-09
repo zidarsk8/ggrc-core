@@ -74,6 +74,9 @@ can.Model.Cacheable("CMS.Models.Response", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
   }
+  , defaults : {
+    status : "Assigned"
+  }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
     , footer_view : GGRC.mustache_path + "/responses/tree_footer.mustache"
@@ -119,6 +122,11 @@ CMS.Models.Response("CMS.Models.DocumentationResponse", {
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
   }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "documentation";
+    return params;
+  }
 }, {});
 
 CMS.Models.Response("CMS.Models.InterviewResponse", {
@@ -134,6 +142,11 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
   }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "interview";
+    return params;
+  }
 }, {});
 
 CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
@@ -148,5 +161,10 @@ CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
     this._super && this._super.apply(this, arguments);
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
+  }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "population sample";
+    return params;
   }
 }, {});
