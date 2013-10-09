@@ -974,6 +974,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
+    , owner: {id : null}
   }
   , tree_view_options : {
     draw_children : true
@@ -1024,7 +1025,9 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validatePresenceOf("objective");
   }
 }, {
-
+  response_model_class : function() {
+    return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";
+  }
 });
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {

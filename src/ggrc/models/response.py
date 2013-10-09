@@ -8,6 +8,7 @@ from .mixins import deferred, BusinessObject
 from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
+from .object_control import Controllable
 
 class Response(BusinessObject, db.Model):
   __tablename__ = 'responses'
@@ -40,7 +41,7 @@ class Response(BusinessObject, db.Model):
     return query.options(
         orm.joinedload('request'))
 
-class DocumentationResponse(Relatable, Documentable, Personable, Response):
+class DocumentationResponse(Relatable, Documentable, Personable, Controllable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
       }
@@ -64,7 +65,7 @@ class DocumentationResponse(Relatable, Documentable, Personable, Response):
     return query.options(
         orm.subqueryload('evidence'))
 
-class InterviewResponse(Relatable, Documentable, Personable, Response):
+class InterviewResponse(Relatable, Documentable, Personable, Controllable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
       }
@@ -85,7 +86,7 @@ class InterviewResponse(Relatable, Documentable, Personable, Response):
     return query.options(
       orm.subqueryload('meetings'))
 
-class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
+class PopulationSampleResponse(Relatable, Documentable, Personable, Controllable, Response):
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'
       }

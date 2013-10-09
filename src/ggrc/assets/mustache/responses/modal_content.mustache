@@ -49,7 +49,7 @@
     </div>
   </div>
   
-  {{#using request=request}}
+  {{#using request=instance.request}}
   <input type="hidden" name="request.id" value="{{request.id}}">
   <input type="hidden" name="response_type" value="{{request.request_type}}">
   {{/using}}

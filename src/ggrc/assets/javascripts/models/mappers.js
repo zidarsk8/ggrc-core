@@ -894,7 +894,7 @@
           , object_model = binding.instance.constructor
           ;
 
-        return (mapping.constructor === model
+        return (mapping instanceof model
                 && mapping[this.object_attr]
                 && (mapping[this.object_attr].reify() === binding.instance
                     || (mapping[this.object_attr].reify().constructor == object_model &&

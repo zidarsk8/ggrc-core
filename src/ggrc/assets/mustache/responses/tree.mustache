@@ -5,7 +5,7 @@
           <div class="span6">
             <div class="item-data">
               <div class="tree-title-area">
-                {{{firstnonempty description 'Response'}}}
+                {{{firstnonempty instance.description 'Response'}}}
               </div>
             </div>
           </div>
@@ -13,12 +13,8 @@
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
-              {{!autocmplete doesn't work for now.  just display the name and force popping up the edit modal to change assignee}}
-              <!--
-                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.assignee.name instance.assignee.email ''}}">
-              -->
               {{#using owner=instance.owner}}
-                {{firstnonempty owner.name owner.email}}
+                <input type="text" name="owner.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.owner.name instance.owner.email ''}}">
               {{/using}}
             </div>
           </div>
@@ -48,7 +44,7 @@
       
       {{#child_options.0}}
       <div class="inner-tree">
-        <h6>Mapped Objects ({{#list}}{{length}}{{/list}})</h6>
+        <h6>Mapped Objects ({{child_options.0.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
         </ul>
       </div>
@@ -57,7 +53,7 @@
       {{#if_equals instance.response_type 'documentation'}}
       {{#child_options.1}}
       <div class="inner-tree">
-        <h6>Evidence ({{list.length}})</h6>
+        <h6>Evidence ({{child_options.1.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
         </ul>
       </div>
@@ -66,7 +62,7 @@
       {{#if_equals instance.response_type 'interview'}}
       {{#child_options.2}}
       <div class="inner-tree">
-        <h6>Meetings ({{list.length}})</h6>
+        <h6>Meetings ({{child_options.2.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}></ul>
       </div>
       {{/child_options.2}}

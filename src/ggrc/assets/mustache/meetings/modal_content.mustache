@@ -14,26 +14,18 @@
       <div class="span4">
         <label>Starts at</label>
         <select class="input-block-level" name="start_at.time">
-          {{local_time_range '09:00' '17:00'}}
+          {{local_time_range '09:00' '17:01'}}
         </select>
         
         <label>Ends at</label>
         <select class="input-block-level">
-          <option>9:00 AM</option>
-          <option>10:00 AM</option>
-          <option>11:00 AM</option>
-          <option>12:00 AM</option>
-          <option>1:00 PM</option>
-          <option>2:00 PM</option>
-          <option>3:00 PM</option>
-          <option>4:00 PM</option>
-          <option>5:00 PM</option>
+          {{local_time_range '09:00' '17:01'}}
         </select>
       </div>
       <div class="span4">
         Participants
         <select name="people" multiple="multiple" class="input-block-level">
-          {{#using response=response}}
+          {{#using response=instance.response}}
             {{#response.people}}
               {{#using person=this}}
                 <option id="{{person.id}}">{{person.name}}</option>

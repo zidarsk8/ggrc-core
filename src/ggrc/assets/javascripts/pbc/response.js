@@ -40,7 +40,7 @@ can.Model.Cacheable("CMS.Models.Response", {
         return CMS.Models[params.type].model(params);
     } else {
       can.each(this.subclasses, function(m) {
-        if(m.root_object === params.response_type) {
+        if(m.root_object === params.response_type + "_response") {
           params = m.model(params);
           found = true;
           return false;
@@ -69,6 +69,8 @@ can.Model.Cacheable("CMS.Models.Response", {
     , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
@@ -76,7 +78,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     , draw_children : true
     , child_options : [{
       //0: mapped objects
-      mapping : "related_objects"
+      mapping : "business_objects"
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"

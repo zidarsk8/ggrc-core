@@ -303,9 +303,9 @@ can.Control("CMS.Controllers.TreeView", {
         default: return null;
       }
     }, null);
-    if(parent.children_drawn)
-      return;
-    parent.attr("children_drawn", true);
+    if(parent && !parent.children_drawn) {
+      parent.attr("children_drawn", true);
+    }
   }
 
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
