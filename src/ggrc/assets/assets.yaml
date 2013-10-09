@@ -8,6 +8,7 @@ dashboard-js-files:
   - rails.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
+  - jquery.transit.min.js
   - sha1.js
   - bootstrap-transition.js
   - bootstrap-alert.js
@@ -40,6 +41,7 @@ dashboard-js-files:
   - spin.min.js
   - tmpl.js
   - mustache_helper.js
+  - sticky_header.js
   - models/mappers.js
   - models/mappings.js
   - models/cacheable.js
