@@ -40,7 +40,6 @@ class TestCSVCompare(unittest.TestCase):
     )
 
   def test_irrelevant_difference(self):
-    #comp = compare_csvs(self.csv1a, self.csv3)
     comp = compare_csvs(self.csv1a, self.csv3)
     self.assertEqual(
       True,

@@ -70,13 +70,9 @@ class TestConsistency(TestCase):
         ControlsConverter,
         **export_options
     )
-    from ggrc.models import Control
-    ctrls = Control.query.all()
     name, args, kwargs = mock_response.mock_calls[0]
     # called with one argument, which is a tuple w/ csv as first arg
     # so access first/only argument, then first arg of tuple
     actual_csv = AbstractCSV(args[0][0])
-    with open(join(CSV_DIR, "test_output.csv"), "w") as f:
-      f.write(args[0][0])
     compare = compare_csvs(expected_csv, actual_csv)
     self.assertEqual(True, compare, compare)
