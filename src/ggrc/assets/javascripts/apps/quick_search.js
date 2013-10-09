@@ -611,7 +611,7 @@ $(function() {
       // Mappings to/from a program should be in the context of the program.
       // Otherwise, default to the page_instance context then default context.
       var join_context;
-      if (inst instanceof CMS.Models.Program) {
+      if (inst instanceof CMS.Models.Program && inst.context) {
         join_context = { id : inst.context.id };
       } else {
         join_context = page_instance.context || { id : null };
