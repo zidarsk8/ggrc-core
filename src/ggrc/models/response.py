@@ -47,11 +47,7 @@ class DocumentationResponse(Relatable, Documentable, Personable, Controllable, R
       }
   _table_plural = 'documentation_responses'
 
-  evidence = db.relationship('Evidence', backref='response',
-    cascade='all, delete-orphan')
-
   _publish_attrs = [
-    'evidence',
       ]
   _sanitize_html = [
       ]
@@ -62,8 +58,7 @@ class DocumentationResponse(Relatable, Documentable, Personable, Controllable, R
     from sqlalchemy import orm
 
     query = super(DocumentationResponse, cls).eager_query()
-    return query.options(
-        orm.subqueryload('evidence'))
+    return query.options()
 
 class InterviewResponse(Relatable, Documentable, Personable, Controllable, Response):
   __mapper_args__ = {
@@ -92,13 +87,22 @@ class PopulationSampleResponse(Relatable, Documentable, Personable, Controllable
       }
   _table_plural = 'population_sample_responses'
 
-  population_worksheet = deferred(db.Column(db.String, nullable=True),
-    'Response')
+  population_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
+      'Response')
   population_count = deferred(db.Column(db.Integer, nullable=True),
     'Response')
-  sample_worksheet = deferred(db.Column(db.String, nullable=True), 'Response')
+  sample_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
+      'Response')
   sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
-  sample_evidence = deferred(db.Column(db.String, nullable=True), 'Response')
+  sample_evidence_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
+      'Response')
+
+  population_worksheet = db.relationship("Document", foreign_keys="PopulationSampleResponse.population_worksheet_id")
+  sample_worksheet = db.relationship("Document", foreign_keys="PopulationSampleResponse.sample_worksheet_id")
+  sample_evidence = db.relationship("Document", foreign_keys="PopulationSampleResponse.sample_evidence_id")
 
   _publish_attrs = [
       'population_worksheet',
@@ -108,11 +112,8 @@ class PopulationSampleResponse(Relatable, Documentable, Personable, Controllable
       'sample_evidence',
       ]
   _sanitize_html = [
-      'population_worksheet',
       'population_count',
-      'sample_worksheet',
       'sample_count',
-      'sample_evidence',
       ]
 
   @classmethod
@@ -120,4 +121,7 @@ class PopulationSampleResponse(Relatable, Documentable, Personable, Controllable
     from sqlalchemy import orm
 
     query = super(PopulationSampleResponse, cls).eager_query()
-    return query.options()
+    return query.options(
+      orm.joinedload('population_worksheet'),
+      orm.joinedload('sample_worksheet'),
+      orm.joinedload('sample_evidence'))

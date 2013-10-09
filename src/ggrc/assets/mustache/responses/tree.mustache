@@ -74,17 +74,18 @@
       {{/child_options.3}}
       {{/if_equals}}
       {{#if_equals instance.response_type 'population sample'}}
-      {{#using population_sample=instance.population_sample}}
-      <div class="tier-2-info-content population-content">
+      <div class="tier-2-info-content population-content" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
         <ul class="population-upload">
           <li>
             <div class="row-fluid">
               <div class="span8">
                 <label>Population worksheet</label>
                 <div class="row-fluid">
+                  {{#using population_worksheet=instance.population_worksheet}}
                   <div class="span9">
-                    <input type="text" name="population.worksheet" class="input-block-level" placeholder="Enter URL">
+                    <input type="text" name="population_worksheet.name" data-lookup="Document" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
                   </div>
+                  {{/using}}
                   <!--
                     <div class="span1">
                       <span class="choose">OR</span>
@@ -97,7 +98,7 @@
               </div>
               <div class="span4">
                 <label>Population #</label>
-                <input type="text" name="population.number" class="input-block-level" placeholder="example: 1000">
+                <input type="text" name="population_count" class="input-block-level" placeholder="example: 1000" value="{{firstnonempty instance.population_count ''}}">
               </div>
             </div>
           </li>
@@ -106,9 +107,11 @@
               <div class="span8">
                 <label>Sample worksheet</label>
                 <div class="row-fluid">
+                  {{#using sample_worksheet=instance.sample_worksheet}}
                   <div class="span9">
-                    <input type="text" name="sample.worksheet" class="input-block-level" placeholder="Enter URL">
+                    <input type="text" name="sample_worksheet.name" data-lookup="Document" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
                   </div>
+                  {{/using}}
                   <!--
                     <div class="span1">
                       <span class="choose">OR</span>
@@ -121,7 +124,7 @@
               </div>
               <div class="span4">
                 <label>Sample #</label>
-                <input type="text" name="sample.number" class="input-block-level" placeholder="example: 1000">
+                <input type="text" name="sample_count" class="input-block-level" placeholder="example: 1000" value="{{firstnonempty instance.sample_count ''}}">
               </div>
             </div>
           </li>
@@ -130,9 +133,11 @@
               <div class="span8">
                 <label>Sample evidence</label>
                 <div class="row-fluid">
+                  {{#using sample_evidence=instance.sample_evidence}}
                   <div class="span9">
-                    <input type="text" name="sample.evidence" class="input-block-level" placeholder="Enter URL">
+                    <input type="text" name="sample_evidence.name" data-lookup="Document" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
                   </div>
+                  {{/using}}
                   <!--
                     <div class="span1">
                       <span class="choose">OR</span>
@@ -148,7 +153,6 @@
           </li>
         </ul>
       </div>
-      {{/using}}
       {{/if_equals}}
       
     </div>
