@@ -316,3 +316,21 @@ class TestImport(TestCase):
           index_results,
           "{0} not indexed".format(title)
       )
+
+  def test_invalid_encoding(self):
+    csv_filename = join(CSV_DIR, "minimal_import_UTF16.csv")
+    pol1 = Policy(
+      kind="Company Policy",
+      title="Example Policy",
+      slug="POL-123",
+    )
+    db.session.add(pol1)
+    db.session.commit()
+    options = {'directive_id': pol1.id, 'dry_run': False}
+    with self.assertRaises(ImportException) as cm:
+      handle_csv_import(ControlsConverter, csv_filename, **options)
+    self.assertEqual(
+        "Could not import: invalid character encountered, verify the file is correctly formatted.",
+        cm.exception.message,
+        "Did not throw exception for non-utf8 character"
+    )
