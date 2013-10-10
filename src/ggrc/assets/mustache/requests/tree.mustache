@@ -16,9 +16,7 @@
           <i class="grcicon-person-green pull-left"></i>
         {{#using assignee=instance.assignee}}
           <div class="objective-selector">
-            {{!autocmplete doesn't work for now.  just display the name and force popping up the edit modal to change assignee}}
-            
-              <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{assignee.email}}">
+            <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
           </div>
         {{/using}}
         </div>
