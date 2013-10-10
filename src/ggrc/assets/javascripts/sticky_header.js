@@ -39,7 +39,8 @@ can.Control("StickyHeader", {
           , left: this.options.header.offset().left + 'px'
           , width: (this.options.header[0].getBoundingClientRect().width
               - parseFloat(this.options.header.css('paddingLeft')) 
-              - parseFloat(this.options.header.css('paddingRight'))) + 'px'
+              - parseFloat(this.options.header.css('paddingRight'))) 
+              + 'px'
         });
       }
       else if (this.options.mode === "transform")
@@ -48,7 +49,9 @@ can.Control("StickyHeader", {
 
     // Update the position
     if (this.options.mode === "fixed") {
-      if (el[0].scrollTop < this._margin && this._clone[0].parentNode)
+      if (el[0].scrollTop >= this._margin && !this._clone[0].parentNode)
+        this.options.header.parent().append(this._clone);
+      else if (el[0].scrollTop < this._margin)
         this._clone.remove();
     }
     else if (this.options.mode === "transform") {
