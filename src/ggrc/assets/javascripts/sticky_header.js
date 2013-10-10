@@ -12,6 +12,7 @@ can.Control("StickyHeader", {
     defaults: {
         header: "header"
       , scroll_area: ".object-area"
+      , mode: "fixed" // transform | fixed
     }
 }, {
     init : function() {
@@ -19,7 +20,6 @@ can.Control("StickyHeader", {
           header: typeof this.options.header === 'string' ? this.element.find(this.options.header) : this.options.header
         , scroll_area: typeof this.options.scroll_area === 'string' ? this.element.closest(this.options.scroll_area) : this.options.scroll_area
       }));
-      this.options.header.css('transform-origin', '0 0');
       this.on();
     }
 
@@ -27,16 +27,37 @@ can.Control("StickyHeader", {
     if (!this.options.header.is(":visible"))
       return;
 
+    // Initialize on first visibility
     if (!this._origin && !this._margin) {
       this._origin = this.options.scroll_area[0].scrollTop;
       this._margin = this.options.header.position().top;
+      if (this.options.mode === "fixed") {
+        this._clone_min = this.options.header.position().top;
+        this._clone = this.options.header.clone().css({
+            position: 'fixed'
+          , top: this.options.scroll_area.css("top")
+          , left: this.options.header.offset().left + 'px'
+          , width: (this.options.header[0].getBoundingClientRect().width
+              - parseFloat(this.options.header.css('paddingLeft')) 
+              - parseFloat(this.options.header.css('paddingRight'))) + 'px'
+        });
+      }
+      else if (this.options.mode === "transform")
+        this.options.header.css('transform-origin', '0 0');
     }
-    
-    this.position(Math.max(0, el[0].scrollTop - this._origin - this._margin));
-  }
 
-  , position : function(y_position) {
-    this.options.header.transition({ 'translate': [0, y_position] }, 0, 'cubic-bezier(0.33, 0.66, 0.66, 1)');
+    // Update the position
+    if (this.options.mode === "fixed") {
+      if (el[0].scrollTop >= this._margin) {
+        this.options.scroll_area.parent().append(this._clone).addClass("sticky-header widget-active governance");
+      }
+      else
+        this._clone.remove();
+    }
+    else if (this.options.mode === "transform") {
+      var y_position = Math.max(0, el[0].scrollTop - this._origin - this._margin);
+      this.options.header.transition({ 'translate': [0, y_position] }, 0, 'cubic-bezier(0.33, 0.66, 0.66, 1)');
+    }
   }
 });
 

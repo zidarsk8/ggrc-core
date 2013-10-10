@@ -626,7 +626,8 @@ i.short {
 
 // icons for active widget state
 
-.widget {
+.widget,
+.sticky-header {
   &.widget-active {
     .header {
       // turned icons to white
