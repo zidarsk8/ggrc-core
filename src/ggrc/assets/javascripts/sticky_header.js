@@ -48,7 +48,7 @@ can.Control("StickyHeader", {
 
     // Update the position
     if (this.options.mode === "fixed") {
-      if (el[0].scrollTop < this._margin && this._clone[0].parentNode) {
+      if (el[0].scrollTop < this._margin && this._clone[0].parentNode)
         this._clone.remove();
     }
     else if (this.options.mode === "transform") {
