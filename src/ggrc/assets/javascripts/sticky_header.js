@@ -33,7 +33,7 @@ can.Control("StickyHeader", {
       this._margin = this.options.header.position().top;
       if (this.options.mode === "fixed") {
         this._clone_min = this.options.header.position().top;
-        this._clone = this.options.header.clone().css({
+        this._clone = this.options.header.clone(true, true).css({
             position: 'fixed'
           , top: this.options.scroll_area.css("top")
           , left: this.options.header.offset().left + 'px'
@@ -48,10 +48,7 @@ can.Control("StickyHeader", {
 
     // Update the position
     if (this.options.mode === "fixed") {
-      if (el[0].scrollTop >= this._margin) {
-        this.options.scroll_area.parent().append(this._clone).addClass("sticky-header widget-active governance");
-      }
-      else
+      if (el[0].scrollTop < this._margin && this._clone[0].parentNode) {
         this._clone.remove();
     }
     else if (this.options.mode === "transform") {
