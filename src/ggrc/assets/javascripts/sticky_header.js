@@ -14,7 +14,7 @@ can.Control("StickyHeader", {
       , header_selector: "header, .tree-open > .item-open > .item-main"
       , depth_selector: ".tree-open > .item-open"
       , root_header_selector: "header"
-      // , margin: 50
+      , margin: 30
     }
 }, {
     init : function() {
@@ -34,14 +34,16 @@ can.Control("StickyHeader", {
     for (var i = headers.length - 1; i >= 0; i--) {
       var el = headers.eq(i)
         , clone = el.data('sticky').clone
+        , margin = this.in_viewport(el)
         ;
 
-      if (this.in_viewport(el)) {
-        !clone[0].parentNode && el.parent().append(clone);
-      }
-      else {
+      if (margin === false) {
         clone[0].parentNode && clone.remove();
         $.removeData(el, 'sticky');
+      }
+      else {
+        !clone[0].parentNode && el.parent().append(clone);
+        clone.css('marginTop', margin + 'px');
       }
     }
   }
@@ -76,9 +78,14 @@ can.Control("StickyHeader", {
       , top = this.options.scroll_area[0].scrollTop
       , bottom = top + this.options.scroll_area.outerHeight() 
       , offset = el.data('sticky').offset
+      , margin = pos.top + parent.outerHeight() - el.outerHeight() - offset
       ;
 
-    return pos.top < offset && (pos.top + parent.outerHeight() - el.outerHeight()) > offset;
+    if (pos.top < offset && (pos.top + parent.outerHeight() - el.outerHeight()) > offset) {
+      return margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
+    }
+    else
+      return false;
   }
 
     // Clones and prepares a header
