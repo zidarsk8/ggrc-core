@@ -13,7 +13,7 @@ can.Control("StickyHeader", {
         // A selector for the scrollable area ancestor
         scroll_area_selector: ".object-area"
         // A selector for all sticky-able headers
-      , header_selector: "header, .tree-open > .item-open > .item-main"
+      , header_selector: ".header, .tree-open > .item-open > .item-main"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
@@ -35,9 +35,9 @@ can.Control("StickyHeader", {
       return;
 
     // Update the header positions
-    var headers = this.find_headers();
-    for (var i = headers.length - 1; i >= 0; i--) {
-      var el = headers.eq(i)
+    this._headers = this.find_headers();
+    for (var i = this._headers.length - 1; i >= 0; i--) {
+      var el = this._headers.eq(i)
         , clone = el.data('sticky').clone
         , margin = this.in_viewport(el)
         ;
@@ -55,6 +55,15 @@ can.Control("StickyHeader", {
         clone.css('marginTop', margin + 'px');
       }
     }
+  }
+
+    // Resize clones on window resize
+  , "{window} resize" : function(el, ev) {
+    var self = this;
+    this._headers && this._headers.each(function() {
+      var $this = $(this);
+      self.position_clone($this, $this.data('sticky').clone);
+    });
   }
 
     // Find all sticky-able headers in the document
@@ -119,18 +128,30 @@ can.Control("StickyHeader", {
     }
     data.offset = offset;
 
-    return el
-      .clone(true, true)
-      .addClass("sticky")
-      .css({
+    return this.position_clone(el, el.clone(true, true).addClass("sticky"));
+  }
+
+    // Reposition a clone
+  , position_clone : function(el, clone) {
+    return clone.css({
           position: 'fixed'
-        , top: (offset + parseFloat(this.options.scroll_area.css("top"))) + 'px'
+        , top: (el.data('sticky').offset + parseFloat(this.options.scroll_area.css("top"))) + 'px'
         , left: el.offset().left + 'px'
         , width: (el[0].getBoundingClientRect().width
             - parseFloat(el.css('paddingLeft')) 
             - parseFloat(el.css('paddingRight'))) 
             + 'px'
       });
+  }
+
+    // Clean up when destroyed
+  , destroy : function() {
+    this._headers.each(function() {
+      var $this = $(this);
+      $this.data('sticky').clone.remove();
+      $.removeData($this, 'sticky');
+    });
+    delete this._headers;
   }
 });
 
