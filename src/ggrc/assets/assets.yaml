@@ -8,7 +8,6 @@ dashboard-js-files:
   - rails.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
-  - jquery.transit.min.js
   - sha1.js
   - bootstrap-transition.js
   - bootstrap-alert.js
