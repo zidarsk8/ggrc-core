@@ -101,16 +101,23 @@ can.Control("StickyHeader", {
   , clone : function(el, headers) {
     // Compute heights of above headers
     var offset = 0
-      , depth = el.data('sticky').depth
+      , data = el.data('sticky')
+      , depths = []
       ;
 
-    // Determine the depth
-    headers.each(function() {
-      var $this = $(this);
-      if ($this.data('sticky').depth < depth)
+    // Determine the offset based on nested parents
+    for (var i = headers.length - 1; i >= 0; i--) {
+      var $this = $(headers[i])
+        , depth = $this.data('sticky').depth
+        ;
+
+      // Only add offsets for the closest nested parent of the given depth
+      if (!depths[depth] && depth < data.depth) {
         offset += $this.outerHeight();
-    })
-    el.data('sticky').offset = offset;
+        depths[depth] = true;
+      }
+    }
+    data.offset = offset;
 
     return el
       .clone(true, true)
