@@ -13,7 +13,7 @@ can.Control("StickyHeader", {
         // A selector for the scrollable area ancestor
         scroll_area_selector: ".object-area"
         // A selector for all sticky-able headers
-      , header_selector: ".header, .tree-open > .item-open > .item-main"
+      , header_selector: ".header, .tree-open > .item-open > .item-main, .advanced-filters"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
@@ -112,7 +112,14 @@ can.Control("StickyHeader", {
     var offset = 0
       , data = el.data('sticky')
       , depths = []
+      , selector
       ;
+
+    // Determine which selector part grabbed this element
+    can.each(this.options.header_selector.split(','), function(part) {
+      if (el.is(part))
+        selector = part;
+    });
 
     // Determine the offset based on nested parents
     for (var i = headers.length - 1; i >= 0; i--) {
@@ -121,7 +128,8 @@ can.Control("StickyHeader", {
         ;
 
       // Only add offsets for the closest nested parent of the given depth
-      if (!depths[depth] && depth < data.depth) {
+      // as well as offsets for siblings with different selectors
+      if ((!depths[depth] && depth < data.depth) || (depth <= data.depth && !$this.is(selector))) {
         offset += $this.outerHeight();
         depths[depth] = true;
       }
