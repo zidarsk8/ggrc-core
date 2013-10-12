@@ -305,6 +305,17 @@ can.Control("GGRC.Controllers.Modals", {
     if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
+    if($elem.is("[data-binding]")) {
+      can.each(can.makeArray($elem[0].options), function(opt) {
+        instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
+      });
+      if(value.push) {
+        can.each(value, can.proxy(instance, "mark_for_addition", $elem.data("binding")));
+      } else {
+        instance.mark_for_addition($elem.data("binding"), value);
+      }
+    }
+
     if(name.length > 1) {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
@@ -326,7 +337,7 @@ can.Control("GGRC.Controllers.Modals", {
             value = this.options.model.convert.date(value);
             if(this.options.$content.find("[name='" + item.name + ".time']").length) {
               value = this.options.model.convert.datetime(
-                this.options.model.serialize.date(value) 
+                this.options.model.serialize.date(value)
                 + "T"
                 + this.options.$content.find("[name='" + item.name + ".time']").val()
               );

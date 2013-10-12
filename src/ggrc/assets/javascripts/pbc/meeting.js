@@ -9,7 +9,7 @@
 //= require models/cacheable
 
 can.Model.Cacheable("CMS.Models.Meeting", {
-  root_collections : "meetings"
+  root_collection : "meetings"
   , root_object : "meeting"
   , findAll : "GET /api/meetings"
   , create : "POST /api/meetings"

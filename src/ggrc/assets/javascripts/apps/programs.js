@@ -159,10 +159,17 @@ can.Construct("RefreshQueue", {
     }
 
   , enqueue: function(obj, force) {
+      var that = this;
       if (!obj)
         return;
       if (this.triggered)
         return null;
+      if (obj.push) {
+        can.each(obj, function(o) {
+          that.enqueue(o, force);
+        });
+        return this;
+      }
 
       this.objects.push(obj);
       if (force || !obj.selfLink) {

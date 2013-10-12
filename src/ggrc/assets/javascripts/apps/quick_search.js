@@ -423,8 +423,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
       , ["InterviewResponse", "Document", "ObjectDocument", "document", "documentable"]
       , ["PopulationSampleResponse", "Document", "ObjectDocument", "document", "documentable"]
-      , ["DocumentationResponse", "Person", "ObjectPerson", "person", "personable"]
-      , ["PopulationSampleResponse", "Person", "ObjectPerson", "person", "personable"]
+      , [response_object_types, "Person", "ObjectPerson", "person", "personable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];

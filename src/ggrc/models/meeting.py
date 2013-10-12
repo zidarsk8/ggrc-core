@@ -14,7 +14,7 @@ class Meeting(Personable, Described, Base, db.Model):
   response_id = deferred(
       db.Column(db.Integer, db.ForeignKey('responses.id'), nullable=False),
       'Meeting')
-  response = db.relationship('Response')
+  #response = db.relationship('Response')
   start_at = db.Column(db.DateTime, nullable=False)
   end_at = db.Column(db.DateTime, nullable=False)
   title = db.Column(db.String, nullable=False)

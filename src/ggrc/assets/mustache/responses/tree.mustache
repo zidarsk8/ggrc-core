@@ -68,7 +68,7 @@
       {{/child_options.2}}
       {{#child_options.3}}
       <div class="inner-tree">
-        <h6>Participants ({{child_count}})</h6>
+        <h6>Participants ({{child_options.3.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}></ul>
       </div>
       {{/child_options.3}}

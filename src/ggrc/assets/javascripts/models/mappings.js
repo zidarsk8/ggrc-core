@@ -469,6 +469,8 @@
       , business_objects : Multi(["related_objects", "controls", "people", "documents"])
       , population_samples : Direct("PopulationSample", "response")
     }
-
+    , Meeting : {
+      _mixins : ["personable"]
+    }
   });
 })(GGRC, can);

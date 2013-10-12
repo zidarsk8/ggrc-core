@@ -24,15 +24,17 @@
       </div>
       <div class="span4">
         Participants
-        <select name="people" multiple="multiple" class="input-block-level">
-          {{#using response=instance.response}}
-            {{#response.people}}
-              {{#using person=this}}
-                <option id="{{person.id}}">{{person.name}}</option>
-              {{/using}}
-            {{/response.people}}
-          {{/using}}
+        {{#using response=instance.response}}
+          {{#using people=response.people}}
+          <select name="people" multiple="multiple" data-binding="people" model="Person" class="input-block-level">
+            {{#people}}
+            <option value="{{id}}">
+                {{name}}
+            </option>
+            {{/people}}
         </select>
+        {{/using}}
+      {{/using}}
       </div>
     </div>
   {{/instance}}
