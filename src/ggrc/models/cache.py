@@ -14,7 +14,7 @@ class Cache:
   def update(self, session):
     self.new.update(session.new)
     self.deleted.update(session.deleted)
-    modified = {o for o in session.dirty if session.is_modified(o)}
+    modified = set(o for o in session.dirty if session.is_modified(o))
     # When intermediate flushes happen, new and dirty may overlap
     self.dirty.update(modified - self.new - self.deleted)
 

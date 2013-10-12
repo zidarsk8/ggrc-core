@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 (function(namespace, $, can) {
 
@@ -1203,7 +1203,7 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+resolve_computed(obj))
+  return (""+(resolve_computed(obj) || ""))
     .replace(/"/g, '\\"')
     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
     //    thus does not allow backslash-escaped single quotes within strings.

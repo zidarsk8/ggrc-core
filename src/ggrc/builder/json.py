@@ -62,7 +62,7 @@ def publish(obj, inclusions=(), inclusion_filter=None):
   # Otherwise, just return the value itself by default
   return obj
 
-def publish_stub(obj):
+def publish_stub(obj, inclusions=(), inclusion_filter=None):
   publisher = get_json_builder(obj)
   if publisher:
     ret = {}
@@ -71,7 +71,7 @@ def publish_stub(obj):
       ret['href'] = self_url
     ret['type'] = obj.__class__.__name__
     if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
-      ret.update(publisher.publish_stubs(obj))
+      ret.update(publisher.publish_stubs(obj, inclusions, inclusion_filter))
     return ret
   # Otherwise, just return the value itself by default
   return obj
@@ -279,11 +279,12 @@ class Builder(AttributeInfo):
         attr_name, remaining_path = path[0], path[1:]
       else:
         attr_name, remaining_path = path, ()
-      result[attr_name] = self.publish_attr(obj, attr_name, remaining_path)
+      result[attr_name] = self.publish_attr(
+          obj, attr_name, remaining_path, include, inclusion_filter)
     return result
 
   def publish_link_collection(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+      self, join_objects, inclusions, include, inclusion_filter):
     """The ``attr_name`` attribute is a collection of object references;
     translate the collection of object references into a collection of link
     objects for the JSON dictionary representation.
@@ -292,7 +293,7 @@ class Builder(AttributeInfo):
     #   integrity
     return [
         self.generate_link_object_for(o, inclusions, include, inclusion_filter)
-        for o in getattr(obj, attr_name) if o is not None]
+        for o in join_objects if o is not None]
 
   def publish_link(
       self, obj, attr_name, inclusions, include, inclusion_filter):
@@ -308,11 +309,21 @@ class Builder(AttributeInfo):
 
   def publish_association_proxy(
       self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
+    # `associationproxy` uses another table as a join table, and context
+    # filtering must be done on the join table, or information leakage will
+    # result.
+    join_objects = []
+    for join_object in getattr(obj, class_attr.local_attr.key):
+      if (not inclusion_filter) or inclusion_filter(join_object):
+        join_objects.append(join_object)
+
     if include:
+      target_objects = [
+          getattr(join_object, class_attr.remote_attr.key)
+          for join_object in join_objects]
       return self.publish_link_collection(
-          obj, attr_name, inclusions, include, inclusion_filter)
+          target_objects, inclusions, include, inclusion_filter)
     else:
-      join_objects = getattr(obj, class_attr.local_attr.key)
       if isinstance(class_attr.remote_attr, property):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
@@ -338,8 +349,9 @@ class Builder(AttributeInfo):
       self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
     uselist = class_attr.property.uselist
     if uselist:
+      join_objects = getattr(obj, attr_name)
       return self.publish_link_collection(
-          obj, attr_name, inclusions, include, inclusion_filter)
+          join_objects, inclusions, include, inclusion_filter)
     elif include or class_attr.property.backref:
       return self.publish_link(
           obj, attr_name, inclusions, include, inclusion_filter)
@@ -414,7 +426,7 @@ class Builder(AttributeInfo):
     inclusions = tuple((attr,) for attr in self._include_links)
     inclusions = tuple(set(inclusions).union(set(extra_inclusions)))
     return self._publish_attrs_for(
-        obj, self._publish_attrs, json_obj, inclusions)
+        obj, self._publish_attrs, json_obj, inclusions, inclusion_filter)
 
   @classmethod
   def do_update_attrs(cls, obj, json_obj, attrs):
@@ -443,12 +455,13 @@ class Builder(AttributeInfo):
     self.publish_attrs(obj, json_obj, inclusions, inclusion_filter)
     return json_obj
 
-  def publish_stubs(self, obj):
+  def publish_stubs(self, obj, inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into a JSON dictionary
     containing an abbreviated representation.
     """
     json_obj = {}
-    self._publish_attrs_for(obj, self._stub_attrs, json_obj)
+    self._publish_attrs_for(
+        obj, self._stub_attrs, json_obj, inclusions, inclusion_filter)
     return json_obj
 
   def update(self, obj, json_obj):

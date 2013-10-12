@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
 from .common import *
 from ggrc.models.all_models import *
 from ggrc.models.exceptions import ValidationError
@@ -628,7 +633,7 @@ class LinkDocumentsHandler(LinksHandler):
     self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
 
   def render_item(self, item):
-    return "[{} {}] {}".format(item.link, item.title, item.description)
+    return u"[{} {}] {}".format(item.link, item.title, item.description)
 
 class LinkPeopleHandler(LinksHandler):
   from ggrc.models.person import Person

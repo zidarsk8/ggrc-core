@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 /*
  *= require application
@@ -848,8 +848,11 @@ jQuery(function($) {
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
     ;
-    
-    if( $targetWidget.hasClass("widget-active") && $(".object-area").data('scrollspy').activeTarget !== $widgetID ) {
+
+    if( $targetWidget.hasClass("widget-active")
+      && $(".object-area").data('scrollspy')
+      && $(".object-area").data('scrollspy').activeTarget !== $widgetID
+    ) {
       $targetWidget.removeClass("widget-active");
     }
   });  

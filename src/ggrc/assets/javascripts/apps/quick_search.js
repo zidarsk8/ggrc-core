@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require controllers/quick_search_controller
@@ -649,7 +649,7 @@ $(function() {
       // Mappings to/from a program should be in the context of the program.
       // Otherwise, default to the page_instance context then default context.
       var join_context;
-      if (inst instanceof CMS.Models.Program) {
+      if (inst instanceof CMS.Models.Program && inst.context) {
         join_context = { id : inst.context.id };
       } else {
         join_context = page_instance.context || { id : null };
