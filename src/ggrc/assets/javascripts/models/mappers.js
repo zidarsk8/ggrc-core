@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 ;(function(GGRC, can) {
 
   /*  GGRC.ListLoaders
@@ -194,9 +201,7 @@
         var i;
         if (depth == null)
           depth = 0;
-        //  Skip when `this.instance === true`, since it's not a real instance,
-        //    just a beacon
-        if (this.instance !== last_instance && this.instance !== true) {
+        if (this.instance !== last_instance) {
           fn(this.instance, this, depth);
           depth++;
         }
@@ -796,6 +801,7 @@
               , mappings: [{
                     instance: true
                   , mappings: []
+                  , binding: binding
                   }]
               , binding: binding
               }]
@@ -825,9 +831,12 @@
           , object_join_attr = this.object_join_attr || model.table_plural
           ;
 
-        can.each(binding.instance[object_join_attr].reify(), function(mapping) {
-          refresh_queue.enqueue(mapping);
-        });
+        // These properties only exist if the user has read access
+        if (binding.instance[object_join_attr]) {
+          can.each(binding.instance[object_join_attr].reify(), function(mapping) {
+            refresh_queue.enqueue(mapping);
+          });
+        }
 
         return refresh_queue.trigger()
           .then(this.proxy("filter_for_valid_mappings", binding))
@@ -938,6 +947,7 @@
           , mappings: [{
                 instance: true
               , mappings: []
+              , binding: binding
               }]
           , binding: binding
           });
@@ -960,7 +970,7 @@
     , _refresh_stubs: function(binding) {
         var model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr].reify();
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
           ;
 
         this.insert_instances_from_mappings(binding, mappings);

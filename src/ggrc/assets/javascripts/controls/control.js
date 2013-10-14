@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/cacheable
@@ -13,6 +13,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     root_object : "control"
   , root_collection : "controls"
   , category : "governance"
+  , findOne : "GET /api/controls/{id}"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
@@ -69,33 +70,8 @@ can.Model.Cacheable("CMS.Models.Control", {
     , footer_view : GGRC.mustache_path + "/controls/tree_footer.mustache"
     , draw_children : true
     , child_options : [{
-    /*    model : "Section"
-      , mapping : "sections"
-      , show_view : "/static/mustache/sections/tree.mustache"
-    }, {*/
-        model : "Person"
-      , mapping : "people"
-      , show_view : "/static/mustache/people/tree.mustache"
-      , draw_children : false
-    }, {
-        model : "Document"
-      , mapping : "documents"
-      , show_view : "/static/mustache/documents/tree.mustache"
-      , draw_children : false
-    }, {
-        model : "Objective"
-      , mapping : "objectives"
-      , show_view : "/static/mustache/objectives/tree.mustache"
-      , draw_children : false
-    }, {
-        model : "Program"
-      , mapping : "programs"
-      , list_view : "/static/mustache/base_objects/tree.mustache"
-      , draw_children : false
-    }, {
         model : can.Model.Cacheable
-      , mapping : "related_objects"
-      , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
+      , mapping : "related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , title_plural : "Business Objects"
       , draw_children : false

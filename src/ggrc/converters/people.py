@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
 from .base import *
 
 from ggrc.models import Person
@@ -23,7 +28,7 @@ class PeopleRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle_text_or_html('name')
-    self.handle_text_or_html('email', is_email = True)
+    self.handle('email', ContactEmailHandler, is_required=True)
     self.handle_text_or_html('company')
 
   def save_object(self, db_session, **options):

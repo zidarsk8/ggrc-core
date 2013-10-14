@@ -1,3 +1,8 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
 -extends "layouts/_widget_box.haml"
 
 -block widget_help
@@ -23,6 +28,6 @@
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-primary', 'type': 'submit' }
             -#%a{ 'href': 'javascript://', 'class': 'import-help', 'data-toggle': 'modal-ajax', 'data-original-title': 'help', 'data-modal-type': 'help-form' }
               -#View Help
-    -if exception_message is defined
+    -if exception_message is defined and not exception_message.show_preview
       -include 'directives/import_errors.haml'
     #results-container

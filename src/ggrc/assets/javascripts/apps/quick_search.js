@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require controllers/quick_search_controller
@@ -153,9 +153,11 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     , by_object_option_models: {}
     , by_option_object_models: {}
     , join_model_name_for: function (model_name_a, model_name_b) {
+        var join_descriptor = null;
         if (this.by_object_option_models[model_name_a] &&
             this.by_object_option_models[model_name_a][model_name_b]) {
-          return this.by_object_option_models[model_name_a][model_name_b][0].options.join_model_name;
+          join_descriptor = this.by_object_option_models[model_name_a][model_name_b][0];
+          return join_descriptor.get_join_model_name();
         }
         return null;
     }
@@ -257,6 +259,15 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
         return this.options.join_model;
       }
 
+    , get_join_model_name: function() {
+        if (this.options.join_model_name)
+          return this.options.join_model_name;
+        else
+          // FIXME: This is only used for Section, since it has a foreign key
+          //   relationship to Directive.
+          return this.options.option_model_name;
+      }
+
     , make_join_object: function(object, option, join_attrs) {
         var join_model = this.get_join_model() //this.get_model(this.options.join_model_name)
           , object_attrs = { id: object.id, type: object.constructor.shortName }
@@ -343,6 +354,10 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ObjectObjective", "objective", "objectiveable", "object_objectives"]
       , ["Objective", "Objective",
           "ObjectObjective", "objectiveable", "objective", "objective_objects"]
+      , ["Control", "Control",
+          "ControlControl", "implemented_control", "control", "control_controls"]
+      , ["Control", "Control",
+          "ControlControl", "control", "implemented_control", "implementing_control_controls"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
       , [business_object_types,
@@ -466,6 +481,16 @@ $(function() {
     }
     
     resize_areas();  
+
+    CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+      prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
+    })
+  });
+
+  // Collapse the LHN if they did it on a previous page
+  CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+    var collapsed = prefs[0].getCollapsed(null, "lhs");
+    collapsed && $(".bar-v").trigger('click');
   });
 
   $(document.body).on("click", ".lhs-closed", function(ev) {
@@ -583,8 +608,16 @@ $(function() {
         })
         .one("modal:success", triggerFlash);
     } else {*/
+      // Mappings to/from a program should be in the context of the program.
+      // Otherwise, default to the page_instance context then default context.
+      var join_context;
+      if (inst instanceof CMS.Models.Program && inst.context) {
+        join_context = { id : inst.context.id };
+      } else {
+        join_context = page_instance.context || { id : null };
+      }
       join_object = join_descriptor.make_join_object(
-          page_instance, inst, { context: page_instance.context || { id : null } });
+          page_instance, inst, { context : join_context });
       // Map the object if we're able to
       if (join_object) {
         join_object.save()

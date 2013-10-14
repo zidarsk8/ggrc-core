@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 ;(function(GGRC, can) {
 
   function Proxy(
@@ -63,12 +70,12 @@
 
   function extended_related(name) {
     return function(definition) {
-      definition["related_" + name + "_via_sections"] = Cross("sections", "related_" + name);
+      definition["related_" + name + "_via_extended_sections"] = Cross("extended_related_sections", "related_" + name);
       definition["related_" + name + "_via_extended_controls"] = Cross("extended_related_controls", "related_" + name);
       definition["related_" + name + "_via_extended_objectives"] = Cross("extended_related_objectives", "related_" + name);
 
       definition["extended_related_" + name] = Multi([
-            "related_" + name + "_via_sections"
+            "related_" + name + "_via_extended_sections"
           , "related_" + name + "_via_extended_controls"
           , "related_" + name + "_via_extended_objectives"
           , "related_" + name
@@ -85,6 +92,7 @@
         _mixins: ["personable", "documentable"] //controllable
       , related_objects: Proxy(
           null, "controllable", "ObjectControl", "control", "object_controls") //control_objects
+      , related_and_able_objects : Multi(["objectives", "implemented_controls", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -95,12 +103,16 @@
       , related_systems:     TypeFilter("related_objects", "System")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
-      //, controls: Proxy(
-      //    "Control", "control", "ObjectControl", "controllable", "object_controls")
+      , controls: Proxy(
+         "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
           "Section", "section", "ControlSection", "control", "control_sections")
+      , implemented_controls: Proxy(
+          "Control", "implemented_control", "ControlControl", "control", "control_controls")
+      , implementing_controls: Proxy(
+          "Control", "control", "ControlControl", "implemented_control", "implementing_control_controls")
       //  FIXME: Cannot currently represent singular foreign-key references
       //    with Mappers/ListLoaders
       //, direct_directives: ForeignKey("Directive", "directive", "controls")
@@ -110,11 +122,28 @@
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
       , regulations: TypeFilter("directives", "Regulation")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "sections"
+        , "controls"
+        , "programs"
+        , "objectives"
+        , "implemented_controls"
+        , "implementing_controls"
+        , "joined_directives"
+        , "people"
+        , "documents"
+        // These don't exist client-side yet:
+        // , "risks"
+        // , "control_risks"
+        // , "control_assessments"
+        ])
       }
     , Objective: {
         _mixins: ["personable", "documentable"] //objectiveable
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
+      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -129,11 +158,19 @@
           "Control", "control", "ObjectiveControl", "objective", "objective_controls")
       , sections: Proxy(
           "Section", "section", "SectionObjective", "objective", "section_objectives")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "controls"
+        , "sections"
+        , "people"
+        , "documents"
+        ])
       }
     , Section: {
         _mixins: ["personable", "documentable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
+      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people", "documents"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -148,6 +185,13 @@
           "Objective", "objective", "SectionObjective", "section", "section_objectives")
       , controls: Proxy(
           "Control", "control", "ControlSection", "section", "control_sections")
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "controls"
+        , "objectives"
+        , "people"
+        , "documents"
+        ])
       }
 
     , controllable: {
@@ -215,22 +259,24 @@
       , regulations: TypeFilter("directives", "Regulation")
 
       , sections_via_directives: Cross("directives", "sections")
-      , sections_via_controls: Cross("controls", "sections")
-      , sections: Multi(["sections_via_controls", "sections_via_directives"])
-
       , controls_via_directives: Cross("directives", "controls")
-      , controls_via_sections: Cross("sections", "controls")
-      , objectives_via_sections: Cross("sections", "objectives")
+
+      , sections_via_directive_controls: Cross("controls_via_directives", "sections")
+      , extended_related_sections: Multi([
+          "sections_via_directive_controls", "sections_via_directives"])
+
+      , controls_via_directive_sections: Cross("sections_via_directives", "controls")
+      , objectives_via_sections: Cross("extended_related_sections", "objectives")
       , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
       , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
       , extended_related_controls: Multi([
             "controls_via_extended_objectives"
-          , "controls_via_sections"
+          , "controls_via_directive_sections"
           , "controls_via_directives"
           , "controls"
           ])
 
-      , related_documents_via_sections: Cross("sections", "documents")
+      , related_documents_via_sections: Cross("extended_related_sections", "documents")
       , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
       , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
       , extended_related_documents:
@@ -241,7 +287,7 @@
             , "related_documents_via_sections"
             ])
 
-      , related_people_via_sections: Cross("sections", "people")
+      , related_people_via_sections: Cross("extended_related_sections", "people")
       , related_people_via_extended_controls: Cross("extended_related_controls", "people")
       , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
       , extended_related_people:
@@ -253,7 +299,7 @@
             ])
 
       , related_objects_via_sections:
-          Cross("sections", "related_objects")
+          Cross("extended_related_sections", "related_objects")
       , related_objects_via_extended_controls:
           Cross("extended_related_controls", "related_objects")
       , related_objects_via_extended_objectives:
@@ -265,7 +311,7 @@
             , "related_objects_via_sections"
             , "related_objects"
             ])
-      /*, extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
+      , extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
       , extended_related_facilities:  TypeFilter("extended_related_objects", "Facility")
       , extended_related_markets:     TypeFilter("extended_related_objects", "Market")
       , extended_related_org_groups:  TypeFilter("extended_related_objects", "OrgGroup")
@@ -273,7 +319,14 @@
       , extended_related_products:    TypeFilter("extended_related_objects", "Product")
       , extended_related_projects:    TypeFilter("extended_related_objects", "Project")
       , extended_related_systems:     TypeFilter("extended_related_objects", "System")
-      */
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "controls"
+        , "directives"
+        , "people"
+        , "documents"
+        // , "cycles"
+        ])
       }
 
     , directive_object: {
@@ -289,10 +342,15 @@
           , extended_related("systems")
           ]
       , sections: Direct("Section", "directive")
+      , extended_related_sections: Multi(["sections"])
+
       , direct_controls: Direct("Control", "directive")
       , joined_controls: Proxy(
           "Control", "control", "DirectiveControl", "directive", "directive_controls")
       , controls: Multi(["direct_controls", "joined_controls"])
+
+      , programs: Proxy(
+          "Program", "program", "ProgramDirective", "directives", "program_directives")
 
       , controls_via_sections: Cross("sections", "controls")
       , objectives_via_sections: Cross("sections", "objectives")
@@ -327,6 +385,15 @@
             , "related_people_via_extended_objectives"
             , "related_people_via_sections"
             ])
+
+      , orphaned_objects: Multi([
+          "sections"
+        , "people"
+        , "documents"
+        , "controls"
+        , "programs"
+        , "documents"
+        ])
       }
 
     // Directives
@@ -346,6 +413,14 @@
             "related_object", "personable", "documentable"
           , "controllable", "objectiveable", "sectionable"
           ]
+      , orphaned_objects: Multi([
+          "related_objects"
+        , "people"
+        , "documents"
+        , "controls"
+        , "objectives"
+        , "sections"
+        ])
       }
 
     , DataAsset: {

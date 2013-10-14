@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
+
 body {
   font-size:$f-regular;
 }
@@ -119,6 +126,11 @@ blockquote {
 .tab-position {
   position: relative;
   overflow: visible;
+}
+
+.tooltip {
+  // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
+  z-index: 2000 !important;
 }
 
 // progress bar

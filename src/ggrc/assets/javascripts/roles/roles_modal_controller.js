@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: david@reciprocitylabs.com
- * Maintained By: david@reciprocitylabs.com
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: david@reciprocitylabs.com
+    Maintained By: david@reciprocitylabs.com
+*/
 
 (function(can, $) {
   GGRC.Controllers.Modals("GGRC.Controllers.RoleModal", {
@@ -163,6 +163,7 @@
         , button_view : button_view
         , model : model
         , instance : instance
+        , scopes : CMS.Models.Role.scopes
         , modal_title : (instance ? "Edit " : "New ") + $trigger.attr("data-object-singular")
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       };

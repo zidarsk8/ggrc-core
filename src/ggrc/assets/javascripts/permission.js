@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 Permission = function(action, resource_type, context_id) {
   return {
@@ -34,14 +34,16 @@ $.extend(Permission, (function() {
   _is_allowed = function(permissions, permission) {
     if (!permissions)
       return false; //?
-    if (permission.context_id == null)
-      return true;
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
       return true;
     if (_permission_match(permissions,
           _admin_permission_for_context(permission.context_id)))
+      return true;
+    // Check for System Admin permission
+    if (_permission_match(permissions,
+          _admin_permission_for_context(0)))
       return true;
     return false;
   };
@@ -52,7 +54,11 @@ $.extend(Permission, (function() {
   };
 
   return {
-    _is_allowed: _is_allowed,
-    is_allowed: is_allowed,
+      _is_allowed: _is_allowed
+    , is_allowed: is_allowed
+    , page_context_id: function() {
+        var page_instance = GGRC.page_instance();
+        return (page_instance && page_instance.context && page_instance.context.id) || null;
+      }
   };
 })());

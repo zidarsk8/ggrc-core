@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/cacheable
@@ -120,6 +120,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     root_object : "system"
   , root_collection : "systems"
   , findAll : "GET /api/systems"
+  , findOne : "GET /api/systems/{id}"
   , create : "POST /api/systems"
   , update : "PUT /api/systems/{id}"
   , destroy : "DELETE /api/systems/{id}"
@@ -173,6 +174,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , title_singular : "Process"
   , table_singular : "process"
   , findAll : "GET /api/processes"
+  , findOne : "GET /api/processes/{id}"
   , create : "POST /api/processes"
   , update : "PUT /api/processes/{id}"
   , destroy : "DELETE /api/processes/{id}"
