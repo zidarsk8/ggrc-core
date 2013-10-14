@@ -88,6 +88,13 @@ can.Model.Cacheable("CMS.Models.Response", {
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , allow_mapping : true
+      , exclude_option_types : function() {
+        var types = {
+          "DocumentationResponse" : "Document"
+          , "InterviewResponse" : "Person"
+        };
+        return types[this.parent_instance.constructor.shortName] || "";
+      }
     }, {
       //1: Document Evidence
       model : "Document"

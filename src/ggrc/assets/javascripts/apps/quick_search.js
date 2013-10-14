@@ -368,7 +368,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     directive_object_types.concat(["Control", "Section", "Objective"]);
 
   all_object_types =
-    governance_object_types.concat(business_plus_program_object_types);
+    governance_object_types.concat(business_plus_program_object_types).concat(response_object_types);
 
   join_descriptor_arguments = [
         [business_object_types,
@@ -421,9 +421,6 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Request", response_object_types, null, null, "request"]
       , ["Person", "Request", null, null, "assignee"]
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
-      , ["InterviewResponse", "Document", "ObjectDocument", "document", "documentable"]
-      , ["PopulationSampleResponse", "Document", "ObjectDocument", "document", "documentable"]
-      , [response_object_types, "Person", "ObjectPerson", "person", "personable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];

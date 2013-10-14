@@ -1183,6 +1183,7 @@
       , option_set = {
             object_model: object_model_name
         }
+      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
       ;
 
     if (!option_model_name) {
@@ -1198,13 +1199,15 @@
         , extra_options = modal_descriptor_view_options[option_model_name]
         ;
 
-      if (!option_set.default_option_descriptor)
-        option_set.default_option_descriptor = option_model_name;
-
       //  If we have duplicate options, we want to use the first, so return
       //    early.
-      if (option_descriptors[option_model_name])
+      //  Also return now if the descriptor is explicitly excluded from the 
+      //    set of descriptors for this modal.
+      if (option_descriptors[option_model_name] || ~can.inArray(option_model_name, exclude_option_types))
         return;
+
+      if (!option_set.default_option_descriptor)
+        option_set.default_option_descriptor = option_model_name;
 
       if (!extra_options)
         extra_options = {
