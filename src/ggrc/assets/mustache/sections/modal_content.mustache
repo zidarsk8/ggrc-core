@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{!div class="modal-body"}}
 
 {{#instance}}
@@ -13,17 +20,17 @@
     </div>
     <div class="span6">
       &nbsp;
-      <input id="directive.id" name="directive" type="hidden" model="Directive" value="{{directive.id}}">
+      <input id="directive.id" name="directive" type="hidden" model="Directive" value="{{instance.directive.id}}">
     </div>
   </div>
   <div class="row-fluid">
     <div class="span12">
       <label>
-        Text of Section/Clause
+        Text of {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
         <i class="grcicon-help-black" rel="tooltip" title="Enter text of section or clause"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of section or clause">{{{description}}}</textarea>
+        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}">{{{description}}}</textarea>
       </div>
     </div>
   </div>

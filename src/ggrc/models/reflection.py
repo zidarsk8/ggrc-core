@@ -1,8 +1,8 @@
 
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
-# Maintained By:
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 """Utilties to deal with introspecting gGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
@@ -51,6 +51,7 @@ class AttributeInfo(object):
     self._stub_attrs = AttributeInfo.gather_stub_attrs(tgt_class)
     self._update_attrs = AttributeInfo.gather_update_attrs(tgt_class)
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
+    self._include_links = AttributeInfo.gather_include_links(tgt_class)
 
   @classmethod
   def gather_attrs(cls, tgt_class, src_attrs, accumulator=None):
@@ -97,6 +98,10 @@ class AttributeInfo(object):
   def gather_create_attrs(cls, tgt_class):
     return cls.gather_attrs(tgt_class, [
       '_create_attrs', '_update_attrs', '_publish_attrs'])
+
+  @classmethod
+  def gather_include_links(cls, tgt_class):
+    return cls.gather_attrs(tgt_class, ['_include_links'])
 
 class SanitizeHtmlInfo(AttributeInfo):
   def __init__(self, tgt_class):

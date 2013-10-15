@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
 from .base import *
 
 from ggrc.models.all_models import System, OrgGroup
@@ -31,11 +36,8 @@ class SystemRowConverter(BaseRowConverter):
     self.handle('sub_processes', LinkRelationshipsHandler, model_class=Process,
         direction='from')
     self.handle_option('network_zone')
-    id_str = "org_group_is_responsible_for_{}".format(
-        "process" if self.options.get('is_biz_process') else "system")
-    self.handle('org_groups', LinkRelationshipsHandler, model_class = OrgGroup,
-                relationship_type_id = id_str, direction='from',
-                model_human_name='Org Group')
+    self.handle('org_groups', LinkRelationshipsHandler, model_class=OrgGroup,
+                 direction='from', model_human_name='Org Group')
     self.handle_date('start_date')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
@@ -68,9 +70,9 @@ class SystemsConverter(BaseConverter):
     ('Infrastructure', 'infrastructure'),
     ('Map:Person of Contact', 'owner'),
     ('Map:Controls', 'controls'),
-    ('Map:System;Sub System', 'sub_systems'),
-    ('Map:Process;Sub Process', 'sub_processes'),
-    ('Map:Org Group;Overseen By', 'org_groups'),
+    ('Map:System', 'sub_systems'),
+    ('Map:Process', 'sub_processes'),
+    ('Map:Org Group', 'org_groups'),
     ('Effective Date', 'start_date'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),

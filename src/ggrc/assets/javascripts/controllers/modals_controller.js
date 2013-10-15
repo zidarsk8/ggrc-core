@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 (function(can, $) {
 
@@ -52,6 +52,10 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
+    if (!(this.options instanceof can.Observe)) {
+      this.options = new can.Observe(this.options);
+    }
+
     if(!this.element.find(".modal-body").length) {
       can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
@@ -64,9 +68,9 @@ can.Control("GGRC.Controllers.Modals", {
     if (content) {
       this.element.html(content);
     }
-    this.options.$header = this.element.find(".modal-header");
-    this.options.$content = this.element.find(".modal-body");
-    this.options.$footer = this.element.find(".modal-footer");
+    this.options.attr("$header", this.element.find(".modal-header"));
+    this.options.attr("$content", this.element.find(".modal-body"));
+    this.options.attr("$footer", this.element.find(".modal-footer"));
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
@@ -78,7 +82,7 @@ can.Control("GGRC.Controllers.Modals", {
     var self = this;
 
     if (this.options.object_params)
-      can.each(this.options.object_params, function(value, key) {
+      this.options.object_params.each(function(value, key) {
         self.set_value({ name: key, value: value });
       });
   }
@@ -143,6 +147,8 @@ can.Control("GGRC.Controllers.Modals", {
   , fetch_data : function(params) {
     var that = this;
     var dfd;
+    params = params || this.find_params();
+    params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
       return new $.Deferred().resolve(this.options.instance);
     }
@@ -150,20 +156,20 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
-          ? $.when(this.options.instance = new this.options.model(params || this.find_params()))
-          : this.options.model.findAll(params || this.find_params()).then(function(data) {
+          ? $.when(this.options.attr("instance", new this.options.model(params)))
+          : this.options.model.findAll(params).then(function(data) {
             var h;
             if(data.length) {
-              that.options.instance = data[0];
+              that.options.attr("instance", data[0]);
               return data[0].refresh(); //have to refresh (get ETag) to be editable.
             } else {
-              that.options.new_object_form = true;
-              that.options.instance = new that.options.model(params || that.find_params());
+              that.options.attr("new_object_form", true);
+              that.options.attr("instance", new that.options.model(params));
               return that.options.instance;
             }
           });
     } else {
-      this.options.instance = new can.Observe(params || this.find_params());
+      this.options.attr("instance", new can.Observe(params));
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     

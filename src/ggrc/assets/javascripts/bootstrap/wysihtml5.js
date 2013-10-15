@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 !function($) {
 
   "use strict"; // jshint ;_;
@@ -16,35 +23,35 @@
   // Patch iframe issues
   // Sometimes the plugin will throw a "cannot read property document of null" error
   if (window.rangy) {
-    rangy.init();
-    // rangy.requireModules(["DomUtil"]);
-    rangy.dom.getIframeDocument = function(iframeEl, no_recurse) {
-      if (typeof iframeEl.contentDocument) {
-        return iframeEl.contentDocument;
-      } else if (typeof iframeEl.contentWindow) {
-        return iframeEl.contentWindow.document;
-      } else if (!no_recurse) {
-        // Add the iframe to the DOM
-        rangy.dom.getBody(document).appendChild(iframeEl);
-        return rangy.dom.getIframeDocument(iframeEl, true);
-      } else {
-        throw new Error("getIframeWindow: No Document object found for iframe element");
-      }
-    };
+    rangy.addInitListener(function() {
+      rangy.dom.getIframeDocument = function(iframeEl, no_recurse) {
+        if (typeof iframeEl.contentDocument) {
+          return iframeEl.contentDocument;
+        } else if (typeof iframeEl.contentWindow) {
+          return iframeEl.contentWindow.document;
+        } else if (!no_recurse) {
+          // Add the iframe to the DOM
+          rangy.dom.getBody(document).appendChild(iframeEl);
+          return rangy.dom.getIframeDocument(iframeEl, true);
+        } else {
+          throw new Error("getIframeWindow: No Document object found for iframe element");
+        }
+      };
 
-    rangy.dom.getIframeWindow = function(iframeEl, no_recurse) {
-      if (typeof iframeEl.contentWindow) {
-        return iframeEl.contentWindow;
-      } else if (typeof iframeEl.contentDocument) {
-        return iframeEl.contentDocument.defaultView;
-      } else if (!no_recurse) {
-        // Add the iframe to the DOM
-        rangy.dom.getBody(document).appendChild(iframeEl);
-        return rangy.dom.getIframeWindow(iframeEl, true);
-      } else {
-        throw new Error("getIframeWindow: No Window object found for iframe element");
-      }
-    };
+      rangy.dom.getIframeWindow = function(iframeEl, no_recurse) {
+        if (typeof iframeEl.contentWindow) {
+          return iframeEl.contentWindow;
+        } else if (typeof iframeEl.contentDocument) {
+          return iframeEl.contentDocument.defaultView;
+        } else if (!no_recurse) {
+          // Add the iframe to the DOM
+          rangy.dom.getBody(document).appendChild(iframeEl);
+          return rangy.dom.getIframeWindow(iframeEl, true);
+        } else {
+          throw new Error("getIframeWindow: No Window object found for iframe element");
+        }
+      };
+    });
   }
 
 

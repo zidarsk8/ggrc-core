@@ -533,7 +533,8 @@ class Resource(ModelView):
 
   def object_for_json(self, obj, model_name=None, properties_to_include=None):
     model_name = model_name or self.model._inflector.table_singular
-    json_obj = ggrc.builder.json.publish(obj, properties_to_include or [])
+    json_obj = ggrc.builder.json.publish(
+        obj, properties_to_include or [], inclusion_filter)
     return { model_name: json_obj }
 
   def get_properties_to_include(self, inclusions):
@@ -549,9 +550,9 @@ class Resource(ModelView):
       for p in paths:
         path = p.split('.')
         if len(path) == 1:
-          inclusions.append(path)
+          inclusions.append(tuple(path))
         else:
-          inclusions.append((path[0], path[1:]))
+          inclusions.append((path[0], tuple(path[1:])))
     else:
       inclusions = ()
     return inclusions
@@ -587,9 +588,11 @@ class Resource(ModelView):
       if not stubs:
         object_for_json = ggrc.builder.json.publish(
             obj,
-            self.get_properties_to_include(request.args.get('__include')))
+            self.get_properties_to_include(request.args.get('__include')),
+            inclusion_filter)
       else:
-        object_for_json = ggrc.builder.json.publish_stub(obj)
+        object_for_json = ggrc.builder.json.publish_stub(
+            obj, (), inclusion_filter)
       objects_json.append(object_for_json)
     collection_json = {
         collection_name: {

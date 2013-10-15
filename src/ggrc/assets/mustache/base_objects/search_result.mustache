@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{#list}}
 <li class="{{constructor.category}}" data-model="true" {{data 'model'}}>
   <a href="{{viewLink}}" class="show-extended">
@@ -38,7 +45,7 @@
   </a>
 </li>
 {{/if_equals}}
-{{#is_allowed 'create' model.shortName}}
+{{#is_allowed 'create' model.shortName context=null}}
 <li class="add-new">
   <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" >
     + Create New

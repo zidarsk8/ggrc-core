@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require controllers/resize_widgets_controller
 //= require controllers/sortable_widgets_controller
@@ -191,8 +191,8 @@ var sort_by_name_email = function(list) {
   return new list.constructor(can.makeArray(list).sort(function(a,b) {
     a = a.person || a;
     b = b.person || b;
-    a = can.trim(a.name) || can.trim(a.email);
-    b = can.trim(b.name) || can.trim(b.email);
+    a = (can.trim(a.name) || can.trim(a.email)).toLowerCase();
+    b = (can.trim(b.name) || can.trim(b.email)).toLowerCase();
     if (a > b) return 1;
     if (a < b) return -1;
     return 0;
@@ -300,7 +300,7 @@ function collated_user_roles_by_person(user_roles) {
 
 function authorizations_list_loader() {
   return CMS.Models.UserRole
-    .findAll({ context_id: null })
+    .findAll({ context_id__in: [null,0] })
     .then(collated_user_roles_by_person);
 }
 

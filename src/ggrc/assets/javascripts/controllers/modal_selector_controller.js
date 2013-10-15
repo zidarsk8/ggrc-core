@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: dan@reciprocitylabs.com
- * Maintained By: dan@reciprocitylabs.com
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+*/
 
 (function(can, $) {
 
@@ -812,15 +812,19 @@
 
         if (!this.options.option_type_menu) {
           menu = [
-            { category: "Assets/Business"
-            , items: []
-            }];
-          menu[0].items = can.map(this.options.option_descriptors, function(descriptor) {
-            return {
+              { category: "Governance"
+              , items: []
+              }
+            , { category: "Assets/Business"
+              , items: []
+              }
+            ];
+          can.each(this.options.option_descriptors, function(descriptor) {
+            menu[descriptor.model.category === "governance" ? 0 : 1].items.push({
                 model_name: descriptor.model.shortName
               , model_display: descriptor.model.title_plural
-            };
-          });
+            })
+          })
 
           this.options.option_type_menu = menu;
         }
@@ -933,14 +937,18 @@
 
         var join_model = GGRC.JoinDescriptor.join_model_name_for(
               this.options.object_model, current_option_model_name);
+        var permission_parms = { __permission_type: 'read' };
+        if (current_option_model_name == 'Program') {
+          permission_parms = {
+            __permission_type: 'create'
+            , __permission_model: join_model
+          };
+        }
         return GGRC.Models.Search
           .search_for_types(
               current_search_term || '',
               [current_option_model_name],
-              {
-                __permission_type: 'create'
-                , __permission_model: join_model
-              })
+              permission_parms)
           .then(function(search_result) {
             var options;
             if (self.element
