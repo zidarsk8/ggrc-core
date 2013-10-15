@@ -8,7 +8,7 @@
 {{#if allow_mapping_or_creating}}
 {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
 {{#if allow_creating}}
-{{#is_allowed 'create' model.shortName}}
+{{#is_allowed 'create' model.shortName context=null}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">

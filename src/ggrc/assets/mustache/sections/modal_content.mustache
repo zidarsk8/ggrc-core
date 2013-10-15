@@ -26,11 +26,11 @@
   <div class="row-fluid">
     <div class="span12">
       <label>
-        Text of Section/Clause
+        Text of {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
         <i class="grcicon-help-black" rel="tooltip" title="Enter text of section or clause"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of section or clause">{{{description}}}</textarea>
+        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}">{{{description}}}</textarea>
       </div>
     </div>
   </div>
