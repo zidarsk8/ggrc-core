@@ -642,14 +642,28 @@ Mustache.registerHelper("all", function(type, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
+  , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
   , items_dfd, hook;
 
   function hookup(element, parent, view_id) {
     items_dfd.done(function(items){
-      var $el = $(element);
+      var val
+      , $parent = $(element.parentNode)
+      , $el = $(element);
       can.each(items, function(item) {
         $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
       });
+      if($parent.is("select")
+        && $parent.attr("name")
+        && context
+      ) {
+        val = context.attr($parent.attr("name"));
+        if(val) {
+          $parent.find("option[value=" + val + "]").attr("selected", true);
+        } else {
+          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
+        }
+      }
       $el.remove();
     });
     return element.parentNode;

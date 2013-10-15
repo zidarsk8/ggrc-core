@@ -154,7 +154,7 @@
       
       <ul class="info-audit">
         <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.constructor.table_singular}}": {{parent_instance.id}}, "{{parent_instance.constructor.table_singular}}_title" : "{{parent_instance.title}}" }'>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.constructor.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
             <i class="grcicon-edit"></i>
             Edit {{model.title_singular}}
           </a>

@@ -11,7 +11,7 @@
             Program
           </label>
           <select class="input-block-level" name="program.id">
-            <option value="{{object_params.program}}">{{object_params.program_title}}</option>
+            <option value="{{object_params.program.id}}">{{object_params.program.title}}</option>
           </select>
         </div>
       </div>
@@ -39,31 +39,32 @@
         Title
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
-      </label>
-      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="2013 {{object_params.program_title}} Audit">
+      </label> 
+      {{#using program=instance.program}}
+      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="2013 {{program.title}} Audit">
+      {{/using}}
     </div>
     <div class="span3">
       <label>
         Status
       </label>
-      <select class="input-block-level" name="status" disabled>
-        <option>Planned</option>
-        <option>In Progress</option>
-        <option>Manager review</option>
-        <option>Ready for external review</option>
-        <option>Completed</option>
+      <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
+        {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
+        <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+        {{/iterate}}
       </select>
     </div>
   </div>
+  {{#new_object_form}}
   <div class="row-fluid">
     <div class="span12">
       <label class="spacing">
         <input type="checkbox" name="auto_generate" value="checked">
-        {{!TODO change objectives.length to a length using extended objective mapping, when available}}
-        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#with_page_object_as 'page_object'}}{{page_object.objectives.length}}{{/with_page_object_as}} Objectives Found)</a></span>
+        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#using program=instance.program}}{{program.objectives.length}}{{/using}} Objectives Found)</a></span>
       </label>
     </div>
   </div>
+  {{/new_object_form}}
   <div class="row-fluid">
     <div class="span3">
       <label>
