@@ -18,6 +18,8 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   , attributes : {
     response : "CMS.Models.Response.stub"
     , people : "CMS.Models.Person.stubs"
+    , start_at : "datetime"
+    , end_at : "datetime"
   }
 }, {
   init : function () {

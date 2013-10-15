@@ -34,7 +34,7 @@ var makeFindRelated = function(thistype, othertype) {
 };
 
 function dateConverter(d) {
-  var conversion = "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
   if(typeof d === "object") {
     d = d.getTime();
@@ -47,11 +47,14 @@ function dateConverter(d) {
     conversion = "MM/DD/YYYY";
   }
   ret = moment(d.toString(), conversion);
-  return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
+  if(typeof d === "string" && ret) {
+    ret.subtract(new Date().getTimezoneOffset(), "minute");
+  }
+  return ret ? ret.toDate() : undefined;
 }
 
 function makeDateSerializer(type) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
   return function(d) {
     if(d == null) {
       return "";

@@ -285,7 +285,7 @@ can.Control("GGRC.Controllers.Modals", {
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
     }
     var name = item.name.split(".")
-      , $elem, value, model;
+      , $elem, value, model, $other;
     $elem = this.options.$content.find("[name='" + item.name + "']");
     model = $elem.attr("model");
 
@@ -335,21 +335,14 @@ can.Control("GGRC.Controllers.Modals", {
             value = null;
           } else {
             value = this.options.model.convert.date(value);
-            if(this.options.$content.find("[name='" + item.name + ".time']").length) {
-              value = this.options.model.convert.datetime(
-                this.options.model.serialize.date(value)
-                + "T"
-                + this.options.$content.find("[name='" + item.name + ".time']").val()
-              );
+            $other = this.options.$content.find("[name='" + name.join(".") + ".time']");
+            if($other.length) {
+              value = moment(value).add(parseInt($other.val(), 10)).toDate();
             }
           }
         } else if(name[name.length - 1] === "time") {
           name.pop(); //time is a pseudoproperty of datetime objects
-          value = this.options.model.convert.datetime(
-            this.options.model.serialize.date(this.options.instance.attr(name.join(".")))
-            + "T"
-            + value
-          );
+          value = moment.utc(this.options.instance.attr(name.join("."))).startOf("day").add(parseInt(value, 10)).toDate();
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
         }

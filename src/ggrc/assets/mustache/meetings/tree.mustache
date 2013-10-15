@@ -7,20 +7,15 @@
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{#instance.title}}
-                  {{instance.title}}
-                {{/instance.title}}
-                {{^instance.title}}
-                  {{{firstnonempty instance.description_inline ''}}}
-                {{/instance.title}}
+                  {{firstnonempty instance.title 'Unnamed meeting'}}
               </div>
             </div>
           </div>
           <div class="span1">
             <div class="counter">
-              {{^instance.owner}}
+              {{^instance.people}}
                 <i class="grcicon-people-warning"></i>
-              {{/instance.owner}}
+              {{/instance.people}}
             </div>
           </div>
         </div>
@@ -34,6 +29,10 @@
         <div class="row-fluid">
 
           <div class="span6">
+            <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Meeting" data-object-plural="meetings" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit {{instance.constructor.title_singular}}
+            </a>
           {{#if instance.viewLink}}
             <a href="{{instance.viewLink}}" class="info-action">
               View {{instance.constructor.title_singular}}
@@ -43,44 +42,45 @@
           </div>
 
           <div class="span6">
-          {{#if mappings}}
-          {{#is_allowed_all 'delete' mappings}}
+          {{#is_allowed 'delete'}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
               <i class="grcicon-remove"></i>
-              Unmap
+              Delete {{instance.constructor.title_singular}}
             </a>
-          {{/is_allowed_all}}
-          {{/if}}
+          {{/is_allowed}}
           </div>
 
         </div>
 
-        {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
               <div class="tree-description short">
-                {{{instance.description}}}
+                Starts at: {{localize_datetime instance.start_at}}
+                <br>
+                Ends at: {{localize_datetime instance.end_at}}
               </div>
-              {{{show_long}}}
             </div>
           </div>
         </div>
-        {{/instance.description}}
 
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
-              <strong>Owner:</strong>
-              {{^instance.owner}}
+              <strong>Participants:</strong>
+              {{^instance.people}}
                 <span class="error">
-                  Not Assigned
+                  No participants
                 </span>
-              {{/instance.owner}}
-              {{#if instance.owner}}
-                {{#using owner=instance.owner}}
-                {{owner.name}}
+              {{/instance.people}}
+              {{#if instance.people.length}}
+                {{#using people=instance.people}}
+                <ul>
+                  {{#people}}
+                    <li>{{name}}</li>
+                  {{/people}}
+                </ul>
                 {{/using}}
               {{/if}}
             </div>

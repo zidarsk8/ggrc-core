@@ -1215,9 +1215,14 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 });
 
-Mustache.registerHelper("localize_date", function(date) {
-  date = resolve_computed(date);
-  return date ? moment(date).format("MM/DD/YYYY") : "";
+can.each({
+  "localize_date" : "MM/DD/YYYY"
+  , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
+}, function(tmpl, fn) {
+  Mustache.registerHelper(fn, function(date) {
+    date = resolve_computed(date);
+    return date ? moment(date).format(tmpl) : "";
+  });
 });
 
 Mustache.registerHelper("instance_ids", function(list, options) {
@@ -1233,12 +1238,24 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   return ids.join(",");
 });
 
-Mustache.registerHelper("local_time_range", function(start, end, options) {
+Mustache.registerHelper("local_time_range", function(value, start, end, options) {
   var tokens = [];
-  start = moment(start, "HH:mm");
-  end = moment(end, "HH:mm");
-  while(start < end) {
-    tokens.push("<option value='", start.format("HH:mm:ss\\Z"), "'>", start.format("hh:mm A"), "</option>\n");
+  var sod;
+  value = resolve_computed(value);
+  sod = moment.utc(value).startOf("day");
+  start = moment(value || undefined).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
+  end = moment(value || undefined).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
+
+  function selected(time) {
+    if(time.hours() === value.getHours() && time.minutes() === value.getMinutes()) {
+      return " selected='true'";
+    } else {
+      return "";
+    }
+  }
+
+  while(start.isBefore(end) || start.isSame(end)) {
+    tokens.push("<option value='", start.diff(sod), "'", selected(start), ">", start.format("hh:mm A"), "</option>\n");
     start.add(1, "hour");
   }
   return new String(tokens.join(""));
