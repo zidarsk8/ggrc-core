@@ -282,7 +282,6 @@ function should_show_authorizations() {
     , context_id = instance.context && instance.context.id
     ;
 
-  debugger;
   return (context_id
       && Permission.is_allowed('read', 'Role', null)
       && Permission.is_allowed('read', 'UserRole', context_id));
