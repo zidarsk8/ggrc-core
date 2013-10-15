@@ -122,7 +122,7 @@
     </ul>
   {{/is_related}}
 {{/is_allowed_to_map}}
-{{#is_allowed 'create' model.title_singular}}
+{{#is_allowed 'create' model.shortName context=null}}
   {{^is_related}}
     <ul class="new-tree">
       <li class="tree-item tree-item-add">
