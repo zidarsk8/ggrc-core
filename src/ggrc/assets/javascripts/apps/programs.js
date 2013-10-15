@@ -282,12 +282,10 @@ function should_show_authorizations() {
     , context_id = instance.context && instance.context.id
     ;
 
+  debugger;
   return (context_id
-      && Permission.is_allowed('read', 'Role', 1)
-      && Permission.is_allowed('read', 'UserRole', context_id)
-      && Permission.is_allowed('create', 'UserRole', context_id)
-      && Permission.is_allowed('update', 'UserRole', context_id)
-      && Permission.is_allowed('delete', 'UserRole', context_id));
+      && Permission.is_allowed('read', 'Role', null)
+      && Permission.is_allowed('read', 'UserRole', context_id));
 }
 
 $(function() {
