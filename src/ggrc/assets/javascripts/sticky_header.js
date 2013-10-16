@@ -13,12 +13,16 @@ can.Control("StickyHeader", {
         // A selector for the scrollable area ancestor
         scroll_area_selector: ".object-area"
         // A selector for all sticky-able headers
-      , header_selector: ".header, .tree-open > .item-open > .item-main, .advanced-filters"
+      , header_selector: ".header"
+                      +", .tree-open > .item-open > .item-main"
+                      +", .tree-open > .item-open > .item-content > .inner-tree > h6"
+                      +", .advanced-filters"
         // A selector for all sticky-able footers
       , footer_selector: ".tree-footer"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
+                      +", .tree-open > .item-open > .item-content > .inner-tree"
         // The amount of space at the bottom of the content when the header should start scrolling away
       , margin: 30
     }
@@ -75,7 +79,7 @@ can.Control("StickyHeader", {
     var self = this;
     this['_'+type] && this['_'+type].each(function() {
       var $this = $(this);
-      self.position_clone($this, $this.data('sticky').clone);
+      self.position_clone($this);
     });
   }
 
@@ -90,14 +94,16 @@ can.Control("StickyHeader", {
     // Generate the depth and clone for each header
     for (var $this; $this = items[i]; i += increment) {
       $this = $($this);
+
       if (!$this.data('sticky')) {
         var data = {
             type: type
           , depth: $this.parents(self.options.depth_selector).length
         };
         $this.data('sticky', data);
-        data.clone = self.clone($this, type === 'footer' ? items.slice(i) : items.slice(0, i));
       }
+
+      self.clone($this, type === 'footer' ? items.slice(i) : items.slice(0, i));
     }
 
     return items;
@@ -129,22 +135,16 @@ can.Control("StickyHeader", {
       return false;
   }
 
-    // Clones and prepares a header
+    // Clones (if one doesn't exist) and prepares an item
   , clone : function(el, items) {
     // Compute heights of above items
     var offset = 0
       , data = el.data('sticky')
-      , depths = []
-      , selector
+      , depths = {}
+      , selector = this.selector_of(el, data.type)
       , increment = data.type === 'footer' ? -1 : 1
       , i = data.type === 'footer' ? items.length - 1 : 0
       ;
-
-    // Determine which selector part grabbed this element
-    can.each(this.options[data.type + '_selector'].split(','), function(part) {
-      if (el.is(part))
-        selector = part;
-    });
 
     // Determine the offset based on nested parents
     for (var $this; $this = items[i]; i += increment) {
@@ -153,25 +153,39 @@ can.Control("StickyHeader", {
       }
       else {
         $this = $($this);
-        var depth = $this.data('sticky').depth;
+        var depth = $this.data('sticky').depth
+          , depth_selector = this.selector_of($this, data.type) + depth
+          ;
 
         // Only add offsets for the closest nested parent of the given depth
-        // as well as offsets for siblings with different selectors
-        if ((!depths[depth] && depth < data.depth) || (depth <= data.depth && !$this.is(selector))) {
-          offset += $this.outerHeight();
-          depths[depth] = true;
+        // as well as offsets for the first adjacent sibling of different selectors
+        if ((!depths[depth] && depth < data.depth) 
+          || (depth <= data.depth && !$this.is(selector) && !depths[depth_selector])) {
+            offset += $this.outerHeight();
+            depths[depth] = true;
+            depths[depth_selector] = true;
         }
       }
     }
-    data.offset = offset;
 
-    return this.position_clone(el, el.clone(true, true).addClass("sticky sticky-" + data.type));
+    data.offset = offset;
+    data.clone = data.clone || el.clone(true, true).addClass("sticky sticky-" + data.type);
+    return this.position_clone(el);
+  }
+
+  , selector_of : function(el, type) {
+    var selector = '';
+    can.each(this.options[type + '_selector'].split(','), function(part) {
+      if (el.is(part))
+        selector = part;
+    });
+    return selector;
   }
 
     // Reposition a clone
-  , position_clone : function(el, clone) {
+  , position_clone : function(el) {
     var data = el.data('sticky');
-    return clone.css({
+    return data.clone.css({
           position: 'fixed'
         , left: el.offset().left + 'px'
         , width: (el[0].getBoundingClientRect().width
