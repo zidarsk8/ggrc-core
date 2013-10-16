@@ -47,8 +47,9 @@ can.Control("StickyHeader", {
 
     // Resize clones on window resize
   , "{window} resize" : function(el, ev) {
-    this.position_items('header');
-    this.position_items('footer');
+    // Update the header/footer positions
+    this.update_items('header');
+    this.update_items('footer');
   }
 
     // Updates the given set of sticky items
@@ -73,14 +74,6 @@ can.Control("StickyHeader", {
         clone.css('margin' + (type === 'footer' ? 'Bottom' : 'Top'), margin + 'px');
       }
     }
-  }
-    // Repositions all sticky items
-  , position_items : function(type) {
-    var self = this;
-    this['_'+type] && this['_'+type].each(function() {
-      var $this = $(this);
-      self.position_clone($this);
-    });
   }
 
     // Find all sticky-able headers in the document
@@ -179,6 +172,7 @@ can.Control("StickyHeader", {
     return this.position_clone(el);
   }
 
+    // Determine the selector that "selected" a given element
   , selector_of : function(el, type) {
     var selector = '';
     can.each(this.options[type + '_selector'].split(','), function(part) {
@@ -208,6 +202,7 @@ can.Control("StickyHeader", {
       );
   }
 
+    // Detach an element's sticky data
   , remove : function(el) {
     el.data('sticky').clone[0].parentNode && el.data('sticky').clone.remove();
     $.removeData(el, 'sticky');
