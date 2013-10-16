@@ -543,6 +543,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
     this.options.attr('expanded', true);
+    this.element.trigger("kill-all-popovers"); //special case for changing evidence links to non-popover ones
     if(!this.options.child_options && this.options.draw_children) {
       this.add_child_lists_to_child();
     }

@@ -99,6 +99,7 @@ can.Model.Cacheable("CMS.Models.Response", {
       //1: Document Evidence
       model : "Document"
       , mapping : "documents"
+      , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
     }, {
       //2: Meetings
       model : "Meeting"

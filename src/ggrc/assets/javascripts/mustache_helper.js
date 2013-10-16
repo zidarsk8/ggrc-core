@@ -864,6 +864,14 @@ function when_attached_to_dom(el, cb) {
   }();
 }
 
+Mustache.registerHelper("open_on_create", function(style) {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).openclose("open");
+    });
+  };
+});
+
 Mustache.registerHelper("trigger_created", function() {
   return function(el) {
     when_attached_to_dom(el, function() {
