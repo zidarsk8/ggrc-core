@@ -53,7 +53,8 @@ can.Control("StickyHeader", {
 
     // Updates the given set of sticky items
   , update_items : function(type) {
-    var items = this['_'+type] = this.find_items(type);
+    var items = this.find_items(type);
+
     for (var i = items.length - 1; i >= 0; i--) {
       var el = items.eq(i)
         , clone = el.data('sticky').clone
@@ -62,8 +63,7 @@ can.Control("StickyHeader", {
 
       // Remove the clone if its content no longer inside the viewport
       if (margin === false) {
-        clone[0].parentNode && clone.remove();
-        $.removeData(el, 'sticky');
+        this.remove(el);
       }
       // Otherwise inject the clone
       else {
@@ -85,11 +85,17 @@ can.Control("StickyHeader", {
 
     // Find all sticky-able headers in the document
   , find_items : function(type) {
-    var items = this.element.find(this.options[type + '_selector']).filter(':not(.sticky):visible')
+    var old_items = this['_'+type] || $()
+      , items = this['_'+type] = this.element.find(this.options[type + '_selector']).filter(':not(.sticky):visible')
       , self = this
       , increment = type === 'footer' ? -1 : 1
       , i = type === 'footer' ? items.length - 1 : 0
       ;
+
+    // Remove all items that no longer are active
+    old_items.not(items).each(function() {
+      self.remove($(this));
+    });
 
     // Generate the depth and clone for each header
     for (var $this; $this = items[i]; i += increment) {
@@ -202,13 +208,18 @@ can.Control("StickyHeader", {
       );
   }
 
+  , remove : function(el) {
+    el.data('sticky').clone[0].parentNode && el.data('sticky').clone.remove();
+    $.removeData(el, 'sticky');
+  }
+
     // Clean up when destroyed
   , destroy : function() {
-    var items = $().add(this._header || $()).add(this._footer || $());
+    var items = $().add(this._header || $()).add(this._footer || $())
+      , self = this
+      ;
     items.each(function() {
-      var $this = $(this);
-      $this.data('sticky').clone.remove();
-      $.removeData($this, 'sticky');
+      self.destroy($(this));
     });
     delete this._header;
     delete this._footer;
