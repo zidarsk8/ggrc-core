@@ -25,84 +25,150 @@ window.process_gapi_query = function(params) {
   return qstr.join(" and ");
 };
 
-var gdrive_findAll;
-can.Model.Cacheable("CMS.Models.GDriveFolder", {
+var gdrive_findAll = function(extra_params, extra_path) {
+  return function(params) {
+    return window.oauth_dfd.then(function() {
+      var dfd = new $.Deferred();
+      if(params.parentfolderid) {
+        params.parents = params.parentfolderid ;
+        delete params.parentfolderid;
+      }
+      if(!params.parents) {
+        params.parents = GGRC.config.GDRIVE_ROOT_FOLDER;
+      }
+      $.extend(params, extra_params);
+      var q = process_gapi_query(params);
 
-  findAll : (gdrive_findAll = function(extra_params) {
-    return function(params) {
-      return window.oauth_dfd.then(function() {
-        var dfd = new $.Deferred();
-        if(params.parentfolderid) {
-          params.parents = params.parentfolderid ;
-          delete params.parentfolderid;
-        }
-        if(!params.parents) {
-          params.parents = GGRC.config.GDRIVE_ROOT_FOLDER;
-        }
-        $.extend(params, extra_params);
-        var q = process_gapi_query(params);
-        gapi.client.request({
-          path : "/drive/v2/files" + (params.id ? ("/" + params.id) : "") + "?q=" + encodeURIComponent(q)
-          , method : "get" //"post"
-          , callback : function(result) {
-            if(!result) {
-              dfd.reject(JSON.parse(arguments[1]));
-            } else {
-              var objs = result.items;
-              can.each(objs, function(obj) {
-                obj.selfLink = obj.selfLink || "#";
-              });
-              dfd.resolve(objs);
-            }
+      var path = "/drive/v2/files";
+      if(params.id) {
+        path += "/" + params.id;
+      }
+      if(extra_path) {
+        path += extra_path;
+      }
+      if(q) {
+        path += "?q=" + encodeURIComponent(q);
+      }
+
+      gapi.client.request({
+        path : path
+        , method : "get" //"post"
+        , callback : function(result) {
+          if(!result) {
+            dfd.reject(JSON.parse(arguments[1]));
+          } else {
+            var objs = result.items;
+            can.each(objs, function(obj) {
+              obj.selfLink = obj.selfLink || "#";
+            });
+            dfd.resolve(objs);
           }
-        });
-        return dfd;
+        }
       });
-    };
-  })({ mimeType : "application/vnd.google-apps.folder"})
+      return dfd;
+    });
+  };
+};
+can.Model.Cacheable("CMS.Models.GDriveFile", {
+
+  findAll : gdrive_findAll({ mimeTypeNot : "application/vnd.google-apps.folder" })
+
+  , removeFromParent : function(object, parent_id) {
+    if(typeof object !== "object") {
+      object = this.store[object];
+    }
+    return window.oauth_dfd.then(function() {
+
+      var dfd = new $.Deferred();
+
+      gapi.client.request({
+        path : "/drive/v2/files/" + parent_id + "/children/" + object.id
+        , method : "delete"
+        , callback : function(result) {
+          if(result.error) {
+            dfd.reject(dfd, result.error.status, result.error);
+          } else {
+            dfd.resolve();
+          }
+        }
+      });
+      return dfd;
+    }).done(function() {
+      object.refresh();
+    });
+  }
+  , destroy : function(id) {
+    return window.oauth_dfd.then(function() {
+
+      var dfd = new $.Deferred();
+
+      gapi.client.request({
+        path : "/drive/v2/files/" + id + "/trash"
+        , method : "post"
+        , callback : function(result) {
+          if(result.error) {
+            dfd.reject(dfd, result.error.status, result.error);
+          } else {
+            dfd.resolve(result);
+          }
+        }
+      });
+      return dfd;
+    });
+  }
+
+  , from_id : function(id) {
+    return new this({ id : id });
+  }
+
+}, {
+  findPermissions : function() {
+    return CMS.Models.GDriveFilePermission.findAll(this.serialize());
+  }
+
+});
+
+CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
+
+  findAll : gdrive_findAll({ mimeType : "application/vnd.google-apps.folder"})
+  
   , findOne : function(params, success, error) {
     return this.findAll(params).then(function(data) {
       return data[0];
     });
   }
   , create : function(params) {
-      params.id = params.parentfolderid;
-      delete params.parentfolderid;
-      return $.ajax({
-      url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-      , type : "post"
-      , dataType : "json"
-      , data : { command : "addfolders", params : [params] }
+    return window.oauth_dfd.then(function() {
+
+      var dfd = new $.Deferred();
+
+      gapi.client.request({
+        path : "/drive/v2/files"
+        , method : "post"
+        , body : {
+          "mimeType": "application/vnd.google-apps.folder"
+          , title : params.title
+          , parents : params.parents.push ? params.parents : [params.parents]
+        }
+        , callback : function(result) {
+          if(result.error) {
+            dfd.reject(dfd, result.error.status, result.error);
+          } else {
+            dfd.resolve(result);
+          }
+        }
+      });
+      return dfd;
     });
-  }
-  , removeFromParent : function(object, parent_id) {
-    if(typeof object !== "object") {
-      object = this.store[object];
-    }
-    return $.ajax({
-      type : "POST"
-      , url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec?"
-      , dataType : "json"
-      , data : {
-        command : "deletefolders"
-        , folderid : object.id
-        , parentfolderid : parent_id
-      }
-    }).done(function(parents) {
-      object.attr("parents", parents);
-    });
-  }
-  , destroy : function() {
-    throw "Destroy not supported for GDrive Folders. Use removeFromParent";
   }
   , findChildFolders : function(params) {
     if(typeof params !== "string") {
       params = params.id;
     }
-    return this.findAll({ parentfolderid : params });
+    return this.findAll({ parent : params.id });
   }
   , addChildFolder : function(parent, params) {
-    return this.create($.extend({ parentfolderid : parent.id }, params));
+    return this.create($.extend({ parent : parent }, params));
   }
   , from_id : function(id) {
     return new this({ id : id });
@@ -119,43 +185,16 @@ can.Model.Cacheable("CMS.Models.GDriveFolder", {
     return this.constructor.findChildFolders(this);
   }
 
-  //No longer a destroy per se, but rather unlinking from all parent folders.
-  , destroy : function() {
-    var that = this;
-    if(this.isNew())
-      return;
-    can.each(this.parents, function(parent) {
-      that.constructor.removeFromParent(that, parent.parentId);
-    });
-  }
-
 });
 
-can.Model.Cacheable("CMS.Models.GDriveFile", {
+can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
 
-  findAll : gdrive_findAll({ mimeTypeNot : "application/vnd.google-apps.folder" })
-
-  , destroy : function() {
-    throw "Destroy is not supported for GDrive Files. Use removeFromParent";
-  }
-
-  , from_id : function(id) {
-    return new this({ id : id });
-  }
+  //call findAll with id param.
+  findAll : gdrive_findAll({}, "/permissions")
 
 }, {});
 
-can.Model.Cacheable("CMS.Models.GDriveFolderPermission", {
-
-  findAll : {
-    url : "https://script.google.com/macros/s/" + GGRC.config.GDRIVE_SCRIPT_ID + "/exec"
-    , type : "get"
-    , dataType : "jsonp"
-    , data : { command : 'getfolderpermissions', id : GGRC.config.GDRIVE_ROOT_FOLDER }
-  }
-
-}, {});
-
+CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {}, {});
 
 can.Model.Join("CMS.Models.ObjectFolder", {
   root_object : "object_folder"
