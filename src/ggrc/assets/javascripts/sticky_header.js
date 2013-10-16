@@ -14,6 +14,8 @@ can.Control("StickyHeader", {
         scroll_area_selector: ".object-area"
         // A selector for all sticky-able headers
       , header_selector: ".header, .tree-open > .item-open > .item-main, .advanced-filters"
+        // A selector for all sticky-able footers
+      , footer_selector: ".tree-footer"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
@@ -34,10 +36,22 @@ can.Control("StickyHeader", {
     if (!this.element.is(":visible"))
       return;
 
-    // Update the header positions
-    this._headers = this.find_headers();
-    for (var i = this._headers.length - 1; i >= 0; i--) {
-      var el = this._headers.eq(i)
+    // Update the header/footer positions
+    this.update_items('header');
+    this.update_items('footer');
+  }
+
+    // Resize clones on window resize
+  , "{window} resize" : function(el, ev) {
+    this.position_items('header');
+    this.position_items('footer');
+  }
+
+    // Updates the given set of sticky items
+  , update_items : function(type) {
+    var items = this['_'+type] = this.find_items(type);
+    for (var i = items.length - 1; i >= 0; i--) {
+      var el = items.eq(i)
         , clone = el.data('sticky').clone
         , margin = this.in_viewport(el)
         ;
@@ -52,54 +66,63 @@ can.Control("StickyHeader", {
         !clone[0].parentNode && el.parent().append(clone);
 
         // When the content is close to scrolling away, also scroll the header away
-        clone.css('marginTop', margin + 'px');
+        clone.css('margin' + (type === 'footer' ? 'Bottom' : 'Top'), margin + 'px');
       }
     }
   }
-
-    // Resize clones on window resize
-  , "{window} resize" : function(el, ev) {
+    // Repositions all sticky items
+  , position_items : function(type) {
     var self = this;
-    this._headers && this._headers.each(function() {
+    this['_'+type] && this['_'+type].each(function() {
       var $this = $(this);
       self.position_clone($this, $this.data('sticky').clone);
     });
   }
 
     // Find all sticky-able headers in the document
-  , find_headers : function() {
-    var headers = this.element.find(this.options.header_selector).filter(':not(.sticky):visible')
+  , find_items : function(type) {
+    var items = this.element.find(this.options[type + '_selector']).filter(':not(.sticky):visible')
       , self = this
+      , increment = type === 'footer' ? -1 : 1
+      , i = type === 'footer' ? items.length - 1 : 0
       ;
 
     // Generate the depth and clone for each header
-    headers.each(function(i) {
-      var $this = $(this);
+    for (var $this; $this = items[i]; i += increment) {
+      $this = $($this);
       if (!$this.data('sticky')) {
         var data = {
-          depth: $this.parents(self.options.depth_selector).length
+            type: type
+          , depth: $this.parents(self.options.depth_selector).length
         };
         $this.data('sticky', data);
-        data.clone = self.clone($this, headers.slice(0, i));
+        data.clone = self.clone($this, type === 'footer' ? items.slice(i) : items.slice(0, i));
       }
-    });
+    }
 
-    return headers;
+    return items;
   }
 
     // Determine whether a header's content section is within the scrolling viewport
   , in_viewport : function(el) {
-    var parent = el.parent()
-      , pos = parent.position()
-      , top = this.options.scroll_area[0].scrollTop
-      , bottom = top + this.options.scroll_area.outerHeight() 
-      , offset = el.data('sticky').offset
-      , margin = pos.top + parent.outerHeight() - el.outerHeight() - offset
+    var data = el.data('sticky')
+      , type = data.type
+      , parent = el.parent()
+      , offset = data.offset
+      , pos = parent.position().top
+      , margin
       ;
 
+    if (type === 'footer') {
+      offset = data.offset + this.options.scroll_area.outerHeight() + this.options.scroll_area[0].scrollTop;
+      pos = el.position().top + this.options.scroll_area[0].scrollTop + el.outerHeight();
+    }
+    margin = pos + parent.outerHeight() - el.outerHeight();
+
     // If the content is in the viewport...
-    if (pos.top < offset && (pos.top + parent.outerHeight() - el.outerHeight()) > offset) {
+    if ((type === 'footer' ? offset < pos : pos < offset) && margin > offset) {
       // Return zero or the amount that the header should start scrolling away if applicable
+      margin -= offset;
       return margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
     }
     else
@@ -107,59 +130,74 @@ can.Control("StickyHeader", {
   }
 
     // Clones and prepares a header
-  , clone : function(el, headers) {
-    // Compute heights of above headers
+  , clone : function(el, items) {
+    // Compute heights of above items
     var offset = 0
       , data = el.data('sticky')
       , depths = []
       , selector
+      , increment = data.type === 'footer' ? -1 : 1
+      , i = data.type === 'footer' ? items.length - 1 : 0
       ;
 
     // Determine which selector part grabbed this element
-    can.each(this.options.header_selector.split(','), function(part) {
+    can.each(this.options[data.type + '_selector'].split(','), function(part) {
       if (el.is(part))
         selector = part;
     });
 
     // Determine the offset based on nested parents
-    for (var i = headers.length - 1; i >= 0; i--) {
-      var $this = $(headers[i])
-        , depth = $this.data('sticky').depth
-        ;
+    for (var $this; $this = items[i]; i += increment) {
+      if (el[0] === $this) {
+        break;
+      }
+      else {
+        $this = $($this);
+        var depth = $this.data('sticky').depth;
 
-      // Only add offsets for the closest nested parent of the given depth
-      // as well as offsets for siblings with different selectors
-      if ((!depths[depth] && depth < data.depth) || (depth <= data.depth && !$this.is(selector))) {
-        offset += $this.outerHeight();
-        depths[depth] = true;
+        // Only add offsets for the closest nested parent of the given depth
+        // as well as offsets for siblings with different selectors
+        if ((!depths[depth] && depth < data.depth) || (depth <= data.depth && !$this.is(selector))) {
+          offset += $this.outerHeight();
+          depths[depth] = true;
+        }
       }
     }
     data.offset = offset;
 
-    return this.position_clone(el, el.clone(true, true).addClass("sticky"));
+    return this.position_clone(el, el.clone(true, true).addClass("sticky sticky-" + data.type));
   }
 
     // Reposition a clone
   , position_clone : function(el, clone) {
+    var data = el.data('sticky');
     return clone.css({
           position: 'fixed'
-        , top: (el.data('sticky').offset + parseFloat(this.options.scroll_area.css("top"))) + 'px'
         , left: el.offset().left + 'px'
         , width: (el[0].getBoundingClientRect().width
             - parseFloat(el.css('paddingLeft')) 
             - parseFloat(el.css('paddingRight'))) 
             + 'px'
-      });
+      }).css(
+          data.type === 'footer' ? 'bottom' : 'top'
+          , (
+              data.type === 'footer'
+              ? data.offset + $(window).height() - this.options.scroll_area.outerHeight() - parseFloat(this.options.scroll_area.position().top)
+              : data.offset + parseFloat(this.options.scroll_area.position().top)
+            ) + 'px'
+      );
   }
 
     // Clean up when destroyed
   , destroy : function() {
-    this._headers.each(function() {
+    var items = $().add(this._header || $()).add(this._footer || $());
+    items.each(function() {
       var $this = $(this);
       $this.data('sticky').clone.remove();
       $.removeData($this, 'sticky');
     });
-    delete this._headers;
+    delete this._header;
+    delete this._footer;
   }
 });
 

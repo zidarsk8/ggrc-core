@@ -602,7 +602,13 @@ select.multiple-selector {
 
 // Sticky headers
 .sticky {
-  @include box-shadow(inset 0 0 3px 0 #bbb);
   background:#fff;
-  padding-bottom:2px;
+  &.sticky-header {
+    @include box-shadow(inset 0 0 3px 0 #bbb);
+    padding-bottom:2px;
+  }
+  &.sticky-footer {
+    @include box-shadow(inset 0 0 3px 0 #bbb);
+    padding-top:2px;
+  }
 }
