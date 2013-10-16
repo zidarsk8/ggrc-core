@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/local_storage
@@ -89,18 +89,18 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   // collapsed state
   // widgets on a page may be collapsed such that only the title bar is visible.
+  // if page_id === null, this is a global value
   , setCollapsed : function(page_id, widget_id, is_collapsed) {
-
-    this.makeObject(path, COLLAPSE).attr(widget_id, is_collapsed);
+    this.makeObject(page_id === null ? page_id : path, COLLAPSE).attr(widget_id, is_collapsed);
 
     this.autoupdate && this.save();
     return this;
   }
 
   , getCollapsed : function(page_id, widget_id) {
-    var collapsed = this.getObject(path, COLLAPSE);
+    var collapsed = this.getObject(page_id === null ? page_id : path, COLLAPSE);
     if(!collapsed) {
-      collapsed = this.makeObject(path, COLLAPSE).attr(this.makeObject(COLLAPSE, page_id).serialize());
+      collapsed = this.makeObject(page_id === null ? page_id : path, COLLAPSE).attr(this.makeObject(COLLAPSE, page_id).serialize());
     }
 
     return widget_id ? collapsed.attr(widget_id) : collapsed;

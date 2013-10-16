@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/cacheable
@@ -13,6 +13,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     root_object : "control"
   , root_collection : "controls"
   , category : "governance"
+  , findOne : "GET /api/controls/{id}"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"

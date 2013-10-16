@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //require can.jquery-all
 
@@ -343,10 +343,13 @@ can.Control("CMS.Controllers.LHN_Search", {
         if (model_name) {
           count = search_result.getCountFor(model_name);
 
-          if (!isNaN(parseInt(count))) {
+          if (Permission.is_allowed('read', model_name, null) && !isNaN(parseInt(count))) {
             $list
               .find(self.options.count_selector)
               .text(count);
+          }
+          else {
+            $list.find(self.options.count_selector).closest('small').remove();
           }
         }
       });
@@ -486,6 +489,10 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         , delay = this.options.fade_in_delay
         ;
 
+      // There isn't tooltip data available for recently viewed objects
+      if (instance instanceof GGRC.Models.RecentlyViewedObject)
+        return;
+
       if (this.options.$extended.data('model') !== instance) {
         clearTimeout(this.fade_in_timeout);
         // If tooltip is already showing, show new content without delay
@@ -533,7 +540,7 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         ;
 
       this.fade_in_timeout = null;
-      can.view(tooltip_view, instance, function(frag) {
+      can.view(tooltip_view, new can.Observe({ instance: instance }), function(frag) {
         self.options.$extended
           .html(frag)
           .addClass('in')

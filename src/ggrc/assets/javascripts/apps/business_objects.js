@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 
@@ -278,7 +278,7 @@ $(function() {
               if ( $objectArea.hasClass("dashboard-area") ) {
                 return far_model.title_plural;
               } else {
-                return "Mapped " + far_model.title_plural;
+                return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
               }
             }
           , widget_icon: far_model.table_singular

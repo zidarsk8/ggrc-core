@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 (function(can, $) {
 
@@ -52,6 +52,10 @@ can.Control("GGRC.Controllers.Modals", {
   }
 }, {
   init : function() {
+    if (!(this.options instanceof can.Observe)) {
+      this.options = new can.Observe(this.options);
+    }
+
     if(!this.element.find(".modal-body").length) {
       can.view(this.options.preload_view, {}, this.proxy("after_preload"));
     } else {
@@ -64,9 +68,9 @@ can.Control("GGRC.Controllers.Modals", {
     if (content) {
       this.element.html(content);
     }
-    this.options.$header = this.element.find(".modal-header");
-    this.options.$content = this.element.find(".modal-body");
-    this.options.$footer = this.element.find(".modal-footer");
+    this.options.attr("$header", this.element.find(".modal-header"));
+    this.options.attr("$content", this.element.find(".modal-body"));
+    this.options.attr("$footer", this.element.find(".modal-footer"));
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
@@ -78,7 +82,7 @@ can.Control("GGRC.Controllers.Modals", {
     var self = this;
 
     if (this.options.object_params)
-      can.each(this.options.object_params, function(value, key) {
+      this.options.object_params.each(function(value, key) {
         self.set_value({ name: key, value: value });
       });
   }
@@ -135,7 +139,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
         , select : ctl.proxy("autocomplete_select", $that)
         , close : function() {
-          $that.val($that.attr("value"));
+          //$that.val($that.attr("value"));
         }
       }).data('ui-autocomplete');
     });
@@ -176,6 +180,8 @@ can.Control("GGRC.Controllers.Modals", {
   , fetch_data : function(params) {
     var that = this;
     var dfd;
+    params = params || this.find_params();
+    params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
       return new $.Deferred().resolve(this.options.instance);
     }
@@ -183,20 +189,20 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
-          ? $.when(this.options.instance = new this.options.model(params || this.find_params()))
-          : this.options.model.findAll(params || this.find_params()).then(function(data) {
+          ? $.when(this.options.attr("instance", new this.options.model(params)))
+          : this.options.model.findAll(params).then(function(data) {
             var h;
             if(data.length) {
-              that.options.instance = data[0];
+              that.options.attr("instance", data[0]);
               return data[0].refresh(); //have to refresh (get ETag) to be editable.
             } else {
-              that.options.new_object_form = true;
-              that.options.instance = new that.options.model(params || that.find_params());
+              that.options.attr("new_object_form", true);
+              that.options.attr("instance", new that.options.model(params));
               return that.options.instance;
             }
           });
     } else {
-      this.options.instance = new can.Observe(params || this.find_params());
+      this.options.attr("instance", new can.Observe(params));
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
@@ -237,9 +243,8 @@ can.Control("GGRC.Controllers.Modals", {
       this.set_value_from_element(el);
   }
 
-  , "input, textarea, select keyup" : function(el, ev) {
-      if ($(el).is(':not([name="owner.email"])') || !$(el).val())
-        this.set_value_from_element(el);
+  , "input:not([data-lookup]), textarea, select keyup" : function(el, ev) {
+    this.set_value_from_element(el);
   }
 
   , serialize_form : function() {
@@ -254,12 +259,19 @@ can.Control("GGRC.Controllers.Modals", {
       var $el = $(el)
         , name = $el.attr('name')
         , value = $el.val()
+        , that = this;
         ;
 
       if ($el.is('select[multiple]'))
         value = value || [];
       if (name)
         this.set_value({ name: name, value: value });
+
+      if($el.is("[data-also-set]")) {
+        can.each($el.data("also-set").split(","), function(oname) {
+          that.set_value({ name : oname, value : value});
+        });
+      }
     }
 
   , set_value: function(item) {
@@ -273,7 +285,7 @@ can.Control("GGRC.Controllers.Modals", {
                = new this.options.model(instance && instance.serialize ? instance.serialize() : instance);
     }
     var name = item.name.split(".")
-      , $elem, value, model;
+      , $elem, value, model, $other;
     $elem = this.options.$content.find("[name='" + item.name + "']");
     model = $elem.attr("model");
 
@@ -293,6 +305,17 @@ can.Control("GGRC.Controllers.Modals", {
     if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
+    if($elem.is("[data-binding]")) {
+      can.each(can.makeArray($elem[0].options), function(opt) {
+        instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
+      });
+      if(value.push) {
+        can.each(value, can.proxy(instance, "mark_for_addition", $elem.data("binding")));
+      } else {
+        instance.mark_for_addition($elem.data("binding"), value);
+      }
+    }
+
     if(name.length > 1) {
       if(can.isArray(value)) {
         value = new can.Observe.List(can.map(value, function(v) { return new can.Observe({}).attr(name.slice(1).join("."), v); }));
@@ -306,6 +329,20 @@ can.Control("GGRC.Controllers.Modals", {
             // Setting a "lookup field is handled in the autocomplete() method"
             return;
           }
+        } else if(name[name.length - 1] === "date") {
+          name.pop(); //date is a pseudoproperty of datetime objects
+          if(!value) {
+            value = null;
+          } else {
+            value = this.options.model.convert.date(value);
+            $other = this.options.$content.find("[name='" + name.join(".") + ".time']");
+            if($other.length) {
+              value = moment(value).add(parseInt($other.val(), 10)).toDate();
+            }
+          }
+        } else if(name[name.length - 1] === "time") {
+          name.pop(); //time is a pseudoproperty of datetime objects
+          value = moment.utc(this.options.instance.attr(name.join("."))).startOf("day").add(parseInt(value, 10)).toDate();
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
         }

@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: brad@reciprocitylabs.com
+# Maintained By: brad@reciprocitylabs.com
+
 Feature: RBAC Permissions enforcement for REST API
 
   Background:
@@ -330,6 +335,10 @@ Feature: RBAC Permissions enforcement for REST API
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
           ],
+          "ProgramDirective": [
+            {{context.context1.value['context']['id']}},
+            {{context.context2.value['context']['id']}}
+          ],
           "Program": [
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
@@ -337,6 +346,10 @@ Feature: RBAC Permissions enforcement for REST API
         },
         "read": {
           "Contract": [
+            {{context.context1.value['context']['id']}},
+            {{context.context2.value['context']['id']}}
+          ],
+          "ProgramDirective": [
             {{context.context1.value['context']['id']}},
             {{context.context2.value['context']['id']}}
           ],
@@ -363,10 +376,18 @@ Feature: RBAC Permissions enforcement for REST API
     And "directive_in_2" link property "context" is "context2"
     And "directive_in_2" is POSTed to its collection
     And a new "Program" named "program"
-    And "directive_in_1" is added to links property "directives" of "program"
-    And "directive_in_2" is added to links property "directives" of "program"
     And "program" link property "context" is "context1"
     And "program" is POSTed to its collection
+    And a new "ProgramDirective" named "program_directive_1"
+    And "program_directive_1" link property "directive" is "directive_in_1"
+    And "program_directive_1" link property "context" is "context1"
+    And "program_directive_1" link property "program" is "program"
+    And "program_directive_1" is POSTed to its collection
+    And a new "ProgramDirective" named "program_directive_2"
+    And "program_directive_2" link property "directive" is "directive_in_2"
+    And "program_directive_2" link property "context" is "context2"
+    And "program_directive_2" link property "program" is "program"
+    And "program_directive_2" is POSTed to its collection
     When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
     Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
@@ -386,6 +407,9 @@ Feature: RBAC Permissions enforcement for REST API
           "Contract": [
             {{context.context1.value['context']['id']}}
           ],
+          "ProgramDirective": [
+            {{context.context1.value['context']['id']}}
+          ],
           "Program": [
             {{context.context1.value['context']['id']}}
           ]
@@ -401,8 +425,8 @@ Feature: RBAC Permissions enforcement for REST API
     When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
     Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
-    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 2"
-    And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0] != 'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][1]"
+    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 1"
+    And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0]"
     Given the current user
     """
     { "email": "alicetester@testertester.com",
@@ -410,6 +434,9 @@ Feature: RBAC Permissions enforcement for REST API
       "permissions": {
         "read": {
           "Contract": [333],
+          "ProgramDirective": [
+            {{context.context1.value['context']['id']}}
+          ],
           "Program": [
             {{context.context1.value['context']['id']}}
           ]

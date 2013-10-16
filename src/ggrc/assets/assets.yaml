@@ -1,3 +1,7 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 dashboard-js-files:
   - jquery.js
@@ -72,11 +76,11 @@ dashboard-js-files:
   - mapping/mapping_controller.js
   - sections/sections_controller.js
   - apps/mapping.js
-  - pbc/population_sample.js
   - pbc/meeting.js
   - pbc/response.js
   - pbc/responses_controller.js
   - pbc/modals_controller.js
+  - pbc/workflow_controller.js
   - apps/pbc.js
   - products/routes_controller.js
   - apps/products.js
@@ -104,6 +108,7 @@ dashboard-js-template-files:
   - base_objects/page_header.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
+  - base_objects/tree_footer_no_access.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
   - controls/list_popover.mustache
@@ -198,6 +203,8 @@ dashboard-js-template-files:
   - meetings/modal_content.mustache
   - meetings/tree_footer.mustache
   - meetings/tree.mustache
+  - documents/autocomplete_result.mustache
+  - documents/pbc_tree.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

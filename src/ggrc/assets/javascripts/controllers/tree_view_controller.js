@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 
@@ -48,6 +48,7 @@ can.Control("CMS.Controllers.TreeView", {
     , draw_children : true
     , find_function : null
     , options_property : "tree_view_options"
+    , allow_reading : true
     , allow_mapping : true
     , allow_creating : true
     , child_options : [] //this is how we can make nested configs. if you want to use an existing 
@@ -88,9 +89,11 @@ can.Control("CMS.Controllers.TreeView", {
     // In some cases, this controller is immediately replaced
     setTimeout(function() {
       if (that.element) {
+        that.element.trigger("updateCount", 0)
         that.element.trigger("loading");
         that.init_view();
-        that.options.list ? that.draw_list() : that.fetch_list();
+        if (that.options.allow_reading)
+          that.options.list ? that.draw_list() : that.fetch_list();
       }
     }, 100);
 
@@ -300,9 +303,9 @@ can.Control("CMS.Controllers.TreeView", {
         default: return null;
       }
     }, null);
-    if(parent.children_drawn)
-      return;
-    parent.attr("children_drawn", true);
+    if(parent && !parent.children_drawn) {
+      parent.attr("children_drawn", true);
+    }
   }
 
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
@@ -540,6 +543,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
   , ".item-main expand" : function(el, ev) {
     ev.stopPropagation();
     this.options.attr('expanded', true);
+    this.element.trigger("kill-all-popovers"); //special case for changing evidence links to non-popover ones
     if(!this.options.child_options && this.options.draw_children) {
       this.add_child_lists_to_child();
     }

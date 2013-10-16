@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 <section class="info">
   {{#instance}}
   <h3>{{title}}</h3>
@@ -16,7 +23,7 @@
   </p>
   <p>
     <strong>Owner:</strong>
-    {{#using owner=owner}}
+    {{#using owner=instance.owner}}
     {{#if owner}}
       {{owner.name}}
     {{else}}

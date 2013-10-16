@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //require can.jquery-all
 
@@ -14,6 +14,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , root_collection : "programs"
   , category : "programs"
   , findAll : "/api/programs?kind=Directive"
+  , findOne : "/api/programs/{id}"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
@@ -68,6 +69,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   // `rootModel` overrides `model.shortName` when determining polymorphic types
   , root_model : "Directive"
   , findAll : "/api/directives"
+  , findOne : "/api/directives/{id}"
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -142,6 +144,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , title_singular : "Regulation"
   , table_singular : "regulation"
   , findAll : "GET /api/regulations"
+  , findOne : "GET /api/regulations/{id}"
   , create : "POST /api/regulations"
   , update : "PUT /api/regulations/{id}"
   , destroy : "DELETE /api/regulations/{id}"
@@ -182,6 +185,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , title_singular : "Policy"
   , table_singular : "policy"
   , findAll : "GET /api/policies"
+  , findOne : "GET /api/policies/{id}"
   , create : "POST /api/policies"
   , update : "PUT /api/policies/{id}"
   , destroy : "DELETE /api/policies/{id}"
@@ -222,6 +226,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , title_singular : "Contract"
   , table_singular : "contract"
   , findAll : "GET /api/contracts"
+  , findOne : "GET /api/contracts/{id}"
   , create : "POST /api/contracts"
   , update : "PUT /api/contracts/{id}"
   , destroy : "DELETE /api/contracts/{id}"
@@ -256,7 +261,8 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   root_object : "org_group"
   , root_collection : "org_groups"
   , category : "business"
-  , findAll : "/api/org_groups"
+  , findAll : "GET /api/org_groups"
+  , findOne : "GET /api/org_groups/{id}"
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
@@ -335,7 +341,8 @@ can.Model.Cacheable("CMS.Models.Project", {
   root_object : "project"
   , root_collection : "projects"
   , category : "business"
-  , findAll : "/api/projects"
+  , findAll : "GET /api/projects"
+  , findOne : "GET /api/projects/{id}"
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
@@ -398,7 +405,8 @@ can.Model.Cacheable("CMS.Models.Facility", {
   root_object : "facility"
   , root_collection : "facilities"
   , category : "business"
-  , findAll : "/api/facilities"
+  , findAll : "GET /api/facilities"
+  , findOne : "GET /api/facilities/{id}"
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
@@ -477,7 +485,8 @@ can.Model.Cacheable("CMS.Models.Product", {
   root_object : "product"
   , root_collection : "products"
   , category : "business"
-  , findAll : "/api/products"
+  , findAll : "GET /api/products"
+  , findOne : "GET /api/products/{id}"
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
@@ -579,7 +588,8 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   root_object : "data_asset"
   , root_collection : "data_assets"
   , category : "business"
-  , findAll : "/api/data_assets"
+  , findAll : "GET /api/data_assets"
+  , findOne : "GET /api/data_assets/{id}"
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
@@ -658,7 +668,8 @@ can.Model.Cacheable("CMS.Models.Market", {
   root_object : "market"
   , root_collection : "markets"
   , category : "business"
-  , findAll : "/api/markets"
+  , findAll : "GET /api/markets"
+  , findOne : "GET /api/markets/{id}"
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
@@ -721,7 +732,8 @@ can.Model.Cacheable("CMS.Models.RiskyAttribute", {
   root_object : "risky_attribute"
   , root_collection : "risky_attributes"
   , category : "risk"
-  , findAll : "/api/risky_attributes"
+  , findAll : "GET /api/risky_attributes"
+  , findOne : "GET /api/risky_attributes/{id}"
   , create : "POST /api/risky_attributes"
   , update : "PUT /api/risky_attributes/{id}"
   , destroy : "DELETE /api/risky_attributes/{id}"
@@ -836,6 +848,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , title_singular : "Objective"
   , title_plural : "Objectives"
   , findAll : "GET /api/objectives"
+  , findOne : "GET /api/objectives/{id}"
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
@@ -888,6 +901,7 @@ can.Model.Cacheable("CMS.Models.Help", {
   root_object : "help"
   , root_collection : "helps"
   , findAll : "GET /api/help"
+  , findOne : "GET /api/help/{id}"
   , update : "PUT /api/help/{id}"
   , destroy : "DELETE /api/help/{id}"
   , create : "POST /api/help"
@@ -904,9 +918,14 @@ can.Model.Cacheable("CMS.Models.Role", {
   root_object : "role"
   , root_collection : "roles"
   , findAll : "GET /api/roles"
+  , findOne : "GET /api/roles/{id}"
   , update : "PUT /api/roles/{id}"
   , destroy : "DELETE /api/roles/{id}"
   , create : "POST /api/roles"
+  , scopes : [
+        "Private Program"
+      , "System"
+    ]
   , defaults : {
       permissions: {
           read: []
@@ -923,8 +942,7 @@ can.Model.Cacheable("CMS.Models.Role", {
   }
 
   , not_system_role : function() {
-    return can.inArray(
-        this.name, ["ProgramOwner", "ProgramEditor", "ProgramReader"]) < 0;
+    return this.attr('scope') !== "System";
   }
 
   , permission_summary : function() {
@@ -939,6 +957,7 @@ can.Model.Cacheable("CMS.Models.Role", {
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
+  , findOne : "GET /api/audits/{id}"
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
@@ -952,9 +971,11 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , report_end_date : "date"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
+    , owner : "CMS.Models.Person.stub"
   }
   , defaults : {
     status : "Draft"
+    , owner: {id : null}
   }
   , tree_view_options : {
     draw_children : true
@@ -978,7 +999,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
-    , assignee : "CMS.Models.Person.model"
+    , assignee : "CMS.Models.Person.stub"
     , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"
@@ -1005,7 +1026,9 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validatePresenceOf("objective");
   }
 }, {
-
+  response_model_class : function() {
+    return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";
+  }
 });
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {

@@ -39,6 +39,7 @@ def all_collections():
     service('facilities', models.Facility),
     service('help', models.Help),
     service('markets', models.Market),
+    service('meetings', models.Meeting),
     service('object_controls', models.ObjectControl),
     service('object_documents', models.ObjectDocument),
     service('object_objectives', models.ObjectObjective),

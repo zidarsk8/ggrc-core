@@ -1,8 +1,8 @@
 -#
 -# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
--# Created By:
--# Maintained By:
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
 -#
 -extends "layouts/dashboard.haml"
 
@@ -11,6 +11,9 @@
 
 -block page_help
   dashboard
+
+-block extra_javascript
+  GGRC.permissions = ={ permissions_json()|safe };
 
 -block header
   %h1.dashboard-title

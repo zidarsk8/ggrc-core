@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{#if allow_mapping_or_creating}}
 {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
 {{#if allow_creating}}
@@ -21,10 +28,17 @@
         </a>
         &nbsp;
         &nbsp;
+        {{#if list.length}}
         <a href="{{parent_instance.viewLink}}/export_controls?ids={{instance_ids list}}" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Export Controls
         </a>
+        {{else}}
+        <a href="{{parent_instance.viewLink}}/import_controls_template?ids={{instance_ids list}}" class="section-import">
+          <i class="grcicon-imp-exp"></i>
+          Download Import Template
+        </a>
+        {{/if}}
       </span>
     </div>
   </div>

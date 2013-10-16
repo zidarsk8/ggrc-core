@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 (function(namespace, $, can) {
 
@@ -558,10 +558,11 @@ function defer_render(tag_name, func, deferred) {
   function hookup(element, parent, view_id) {
     var f = function() {
       var frag_or_html = func.apply(this, arguments);
-      $(element).after(frag_or_html).remove();
+      $(element).html(frag_or_html);
     };
-    if (deferred)
-      deferred.done(f)
+    if (deferred) {
+      deferred.done(f);
+    }
     else
       setTimeout(f, 13);
   }
@@ -641,14 +642,28 @@ Mustache.registerHelper("all", function(type, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
+  , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
   , items_dfd, hook;
 
   function hookup(element, parent, view_id) {
     items_dfd.done(function(items){
-      var $el = $(element);
+      var val
+      , $parent = $(element.parentNode)
+      , $el = $(element);
       can.each(items, function(item) {
         $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
       });
+      if($parent.is("select")
+        && $parent.attr("name")
+        && context
+      ) {
+        val = context.attr($parent.attr("name"));
+        if(val) {
+          $parent.find("option[value=" + val + "]").attr("selected", true);
+        } else {
+          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
+        }
+      }
       $el.remove();
     });
     return element.parentNode;
@@ -711,7 +726,7 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
 });
 
 Mustache.registerHelper("private_program", function(modal_title) {
-  return modal_title.indexOf("New ") !=0 ? '' : [
+  return resolve_computed(modal_title).indexOf("New ") !=0 ? '' : [
     '<div class="span6">'
     , '<label>'
     , 'Privacy'
@@ -848,6 +863,14 @@ function when_attached_to_dom(el, cb) {
     }
   }();
 }
+
+Mustache.registerHelper("open_on_create", function(style) {
+  return function(el) {
+    when_attached_to_dom(el, function() {
+      $(el).openclose("open");
+    });
+  };
+});
 
 Mustache.registerHelper("trigger_created", function() {
   return function(el) {
@@ -1042,7 +1065,7 @@ Mustache.registerHelper("is_allowed", function() {
     , args = Array.prototype.slice.call(arguments, 0)
     , actions = []
     , resource_type = allowed_page && allowed_page.constructor.shortName
-    , context_id = allowed_page && allowed_page.context && allowed_page.context.id
+    , context_id = (allowed_page && allowed_page.context && allowed_page.context.id) || null
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1068,6 +1091,13 @@ Mustache.registerHelper("is_allowed", function() {
       }
     }
   });
+  if (options.hash && typeof options.hash.context !== undefined && !options.hash.context) {
+    context_id = null;
+  }
+  // This happens for Section widget, when GGRC.page_instance().context is null
+  if (typeof(context_id) === 'undefined') {
+    context_id = null;
+  }
   actions = actions.length ? actions : allowed_actions;
 
   // Check permissions
@@ -1088,7 +1118,7 @@ Mustache.registerHelper("is_allowed", function() {
     ;
 });
 
-Mustache.registerHelper("is_allowed_for_all", function(action, instances, options) {
+Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
   var passed = true;
 
   action = resolve_computed(action);
@@ -1122,6 +1152,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
   var target_type
     , resource_type
     , context_id
+    , can_map
     ;
 
   source = resolve_computed(source);
@@ -1140,16 +1171,30 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
   //  source = GGRC.page_instance();
   //}
 
-  resource_type = GGRC.JoinDescriptor.join_model_name_for(
-    source.constructor.shortName, target_type);
+  if (target_type === 'Cacheable') {
+    //  FIXME: This will *not* work for customizable roles -- this *only* works
+    //    for the limited default roles as of 2013-10-07, and assumes that:
+    //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
+    //        to a single object) are in the `null` context; and
+    //    2.  If a user has permission for creating `Relationship` objects in
+    //        the `null` context, they have permission for creating all mapping
+    //        objects in `null` context.
+    can_map = Permission.is_allowed('create', 'Relationship', null);
+  }
+  else {
+    resource_type = GGRC.JoinDescriptor.join_model_name_for(
+      source.constructor.shortName, target_type);
 
-  context_id = source.context ? source.context.id : null;
-  if (!(source instanceof CMS.Models.Program)
-      && target instanceof CMS.Models.Program)
-    context_id = target.context ? target.context.id : null;
+    context_id = source.context ? source.context.id : null;
+    if (!(source instanceof CMS.Models.Program)
+        && target instanceof CMS.Models.Program)
+      context_id = target.context ? target.context.id : null;
 
-  // We should only map objects that have join models
-  if ((!(options.hash && options.hash.join) || resource_type) && Permission.is_allowed('create', resource_type, context_id))
+    // We should only map objects that have join models
+    can_map = (!(options.hash && options.hash.join) || resource_type)
+      && Permission.is_allowed('create', resource_type, context_id);
+  }
+  if (can_map)
     return options.fn(options.contexts || this);
   else
     return options.inverse(options.contexts || this);
@@ -1180,7 +1225,7 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+resolve_computed(obj))
+  return (""+(resolve_computed(obj) || ""))
     .replace(/"/g, '\\"')
     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
     //    thus does not allow backslash-escaped single quotes within strings.
@@ -1192,9 +1237,14 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
 });
 
-Mustache.registerHelper("localize_date", function(date) {
-  date = resolve_computed(date);
-  return date ? moment(date).format("MM/DD/YYYY") : "";
+can.each({
+  "localize_date" : "MM/DD/YYYY"
+  , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
+}, function(tmpl, fn) {
+  Mustache.registerHelper(fn, function(date) {
+    date = resolve_computed(date);
+    return date ? moment(date).format(tmpl) : "";
+  });
 });
 
 Mustache.registerHelper("instance_ids", function(list, options) {
@@ -1209,5 +1259,164 @@ Mustache.registerHelper("instance_ids", function(list, options) {
     ids = [];
   return ids.join(",");
 });
+
+Mustache.registerHelper("local_time_range", function(value, start, end, options) {
+  var tokens = [];
+  var sod;
+  value = resolve_computed(value);
+  sod = moment.utc(value).startOf("day");
+  start = moment(value || undefined).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
+  end = moment(value || undefined).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
+
+  function selected(time) {
+    if(time.hours() === value.getHours() && time.minutes() === value.getMinutes()) {
+      return " selected='true'";
+    } else {
+      return "";
+    }
+  }
+
+  while(start.isBefore(end) || start.isSame(end)) {
+    tokens.push("<option value='", start.diff(sod), "'", selected(start), ">", start.format("hh:mm A"), "</option>\n");
+    start.add(1, "hour");
+  }
+  return new String(tokens.join(""));
+});
+
+Mustache.registerHelper("mapping_count", function(instance) {
+  var args = can.makeArray(arguments)
+    , mappings = args.slice(1, args.length - 1)
+    , options = args[args.length-1]
+    , root = options.contexts[0]
+    , mapping
+    ;
+  instance = resolve_computed(args[0]);
+
+  // Find the most appropriate mapping
+  for (var i = 0; i < mappings.length; i++) {
+    if (instance.get_binding(mappings[i])) {
+      mapping = mappings[i];
+      break;
+    }
+  }
+
+  if (!root[mapping]) {
+    root.attr(mapping, new can.Observe.List());
+    root.attr(mapping).attr('loading', true);
+    instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
+      if (full_instance.get_binding(mapping)) {
+        full_instance.get_list_loader(mapping).done(function(list) {
+          root.attr(mapping, list);
+        })
+      }
+      else
+        root.attr(mapping).attr('loading', false);
+    });
+  }
+
+  return (root.attr(mapping).attr('loading') ? options.inverse(options.contexts) : options.fn(''+root.attr(mapping).attr('length')));
+});
+
+Mustache.registerHelper("visibility_delay", function(delay, options) {
+  delay = resolve_computed(delay);
+
+  return function(el) {
+    setTimeout(function() {
+      if ($(el.parentNode).is(':visible'))
+        $(el).append(options.fn(options.contexts));
+    }, delay);
+    return el;
+  };
+});
+
+// This retrieves the potential orphan stats for a given instance
+// Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
+Mustache.registerHelper("delete_counts", function(instance, options) {
+  instance = resolve_computed(instance)
+  var root = options.contexts[0];
+
+  // Retrieve the orphan stats
+  if (!root.attr('orphaned_status')) {
+    root.attr('orphaned_status', 'loading');
+    instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
+      if (full_instance.get_binding('orphaned_objects')) {
+        full_instance.get_list_loader('orphaned_objects').done(function(list) {
+          var objects = new can.Observe.List()
+            , mappings = new can.Observe.List()
+            ;
+          can.each(list, function(mapping) {
+            var inst;
+            if (inst = is_join(mapping))
+              mappings.push(inst);
+            else
+              objects.push(mapping.instance);
+          })
+          root.attr({
+              orphaned_objects: objects
+            , orphaned_mappings: mappings
+            , orphaned_status: 'loaded'
+          });
+        })
+      }
+      else
+        root.attr('orphaned_status', 'failed');
+    });
+  }
+
+  // Return the dynamic result
+  var objects = root.attr('orphaned_objects')
+    , mappings = root.attr('orphaned_mappings')
+    ;
+  if (root.attr('orphaned_status') === 'loading') {
+    return options.inverse(options.contexts);
+  }
+  else if (root.attr('orphaned_status') === 'failed' || (!objects.attr('length') && !mappings.attr('length'))) {
+    return '';
+  }
+  else {
+    var counts = {}
+      , result = []
+      , parts = 0
+      ;
+
+    // Generate the summary
+    result.push('This may also delete');
+    if (objects.attr('length')) {
+      can.each(objects, function(instance) {
+        var title = instance.constructor.title_singular;
+        counts[title] = counts[title] || {
+            model: instance.constructor
+          , count: 0
+          };
+        counts[title].count++;
+      });
+      can.each(counts, function(count, i) {
+        parts++;
+        result.push(count.count + ' ' + (count.count === 1 ? count.model.title_singular : count.model.title_plural) + ',')
+      });
+    }
+    if (mappings.attr('length')) {
+      parts++;
+      result.push(mappings.attr('length') + ' object mapping' + (mappings.attr('length') !== 1 ? 's' : ''));
+    }
+
+    // Clean up commas, add an "and" if appropriate
+    parts >= 1 && parts <= 2 && (result[result.length - 1] = result[result.length - 1].replace(',',''));
+    parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',',''));
+    parts >= 2 && result.splice(result.length - 1, 0, 'and');
+
+    return options.fn(result.join(' ') + (objects.attr('length') || mappings.attr('length') ? '.' : ''));
+  }
+});
+function is_join(mapping) {
+  if (mapping.mappings.length > 0) {
+    for (var i = 0, child; child = mapping.mappings[i]; i++) {
+      if (child = is_join(child)) {
+        return child;
+      }
+    }
+  }
+  return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
+}
 
 })(this, jQuery, can);

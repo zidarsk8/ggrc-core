@@ -20,10 +20,10 @@
           <label>
             Status
           </label>
-          <select class="input-block-level" name="status" disabled>
-            <option>Assigned</option>
-            <option>Accepted</option>
-            <option>Completed</option>
+          <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
+            {{#iterate 'Assigned' 'Accepted' 'Completed'}}
+            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
           </select>
         </div>
       </div>
@@ -49,7 +49,7 @@
     </div>
   </div>
   
-  {{#using request=request}}
+  {{#using request=instance.request}}
   <input type="hidden" name="request.id" value="{{request.id}}">
   <input type="hidden" name="response_type" value="{{request.request_type}}">
   {{/using}}

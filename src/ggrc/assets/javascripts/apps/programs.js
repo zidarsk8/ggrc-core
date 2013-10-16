@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require controllers/tree_view_controller
@@ -126,7 +126,8 @@ can.Construct("RefreshQueueManager", {
 
       if (!found_queue) {
         can.each(this.queues, function(queue) {
-          if (!found_queue && queue.model === model && !queue.triggered) {
+          if (!found_queue && queue.model === model
+              && !queue.triggered && queue.ids.length < 50) {
             found_queue = queue.enqueue(id);
             return false;
           }
@@ -159,10 +160,17 @@ can.Construct("RefreshQueue", {
     }
 
   , enqueue: function(obj, force) {
+      var that = this;
       if (!obj)
         return;
       if (this.triggered)
         return null;
+      if (obj.push) {
+        can.each(obj, function(o) {
+          that.enqueue(o, force);
+        });
+        return this;
+      }
 
       this.objects.push(obj);
       if (force || !obj.selfLink) {
@@ -296,10 +304,10 @@ $(function() {
         , widget_name: "Authorizations"
         , widget_icon: "authorization"
         , widget_guard: should_show_authorizations
-        , extra_widget_actions_view: '/static/ggrc_basic_permissions/mustache/people_roles/authorizations_modal_actions.mustache'
+        , extra_widget_actions_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache"
         , content_controller: GGRC.Controllers.ListView
         , content_controller_options: {
-              list_view: "/static/ggrc_basic_permissions/mustache/people_roles/authorizations_by_person_list.mustache"
+              list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
             , list_loader: authorizations_list_loader
             }
         }

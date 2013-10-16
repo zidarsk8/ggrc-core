@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: dan@reciprocitylabs.com
- * Maintained By: dan@reciprocitylabs.com
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+*/
 
 (function(can, $) {
 
@@ -134,12 +134,13 @@
     init_context: function() {
       if (!this.context) {
         this.context = new can.Observe($.extend({
-          objects: this.object_list,
-          options: this.option_list,
-          joins: this.join_list,
-          actives: this.active_list,
-          selected_object: null,
-          selected_option: null,
+            objects: this.object_list
+          , options: this.option_list
+          , joins: this.join_list
+          , actives: this.active_list
+          , selected_object: null
+          , selected_option: null
+          , page_model: GGRC.page_model
         }, this.options));
       }
       return this.context;
@@ -172,10 +173,23 @@
 
     refresh_option_list: function() {
       var self = this
+        , instance = GGRC.page_instance()
+        , params = {}
         ;
 
+      // If this is a private model, set the scope
+      if (instance && instance.constructor.shortName === "Program" && instance.context) {
+        params.scope = "Private Program";
+      }
+      else if (/admin/.test(window.location)) {
+        params.scope__in = "System,Admin";
+      }
+      else if (instance) {
+        params.scope = instance.constructor.shortName;
+      }
+
       return this.options.option_model.findAll(
-        $.extend({}, this.option_query),
+        $.extend(params, this.option_query),
         function(options) {
           self.option_list.replace(options)
         });
@@ -259,7 +273,8 @@
           join.attr('_removed', false);
         } else {
           // Otherwise, create it
-          join = this.get_new_join(option.id, option.constructor.shortName);
+          join = this.get_new_join(
+              option.id, option.scope, option.constructor.shortName);
           join.save().then(function() {
             //join.refresh().then(function() {
               self.join_list.push(join);
@@ -318,7 +333,7 @@
          && join[this.options.option_attr].id == option_id)
     },
 
-    get_new_join: function(option_id, option_type) {
+    get_new_join: function(option_id, option_scope, option_type) {
       var join_params = {};
       join_params[this.options.option_id_field] = option_id;
       if (this.options.option_type_field) {
@@ -329,9 +344,9 @@
         join_params[this.options.join_type_field] = this.get_join_object_type();
       }
       $.extend(join_params, this.options.extra_join_fields);
-      // FIXME: context_id must get a real value
-      if (!join_params.context || !join_params.context.id)
-        join_params.context = { id: 0 }
+      if (option_scope == 'Admin') {
+        join_params.context = { id: 0, type: 'Context' };
+      } // otherwise, go with the current value
 
       return new (this.options.join_model)(join_params);
     },
@@ -356,19 +371,26 @@
 
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
-    var context = GGRC.make_model_instance(GGRC.page_object).context;
-    if (!context)
-      throw new Error("`context` is required for Assignments model");
-    context = context.stub();
+    var context;
+    if (GGRC.page_object) {
+      context = GGRC.make_model_instance(GGRC.page_object).context;
+      if (!context)
+        throw new Error("`context` is required for Assignments model");
+      context = context.stub();
+      extra_join_query = { context_id: context.id }
+    } else {
+      context = {id: null};
+      extra_join_query = { context_id__in: [context.id,0] }
+    }
 
     return {
-        base_modal_view: "/static/ggrc_basic_permissions/mustache/people_roles/base_modal.mustache"
-      , option_column_view: "/static/ggrc_basic_permissions/mustache/people_roles/option_column.mustache"
-      , option_detail_view: "/static/ggrc_basic_permissions/mustache/people_roles/option_detail.mustache"
-      , active_column_view: "/static/ggrc_basic_permissions/mustache/people_roles/active_column.mustache"
+        base_modal_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/base_modal.mustache"
+      , option_column_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/option_column.mustache"
+      , option_detail_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/option_detail.mustache"
+      , active_column_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/active_column.mustache"
 
-      , object_column_view: "/static/ggrc_basic_permissions/mustache/people_roles/object_column.mustache"
-      , object_detail_view: "/static/ggrc_basic_permissions/mustache/people_roles/object_detail.mustache"
+      , object_column_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/object_column.mustache"
+      , object_detail_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/object_detail.mustache"
 
       , new_object_title: "Person"
       , modal_title: "User Role Assignments"
@@ -396,9 +418,7 @@
       , extra_join_fields: {
           context: context
         }
-      , extra_join_query: {
-          context_id: context.id
-        }
+      , extra_join_query: extra_join_query
     };
   }
 
