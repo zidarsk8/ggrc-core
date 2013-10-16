@@ -59,8 +59,9 @@ class TestImport(TestCase):
     actual_slugs = set()
     actual_start_dates = set()
     actual_end_dates = set()
-    print pol1.controls
-    for control in pol1.controls:
+    ctrls = Control.query.all()
+    for directive_control in pol1.directive_controls:
+      control = directive_control.control
       actual_titles.add(control.title)
       actual_slugs.add(control.slug)
       actual_start_dates.add(control.start_date)
@@ -227,16 +228,15 @@ class TestImport(TestCase):
         actual_slugs,
         "Control slugs not imported correctly"
     )
-    #self.assertEqual(
-    #    expected_end_dates,
-    #    actual_end_dates,
-    #    "Control end dates not imported correctly"
-    #)
-    #self.assertEqual(
-    #    expected_start_dates,
-    #    actual_start_dates,
-    #    "Control start dates not imported correctly"
-    #)
+    systems = System.query.all()
+    for system in systems:
+      self.assertEqual(
+          system.controls,
+          pol1.controls,
+          "System {0} not connected to controls on import".format(
+              system.slug
+          ),
+      )
     self.mock_log.assert_called_once_with(db.session)
     # check that imported items appear in index
     results = MysqlRecordProperty.query.filter(
