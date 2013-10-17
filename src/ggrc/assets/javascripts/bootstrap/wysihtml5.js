@@ -13,10 +13,20 @@
   var createLink = wysihtml5.commands.createLink
     , old_exec = createLink.exec;
   createLink.exec = function(composer, command, value) {
+    var url = typeof(value) === "object" ? value.href : value;
+
+    // Inject the http:// if no prefix was included
+    url = url.indexOf('//') > -1 ? url : 'http://' + url;
+
+    // If there are multiple prefixes, remove the first http://
+    // This can occur if the user pastes a URL without deleting the default "http://"
+    if (url.match(/^http:\/\/.+?\/\//))
+      url = url.replace(/^http:\/\//, '');
+
     if (typeof(value) === "object")
-      value.href = value.href.indexOf('//') > -1 ? value.href : 'http://' + value.href;
+      value.href = url;
     else
-      value = value.indexOf('//') > -1 ? value : 'http://' + value;
+      value = url;
     return old_exec.call(this, composer, command, value);
   }
 

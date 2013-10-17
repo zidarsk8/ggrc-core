@@ -378,8 +378,10 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
-  , " hide" : function() {
+  , " hide" : function(el, ev) {
       if (this.options.instance instanceof can.Model
+          // Ensure that this modal was hidden and not a child modal
+          && ev.target === this.element[0]
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
         this.options.instance.refresh();
