@@ -9,6 +9,18 @@ import ggrc.views
 """Filters for GRC specific Jinja processing
 """
 
+@app.template_filter("with_static_subdomain")
+def with_static_subdomain_filter(path):
+  import urlparse
+  from flask import request
+  from ggrc import settings
+  if not getattr(settings, 'APP_ENGINE', False):
+    return path
+  scheme, netloc, _, _, _ = urlparse.urlsplit(request.url_root)
+  if not netloc.startswith('static.'):
+    netloc = 'static.' + netloc
+  return urlparse.urlunsplit((scheme, netloc, path, '', ''))
+
 @app.template_filter("viewlink")
 def view_link_filter(obj):
   """Create a view link for an object, that navigates
