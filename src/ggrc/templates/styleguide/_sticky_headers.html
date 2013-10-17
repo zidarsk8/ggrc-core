@@ -1,41 +1,43 @@
-<section id="events" class="widget">
+<section id="sticky_headers" class="widget">
   <section class="header">
-    <h2>Events (2)</h2>
+    <h2>Sticky Headers</h2>
   </section>
+
+  <section class="content" style="padding:10px 20px; box-shadow: inset 0 0 3px 0 #bbbbbb">
+    <p>
+      Sticky headers are used to implement headers that stick to the top of the scrollable 
+      area when a section's content is scrolled past the top. These headers support stacking when 
+      the headers are in nested content.
+    </p>
+    <p>
+      To initialize, use the <strong>sticky_header()</strong> jQuery plugin. Each instance will handle 
+      an entire nested section of content and is easily configurable using just three CSS selectors.
+    </p>
+    <p>
+      <strong>Example:</strong>
+    </p>
+    <textarea style="width: 95%" rows="18" cols="110">
+$(".widget").sticky_header({
+    // A selector for the scrollable area ancestor
+    scroll_area_selector: ".object-area"
+    // A selector for all sticky-able headers
+  , header_selector: ".header"
+                  +", .tree-open > .item-open > .item-main"
+                  +", .tree-open > .item-open > .item-content > .inner-tree > h6"
+                  +", .advanced-filters"
+    // A selector for all sticky-able footers
+  , footer_selector: ".tree-footer"
+    // A selector for counting the depth
+    // Generally this should be header_selector with the final element in each selector removed
+  , depth_selector: ".tree-open > .item-open"
+                  +", .tree-open > .item-open > .item-content > .inner-tree"
+    // The amount of space at the bottom of the content when the header should start scrolling away
+  , margin: 30
+});
+    </textarea>
+  </section>
+
   <section class="content">
-    <div class="advanced-filters">
-      <div class="row-fluid">
-        <div class="span3">
-          <select class="input-block-level">
-            <option>Show All Events</option>
-            <option>Mappings</option>
-            <option>Unmappings</option>
-            <option>Updates</option>
-            <option>Creations</option>
-            <option>Deletions</option>
-          </select>
-        </div>
-        <div class="span5">
-          <ul class="filter-date-range">
-            <li>
-              <span>Date Range:</span>
-            </li>
-            <li>
-              <input class="input-small date" name="filter_start_date" data-toggle="datepicker" data-before="filter_end_date" placeholder="MM/DD/YYYY" type="text" value=""> - 
-            </li>
-            <li>
-              <input class="input-small date" name="filter_end_date" data-toggle="datepicker" data-after="filter_start_date" placeholder="MM/DD/YYYY" type="text" value="">
-            </li>
-          </ul>
-        </div>
-        <div class="span4">
-          <div class="objective-selector">
-            <input type="text" name="owner.email" data-lookup="Person" class="span9 audit-selector" value="" placeholder="Filter by assignee">
-            <i class="grcicon-person-green"></i>
-          </div>
-        </div>
-      </div>
-    </div>
     <ul class="tree-structure new-tree event-tree new-event-tree">
       <li class="tree-item">
         <div class="item-main">
@@ -44,32 +46,32 @@
               <div class="span12">
                 <div class="item-data">
                   <div class="tree-title-area">
-                    <div class="row-fluid">
-                      <div class="span9">
-                        <div class="event-main-title">
-                          <span class="event-icon">
-                            <i class="grcicon-created" rel="tooltip" title="Created"></i>
-                          </span>
-                          <span class="event-object program">
-                            <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
-                            <strong>SOX Compliance Program</strong>
-                          </span>
-                          <span class="event-action">
-                            created
-                          </span>
-                          <span class="event-owner">
-                            by Dan Ring
-                          </span>
-                        </div>
-                      </div>
-                      <div class="span3">
-                        <div class="event-date">
-                          <span class="event-time">
-                            on 09/13/2013 12:57:37am PDT
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <ul>
+                      <li class="event-icon">
+                        <i class="grcicon-mapped" rel="tooltip" title="Mapped"></i>
+                      </li>
+                      <li class="orggroup">
+                        <i class="grcicon-orggroup-color" rel="tooltip" title="Org Group"></i>
+                        <strong>Engineering Core Team</strong>
+                      </li>
+                      <li>
+                        <span class="event-action">
+                          mapped to
+                        </span>
+                      </li>
+                      <li class="program">
+                        <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
+                        <strong>SOX Compliance Program</strong>
+                      </li>
+                      <li>
+                        <span class="event-owner">
+                          by Dan Ring
+                        </span>
+                        <span class="event-time">
+                          on 09/10/2013 12:57:37am PDT
+                        </span>
+                      </li>
+                    </ul>
                   </div>
                   <span class="event-more">more...</span>
                 </div>
@@ -78,115 +80,7 @@
           </a>
         </div>
         
-        <div class="tier-2-info item-content events-content">
-          <div class="tier-2-info-content">
-            <div class="full-info">
-              <p>
-                <strong>Title:</strong> SOX Compliance Program; <strong>Description:</strong> Lorem ipsum dolor sit amet; <strong>Owner/Person of Contact:</strong> ken@reciprocitylabs.com; <strong>Program URL:</strong> http://www.google.com/webdesigner/; <strong>Code:</strong> PROGRAM-007; <strong>Organization:</strong> null; <strong>Program Scope:</strong> null; <strong>Privacy:</strong> Private Program
-              </p>
-            </div>
-          </div>
-        </div>
-        
-      </li>
-      <li class="tree-item">
-        <div class="item-main">
-          <a href="javascript://" class="openclose">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="item-data">
-                  <div class="tree-title-area">
-                    <div class="row-fluid">
-                      <div class="span9">
-                        <div class="event-main-title">
-                          <span class="event-icon">
-                            <i class="grcicon-updated" rel="tooltip" title="Updated"></i>
-                          </span>
-                          <span class="event-object program">
-                            <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
-                            <strong>SOX Compliance Program</strong>
-                          </span>
-                          <span class="event-action">
-                            updated
-                          </span>
-                          <span class="event-owner">
-                            by Dan Ring
-                          </span>
-                        </div>
-                      </div>
-                      <div class="span3">
-                        <div class="event-date">
-                          <span class="event-time">
-                            on 09/13/2013 12:57:37am PDT
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="event-more">more...</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        
-        <div class="tier-2-info item-content events-content">
-          <div class="tier-2-info-content">
-            <div class="full-info">
-              <p>
-                <strong>Title <span class="changed">changed</span>:</strong> SOX Compliance Program Updated; <strong>Description:</strong> Lorem ipsum dolor sit amet; <strong>Owner/Person of Contact:</strong> ken@reciprocitylabs.com; <strong>Program URL:</strong> http://www.google.com/webdesigner/; <strong>Code:</strong> PROGRAM-007; <strong>Organization <span class="changed">changed</span>:</strong> New Organization; <strong>Program Scope:</strong> null; <strong>Privacy:</strong> Private Program
-              </p>
-            </div>
-          </div>
-        </div>
-        
-      </li>
-      <li class="tree-item">
-        <div class="item-main">
-          <a href="javascript://" class="openclose">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="item-data">
-                  <div class="tree-title-area">
-                    <div class="row-fluid">
-                      <div class="span9">
-                        <div class="event-main-title">
-                          <span class="event-icon">
-                            <i class="grcicon-mapped" rel="tooltip" title="Mapped"></i>
-                          </span>
-                          <span class="event-object orggroup">
-                            <i class="grcicon-orggroup-color" rel="tooltip" title="Org Group"></i>
-                            <strong>Engineering Core Team</strong>
-                          </span>
-                          <span class="event-action">
-                            mapped to
-                          </span>
-                          <span class="event-object program">
-                            <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
-                            <strong>SOX Compliance Program</strong>
-                          </span>
-                          <span class="event-owner">
-                            by Dan Ring
-                          </span>
-                        </div>
-                      </div>
-                      <div class="span3">
-                        <div class="event-date">
-                          <span class="event-time">
-                            on 09/13/2013 12:57:37am PDT
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <span class="event-more">more...</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        
-        <div class="tier-2-info item-content events-content">
+        <div class="tier-2-info item-content content-open events-content">
           <div class="tier-2-info-content">
             <p>
               <a class="info-action" href="#">View Engineering Core Team <i class="grcicon-goto"></i></a>
@@ -203,36 +97,32 @@
               <div class="span12">
                 <div class="item-data">
                   <div class="tree-title-area">
-                    <div class="row-fluid">
-                      <div class="span9">
-                        <div class="event-main-title">
-                          <span class="event-icon">
-                            <i class="grcicon-unmapped" rel="tooltip" title="Unmapped"></i>
-                          </span>
-                          <span class="event-object orggroup">
-                            <i class="grcicon-orggroup-color" rel="tooltip" title="Org Group"></i>
-                            <strong>Engineering Core Team</strong>
-                          </span>
-                          <span class="event-action">
-                            unmapped from
-                          </span>
-                          <span class="event-object program">
-                            <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
-                            <strong>SOX Compliance Program</strong>
-                          </span>
-                          <span class="event-owner">
-                            by Dan Ring
-                          </span>
-                        </div>
-                      </div>
-                      <div class="span3">
-                        <div class="event-date">
-                          <span class="event-time">
-                            on 09/13/2013 12:57:37am PDT
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <ul>
+                      <li class="event-icon">
+                        <i class="grcicon-unmapped" rel="tooltip" title="Unmapped"></i>
+                      </li>
+                      <li class="orggroup">
+                        <i class="grcicon-orggroup-color" rel="tooltip" title="Org Group"></i>
+                        <strong>Engineering Core Team</strong>
+                      </li>
+                      <li>
+                        <span class="event-action">
+                          unmapped from
+                        </span>
+                      </li>
+                      <li class="program">
+                        <i class="grcicon-program-color" rel="tooltip" data-original-title="Program"></i>
+                        <strong>SOX Compliance Program</strong>
+                      </li>
+                      <li>
+                        <span class="event-owner">
+                          by Dan Ring
+                        </span>
+                        <span class="event-time">
+                          on 09/13/2013 12:57:37am PDT
+                        </span>
+                      </li>
+                    </ul>
                   </div>
                   <span class="event-more">more...</span>
                 </div>
@@ -241,7 +131,7 @@
           </a>
         </div>
         
-        <div class="tier-2-info item-content events-content">
+        <div class="tier-2-info item-content content-open events-content">
           <div class="tier-2-info-content">
             <p>
               <a class="info-action" href="#">View Engineering Core Team <i class="grcicon-goto"></i></a>
@@ -269,7 +159,7 @@
                   </a>
                 </div>
                 
-                <div class="tier-2-info item-content events-content">
+                <div class="tier-2-info item-content content-open events-content">
                   <div class="tier-2-info-content">
                     <a href="#" class="info-action">
                       <strong>View SOX Compliance Audit 2013</strong>
@@ -296,7 +186,7 @@
                           </a>
                         </div>
 
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -353,7 +243,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -426,7 +316,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -502,34 +392,32 @@
               <div class="span12">
                 <div class="item-data">
                   <div class="tree-title-area">
-                    <div class="row-fluid">
-                      <div class="span9">
-                        <div class="event-main-title">
-                          <span class="event-icon">
-                            <i class="grcicon-deleted" rel="tooltip" title="Deleted"></i>
-                          </span>
-                          <span class="event-object program">
-                            <i class="grcicon-program-color" rel="tooltip" title="Program"></i>
-                            <strong>
-                              SOX Compliance Program
-                            </strong>
-                          </span>
-                          <span class="event-action">
-                            deleted
-                          </span>
-                          <span class="event-owner">
-                            by Dan Ring
-                          </span>
-                        </div>
-                      </div>
-                      <div class="span3">
-                        <div class="event-date">
-                          <span class="event-time">
-                            on 09/13/2013 12:57:37am PDT
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <ul>
+                      <li class="event-icon">
+                        <i class="grcicon-deleted" rel="tooltip" title="Deleted"></i>
+                      </li>
+                      <li class="program">
+                        <i class="grcicon-program-color" rel="tooltip" title="Program"></i>
+                        <strong>
+                          SOX Compliance Program
+                        </strong>
+                      </li>
+                      <li>
+                        <span class="event-action">
+                          deleted
+                        </span>
+                      </li>
+                      <li>
+                        <span class="event-owner">
+                          by Dan Ring
+                        </span>
+                      </li>
+                      <li>
+                        <span class="event-time">
+                          on 09/13/2013 12:57:37am PDT
+                        </span>
+                      </li>
+                    </ul>
                   </div>
                   <span class="event-more">more...</span>
                 </div>
@@ -538,7 +426,7 @@
           </a>
         </div>
         
-        <div class="tier-2-info item-content events-content">
+        <div class="tier-2-info item-content content-open events-content">
           <div class="tier-2-info-content">&nbsp;</div>
           
           <div class="inner-tree">
@@ -560,7 +448,7 @@
                   </a>
                 </div>
                 
-                <div class="tier-2-info item-content events-content">
+                <div class="tier-2-info item-content content-open events-content">
                   <div class="tier-2-info-content">&nbsp;</div>
                   
                   <div class="inner-tree">
@@ -582,7 +470,7 @@
                           </a>
                         </div>
 
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -640,7 +528,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -691,6 +579,20 @@
                                   </a>
                                 </div>
                               </li>
+
+                              <li class="tree-footer tree-item tree-item-add">
+                                <div class="row-fluid">
+                                  <div class="span12 section-expandable">
+                                    <a
+                                      class="section-add section-sticky"
+                                      href="javascript://"
+                                      rel="tooltip"
+                                      data-placement="left">
+                                      + Object
+                                    </a>
+                                  </div>
+                                </div>
+                              </li>
                             </ul>
                           </div>
                           
@@ -714,7 +616,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -747,6 +649,20 @@
                 </div>
                 
               </li>
+
+              <li class="tree-footer tree-item tree-item-add">
+                <div class="row-fluid">
+                  <div class="span12 section-expandable">
+                    <a
+                      class="section-add section-sticky"
+                      href="javascript://"
+                      rel="tooltip"
+                      data-placement="left">
+                      + Object
+                    </a>
+                  </div>
+                </div>
+              </li>
             </ul>
           </div>
           
@@ -769,7 +685,7 @@
                   </a>
                 </div>
                 
-                <div class="tier-2-info item-content events-content">
+                <div class="tier-2-info item-content content-open events-content">
                   <div class="tier-2-info-content">&nbsp;</div>
                   
                   <div class="inner-tree">
@@ -791,7 +707,7 @@
                           </a>
                         </div>
 
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -848,7 +764,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -921,7 +837,7 @@
                           </a>
                         </div>
                         
-                        <div class="tier-2-info item-content events-content">
+                        <div class="tier-2-info item-content content-open events-content">
                           <div class="tier-2-info-content">&nbsp;</div>
                           
                           <div class="inner-tree">
@@ -987,9 +903,29 @@
               </li>
             </ul>
           </div>
-    
+        </div>
+      </li>
+
+      <li class="tree-footer tree-item tree-item-add">
+        <div class="row-fluid">
+          <div class="span12 section-expandable">
+            <a
+              class="section-add section-sticky"
+              href="javascript://"
+              rel="tooltip"
+              data-placement="left">
+              + Object
+            </a>
+          </div>
         </div>
       </li>
     </ul>
   </section>
 </section>
+
+<script>
+  // Toggle all content
+  $(document).ready(function() {
+    $('#sticky_headers ul.tree-structure .item-main .openclose').trigger('click');
+  });
+</script>
