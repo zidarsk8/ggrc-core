@@ -7,13 +7,7 @@
 
 (function($, CMS, GGRC) {
 
-  $.ajaxPrefilter(function(opts, orig_opts, jqXHR) {
-
-    if(/^https:\/\/script.google.com/.test(opts.url)) {
-      opts.data = opts.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(orig_opts.data);
-    }
-
-  });
+  $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=doGAuth'></script>");
 
   var google_oauth = null;
   window.oauth_dfd = new $.Deferred();
@@ -24,7 +18,7 @@
     }
     window.gapi.client.load('drive', 'v2');
     window.gapi.auth.authorize({
-      'client_id': "831270113958.apps.googleusercontent.com",
+      'client_id': GGRC.config.GAPI_CLIENT_ID,
       'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar'],
       'immediate': !use_popup
     },
@@ -51,23 +45,38 @@
 
   $.extend(true, CMS.Models.Program.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
+    , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  // GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  GGRC.Mappings.Program.folders = new GGRC.ListLoaders.ProxyListLoader("GDriveFolder", "folder", "ObjectFolder", "folderable", "object_folders");
 
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
+    , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Audit", true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  can.getObject("GGRC.Mappings.Audit", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
+  //GGRC.Mappings.Audit.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  CMS.Models.Audit.tree_view_options.show_view = GGRC.mustache_path + "/audits/gdrive_tree.mustache";
+
+  GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
+
 
   $.extend(true, CMS.Models.Request.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
+    , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Request", true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  can.getObject("GGRC.Mappings.Request", window, true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
+  GGRC.Mappings.Request.folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
 
   $.extend(true, CMS.Models.Response.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"
+    , "files" : "CMS.Models.GDriveFile.stubs"
   });
-  can.getObject("GGRC.Mappings.Response", true).object_files = new GGRC.ListLoaders.DirectListLoader("ObjectFile", "fileable");
+  can.getObject("GGRC.Mappings.Response", window, true).object_files = new GGRC.ListLoaders.DirectListLoader("ObjectFile", "fileable");
+
+  can.getObject("GGRC.Mappings.GDriveFolder", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDrivePermission", "parents");
+  can.getObject("GGRC.Mappings.GDriveFile", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDrivePermission", "parents");
+
 
   // GGRC.JoinDescriptor.from_arguments_list([
   //   [["Program", "Audit", "Request"], "GDriveFolder", "ObjectFolder", "folder", "folderable"]

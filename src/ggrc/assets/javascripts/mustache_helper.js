@@ -549,6 +549,13 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, context);
 });
 
+Mustache.registerHelper("render_hooks", function(hook, options) {
+
+  return can.map(can.getObject(hook, GGRC.hooks), function(hook_tmpl) {
+    return can.Mustache.getHelper("renderLive").fn(hook_tmpl, options.contexts, options);
+  }).join("\n");
+});
+
 function defer_render(tag_name, func, deferred) {
   var hook
     ;

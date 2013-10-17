@@ -33,6 +33,19 @@ jQuery(document).ready(function($) {
 var GGRC = window.GGRC || {};
 GGRC.mustache_path = '/static/mustache';
 
+GGRC.hooks = GGRC.hooks || {};
+GGRC.register_hook = function(path, hook) {
+  var h, parent_path, last;
+  parent_path = path.split(".");
+  last = parent_path.pop();
+  parent_path = can.getObject(parent_path.join("."), GGRC.hooks, true);
+  if(!(h = parent_path[last])) {
+    h = new can.Observe.List();
+    parent_path[last] = h;
+  }
+  h.push(hook);
+};
+
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
 function ModelError(message, data) {

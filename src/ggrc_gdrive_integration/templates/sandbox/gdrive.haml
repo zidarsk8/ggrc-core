@@ -79,11 +79,11 @@
           %input.add-folder{ 'type' : 'button', 'value' : 'Add folder'}
   :javascript
     $(function() {
-      var folderstack = [GGRC.config.GDRIVE_ROOT_FOLDER];
+      var folderstack = ['root'];
       var lblist = null;
       var folderspinner, filespinner;
       $(document.body).on("click", ".list-folders", function(ev) {
-        var folder = $(this).data('folder') || GGRC.config.GDRIVE_ROOT_FOLDER;
+        var folder = $(this).data('folder') || 'root';
         if($(this).is(".go-up")) {
           folderstack.shift();
           folder = folderstack[0];
@@ -101,7 +101,7 @@
                 lblist = list;
                 return { 
                   list : list, 
-                  parent : folder === GGRC.config.GDRIVE_ROOT_FOLDER ? null : folder
+                  parent : folder === 'root' ? null : folder
                 };
               }
             }, function(xhr, status) {

@@ -143,14 +143,7 @@
         </div>
       </div>
       
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="tree-info">
-            <strong>gDrive Evidence Folder: </strong>
-            /{{parent_instance.title}}/{{instance.title}}
-          </div>
-        </div>
-      </div>
+      {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
         <li>

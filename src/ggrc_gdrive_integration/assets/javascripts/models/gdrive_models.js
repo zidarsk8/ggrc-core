@@ -1,12 +1,21 @@
 /*
  * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: Bradley Momberger
- * Maintained By: Bradley Momberger
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
  */
 
 (function(can) {
 
+/**
+  create a search query that matches the expected format for GDrive API.
+  It's a series of boolean constructors with operators for testing equality
+  and list membership (the 'in' operator).  Add more fields as necessary, as
+  this is the minimal needed set.
+
+  Reference for search query format:
+  https://developers.google.com/drive/search-parameters
+*/
 window.process_gapi_query = function(params) {
   var qstr = [];
   for(var i in params) {
@@ -25,6 +34,8 @@ window.process_gapi_query = function(params) {
   return qstr.join(" and ");
 };
 
+//Template for all findAll operations on GDrive objects.
+// https://developers.google.com/drive/v2/reference/files/list
 var gdrive_findAll = function(extra_params, extra_path) {
   return function(params) {
     return window.oauth_dfd.then(function() {
@@ -34,7 +45,7 @@ var gdrive_findAll = function(extra_params, extra_path) {
         delete params.parentfolderid;
       }
       if(!params.parents) {
-        params.parents = GGRC.config.GDRIVE_ROOT_FOLDER;
+        params.parents = "root";
       }
       $.extend(params, extra_params);
       var q = process_gapi_query(params);
@@ -56,12 +67,14 @@ var gdrive_findAll = function(extra_params, extra_path) {
         , callback : function(result) {
           if(!result) {
             dfd.reject(JSON.parse(arguments[1]));
-          } else {
+          } else if(result.items) {
             var objs = result.items;
             can.each(objs, function(obj) {
               obj.selfLink = obj.selfLink || "#";
             });
             dfd.resolve(objs);
+          } else { //single object case
+            dfd.resolve(result);
           }
         }
       });
@@ -69,9 +82,18 @@ var gdrive_findAll = function(extra_params, extra_path) {
     });
   };
 };
+
+/**
+  GDrive files not including folders.  Folders are also files in GDrive,
+  with a particular MIME type, but we distinguish between them here as
+  different object types for conceptual ease.
+
+  https://developers.google.com/drive/v2/reference/files
+*/
 can.Model.Cacheable("CMS.Models.GDriveFile", {
 
   findAll : gdrive_findAll({ mimeTypeNot : "application/vnd.google-apps.folder" })
+  , findOne : gdrive_findAll({})
 
   , removeFromParent : function(object, parent_id) {
     if(typeof object !== "object") {
@@ -85,7 +107,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
         path : "/drive/v2/files/" + parent_id + "/children/" + object.id
         , method : "delete"
         , callback : function(result) {
-          if(result.error) {
+          if(result && result.error) {
             dfd.reject(dfd, result.error.status, result.error);
           } else {
             dfd.resolve();
@@ -106,7 +128,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
         path : "/drive/v2/files/" + id + "/trash"
         , method : "post"
         , callback : function(result) {
-          if(result.error) {
+          if(result && result.error) {
             dfd.reject(dfd, result.error.status, result.error);
           } else {
             dfd.resolve(result);
@@ -121,22 +143,37 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
     return new this({ id : id });
   }
 
+  , attributes : {
+    permissions : "CMS.Models.GDriveFolderPermission.models"
+  }
+
 }, {
   findPermissions : function() {
     return CMS.Models.GDriveFilePermission.findAll(this.serialize());
   }
-
+  , refresh : function(params) {
+    return this.constructor.findOne(this.serialize())
+    .then(can.proxy(this.constructor, "model"))
+    .done(function(d) {
+      d.updated();
+      //  Trigger complete refresh of object -- slow, but fixes live-binding
+      //  redraws in some cases
+      can.trigger(d, "change", "*");
+    });
+  }
 });
 
+/**
+  The separate type for folders.
+
+  The docs have a special page about working with folders, which is
+  worth reading:
+  https://developers.google.com/drive/folder
+*/
 CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
   findAll : gdrive_findAll({ mimeType : "application/vnd.google-apps.folder"})
   
-  , findOne : function(params, success, error) {
-    return this.findAll(params).then(function(data) {
-      return data[0];
-    });
-  }
   , create : function(params) {
     return window.oauth_dfd.then(function() {
 
@@ -179,6 +216,12 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
     }
     return this._super.apply(this, arguments);
   }
+  //Note that when you get the file and folder objects back from the server
+  // the current user's permission on the file comes back in the 'userPermission'
+  // property, but we can't modelize these permissions because they always have ID "me"
+  , attributes : {
+    permissions : "CMS.Models.GDriveFilePermission.models"
+  }
 }, {
 
   findChildFolders : function() {
@@ -187,6 +230,9 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
 });
 
+/* permissions come from a sub-endpoint of the files endpoint, so we
+   can get away with just using findAll from the File/Folder model with a little tweak
+ */
 can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
 
   //call findAll with id param.
@@ -217,12 +263,28 @@ can.Model.Join("CMS.Models.ObjectFolder", {
     if(typeof params === "object") {
       params.folder = {
         id : params.folder_id
+        , type : "GDriveFolder"
         , parentfolderid : params.parent_folder_id
       };
     }
     return this._super(params);
   }
-}, {});
+}, {
+
+  serialize : function(attr) {
+    var serial;
+    if(!attr) {
+      serial = this._super.apply(this, arguments);
+      serial.folder_id = serial.folder.id;
+      delete serial.folder;
+      return serial;
+    }
+    if(attr === "folder_id") {
+      return this.folder_id || this.folder.id;
+    }
+    return this._super.apply(this, arguments);
+  }
+});
 
 can.Model.Join("CMS.Models.ObjectFile", {
   root_object : "object_file"
@@ -245,11 +307,26 @@ can.Model.Join("CMS.Models.ObjectFile", {
     if(typeof params === "object") {
       params.folder = {
         id : params.file_id
+        , type : "GDriveFile"
         , parentfolderid : params.folder_id
       };
     }
     return this._super(params);
   }
-}, {});
+}, {
+  serialize : function(attr) {
+    var serial;
+    if(!attr) {
+      serial = this._super.apply(this, arguments);
+      serial.file_id = serial.file.id;
+      delete serial.file;
+      return serial;
+    }
+    if(attr === "file_id") {
+      return this.file_id || this.file.id;
+    }
+    return this._super.apply(this, arguments);
+  }
+});
 
 })(window.can);

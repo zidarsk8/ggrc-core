@@ -5,3 +5,6 @@ dashboard-js-files:
 
 dashboard-js-spec-files:
   - models/gdrive_models_spec.js
+
+dashboard-js-template-files:
+  - audits/gdrive_info.mustache

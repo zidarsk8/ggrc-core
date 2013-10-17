@@ -33,16 +33,14 @@
     {{/if}}
     {{/using}}
   </p>
-  {{#object_folders}}
-    {{#using object_folder=this}}
+  {{#using object_folders=instance.object_folders}}
       <p>
         GDriveFolder: 
-        {{#using folder=object_folder.folder}}
-          <a href="{{folder.url}}">{{folder.name}}</a>
+        {{#using folder=object_folders.0.folder}}
+          <a href="{{folder.alternateLink}}">{{folder.title}}</a>
         {{/using}}
       <p>
-    {{/using}}
-  {{/object_folders}}
+  {{/using}}
 
   {{#is_allowed 'update' model.shortName}}
   <p>
