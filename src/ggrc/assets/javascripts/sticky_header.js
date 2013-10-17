@@ -121,7 +121,7 @@ can.Control("StickyHeader", {
 
     if (type === 'footer') {
       offset = scroll_height - data.offset;
-      margin = el.position().top + el.outerHeight();
+      margin = offset - pos - el.outerHeight();
     }
 
     // If the content is in the viewport...
@@ -130,10 +130,7 @@ can.Control("StickyHeader", {
       margin -= offset;
       return margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
     }
-    else if (type === 'footer' && pos < scroll_height && margin > offset) {
-      // margin = 0;
-      margin = offset - pos - el.outerHeight();
-      // console.log(data.offset, margin)
+    else if (type === 'footer' && pos < scroll_height && (el.position().top + el.outerHeight()) > offset && margin > 0) {
       return margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
     }
     else
