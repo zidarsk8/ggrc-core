@@ -16,16 +16,22 @@
     <p>
       <strong>Example:</strong>
     </p>
-    <textarea style="width: 95%" rows="12" cols="110">
+    <textarea style="width: 95%" rows="18" cols="110">
 $(".widget").sticky_header({
     // A selector for the scrollable area ancestor
     scroll_area_selector: ".object-area"
     // A selector for all sticky-able headers
-  , header_selector: ".header, .tree-open > .item-open > .item-main"
+  , header_selector: ".header"
+                  +", .tree-open > .item-open > .item-main"
+                  +", .tree-open > .item-open > .item-content > .inner-tree > h6"
+                  +", .advanced-filters"
+    // A selector for all sticky-able footers
+  , footer_selector: ".tree-footer"
     // A selector for counting the depth
     // Generally this should be header_selector with the final element in each selector removed
   , depth_selector: ".tree-open > .item-open"
-    // The number of pixels at the bottom of the content to start scrolling the sticky header away
+                  +", .tree-open > .item-open > .item-content > .inner-tree"
+    // The amount of space at the bottom of the content when the header should start scrolling away
   , margin: 30
 });
     </textarea>
@@ -374,20 +380,6 @@ $(".widget").sticky_header({
                   </a>
                 </div>
               </li>
-
-              <li class="tree-footer tree-item tree-item-add">
-                <div class="row-fluid">
-                  <div class="span12 section-expandable">
-                    <a
-                      class="section-add section-sticky"
-                      href="javascript://"
-                      rel="tooltip"
-                      data-placement="left">
-                      + Object
-                    </a>
-                  </div>
-                </div>
-              </li>
             </ul>
           </div>
     
@@ -642,6 +634,20 @@ $(".widget").sticky_header({
                   </div>
                 </div>
                 
+              </li>
+
+              <li class="tree-footer tree-item tree-item-add">
+                <div class="row-fluid">
+                  <div class="span12 section-expandable">
+                    <a
+                      class="section-add section-sticky"
+                      href="javascript://"
+                      rel="tooltip"
+                      data-placement="left">
+                      + Object
+                    </a>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>
