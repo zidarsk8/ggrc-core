@@ -29,7 +29,6 @@ Feature: Basic RESTful CRUD Support
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |

@@ -56,7 +56,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -131,7 +130,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -214,7 +212,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
@@ -297,7 +294,6 @@ Feature: RBAC Permissions enforcement for REST API
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |

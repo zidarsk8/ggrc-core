@@ -59,9 +59,9 @@ def downgrade():
   op.add_column("responses",
     sa.Column("sample_evidence", sa.String(length=250), nullable=True))
 
-  op.drop_constraint('population_worksheet_document', 'documents', type_='foreignkey')
-  op.drop_constraint('sample_worksheet_document', 'documents', type_='foreignkey')
-  op.drop_constraint('sample_evidence_document', 'documents', type_='foreignkey')
+  op.drop_constraint('population_worksheet_document', 'responses', type_='foreignkey')
+  op.drop_constraint('sample_worksheet_document', 'responses', type_='foreignkey')
+  op.drop_constraint('sample_evidence_document', 'responses', type_='foreignkey')
 
   op.drop_column("responses", "population_worksheet_id")
   op.drop_column("responses", "sample_worksheet_id")

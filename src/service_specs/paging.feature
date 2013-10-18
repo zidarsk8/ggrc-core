@@ -66,7 +66,6 @@ Feature: Collections can be paged
       | Policy             |
       | Regulation         |
       | Document           |
-      | Evidence           |
       | Facility           |
       | Help               |
       | Market             |
