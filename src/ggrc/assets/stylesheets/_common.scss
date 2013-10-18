@@ -430,6 +430,10 @@ input.disabled.pending-ajax{
     height: 120px;
     @include input-block-level();
   }
+  .quadruple {
+    height: 150px;
+    @include input-block-level();
+  }
   iframe {
     width: 97.5% !important;
     margin-bottom:0 !important;
@@ -598,4 +602,24 @@ select.multiple-selector {
 
 .tooltip-inner {
   text-align: left;
+}
+
+// Sticky headers
+.sticky {
+  background:#fff;
+  border-left: none !important;
+  border-right: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  z-index:9999;
+  &.sticky-header {
+    @include box-shadow(inset 0 0 3px 0 #bbb);
+    border-top: none !important;
+    padding-bottom:1px;
+  }
+  &.sticky-footer {
+    @include box-shadow(inset 0 0 3px 0 #bbb);
+    border-bottom: none !important;
+    padding-top:1px;
+  }
 }

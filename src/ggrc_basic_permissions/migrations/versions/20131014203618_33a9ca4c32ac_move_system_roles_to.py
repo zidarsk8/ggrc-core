@@ -6,14 +6,14 @@
 """Move system roles to default context.
 
 Revision ID: 33a9ca4c32ac
-Revises: 10adeac7b693
+Revises: 3adc42b4f6b9
 Create Date: 2013-10-14 20:36:18.251704
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '33a9ca4c32ac'
-down_revision = '10adeac7b693'
+down_revision = '3adc42b4f6b9'
 
 import json
 import sqlalchemy as sa
