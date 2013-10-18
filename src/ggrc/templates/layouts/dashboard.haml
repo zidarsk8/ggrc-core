@@ -21,7 +21,8 @@
 -endmacro
 
 -block extra_javascript
-  GGRC.current_user = ={ current_user()|safe };
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.current_user = ={ current_user_json()|safe };
 
 -block page_help scoped
 
