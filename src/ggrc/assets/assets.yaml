@@ -40,6 +40,7 @@ dashboard-js-files:
   - spin.min.js
   - tmpl.js
   - mustache_helper.js
+  - sticky_header.js
   - models/mappers.js
   - models/mappings.js
   - models/cacheable.js
@@ -106,6 +107,7 @@ dashboard-js-template-files:
   - base_objects/map_related_modal_content.mustache
   - base_objects/mappings_detail.mustache
   - base_objects/page_header.mustache
+  - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache

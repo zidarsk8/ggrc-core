@@ -685,7 +685,8 @@ jQuery(function($) {
         use_slide ? $content.slideUp('fast') : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
-        $parentTree.removeClass('tree-open');
+        // Only remove tree open if there are no open siblings
+        !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
         use_slide ? $content.slideDown('fast') : $content.css("display", "block");

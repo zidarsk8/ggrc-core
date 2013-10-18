@@ -138,22 +138,6 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
     });
   }
 
-  , ".view-more click" : function(el, ev) {
-    var that = this
-    , $tab = this.element
-              .find(this.options.tab_selector)
-              .map(function(i, v) {
-                if(that.element.find(get_attr(v, that.options.tab_target_attr)).has(el).length) {
-                  return v;
-                }
-              })
-    , view_data = $tab.data("view_data");
-
-    //show twice as many items each time.
-    view_data.list.replace(view_data.filtered_items.slice(0, view_data.list.length * 2));
-  }
-
-
   , "{observer} value" : function(el, ev, newval) {
     this.filter(newval);
     this.element.trigger('kill-all-popovers');
@@ -209,13 +193,15 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
 can.Control("CMS.Controllers.LHN_Search", {
     defaults : {
         list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
+      , actions_view : GGRC.mustache_path + "/base_objects/search_actions.mustache"
       , list_selector: 'ul.top-level > li'
       , model_attr_selector: null
       , model_attr: 'data-model-name'
       , count_selector: '.item-count'
-      , list_content_selector: 'ul'
+      , list_content_selector: 'ul.sub-level'
+      , actions_content_selector: 'ul.sub-actions'
       , spinner_selector: '.spinner'
-      , limit : 6
+      , limit : 50
       , observer : null
     }
 }, {
@@ -257,7 +243,37 @@ can.Control("CMS.Controllers.LHN_Search", {
       return spinner.el;
     }
 
-  , "{list_selector} {list_content_selector} show": "on_show_list"
+  , "{list_selector} > a click": "toggle_list_visibility"
+
+  , toggle_list_visibility: function(el, ev) {
+      var selector = this.options.list_content_selector + ',' + this.options.actions_content_selector
+        , $ul = el.parent().find(selector)
+        ;
+
+      if ($ul.is(":visible")) {
+        $ul.slideUp().removeClass("in");
+      } else {
+        // Use a cached max-height if one exists
+        var holder = el.closest('.lhs-holder')
+          , maxHeight = parseInt(holder.find(this.options.list_content_selector).filter(':visible').css('maxHeight'),10)
+          ;
+
+        // Collapse other lists
+        $ul.closest(".lhs").find(selector)
+          .slideUp().removeClass("in");
+        // Expand this list
+        $ul.slideDown().addClass("in");
+
+        // Determine the expandable height
+        $ul.filter(this.options.list_content_selector).css('maxHeight', (maxHeight || (holder[0].offsetHeight
+          - el.closest('#lhs')[0].offsetHeight
+          - $ul.filter(this.options.actions_content_selector)[0].scrollHeight
+          - 25)) + 'px');
+
+        this.on_show_list($ul);
+      }
+      ev.preventDefault();
+    }
 
   , on_show_list: function(el, ev) {
       var $list = $(el).closest(this.get_lists())
@@ -272,22 +288,82 @@ can.Control("CMS.Controllers.LHN_Search", {
       //this.element.trigger('kill-all-popovers');
     }
 
-  , ".view-more click" : function(el, ev) {
-      var self = this
-        , $list = $(el).closest(this.get_lists())
+  , show_more: function($el) {
+      if (this._show_more_pending)
+        return;
+
+      var that = this
+        , $list = $el.closest(this.get_lists())
         , model_name = this.get_list_model($list)
         , visible_list = this.options.visible_lists[model_name]
         , results_list = this.options.results_lists[model_name]
+        , refresh_queue
+        , new_visible_list
         ;
 
-      var refresh_queue = new RefreshQueue()
-        , new_visible_list = results_list.slice(0, visible_list.length * 2);
+      if (visible_list.length >= results_list.length)
+        return;
+
+      this._show_more_pending = true;
+      refresh_queue = new RefreshQueue();
+      new_visible_list =
+        //results_list.slice(0, visible_list.length + this.options.limit);
+        results_list.slice(visible_list.length, visible_list.length + this.options.limit);
+
       can.each(new_visible_list, function(item) {
         refresh_queue.enqueue(item);
       });
       refresh_queue.trigger().then(function() {
-        visible_list.replace(new_visible_list);
+        visible_list.push.apply(visible_list, new_visible_list);
+        visible_list.attr('is_loading', false)
+        //visible_list.replace(new_visible_list);
+        delete that._show_more_pending;
       });
+      visible_list.attr('is_loading', true)
+    }
+
+  , ".sub-level DOMMouseScroll": "prevent_overscroll"
+  , ".sub-level mousewheel": "prevent_overscroll"
+
+  , prevent_overscroll: function($el, ev) {
+      // Based on Troy Alford's response on StackOverflow:
+      //   http://stackoverflow.com/a/16324762
+      var scrollTop = $el[0].scrollTop
+        , scrollHeight = $el[0].scrollHeight
+        , height = $el.height()
+        , scrollTopMax = scrollHeight - height
+        , delta
+        , up
+        , loadTriggerOffset = 50
+        ;
+
+      if (ev.type === "DOMMouseScroll")
+        delta = ev.originalEvent.detail * -40;
+      else
+        delta = ev.originalEvent.wheelDelta;
+
+      up = delta > 0;
+
+      var prevent = function() {
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.returnValue = false;
+        return false;
+      }
+
+      if (!up && scrollTop - delta > scrollTopMax) {
+        // Scrolling down, but this will take us past the bottom.
+        $el.scrollTop(scrollHeight);
+        this.show_more($el);
+        return prevent();
+      } else if (up && delta > scrollTop) {
+        // Scrolling up, but this will take us past the top.
+        $el.scrollTop(0);
+        return prevent();
+      } else if (!up && scrollTop - delta > scrollTopMax - loadTriggerOffset) {
+        // Scrolling down, close to bottom, so start loading more
+        this.show_more($el);
+      }
     }
 
   , init_object_lists: function() {
@@ -323,6 +399,9 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
+        });
+        can.view(self.options.actions_view, context, function(frag, xhr) {
+          $list.find(self.options.actions_content_selector).html(frag);
         });
       });
     }

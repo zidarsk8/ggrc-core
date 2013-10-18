@@ -734,14 +734,12 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
 
 Mustache.registerHelper("private_program", function(modal_title) {
   return resolve_computed(modal_title).indexOf("New ") !=0 ? '' : [
-    '<div class="span6">'
-    , '<label>'
+      '<label>'
     , 'Privacy'
     , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
     , '<input name="private" value="private" type="checkbox"> Private Program'
-    , '</div>'
     , '</div>'
   ].join("");
 });
@@ -1056,23 +1054,19 @@ Mustache.registerHelper("date", function(date) {
 });
 
 /**
- * Checks permissions. 
- * RESOURCE_TYPE and CONTEXT_ID will be retrieved from GGRC.page_object if not defined.
+ * Checks permissions.
  * Usage:
- *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE CONTEXT_ID}} content {{/is_allowed}}
- *  {{#is_allowed ACTION RESOURCE_TYPE}} content {{/is_allowed}}
- *  {{#is_allowed ACTION CONTEXT_ID}} content {{/is_allowed}}
- *  {{#is_allowed ACTION}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
+ *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
-var allowed_actions = [
-      "create", "read", "update", "delete",
-      "join_create", "join_read", "join_update", "join_delete"];
+var allowed_actions = ["create", "read", "update", "delete"];
 Mustache.registerHelper("is_allowed", function() {
-  var allowed_page = GGRC.page_instance()
-    , args = Array.prototype.slice.call(arguments, 0)
+  var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
-    , resource_type = allowed_page && allowed_page.constructor.shortName
-    , context_id = (allowed_page && allowed_page.context && allowed_page.context.id) || null
+    , resource
+    , resource_type
+    , context_unset = new Object()
+    , context_id = context_unset
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1087,36 +1081,38 @@ Mustache.registerHelper("is_allowed", function() {
     else if (typeof arg === 'string') {
       resource_type = arg;
     }
-    else if (typeof arg === 'number' || arg == null) {
-      context_id = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Model) {
-      if (GGRC.page_model instanceof CMS.Models.Program) {
-        resource_type = arg.constructor.shortName
-      } else {
-        resource_type = arg.constructor.shortName;
-        context_id = arg.context ? arg.context.id : null;
-      }
+    else if (typeof arg === 'object' && arg instanceof can.Model) {
+      resource = arg;
     }
   });
-  if (options.hash && typeof options.hash.context !== undefined && !options.hash.context) {
-    context_id = null;
+  if (options.hash && typeof options.hash.context !== undefined) {
+    context_id = options.hash.context;
+    if (typeof context_id === 'function' && context_id.isComputed)
+      context_id = context_id();
+    //  Using `context=null` in Mustache templates, when `null` is not defined,
+    //  causes `context_id` to be `""`.
+    if (context_id === "")
+      context_id = null;
   }
-  // This happens for Section widget, when GGRC.page_instance().context is null
-  if (typeof(context_id) === 'undefined') {
-    context_id = null;
+
+  if (resource_type && context_id === context_unset) {
+    throw new Error(
+        "If `resource_type` is a string, `context` must be explicit");
   }
-  actions = actions.length ? actions : allowed_actions;
+  if (actions.length === 0) {
+    throw new Error(
+        "Must specify at least one action");
+  }
+
+  if (resource) {
+    resource_type = resource.constructor.shortName;
+    context_id = resource.context ? resource.context.id : null;
+  }
 
   // Check permissions
   can.each(actions, function(action) {
-    var actual_resource_type = resource_type;
-    var actual_action = action;
-    if (action.indexOf("join_") == 0) {
-      actual_action = action.slice(5);
-      actual_resource_type = GGRC.JoinDescriptor.join_model_name_for(
-        GGRC.page_model.constructor.shortName, resource_type);
-    }
-    passed = passed && Permission.is_allowed(actual_action, actual_resource_type, context_id);
+    passed =
+      passed && Permission.is_allowed(action, resource_type, context_id);
   });
 
   return passed
