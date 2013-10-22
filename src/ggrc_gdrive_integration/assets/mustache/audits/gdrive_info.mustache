@@ -3,7 +3,11 @@
     <div class="span12">
       <div class="tree-info">
         <strong>gDrive Evidence Folder: </strong>
-        /{{#using folders=parent_instance.folders}}{{folders.0.id}}{{/using}}/{{#using folders=instance.folders}}{{folders.0.id}}{{/using}}
+        {{#with_mapping 'folders' instance}}
+          <a href="{{folders.0.instance.alternateLink}}" target="_blank">
+            /{{#with_mapping 'folders' parent_instance}}{{folders.0.instance.title}}{{/with_mapping}}/{{folders.0.instance.title}}
+          </a>
+        {{/with_mapping}}
       </div>
     </div>
   </div>

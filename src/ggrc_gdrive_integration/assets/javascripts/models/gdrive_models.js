@@ -38,13 +38,25 @@ window.process_gapi_query = function(params) {
 // https://developers.google.com/drive/v2/reference/files/list
 var gdrive_findAll = function(extra_params, extra_path) {
   return function(params) {
+    var that = this;
+    params = params || {};
     return window.oauth_dfd.then(function() {
       var dfd = new $.Deferred();
+
+      //Short-circuit for refresh queue, because GAPI doesn't play that.
+      if(params.id__in) {
+        return $.when.apply($, can.map(params.id__in.split(","), function(id) {
+          return that.findOne({id : id});
+        })).then(function() {
+          return can.makeArray(arguments);
+        });
+      }
+
       if(params.parentfolderid) {
         params.parents = params.parentfolderid ;
         delete params.parentfolderid;
       }
-      if(!params.parents) {
+      if(!params.parents && !params.id) {
         params.parents = "root";
       }
       $.extend(params, extra_params);
@@ -179,6 +191,10 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
       var dfd = new $.Deferred();
 
+      if(!params.parents) {
+        params.parents = [{ id : 'root'}];
+      }
+
       gapi.client.request({
         path : "/drive/v2/files"
         , method : "post"
@@ -238,9 +254,65 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
   //call findAll with id param.
   findAll : gdrive_findAll({}, "/permissions")
 
+  , create : function(params) {
+    var file = typeof params.file === "object" ? params.file.id : params.file;
+
+    return window.oauth_dfd.then(function() {
+      var dfd = new $.Deferred();
+
+      gapi.client.request({
+        path : "/drive/v2/files/" + file + "/permissions"
+        , method : "post"
+        , body : {
+          role : params.role || "writer"
+          , type : "user"
+          , value : params.person.email
+        }
+        , callback : function(result) {
+          if(result.error) {
+            dfd.reject(dfd, result.error.status, result.error);
+          } else {
+            result.file = typeof params.file === "object" ? params.file : CMS.Models.GDriveFile.cache[params.file];
+            dfd.resolve(result);
+          }
+        }
+      });
+
+      return dfd;
+    });
+
+  }
 }, {});
 
-CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {}, {});
+CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
+  create : function(params) {
+    var folder = typeof params.folder === "object" ? params.folder.id : params.folder;
+
+    return window.oauth_dfd.then(function() {
+      var dfd = new $.Deferred();
+
+      gapi.client.request({
+        path : "/drive/v2/files/" + folder + "/permissions"
+        , method : "post"
+        , body : {
+          role : params.role || "writer"
+          , type : "user"
+          , value : params.person.email
+        }
+        , callback : function(result) {
+          if(result.error) {
+            dfd.reject(dfd, result.error.status, result.error);
+          } else {
+            result.folder = typeof params.folder === "object" ? params.folder : CMS.Models.GDriveFolder.cache[params.folder];
+            dfd.resolve(result);
+          }
+        }
+      });
+
+      return dfd;
+    });
+  }
+}, {});
 
 can.Model.Join("CMS.Models.ObjectFolder", {
   root_object : "object_folder"
@@ -265,6 +337,7 @@ can.Model.Join("CMS.Models.ObjectFolder", {
         id : params.folder_id
         , type : "GDriveFolder"
         , parentfolderid : params.parent_folder_id
+        , href : "/drive/v2/files/" + params.folder_id
       };
     }
     return this._super(params);
@@ -275,7 +348,7 @@ can.Model.Join("CMS.Models.ObjectFolder", {
     var serial;
     if(!attr) {
       serial = this._super.apply(this, arguments);
-      serial.folder_id = serial.folder.id;
+      serial.folder_id = serial.folder ? serial.folder.id : serial.folder_id;
       delete serial.folder;
       return serial;
     }
@@ -309,6 +382,7 @@ can.Model.Join("CMS.Models.ObjectFile", {
         id : params.file_id
         , type : "GDriveFile"
         , parentfolderid : params.folder_id
+        , href : "/drive/v2/files/" + params.file_id
       };
     }
     return this._super(params);
@@ -318,7 +392,7 @@ can.Model.Join("CMS.Models.ObjectFile", {
     var serial;
     if(!attr) {
       serial = this._super.apply(this, arguments);
-      serial.file_id = serial.file.id;
+      serial.file_id = serial.file ? serial.file.id : serial.file_id;
       delete serial.file;
       return serial;
     }

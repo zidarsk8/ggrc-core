@@ -33,14 +33,14 @@
     {{/if}}
     {{/using}}
   </p>
-  {{#using object_folders=instance.object_folders}}
-      <p>
-        GDriveFolder: 
-        {{#using folder=object_folders.0.folder}}
-          <a href="{{folder.alternateLink}}">{{folder.title}}</a>
-        {{/using}}
-      <p>
-  {{/using}}
+  {{#with_mapping 'folders' instance}}
+  {{#folders}}
+  <p>
+      GDriveFolder: 
+      <a href="{{instance.alternateLink}}">{{instance.title}}</a>
+  <p>
+  {{/folders}}
+  {{/with_mapping}}
 
   {{#is_allowed 'update' instance}}
   <p>

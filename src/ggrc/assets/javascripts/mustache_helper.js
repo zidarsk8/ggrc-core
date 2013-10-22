@@ -923,13 +923,13 @@ Mustache.registerHelper("show_long", function() {
   ].join('');
 });
 
-Mustache.registerHelper("using", function(args, options) {
+Mustache.registerHelper("using", function(options) {
   var refresh_queue = new RefreshQueue()
     , context
     , frame = new can.Observe()
+    , args = can.makeArray(arguments)
     , i, arg;
 
-  args = can.makeArray(arguments);
   options = args.pop();
   context = options.contexts || this;
 
@@ -954,6 +954,29 @@ Mustache.registerHelper("using", function(args, options) {
 
   return defer_render('span', finish, refresh_queue.trigger());
 });
+
+Mustache.registerHelper("with_mapping", function(binding, options) {
+  var refresh_queue = new RefreshQueue()
+    , context = arguments.length > 2 ? resolve_computed(options) : this
+    , frame = new can.Observe()
+    , loader
+    , stack;
+
+  if(!context) // can't find an object to map to.  Do nothing;
+    return;
+
+  loader = context.get_binding(binding);
+  frame.attr(binding, loader.list);
+
+  options = arguments[2] || options;
+
+  function finish(list) {
+    return options.fn(frame);
+  }
+
+  return defer_render('span', finish, loader.refresh_instances());
+});
+
 
 Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
   if (can.isFunction(instance))

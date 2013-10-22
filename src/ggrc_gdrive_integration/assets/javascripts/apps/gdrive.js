@@ -48,13 +48,13 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
   // GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
-  GGRC.Mappings.Program.folders = new GGRC.ListLoaders.ProxyListLoader("GDriveFolder", "folder", "ObjectFolder", "folderable", "object_folders");
+  GGRC.Mappings.Program.folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
 
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Audit", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
+  can.getObject("GGRC.Mappings.Audit", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
   //GGRC.Mappings.Audit.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
   CMS.Models.Audit.tree_view_options.show_view = GGRC.mustache_path + "/audits/gdrive_tree.mustache";
 
@@ -65,8 +65,7 @@
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Request", window, true).object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
-  GGRC.Mappings.Request.folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
+  can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
 
   $.extend(true, CMS.Models.Response.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"

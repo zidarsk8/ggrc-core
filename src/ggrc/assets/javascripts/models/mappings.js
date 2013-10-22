@@ -451,6 +451,8 @@
 
     , Audit : {
       requests: Direct("Request", "audit")
+      , _program: Direct("Program", "audit")
+      , objectives_via_program : Cross("_program", "objectives")
     }
     , Request : {
       responses: Direct("Response", "request")
