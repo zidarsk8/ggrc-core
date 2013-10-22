@@ -1,8 +1,8 @@
 (function(can, $) {
 var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
-  var refresh_queue
-  , that = this
-  , dfd;
+  var that = this
+  , dfd
+  , owner = cls === CMS.Models.Request ? "assignee" : "owner";
 
   if(instance instanceof cls) {
     if(parent_attr) {
@@ -17,18 +17,20 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
         , parents : parent_folders[0].instance
       }).save();
     }).then(function(folder) {
+      var refresh_queue;
+
       new CMS.Models.ObjectFolder({
         folder : folder
         , folderable : instance
         , context : instance.context || { id : null }
       }).save();
 
-      if(instance.owner && instance.owner.id !== GGRC.current_user.id) {
-        refresh_queue.enqueue(instance.owner.reify());
+      if(instance[owner] && instance[owner].id !== GGRC.current_user.id) {
+        refresh_queue = new RefreshQueue().enqueue(instance[owner].reify());
         refresh_queue.trigger().done(function() {
           new CMS.Models.GDriveFolderPermission({
             folder : folder
-            , person : instance.owner.reify()
+            , person : instance[owner]
             , role : "writer"
           }).save();
         });

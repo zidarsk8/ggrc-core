@@ -40,60 +40,84 @@ var gdrive_findAll = function(extra_params, extra_path) {
   return function(params) {
     var that = this;
     params = params || {};
-    return window.oauth_dfd.then(function() {
-      var dfd = new $.Deferred();
 
-      //Short-circuit for refresh queue, because GAPI doesn't play that.
-      if(params.id__in) {
-        return $.when.apply($, can.map(params.id__in.split(","), function(id) {
-          return that.findOne({id : id});
-        })).then(function() {
-          return can.makeArray(arguments);
-        });
-      }
-
-      if(params.parentfolderid) {
-        params.parents = params.parentfolderid ;
-        delete params.parentfolderid;
-      }
-      if(!params.parents && !params.id) {
-        params.parents = "root";
-      }
-      $.extend(params, extra_params);
-      var q = process_gapi_query(params);
-
-      var path = "/drive/v2/files";
-      if(params.id) {
-        path += "/" + params.id;
-      }
-      if(extra_path) {
-        path += extra_path;
-      }
-      if(q) {
-        path += "?q=" + encodeURIComponent(q);
-      }
-
-      gapi.client.request({
-        path : path
-        , method : "get" //"post"
-        , callback : function(result) {
-          if(!result) {
-            dfd.reject(JSON.parse(arguments[1]));
-          } else if(result.items) {
-            var objs = result.items;
-            can.each(objs, function(obj) {
-              obj.selfLink = obj.selfLink || "#";
-            });
-            dfd.resolve(objs);
-          } else { //single object case
-            dfd.resolve(result);
-          }
-        }
+    //Short-circuit for refresh queue, because GAPI doesn't play that.
+    if(params.id__in) {
+      return $.when.apply($, can.map(params.id__in.split(","), function(id) {
+        return that.findOne({id : id});
+      })).then(function() {
+        return can.makeArray(arguments);
       });
-      return dfd;
+    }
+
+    if(params.parentfolderid) {
+      params.parents = params.parentfolderid ;
+      delete params.parentfolderid;
+    }
+    if(!params.parents && !params.id) {
+      params.parents = "root";
+    }
+    $.extend(params, extra_params);
+    var q = process_gapi_query(params);
+
+    var path = "/drive/v2/files";
+    if(params.id) {
+      path += "/" + params.id;
+    }
+    if(extra_path) {
+      path += extra_path;
+    }
+    if(q) {
+      path += "?q=" + encodeURIComponent(q);
+    }
+
+    return gapi_request_with_auth({
+      path : path
+      , method : "get" //"post"
+      , callback : function(dfd, result) {
+        if(!result) {
+          dfd.reject(JSON.parse(arguments[1]));
+        } else if(result.items) {
+          var objs = result.items;
+          can.each(objs, function(obj) {
+            obj.selfLink = obj.selfLink || "#";
+          });
+          dfd.resolve(objs);
+        } else { //single object case
+          dfd.resolve(result);
+        }
+      }
     });
   };
 };
+
+function gapi_request_with_auth(params) {
+  return window.oauth_dfd.then(function() {
+    var dfd = new $.Deferred();
+    var cb = params.callback;
+    var check_auth = function(result) {
+      var args = can.makeArray(arguments);
+      args.unshift(dfd);
+      if(result.error && result.error.code === 401) {
+        doGAuth(); //changes oauth_dfd to a new deferred
+        params.callback = cb;
+        window.oauth_dfd.then(can.proxy(gapi_request_with_auth, window, params))
+        .then(
+          function() {
+            dfd.resolve.apply(dfd, arguments);
+          }, function() {
+            dfd.reject.apply(dfd, arguments);
+          });
+      } else {
+        cb.apply(window, args);
+      }
+    };
+    params.callback = check_auth;
+    gapi.client.request(params);
+    return dfd.promise();
+  });
+}
+
 
 /**
   GDrive files not including folders.  Folders are also files in GDrive,
@@ -111,43 +135,31 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
     if(typeof object !== "object") {
       object = this.store[object];
     }
-    return window.oauth_dfd.then(function() {
-
-      var dfd = new $.Deferred();
-
-      gapi.client.request({
-        path : "/drive/v2/files/" + parent_id + "/children/" + object.id
-        , method : "delete"
-        , callback : function(result) {
-          if(result && result.error) {
-            dfd.reject(dfd, result.error.status, result.error);
-          } else {
-            dfd.resolve();
-          }
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + parent_id + "/children/" + object.id
+      , method : "delete"
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve();
         }
-      });
-      return dfd;
+      }
     }).done(function() {
       object.refresh();
     });
   }
   , destroy : function(id) {
-    return window.oauth_dfd.then(function() {
-
-      var dfd = new $.Deferred();
-
-      gapi.client.request({
-        path : "/drive/v2/files/" + id + "/trash"
-        , method : "post"
-        , callback : function(result) {
-          if(result && result.error) {
-            dfd.reject(dfd, result.error.status, result.error);
-          } else {
-            dfd.resolve(result);
-          }
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + id + "/trash"
+      , method : "post"
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve(result);
         }
-      });
-      return dfd;
+      }
     });
   }
 
@@ -187,31 +199,24 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
   findAll : gdrive_findAll({ mimeType : "application/vnd.google-apps.folder"})
   
   , create : function(params) {
-    return window.oauth_dfd.then(function() {
-
-      var dfd = new $.Deferred();
-
-      if(!params.parents) {
-        params.parents = [{ id : 'root'}];
+    if(!params.parents) {
+      params.parents = [{ id : 'root'}];
+    }
+    return gapi_request_with_auth({
+      path : "/drive/v2/files"
+      , method : "post"
+      , body : {
+        "mimeType": "application/vnd.google-apps.folder"
+        , title : params.title
+        , parents : params.parents.push ? params.parents : [params.parents]
       }
-
-      gapi.client.request({
-        path : "/drive/v2/files"
-        , method : "post"
-        , body : {
-          "mimeType": "application/vnd.google-apps.folder"
-          , title : params.title
-          , parents : params.parents.push ? params.parents : [params.parents]
+      , callback : function(dfd, result) {
+        if(result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve(result);
         }
-        , callback : function(result) {
-          if(result.error) {
-            dfd.reject(dfd, result.error.status, result.error);
-          } else {
-            dfd.resolve(result);
-          }
-        }
-      });
-      return dfd;
+      }
     });
   }
   , findChildFolders : function(params) {
@@ -257,30 +262,23 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
   , create : function(params) {
     var file = typeof params.file === "object" ? params.file.id : params.file;
 
-    return window.oauth_dfd.then(function() {
-      var dfd = new $.Deferred();
-
-      gapi.client.request({
-        path : "/drive/v2/files/" + file + "/permissions"
-        , method : "post"
-        , body : {
-          role : params.role || "writer"
-          , type : "user"
-          , value : params.person.email
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + file + "/permissions"
+      , method : "post"
+      , body : {
+        role : params.role || "writer"
+        , type : "user"
+        , value : CMS.Models.get_instance("Person", params.person.id).email
+      }
+      , callback : function(dfd, result) {
+        if(result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          result.file = typeof params.file === "object" ? params.file : CMS.Models.GDriveFile.cache[params.file];
+          dfd.resolve(result);
         }
-        , callback : function(result) {
-          if(result.error) {
-            dfd.reject(dfd, result.error.status, result.error);
-          } else {
-            result.file = typeof params.file === "object" ? params.file : CMS.Models.GDriveFile.cache[params.file];
-            dfd.resolve(result);
-          }
-        }
-      });
-
-      return dfd;
+      }
     });
-
   }
 }, {});
 
@@ -288,28 +286,22 @@ CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
   create : function(params) {
     var folder = typeof params.folder === "object" ? params.folder.id : params.folder;
 
-    return window.oauth_dfd.then(function() {
-      var dfd = new $.Deferred();
-
-      gapi.client.request({
-        path : "/drive/v2/files/" + folder + "/permissions"
-        , method : "post"
-        , body : {
-          role : params.role || "writer"
-          , type : "user"
-          , value : params.person.email
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + folder + "/permissions"
+      , method : "post"
+      , body : {
+        role : params.role || "writer"
+        , type : "user"
+        , value : CMS.Models.get_instance("Person", params.person.id).email
+      }
+      , callback : function(dfd, result) {
+        if(result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          result.folder = typeof params.folder === "object" ? params.folder : CMS.Models.GDriveFolder.cache[params.folder];
+          dfd.resolve(result);
         }
-        , callback : function(result) {
-          if(result.error) {
-            dfd.reject(dfd, result.error.status, result.error);
-          } else {
-            result.folder = typeof params.folder === "object" ? params.folder : CMS.Models.GDriveFolder.cache[params.folder];
-            dfd.resolve(result);
-          }
-        }
-      });
-
-      return dfd;
+      }
     });
   }
 }, {});
