@@ -34,7 +34,6 @@ def all_collections():
       service('regulations', models.Regulation),
     service('directive_controls', models.DirectiveControl),
     service('documents', models.Document),
-    service('evidence', models.Evidence),
     service('events', models.Event, ReadOnlyResource),
     service('facilities', models.Facility),
     service('help', models.Help),
@@ -70,7 +69,6 @@ def all_collections():
     service('systems_or_processes', models.SystemOrProcess, ReadOnlyResource),
       service('systems', models.System),
       service('processes', models.Process),
-    service('system_systems', models.SystemSystem),
     ]
 
   for extension in settings.EXTENSIONS:

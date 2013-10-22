@@ -40,7 +40,7 @@ def base_context():
       permissions_json=get_permissions_json,
       permissions=permissions,
       config_json=get_config_json,
-      current_user=get_current_user_json
+      current_user_json=get_current_user_json,
       )
 
 from flask import render_template

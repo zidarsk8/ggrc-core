@@ -1295,7 +1295,11 @@ Mustache.registerHelper("local_time_range", function(value, start, end, options)
   end = moment(value || undefined).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
 
   function selected(time) {
-    if(time.hours() === value.getHours() && time.minutes() === value.getMinutes()) {
+    if(time
+      && value
+      && time.hours() === value.getHours()
+      && time.minutes() === value.getMinutes()
+    ) {
       return " selected='true'";
     } else {
       return "";

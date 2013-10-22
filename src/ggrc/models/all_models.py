@@ -19,7 +19,6 @@ from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract
 from .directive_control import DirectiveControl
 from .document import Document
-from .evidence import Evidence
 from .facility import Facility
 from .help import Help
 from .market import Market
@@ -52,10 +51,6 @@ from .section import Section
 from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
 
-# TODO: Is this used?
-#from .system_section import SystemSection
-from .system_system import SystemSystem
-
 from .revision import Revision
 from .event import Event
 all_models = [
@@ -74,7 +69,6 @@ all_models = [
     Regulation,
   DirectiveControl,
   Document,
-  Evidence,
   Facility,
   Help,
   Market,
@@ -109,7 +103,6 @@ all_models = [
   SystemOrProcess,
     System,
     Process,
-  SystemSystem,
   Revision,
   Event,
   ]
