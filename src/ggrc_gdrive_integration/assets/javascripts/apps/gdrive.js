@@ -65,7 +65,7 @@
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folders", "object_folders", "GDriveFolder");
+  can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
 
   $.extend(true, CMS.Models.Response.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"

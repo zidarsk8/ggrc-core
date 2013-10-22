@@ -96,6 +96,39 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     }
   }
 
+  , update_owner_permission : function(model, ev, instance) {
+    var owner = instance instanceof CMS.Models.Request ? "assignee" : "owner";
+    var person;
+    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && instance[owner]) {
+      person = instance[owner].reify();
+      instance.get_binding("folders").refresh_instances().then(function(list) {
+        can.each(list, function(binding) {
+          binding.instance.findPermissions().then(function(permissions) {
+            var matching = can.map(permissions, function(permission) {
+              if(permission.type === "user"
+                && permission.emailAddress === person.email
+                && (permission.role === "owner" || permission.role === "writer")
+              ) {
+                return permission;
+              }
+            });
+            if(matching.length < 1) {
+              new CMS.Models.GDriveFolderPermission({
+                folder : binding.instance
+                , person : person
+                , role : "writer"
+              }).save();
+            }
+          });
+        });
+      });
+    }
+
+
+  }
+  , "{CMS.Models.Program} updated" : "update_owner_permission"
+  , "{CMS.Models.Audit} updated" : "update_owner_permission"
+  , "{CMS.Models.Request} updated" : "update_owner_permission"
 });
 
 $(function() {
