@@ -86,7 +86,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   , create_request_folder : partial_proxy(create_folder, CMS.Models.Request, function(inst) { return inst.objective.reify().title; }, "audit")
   , "{CMS.Models.Request} created" : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Request) {
-      if(this._audit_create_in_progress || instance.object_folders.length < 1) {
+      if(this._audit_create_in_progress || instance.audit.reify().object_folders.length < 1) {
         this.request_create_queue.push(instance);
       } else {
         this.create_request_folder(model, ev, instance);
