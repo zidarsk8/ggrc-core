@@ -648,6 +648,47 @@
       margin-bottom: 0;
     }
   }
+  &.pbc-filters {
+    border-left: 1px solid $widgetBorder;
+    border-right: 1px solid $widgetBorder;
+    border-top: 1px solid $darkGray;
+    border-bottom: 1px solid $darkGray;
+    background: darken($widgetHeader, 15%);
+    margin: 0 20px;
+    padding: 0;
+    display: none;
+    span {
+      line-height: 30px;
+    }
+    .request-type {
+      margin-right: 4px;
+    }
+    .input-mini {
+      &.date {
+        width: 30px;
+        padding-top: 5px;
+        padding-bottom: 3px;
+      }
+    }
+    i {
+      margin-top: 7px;
+    }
+    .short-field {
+      min-height: 23px;
+      margin-top: 4px;
+    }
+    .filter-date-range {
+      @include clearfix();
+      padding-left: 20px;
+      li {
+        line-height: 30px;
+      }
+      span {
+        font-size: 12px;
+        color: $black;
+      }
+    }
+  }
 }
 
 .widget-filters {
