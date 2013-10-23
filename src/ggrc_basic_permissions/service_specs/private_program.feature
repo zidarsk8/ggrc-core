@@ -145,7 +145,7 @@ Feature: Private Programs
 
   Examples: Resources
       | resource_type    |
-      | Audit            |
+      #FIXME add back when Auditor role is defined | Audit            |
       #| Categorization   |
       | Category         |
       | Control          |

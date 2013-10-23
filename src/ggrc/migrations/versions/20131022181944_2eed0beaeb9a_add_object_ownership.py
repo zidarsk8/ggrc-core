@@ -25,6 +25,7 @@ ownership_table = table('object_owners',
     column('modified_by_id', sa.Integer),
     column('created_at', sa.DateTime),
     column('updated_at', sa.DateTime),
+    column('context_id', sa.Integer),
     )
 
 object_tables = [
@@ -42,7 +43,6 @@ object_tables = [
     ('products', 'Product'),
     ('projects', 'Project'),
     ('relationships', 'Relationship'),
-    ('relationship_types', 'RelationshipType'),
     ('sections', 'Section'),
     ('systems', 'System'),
     ]
@@ -56,7 +56,9 @@ def upgrade():
       sa.Column('modified_by_id', sa.Integer(), nullable=False),
       sa.Column('created_at', sa.DateTime(), nullable=False),
       sa.Column('updated_at', sa.DateTime(), nullable=False),
+      sa.Column('context_id', sa.Integer(), nullable=False),
       sa.ForeignKeyConstraint(['person_id'], ['people.id']),
+      sa.ForeignKeyConstraint(['context_id'], ['contexts.id']),
       sa.PrimaryKeyConstraint('id'),
       )
   for object_table_name, object_type in object_tables:

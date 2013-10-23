@@ -7,6 +7,7 @@ from ggrc import db
 from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Hierarchical
 from .object_document import Documentable
+from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 
