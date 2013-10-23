@@ -131,6 +131,27 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   findAll : gdrive_findAll({ mimeTypeNot : "application/vnd.google-apps.folder" })
   , findOne : gdrive_findAll({})
 
+  , addToParent : function(object, parent) {
+    if(typeof parent === "string") {
+      parent = { id : parent };
+    }
+
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + object.id + "/parents"
+      , method : "post"
+      , body : parent.stub ? parent.stub() : parent
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve();
+        }
+      }
+    }).done(function() {
+      object.refresh();
+    });
+  }
+
   , removeFromParent : function(object, parent_id) {
     if(typeof object !== "object") {
       object = this.store[object];
@@ -176,7 +197,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
     return CMS.Models.GDriveFilePermission.findAll(this.serialize());
   }
   , refresh : function(params) {
-    return this.constructor.findOne(this.serialize())
+    return this.constructor.findOne({ id : this.id })
     .then(can.proxy(this.constructor, "model"))
     .done(function(d) {
       d.updated();
@@ -184,6 +205,9 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
       //  redraws in some cases
       can.trigger(d, "change", "*");
     });
+  }
+  , addToParent : function(parent) {
+    return this.constructor.addToParent(this, parent);
   }
 });
 
@@ -247,6 +271,36 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
   findChildFolders : function() {
     return this.constructor.findChildFolders(this);
+  }
+
+  , uploadFiles : function() {
+    var that = this;
+    var dfd = new $.Deferred();
+      gapi.load('picker', {'callback': createPicker});
+
+      // Create and render a Picker object for searching images.
+      function createPicker() {
+        var picker = new google.picker.PickerBuilder()
+        .addView(new google.picker.DocsUploadView().setParent(that.id))
+        .addView(google.picker.ViewId.DOCS)
+        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+        .setDeveloperKey(GGRC.config.GAPI_KEY)
+        .setCallback(pickerCallback)
+        .build();
+        
+        picker.setVisible(true);
+      }
+
+      // A simple callback implementation.
+      function pickerCallback(data) {
+        if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+          dfd.resolve(CMS.Models.GDriveFile.models(data[google.picker.Response.DOCUMENTS]));
+        }
+        else if (data[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+          dfd.reject("action cancelled");
+        }
+      }
+    return dfd.promise();
   }
 
 });
@@ -354,10 +408,10 @@ can.Model.Join("CMS.Models.ObjectFolder", {
 can.Model.Join("CMS.Models.ObjectFile", {
   root_object : "object_file"
   , root_collection : "object_files"
-  , findAll: "GET /api/object_people?__include=person"
-  , create : "POST /api/object_people"
-  , update : "PUT /api/object_people/{id}"
-  , destroy : "DELETE /api/object_people/{id}"
+  , findAll: "GET /api/object_files"
+  , create : "POST /api/object_files"
+  , update : "PUT /api/object_files/{id}"
+  , destroy : "DELETE /api/object_files/{id}"
   , join_keys : {
     fileable : can.Model.Cacheable
     , file : CMS.Models.GDriveFile

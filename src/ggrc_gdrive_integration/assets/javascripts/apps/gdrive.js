@@ -66,12 +66,15 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
   can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
+  GGRC.register_hook("Request.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
 
   $.extend(true, CMS.Models.Response.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"
     , "files" : "CMS.Models.GDriveFile.stubs"
   });
-  can.getObject("GGRC.Mappings.Response", window, true).object_files = new GGRC.ListLoaders.DirectListLoader("ObjectFile", "fileable");
+  CMS.Models.Response.tree_view_options.child_options[1].footer_view = GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache"
+  can.getObject("GGRC.Mappings.DocumentationResponse", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
+  can.getObject("GGRC.Mappings.PopulationSampleResponse", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
 
   can.getObject("GGRC.Mappings.GDriveFolder", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDrivePermission", "parents");
   can.getObject("GGRC.Mappings.GDriveFile", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDrivePermission", "parents");

@@ -57,6 +57,9 @@
             <p><strong>requested on: </strong>{{localize_date requested_on}}</p>
             {{/using}}
           {{/if}}
+
+          {{{render_hooks 'Request.tree_view_info'}}}
+
           <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
             <i class="grcicon-edit"></i>
             Edit PBC {{model.title_singular}}

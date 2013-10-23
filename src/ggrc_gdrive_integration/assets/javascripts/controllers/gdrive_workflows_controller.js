@@ -123,12 +123,61 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         });
       });
     }
-
-
   }
   , "{CMS.Models.Program} updated" : "update_owner_permission"
   , "{CMS.Models.Audit} updated" : "update_owner_permission"
   , "{CMS.Models.Request} updated" : "update_owner_permission"
+
+
+  , "a[data-toggle=gdrive-picker] click" : function(el, ev) {
+    var response = CMS.Models.Response.findInCacheById(el.data("response-id"))
+    , request = response.request.reify()
+    , parent_folder = (request.get_mapping("folders")[0] || {}).instance;
+
+    if(!parent_folder) {
+      el.trigger("ajax:flash", { warning : 'No GDrive folder found for PBC Request "' + request.objective.reify().title + '"'});
+    }
+    parent_folder.uploadFiles().then(function(files) {
+      can.each(files, function(file) {
+        new CMS.Models.ObjectFile({
+          context : response.context || {id : null}
+          , file : file
+          , fileable : response
+        }).save();
+        //Since we can re-use existing file references from the picker, check for that case.
+        CMS.Models.Document.findAll({link : file.url}).done(function(d) {
+          if(d.length) {
+            //file found, just link to Response
+            new CMS.Models.ObjectDocument({
+              context : response.context || {id : null}
+              , documentable : response
+              , document : d[0]
+            }).save();
+          } else {
+            //file not found, make Document object.
+            new CMS.Models.Document({
+              context : response.context || {id : null}
+              , title : file.name
+              , link : file.url
+            }).save().then(function(doc) {
+              new CMS.Models.ObjectDocument({
+                context : response.context || {id : null}
+                , documentable : response
+                , document : doc
+              }).save();
+            });
+          }
+        });
+      });
+      new RefreshQueue().enqueue(files).trigger().done(function(fs) {
+        can.each(fs, function(f) {
+          if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
+            f.addToParent(parent_folder);
+          }
+        });
+      });
+    });
+  }
 });
 
 $(function() {
