@@ -662,6 +662,31 @@ ul.new-tree {
     margin-left:20px;
     margin-right:20px;
     line-height:24px;
+    .advanced-filter-trigger {
+      margin-right: 20px;
+      float: right;
+      color: $gray;
+      font-size: 11px;
+      @include transition(color 0.2s ease-in-out);
+      i {
+        @include opacity(0.3);
+        @include transition(opacity 0.2s ease-in-out);
+        margin-top: 4px;
+      }
+      &:hover {
+        color: $black;
+        text-decoration: none;
+        i {
+          @include opacity(1);
+        }
+      }
+      &.active {
+        color: $black;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
   }
 }
 
