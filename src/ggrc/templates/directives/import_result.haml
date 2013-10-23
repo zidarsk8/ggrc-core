@@ -10,6 +10,9 @@
 -set has_errors = converter.has_errors()
 -set all_warnings = converter.warnings
 -set has_warnings = converter.has_warnings()
+-set objects_imported = converter.total_imported
+-set objects_created = converter.objects_created
+-set objects_updated = converter.objects_updated
 
 .results-table
   %h2
@@ -31,6 +34,15 @@
             =all_warnings[loop.index0]
 
       -include "directives/_import_table.haml"
+
+  -if objects_imported > 1
+    {{objects_imported}} Sections will be imported,
+  -else
+    {{objects_imported}} Sections will be imported,
+  %br/
+  {{objects_created}} will be created,
+  %br/
+  {{objects_updated}} will be updated
 
   .import-actions
     .row-fluid

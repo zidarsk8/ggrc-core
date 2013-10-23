@@ -28,6 +28,15 @@
 
       -include "directives/_import_table.haml"
 
+  -if objects_imported > 1
+    {{objects_imported}} People will be imported,
+  -else
+    {{objects_imported}} Person will be imported,
+  %br/
+  {{objects_created}} will be created,
+  %br/
+  {{objects_updated}} will be updated
+
   .import-actions
     .row-fluid
         .span6
