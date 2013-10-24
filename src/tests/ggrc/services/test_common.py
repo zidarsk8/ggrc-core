@@ -41,9 +41,7 @@ class TestResource(TestCase):
       ServicesTestMockModel.__table__.create(db.engine)
     with self.client.session_transaction() as session:
       session['permissions'] = {
-          "__GGRC_ADMIN__": {
-            "__GGRC_ALL__": [0]
-            }
+          "__GGRC_ADMIN__": {"__GGRC_ALL__": {"contexts": [0]} }
           }
 
   def tearDown(self):
