@@ -46,8 +46,7 @@ def resolve_permission_variable(value):
     return value
 
 def ContainsCondition(instance, value, list_property):
-  if value.startswith('$'):
-    value = resolve_permission_variable(value)
+  value = resolve_permission_variable(value)
   list_value = getattr(instance, list_property)
   return value in list_value
 

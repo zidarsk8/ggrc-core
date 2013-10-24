@@ -1106,6 +1106,9 @@ Mustache.registerHelper("is_allowed", function() {
   can.each(actions, function(action) {
     passed =
       passed && Permission.is_allowed(action, resource_type, context_id);
+    if (resource) {
+      passed = passed && Permission.is_allowed_for(action, resource);
+    }
   });
 
   return passed
