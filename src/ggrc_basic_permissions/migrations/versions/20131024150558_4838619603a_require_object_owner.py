@@ -34,7 +34,6 @@ basic_objects_editable = [
     'Control',
     'ControlControl',
     'ControlSection',
-    'Cycle',
     'DataAsset',
     'Directive',
       'Contract',
@@ -90,9 +89,26 @@ basic_objects_updateable.extend([
     ])
 
 ownable = set([
-    'Category', 'Control', 'DataAsset', 'Directive', 'Document', 'Facility',
-    'Help', 'Market', 'Objective', 'Option', 'OrgGroup', 'Product',
-    'Project', 'Section', 'System',
+    'Category',
+    'Control',
+    'Contract',
+    'DataAsset',
+    'Directive',
+    'Document',
+    'Facility',
+    'Help',
+    'Market',
+    'Objective',
+    'Option',
+    'OrgGroup',
+    'Policy',
+    'Process',
+    'Product',
+    'Project',
+    'Regulation',
+    'Section',
+    'System',
+    'SystemOrProcess',
     ])
 
 def deletable_entry(typename):

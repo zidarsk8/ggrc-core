@@ -25,7 +25,8 @@ $.extend(Permission, (function() {
 
   _permission_match = function(permissions, permission) {
     var resource_types = permissions[permission.action] || {}
-      , contexts = resource_types[permission.resource_type] || []
+      , resource_type = resource_types[permission.resource_type] || {}
+      , contexts = resource_type['contexts'] || []
       ;
 
     return (contexts.indexOf(permission.context_id) > -1);
