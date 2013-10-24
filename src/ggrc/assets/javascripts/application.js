@@ -721,6 +721,25 @@ $(window).load(function(){
     return false;
     
   });
+  
+  // Google Circle CTA Button
+  $('body').on('mouseenter', '.square-trigger', function() {
+    var $this = $(this),
+        $popover = $this.closest('.circle-holder').find('.square-popover');
+    
+    $popover.slideDown('fast');
+    $this.addClass("active");
+    return false;
+  });
+  $('body').on('mouseleave', '.square-popover', function() {
+    var $this = $(this),
+        $trigger = $this.closest('.circle-holder').find('.square-trigger');
+    
+    $this.slideUp('fast');
+    $trigger.removeClass('active');
+    $this.removeClass("active");
+    return false;
+  });
 
 });
 
