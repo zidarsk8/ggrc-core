@@ -333,6 +333,8 @@ class Resource(ModelView):
         'application/json', 406, [('Content-Type', 'text/plain')]))
     if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
       raise Forbidden()
+    if not permissions.is_allowed_read_for(obj):
+      raise Forbidden()
     object_for_json = self.object_for_json(obj)
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
@@ -384,6 +386,8 @@ class Resource(ModelView):
       return current_app.make_response((
         'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
+      raise Forbidden()
+    if not permissions.is_allowed_update_for(obj):
       raise Forbidden()
     new_context = self.get_context_id_from_json(src)
     if new_context != obj.context_id \

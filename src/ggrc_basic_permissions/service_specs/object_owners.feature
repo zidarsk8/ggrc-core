@@ -14,7 +14,7 @@ Feature: Some object types can have an owner as recorded in an ObjectOwner
     And User link object for "owning.user@example.com" as "owning_user"
     And User link object for "non.owning.user@example.com" as "non_owning_user"
 
-  Scenario Outline: The object owner can delete the resource, but other users cannot.
+  Scenario Outline: The object owner can update and delete the resource, but other users cannot.
     Given the current user
        """
        { "email": "owning.user@example.com" }
@@ -29,28 +29,35 @@ Feature: Some object types can have an owner as recorded in an ObjectOwner
       { "email": "non.owning.user@example.com" }
       """
     When GET of the resource "owned_resource"
+    Then PUT of "owned_resource" is forbidden
+    When GET of the resource "owned_resource"
     Then DELETE of "owned_resource" is forbidden
     Given the current user
        """
        { "email": "owning.user@example.com" }
        """
     When GET of the resource "owned_resource"
+    Then PUT of "owned_resource" is allowed
+    When GET of the resource "owned_resource"
     Then DELETE of "owned_resource" is allowed
 
     Examples:
-      | type      |
-      | Category  |
-      #| Control   |
-      #| DataAsset |
-      #| Directive |
-      #| Document  |
-      #| Facility  |
-      #| Help      |
-      #| Market    |
-      #| Objective |
-      #| Option    |
-      #| OrgGroup  |
-      #| Product   |
-      #| Project   |
-      #| Section   |
-      #| System    |
+      | type       |
+      | Category   |
+      | Contract   |
+      | Control    |
+      | DataAsset  |
+      | Document   |
+      | Facility   |
+      | Help       |
+      | Market     |
+      | Objective  |
+      | Option     |
+      | OrgGroup   |
+      | Policy     |
+      | Process    |
+      | Product    |
+      | Project    |
+      | Regulation |
+      | Section    |
+      | System     |

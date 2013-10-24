@@ -11,7 +11,8 @@ from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 
-class Section(Documentable, Personable, Hierarchical, BusinessObject, db.Model):
+class Section(
+    Documentable, Personable, Hierarchical, Ownable, BusinessObject, db.Model):
   __tablename__ = 'sections'
 
   directive_id = deferred(

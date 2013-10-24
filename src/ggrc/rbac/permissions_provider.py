@@ -38,7 +38,7 @@ class DefaultUserPermissionsProvider(object):
 
 def resolve_permission_variable(value):
   if value.startswith('$'):
-    if value == '$logged_in_user':
+    if value == '$current_user':
       return current_user
     raise Exception(
         'The permission condition variable {0} is not defined!'.format(name))
@@ -98,29 +98,9 @@ class DefaultUserPermissions(UserPermissions):
         self._admin_permission_for_context(permission.context_id),
         permissions)
 
-  def is_allowed_create(self, resource_type, context_id):
-    """Whether or not the user is allowed to create a resource of the specified
-    type in the context."""
-    return self._is_allowed(Permission('create', resource_type, context_id))
-
-  def is_allowed_read(self, resource_type, context_id):
-    """Whether or not the user is allowed to read a resource of the specified
-    type in the context."""
-    return self._is_allowed(Permission('read', resource_type, context_id))
-
-  def is_allowed_update(self, resource_type, context_id):
-    """Whether or not the user is allowed to update a resource of the specified
-    type in the context."""
-    return self._is_allowed(Permission('update', resource_type, context_id))
-
-  def is_allowed_delete(self, resource_type, context_id):
-    """Whether or not the user is allowed to delete a resource of the specified
-    type in the context."""
-    return self._is_allowed(Permission('delete', resource_type, context_id))
-
-  def is_allowed_delete_for(self, instance):
+  def _is_allowed_for(self, instance, action):
     conditions = self._permissions()\
-        .setdefault('delete', {})\
+        .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
@@ -132,6 +112,35 @@ class DefaultUserPermissions(UserPermissions):
       if func(instance, **terms):
         return True
     return False
+
+  def is_allowed_create(self, resource_type, context_id):
+    """Whether or not the user is allowed to create a resource of the specified
+    type in the context."""
+    return self._is_allowed(Permission('create', resource_type, context_id))
+
+  def is_allowed_read(self, resource_type, context_id):
+    """Whether or not the user is allowed to read a resource of the specified
+    type in the context."""
+    return self._is_allowed(Permission('read', resource_type, context_id))
+
+  def is_allowed_read_for(self, instance):
+    return self._is_allowed_for(instance, 'read')
+
+  def is_allowed_update(self, resource_type, context_id):
+    """Whether or not the user is allowed to update a resource of the specified
+    type in the context."""
+    return self._is_allowed(Permission('update', resource_type, context_id))
+
+  def is_allowed_update_for(self, instance):
+    return self._is_allowed_for(instance, 'update')
+
+  def is_allowed_delete(self, resource_type, context_id):
+    """Whether or not the user is allowed to delete a resource of the specified
+    type in the context."""
+    return self._is_allowed(Permission('delete', resource_type, context_id))
+
+  def is_allowed_delete_for(self, instance):
+    return self._is_allowed_for(instance, 'delete')
 
   def _get_contexts_for(self, action, resource_type):
     # FIXME: (Security) When applicable, we should explicitly assert that no

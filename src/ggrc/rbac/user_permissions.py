@@ -17,9 +17,26 @@ class UserPermissions(object):
     type in the context."""
     raise NotImplementedError()
 
+  def is_allowed_read_for(self, instance):
+    """Whether or not the user is allowed to read this particular resource
+    instance. This is in contrast to ``is_allowed_read`` which checks that the
+    user can read resources of this type, though may not be able to read any
+    one particular instance depending upon permissions implementation.
+    """
+    raise NotImplementedError()
+
   def is_allowed_update(self, resource_type, context_id):
     """Whether or not the user is allowed to update a resource of the specified
     type in the context."""
+    raise NotImplementedError()
+
+  def is_allowed_update_for(self, instance):
+    """Whether or not the user is allowed to update this particular resource
+    instance. This is in contrast to ``is_allowed_update`` which checks that
+    the user can update resources of this type, though may not be able to
+    update any one particular instance depending upon permissions
+    implementation.
+    """
     raise NotImplementedError()
 
   def is_allowed_delete(self, resource_type, context_id):

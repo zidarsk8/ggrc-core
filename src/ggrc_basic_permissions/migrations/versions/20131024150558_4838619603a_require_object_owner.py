@@ -90,8 +90,8 @@ basic_objects_updateable.extend([
 
 ownable = set([
     'Category',
-    'Control',
     'Contract',
+    'Control',
     'DataAsset',
     'Directive',
     'Document',
@@ -111,13 +111,15 @@ ownable = set([
     'SystemOrProcess',
     ])
 
-def deletable_entry(typename):
+basic_objects_deletable=list(basic_objects_editable)
+
+def type_conditions(typename):
   if typename in ownable:
     return {
         'type': typename,
         'condition': 'contains',
         'terms': {
-          'value': '$logged_in_user',
+          'value': '$current_user',
           'list_property': 'owners',
           },
         }
@@ -125,9 +127,15 @@ def deletable_entry(typename):
     return typename
 
 def upgrade():
-  do_permission_update(map(deletable_entry, basic_objects_editable))
+  do_permission_update(
+      basic_objects_updateable=map(type_conditions, basic_objects_updateable),
+      basic_objects_deletable=map(type_conditions, basic_objects_editable))
 
-def do_permission_update(basic_objects_deletable):
+def do_permission_update(
+    basic_objects_creatable=basic_objects_creatable,
+    basic_objects_readable=basic_objects_readable,
+    basic_objects_updateable=basic_objects_updateable,
+    basic_objects_deletable=basic_objects_deletable):
   op.execute(roles_table.update()\
       .where(roles_table.c.name == 'Reader')\
       .values(permissions_json=json.dumps({
@@ -143,4 +151,4 @@ def do_permission_update(basic_objects_deletable):
             })))
 
 def downgrade():
-  do_permission_update(list(basic_objects_editable))
+  do_permission_update()
