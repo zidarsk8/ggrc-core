@@ -1,11 +1,15 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 dashboard-js-files:
   - controllers/contributions.js
 
 dashboard-js-template-files:
-  #- people_roles/authorizations_by_person_list.mustache
-  #- people_roles/authorizations_modal_actions.mustache
-  #- people_roles/base_modal.mustache
-  #- people_roles/object_column.mustache
-  #- people_roles/object_detail.mustache
-  #- people_roles/option_column.mustache
+  - ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache
+  - ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache
+  - ggrc_basic_permissions/people_roles/base_modal.mustache
+  - ggrc_basic_permissions/people_roles/object_column.mustache
+  - ggrc_basic_permissions/people_roles/object_detail.mustache
+  - ggrc_basic_permissions/people_roles/option_column.mustache

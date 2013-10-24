@@ -16,7 +16,8 @@ for key in settings.exports:
 import ggrc_gdrive_integration.models
 
 from ggrc import db
-from ggrc.models import Program, Audit, Request, Response
+from ggrc.models import Program, Audit, Request, Response, \
+  DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .models.object_folder import Folderable
 from .models.object_file import Fileable
 Program.__bases__ = (Folderable,) + Program.__bases__
@@ -25,8 +26,15 @@ Audit.__bases__ = (Folderable,) + Audit.__bases__
 Audit.late_init_folderable()
 Request.__bases__ = (Folderable,) + Request.__bases__
 Request.late_init_folderable()
-Response.__bases__ = (Fileable,) + Response.__bases__
-Response.late_init_fileable()
+# Response.__bases__ = (Fileable,) + Response.__bases__
+# Response.late_init_fileable()
+DocumentationResponse.__bases__ = (Fileable,) + DocumentationResponse.__bases__
+DocumentationResponse.late_init_fileable()
+# InterviewResponse.__bases__ = (Fileable,) + InterviewResponse.__bases__
+# InterviewResponse.late_init_fileable()
+PopulationSampleResponse.__bases__ = (Fileable,) + \
+  PopulationSampleResponse.__bases__
+PopulationSampleResponse.late_init_fileable()
 #Program._publish_attrs.append('object_folders')
 '''
 Some other spitballs from Dan here:

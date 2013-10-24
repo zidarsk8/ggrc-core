@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
+
 .area {
   border-right:5px solid #444;
   &.governance {
@@ -89,6 +96,12 @@
   ul {
     @include reset-list();
     margin-bottom:14px;
+    &.sub-level {
+      margin-bottom:0px;
+    }
+    &.sub-actions {
+      margin-bottom:14px;
+    }
     &.collapse {
       margin-bottom:0px;
       &.in {
@@ -143,22 +156,27 @@
       }
     }
   }
-  ul.sub-level {
+  ul.sub-level,
+  ul.sub-actions {
     background:#fff;
     border-bottom:1px solid #ccc;
     border-top:1px solid #ddd;
-    &.collapse {
-      border-bottom:none;
-      border-top:none;
-      &.in {
-        border-bottom:1px solid #ccc;
-        border-top:1px solid #ddd;
-      }
+    display: none;
+    overflow: auto;
+    max-height: 160px;
+
+    &.in {
+      border-bottom:1px solid #ccc;
+      border-top:1px solid #ddd;
     }
 
     li {
       font-size:12px;
       border-bottom:1px solid #ddd;
+      &.no-access {
+        padding-left:34px;
+        background:#eee;
+      }
       a {
         [class*="span"] {
           min-height:24px;

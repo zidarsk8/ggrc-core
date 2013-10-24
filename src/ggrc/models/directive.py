@@ -1,6 +1,6 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By:
+# Created By: dan@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
@@ -70,10 +70,16 @@ class Directive(Timeboxed, BusinessObject, db.Model):
       'sections',
       'version',
       ]
+
   _sanitize_html = [
       'organization',
       'scope',
       'version',
+      ]
+
+  _include_links = [
+      'program_directives',
+      'directive_controls',
       ]
 
   @validates('kind')
@@ -93,12 +99,12 @@ class Directive(Timeboxed, BusinessObject, db.Model):
     from sqlalchemy import orm
 
     query = super(Directive, cls).eager_query()
-    return query.options(
+    return cls.eager_inclusions(query, Directive._include_links).options(
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),
         orm.subqueryload('controls'),
-        orm.subqueryload_all('program_directives.program'),
-        orm.subqueryload_all('directive_controls'),
+        orm.subqueryload('program_directives'),
+        orm.subqueryload('directive_controls'),
         orm.subqueryload('sections'))
 
 # FIXME: For subclasses, restrict kind

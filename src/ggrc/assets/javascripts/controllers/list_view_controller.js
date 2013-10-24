@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 (function(can, $) {
 
 function model_list_loader(controller) {
@@ -125,11 +132,16 @@ can.Control("GGRC.Controllers.ListView", {
   }
 
   , draw_list : function(list) {
+    if (list && this.options.fetch_post_process) {
+      list = this.options.fetch_post_process(list);
+    }
+
     var that = this;
     if(list) {
       this.options.list = list;
       this.on();
     }
+
     can.view(this.options.list_view, this.options, function(frag) {
       that.element
         .html(frag)

@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require controllers/quick_search_controller
@@ -142,7 +142,7 @@ var RELATIONSHIP_TYPES = {
     , "Project": []
     , "Market": []
     , "OrgGroup": []
-  }, "InterviewnResponse" : {
+  }, "InterviewResponse" : {
       "System": []
     , "Process": []
     , "DataAsset": []
@@ -180,9 +180,11 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     , by_object_option_models: {}
     , by_option_object_models: {}
     , join_model_name_for: function (model_name_a, model_name_b) {
+        var join_descriptor = null;
         if (this.by_object_option_models[model_name_a] &&
             this.by_object_option_models[model_name_a][model_name_b]) {
-          return this.by_object_option_models[model_name_a][model_name_b][0].options.join_model_name;
+          join_descriptor = this.by_object_option_models[model_name_a][model_name_b][0];
+          return join_descriptor.get_join_model_name();
         }
         return null;
     }
@@ -284,6 +286,15 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
         return this.options.join_model;
       }
 
+    , get_join_model_name: function() {
+        if (this.options.join_model_name)
+          return this.options.join_model_name;
+        else
+          // FIXME: This is only used for Section, since it has a foreign key
+          //   relationship to Directive.
+          return this.options.option_model_name;
+      }
+
     , make_join_object: function(object, option, join_attrs) {
         var join_model = this.get_join_model() //this.get_model(this.options.join_model_name)
           , object_attrs = { id: object.id, type: object.constructor.shortName }
@@ -348,7 +359,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
-  response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationsSampleResponse"];
+  response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"];
 
   business_plus_program_and_directive_object_types =
     business_plus_program_object_types.concat(directive_object_types);
@@ -357,7 +368,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
     directive_object_types.concat(["Control", "Section", "Objective"]);
 
   all_object_types =
-    governance_object_types.concat(business_plus_program_object_types);
+    governance_object_types.concat(business_plus_program_object_types).concat(response_object_types);
 
   join_descriptor_arguments = [
         [business_object_types,
@@ -388,12 +399,6 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Section", "Control", "ControlSection", "control", "section"]
       , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
       , ["Objective", "Control", "ObjectiveControl", "control", "objective"]
-      //, ["System", "System", "SystemSystem", "child", "parent"]
-      //, ["System", "Process", "SystemSystem", "child", "parent"]
-      //, ["Process", "System", "SystemSystem", "child", "parent"]
-      //, ["Process", "Process", "SystemSystem", "child", "parent"]
-      //, ["System", "Control", "SystemControl", "control", "system"]
-      //, ["Control", "System", "SystemControl", "system", "control"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , ["Program", "Audit", null, null, "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
@@ -407,10 +412,9 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
       , ["Audit", "Request", null, null, "audit"]
       , ["Request", "Objective", null, null, "objective"]
-      , ["Request", "Response", null, null, "request"]
+      , ["Request", response_object_types, null, null, "request"]
       , ["Person", "Request", null, null, "assignee"]
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
-      , ["DocumentationResponse", "Document", "ObjectDocument", "document", "documentable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
       ];
@@ -506,6 +510,16 @@ $(function() {
     }
     
     resize_areas();  
+
+    CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+      prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
+    })
+  });
+
+  // Collapse the LHN if they did it on a previous page
+  CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+    var collapsed = prefs[0].getCollapsed(null, "lhs");
+    collapsed && $(".bar-v").trigger('click');
   });
 
   $(document.body).on("click", ".lhs-closed", function(ev) {
@@ -623,8 +637,16 @@ $(function() {
         })
         .one("modal:success", triggerFlash);
     } else {*/
+      // Mappings to/from a program should be in the context of the program.
+      // Otherwise, default to the page_instance context then default context.
+      var join_context;
+      if (inst instanceof CMS.Models.Program && inst.context) {
+        join_context = { id : inst.context.id };
+      } else {
+        join_context = page_instance.context || { id : null };
+      }
       join_object = join_descriptor.make_join_object(
-          page_instance, inst, { context: page_instance.context || { id : null } });
+          page_instance, inst, { context : join_context });
       // Map the object if we're able to
       if (join_object) {
         join_object.save()

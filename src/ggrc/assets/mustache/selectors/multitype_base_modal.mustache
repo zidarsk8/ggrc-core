@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
       <div class="pull-right">
@@ -7,8 +14,13 @@
       </div>
       <h2>
         {{#if_equals option_type_count 1}}
-          Map {{#option_type_menu}}{{#items}}{{model_display}}{{/#items}}{{/option_type_menu}} to {{selected_object.constructor.title_singular}}
-          
+          {{#option_type_menu}}{{#items}}
+            {{#if_equals model_display 'References'}}
+              Link {{model_display}} to {{selected_object.constructor.title_singular}}
+            {{else}}
+              Map {{model_display}} to {{selected_object.constructor.title_singular}}
+            {{/if_equals}}
+          {{/#items}}{{/option_type_menu}}
         {{else}}
           Map Object {{! modal_title }}
         {{/if_equals}}
@@ -90,7 +102,17 @@
         <div class="span6">
           <div class="confirm-buttons">
             <a class="btn btn-primary preventdoubleclick {{^if selected_option}}disabled {{/if}}map-button" href="javascript://">
-              Map
+              {{#if_equals option_type_count 1}}
+                {{#option_type_menu}}{{#items}}
+                  {{#if_equals model_display 'References'}}
+                    Link
+                  {{else}}
+                    Map
+                  {{/if_equals}}
+                {{/#items}}{{/option_type_menu}}
+              {{else}}
+                Map
+              {{/if_equals}}
             </a>
           </div>
         </div>

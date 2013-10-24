@@ -1,3 +1,8 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
 import csv
 from .common import *
 from ggrc import db
@@ -5,23 +10,7 @@ from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
-from ggrc.services.common import get_cache
-
-def get_modified_objects(session):
-  session.flush()
-  cache = get_cache()
-  if cache:
-    return cache.copy()
-
-def update_index_for_objects(session, cache):
-  indexer = get_indexer()
-  for obj in cache.new:
-    indexer.create_record(fts_record_for(obj), commit=False)
-  for obj in cache.dirty:
-    indexer.update_record(fts_record_for(obj), commit=False)
-  for obj in cache.deleted:
-    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
-  session.commit()
+from ggrc.services.common import get_modified_objects, update_index
 
 class BaseConverter(object):
 
@@ -94,8 +83,8 @@ class BaseConverter(object):
 
   def import_metadata(self):
     if len(self.rows) < 6:
-      self.errors.append("Could not import: verify the file is correctly formatted.")
-      raise ImportException("Could not import: verify the file is correctly formatted.")
+      self.errors.append("There is no data to import in this CSV file")
+      raise ImportException("", show_preview=True, converter=self)
 
     optional_metadata = []
     if hasattr(self, 'optional_metadata'):
@@ -184,6 +173,8 @@ class BaseConverter(object):
       self.objects.append(row)
 
     if not dry_run:
+      if self.has_errors():
+        raise ImportException("Attempted import with errors")
       self.save_import()
     return self
 
@@ -196,7 +187,7 @@ class BaseConverter(object):
     modified_objects = get_modified_objects(db.session)
     log_event(db.session)
     db.session.commit()
-    update_index_for_objects(db.session, modified_objects)
+    update_index(db.session, modified_objects)
 
   def read_objects(self, headers, rows):
     attrs_collection = []
@@ -213,6 +204,8 @@ class BaseConverter(object):
     elif self.__class__.__name__ == 'SystemsConverter':
       model_name = "Processes" if self.options.get('is_biz_process') else "Systems"
       self.validate_metadata_type(attrs, model_name)
+    elif self.__class__.__name__ == "PeopleConverter":
+      self.validate_metadata_type(attrs, "People")
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
@@ -221,7 +214,7 @@ class BaseConverter(object):
       self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
   def validate_metadata_type(self, attrs, required_type):
-    if not attrs.get('type'):
+    if attrs.get('type') is None:
       self.errors.append('Missing "Type" heading')
     elif attrs['type'] != required_type:
       self.errors.append('Type must be "{}"'.format(required_type))

@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
     <div class="item-main" {{data 'model'}}>
@@ -68,7 +75,7 @@
             {{#is_allowed 'update' instance}}
               <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
-                Edit Section
+                Edit {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
               </a>
             {{/is_allowed}}
           </div>
@@ -80,7 +87,7 @@
             <div class="span12">
               <div class="tree-description short">
                 {{^instance.description}}
-                  <p><i>No text for this section/clause</i></p>
+                  <p><i>No text for this {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}</i></p>
                 {{/instance.description}}
                 {{{instance.description}}}
               </div>

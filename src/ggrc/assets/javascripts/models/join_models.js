@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 (function(can, $) {
 
 can.Model.Cacheable("can.Model.Join", {
@@ -82,7 +89,7 @@ can.Model.Cacheable("can.Model.Join", {
               model_name
             , object_id
             , this[attr]
-            ) || this[attr]);
+            ).stub() || this[attr]);
     }
 
   , init_join_objects: function() {
@@ -262,42 +269,6 @@ can.Model.Join("CMS.Models.ObjectiveControl", {
   , findAll: "GET /api/objective_controls"
   , create: "POST /api/objective_controls"
   , destroy : "DELETE /api/objective_controls/{id}"
-}, {
-});
-
-can.Model.Join("CMS.Models.SystemControl", {
-  root_object : "system_control"
-  , root_collection : "system_controls"
-  , attributes: {
-      modified_by : "CMS.Models.Person.stub"
-    , system : "CMS.Models.System.stub"
-    , control : "CMS.Models.Control.stub"
-  }
-  , join_keys : {
-    "system" : CMS.Models.System
-    , "control" : CMS.Models.Control
-  }
-  , findAll: "GET /api/system_controls"
-  , create: "POST /api/system_controls"
-  , destroy : "DELETE /api/system_controls/{id}"
-}, {
-});
-
-can.Model.Join("CMS.Models.SystemSystem", {
-  root_object : "system_system"
-  , root_collection : "system_systems"
-  , attributes : {
-      modified_by : "CMS.Models.Person.stub"
-    , parent : "CMS.Models.System.stub"
-    , child : "CMS.Models.System.stub"
-  }
-  , join_keys : {
-    "parent" : can.Model.Cacheable
-    , "child" : can.Model.Cacheable
-  }
-  , findAll: "GET /api/system_systems"
-  , create: "POST /api/system_systems"
-  , destroy : "DELETE /api/system_systems/{id}"
 }, {
 });
 

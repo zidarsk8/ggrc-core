@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
@@ -13,6 +20,9 @@
       <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
       {{/if_null}}
     </div>
+    <div class="span6">
+      {{#private_program modal_title}}{{/private_program}}
+    </div>
   </div>
   <div class="row-fluid">
     <div class="span6">
@@ -25,7 +35,7 @@
       </div>
     </div>
     <div class="span6">
-      {{#using owner=owner}}
+      {{#using owner=instance.owner}}
       <label>
         Owner/Person of Contact
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model.model_singular}}."></i>
@@ -84,7 +94,6 @@
         </label>
         <input class="input-block-level" name="scope" placeholder="Enter Scope" type="text" value="{{scope}}">
       </div>
-      {{#private_program modal_title}}{{/private_program}}
     </div>
   </div>
 </form>

@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 <section class="info">
   {{#instance}}
   <h3>{{title}}</h3>
@@ -16,7 +23,7 @@
   </p>
   <p>
     <strong>Owner:</strong>
-    {{#using owner=owner}}
+    {{#using owner=instance.owner}}
     {{#if owner}}
       {{owner.name}}
     {{else}}
@@ -26,18 +33,16 @@
     {{/if}}
     {{/using}}
   </p>
-  {{#object_folders}}
-    {{#using object_folder=this}}
-      <p>
-        GDriveFolder: 
-        {{#using folder=object_folder.folder}}
-          <a href="{{folder.url}}">{{folder.name}}</a>
-        {{/using}}
-      <p>
-    {{/using}}
-  {{/object_folders}}
+  {{#with_mapping 'folders' instance}}
+  {{#folders}}
+  <p>
+      GDriveFolder: 
+      <a href="{{instance.alternateLink}}">{{instance.title}}</a>
+  <p>
+  {{/folders}}
+  {{/with_mapping}}
 
-  {{#is_allowed 'update' model.shortName}}
+  {{#is_allowed 'update' instance}}
   <p>
     <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">
       <i class="grcicon-edit"></i>

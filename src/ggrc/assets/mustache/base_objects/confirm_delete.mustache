@@ -1,7 +1,19 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 <div class="centered">
 <p>
 {{#instance}}
 Are you sure you want to delete {{display_name}}?
+{{#delete_counts instance}}
+	<br/>{{.}}
+{{else}}
+	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
+{{/delete_counts}}
 {{/instance}}
 </p>
 </div>

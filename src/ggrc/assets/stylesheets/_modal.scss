@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
+
 .modal {
   width:700px;
   margin-left: -350px;
@@ -403,6 +410,10 @@
       }
       .triple {
         height: 120px;
+        @include input-block-level();
+      }
+      .quadruple {
+        height: 150px;
         @include input-block-level();
       }
       iframe {

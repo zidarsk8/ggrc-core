@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 /*
  *= require jquery
@@ -32,6 +32,19 @@ jQuery(document).ready(function($) {
 
 var GGRC = window.GGRC || {};
 GGRC.mustache_path = '/static/mustache';
+
+GGRC.hooks = GGRC.hooks || {};
+GGRC.register_hook = function(path, hook) {
+  var h, parent_path, last;
+  parent_path = path.split(".");
+  last = parent_path.pop();
+  parent_path = can.getObject(parent_path.join("."), GGRC.hooks, true);
+  if(!(h = parent_path[last])) {
+    h = new can.Observe.List();
+    parent_path[last] = h;
+  }
+  h.push(hook);
+};
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
@@ -210,14 +223,25 @@ jQuery.extend(GGRC, {
 //  we are not overwriting more recent data than was viewed by the user.
 var etags = {};
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
-  var data;
+  var data = originalOptions.data;
+
+  function attach_provisional_id(prop) {
+    jqXHR.done(function(obj) {
+      obj[prop].provisional_id = data[prop].provisional_id;
+    });
+  }
+
   if ( /^\/api\//.test(options.url) && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
-    data = originalOptions.data;
     options.dataType = "json";
     options.contentType = "application/json";
     jqXHR.setRequestHeader("If-Match", (etags[originalOptions.url] || [])[0]);
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
+    for(var i in data) {
+      if(data.hasOwnProperty(i) && data[i].provisional_id) {
+        attach_provisional_id(i);
+      }
+    }
   }
   if( /^\/api\//.test(options.url) && (options.type.toUpperCase() === "GET")) {
     options.cache = false;
@@ -262,7 +286,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   //  we have a default failure handler that should only be called if no other one is registered, 
   //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
   //  then() or pipe()), then the original one won't normally be notified of failure.
-  can.ajax = $.ajax = function() {
+  can.ajax = $.ajax = function(options) {
     var _ajax = _old_ajax.apply($, arguments);
 
     function setup(_new_ajax, _old_ajax) {
@@ -661,7 +685,8 @@ jQuery(function($) {
         use_slide ? $content.slideUp('fast') : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
-        $parentTree.removeClass('tree-open');
+        // Only remove tree open if there are no open siblings
+        !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
         use_slide ? $content.slideDown('fast') : $content.css("display", "block");

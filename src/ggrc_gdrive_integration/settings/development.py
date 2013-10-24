@@ -5,6 +5,6 @@
 
 EXTENSIONS = ['ggrc_gdrive_integration']
 
-GDRIVE_ROOT_FOLDER = '0ByeYJ052BwIZb2hoTWtjcDV2dTg'
-GDRIVE_SCRIPT_ID = 'AKfycbzopb55UPhdasOrt-lthqmD9hZ-pLZL-tLFjX4i1H_Qz-xF-RI'
-exports = ["GDRIVE_ROOT_FOLDER", "GDRIVE_SCRIPT_ID"]
+GAPI_KEY = "AIzaSyAndAzs1E-8brJdESH7YSuvrj3A8Y-MZCg"
+GAPI_CLIENT_ID = "831270113958.apps.googleusercontent.com"
+exports = ["GAPI_KEY", "GAPI_CLIENT_ID"]

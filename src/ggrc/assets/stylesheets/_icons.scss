@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
+
 /* 
    Icons are used in a number of places and resolution sizes. 
    Images are saved at 32pixels, scaled to 16pixels for .widgetbtn, and further scaled for .btn-nano and similar ...
@@ -331,6 +338,17 @@
   background-position:-54px -344px;
 }
 
+.grcicon-upload {
+  background-position:-54px -344px;
+}
+
+.grcicon-person-green {
+  background-position:-30px -344px;
+}
+.grcicon-pie-chart {
+  background-position:-198px -344px;
+}
+
 // Large icons
 .grciconlarge-dashboard {
   background-position:-8px -8px;
@@ -517,6 +535,15 @@
 
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
+
+.grcicon-logout-color { background-position:-150px -8px; }
+
+// events log icons
+.grcicon-mapped { background-position:-6px -56px; }
+.grcicon-unmapped { background-position:-78px -344px; }
+.grcicon-deleted { background-position:-102px -344px; }
+.grcicon-updated { background-position:-126px -344px; }
+.grcicon-created { background-position:-222px -8px; }
 
 i.short {
   margin-top:5px !important;

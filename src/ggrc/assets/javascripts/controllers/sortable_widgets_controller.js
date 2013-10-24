@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/display_prefs
@@ -90,6 +90,8 @@ can.Control("CMS.Controllers.SortableWidgets", {
     //}
 
     this.sortable().sortable("refresh");
+    this.element.find(".widget").sticky_header();
+
     // FIXME: Is `this.is_initialized` necessary anymore?
     this.is_initialized = true;
     //this.force_add_widget_bottom();

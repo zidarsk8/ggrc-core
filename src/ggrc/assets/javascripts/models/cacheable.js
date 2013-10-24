@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 
@@ -34,7 +34,7 @@ var makeFindRelated = function(thistype, othertype) {
 };
 
 function dateConverter(d) {
-  var conversion = "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
   if(typeof d === "object") {
     d = d.getTime();
@@ -47,7 +47,10 @@ function dateConverter(d) {
     conversion = "MM/DD/YYYY";
   }
   ret = moment(d.toString(), conversion);
-  return ret ? ret.zone(new Date().getTimezoneOffset()).toDate() : undefined;
+  if(typeof d === "string" && ret) {
+    ret.subtract(new Date().getTimezoneOffset(), "minute");
+  }
+  return ret ? ret.toDate() : undefined;
 }
 
 function makeDateUnpacker(key) {
@@ -151,9 +154,11 @@ can.Model("can.Model.Cacheable", {
     this.update = function(id, params) {
       var ret = _update
         .call(this, id, this.process_args(params))
-        .fail(function(status) {
-          if(status === 409) {
-            //handle conflict.
+        .then(
+          can.proxy(this, "resolve_deferred_bindings")
+          , function(status) {
+            if(status === 409) {
+              //handle conflict.
           }
         });
       delete ret.hasFailCallback;
@@ -163,7 +168,8 @@ can.Model("can.Model.Cacheable", {
     var _create = this.create;
     this.create = function(params) {
       var ret = _create
-        .call(this, this.process_args(params));
+        .call(this, this.process_args(params))
+        .then(can.proxy(this, "resolve_deferred_bindings"));
       delete ret.hasFailCallback;
       return ret;
     };
@@ -193,6 +199,57 @@ can.Model("can.Model.Cacheable", {
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
     });
+  }
+
+  , resolve_deferred_bindings : function(obj) {
+    var dfds = [];
+    if(obj._pending_joins) {
+      can.each(obj._pending_joins, function(pj) {
+        var inst
+        , binding = obj.get_binding(pj.through)
+        , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
+        if(pj.how === "add") {
+          //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
+          // move on to the next one
+          if(~can.inArray(pj.what, binding.list)
+             || (binding.loader.option_attr
+                && ~can.inArray(
+                  pj.what
+                  , can.map(
+                    binding.list
+                    , function(join_obj) { return join_obj[binding.loader.option_attr]; }
+                  )
+                )
+          )) {
+            return;
+          }
+          inst = pj.what instanceof model
+            ? pj.what
+            : new model({
+                context : obj.context
+              });
+          if(binding.loader.object_attr) {
+            inst.attr(binding.loader.object_attr, obj.stub());
+          }
+          if(binding.loader.option_attr) {
+            inst.attr(binding.loader.option_attr, pj.what.stub());
+          }
+          dfds.push(inst.save());
+        } else if(pj.how === "remove") {
+          can.map(binding.list, function(bound_obj) {
+            if(bound_obj === pj.what || bound_obj[binding.loader.option_attr] === pj.what) {
+              dfds.push(bound_obj.destroy());
+            }
+          });
+        }
+      });
+      delete obj._pending_joins;
+      return $.when.apply($, dfds).then(function() {
+        return obj;
+      });
+    } else {
+      return obj;
+    }
   }
 
   , findInCacheById : function(id) {
@@ -288,7 +345,14 @@ can.Model("can.Model.Cacheable", {
     if (!params)
       return params;
     var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
-    if(m = this.findInCacheById(params.id)) {
+    m = this.findInCacheById(params.id)
+        || (params.provisional_id && can.getObject("provisional_cache", can.Model.Cacheable, true)[params.provisional_id]);
+    if(m) {
+      if(m.provisional_id) {
+        delete can.Model.Cacheable.provisional_cache[m.provisional_id];
+        m.removeAttr("provisional_id");
+      }
+
       if (m === params) {
         //return m;
       } else if (!params.selfLink) {
@@ -616,6 +680,43 @@ can.Model("can.Model.Cacheable", {
   }
   , autocomplete_label : function() {
     return this.title;
+  }
+  /**
+   Set up a deferred join object deletion when this object is updated.
+  */
+  , mark_for_deletion : function(join_attr, obj) {
+    obj = obj.reify ? obj.reify() : obj;
+    if(!this._pending_joins) {
+      this._pending_joins = [];
+    }
+    for(var i = this._pending_joins.length; i--;) {
+      if(this._pending_joins[i].what === obj) {
+        this._pending_joins.splice(i, 1);
+      }
+    }
+    this._pending_joins.push({how : "remove", what : obj, through : join_attr });
+  }
+  /**
+   Set up a deferred join object creation when this object is updated.
+  */
+  , mark_for_addition : function(join_attr, obj) {
+    obj = obj.reify ? obj.reify() : obj;
+    if(!this._pending_joins) {
+      this._pending_joins = [];
+    }
+    for(var i = this._pending_joins.length; i--;) {
+      if(this._pending_joins[i].what === obj) {
+        this._pending_joins.splice(i, 1);
+      }
+    }
+    this._pending_joins.push({how : "add", what : obj, through : join_attr });
+  }
+  , save : function() {
+    if(this.isNew()) {
+      this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
+      can.getObject("provisional_cache", can.Model.Cacheable, true)[this.provisional_id] = this;
+    }
+    return this._super.apply(this, arguments);
   }
 });
 

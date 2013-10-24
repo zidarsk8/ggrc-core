@@ -1,25 +1,25 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/cacheable
 
 can.Model.Cacheable("CMS.Models.Meeting", {
-  root_collections : "meetings"
+  root_collection : "meetings"
   , root_object : "meeting"
-  /*
-  Meetings are not implemented on the GGRC server yet.
   , findAll : "GET /api/meetings"
   , create : "POST /api/meetings"
   , update : "PUT /api/meetings/{id}"
   , destroy : "DELETE /api/meetings/{id}"
-  */
   , attributes : {
     response : "CMS.Models.Response.stub"
+    , people : "CMS.Models.Person.stubs"
+    , start_at : "datetime"
+    , end_at : "datetime"
   }
 }, {
   init : function () {

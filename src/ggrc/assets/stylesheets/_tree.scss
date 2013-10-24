@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
+
 ul.new-tree {
   @include reset-list();
   a.openclose {
@@ -17,6 +24,213 @@ ul.new-tree {
       }
     }
     
+  }
+  
+  &.event-tree {
+    [class^="grcicon-"] {
+      margin-top: 1px;
+    }
+    a.openclose {
+      &.active {
+        font-weight: normal;
+      }
+    }
+    .event-action {
+      font-size:13px;
+      color:#777;
+    }
+    .view-more-paging {
+      line-height: 31px;
+      min-height: 31px;
+      padding-left: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      [class^="grcicon-"] {
+        margin-top: 7px;
+      }
+    }
+    .item-data {
+      padding-right: 20px;
+      .tree-title-area {
+        overflow: auto;
+        white-space: normal;
+        text-overflow: inherit;
+        width: auto;
+        ul {
+          @include reset-list();
+          li {
+            display: inline-block;
+            margin-right: 5px;
+            line-height: 18px;
+            padding-right: 8px;
+            border-right: 1px solid #111;
+            &:last-child {
+              margin-right: 0;
+            }
+            &.governance,
+            &.control,
+            &.objective,
+            &.contract,
+            &.policy,
+            &.regulation {
+              color:$governance;
+            }
+            &.business,
+            &.process,
+            &.system,
+            &.orggroup,
+            &.project,
+            &.facility,
+            &.product,
+            &.dataasset,
+            &.market {
+              color:$business;
+            }
+            &.risk,
+            &.riskyattribute {
+              color:$risk;
+            }
+            &.program {
+              color:$programs;
+            }
+          }
+        }
+        .event-more {
+          position: absolute;
+          top: 0;
+          right: 0px;
+          z-index: 2000;
+        }
+      }
+    }
+    .events-content {
+      [class^="grcicon-"] {
+        margin-top: 7px;
+      }
+      .info-action {
+        text-transform: none;
+        font-size: 13px;
+        @include opacity(1);
+      }
+      .disabled {
+        @include opacity(.3);
+      }
+      .inner-tree {
+        h6 {
+          color: $black;
+          .event-action {
+            font-size:11px;
+            color:#777;
+            text-transform: none;
+            font-style: italic;
+            font-weight: normal;
+          }
+        }
+      }
+    }
+    &.new-event-tree {
+      .item-data {
+        padding-right:70px;
+        position:relative;
+        min-height: 31px;
+        height: 31px;
+        .tree-title-area {
+          position:static;
+          padding: 0;
+          display:inline-block !important;
+          overflow: hidden !important;
+          white-space: nowrap !important;
+          text-overflow: ellipsis !important;
+          width:100% !important;
+          .event-main-title {
+            @include oneline();
+            height: 31px;
+            min-height: 31px;
+            span {
+              margin-right: 10px;
+              &:last-child {
+                margin-right: 0;
+              }
+              i {
+                margin-top: 7px;
+              }
+              &.governance,
+              &.control,
+              &.objective,
+              &.contract,
+              &.policy,
+              &.regulation {
+                color:$governance;
+              }
+              &.business,
+              &.process,
+              &.system,
+              &.orggroup,
+              &.project,
+              &.facility,
+              &.product,
+              &.dataasset,
+              &.market {
+                color:$business;
+              }
+              &.risk,
+              &.riskyattribute {
+                color:$risk;
+              }
+              &.program {
+                color:$programs;
+              }
+            }
+          }
+          .event-date {
+            @include oneline();
+            text-align: right;
+          }
+        }
+        .event-more {
+          position: absolute;
+          top: 0;
+          right: 20px;
+          z-index: 2000;
+        }
+      }
+      .events-content {
+        p {
+          @include oneline();
+          .event-action {
+            margin:0 20px;
+          }
+        }
+        .full-info {
+          padding-top: 16px;
+          p {
+            overflow: auto !important;
+            white-space: normal;
+            text-overflow: inherit;
+            width: 100%;
+            font-size: 13px;
+            line-height: 18px;
+            .changed {
+              color: #f08925;
+            }
+          }
+        }
+        .deleted-info {
+          @include opacity(0.4);
+          font-weight:bold;
+        }
+        .info-action {
+          text-transform: uppercase;
+          font-size: 11px;
+          @include opacity(0.6);
+          &:hover {
+            @include opacity(1);
+            text-decoration:none;
+          }
+        }
+      }
+    }
   }
   
   a.simple-link {
@@ -353,7 +567,8 @@ ul.new-tree {
       font-size:11px;
     }
     .role,
-    .option {
+    .option,
+    .scope {
       font-size:11px;
       font-weight:bold;
       text-transform:uppercase;
@@ -376,7 +591,12 @@ ul.new-tree {
       font-size:13px;
       color:#777;
     }
-
+  }
+  .event-more {
+    float:right;
+    color:$blue;
+    margin-right:0;
+    font-size:13px;
   }
   .tree-code {
     font-weight:bold;

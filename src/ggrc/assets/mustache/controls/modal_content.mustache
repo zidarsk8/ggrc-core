@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
@@ -16,10 +23,10 @@
           Directive
           <i class="grcicon-help-black" rel="tooltip" title="Contract, Policy or Regulation Code"></i>
         </label>
-        <input id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty directive.id ''}}">
+        <input id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty instance.directive.id ''}}">
         <p class="modal-value">
-          {{#if directive}}
-            {{#using directive=directive}}
+          {{#if instance.directive}}
+            {{#using directive=instance.directive}}
             {{directive.title}}
             {{/using}}
           {{else}}
@@ -40,7 +47,7 @@
       </div>
     </div>
     <div class="span6">
-      {{#using owner=owner}}
+      {{#using owner=instance.owner}}
       <label>
         Owner/Person of Contact
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model.model_singular}}."></i>

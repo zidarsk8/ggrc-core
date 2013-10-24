@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require controls/control
@@ -21,6 +21,7 @@ can.Model.Cacheable("CMS.Models.Section", {
   , category : "governance"
   , root_model : "Section"
   , findAll : "GET /api/sections"
+  , findOne : "GET /api/sections/{id}"
   , create : "POST /api/sections"
   , update : "PUT /api/sections/{id}"
   , destroy : "DELETE /api/sections/{id}"

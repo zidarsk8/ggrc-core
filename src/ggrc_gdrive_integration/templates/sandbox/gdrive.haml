@@ -43,22 +43,17 @@
 
   %script#permissions_tmpl{ 'type' : 'text/mustache' }
     -raw
-      <h3>permissions</h3>
+      <ul>
       {{#this}}
-      {{#if_equals status -1}}
-        Error: {{message}}
-      {{else}}
-      {{shareablepermissions}}
-      {{/if_equals}}
+        <li>
+          {{type}}: {{name}}
+          ({{firstnonempty emailAddress domain}})
+          <ul>
+            <li>{{role}}</li>
+          </ul>
+        </li>
       {{/this}}
-      <h3>users</h3>
-      {{#this}}
-      {{#if_equals status -1}}
-        Error: {{message}}
-      {{else}}
-      {{viewers}}
-      {{/if_equals}}
-      {{/this}}
+      </ul>
     -endraw
 
 -block main
@@ -84,11 +79,11 @@
           %input.add-folder{ 'type' : 'button', 'value' : 'Add folder'}
   :javascript
     $(function() {
-      var folderstack = [GGRC.config.GDRIVE_ROOT_FOLDER];
+      var folderstack = ['root'];
       var lblist = null;
       var folderspinner, filespinner;
       $(document.body).on("click", ".list-folders", function(ev) {
-        var folder = $(this).data('folder') || GGRC.config.GDRIVE_ROOT_FOLDER;
+        var folder = $(this).data('folder') || 'root';
         if($(this).is(".go-up")) {
           folderstack.shift();
           folder = folderstack[0];
@@ -106,7 +101,7 @@
                 lblist = list;
                 return { 
                   list : list, 
-                  parent : folder === GGRC.config.GDRIVE_ROOT_FOLDER ? null : folder
+                  parent : folder === 'root' ? null : folder
                 };
               }
             }, function(xhr, status) {
@@ -143,10 +138,13 @@
         });
       }).on("click", ".add-folder", function(ev) {
         var that = this;
-        new CMS.Models.GDriveFolder({ name : $(this).closest("form").find("[name=name]").val(), parentfolderid : folderstack[0], allowduplicatenames : false })
+        new CMS.Models.GDriveFolder({ 
+          title : $(this).closest("form").find("[name=name]").val()
+          , parents : [typeof folderstack[0] === "string" ? { id : folderstack[0] } : folderstack[0]]
+         })
         .save()
-        .fail(function(xhr, status){
-          $(document.body).trigger("ajax:flash", { error : [status]});
+        .fail(function(xhr, status, gerror){
+          $(document.body).trigger("ajax:flash", { error : [gerror.message]});
         })
         .done(function(noobs) {
           lblist.push.apply(lblist, noobs);
@@ -157,8 +155,8 @@
         , folder = $(this).data("folder");
 
         CMS.Models.GDriveFolder.removeFromParent(folder, folderstack[0])
-        .fail(function(xhr, status){
-          $(document.body).trigger("ajax:flash", { error : [status]});
+        .fail(function(xhr, status, gerror){
+          $(document.body).trigger("ajax:flash", { error : [gerror.message]});
         })
         .done(function(noob) {
           lblist.replace(can.map(lblist, function(l) {

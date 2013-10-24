@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require models/cacheable
@@ -12,6 +12,7 @@ can.Model.Cacheable("CMS.Models.Category", {
   root_object : "category"
   , root_collection : "categories"
   , findAll : "GET /api/categories"
+  , findOne : "GET /api/categories/{id}"
   , cache_by_scope: {}
   , for_scope: function(scope) {
       var self = this;

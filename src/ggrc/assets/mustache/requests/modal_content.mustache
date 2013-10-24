@@ -9,7 +9,7 @@
         <span class="required">*</span>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="request_description" class="span12 double wysihtml5" name="pbc_request" placeholder="Request Description">{{{description}}}</textarea>
+        <textarea id="request_description" class="span12 double wysihtml5" name="pbc_request" placeholder="State your request here...">{{{description}}}</textarea>
       </div>
     </div>
     <div class="span3">
@@ -18,9 +18,9 @@
         <span class="required">*</span>
       </label>
       <select name="request_type" class="input-block-level">
-        <option>Documentation</option>
-        <option>Interview</option>
-        <option>Population Sample</option>
+        {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+        <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+        {{/iterate}}
       </select>
       <label>
         Requested On
@@ -32,24 +32,21 @@
       <label>
         Status
       </label>
-      <select class="input-block-level" name="status" disabled>
-        <option>Draft</option>
-        <option>Requested</option>
-        <option>Responded</option>
-        <option>Ammended Request</option>
-        <option>Updated Response</option>
-        <option>Accepted</option>
+      <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
+        {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+        <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+        {{/iterate}}
       </select>
       <label>
         Due On
         <span class="required">*</span>
       </label>
-      <input class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localized_date due_on}}">
+      <input class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
     </div>
   </div>
   
   <div class="row-fluid">
-    {{#using objective=objective}}
+    {{#using objective=instance.objective}}
     <div class="span6">
       <label>
         Objective
@@ -61,8 +58,7 @@
       </div>
     </div>
     {{/using}}
-    {{#using assignee=assignee}}
-    {{#with_current_user_as 'current_user'}}
+    {{#using assignee=instance.assignee}}
     <div class="span6">
       <label>
         Assignee
@@ -70,10 +66,9 @@
       </label>
       <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
-        <input type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email current_user.email ''}}">
+        <input type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
       </div>
     </div>
-    {{/with_current_user_as}}
     {{/using}}
   </div>
   <div class="row-fluid">
@@ -124,7 +119,7 @@
       </div>
     </div>
   </div>
-  {{#using audit=audit}}
+  {{#using audit=instance.audit}}
   <input type="hidden" name="audit.id" value="{{audit.id}}">
   {{/using}}
 </form>

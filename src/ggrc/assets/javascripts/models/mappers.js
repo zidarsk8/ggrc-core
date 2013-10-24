@@ -1,3 +1,10 @@
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
 ;(function(GGRC, can) {
 
   /*  GGRC.ListLoaders
@@ -228,7 +235,7 @@
 
     , refresh_list: function() {
         // Returns a list which will *only* ever contain fully loaded instances
-        var loader = new GGRC.ListLoaders.ReifyingListLoader(this.loader)
+        var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
           ;
 
@@ -576,7 +583,7 @@
           , new_results = can.map(results, function(result) {
               return self.make_result(result.instance, [result], binding);
             })
-          , inserted_results = this.insert_results(binding, new_results);
+          , inserted_results = this.insert_results(binding, new_results)
           ;
       }
 
@@ -627,6 +634,41 @@
         };
 
         this._super(source, filter_fn);
+      }
+  });
+
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.FirstElementLoader", {
+  }, {
+
+    init_listeners: function(binding) {
+        var self = this;
+
+        binding.source_binding = binding.instance.get_binding(this.source);
+
+        binding.source_binding.list.bind("add", function(ev, results) {
+          var matching_results = results[0];
+          if(self.list.length < 1)
+            self.insert_results(binding, [matching_results]);
+        });
+
+        binding.source_binding.list.bind("remove", function(ev, results) {
+          can.each(results, function(result) {
+            self.remove_instance(binding, result.instance, result);
+          });
+          if(self.list.length < 1)
+            self.insert_results(binding, [binding.source_binding.list[0]]);
+        });
+      }
+
+    , _refresh_stubs: function(binding) {
+        var self = this
+          ;
+
+        return binding.source_binding.refresh_stubs()
+          .then(function(results) {
+            var matching_results = results[0];
+            self.insert_results(binding, matching_results);
+          });
       }
   });
 
@@ -824,9 +866,12 @@
           , object_join_attr = this.object_join_attr || model.table_plural
           ;
 
-        can.each(binding.instance[object_join_attr].reify(), function(mapping) {
-          refresh_queue.enqueue(mapping);
-        });
+        // These properties only exist if the user has read access
+        if (binding.instance[object_join_attr]) {
+          can.each(binding.instance[object_join_attr].reify(), function(mapping) {
+            refresh_queue.enqueue(mapping);
+          });
+        }
 
         return refresh_queue.trigger()
           .then(this.proxy("filter_for_valid_mappings", binding))
@@ -891,7 +936,7 @@
           , object_model = binding.instance.constructor
           ;
 
-        return (mapping.constructor === model
+        return (mapping instanceof model
                 && mapping[this.object_attr]
                 && (mapping[this.object_attr].reify() === binding.instance
                     || (mapping[this.object_attr].reify().constructor == object_model &&
@@ -960,7 +1005,7 @@
     , _refresh_stubs: function(binding) {
         var model = CMS.Models[this.model_name]
           , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr].reify();
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
           ;
 
         this.insert_instances_from_mappings(binding, mappings);
@@ -972,7 +1017,12 @@
       init: function(source) {
         this._super();
 
-        this.source = source;
+        if (source instanceof GGRC.ListLoaders.BaseListLoader)
+          this.source = source;
+        else if (source instanceof GGRC.ListLoaders.ListBinding)
+          this.source_binding = source;
+        else
+          throw new Error("Invalid source:", source);
       }
 
     , insert_from_source_binding: function(binding, results, index) {
@@ -993,7 +1043,11 @@
     , init_listeners: function(binding) {
         var self = this;
 
-        binding.source_binding = binding.instance.get_binding(this.source);
+        if (this.source_binding)
+          binding.source_binding = this.source_binding;
+        else
+          binding.source_binding = binding.instance.get_binding(this.source);
+
         this.insert_from_source_binding(binding, binding.source_binding.list, 0);
 
         binding.source_binding.list.bind("add", function(ev, results, index) {

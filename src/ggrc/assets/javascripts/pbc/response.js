@@ -1,9 +1,9 @@
-/*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
- * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By:
- * Maintained By:
- */
+/*!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 //= require can.jquery-all
 //= require pbc/system
@@ -40,7 +40,7 @@ can.Model.Cacheable("CMS.Models.Response", {
         return CMS.Models[params.type].model(params);
     } else {
       can.each(this.subclasses, function(m) {
-        if(m.root_object === params.response_type) {
+        if(m.root_object === params.response_type + "_response") {
           params = m.model(params);
           found = true;
           return false;
@@ -59,17 +59,23 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
   , attributes : {
     owner : "CMS.Models.Person.model"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
     , object_documents : "CMS.Models.ObjectDocument.stubs"
     , documents : "CMS.Models.Document.stubs"
-    , population_sample : "CMS.Models.PopulationSample.stub"
+    , population_worksheet : "CMS.Models.Document.stub"
+    , sample_worksheet : "CMS.Models.Document.stub"
+    , sample_evidence : "CMS.Models.Document.stub"
+    , object_people : "CMS.Models.ObjectPerson.stubs"
+    , people : "CMS.Models.Person.stubs"
     , meetings : "CMS.Models.Meeting.stubs"
-    , participants : "CMS.Models.Person.stubs"
     , request : "CMS.Models.Request.stub"
     , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
+    , object_controls : "CMS.Models.ObjectControl.stubs"
+    , controls : "CMS.Models.Control.stubs"
+  }
+  , defaults : {
+    status : "Assigned"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/responses/tree.mustache"
@@ -77,23 +83,35 @@ can.Model.Cacheable("CMS.Models.Response", {
     , draw_children : true
     , child_options : [{
       //0: mapped objects
-      mapping : "related_objects"
+      mapping : "business_objects"
       , model : can.Model.Cacheable
       , show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , allow_mapping : true
+      , exclude_option_types : function() {
+        var types = {
+          "DocumentationResponse" : "Document"
+          , "InterviewResponse" : "Person"
+        };
+        return types[this.parent_instance.constructor.shortName] || "";
+      }
     }, {
       //1: Document Evidence
       model : "Document"
       , mapping : "documents"
+      , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
     }, {
       //2: Meetings
       model : "Meeting"
+      , mapping : "meetings"
       , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
       , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
     }, {
       //3: Meeting participants
       model : "Person"
+      , mapping : "people"
+      , show_view : GGRC.mustache_path + "/people/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }]
   }
 }, {
@@ -112,6 +130,11 @@ CMS.Models.Response("CMS.Models.DocumentationResponse", {
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
   }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "documentation";
+    return params;
+  }
 }, {});
 
 CMS.Models.Response("CMS.Models.InterviewResponse", {
@@ -127,6 +150,11 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
   }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "interview";
+    return params;
+  }
 }, {});
 
 CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
@@ -141,5 +169,10 @@ CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
     this._super && this._super.apply(this, arguments);
     can.extend(this.attributes, CMS.Models.Response.attributes);
     this.cache = CMS.Models.Response.cache;
+  }
+  , process_args : function(args, names) {
+    var params = this._super(args, names);
+    params[this.root_object].response_type = "population sample";
+    return params;
   }
 }, {});
