@@ -106,6 +106,13 @@ def create_role_assignment(context, role_id, person_id, context_id):
 def ensure_user_and_role_assignment_in_default(context, email, role_name):
   ensure_user_and_role_assignment(context, email, role_name, None)
 
+@given('User link object for "{email}" as "{object_name}"')
+def retrieve_user_link_object(context, email, object_name):
+  with Admin(context):
+    person = retrieve_person_by_email(context, email)
+    assert person is not None and person['id'] is not None
+    setattr(context, object_name, {'id': person['id']})
+
 def ensure_user_and_role_assignment(context, email, role_name, context_id):
   with Admin(context):
     role = retrieve_role_by_name(context, role_name)

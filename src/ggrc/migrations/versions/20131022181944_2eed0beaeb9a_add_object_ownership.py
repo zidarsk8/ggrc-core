@@ -20,8 +20,8 @@ from sqlalchemy.sql.expression import literal_column
 ownership_table = table('object_owners',
     column('id', sa.Integer),
     column('person_id', sa.Integer),
-    column('object_id', sa.Integer),
-    column('object_type', sa.String),
+    column('ownable_id', sa.Integer),
+    column('ownable_type', sa.String),
     column('modified_by_id', sa.Integer),
     column('created_at', sa.DateTime),
     column('updated_at', sa.DateTime),
@@ -51,12 +51,12 @@ def upgrade():
   op.create_table('object_owners',
       sa.Column('id', sa.Integer(), nullable=False),
       sa.Column('person_id', sa.Integer(), nullable=False),
-      sa.Column('object_id', sa.Integer(), nullable=False),
-      sa.Column('object_type', sa.String(length=250), nullable=False),
+      sa.Column('ownable_id', sa.Integer(), nullable=False),
+      sa.Column('ownable_type', sa.String(length=250), nullable=False),
       sa.Column('modified_by_id', sa.Integer(), nullable=False),
       sa.Column('created_at', sa.DateTime(), nullable=False),
       sa.Column('updated_at', sa.DateTime(), nullable=False),
-      sa.Column('context_id', sa.Integer(), nullable=False),
+      sa.Column('context_id', sa.Integer(), nullable=True),
       sa.ForeignKeyConstraint(['person_id'], ['people.id']),
       sa.ForeignKeyConstraint(['context_id'], ['contexts.id']),
       sa.PrimaryKeyConstraint('id'),
@@ -65,8 +65,8 @@ def upgrade():
     current_datetime = datetime.now()
     op.execute("""
       INSERT INTO object_owners
-      (person_id, object_id, object_type, modified_by_id, created_at,
-              updated_at)
+      (person_id, ownable_id, ownable_type, modified_by_id,
+       created_at, updated_at)
       SELECT modified_by_id, id, "{object_type}" as object_type,
         modified_by_id as modified_by_id_2,
         '{current_datetime}' as created_at,
