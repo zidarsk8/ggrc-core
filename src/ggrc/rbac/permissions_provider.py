@@ -152,8 +152,8 @@ class DefaultUserPermissions(UserPermissions):
     for resource_type in resource_types:
       ret.extend(permissions\
           .get(action, {})\
-          .get(resource_type, ())\
-          .get('contexts'))
+          .get(resource_type, {})\
+          .get('contexts', []))
 
     # Extend with the list of all contexts for which the user is an ADMIN
     admin_list = list(
