@@ -410,6 +410,8 @@ class Resource(ModelView):
       return header_error
     if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
       raise Forbidden()
+    if not permissions.is_allowed_delete_for(obj):
+      raise Forbidden()
     db.session.delete(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)

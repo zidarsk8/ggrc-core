@@ -33,7 +33,7 @@ class Admin(object):
         """
         { "email": "test.admin@example.com", "name": "GGRC TEST ADMIN",
           "permissions": {
-            "__GGRC_ADMIN__": { "__GGRC_ALL__": [0] }
+            "__GGRC_ADMIN__": { "__GGRC_ALL__": { "contexts": [0] } }
           }
         }
         """

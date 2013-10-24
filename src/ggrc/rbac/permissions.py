@@ -49,6 +49,9 @@ def is_allowed_delete(resource_type, context_id):
   return permissions_for(get_user()).is_allowed_delete(
       resource_type, context_id)
 
+def is_allowed_delete_for(instance):
+  return permissions_for(get_user()).is_allowed_delete_for(instance)
+
 def create_contexts_for(resource_type):
   """All contexts in which the user has create permission."""
   return permissions_for(get_user()).create_contexts_for(resource_type)

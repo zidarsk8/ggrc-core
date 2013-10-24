@@ -36,6 +36,32 @@ class DefaultUserPermissionsProvider(object):
   def permissions_for(self, user):
     return DefaultUserPermissions()
 
+def resolve_permission_variable(value):
+  if value.startswith('$'):
+    if value == '$logged_in_user':
+      return current_user
+    raise Exception(
+        'The permission condition variable {0} is not defined!'.format(name))
+  else:
+    return value
+
+def ContainsCondition(instance, value, list_property):
+  if value.startswith('$'):
+    value = resolve_permission_variable(value)
+  list_value = getattr(instance, list_property)
+  return value in list_value
+
+"""
+All functions with a signature
+
+..
+  
+  func(instance, **kwargs)
+"""
+_CONDITIONS_MAP = {
+  'contains': ContainsCondition,
+  }
+
 class DefaultUserPermissions(UserPermissions):
   # super user, context_id 0 indicates all contexts
   ADMIN_PERMISSION = Permission(
@@ -54,7 +80,8 @@ class DefaultUserPermissions(UserPermissions):
     return permission.context_id in \
         permissions\
           .get(permission.action, {})\
-          .get(permission.resource_type, [])
+          .get(permission.resource_type, {})\
+          .get('contexts', [])
 
   def _permissions(self):
     return session['permissions']
@@ -91,6 +118,21 @@ class DefaultUserPermissions(UserPermissions):
     type in the context."""
     return self._is_allowed(Permission('delete', resource_type, context_id))
 
+  def is_allowed_delete_for(self, instance):
+    conditions = self._permissions()\
+        .setdefault('delete', {})\
+        .setdefault(instance._inflector.model_singular, {})\
+        .setdefault('conditions', {})\
+        .setdefault(instance.context_id, [])
+    if not conditions:
+      return True
+    for condition in conditions:
+      func = _CONDITIONS_MAP[str(condition['condition'])]
+      terms = condition.setdefault('terms', {})
+      if func(instance, **terms):
+        return True
+    return False
+
   def _get_contexts_for(self, action, resource_type):
     # FIXME: (Security) When applicable, we should explicitly assert that no
     #   permissions are expected (e.g. that every user has ADMIN_PERMISSION).
@@ -108,7 +150,10 @@ class DefaultUserPermissions(UserPermissions):
 
     ret = []
     for resource_type in resource_types:
-      ret.extend(permissions.get(action, {}).get(resource_type, ()))
+      ret.extend(permissions\
+          .get(action, {})\
+          .get(resource_type, ())\
+          .get('contexts'))
 
     # Extend with the list of all contexts for which the user is an ADMIN
     admin_list = list(
