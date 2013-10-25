@@ -272,6 +272,9 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
   findChildFolders : function() {
     return this.constructor.findChildFolders(this);
   }
+  , findPermissions : function() {
+    return CMS.Models.GDriveFolderPermission.findAll(this.serialize());
+  }
 
   , uploadFiles : function() {
     var that = this;
@@ -312,6 +315,7 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
 
   //call findAll with id param.
   findAll : gdrive_findAll({}, "/permissions")
+  , id : "etag" //id is a user's Permission ID, so using etags instead for cache keys.
 
   , create : function(params) {
     var file = typeof params.file === "object" ? params.file.id : params.file;
@@ -330,6 +334,21 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
         } else {
           result.file = typeof params.file === "object" ? params.file : CMS.Models.GDriveFile.cache[params.file];
           dfd.resolve(result);
+        }
+      }
+    });
+  }
+
+  , findUserPermissionId : function(person) {
+    var person_email = typeof person === "string" ? person : person.email;
+    return gapi_request_with_auth({
+      path : "/drive/v2/permissionIds/" + person_email
+      , method : "get"
+      , callback : function(dfd, result) {
+        if(result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve(result.id);
         }
       }
     });
@@ -424,7 +443,7 @@ can.Model.Join("CMS.Models.ObjectFile", {
 
   , model : function(params) {
     if(typeof params === "object") {
-      params.folder = {
+      params.file = {
         id : params.file_id
         , type : "GDriveFile"
         , parentfolderid : params.folder_id

@@ -137,16 +137,17 @@ can.Model("can.Model.Cacheable", {
     return ret;
   }
   , init : function() {
+    var id_key = this.id;
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
-      if(new_obj.id) {
-        cache[new_obj.id] = new_obj;
+      if(new_obj[id_key]) {
+        cache[new_obj[id_key]] = new_obj;
         if(cache[undefined] === new_obj)
           delete cache[undefined];
       }
     });
     this.bind("destroyed", function(ev, old_obj) {
-      delete can.getObject("cache", old_obj.constructor, true)[old_obj.id];
+      delete can.getObject("cache", old_obj.constructor, true)[old_obj[id_key]];
     });
     //can.getObject("cache", this, true);
 
@@ -258,11 +259,11 @@ can.Model("can.Model.Cacheable", {
 
   , newInstance : function(args) {
     var cache = can.getObject("cache", this, true);
-    if(args && args.id && cache[args.id]) {
+    if(args && args[this.id] && cache[args[this.id]]) {
       //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging 
                                           // (merging -- adding properties from an object without removing existing ones 
                                           //  -- doesn't work in nested objects).  So we're just going to not merge properties.
-      return cache[args.id];
+      return cache[args[this.id]];
     } else {
       return this._super.apply(this, arguments);
     }
@@ -345,7 +346,7 @@ can.Model("can.Model.Cacheable", {
     if (!params)
       return params;
     var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
-    m = this.findInCacheById(params.id)
+    m = this.findInCacheById(params[this.id])
         || (params.provisional_id && can.getObject("provisional_cache", can.Model.Cacheable, true)[params.provisional_id]);
     if(m) {
       if(m.provisional_id) {
@@ -540,9 +541,10 @@ can.Model("can.Model.Cacheable", {
     }
 }, {
   init : function() {
-    var cache = can.getObject("cache", this.constructor, true);
-    if (this.id)
-      cache[this.id] = this;
+    var cache = can.getObject("cache", this.constructor, true)
+    , id_key = this.constructor.id;
+    if (this[id_key])
+      cache[this[id_key]] = this;
   }
   , computed_errors : function() {
       var that = this
@@ -618,7 +620,11 @@ can.Model("can.Model.Cacheable", {
 
     if (!href)
       return (new can.Deferred()).reject();
-    return $.ajax({
+
+    if(this._pending_refresh) {
+      return this._pending_refresh;
+    }
+    return (this._pending_refresh = $.ajax({
       url : href
       , params : params
       , type : "get"
@@ -626,11 +632,12 @@ can.Model("can.Model.Cacheable", {
     })
     .then(can.proxy(this.constructor, "model"))
     .done(function(d) {
+      delete d._pending_refresh;
       d.updated();
       //  Trigger complete refresh of object -- slow, but fixes live-binding
       //  redraws in some cases
       can.trigger(d, "change", "*");
-    });
+    }));
   }
   , attr : function() {
     if(arguments.length < 1) {
@@ -742,11 +749,16 @@ can.Observe.prototype.stub = function() {
   if (!this.id)
     return null;
 
-  return new can.Observe({
+  var obj = {
     id : this.id,
     href : this.selfLink || this.href,
     type : type
-  });
+  };
+  if(this.constructor.id && this.constructor.id !== "id") {
+    obj[this.constructor.id] = this[this.constructor.id];
+  }
+
+  return new can.Observe(obj);
 };
 
 can.Observe.List.prototype.stubs = function() {
@@ -762,9 +774,9 @@ can.Observe.prototype.reify = function() {
     return this;
   } else if (model = (CMS.Models[type] || GGRC.Models[type])) {
     if (model.cache
-        && model.cache[this.id]) {
+        && model.cache[this[model.id]]) {
         //&& CMS.Models[this.type].cache[this.id].selfLink) {
-      return model.cache[this.id];
+      return model.cache[this[model.id]];
     } else {
       return null;
     }

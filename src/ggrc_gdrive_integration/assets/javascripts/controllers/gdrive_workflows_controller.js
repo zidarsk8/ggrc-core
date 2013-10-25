@@ -70,15 +70,17 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   // if we had to wait for an Audit to get its own folder link on creation, we can now do the delayed creation
   //  of folder links for the audit's requests, which were created first in the PBC workflow
   , "{CMS.Models.ObjectFolder} created" : function(model, ev, instance) {
-    var i, that = this;
-    if(instance instanceof CMS.Models.ObjectFolder && instance.folderable.reify() instanceof CMS.Models.Audit) {
-      instance.folderable.reify().refresh().then(function() {
-        for(i = that.request_create_queue.length; i--;) {
-          if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
-            that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]);
-            that.request_create_queue.splice(i, 1);
+    var i, that = this, folderable;
+    if(instance instanceof CMS.Models.ObjectFolder && (folderable = instance.folderable.reify()) instanceof CMS.Models.Audit) {
+      folderable.refresh().then(function() {
+        folderable.get_binding("folders").refresh_instances().then(function() {
+          for(i = that.request_create_queue.length; i--;) {
+            if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
+              that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]);
+              that.request_create_queue.splice(i, 1);
+            }
           }
-        }
+        });
       });
     }
   }
@@ -99,27 +101,44 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
   , update_owner_permission : function(model, ev, instance) {
     var owner = instance instanceof CMS.Models.Request ? "assignee" : "owner";
-    var person;
+    var person
+    , dfd;
     if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && instance[owner]) {
       person = instance[owner].reify();
-      instance.get_binding("folders").refresh_instances().then(function(list) {
-        can.each(list, function(binding) {
-          binding.instance.findPermissions().then(function(permissions) {
-            var matching = can.map(permissions, function(permission) {
-              if(permission.type === "user"
-                && permission.emailAddress === person.email
-                && (permission.role === "owner" || permission.role === "writer")
-              ) {
-                return permission;
+      if(person.selfLink) {
+        dfd = $.when(person);
+      } else {
+        dfd = person.refresh();
+      }
+      dfd.then(function() {
+        $.when(
+          CMS.Models.GDriveFilePermission.findUserPermissionId(person)
+          , instance.get_binding("folders").refresh_instances()
+        ).then(function(user_permission_id, list) {
+          can.each(list, function(binding) {
+            binding.instance.findPermissions().then(function(permissions) {
+              var matching = can.map(permissions, function(permission) {
+                /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
+                   Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
+                   while "Permission IDs" will match on internal account permissions (where email address is
+                   usually not provided).  Check both.
+                */
+                if(permission.type === "user"
+                  && (permission.id === user_permission_id
+                      || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.email.toLowerCase()))
+                  && (permission.role === "owner" || permission.role === "writer")
+                ) {
+                  return permission;
+                }
+              });
+              if(matching.length < 1) {
+                new CMS.Models.GDriveFolderPermission({
+                  folder : binding.instance
+                  , person : person
+                  , role : "writer"
+                }).save();
               }
             });
-            if(matching.length < 1) {
-              new CMS.Models.GDriveFolderPermission({
-                folder : binding.instance
-                , person : person
-                , role : "writer"
-              }).save();
-            }
           });
         });
       });
@@ -199,6 +218,12 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     return dfd.then(function foldercheck() {
       if(object.get_mapping("folders").length) {
         //assume we already tried refreshing folders.
+      } else if(object instanceof CMS.Models.Request) {
+        if(that._audit_create_in_progress || object.audit.reify().get_mapping("folders").length < 1) {
+          that.request_create_queue.push(object);
+        } else {
+          that.create_request_folder(object.constructor, {}, object);
+        }
       } else {
         return that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
       }
