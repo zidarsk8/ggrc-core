@@ -10,3 +10,4 @@ dashboard-js-spec-files:
 dashboard-js-template-files:
   - audits/gdrive_info.mustache
   - responses/gdrive_upload_evidence.mustache
+  - programs/gdrive_info.mustache
