@@ -488,7 +488,10 @@
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
 
-      , extended_related_programs:    Multi(["related_programs", "owned_programs"])
+      , authorizations: Indirect("UserRole", "person")
+      , programs_via_authorizations: Cross("authorizations", "program_via_context")
+
+      , extended_related_programs:    Multi(["related_programs", "owned_programs", "programs_via_authorizations"])
       , extended_related_regulations: Multi(["related_regulations", "owned_regulations"])
       , extended_related_contracts:   Multi(["related_contracts", "owned_contracts"])
       , extended_related_policies:    Multi(["related_policies", "owned_policies"])
@@ -503,8 +506,10 @@
       , extended_related_products:    Multi(["related_products", "owned_products"])
       , extended_related_projects:    Multi(["related_projects", "owned_projects"])
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
+    }
 
-      // , authorizations: Indirect("UserRole", )
+    , UserRole : {
+        program_via_context: Indirect("Program", "context")
     }
 
     , Audit : {

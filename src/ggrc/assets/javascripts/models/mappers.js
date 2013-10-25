@@ -1093,11 +1093,11 @@
           , object_join_attr = ('indirect_' + (this.object_join_attr || model.table_plural))
           , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
           , params = {}
-          , object_attr = this.object_attr + (model.attributes[this.object_attr].indexOf('stubs') > -1 ?  '.id' : '_id')
+          , object_attr = this.object_attr + (this.object_attr !== 'context' && model.attributes[this.object_attr].indexOf('stubs') > -1 ?  '.id' : '_id')
           , self = this
           ;
-        params[object_attr] = binding.instance.id; 
-        if (mappings) {
+        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id; 
+        if (mappings || !params[object_attr]) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
         }
@@ -1111,13 +1111,6 @@
 
     , refresh_list: function() {
         return this._refresh_stubs(binding);
-        // // Returns a list which will *only* ever contain fully loaded instances
-        // var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
-        //   , binding = loader.attach(this.instance)
-        //   ;
-
-        // binding.name = this.name + "_instances";
-        // return binding.refresh_instances(this);
       }
   });
 
