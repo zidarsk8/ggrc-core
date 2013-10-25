@@ -7,10 +7,12 @@ from ggrc import db
 from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Hierarchical
 from .object_document import Documentable
+from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 
-class Section(Documentable, Personable, Hierarchical, BusinessObject, db.Model):
+class Section(
+    Documentable, Personable, Hierarchical, Ownable, BusinessObject, db.Model):
   __tablename__ = 'sections'
 
   directive_id = deferred(
