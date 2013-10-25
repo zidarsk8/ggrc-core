@@ -55,7 +55,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 }, {
   request_create_queue : []
 
-  , "{CMS.Models.Program} created" : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
+  , create_program_folder : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
+  , "{CMS.Models.Program} created" : "create_program_folder"
 
   , create_audit_folder : partial_proxy(create_folder, CMS.Models.Audit, function(inst) { return inst.title; }, "program")
   , "{CMS.Models.Audit} created" : function(model, ev, instance) {
@@ -176,6 +177,31 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           }
         });
       });
+    });
+  }
+  , "a.create-folder click" : function(el, ev) {
+    var data = el.closest("[data-model], :data(model)").data("model") || GGRC.make_model_instance(GGRC.page_object);
+    this.create_folder_if_nonexistent(data);
+  }
+  , create_folder_if_nonexistent : function(object) {
+    var dfd = new $.Deferred()
+    , that = this
+    , parent_prop = {
+      "Program" : null
+      , "Audit" : "program"
+      , "Request" : "audit"
+    };
+    if(parent_prop[object.constructor.shortName]) {
+      dfd = this.create_folder_if_nonexistent(object[parent_prop[object.constructor.shortName]].reify());
+    } else {
+      dfd.resolve();
+    }
+    return dfd.then(function foldercheck() {
+      if(object.get_mapping("folders").length) {
+        //assume we already tried refreshing folders.
+      } else {
+        return that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
+      }
     });
   }
 });

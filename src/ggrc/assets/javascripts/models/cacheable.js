@@ -264,7 +264,7 @@ can.Model("can.Model.Cacheable", {
                                           //  -- doesn't work in nested objects).  So we're just going to not merge properties.
       return cache[args.id];
     } else {
-      return can.Model.Cacheable.prototype.__proto__.constructor.newInstance.apply(this, arguments);
+      return this._super.apply(this, arguments);
     }
   }
   , process_args : function(args, names) {
