@@ -165,7 +165,7 @@
         </li>
         -->
         <li>
-          <a href="#"><i class="grcicon-export"></i> Export PBC List</a>
+        <a href="{{parent_instance.viewLink}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
         </li>
       </ul>
       
@@ -176,7 +176,7 @@
         <div class="inner-tree">
           <h6>PBC Requests ({{child_count}})</h6>
           {{#child_options}}
-            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
           {{/child_options}}
         </div>
       {{/if_null}}

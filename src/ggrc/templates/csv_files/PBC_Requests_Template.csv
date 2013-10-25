@@ -1,0 +1,11 @@
+IMPORT TEMPLATE,,,,,,,,,,
+PBC REQUESTS,,,,,,,,,,
+,,,,,,,,,,
+FIELDS,Request Type,Request Description,Objective Code,Notes,Test,Assignee,Audit Contact,Requested On,Due On,Status
+REQUIRED?,,YES,,,,,,,YES,
+******,******,******,******,******,******,******,******,******,******,******
+HELP,Documentation / Interview / Population Sample,HTML Allowed,"If not specified, field will remain blank, highlighted red",,,"If not specified, value will default to Audit Lead",,,MM/DD/YYYY,Draft / Requested / Responded / Ammended Request / Updated Response / Accepted
+******,******,******,******,******,******,******,******,******,******,******
+,Documentation,need screenshot of config file.,,,,,,3/29/2013,3/1/2014,Draft
+,Interview,test,,,,,,7/22/2013,3/1/2014,Requested
+,Population Sample,need screenshot of config file.,,,,,,7/22/2013,3/1/2014,Updated Response
