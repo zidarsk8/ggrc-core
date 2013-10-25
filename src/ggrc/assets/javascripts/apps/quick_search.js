@@ -389,6 +389,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ControlControl", "control", "implemented_control", "implementing_control_controls"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
+      , ["Person", all_object_types,
+          "ObjectPerson", "personable", "person", "object_people"]
       , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
       , ["Section", business_object_types,

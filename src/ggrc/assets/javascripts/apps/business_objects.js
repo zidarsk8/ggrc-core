@@ -243,6 +243,56 @@ $(function() {
         , Contract : {
               _mixins: ["directive"]
             }
+
+        , Person : {
+              _mixins: [
+                  "extended_objectives"
+                , "extended_controls"
+                , "extended_business_objects"
+                ]
+            , Program : {
+                mapping: "extended_related_programs"
+              , fetch_post_process: sort_sections
+              }
+            , Regulation: {
+                mapping: "extended_related_regulations"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+              }
+            , Contract: {
+                mapping: "extended_related_contracts"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+              }
+            , Policy: {
+                mapping: "extended_related_policies"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
+              }
+            , Audit : { 
+                mapping: "extended_related_audits"
+              , allow_mapping : false
+              , draw_children : true
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+            }
+            , Section : {
+                model : CMS.Models.Section
+              , mapping : "extended_related_sections"
+              , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
+              , draw_children : true
+              } 
+            }
         })
     ;
 
