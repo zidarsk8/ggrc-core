@@ -107,8 +107,11 @@ can.Control("GGRC.Controllers.Modals", {
 
         // Search for the people based on the term
         , source : function(request, response) {
-          var query = request.term
-          , that = this;
+          var query = request.term || ''
+            , that = this;
+
+          if (query.indexOf('@') > -1)
+            query = '"' + query + '"';
 
           GGRC.Models.Search
           .search_for_types(
