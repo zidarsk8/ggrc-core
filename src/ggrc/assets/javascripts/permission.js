@@ -72,7 +72,9 @@ $.extend(Permission, (function() {
 
   _is_allowed_for = function(permissions, instance, action) {
     var action_obj = permissions[action] || {}
-      , type_obj = action_obj[instance.kind] || {}
+      , instance_type =
+          instance.constructor ? instance.constructor.shortName : instance.type
+      , type_obj = action_obj[instance_type] || {}
       , conditions_by_context = type_obj['conditions'] || {}
       , context = instance.context || {id: null}
       , conditions = conditions_by_context[context.id] || [];
