@@ -251,6 +251,17 @@ class TextOrHtmlColumnHandler(ColumnHandler):
       value = value.strip()
     return value or ''
 
+class ObjectiveHandler(ColumnHandler):
+
+  def export(self):
+    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    if objective_id:
+      objective = Objective.query.filter_by(id=objective_id).first()
+      return objective.slug
+    else:
+      return objective_id
+
+
 class ContactEmailHandler(ColumnHandler):
 
   def parse_item(self, value):

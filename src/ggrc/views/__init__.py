@@ -473,25 +473,22 @@ def import_policy_sections_template(directive_id):
 
 @app.route("/programs/<program_id>/export_pbcs", methods=['GET'])
 def export_requests(program_id):
-  from flask import current_app
+  from ggrc.converters.requests import RequestsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Audit, Request, Program
 
   options = {}
   program = Program.query.filter_by(id=int(program_id)).first()
   audit = Audit.query.filter_by(program_id=int(program_id)).first()
   options['program'] = program
-  template = "PBC_Requests_Template.csv"
   filename = "{}-requests.csv".format(program.slug)
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   if 'ids' in request.args:
     ids = request.args['ids'].split(",")
     requests = Request.query.filter(Request.id.in_(ids))
   else:
     requests = audit.requests
   options['export'] = True
-  body = render_template("csv_files/" + template)
-  #print [request_.id for request_ in requests]
-  return current_app.make_response((body, 200, headers))
+  return handle_converter_csv_export(filename, requests, RequestsConverter, **options)
 
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])

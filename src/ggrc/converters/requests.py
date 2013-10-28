@@ -21,6 +21,7 @@ class RequestRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
+    self.handle('objective_code', ObjectiveHandler)
     self.handle_date('requested_on')
     self.handle_date('due_on')
     self.handle_option('request_type')
@@ -45,7 +46,7 @@ class RequestsConverter(BaseConverter):
   object_map = OrderedDict([
     ('Request Type', 'request_type'),
     ('Request Description', 'description'),
-    ('Objective Code', 'slug'),
+    ('Objective Code', 'objective_code'),
     ('Notes', 'notes'),
     ('Test', 'test'),
     ('Assignee', 'assignee'),
@@ -59,8 +60,7 @@ class RequestsConverter(BaseConverter):
 
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
-    program = self.program()
-    self.metadata_map = OrderedDict([(program, program.slug)])
+    self.metadata_map = OrderedDict([('Program', self.program().slug)])
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Requests")
