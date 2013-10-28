@@ -9,6 +9,11 @@
               {{#using objective=instance.objective}}
                 {{objective.title}}
               {{/using}}
+              {{#infer_roles instance}}
+                <span class="role">
+                  {{.}}
+                </span>
+              {{/infer_roles}}
             </div>
           </div>
         </div>

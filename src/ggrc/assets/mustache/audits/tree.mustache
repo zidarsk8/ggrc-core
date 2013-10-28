@@ -8,6 +8,11 @@
             <div class="tree-title-area">
               {{instance.title}}
               <span class="small gray">Planned</span>
+              {{#infer_roles instance}}
+                <span class="role">
+                  {{.}}
+                </span>
+              {{/infer_roles}}
             </div>
           </div>
         </div>
