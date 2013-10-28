@@ -27,11 +27,16 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
           return refresh_queue.trigger();
         })
         .then(function(objectives) {
+          var dfds = [];
           can.each(objectives, function(objective) {
-            that.create_request(instance, objective)
-            .then(that.proxy("create_response"));
+            dfds.push(
+              that
+                .create_request(instance, objective)
+                .then(that.proxy("create_response")))
           });
-        });
+          return $.when.apply($, dfds);
+        })
+        .then(function() { instance.refresh(); });
       } else {
         this.create_objective(instance)
         .then(this.proxy("map_objective_to_program", instance.program.reify()))
@@ -40,7 +45,8 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
         })
         .then(that.proxy("create_request", instance))
         .done(that.proxy("update_objective_title"))
-        .done(this.proxy("create_response"));
+        .done(this.proxy("create_response"))
+        .then(function() { instance.refresh(); });
       }
     }
   }
