@@ -287,9 +287,9 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           var picker = new google.picker.PickerBuilder()
           .addView(new google.picker.DocsUploadView().setParent(that.id))
           .addView(google.picker.ViewId.DOCS)
-          //.setOAuthToken(gapi.auth.getToken().access_token)
-          .setAuthUser(oauth_user.email)
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+          //.setOAuthToken(gapi.auth.getToken().access_token) //NB: setOAuthToken is the preferred way of choosing a user for the 
+          .setAuthUser(oauth_user.email)                      // picker, but it doesn't work with DocsUploadView. So we use 
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)  // setAuthUser instead.  --BM 10/28/13
           .setDeveloperKey(GGRC.config.GAPI_KEY)
           .setCallback(pickerCallback)
           .build();
