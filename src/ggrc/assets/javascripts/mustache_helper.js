@@ -25,6 +25,16 @@ function get_template_path(url) {
   return match && match[1];
 }
 
+// Returns an observable object in the current context
+// This allows the helper to inject asynchronous additional content
+function get_binding_observe(name, options) {
+  var context = options.contexts[0];
+  if (!context.attr(name)) {
+    context.attr(name, new can.Observe());
+  }
+  return context.attr(name);
+}
+
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
@@ -1419,5 +1429,81 @@ function is_join(mapping) {
   }
   return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
 }
+
+// Determines and serializes the roles for a user
+Mustache.registerHelper("infer_roles", function(instance, options) {
+  instance = resolve_computed(instance);
+  var state = get_binding_observe("__infer_roles", options)
+    , page_instance = GGRC.page_instance()
+    , person = page_instance instanceof CMS.Models.Person ? page_instance : null
+    ;
+
+  if (person && !state.attr('status')) {
+    state.attr({
+        status: 'loading'
+      , count: 0
+      , roles: new can.Observe.List()
+    });
+
+    // Check for owner
+    if (instance.owner && instance.owner.id === person.id) {
+      state.attr('roles').push('Owner/POC');
+    }
+
+    // Check for people
+    if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
+      state.attr('roles').push('Follower');
+    }
+
+    // Check for authorizations
+    if (instance instanceof CMS.Models.Program) {
+      person.get_list_loader("authorizations").done(function(authorizations) {
+        var context_ids = $.unique($.map(authorizations, function(binding) {
+            if (binding.instance.context)
+              return binding.instance.context.id;
+          }));
+        can.each(context_ids, function(context_id) {
+          CMS.Models.Program.findAll({ context_id: context_id }).done(function(programs) {
+            if (programs && programs[0] && programs[0].id === instance.id) {
+              var finding = [];
+              can.each(authorizations, function(binding) {
+                if (binding.instance.context && binding.instance.context.id === instance.context.id && !finding[instance.context.id]) {
+                  finding[instance.context.id] = true;
+                  CMS.Models.Role.findAll({
+                    id__in: $.map(authorizations, function(binding) {
+                              if (binding.instance.context && binding.instance.context.id === instance.context.id)
+                                return binding.instance.role.id;
+                            }).join(',')
+                  }).done(function(roles) {
+                    can.each(roles, function(role) {
+                      state.attr('roles').push(role.name);
+                    });
+                  })
+                }
+              })
+            }
+          })
+        });
+      });
+    }
+  }
+
+  // Return the result
+  if (!person || state.attr('status') === 'failed') {
+    return '';
+  }
+  if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
+    return options.inverse(options.contexts);
+  }
+  else {
+    if (state.attr('roles').attr('length')) {
+      var result = [];
+      can.each(state.attr('roles'), function(role) {
+        result.push(options.fn(role));
+      });
+      return result.join('');
+    }
+  }
+});
 
 })(this, jQuery, can);

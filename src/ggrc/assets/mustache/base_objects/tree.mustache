@@ -19,6 +19,11 @@
                 {{^instance.title}}
                   {{{firstnonempty instance.description_inline ''}}}
                 {{/instance.title}}
+                {{#infer_roles instance}}
+                  <span class="role">
+                    {{.}}
+                  </span>
+                {{/infer_roles}}
               </div>
             </div>
           </div>
