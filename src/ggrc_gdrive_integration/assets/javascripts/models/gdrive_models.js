@@ -283,16 +283,19 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
 
       // Create and render a Picker object for searching images.
       function createPicker() {
-        var picker = new google.picker.PickerBuilder()
-        .addView(new google.picker.DocsUploadView().setParent(that.id))
-        .addView(google.picker.ViewId.DOCS)
-        .setOAuthToken(gapi.auth.getToken().access_token)
-        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-        .setDeveloperKey(GGRC.config.GAPI_KEY)
-        .setCallback(pickerCallback)
-        .build();
-        
-        picker.setVisible(true);
+        window.oauth_dfd.done(function(token, oauth_user) {
+          var picker = new google.picker.PickerBuilder()
+          .addView(new google.picker.DocsUploadView().setParent(that.id))
+          .addView(google.picker.ViewId.DOCS)
+          .setOAuthToken(gapi.auth.getToken().access_token)
+          .setAuthUser(oauth_user.email)
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+          .setDeveloperKey(GGRC.config.GAPI_KEY)
+          .setCallback(pickerCallback)
+          .build();
+          
+          picker.setVisible(true);
+        });
       }
 
       // A simple callback implementation.

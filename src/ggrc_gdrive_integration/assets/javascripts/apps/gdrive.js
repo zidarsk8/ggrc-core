@@ -68,7 +68,7 @@
           });
       }
       google_oauth = authresult;
-      oauth_dfd.resolve(authresult);
+      oauth_dfd.resolve(authresult, o2result);
     });
   };
 
