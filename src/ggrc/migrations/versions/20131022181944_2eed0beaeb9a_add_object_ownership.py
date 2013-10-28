@@ -67,12 +67,17 @@ def upgrade():
       INSERT INTO object_owners
       (person_id, ownable_id, ownable_type, modified_by_id,
        created_at, updated_at)
-      SELECT modified_by_id, id, "{object_type}" as object_type,
-        modified_by_id as modified_by_id_2,
-        '{current_datetime}' as created_at,
-        '{current_datetime}' as updated_at
+      SELECT
+        joined_people.id,
+        {object_table_name}.id,
+        "{object_type}" AS object_type,
+        joined_people.id AS modified_by_id_2,
+        '{current_datetime}' AS created_at,
+        '{current_datetime}' AS updated_at
       FROM {object_table_name}
-      WHERE modified_by_id IS NOT NULL""".format(
+        LEFT JOIN people AS joined_people
+          ON joined_people.id = {object_table_name}.modified_by_id
+      WHERE joined_people.id IS NOT NULL""".format(
         current_datetime=current_datetime,
         object_table_name=object_table_name,
         object_type=object_type,
