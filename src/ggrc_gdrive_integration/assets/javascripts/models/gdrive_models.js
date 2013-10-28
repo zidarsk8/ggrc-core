@@ -287,7 +287,7 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           var picker = new google.picker.PickerBuilder()
           .addView(new google.picker.DocsUploadView().setParent(that.id))
           .addView(google.picker.ViewId.DOCS)
-          .setOAuthToken(gapi.auth.getToken().access_token)
+          //.setOAuthToken(gapi.auth.getToken().access_token)
           .setAuthUser(oauth_user.email)
           .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
           .setDeveloperKey(GGRC.config.GAPI_KEY)
