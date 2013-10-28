@@ -349,6 +349,19 @@
   background-position:-198px -344px;
 }
 
+.grcicon-gvideo {
+  background-position:-270px -344px;
+}
+.grcicon-gmail {
+  background-position:-174px -344px;
+}
+.grcicon-gphone {
+  background-position:-222px -344px;
+}
+.grcicon-gchat {
+  background-position:-246px -344px;
+}
+
 // Large icons
 .grciconlarge-dashboard {
   background-position:-8px -8px;
@@ -593,6 +606,7 @@ i.short {
   .grcicon-clause-color { background-position:-198px -104px; }
   .grcicon-event-color { background-position:-102px -176px; }
   .grcicon-program-color { background-position:-102px -104px; }
+  .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -8px; }
 
   li {
     &.active,
@@ -626,6 +640,7 @@ i.short {
       .grcicon-clause-color { background-position:-198px -128px; }
       .grcicon-event-color { background-position:-198px -56px; }
       .grcicon-program-color { background-position:-102px -128px; }
+      .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
     }
   }
 }
@@ -666,6 +681,7 @@ i.short {
       .grcicon-help-black { background-position:-78px -32px; }
       .grcicon-x-grey { background-position:-174px -176px; }
       .grcicon-program-color { background-position:-102px -128px; }
+      .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
       .widget-showhide {
         a {
           background-position: -265px -241px;
