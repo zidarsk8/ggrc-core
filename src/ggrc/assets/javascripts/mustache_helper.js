@@ -551,7 +551,7 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
 
 Mustache.registerHelper("render_hooks", function(hook, options) {
 
-  return can.map(can.getObject(hook, GGRC.hooks), function(hook_tmpl) {
+  return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
     return can.Mustache.getHelper("renderLive").fn(hook_tmpl, options.contexts, options);
   }).join("\n");
 });
