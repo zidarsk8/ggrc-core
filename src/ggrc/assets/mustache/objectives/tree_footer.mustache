@@ -7,6 +7,8 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
+{{#with_page_object_as 'page_object'}}
+{{^if_equals page_object.constructor.shortName 'Person'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -28,5 +30,7 @@
     </div>
   </div>
 </li>
+{{/if_equals}}
+{{/with_page_object_as}}
 {{/if}}
 {{/is_allowed_to_map}}

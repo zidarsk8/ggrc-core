@@ -1,3 +1,5 @@
+{{#with_page_object_as 'page_object'}}
+{{^if_equals page_object.constructor.shortName 'Person'}}
   <li class="tree-item tree-item-add tree-footer">
     <div class="row-fluid">
       <div class="span12 section-expandable">
@@ -13,3 +15,5 @@
       </div>
     </div>
   </li>
+{{/if_equals}}
+{{/with_page_object_as}}

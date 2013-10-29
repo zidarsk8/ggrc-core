@@ -1452,7 +1452,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
 
     // Check for people
     if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
-      state.attr('roles').push('Follower');
+      state.attr('roles').push('Mapped');
     }
 
     // Check for authorizations
