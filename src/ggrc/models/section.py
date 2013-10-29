@@ -62,6 +62,13 @@ class Section(
       ]
 
   @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    from directive import Contract
+    if obj.directive and isinstance(obj.directive, Contract):
+      return "CLAUSE"
+    return super(Section, cls).generate_slug_prefix_for(obj)
+
+  @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
