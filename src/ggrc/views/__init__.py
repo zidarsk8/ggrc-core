@@ -234,6 +234,55 @@ def import_controls(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
 
+@app.route("/programs/<program_id>/import_pbcs", methods=['GET', 'POST'])
+def import_requests(program_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.sections import RequestsConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Program
+  import ggrc.views
+
+  program = Program.query.get(directive_id)
+  program_url =\
+    getattr(ggrc.views, program.__class__.__name__).url_for(program)
+
+  if request.method == 'POST':
+
+    if 'cancel' in request.form:
+      return import_redirect(program_url + "#audit_widget")
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        converter = handle_csv_import(RequestsConverter, csv_file,
+          program_id = program_id, dry_run = dry_run)
+
+        if dry_run:
+          return render_template("programs/import_request_result.haml",
+              program_id=int(program_id), converter=converter,
+              results=converter.objects, heading_map=converter.object_map)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect(directive_url + "#audit_widget")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("audits/import_request_errors.haml",
+              program_id = program_id, exception_message = file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("programs/import_request_result.haml", exception_message=e,
+            converter=converter, results=converter.objects,
+            program_id=int(program_id), heading_map=converter.object_map)
+      return render_template("programs/import_request_errors.haml",
+            program_id=int(program_id), exception_message=e)
+
+  return render_template("programs/import_request.haml", program_id=program_id, import_kind='Requests')
+
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
