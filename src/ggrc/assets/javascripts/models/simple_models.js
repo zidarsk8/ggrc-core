@@ -1034,10 +1034,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validatePresenceOf("due_on");
     this.validatePresenceOf("assignee");
     this.validatePresenceOf("objective");
-  }
-  , created : function(ev, instance) {
-    if(instance.constructor === CMS.Models.Request) {
-      instance.audit.reify().refresh();
+    if(this === CMS.Models.Request) {
+      this.bind("created", function(ev, instance) {
+        if(instance.constructor === CMS.Models.Request) {
+          instance.audit.reify().refresh();
+        }
+      });
     }
   }
 }, {
