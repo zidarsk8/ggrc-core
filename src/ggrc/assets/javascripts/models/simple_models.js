@@ -1035,6 +1035,11 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validatePresenceOf("assignee");
     this.validatePresenceOf("objective");
   }
+  , created : function(ev, instance) {
+    if(instance.constructor === CMS.Models.Request) {
+      instance.audit.reify().refresh();
+    }
+  }
 }, {
   response_model_class : function() {
     return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";

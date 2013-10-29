@@ -57,6 +57,12 @@ can.Model.Cacheable("CMS.Models.Response", {
       console.debug("Invalid Response:", params);
     }
   }
+  , created : function(ev, instance) {
+    if(instance.constructor === CMS.Models.Response) {
+      instance.request.reify().refresh();
+    }
+  }
+
   , attributes : {
     owner : "CMS.Models.Person.model"
     , object_documents : "CMS.Models.ObjectDocument.stubs"
