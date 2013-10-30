@@ -260,16 +260,39 @@ class RequestTypeColumnHandler(ColumnHandler):
 
 class RequestTypeColumnHandler(ColumnHandler):
 
-    def parse_item(self, value):
-      from ggrc.models import Request
-      formatted_type = value.lower()
-      if formatted_type in Request.VALID_TYPES:
-        return formatted_type
-      else:
-        self.add_error("Value must be one of the following: {}".format(
-            Request.VALID_TYPES
-        ))
-        return None
+  def parse_item(self, value):
+    from ggrc.models import Request
+    formatted_type = value.strip().lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
+
+
+class RequestStatusColumnHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    from ggrc.models import Request
+    words = value.strip().split()
+    formatted_type = u" ".join(s.capitalize() for s in words)
+    if formatted_type in Request.VALID_STATES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_STATES
+      ))
+      return None
+
+
+class TextOrHtmlColumnHandler(ColumnHandler):
+
+ def parse_item(self, value):
+   if value:
+     value = value.strip()
+   return value or ''
 
 
 class ObjectiveHandler(ColumnHandler):
