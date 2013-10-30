@@ -244,12 +244,33 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
-class TextOrHtmlColumnHandler(ColumnHandler):
+class RequestTypeColumnHandler(ColumnHandler):
 
-  def parse_item(self, value):
-    if value:
-      value = value.strip()
-    return value or ''
+    def parse_item(self, value):
+      from ggrc.models import Request
+      formatted_type = value.lower()
+      if formatted_type in Request.VALID_TYPES:
+        return formatted_type
+      else:
+        self.add_error("Value must be one of the following: {}".format(
+            Request.VALID_TYPES
+        ))
+        return None
+
+
+class RequestTypeColumnHandler(ColumnHandler):
+
+    def parse_item(self, value):
+      from ggrc.models import Request
+      formatted_type = value.lower()
+      if formatted_type in Request.VALID_TYPES:
+        return formatted_type
+      else:
+        self.add_error("Value must be one of the following: {}".format(
+            Request.VALID_TYPES
+        ))
+        return None
+
 
 class ObjectiveHandler(ColumnHandler):
 

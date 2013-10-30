@@ -22,9 +22,9 @@ class RequestRowConverter(BaseRowConverter):
   def reify(self):
     self.handle('slug', SlugColumnHandler)
     self.handle('objective_code', ObjectiveHandler)
+    self.handle('request_type', RequestTypeColumnHandler)
     self.handle_date('requested_on')
     self.handle_date('due_on')
-    self.handle_option('request_type')
     self.handle_option('status')
     self.handle_text_or_html('description')
     self.handle_text_or_html('test')
@@ -67,7 +67,6 @@ class RequestsConverter(BaseConverter):
       self.errors.append('Program Code must be {}'.format(self.program().slug))
 
   def validate_metadata(self, attrs):
-    print attrs
     self.validate_metadata_type(attrs, "Requests")
     self.validate_code(attrs)
 
