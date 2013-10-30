@@ -31,6 +31,14 @@
             =all_warnings[loop.index0]
 
       -include "directives/_import_table.haml"
+        
+      -if has_errors
+        .alert.alert-error
+          %button{ 'type': 'button', 'class': 'close', 'data-dismiss': 'alert' }
+            &times;
+          %strong
+            Error!
+          Correct Errors on gSheet and Upload a new CSV
 
   .import-actions
     .row-fluid
@@ -38,7 +46,7 @@
           %input{ 'value': 'Cancel', 'class': 'btn btn-large', 'type': 'submit', 'name': 'cancel' }
         .span6
           -if has_errors
-            %input{ 'value': 'Correct Errors Before Proceeding', 'class': 'btn btn-large btn-danger pull-right', 'type': 'submit', 'name': 'confirm', 'disabled': True }
+            &nbsp;
           -elif has_warnings
             %input{ 'value': 'Proceed with Caution', 'class': 'btn btn-large btn-warning pull-right', 'type': 'submit', 'name': 'confirm' }
           -else
