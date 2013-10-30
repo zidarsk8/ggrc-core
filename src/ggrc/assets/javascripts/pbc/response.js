@@ -21,6 +21,12 @@ can.Model.Cacheable("CMS.Models.Response", {
     this.cache = {};
     if(this !== CMS.Models.Response) {
       CMS.Models.Response.subclasses.push(this);
+    } else {
+      this.bind("created", function(ev, instance) {
+        if(instance instanceof CMS.Models.Response) {
+          instance.request.reify().refresh();
+        }
+      });
     }
   }
   , create : "POST /api/responses"
@@ -57,6 +63,8 @@ can.Model.Cacheable("CMS.Models.Response", {
       console.debug("Invalid Response:", params);
     }
   }
+
+
   , attributes : {
     owner : "CMS.Models.Person.model"
     , object_documents : "CMS.Models.ObjectDocument.stubs"

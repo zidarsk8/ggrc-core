@@ -590,23 +590,41 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function(params) {
-    var href = this.selfLink || this.href;
+    var href = this.selfLink || this.href
+    , that = this;
 
     if (!href)
       return (new can.Deferred()).reject();
-    return $.ajax({
-      url : href
-      , params : params
-      , type : "get"
-      , dataType : "json"
-    })
-    .then(can.proxy(this.constructor, "model"))
-    .done(function(d) {
-      d.updated();
-      //  Trigger complete refresh of object -- slow, but fixes live-binding
-      //  redraws in some cases
-      can.trigger(d, "change", "*");
-    });
+
+    if(!this._pending_refresh) {
+      this._pending_refresh = {
+        dfd : new $.Deferred()
+        , fn : $.debounce(1000, function() {
+          var dfd = that._pending_refresh.dfd;
+          delete that._pending_refresh;
+          $.ajax({
+            url : href
+            , params : params
+            , type : "get"
+            , dataType : "json"
+          })
+          .then(can.proxy(that.constructor, "model"))
+          .done(function(d) {
+            d.updated();
+            //  Trigger complete refresh of object -- slow, but fixes live-binding
+            //  redraws in some cases
+            can.trigger(d, "change", "*");
+            dfd.resolve(d);
+          })
+          .fail(function() {
+            dfd.reject.apply(dfd, arguments);
+          });
+        })
+      };
+    }
+    
+    this._pending_refresh.fn();
+    return this._pending_refresh.dfd;
   }
   , attr : function() {
     if(arguments.length < 1) {
