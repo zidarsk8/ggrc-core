@@ -469,6 +469,15 @@ ul.new-tree {
   }
   .tree-info {
     @include oneline();
+    a {
+      &.reference {
+        display: inline;
+      }
+      &.shrink-it {
+        display: inline-block;
+        @include oneline();
+      }
+    }
     font-size:13px;
     .tree-info-list {
       @include reset-list();
