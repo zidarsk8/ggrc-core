@@ -58,11 +58,16 @@ class RequestsConverter(BaseConverter):
 
   row_converter = RequestRowConverter
 
-  # Creates the correct metadata_map for the specific directive kind.
-  def create_metadata_map(self):
-    self.metadata_map = OrderedDict([('Program', self.program().slug)])
+  # Overwrite validate functions since they assume a program rather than a directive
+
+  def validate_code(self, attrs):
+    if not attrs.get('slug'):
+      self.errors.append('Missing Program Code heading')
+    elif attrs['slug'] != self.program().slug:
+      self.errors.append('Program Code must be {}'.format(self.program().slug))
 
   def validate_metadata(self, attrs):
+    print attrs
     self.validate_metadata_type(attrs, "Requests")
     self.validate_code(attrs)
 
@@ -70,6 +75,9 @@ class RequestsConverter(BaseConverter):
     return self.options['program']
 
   def do_export_metadata(self):
+    print "entering requests::do_export_metadata"
+    print "****metadata_map: ", self.metadata_map
+    print "****metadata_map keys:", self.metadata_map.keys()
     yield self.metadata_map.keys()
     yield ['Requests', self.program().slug]
     yield[]

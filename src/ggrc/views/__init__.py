@@ -238,12 +238,12 @@ def import_controls(directive_id):
 def import_requests(program_id):
   from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
-  from ggrc.converters.sections import RequestsConverter
+  from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Program
   import ggrc.views
 
-  program = Program.query.get(directive_id)
+  program = Program.query.get(program_id)
   program_url =\
     getattr(ggrc.views, program.__class__.__name__).url_for(program)
 
@@ -257,7 +257,7 @@ def import_requests(program_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(RequestsConverter, csv_file,
-          program_id = program_id, dry_run = dry_run)
+          program = program, dry_run = dry_run)
 
         if dry_run:
           return render_template("programs/import_request_result.haml",
@@ -266,7 +266,7 @@ def import_requests(program_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url + "#audit_widget")
+          return import_redirect(program_url + "#audit_widget")
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("audits/import_request_errors.haml",

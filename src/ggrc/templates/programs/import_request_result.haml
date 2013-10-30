@@ -3,8 +3,8 @@
 -# Created By: silas@reciprocitylabs.com
 -# Maintained By: silas@reciprocitylabs.com
 
--set width_pcts = [25, 25, 25, 25]
--set column_names = ["slug", "title", "description", "controls"]
+-set width_pcts = [5, 10, 5, 10, 10, 5, 5, 5, 5, 5]
+-set column_names = ["request_type", "description", "objective_code", "notes", "test", "assignee", "auditor_contact", "requested_on", "due_on", "status"]
 -set header_overrides = {}
 -set all_errors = converter.errors
 -set has_errors = converter.has_errors()
@@ -16,7 +16,7 @@
     Data to Import
 
   %h3
-    Directive:
+    Program:
     %strong {{converter.import_slug}}
 
   .row-fluid
@@ -30,7 +30,7 @@
           %p.label-warning
             =all_warnings[loop.index0]
 
-      -include "directives/_import_request_table.haml"
+      -include "programs/_import_request_table.haml"
 
   .import-actions
     .row-fluid
