@@ -20,7 +20,6 @@ class RequestRowConverter(BaseRowConverter):
       self.add_warning('slug', "Request already exists and will be updated")
 
   def reify(self):
-    self.handle('slug', SlugColumnHandler)
     self.handle('objective_code', ObjectiveHandler)
     self.handle('request_type', RequestTypeColumnHandler)
     self.handle('status', RequestStatusColumnHandler)
@@ -33,8 +32,7 @@ class RequestRowConverter(BaseRowConverter):
     self.handle('assignee', ContactEmailHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
-    if options.get('audit_id'):
-      db_session.add(self.obj)
+    db_session.add(self.obj)
 
 class RequestsConverter(BaseConverter):
 
