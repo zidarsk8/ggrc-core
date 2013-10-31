@@ -20,7 +20,7 @@ class RequestRowConverter(BaseRowConverter):
       self.add_warning('slug', "Request already exists and will be updated")
 
   def reify(self):
-    self.handle('objective_code', ObjectiveHandler)
+    self.handle('objective_id', ObjectiveHandler)
     self.handle('request_type', RequestTypeColumnHandler)
     self.handle('status', RequestStatusColumnHandler)
     self.handle_date('requested_on')
@@ -46,7 +46,7 @@ class RequestsConverter(BaseConverter):
   object_map = OrderedDict([
     ('Request Type', 'request_type'),
     ('Request Description', 'description'),
-    ('Objective Code', 'objective_code'),
+    ('Objective Code', 'objective_id'),
     ('Notes', 'notes'),
     ('Test', 'test'),
     ('Assignee', 'assignee'),

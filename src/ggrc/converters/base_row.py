@@ -295,17 +295,6 @@ class TextOrHtmlColumnHandler(ColumnHandler):
    return value or ''
 
 
-class ObjectiveHandler(ColumnHandler):
-
-  def export(self):
-    objective_id = getattr(self.importer.obj, 'objective_id', '')
-    if objective_id:
-      objective = Objective.query.filter_by(id=objective_id).first()
-      return objective.slug
-    else:
-      return objective_id
-
-
 class ContactEmailHandler(ColumnHandler):
 
   def parse_item(self, value):
@@ -618,6 +607,35 @@ class LinksHandler(ColumnHandler):
       # Overwrite with only imported links
       if hasattr(obj, self.options.get('association')):
         setattr(obj, self.options.get('association'), self.imported_links())
+
+class ObjectiveHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the objective_id, otherwise throw error
+    objective = Objective.query.filter_by(slug=value.upper()).first()
+    if not objective:
+      self.add_error("Objective code {} does not exist.".format(value))
+    else:
+      return objective.id
+
+  def export(self):
+    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    if objective_id:
+      objective = Objective.query.filter_by(id=objective_id).first()
+      return objective.slug
+    else:
+      return objective_id
+
+  def display(self):
+    # self.importer.obj[self.key] only returns objective id
+    # need to return corresponding objective slug or empty string
+    objective_id = getattr(self.importer.obj, self.key, '') or ''
+    if objective_id:
+      objective = Objective.query.get(objective_id)
+      if objective:
+        return objective.slug
+    return ''
+
 
 class LinkControlsHandler(LinksHandler):
 
