@@ -32,7 +32,9 @@ class RequestRowConverter(BaseRowConverter):
     self.handle('assignee', ContactEmailHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
-    db_session.add(self.obj)
+    if options.get('audit'):
+      self.obj.audit_id = options.get('audit').id
+      db_session.add(self.obj)
 
 class RequestsConverter(BaseConverter):
 
@@ -72,9 +74,6 @@ class RequestsConverter(BaseConverter):
     return self.options['program']
 
   def do_export_metadata(self):
-    print "entering requests::do_export_metadata"
-    print "****metadata_map: ", self.metadata_map
-    print "****metadata_map keys:", self.metadata_map.keys()
     yield self.metadata_map.keys()
     yield ['Requests', self.program().slug]
     yield[]

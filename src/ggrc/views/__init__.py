@@ -240,10 +240,12 @@ def import_requests(program_id):
   from ggrc.converters.common import ImportException
   from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Program
+  from ggrc.models import Audit, Program
   import ggrc.views
 
   program = Program.query.get(program_id)
+  audit = Audit.query.get(program_id)
+  #audit = Audit.query.filter_by(program_id=int(program_id)).first()
   program_url =\
     getattr(ggrc.views, program.__class__.__name__).url_for(program)
 
@@ -257,7 +259,7 @@ def import_requests(program_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(RequestsConverter, csv_file,
-          program = program, dry_run = dry_run)
+          program = program, audit = audit, dry_run = dry_run)
 
         if dry_run:
           return render_template("programs/import_request_result.haml",
