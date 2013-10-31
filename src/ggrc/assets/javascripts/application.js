@@ -747,6 +747,16 @@ $(window).load(function(){
       $(this).addClass('shrink-it');
     } 
   });
+  
+  // Popover trigger for person tooltip in styleguide
+  if($('.person-tooltip-trigger').length > 0) {
+    $('.person-tooltip-trigger').popover({
+      html: true,
+      content: function() {
+        return $(this).closest('.person-holder').find('.custom-popover-content').html();
+      }
+    });
+  }
 
 });
 
