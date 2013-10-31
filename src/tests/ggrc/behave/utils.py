@@ -114,6 +114,7 @@ def handle_post_fails_with_status_and_content(context, name, expected_status, co
 
 def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)
+  print 'handle_post_named_example', example.resource_type
   response = post_example(
       context, example.resource_type, example.value)
   assert response.status_code == expected_status, \
@@ -126,6 +127,7 @@ def handle_post_named_example(context, name, expected_status=201):
 def post_to_endpoint(context, endpoint, data, url=None):
   if url is None:
     url = get_service_endpoint_url(context, endpoint)
+  print endpoint, url
   headers = {
       'Content-Type': 'application/json',
       'X-Requested-By': 'Reciprocity Behave Tests',
@@ -164,6 +166,7 @@ def post_to_endpoint(context, endpoint, data, url=None):
   return response
 
 def post_example(context, resource_type, example, url=None, rbac_context=None):
+  print 'post_example', resource_type
   if rbac_context is None:
     rbac_context = example.get("context", None)
 

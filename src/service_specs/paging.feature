@@ -76,11 +76,6 @@ Feature: Collections can be paged
       | Product            |
       | Project            |
       | Program            |
-      | Request            |
-      #| Response           |
-      | DocumentationResponse     |
-      | InterviewResponse         |
-      | PopulationSampleResponse  |
       | Risk               |
       | RiskyAttribute     |
       | Section            |
