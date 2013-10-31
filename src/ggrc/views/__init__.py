@@ -285,6 +285,19 @@ def import_requests(program_id):
 
   return render_template("programs/import_request.haml", program_id=program_id, import_kind='Requests')
 
+
+@app.route("/programs/<program_id>/import_pbc_template", methods=['GET'])
+def import_requests_template(program_id):
+  from flask import current_app
+  from ggrc.models.all_models import Program
+  program = Program.query.filter_by(id=int(program_id)).first()
+  template = "Request_Import_Template.csv"
+  filename = "{}-requests.csv".format(program.slug)
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  options = {'program_slug': program.slug}
+  body = render_template("csv_files/" + template, **options)
+  return current_app.make_response((body, 200, headers))
+
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
