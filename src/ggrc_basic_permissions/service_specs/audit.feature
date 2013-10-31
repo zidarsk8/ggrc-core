@@ -108,10 +108,97 @@ Feature: Private Program Audits and Role Implication
     Then PUT of "request" is allowed
     Then GET of "request" is allowed
     Then DELETE of "request" is forbidden
+    Given a new "DocumentationResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Then POST of "response" to its collection is allowed
+    Then GET of "response" is allowed
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
 
-  #Scenario: ProgramEditor has ProgramAuditEditor permissions
+  Scenario: ProgramEditor has ProgramAuditEditor permissions
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "audit" is allowed
+    Then PUT of "audit" is allowed
+    Then GET of "audit" is allowed
+    Then DELETE of "audit" is forbidden
+    Given a new "Objective" named "objective"
+    And "objective" is POSTed to its collection
+    And a new "Request" named "request"
+    And link property "context" of "request" is link property "context" of "audit"
+    And "request" link property "audit" is "audit"
+    And "request" link property "objective" is "objective"
+    And "request" link property "assignee" is "assignee"
+    Then POST of "request" to its collection is allowed
+    Then GET of "request" is allowed
+    Then PUT of "request" is allowed
+    Then GET of "request" is allowed
+    Then DELETE of "request" is forbidden
+    Given a new "DocumentationResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Then POST of "response" to its collection is allowed
+    Then GET of "response" is allowed
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
 
-  #Scenario: ProgramReader has ProgramAuditReader permissions
+  Scenario: ProgramReader has ProgramAuditReader permissions
+    Given the current user
+      """
+      { "email": "program.reader@example.com" }
+      """
+    Then GET of "audit" is allowed
+    Then PUT of "audit" is forbidden
+    Then GET of "audit" is allowed
+    Then DELETE of "audit" is forbidden
+    Given a new "Objective" named "objective"
+    And "objective" is POSTed to its collection
+    And a new "Request" named "request"
+    And link property "context" of "request" is link property "context" of "audit"
+    And "request" link property "audit" is "audit"
+    And "request" link property "objective" is "objective"
+    And "request" link property "assignee" is "assignee"
+    Then POST of "request" to its collection is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then POST of "request" to its collection is allowed
+    Then GET of "request" is allowed
+    Given the current user
+      """
+      { "email": "program.reader@example.com" }
+      """
+    Then GET of "request" is allowed
+    Then PUT of "request" is forbidden
+    Then GET of "request" is allowed
+    Then DELETE of "request" is forbidden
+    Given a new "DocumentationResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Then POST of "response" to its collection is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then POST of "response" to its collection is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "program.reader@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then PUT of "response" is forbidden
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
 
   #Scenario: Auditors can create, read, and update requests
 
