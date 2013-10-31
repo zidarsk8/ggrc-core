@@ -409,6 +409,19 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
+    When "response" property "status" is "Accepted"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
     When "response" property "status" is "Completed"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
@@ -417,14 +430,7 @@ Feature: Private Program Audits and Role Implication
       { "email": "auditor@example.com" }
       """
     Then GET of "response" is allowed
-    Given the current user
-      """
-      { "email": "program.editor@example.com" }
-      """
-    Then GET of "response" is allowed
-    When "response" property "status" is "Accepted"
-    Then PUT of "response" is allowed
-    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
     Given the current user
       """
       { "email": "auditor@example.com" }
@@ -450,21 +456,20 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Completed"
+    When "response" property "status" is "Accepted"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user
       """
       { "email": "auditor@example.com" }
       """
-    Then GET of "response" is allowed
-    Then DELETE of "response" is forbidden
+    Then GET of "response" is forbidden
     Given the current user
       """
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Accepted"
+    When "response" property "status" is "Completed"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user
@@ -511,21 +516,20 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Completed"
+    When "response" property "status" is "Accepted"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user
       """
       { "email": "auditor@example.com" }
       """
-    Then GET of "response" is allowed
-    Then DELETE of "response" is forbidden
+    Then GET of "response" is forbidden
     Given the current user
       """
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Accepted"
+    When "response" property "status" is "Completed"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user

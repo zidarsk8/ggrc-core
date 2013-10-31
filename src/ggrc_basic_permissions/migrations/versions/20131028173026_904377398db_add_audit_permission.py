@@ -161,25 +161,25 @@ auditor_read_objects = [
   'Audit', 'Request',
   {
     'type': 'DocumentationResponse',
-    'condition': 'in',
+    'condition': 'is',
     'terms': {
-      'value': ['Completed','Accepted',],
+      'value': 'Completed',
       'property_name': 'status',
       },
     },
   {
     'type': 'InterviewResponse',
-    'condition': 'in',
+    'condition': 'is',
     'terms': {
-      'value': ['Completed','Accepted',],
+      'value': 'Completed',
       'property_name': 'status',
       },
     },
   {
     'type': 'PopulationSampleResponse',
-    'condition': 'in',
+    'condition': 'is',
     'terms': {
-      'value': ['Completed','Accepted',],
+      'value': 'Completed',
       'property_name': 'status',
       },
     },
