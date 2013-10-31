@@ -37,7 +37,7 @@ class DefaultUserPermissionsProvider(object):
     return DefaultUserPermissions()
 
 def resolve_permission_variable(value):
-  if type(value) is str:
+  if type(value) is str or type(value) is unicode:
     if value.startswith('$'):
       if value == '$current_user':
         return current_user

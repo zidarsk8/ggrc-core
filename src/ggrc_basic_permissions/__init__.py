@@ -100,6 +100,8 @@ class UserPermissions(DefaultUserPermissions):
     else:
       session['permissions'] = load_permissions_for(user)
       session['permissions__ts'] = None
+      from pprint import pprint
+      pprint(session['permissions'])
 
 def collect_permissions(src_permissions, context_id, permissions):
   for action, resource_permissions in src_permissions.items():
