@@ -309,7 +309,35 @@ Feature: Private Program Audits and Role Implication
     Then GET of "response" is allowed
     Then DELETE of "response" is forbidden
 
-  #Scenario: Auditors can create, read, and update requests
+  Scenario: Auditors can create, read, and update requests
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "audit" is allowed
+    Then PUT of "audit" is forbidden
+    Then GET of "audit" is allowed
+    Then DELETE of "audit" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Given a new "Objective" named "objective"
+    And "objective" is POSTed to its collection
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    And a new "Request" named "request"
+    And link property "context" of "request" is link property "context" of "audit"
+    And "request" link property "audit" is "audit"
+    And "request" link property "objective" is "objective"
+    And "request" link property "assignee" is "assignee"
+    Then POST of "request" to its collection is allowed
+    Then GET of "request" is allowed
+    Then PUT of "request" is allowed
+    Then GET of "request" is allowed
+    Then DELETE of "request" is forbidden
 
   #Scenario: Auditors can read responses that are in a valid state
 
