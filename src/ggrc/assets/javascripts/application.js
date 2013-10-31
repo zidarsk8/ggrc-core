@@ -741,6 +741,13 @@ $(window).load(function(){
     $this.removeClass("active");
     return false;
   });
+  
+  // References popup preview
+  $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
+    if($(this).width() > $('.new-tree .tree-info').width()) {
+      $(this).addClass('shrink-it');
+    } 
+  });
 
 });
 
