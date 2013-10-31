@@ -35,13 +35,10 @@ can.Model.Cacheable("can.Model.Join", {
     }
   }
 }, {
-    init : function() {
-      this._super && this._super.apply(this, arguments);
-      this.reinit();
-    }
-  , reinit : function() {//ev, data) {
+    reinit : function() {//ev, data) {
       this.init_join_objects();
-  }
+    }
+  /* TODO: Dead code?
   , getOtherSide : function(obj) {
     var that = this;
     var keys = $.extend({}, this.constructor.join_keys);
@@ -59,7 +56,7 @@ can.Model.Cacheable("can.Model.Join", {
     } else {
       return null;
     }
-  }
+  }*/
 
   , init_join_object_with_type: function(attr) {
       if(this[attr] instanceof can.Model) {
