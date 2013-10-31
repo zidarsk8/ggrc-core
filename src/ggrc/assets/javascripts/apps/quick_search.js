@@ -463,6 +463,14 @@ $(function() {
     if(ev.which === 13)
       obs.attr("value", $(ev.target).val());
   });
+  $("#lhs").bind("click", "input.my-work", function(ev) {
+    var target = $(ev.target);
+    if (target.is('input.my-work')) {
+      var checked = target.prop("checked");
+      obs.attr("my_work", checked);
+      target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+    }
+  });
   $("#lhs").cms_controllers_lhn_search({ observer: obs });
 
   function bindQuickSearch(ev, opts) {
