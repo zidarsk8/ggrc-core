@@ -35,7 +35,7 @@ Feature: String and Text column HTML sanitization
       | Product           | title, version, description |
       | Program           | title, description |
       | Project           | title, description |
-      | Request           | gdrive_upload_path |
+      #| Request           | gdrive_upload_path |
       #| Response          | status |
       #| DocumentationResponse     | title, description |
       #| InterviewResponse         | title, description |

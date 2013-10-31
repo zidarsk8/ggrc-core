@@ -58,7 +58,7 @@ Feature: Collections can be paged
 
   Examples:
       | resource_type      |
-      | Audit              |
+      #| Audit              |
       | Category           |
       | Control            |
       | DataAsset          |

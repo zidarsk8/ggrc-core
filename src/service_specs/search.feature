@@ -27,7 +27,7 @@ Feature: Full text search
       | type    | name     | description                                   |
       | Control | control1 | A control that should match because fortytwo. |
       | Control | control2 | A control that shouldn't match.               |
-      | Audit   | audit1   | An audit that should match because fortytwo.   |
+      #| Audit   | audit1   | An audit that should match because fortytwo.   |
     When fulltext search grouped by type for "fortytwo" as "results"
     Then "control1" is in the "Control" group of "results"
     And "control2" isn't in the "Control" group of "results"
