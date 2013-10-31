@@ -300,6 +300,19 @@ ul.new-tree {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
     }
+    .inner-item-count {
+      padding-right: 20px;
+      color: $black;
+      font-size: 12px;
+      font-weight: bold;
+      @include opacity(0.3);
+    }
+    .response-connect {
+      font-style: italic;
+      span {
+        text-transform: uppercase;
+      }
+    }
     &.governance,
     &.control,
     &.objective,
@@ -365,6 +378,13 @@ ul.new-tree {
     }
     .gray {
       color: $gray;
+    }
+    .assignee {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+      margin-left: 6px;
     }
     .section-item-count {
       float: right;
@@ -496,6 +516,9 @@ ul.new-tree {
       }
       &.item-open {
         .tree-title-area {
+          @include opacity(1);
+        }
+        .inner-item-count {
           @include opacity(1);
         }
       }
@@ -762,6 +785,17 @@ ul.new-tree {
         i {
           @include opacity(1);
         }
+      }
+    }
+    .title-path {
+      text-transform: none;
+      color: $gray;
+      font-weight: normal;
+      float: right;
+      margin-right: 20px;
+      i {
+        margin-top: 4px;
+        @include opacity(0.3);
       }
     }
   }
