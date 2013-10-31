@@ -371,7 +371,6 @@ Feature: Private Program Audits and Role Implication
       """
     Then POST of "response" to its collection is forbidden
 
-  @wip
   Scenario: Auditors can read responses that are in a valid state
     Given the current user
       """
@@ -541,6 +540,15 @@ Feature: Private Program Audits and Role Implication
 
   #Scenario: Auditors can update responses in a limited, validated, way
 
-  #Scenario: Auditors can read business and governance objects
+  #Scenario: Auditors can read business and governance objects (eventually, scoped... but that's tough)
 
-  #Scenario: Auditors have AuditorProgramReader permissions in the audited program
+  @wip
+  Scenario: Auditors have AuditorProgramReader permissions in the audited program
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "private_program" is allowed
+    Then PUT of "private_program" is forbidden
+    Then GET of "private_program" is allowed
+    Then DELETE of "private_program" is forbidden

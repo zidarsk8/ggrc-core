@@ -298,10 +298,10 @@ def create_private_program_audit_role_implications(
   db.session.flush()
   #Role implied from Audit for Private Program context
   db.session.add(RoleImplication(
-      source_context=program_context,
+      source_context=audit_context,
       source_role=basic_roles.auditor(),
       role=basic_roles.auditor_program_reader(),
-      context=audit_context,
+      context=program_context,
       modified_by=get_current_user(),
       ))
   db.session.flush()
