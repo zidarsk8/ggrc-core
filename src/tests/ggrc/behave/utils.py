@@ -83,7 +83,6 @@ def put_resource(context, url, resource):
       }
   if hasattr(context, 'current_user_json'):
     headers['X-ggrc-user'] = context.current_user_json
-  print 'put_resource', resource, resource.value
   data = as_json(resource.value)
   response = requests.put(
       context.base_url+url,
@@ -100,12 +99,9 @@ def handle_get_example_resource(context, name, expected_status=200):
   response = get_resource(context, url)
   assert response.status_code == expected_status
   if expected_status == 200 or expected_status == 201:
-    print '###handle_get_example_resource###', response.json()
     example = Example(
         example.resource_type, response.json(), response=response)
-    print '###handle_get_example_resource  example.value###', example.value
     setattr(context, name, example)
-    print '*&*&*&*&*&*&*&*&', getattr(context, name, example).value
 
 def handle_post_fails_with_status_and_content(context, name, expected_status, content):
   example = getattr(context, name)
@@ -118,7 +114,6 @@ def handle_post_fails_with_status_and_content(context, name, expected_status, co
 
 def handle_post_named_example(context, name, expected_status=201):
   example = getattr(context, name)
-  print 'handle_post_named_example', example.resource_type
   response = post_example(
       context, example.resource_type, example.value)
   assert response.status_code == expected_status, \
@@ -131,7 +126,6 @@ def handle_post_named_example(context, name, expected_status=201):
 def post_to_endpoint(context, endpoint, data, url=None):
   if url is None:
     url = get_service_endpoint_url(context, endpoint)
-  print endpoint, url
   headers = {
       'Content-Type': 'application/json',
       'X-Requested-By': 'Reciprocity Behave Tests',
@@ -170,7 +164,6 @@ def post_to_endpoint(context, endpoint, data, url=None):
   return response
 
 def post_example(context, resource_type, example, url=None, rbac_context=None):
-  print 'post_example', resource_type
   if rbac_context is None:
     rbac_context = example.get("context", None)
 

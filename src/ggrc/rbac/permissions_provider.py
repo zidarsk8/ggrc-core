@@ -54,17 +54,13 @@ def ContainsCondition(instance, value, list_property):
   return value in list_value
 
 def IsCondition(instance, value, property_name):
-  print '***** IsCondition *****'
   value = resolve_permission_variable(value)
   property_value = getattr(instance, property_name)
-  print 'value', value, '  property_value', property_value
   return value == property_value
 
 def InCondition(instance, value, property_name):
-  print '***** InCondition *****'
   value = resolve_permission_variable(value)
   property_value = getattr(instance, property_name)
-  print 'value', value, '  property_value', property_value
   return property_value in value
 
 """

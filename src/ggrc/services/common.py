@@ -340,7 +340,6 @@ class Resource(ModelView):
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(object_for_json))]))
-    print '***GET***', object_for_json
     return self.json_success_response(
       object_for_json, self.modified_at(obj))
 
@@ -380,7 +379,6 @@ class Resource(ModelView):
     if header_error:
       return header_error
     src = UnicodeSafeJsonWrapper(self.request.json)
-    print '***PUT src***', src
     root_attribute = self.model._inflector.table_singular
     try:
       src = src[root_attribute]
@@ -403,7 +401,6 @@ class Resource(ModelView):
     db.session.commit()
     obj = self.get_object(id)
     update_index(db.session, modified_objects)
-    print '***PUT***', self.object_for_json(obj)
     return self.json_success_response(
         self.object_for_json(obj), self.modified_at(obj))
 
