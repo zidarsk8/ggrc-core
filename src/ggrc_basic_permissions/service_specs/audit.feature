@@ -542,7 +542,6 @@ Feature: Private Program Audits and Role Implication
 
   #Scenario: Auditors can read business and governance objects (eventually, scoped... but that's tough)
 
-  @wip
   Scenario: Auditors have AuditorProgramReader permissions in the audited program
     Given the current user
       """
