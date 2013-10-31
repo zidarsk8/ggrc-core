@@ -309,7 +309,7 @@ Feature: Private Program Audits and Role Implication
     Then GET of "response" is allowed
     Then DELETE of "response" is forbidden
 
-  Scenario: Auditors can create, read, and update requests
+  Scenario: Auditors can create, read, and update requests but cannot create responses
     Given the current user
       """
       { "email": "auditor@example.com" }
@@ -338,8 +338,202 @@ Feature: Private Program Audits and Role Implication
     Then PUT of "request" is allowed
     Then GET of "request" is allowed
     Then DELETE of "request" is forbidden
+    Given a new "DocumentationResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Then POST of "response" to its collection is forbidden
+    Given a new "InterviewResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Then POST of "response" to its collection is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Given a new "Document" named "population_worksheet"
+    And "population_worksheet" is POSTed to its collection
+    Given a new "Document" named "sample_worksheet"
+    And "sample_worksheet" is POSTed to its collection
+    Given a new "Document" named "sample_evidence"
+    And "sample_evidence" is POSTed to its collection
+    Given a new "PopulationSampleResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "population_worksheet" is "population_worksheet"
+    And "response" link property "sample_worksheet" is "sample_worksheet"
+    And "response" link property "sample_evidence" is "sample_evidence"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then POST of "response" to its collection is forbidden
 
-  #Scenario: Auditors can read responses that are in a valid state
+  @wip
+  Scenario: Auditors can read responses that are in a valid state
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Given a new "Objective" named "objective"
+    And "objective" is POSTed to its collection
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    And a new "Request" named "request"
+    And link property "context" of "request" is link property "context" of "audit"
+    And "request" link property "audit" is "audit"
+    And "request" link property "objective" is "objective"
+    And "request" link property "assignee" is "assignee"
+    Then POST of "request" to its collection is allowed
+    Given a new "DocumentationResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then POST of "response" to its collection is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Completed"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Accepted"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
+    Given a new "InterviewResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then POST of "response" to its collection is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Completed"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Accepted"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Given a new "Document" named "population_worksheet"
+    And "population_worksheet" is POSTed to its collection
+    Given a new "Document" named "sample_worksheet"
+    And "sample_worksheet" is POSTed to its collection
+    Given a new "Document" named "sample_evidence"
+    And "sample_evidence" is POSTed to its collection
+    Given a new "PopulationSampleResponse" named "response"
+    And link property "context" of "response" is link property "context" of "audit"
+    And "response" link property "population_worksheet" is "population_worksheet"
+    And "response" link property "sample_worksheet" is "sample_worksheet"
+    And "response" link property "sample_evidence" is "sample_evidence"
+    And "response" link property "request" is "request"
+    And "response" property "status" is "Assigned"
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then POST of "response" to its collection is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then POST of "response" to its collection is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Completed"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
+    Given the current user
+      """
+      { "email": "program.editor@example.com" }
+      """
+    Then GET of "response" is allowed
+    When "response" property "status" is "Accepted"
+    Then PUT of "response" is allowed
+    Then GET of "response" is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "response" is allowed
+    Then DELETE of "response" is forbidden
 
   #Scenario: Auditors can update responses in a limited, validated, way
 

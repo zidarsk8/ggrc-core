@@ -157,6 +157,34 @@ audit_owner_create.append('Audit')
 audit_read_objects = list(audit_create_objects)
 audit_read_objects.append('Audit')
 
+auditor_read_objects = [
+  'Audit', 'Request',
+  {
+    'type': 'DocumentationResponse',
+    'condition': 'in',
+    'terms': {
+      'value': ['Completed','Accepted',],
+      'property_name': 'status',
+      },
+    },
+  {
+    'type': 'InterviewResponse',
+    'condition': 'in',
+    'terms': {
+      'value': ['Completed','Accepted',],
+      'property_name': 'status',
+      },
+    },
+  {
+    'type': 'PopulationSampleResponse',
+    'condition': 'in',
+    'terms': {
+      'value': ['Completed','Accepted',],
+      'property_name': 'status',
+      },
+    },
+  ]
+
 audit_update_objects = list(audit_read_objects)
 
 def upgrade():
@@ -267,7 +295,7 @@ def upgrade():
               'relevant resources for the program being audited.',
           'permissions_json': json.dumps({
             'create': ['Request'],
-            'read': audit_read_objects,
+            'read': auditor_read_objects,
             'update': ['Request', 'Response'], #FIXME add response constraints
             'delete': [],
             }),

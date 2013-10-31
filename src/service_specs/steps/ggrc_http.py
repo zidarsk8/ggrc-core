@@ -263,6 +263,7 @@ def get_or_post_with_email(context, email, resource_name):
 
 def put_example_resource(context, name, expected_status=200):
   example = getattr(context, name)
+  print 'put_example_resource', example.value
   url = example.get('selfLink')
   response = put_resource(context, url, example)
   assert response.status_code == expected_status
