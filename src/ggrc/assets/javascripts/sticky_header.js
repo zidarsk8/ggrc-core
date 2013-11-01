@@ -23,6 +23,8 @@ can.Control("StickyHeader", {
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
                       +", .tree-open > .item-open > .item-content > .inner-tree"
+        // Identify "extra" headers that should be fixed alongside their previous header siblings.
+      , extra_selector: ".extra-header"
         // The amount of space at the bottom of the content when the header should start scrolling away
       , margin: 30
     }
@@ -59,15 +61,21 @@ can.Control("StickyHeader", {
     for (var i = items.length - 1; i >= 0; i--) {
       var el = items.eq(i)
         , clone = el.data('sticky').clone
-        , margin = this.in_viewport(el)
+        , margin
         ;
 
+      el.data('sticky').offset = this.calculate_offset(el, items);
+      margin = this.in_viewport(el);
       // Remove the clone if its content no longer inside the viewport
       if (margin === false) {
         this.remove(el);
       }
       // Otherwise inject the clone
       else {
+        if(!clone) {
+          clone = this.clone($(items[i]), type === 'footer' ? items.slice(i) : items.slice(0, i));
+        }
+
         !clone[0].parentNode && el.parent().append(clone);
 
         // When the content is close to scrolling away, also scroll the header away
@@ -90,7 +98,7 @@ can.Control("StickyHeader", {
       self.remove($(this));
     });
 
-    // Generate the depth and clone for each header
+    // Generate the depth for each header
     for (var $this; $this = items[i]; i += increment) {
       $this = $($this);
 
@@ -102,7 +110,7 @@ can.Control("StickyHeader", {
         $this.data('sticky', data);
       }
 
-      self.clone($this, type === 'footer' ? items.slice(i) : items.slice(0, i));
+      //don't clone yet -- only clone when we need to show the clone
     }
 
     return items;
@@ -113,14 +121,14 @@ can.Control("StickyHeader", {
     var data = el.data('sticky')
       , type = data.type
       , parent = el.parent()
-      , offset = data.offset
+      , offset = data.offset || 0
       , pos = parent.position().top
       , margin = pos + parent.outerHeight() - el.outerHeight()
       , scroll_height = this.options.scroll_area.outerHeight()
       ;
 
     if (type === 'footer') {
-      offset = scroll_height - data.offset;
+      offset = scroll_height - offset;
       margin = offset - pos - el.outerHeight();
     }
 
@@ -140,13 +148,29 @@ can.Control("StickyHeader", {
     // Clones (if one doesn't exist) and prepares an item
   , clone : function(el, items) {
     // Compute heights of above items
-    var offset = 0
+    var offset = this.calculate_offset(el, items)
       , data = el.data('sticky')
-      , depths = {}
-      , selector = this.selector_of(el, data.type)
-      , increment = data.type === 'footer' ? -1 : 1
-      , i = data.type === 'footer' ? items.length - 1 : 0
       ;
+
+    data.offset = offset;
+    data.clone = data.clone || el.clone(true, true).addClass("sticky sticky-" + data.type);
+    return this.position_clone(el);
+  }
+
+  , calculate_offset : function(el, items) {
+    var data = el.data('sticky')
+    , offset = new Array(data.depth + 1)
+    , increment = data.type === 'footer' ? -1 : 1
+    , depths = {}
+    , i = data.type === 'footer' ? items.length - 1 : 0
+    , selector = this.selector_of(el, data.type)
+    ;
+
+    // Find the number of ancestors that two elements share
+    //  (a measure of how close together they are compared to others)
+    function common_parents(a, b) {
+      return a.first().parents().filter(b.first().parents());
+    }
 
     // Determine the offset based on nested parents
     for (var $this; $this = items[i]; i += increment) {
@@ -157,22 +181,27 @@ can.Control("StickyHeader", {
         $this = $($this);
         var depth = $this.data('sticky').depth
           , depth_selector = this.selector_of($this, data.type) + depth
+          , cp = common_parents(el, $this).length
           ;
 
         // Only add offsets for the closest nested parent of the given depth
         // as well as offsets for the first adjacent sibling of different selectors
-        if ((!depths[depth] && depth < data.depth) 
-          || (depth <= data.depth && !$this.is(selector) && !depths[depth_selector])) {
-            offset += $this.outerHeight();
-            depths[depth] = true;
+        if ((!depths[depth] && depth < data.depth) // if we haven't set up any header for this parent depth yet.
+          || (depth <= data.depth   // or if we have (OR we are at the current level)...
+              && cp >= (depths[depth] || 0) //...AND the current item is a closer fit for the level (more common ancestors)
+              && (el.is(this.options.extra_selector) 
+                  && $this.nextAll().is(el) //    ...AND this is an extra header sibling
+                  || !$this.is(selector))  //     ...OR a different type of header/footer than the point element
+              && !depths[depth_selector])  // ....AND there wasn't a match for this selector at this level yet.
+          ) {
+            offset[depth] = $this.is(this.options.extra_selector) ? ((offset[depth] || 0) + $this.outerHeight()) : $this.outerHeight();
+            depths[depth] = cp
             depths[depth_selector] = true;
         }
       }
     }
-
-    data.offset = offset;
-    data.clone = data.clone || el.clone(true, true).addClass("sticky sticky-" + data.type);
-    return this.position_clone(el);
+    //Add together all the offsets for all the depths.
+    return can.reduce(offset, function(a, b) { return a + (b || 0); }, 0);
   }
 
     // Determine the selector that "selected" a given element
@@ -207,7 +236,8 @@ can.Control("StickyHeader", {
 
     // Detach an element's sticky data
   , remove : function(el) {
-    el.data('sticky').clone[0].parentNode && el.data('sticky').clone.remove();
+    var $clone = el.data('sticky').clone;
+    $clone && $clone[0].parentNode && $clone.remove();
     $.removeData(el, 'sticky');
   }
 
