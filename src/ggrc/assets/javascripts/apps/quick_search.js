@@ -357,6 +357,10 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
   business_plus_program_object_types =
     business_object_types.concat(["Program"]);
 
+  entities_object_types = [
+    "People"
+    ];
+
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
   response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"];

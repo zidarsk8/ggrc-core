@@ -13,6 +13,7 @@
 can.Model.Cacheable("CMS.Models.Person", {
    root_object : "person"
    , root_collection : "people"
+   , category : "entities"
    , findAll : "GET /api/people"
    , findOne : "GET /api/people/{id}"
    , create : "POST /api/people"

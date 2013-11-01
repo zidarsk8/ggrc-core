@@ -52,13 +52,6 @@ var model_descriptors = {
     , object_route : "directives"
     , object_display : "Contracts"
   }
-  , "org_group" : {
-    model : CMS.Models.OrgGroup
-    , object_type : "org_group"
-    , object_category : "entities"
-    , object_route : "org_groups"
-    , object_display : "Org Groups"
-  }
   , "project" : {
     model : CMS.Models.Project
     , object_type : "project"
@@ -183,14 +176,19 @@ var model_descriptors = {
     , object_route : "people"
     , object_category : "entities"
   }
-  /*
+  , "org_group" : {
+    model : CMS.Models.OrgGroup
+    , object_type : "org_group"
+    , object_category : "entities"
+    , object_route : "org_groups"
+    , object_display : "Org Groups"
+  }
   , "document" : {
     model : CMS.Models.Document
     , object_type : "document"
     , object_route : "documents"
-    , object_category : "programs"
+    , object_category : "business"
   }
-  */
 };
 
 var sort_by_name_email = function(list) {
@@ -391,8 +389,11 @@ dashboard_menu_spec = [
   , objects: [ "regulation", "policy", "contract", "control" ]
   },
   { title : "Asset / Business"
-  , objects: [ "system", "process", "org_group", "project"
+  , objects: [ "system", "process", "project"
              , "facility", "product", "data_asset", "market" ]
+  },
+  { title : "People / Groups"
+  , objects: [ "people", "org_group" ]
   },
   /*{ title : "Risk"
   , objects: [ "risky_attributes", "risk" ]
