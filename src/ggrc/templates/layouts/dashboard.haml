@@ -153,7 +153,7 @@
       .affix-holder
         #lhs.lhs.accordion
           -#NEW LHS
-          %form.form-search
+          %form.form-search{ 'onsubmit': 'return false' }
             .lhs-search.input-append<
               %input.widgetsearch{ 'type': 'text', 'placeholder': 'Enter text to search' }>
               %label.checkbox.btn<

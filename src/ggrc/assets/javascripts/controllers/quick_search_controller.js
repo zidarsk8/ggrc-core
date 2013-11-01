@@ -143,6 +143,11 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
     this.element.trigger('kill-all-popovers');
   }
 
+  , "{observer} my_work" : function(el, ev, newval) {
+    this.filter(null, newval ? { "owner_id": GGRC.current_user.id } : null);
+    this.element.trigger('kill-all-popovers');
+  }
+
   // @override
   , redo_last_filter : function(id_to_add) {
     var that = this;
@@ -284,9 +289,12 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 
   , "{observer} value" : function(el, ev, newval) {
-      this.run_search(newval);
-      //this.element.trigger('kill-all-popovers');
+      this.run_search(newval, this.current_params);
     }
+
+  , "{observer} my_work" : function(el, ev, newval) {
+    this.run_search(this.current_term, newval ? { "owner_id": GGRC.current_user.id } : null);
+  }
 
   , show_more: function($el) {
       if (this._show_more_pending)
@@ -467,7 +475,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       models = can.map(this.get_lists(), this.proxy("get_list_model"));
 
       // Retrieve and display counts
-      GGRC.Models.Search.counts_for_types(this.current_term, models)
+      GGRC.Models.Search.counts_for_types(this.current_term, models, this.current_params)
         .then(this.proxy("display_counts"));
     }
 
@@ -494,14 +502,14 @@ can.Control("CMS.Controllers.LHN_Search", {
           $list.find('.spinner').html(self.make_spinner());
         });
 
-        GGRC.Models.Search.search_for_types(this.current_term, models)
+        GGRC.Models.Search.search_for_types(this.current_term, models, this.current_params)
           .then(this.proxy("display_lists"));
       }
     }
 
-  , run_search: function(term) {
+  , run_search: function(term, extra_params) {
       var self = this;
-      if (term !== this.current_term) {
+      if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
         can.each(this.options.results_lists, function(list) {
           list.replace([]);
@@ -512,6 +520,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         this.options.loaded_lists = [];
 
         this.current_term = term;
+        this.current_params = extra_params;
         this.refresh_counts();
         // Retrieve and display results for visible lists
         this.refresh_visible_lists();
