@@ -1431,6 +1431,7 @@ function is_join(mapping) {
 }
 
 // Determines and serializes the roles for a user
+var program_roles;
 Mustache.registerHelper("infer_roles", function(instance, options) {
   instance = resolve_computed(instance);
   var state = get_binding_observe("__infer_roles", options)
@@ -1456,33 +1457,19 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
     }
 
     // Check for authorizations
-    if (instance instanceof CMS.Models.Program) {
+    if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
       person.get_list_loader("authorizations").done(function(authorizations) {
-        var context_ids = $.unique($.map(authorizations, function(binding) {
-            if (binding.instance.context)
-              return binding.instance.context.id;
-          }));
-        can.each(context_ids, function(context_id) {
-          CMS.Models.Program.findAll({ context_id: context_id }).done(function(programs) {
-            if (programs && programs[0] && programs[0].id === instance.id) {
-              var finding = [];
-              can.each(authorizations, function(binding) {
-                if (binding.instance.context && binding.instance.context.id === instance.context.id && !finding[instance.context.id]) {
-                  finding[instance.context.id] = true;
-                  CMS.Models.Role.findAll({
-                    id__in: $.map(authorizations, function(binding) {
-                              if (binding.instance.context && binding.instance.context.id === instance.context.id)
-                                return binding.instance.role.id;
-                            }).join(',')
-                  }).done(function(roles) {
-                    can.each(roles, function(role) {
-                      state.attr('roles').push(role.name);
-                    });
-                  })
-                }
-              })
-            }
-          })
+        authorizations = can.map(authorizations, function(auth) {
+          if (auth.instance.context && auth.instance.context.id === instance.context.id) {
+            return auth.instance;
+          }
+        });
+        !program_roles && (program_roles = CMS.Models.Role.findAll({ scope: "Private Program" }));
+        program_roles.done(function(roles) {
+          can.each(authorizations, function(auth) {
+            var role = CMS.Models.Role.findInCacheById(auth.role.id);
+            role && state.attr('roles').push(role.name);
+          });
         });
       });
     }

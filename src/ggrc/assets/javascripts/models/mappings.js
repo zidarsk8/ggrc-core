@@ -23,6 +23,10 @@
     return new GGRC.ListLoaders.IndirectListLoader(instance_model_name, option_join_attr);
   }
 
+  function Search(term, types, params) {
+    return new GGRC.ListLoaders.SearchListLoader(term, types, params);
+  }
+
   function Multi(sources) {
     return new GGRC.ListLoaders.MultiListLoader(sources);
   }
@@ -506,6 +510,28 @@
       , extended_related_products:    Multi(["related_products", "owned_products"])
       , extended_related_projects:    Multi(["related_projects", "owned_projects"])
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
+
+      , related_objects_via_search: Search("", [
+          "Program",  "Regulation", "Contract", "Policy", "Section", "Objective",
+          "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility",
+          "Market", "OrgGroup", "Audit"
+        ], { owner_id: "id" })
+
+      , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
+      , extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation")
+      , extended_related_contracts_via_search:   TypeFilter("related_objects_via_search", "Contract")
+      , extended_related_policies_via_search:    TypeFilter("related_objects_via_search", "Policy")
+      , extended_related_objectives_via_search:  TypeFilter("related_objects_via_search", "Objective")
+      , extended_related_controls_via_search:    TypeFilter("related_objects_via_search", "Control")
+      , extended_related_sections_via_search:    TypeFilter("related_objects_via_search", "Section")
+      , extended_related_data_assets_via_search: TypeFilter("related_objects_via_search", "DataAsset")
+      , extended_related_facilities_via_search:  TypeFilter("related_objects_via_search", "Facility")
+      , extended_related_markets_via_search:     TypeFilter("related_objects_via_search", "Market")
+      , extended_related_org_groups_via_search:  TypeFilter("related_objects_via_search", "OrgGroup")
+      , extended_related_processes_via_search:   TypeFilter("related_objects_via_search", "Process")
+      , extended_related_products_via_search:    TypeFilter("related_objects_via_search", "Product")
+      , extended_related_projects_via_search:    TypeFilter("related_objects_via_search", "Project")
+      , extended_related_systems_via_search:     TypeFilter("related_objects_via_search", "System")
     }
 
     , UserRole : {

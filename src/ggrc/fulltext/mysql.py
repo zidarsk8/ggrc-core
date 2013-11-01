@@ -109,7 +109,7 @@ class MysqlIndexer(SqlIndexer):
             MysqlRecordProperty.key.in_(
               db.session.query(ObjectPerson.personable_id).filter(
                 and_(
-                  ObjectPerson.personable_id == owner_id, 
+                  ObjectPerson.person_id == owner_id, 
                   ObjectPerson.personable_type == model_name
                 )
               )

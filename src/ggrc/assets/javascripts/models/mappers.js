@@ -1114,6 +1114,127 @@
       }
   });
 
+  /*  SearchListLoader
+   *  - handles search relationships 
+   *
+   *  - listens to:
+   *      - model.created
+   *      - model.destroyed
+   *      - not implemented:
+   *        - instance.change(object_attr)
+   */
+
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
+  }, {
+      init: function(term, types, params) {
+        this._super();
+
+        this.term = term || '';
+        this.types = types;
+        this.params = params || {};
+      }
+
+    , init_listeners: function(binding) {
+      }
+
+    , is_valid_mapping: function(binding, mapping) {
+        return true;
+      }
+
+    , filter_and_insert_instances_from_mappings: function(binding, mappings) {
+        var self = this
+          , matching_mappings
+          ;
+
+        matching_mappings = can.map(can.makeArray(mappings), function(mapping) {
+          if (self.is_valid_mapping(binding, mapping))
+            return mapping;
+        });
+        return this.insert_instances_from_mappings(binding, matching_mappings);
+      }
+
+    , insert_instances_from_mappings: function(binding, mappings) {
+        var self = this
+          , new_results
+          ;
+
+        new_results = can.map(can.makeArray(mappings), function(mapping) {
+          return self.get_result_from_mapping(binding, mapping);
+        });
+        this.insert_results(binding, new_results);
+      }
+
+    , remove_instance_from_mapping: function(binding, mapping) {
+        var instance;
+        if (this.is_valid_mapping(binding, mapping)) {
+          instance = this.get_instance_from_mapping(binding, mapping);
+          result = this.find_result_from_mapping(binding, mapping);
+          if (instance)
+            this.remove_instance(binding, instance, result);
+        }
+      }
+
+    , get_result_from_mapping: function(binding, mapping) {
+        return this.make_result({
+            instance: mapping
+          , mappings: [{
+                instance: true
+              , mappings: []
+              , binding: binding
+              }]
+          , binding: binding
+          });
+      }
+
+    , get_instance_from_mapping: function(binding, mapping) {
+        return mapping;
+      }
+
+    , find_result_from_mapping: function(binding, mapping) {
+        var result_i, mapping_i, result;
+        for (result_i=0; result_i<binding.list.length; result_i++) {
+          result = binding.list[result_i];
+          if (result.instance === mapping)
+            // DirectListLoader can't have multiple mappings
+            return result.mappings[0];
+        }
+      }
+
+    , _refresh_stubs: function(binding) {
+        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural))
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+          , params = can.extend({}, this.params)
+          , self = this
+          ;
+
+        if (mappings) {
+          this.insert_instances_from_mappings(binding, mappings);
+          return new $.Deferred().resolve(mappings);
+        }
+        else {
+          for (var prop in params) {
+            if (params[prop] && binding.instance[params[prop]]) {
+              params[prop] = binding.instance[params[prop]];
+            }
+          }
+          return GGRC.Models.Search.search_for_types(this.term, this.types, params).pipe(function(mappings) {
+            can.each(mappings.entries, function(entry, i) {
+              var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
+              mappings.entries[i] = new _class({ id: entry.id });
+            });
+
+            binding.instance.attr(object_join_attr, mappings.entries);
+            self.insert_instances_from_mappings(binding, mappings.entries.reify());
+            return mappings.entries;
+          });
+        }
+      }
+
+    , refresh_list: function() {
+        return this._refresh_stubs(binding);
+      }
+  });
+
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.ReifyingListLoader", {
   }, {
       init: function(source) {

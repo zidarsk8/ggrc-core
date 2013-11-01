@@ -245,17 +245,12 @@ $(function() {
             }
 
         , Person : {
-              _mixins: [
-                  "extended_objectives"
-                , "extended_controls"
-                , "extended_business_objects"
-                ]
-            , Program : {
-                mapping: "extended_related_programs"
+             Program : {
+                mapping: "extended_related_programs_via_search"
               , fetch_post_process: sort_sections
               }
             , Regulation: {
-                mapping: "extended_related_regulations"
+                mapping: "extended_related_regulations_via_search"
               , draw_children: true
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
@@ -263,7 +258,7 @@ $(function() {
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Contract: {
-                mapping: "extended_related_contracts"
+                mapping: "extended_related_contracts_via_search"
               , draw_children: true
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
@@ -271,7 +266,7 @@ $(function() {
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Policy: {
-                mapping: "extended_related_policies"
+                mapping: "extended_related_policies_via_search"
               , draw_children: true
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
@@ -279,7 +274,7 @@ $(function() {
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Audit : { 
-                mapping: "extended_related_audits"
+                mapping: "extended_related_audits_via_search"
               , allow_mapping : false
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
@@ -287,12 +282,51 @@ $(function() {
             }
             , Section : {
                 model : CMS.Models.Section
-              , mapping : "extended_related_sections"
+              , mapping : "extended_related_sections_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
               , draw_children : true
               } 
             }
+            , Objective: {
+                mapping: "extended_related_objectives_via_search"
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+              }
+            , Control: {
+                  mapping: "extended_related_controls_via_search"
+                , draw_children: true
+                , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+                }
+            , DataAsset: {
+                  mapping: "extended_related_data_assets_via_search"
+                }
+            , Facility: {
+                  mapping: "extended_related_facilities_via_search"
+                }
+            , Market: {
+                  mapping: "extended_related_markets_via_search"
+                }
+            , OrgGroup: {
+                  mapping: "extended_related_org_groups_via_search"
+                }
+            , Process: {
+                  mapping: "extended_related_processes_via_search"
+                }
+            , Product: {
+                  mapping: "extended_related_products_via_search"
+                }
+            , Project: {
+                  mapping: "extended_related_projects_via_search"
+                }
+            , System: {
+                  mapping: "extended_related_systems_via_search"
+                }
+            , Document: {
+                  mapping: "extended_related_documents_via_search"
+                }
         })
     ;
 
