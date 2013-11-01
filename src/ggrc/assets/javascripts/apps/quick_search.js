@@ -549,25 +549,6 @@ $(function() {
     collapsed && $(".bar-v").trigger('click');
   });
 
-  // Resize search input as necessary
-  var $lhsHolder = $(".lhs-holder")
-    , last_height = $lhsHolder[0].scrollHeight;
-  function resize_search() {
-    var input = $('#lhs input.widgetsearch')
-      , width = input.closest('.form-search').width() - input.parent().outerWidth() + input.parent().width()
-                - input.next().outerWidth() - input.outerWidth() + input.width();
-    input.css('width', width + 'px');
-  };
-  $(document.body).on("click", "#lhs", function(ev) {
-    resize_search();
-  });
-  setInterval(function() {
-    if (last_height !== $lhsHolder[0].scrollHeight) {
-      last_height = $lhsHolder[0].scrollHeight;
-      resize_search(); 
-    }
-  }, 25);
-
   $(document.body).on("click", ".lhs-closed", function(ev) {
     
     var $lhs = $(this)
