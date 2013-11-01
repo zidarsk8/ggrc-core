@@ -469,7 +469,19 @@ $(function() {
       var checked = target.prop("checked");
       obs.attr("my_work", checked);
       target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+        prefs[0].setGlobal("lhs", { my_work: checked });
+      });
     }
+  });
+  CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+    var target = $('#lhs input.my-work')
+      , settings = prefs[0].getGlobal("lhs")
+      , checked = !!(settings && settings.my_work)
+      ;
+    target.prop('checked', checked);
+    obs.attr("my_work", checked);
+    target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
   });
   $("#lhs").cms_controllers_lhn_search({ observer: obs });
 
