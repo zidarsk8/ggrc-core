@@ -167,6 +167,13 @@
       }
     }
     li {
+      &.entities {
+        a {
+          color:$entities;
+        }
+      }
+    }
+    li {
       &.risk {
         a {
           color:$risk;

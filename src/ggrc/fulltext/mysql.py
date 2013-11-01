@@ -89,30 +89,33 @@ class MysqlIndexer(SqlIndexer):
     owner_queries = []
     for model_name in model_names:
       model = [x for x in all_models if x.__name__ == model_name][0]
-      filter_query = and_(
-        MysqlRecordProperty.type == model_name,
-        or_(
-          MysqlRecordProperty.context_id.in_(
-            db.session.query(UserRole.context_id).filter(
-              and_(
-                UserRole.person_id == owner_id, 
-                UserRole.context_id != None
-              )
-            ).distinct()
-          ),
-          MysqlRecordProperty.key.in_(
-            db.session.query(model.id).filter(model.owner_id == owner_id)
-          ),
-          MysqlRecordProperty.key.in_(
-            db.session.query(ObjectPerson.personable_id).filter(
-              and_(
-                ObjectPerson.personable_id == owner_id, 
-                ObjectPerson.personable_type == model_name
+      if model_name is "Person":
+        filter_query = False
+      else:
+        filter_query = and_(
+          MysqlRecordProperty.type == model_name,
+          or_(
+            MysqlRecordProperty.context_id.in_(
+              db.session.query(UserRole.context_id).filter(
+                and_(
+                  UserRole.person_id == owner_id, 
+                  UserRole.context_id != None
+                )
+              ).distinct()
+            ),
+            MysqlRecordProperty.key.in_(
+              db.session.query(model.id).filter(model.owner_id == owner_id)
+            ),
+            MysqlRecordProperty.key.in_(
+              db.session.query(ObjectPerson.personable_id).filter(
+                and_(
+                  ObjectPerson.personable_id == owner_id, 
+                  ObjectPerson.personable_type == model_name
+                )
               )
             )
           )
         )
-      )
       owner_queries.append(filter_query)
 
     return and_(

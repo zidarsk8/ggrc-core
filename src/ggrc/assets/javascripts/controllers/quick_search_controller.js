@@ -215,7 +215,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
       this.init_object_lists();
       this.init_list_views();
-      this.run_search("");
+      this.run_search("", this.options.observer.my_work ? { "owner_id": GGRC.current_user.id } : null);
 
       can.Model.Cacheable.bind("created", function(ev, instance) {
         var visible_model_names =

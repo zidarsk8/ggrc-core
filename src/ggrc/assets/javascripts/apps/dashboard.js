@@ -55,7 +55,7 @@ var model_descriptors = {
   , "org_group" : {
     model : CMS.Models.OrgGroup
     , object_type : "org_group"
-    , object_category : "business"
+    , object_category : "entities"
     , object_route : "org_groups"
     , object_display : "Org Groups"
   }
@@ -177,13 +177,13 @@ var model_descriptors = {
     , object_route : "audits"
     , object_category : "programs"
   }
-  /*
   , "person" : {
     model : CMS.Models.Person
     , object_type : "person"
     , object_route : "people"
-    , object_category : "programs"
+    , object_category : "entities"
   }
+  /*
   , "document" : {
     model : CMS.Models.Document
     , object_type : "document"

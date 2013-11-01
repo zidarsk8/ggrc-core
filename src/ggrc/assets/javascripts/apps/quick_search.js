@@ -482,8 +482,10 @@ $(function() {
     target.prop('checked', checked);
     obs.attr("my_work", checked);
     target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+
+    console.log(obs.attr())
+    $("#lhs").cms_controllers_lhn_search({ observer: obs });
   });
-  $("#lhs").cms_controllers_lhn_search({ observer: obs });
 
   function bindQuickSearch(ev, opts) {
 
