@@ -64,6 +64,7 @@ dashboard-js-files:
   - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
+  - controllers/tree_filter_controller.js
   - controls/control.js
   - controls/controls_controller.js
   - controllers/dashboard_controller.js
@@ -207,6 +208,7 @@ dashboard-js-template-files:
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
+  - requests/filters.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

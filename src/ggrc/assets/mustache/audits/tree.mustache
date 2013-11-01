@@ -174,7 +174,12 @@
     {{#if draw_children}}
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         <div class="inner-tree">
-          <h6>PBC Requests ({{child_count}})</h6>
+          <h6>
+            PBC Requests ({{child_count}})
+            {{#child_options.0.header_view}}
+            <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
+            {{/child_options.0.header_view}}
+          </h6>
           {{#child_options}}
             <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
           {{/child_options}}
