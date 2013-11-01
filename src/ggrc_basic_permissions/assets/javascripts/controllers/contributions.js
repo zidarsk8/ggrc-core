@@ -154,7 +154,7 @@
           return new can.Observe({
             option: CMS.Models.get_instance(
               CMS.Models.get_link_type(join, self.options.option_attr),
-              join[self.options.option_id_field] || join[self.options.option_attr].id)
+              join[self.options.option_attr].id)
           , join: join
           });
         }));
@@ -328,26 +328,23 @@
     },
 
     match_join: function(option_id, join) {
-      return join[this.options.option_id_field] == option_id ||
-        (join[this.options.option_attr]
-         && join[this.options.option_attr].id == option_id)
+      return (join[this.options.option_attr]
+              && join[this.options.option_attr].id == option_id);
     },
 
     get_new_join: function(option_id, option_scope, option_type) {
       var join_params = {};
-      join_params[this.options.option_id_field] = option_id;
-      if (this.options.option_type_field) {
-        join_params[this.options.option_type_field] = option_type;
-      }
-      join_params[this.options.join_id_field] = this.get_join_object_id();
-      if (this.options.join_type_field) {
-        join_params[this.options.join_type_field] = this.get_join_object_type();
-      }
+      join_params[this.options.option_attr] = {};
+      join_params[this.options.option_attr].id = option_id;
+      join_params[this.options.option_attr].type = option_type;
+      join_params[this.options.join_attr] = {};
+      join_params[this.options.join_attr].id = this.get_join_object_id();
+      join_params[this.options.join_attr].type = this.get_join_object_type();
+
       $.extend(join_params, this.options.extra_join_fields);
       if (option_scope == 'Admin') {
         join_params.context = { id: 0, type: 'Context' };
-      } // otherwise, go with the current value
-
+      }
       return new (this.options.join_model)(join_params);
     },
 
