@@ -181,10 +181,11 @@
               =search_result('Project', 'projects', 'business')
               =search_result('Facility', 'facilities', 'business')
               =search_result('Market', 'markets', 'business')
-            %h2.entities People/Groups
-            %ul.top-level
-              =search_result('Person', 'people', 'entities')
-              =search_result('OrgGroup', 'org groups', 'entities')
+              =search_result('OrgGroup', 'org groups', 'business')
+            -#%h2.entities People/Groups
+            -#%ul.top-level
+              -#=search_result('Person', 'people', 'entities')
+              -#=search_result('OrgGroup', 'org groups', 'entities')
             -#%h2.risk Risk Management
             -#%ul.top-level
               =search_result('Risk', 'risks', 'risk')
