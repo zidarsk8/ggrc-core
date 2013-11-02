@@ -578,17 +578,24 @@ function defer_render(tag_name, func, deferred) {
   return ["<", tag_name, " ", hook, ">", "</", tag_name, ">"].join("");
 }
 
-Mustache.registerHelper("defer", function(tag_name, options) {
+Mustache.registerHelper("defer", function(prop, deferred, options) {
   var context = this;
-
+  var tag_name;
   if (!options) {
-    options = tag_name;
-    tag_name = "span";
+    options = prop;
+    prop = "result";
   }
 
-  return defer_render(tag_name, function() {
-    return options.fn(context);
-  });
+  tag_name = (options.hash || {}).tag_name || "span";
+
+  deferred = resolve_computed(deferred);
+  typeof deferred === "function" && (deferred = deferred());
+
+  return defer_render(tag_name, function(items) {
+    var ctx = {};
+    ctx[prop] = items;
+    return options.fn(ctx);
+  }, deferred);
 });
 
 Mustache.registerHelper("pbc_is_read_only", function() {

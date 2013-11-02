@@ -17,7 +17,7 @@ import ggrc_gdrive_integration.models
 
 from ggrc import db
 from ggrc.models import Program, Audit, Request, Response, \
-  DocumentationResponse, InterviewResponse, PopulationSampleResponse
+  DocumentationResponse, InterviewResponse, PopulationSampleResponse, Document
 from .models.object_folder import Folderable
 from .models.object_file import Fileable
 Program.__bases__ = (Folderable,) + Program.__bases__
@@ -36,6 +36,9 @@ PopulationSampleResponse.__bases__ = (Fileable,) + \
   PopulationSampleResponse.__bases__
 PopulationSampleResponse.late_init_fileable()
 #Program._publish_attrs.append('object_folders')
+Document.__bases__ = (Fileable,) + \
+  Document.__bases__
+Document.late_init_fileable()
 '''
 Some other spitballs from Dan here:
 

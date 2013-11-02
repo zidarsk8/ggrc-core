@@ -189,12 +189,16 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   }
 
   , attributes : {
-    permissions : "CMS.Models.GDriveFolderPermission.models"
+    permissions : "CMS.Models.GDriveFilePermission.models"
+    , revisions : "CMS.Models.GDriveFileRevision.models"
   }
 
 }, {
   findPermissions : function() {
     return CMS.Models.GDriveFilePermission.findAll(this.serialize());
+  }
+  , findRevisions : function() {
+    return CMS.Models.GDriveFileRevision.findAll(this.serialize());
   }
   , refresh : function(params) {
     return this.constructor.findOne({ id : this.id })
@@ -265,7 +269,8 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
   // the current user's permission on the file comes back in the 'userPermission'
   // property, but we can't modelize these permissions because they always have ID "me"
   , attributes : {
-    permissions : "CMS.Models.GDriveFilePermission.models"
+    permissions : "CMS.Models.GDriveFolderPermission.models"
+    , revisions : "CMS.Models.GDriveFileRevision.models"
   }
 }, {
 
@@ -382,6 +387,18 @@ CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
     });
   }
 }, {});
+
+can.Model.Cacheable("CMS.Models.GDriveFileRevision", {
+  findAll : gdrive_findAll({}, "/revisions")
+  , id : "etag" //id is a user's Permission ID, so using etags instead for cache keys.
+
+  , attributes : {
+    "modifiedDate" : "datetime"
+  }
+}, {
+
+});
+
 
 can.Model.Join("CMS.Models.ObjectFolder", {
   root_object : "object_folder"

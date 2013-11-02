@@ -159,11 +159,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     }
     parent_folder.uploadFiles().then(function(files) {
       can.each(files, function(file) {
-        new CMS.Models.ObjectFile({
-          context : response.context || {id : null}
-          , file : file
-          , fileable : response
-        }).save();
         //Since we can re-use existing file references from the picker, check for that case.
         CMS.Models.Document.findAll({link : file.url}).done(function(d) {
           if(d.length) {
@@ -173,6 +168,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
               , documentable : response
               , document : d[0]
             }).save();
+            CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable : d[0] })
+            .done(function(ofs) {
+              if(ofs.length < 1) {
+                new CMS.Models.ObjectFile({
+                  context : response.context || {id : null}
+                  , file : file
+                  , fileable : d[0]
+                }).save();
+              }
+            });
           } else {
             //file not found, make Document object.
             new CMS.Models.Document({
@@ -184,6 +189,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 context : response.context || {id : null}
                 , documentable : response
                 , document : doc
+              }).save();
+              new CMS.Models.ObjectFile({
+                context : response.context || {id : null}
+                , file : file
+                , fileable : doc
               }).save();
             });
           }
