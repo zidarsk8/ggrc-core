@@ -1424,4 +1424,9 @@ function is_join(mapping) {
   return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
 }
 
+Mustache.registerHelper("default_audit_title", function(program, options) {
+  program = resolve_computed(program) || {title : "program"};
+  return new Date().getFullYear() + " " + program.title + " Audit";
+});
+
 })(this, jQuery, can);
