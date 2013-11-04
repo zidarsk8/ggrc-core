@@ -2,8 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: vraj@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
+from json import loads
 
 from ggrc import db
+from .all_models import Directive
 from .mixins import Base
 from .types import JsonType
 from .computed_property import computed_property
@@ -66,5 +68,13 @@ class Revision(Base, db.Model):
         else:
           result = u"{0} {1}".format(display_name, self.action)
     else:
-      result = u"{0} {1}".format(display_name, self.action)
+      if self.resource_type == "Section" and u'directive_id' in self.content:
+        # then get the corresponding directive
+        #TODO: a way to avoid this db hit?
+        directive = Directive.query.get(self.content[u'directive_id'])
+        result = "New section, {0}, created under {1}: {2}".format(
+            display_name, directive.kind, directive.display_name)
+      else:
+        # otherwise, it's a normal creation event
+        result = "{0} {1} in G".format(display_name, self.action)
     return result

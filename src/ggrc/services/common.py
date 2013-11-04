@@ -14,11 +14,11 @@ from flask import url_for, request, current_app, g, has_request_context
 from flask.ext.sqlalchemy import Pagination
 from flask.views import View
 from ggrc import db
-from ggrc.models.cache import Cache
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
+from ggrc.models.cache import Cache
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
