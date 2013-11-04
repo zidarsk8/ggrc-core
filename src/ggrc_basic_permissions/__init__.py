@@ -281,7 +281,6 @@ def create_private_program_audit_role_implications(
       role=basic_roles.program_audit_owner(),
       modified_by=get_current_user(),
       ))
-  db.session.flush()
   db.session.add(RoleImplication(
       source_context=program_context,
       source_role=basic_roles.program_editor(),
@@ -289,7 +288,6 @@ def create_private_program_audit_role_implications(
       context=audit_context,
       modified_by=get_current_user(),
       ))
-  db.session.flush()
   db.session.add(RoleImplication(
       source_context=program_context,
       source_role=basic_roles.program_reader(),
@@ -297,7 +295,6 @@ def create_private_program_audit_role_implications(
       context=audit_context,
       modified_by=get_current_user(),
       ))
-  db.session.flush()
   #Role implied from Audit for Private Program context
   db.session.add(RoleImplication(
       source_context=audit_context,
@@ -306,7 +303,6 @@ def create_private_program_audit_role_implications(
       context=program_context,
       modified_by=get_current_user(),
       ))
-  db.session.flush()
 
 def create_public_program_audit_role_implications(audit_context):
   #Roles implied from Private Program context for Audit context
@@ -351,7 +347,6 @@ def assign_role_reader(user):
           context_id=None,
           )
       db.session.add(role_reader_for_user)
-      db.session.flush()
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.

@@ -415,7 +415,7 @@ Feature: Private Program Audits and Role Implication
       """
       { "email": "auditor@example.com" }
       """
-    Then GET of "response" is forbidden
+    Then GET of "response" is allowed
     Given the current user
       """
       { "email": "program.editor@example.com" }
@@ -462,7 +462,7 @@ Feature: Private Program Audits and Role Implication
       """
       { "email": "auditor@example.com" }
       """
-    Then GET of "response" is forbidden
+    Then GET of "response" is allowed
     Given the current user
       """
       { "email": "program.editor@example.com" }
@@ -522,7 +522,7 @@ Feature: Private Program Audits and Role Implication
       """
       { "email": "auditor@example.com" }
       """
-    Then GET of "response" is forbidden
+    Then GET of "response" is allowed
     Given the current user
       """
       { "email": "program.editor@example.com" }

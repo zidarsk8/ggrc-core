@@ -50,11 +50,13 @@ $.extend(Permission, (function() {
   };
 
   _resolve_permission_variable = function (value) {
-    if (value[0] == '$') {
-      if (value == '$current_user') {
-        return GGRC.current_user;
+    if ($.type(value) == 'string') {
+      if (value[0] == '$') {
+        if (value == '$current_user') {
+          return GGRC.current_user;
+        }
+        throw new Error('unknown permission variable: ' + value);
       }
-      throw new Error('unknown permission variable: ' + value);
     }
     return value;
   };
@@ -68,9 +70,20 @@ $.extend(Permission, (function() {
       }
       return false;
     }
+    , is: function(instance, argss) {
+      var value = _resolve_permission_variable(args.value);
+      var property_value = instance[args.property_name];
+      return value == property_value;
+    }
+    , in: function(instance, args) {
+      var value = _resolve_permission_variable(args.value);
+      var property_value = instance[args.property_name];
+      return value.indexOf(property_value) >= 0;
+    }
   };
 
   _is_allowed_for = function(permissions, instance, action) {
+    debugger;
     var action_obj = permissions[action] || {}
       , instance_type =
           instance.constructor ? instance.constructor.shortName : instance.type
