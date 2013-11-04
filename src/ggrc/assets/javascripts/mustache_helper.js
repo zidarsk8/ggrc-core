@@ -1483,7 +1483,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
   if (!person || state.attr('status') === 'failed') {
     return '';
   }
-  if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
+  else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
     return options.inverse(options.contexts);
   }
   else {
@@ -1494,6 +1494,34 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       });
       return result.join('');
     }
+  }
+});
+
+// Uses search to find the counts for a model type
+Mustache.registerHelper("global_count", function(model_type, options) {
+  model_type = resolve_computed(model_type);
+  var state = get_binding_observe("__global_count", options)
+    ;
+
+  if (!state.attr('status')) {
+    state.attr('status', 'loading');
+    GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+      state.attr({
+          status: 'loaded'
+        , count: result.counts[model_type]
+      });
+    })
+  }
+
+  // Return the result
+  if (state.attr('status') === 'failed') {
+    return '';
+  }
+  else if (state.attr('status') === 'loading') {
+    return options.inverse(options.contexts);
+  }
+  else {
+    return options.fn(state.count);
   }
 });
 

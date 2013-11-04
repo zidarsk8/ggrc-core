@@ -248,6 +248,8 @@ can.Control("CMS.Controllers.Dashboard", {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
+          } else if (/people/.test(window.location)) {
+            return "My " + descriptor.model.title_plural;
           } else {
             return "Mapped " + descriptor.model.title_plural;
           }
@@ -267,6 +269,8 @@ can.Control("CMS.Controllers.Dashboard", {
           var $objectArea = $(".object-area");
           if ( $objectArea.hasClass("dashboard-area") ) {
             return descriptor.model.title_plural;
+          } else if (/people/.test(window.location)) {
+            return "My " + descriptor.model.title_plural;
           } else {
             return "Mapped " + descriptor.model.title_plural;
           }
@@ -395,7 +399,7 @@ can.Control("CMS.Controllers.InnerNav", {
           , $header = $widget.find(".header h2")
           , icon = $header.find("i").attr("class")
           , menuItem = $header.text().trim()
-          , match = menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)\))?$/)
+          , match = menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/)
           , title = match[1]
           , count = match[2]
           ;

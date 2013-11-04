@@ -357,10 +357,6 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
   business_plus_program_object_types =
     business_object_types.concat(["Program"]);
 
-  entities_object_types = [
-    "People"
-    ];
-
   directive_object_types = ["Regulation", "Policy", "Contract"];
 
   response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"];
@@ -370,6 +366,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   governance_object_types =
     directive_object_types.concat(["Control", "Section", "Objective"]);
+
+  person_object_types = governance_object_types.concat(business_plus_program_object_types).concat(["Audit"])
 
   all_object_types =
     governance_object_types.concat(business_plus_program_object_types).concat(response_object_types);
@@ -393,7 +391,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ControlControl", "control", "implemented_control", "implementing_control_controls"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
-      , ["Person", all_object_types,
+      , ["Person", person_object_types,
           "ObjectPerson", "personable", "person", "object_people"]
       , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
@@ -419,7 +417,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Audit", "Request", null, null, "audit"]
       , ["Request", "Objective", null, null, "objective"]
       , ["Request", response_object_types, null, null, "request"]
-      , ["Person", "Request", null, null, "assignee"]
+      // , ["Person", "Request", null, null, "assignee"]
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]

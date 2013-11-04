@@ -12,7 +12,7 @@
         <h2>
           <i class="{{widget_icon}}"></i>
           {{widget_name}}
-          <span class="object_count"></span>
+          <span class="object_count">{{#widget_count}}({{widget_count}}{{#global_count model.model_singular}}/{{.}}{{/global_count}}){{/widget_count}}</span>
           <span class="explanation">{{widget_info}}</span>
         </h2>
       </div>

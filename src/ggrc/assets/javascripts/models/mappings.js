@@ -514,7 +514,7 @@
       , related_objects_via_search: Search("", [
           "Program",  "Regulation", "Contract", "Policy", "Section", "Objective",
           "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Audit"
+          "Market", "OrgGroup", "Audit"//, "Request", "Response"
         ], { owner_id: "id" })
 
       , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
@@ -532,6 +532,7 @@
       , extended_related_products_via_search:    TypeFilter("related_objects_via_search", "Product")
       , extended_related_projects_via_search:    TypeFilter("related_objects_via_search", "Project")
       , extended_related_systems_via_search:     TypeFilter("related_objects_via_search", "System")
+      , extended_related_audits_via_search:     TypeFilter("related_objects_via_search", "Audit")
     }
 
     , UserRole : {

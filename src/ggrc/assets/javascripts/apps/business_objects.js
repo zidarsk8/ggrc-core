@@ -279,7 +279,7 @@ $(function() {
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
-            }
+              }
             , Section : {
                 model : CMS.Models.Section
               , mapping : "extended_related_sections_via_search"
@@ -287,7 +287,6 @@ $(function() {
               , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
               , draw_children : true
               } 
-            }
             , Objective: {
                 mapping: "extended_related_objectives_via_search"
               , draw_children: true
@@ -327,7 +326,8 @@ $(function() {
             , Document: {
                   mapping: "extended_related_documents_via_search"
                 }
-        })
+        }
+      })
     ;
 
   can.each(far_models, function(join_descriptors, model_name) {
@@ -367,6 +367,7 @@ $(function() {
             }
           , widget_icon: far_model.table_singular
           , object_category: far_model.category || 'default'
+          , model: far_model
           , content_controller_options: {
                 child_options: []
               , draw_children: false
