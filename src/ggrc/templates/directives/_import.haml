@@ -25,8 +25,12 @@
             Choose CSV file to upload
         .span4
           .download-template
-            %a.section-import{"href":'/import_sections_template'}
-              Download Import Sections template
+            -if import_kind == "Controls"
+              %a.section-import{"href": 'import_controls_template'}
+                Download Import Controls template
+            -else
+              %a.section-import{"href": 'import_sections_template'}
+                Download Import Sections template
       .row-fluid
         .span12
           %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
