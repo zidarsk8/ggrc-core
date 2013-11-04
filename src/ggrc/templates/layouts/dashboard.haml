@@ -11,7 +11,8 @@
     %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
       -if type_plural|title == 'Audits'
-        Audits (BETA)
+        Audits
+        %small BETA
       -else
         {{ type_plural|title }}
       %small
