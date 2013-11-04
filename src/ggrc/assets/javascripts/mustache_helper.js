@@ -1299,6 +1299,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
     , mappings = args.slice(1, args.length - 1)
     , options = args[args.length-1]
     , root = options.contexts[0]
+    , refresh_queue = new RefreshQueue()
     , mapping
     ;
   instance = resolve_computed(args[0]);
@@ -1314,15 +1315,18 @@ Mustache.registerHelper("mapping_count", function(instance) {
   if (!root[mapping]) {
     root.attr(mapping, new can.Observe.List());
     root.attr(mapping).attr('loading', true);
-    instance.constructor.findOne({ id: instance.id }).done(function(full_instance) {
-      if (full_instance.get_binding(mapping)) {
-        full_instance.get_list_loader(mapping).done(function(list) {
-          root.attr(mapping, list);
-        })
-      }
-      else
-        root.attr(mapping).attr('loading', false);
-    });
+    refresh_queue.enqueue(instance);
+    refresh_queue.trigger()
+      .then(function(instances) { return instances[0]; })
+      .done(function(full_instance) {
+        if (full_instance.get_binding(mapping)) {
+          full_instance.get_list_loader(mapping).done(function(list) {
+            root.attr(mapping, list);
+          })
+        }
+        else
+          root.attr(mapping).attr('loading', false);
+      });
   }
 
   return (root.attr(mapping).attr('loading') ? options.inverse(options.contexts) : options.fn(''+root.attr(mapping).attr('length')));

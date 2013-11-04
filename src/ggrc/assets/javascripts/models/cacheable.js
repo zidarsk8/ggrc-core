@@ -78,6 +78,34 @@ can.Model("can.Model.Cacheable", {
   , title_singular : ""
   , title_plural : ""
   , findOne : "GET {href}"
+  , makeFindAll: function(finder) {
+      return function(params, success, error) {
+        var deferred = $.Deferred()
+          , sourceDeferred = finder(params)
+          , self = this
+          ;
+
+        deferred.then(success, error);
+        sourceDeferred.then(function(sourceData) {
+          var obsList = new self.List([])
+            , sourceList = sourceData[self.root_collection + "_collection"][self.root_collection]
+            ;
+          setTimeout(function(){
+            var piece = sourceList.splice(0,Math.min(sourceList.length, 5))
+            obsList.push.apply(obsList, self.models(piece))
+
+            if(sourceList.length){
+              setTimeout(arguments.callee, 10)
+            } else {
+              deferred.resolve(obsList)
+            }
+          }, 10);
+        });
+
+        return deferred;
+      };
+    }
+
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
     if(this.fullName === "can.Model.Cacheable") {
