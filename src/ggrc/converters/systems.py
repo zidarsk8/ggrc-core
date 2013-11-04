@@ -66,7 +66,7 @@ class SystemsConverter(BaseConverter):
     ('System Code', 'slug'),
     ('Title', 'title'),
     ('Description' , 'description'),
-    ('Map:References', 'documents'),
+    ('Link:References', 'documents'),
     ('Infrastructure', 'infrastructure'),
     ('Map:Person of Contact', 'owner'),
     ('Map:Controls', 'controls'),

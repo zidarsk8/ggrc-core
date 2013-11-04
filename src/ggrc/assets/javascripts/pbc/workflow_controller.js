@@ -21,14 +21,10 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 
         instance.program.reify().refresh()
         .then(function(program) {
-          can.each(program.objectives.reify(), function(obj) {
-            refresh_queue.enqueue(obj);
-          });
-          return refresh_queue.trigger();
-        })
-        .then(function(objectives) {
-          can.each(objectives, function(objective) {
-            that.create_request(instance, objective)
+          return program.get_binding("extended_related_objectives").refresh_instances()
+        }).then(function(objective_mappings) {
+          can.each(objective_mappings, function(objective_mapping) {
+            that.create_request(instance, objective_mapping.instance)
             .then(that.proxy("create_response"));
           });
         });

@@ -86,7 +86,7 @@ class ControlsConverter(BaseConverter):
     ('Map:Categories', 'categories'),
     ('Map:Assertions', 'assertions'),
     ('Frequency', 'verify_frequency'),
-    ('References', 'documents'),
+    ('Link:References', 'documents'),
     ('Map:Person of Contact', 'owner'),
     ('Key Control', 'key_control'),
     ('Active', 'active'),
