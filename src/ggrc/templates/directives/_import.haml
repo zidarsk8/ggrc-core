@@ -20,9 +20,15 @@
   %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
     .import-interface
       .row-fluid
-        .span12
+        .span8
           %h3
             Choose CSV file to upload
+        .span4
+          .download-template
+            %a.section-import{"href":'/import_sections_template'}
+              Download Import Sections template
+      .row-fluid
+        .span12
           %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
           .import-buttons
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-primary', 'type': 'submit' }
