@@ -665,7 +665,9 @@ Mustache.registerHelper("all", function(type, options) {
           context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
         }
       }
+      $parent.parent().find(":data(spinner)").data("spinner").stop();
       $el.remove();
+      can.view.live.nodeLists.replace($el.get(), $parent.children().get());
     });
     return element.parentNode;
   }
