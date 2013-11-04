@@ -277,6 +277,8 @@ $(function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") ) {
                 return far_model.title_plural;
+              } else if (far_model.title_plural === "Audits") {
+                return "Mapped Audits (BETA)";
               } else {
                 return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
               }
