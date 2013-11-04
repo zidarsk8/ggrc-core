@@ -164,6 +164,26 @@ class ModelView(View):
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
     query = query.order_by(self.modified_attr.desc())
+    order_properties = []
+    if '__sort' in request.args:
+      sort_attrs = request.args['__sort'].split(",")
+      sort_desc = request.args.get('__sort_desc', False)
+      for sort_attr in sort_attrs:
+        attr_desc = sort_desc
+        if sort_attr.startswith('-'):
+          attr_desc = not sort_desc
+          sort_attr = sort_attr[1:]
+        order_property = getattr(self.model, sort_attr, None)
+        if order_property and hasattr(order_property, 'desc'):
+          if attr_desc:
+            order_property = order_property.desc()
+          order_properties.append(order_property)
+        else:
+          # Possibly throw an exception instead, if sorting by invalid attribute?
+          pass
+    if len(order_properties) == 0:
+      order_properties.append(self.modified_attr.desc())
+    query = query.order_by(*order_properties)
     if '__limit' in request.args:
       try:
         limit = int(request.args['__limit'])

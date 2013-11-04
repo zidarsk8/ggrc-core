@@ -946,6 +946,49 @@ Mustache.registerHelper("using", function(args, options) {
   return defer_render('span', finish, refresh_queue.trigger());
 });
 
+Mustache.registerHelper("person_roles", function(person, scope, options) {
+  var roles_deferred = new $.Deferred()
+    , refresh_queue = new RefreshQueue()
+    ;
+
+  if (!options) {
+    options = scope;
+    scope = null;
+  }
+
+  person = Mustache.resolve(person);
+  person = person.reify();
+  refresh_queue.enqueue(person);
+  refresh_queue.trigger().then(function() {
+    var user_roles = person.user_roles.reify()
+      , user_roles_refresh_queue = new RefreshQueue()
+      ;
+    user_roles_refresh_queue.enqueue(user_roles);
+    user_roles_refresh_queue.trigger().then(function() {
+      var roles = can.map(can.makeArray(user_roles), function(user_role) {
+              return user_role.role.reify();
+            })
+        , roles_refresh_queue = new RefreshQueue()
+        ;
+      roles_refresh_queue.enqueue(roles);
+      roles_refresh_queue.trigger().then(function() {
+        roles = can.map(can.makeArray(roles), function(role) {
+          if (!scope || new RegExp(scope).test(role.scope)) {
+            return role;
+          }
+        });
+        roles_deferred.resolve(roles);
+      });
+    });
+  });
+
+  function finish(roles) {
+    return options.fn({ roles: roles });
+  }
+
+  return defer_render('span', finish, roles_deferred);
+});
+
 Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
   if (can.isFunction(instance))
     instance = instance();

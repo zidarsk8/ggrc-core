@@ -165,9 +165,12 @@
         ;
 
       return this.options.object_model.findAll(
-        $.extend({}, this.object_query),
+        $.extend({}, this.options.object_query),
         function(objects) {
           self.object_list.replace(objects)
+          if (self.object_list.length === 1) {
+            self.context.attr('selected_object', self.object_list[0]);
+          }
         });
     },
 
@@ -368,7 +371,7 @@
 
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
-    var context;
+    var context, object_query = {};
     if (GGRC.page_object) {
       context = GGRC.make_model_instance(GGRC.page_object).context;
       if (!context)
@@ -378,6 +381,10 @@
     } else {
       context = {id: null};
       extra_join_query = { context_id__in: [context.id,0] }
+    }
+
+    if (data.person_id) {
+      object_query = { id: data.person_id };
     }
 
     return {
@@ -400,6 +407,8 @@
       , object_model: CMS.Models.Person
       , option_model: CMS.Models.Role
       , join_model: CMS.Models.UserRole
+
+      , object_query: object_query
 
       //join_object_attr
       , option_attr: 'role'
@@ -427,9 +436,14 @@
         ;
 
       can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+        //  This is just a mapping of keys to underscored keys
+        var new_key = k.replace(
+                /[A-Z]/g, function(s) { return "_" + s.toLowerCase(); });
+        data_set[new_key] = v;
+        //  If we changed the key at all, delete the original
+        if (new_key !== k) {
           delete data_set[k];
+        }
       });
 
       if (typeof(options) === "string")
