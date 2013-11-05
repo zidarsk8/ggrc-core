@@ -1,6 +1,7 @@
 {{#list}}
 <li class="{{constructor.category}}" data-model="true" {{data 'model'}}>
-  <a href="{{viewLink}}" class="show-extended">
+  {{#using program=program}}
+  <a href="{{program.viewLink}}#audit_widget" class="show-extended">
     <div class="row-fluid">
       <div class="span8">
         <span class="lhs-item">
@@ -17,6 +18,7 @@
       </div>
     </div>
   </a>
+  {{/using}}
 </li>
 {{/list}}
 {{^list}}
