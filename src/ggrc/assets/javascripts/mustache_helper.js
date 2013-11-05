@@ -28,7 +28,12 @@ function get_template_path(url) {
 // Returns an observable object in the current context
 // This allows the helper to inject asynchronous additional content
 function get_binding_observe(name, options) {
-  var context = options.contexts[0];
+  var context,
+    i = 0
+    ;
+  do {
+    context = options.contexts[i++]
+  } while (!(context instanceof can.Observe));
   if (!context.attr(name)) {
     context.attr(name, new can.Observe());
   }

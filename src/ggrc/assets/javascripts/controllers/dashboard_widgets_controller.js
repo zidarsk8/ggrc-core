@@ -56,7 +56,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         }))
     .trigger("section_created");
 
-    this.options = new can.Observe(this.options);
+    this.options.widget_count = new can.Observe();
 
     $.when(
       can.view(this.options.widget_view, $.when(this.options))
@@ -149,7 +149,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   }
 
   , " updateCount" : function(el, ev, count) {
-    this.options.attr('widget_count', ''+count);
+    this.options.widget_count.attr('count', ''+count);
     this.element.trigger("widgets_updated");
   }
 });

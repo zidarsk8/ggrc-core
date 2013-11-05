@@ -286,6 +286,7 @@ $(function() {
                 model : CMS.Models.Section
               , mapping : "extended_related_sections_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               , draw_children : true
               } 
             , Objective: {
