@@ -36,7 +36,7 @@ $.extend(Permission, (function() {
     if (!permissions)
       return false; //?
     // Prohibit all activity on profile pages
-    if (GGRC.page_instance() instanceof CMS.Models.Person && (!/dashboard/.test(window.location) || permission.resource_type !== 'Audit') && permission.action !== 'read')
+    if (GGRC.page_instance() instanceof CMS.Models.Person && permission.action !== 'read' && !/dashboard/.test(window.location))
       return false;
     if (_permission_match(permissions, permission))
       return true;

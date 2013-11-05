@@ -5,10 +5,9 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-{{#is_profile}}
+{{^is_profile parent_instance}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">

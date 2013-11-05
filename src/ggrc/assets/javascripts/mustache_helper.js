@@ -1542,8 +1542,14 @@ Mustache.registerHelper("is_dashboard", function(options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("is_profile", function(options) {
-  if (GGRC.page_instance() instanceof CMS.Models.Person)
+Mustache.registerHelper("is_profile", function(parent_instance, options) {
+  var instance;
+  if (options)
+    instance = resolve_computed(parent_instance);
+  else
+    options = parent_instance;
+
+  if (GGRC.page_instance() instanceof CMS.Models.Person && (!instance || instance.constructor.shortName !== 'DocumentationResponse'))
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
