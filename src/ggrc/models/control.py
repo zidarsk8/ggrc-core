@@ -176,3 +176,9 @@ class Control(
         orm.subqueryload('program_controls'),
         orm.subqueryload('object_controls'),
         )
+
+  def log_json(self):
+    out_json = super(Section, self).log_json()
+    # so that event log can refer to deleted directive
+    out_json["mapped_directive"] = self.directive.display_name
+    return out_json
