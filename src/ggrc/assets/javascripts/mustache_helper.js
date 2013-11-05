@@ -639,12 +639,19 @@ Mustache.registerHelper("allow_help_edit", function() {
   return options.fn(this); //always true for now
 });
 
-Mustache.registerHelper("all", function(type, options) {
+Mustache.registerHelper("all", function(type, params, options) {
   var model = CMS.Models[type] || GGRC.Models[type]
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
   , items_dfd, hook;
+
+  if(!options) {
+    options = params;
+    params = {};
+  } else {
+    params = JSON.parse(resolve_computed(params));
+  }
 
   function hookup(element, parent, view_id) {
     items_dfd.done(function(items){
@@ -682,7 +689,7 @@ Mustache.registerHelper("all", function(type, options) {
     $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function(s) { return s.replace(/'|"| /, "");}));
   }
 
-  items_dfd = model.findAll();
+  items_dfd = model.findAll(params);
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
@@ -779,11 +786,16 @@ Mustache.registerHelper("iterate", function() {
 });
 
 Mustache.registerHelper("is_private", function(options) {
-  var context_id = this.attr('context.id');
-  if (context_id != undefined && context_id != null) {
-    return options.fn(this);
+  var context = this;
+  if(options.isComputed) {
+    context = resolve_computed(options);
+    options = arguments[1];
   }
-  return options.inverse(this);
+  var context_id = context && context.attr('context.id');
+  if (context_id != undefined && context_id != null) {
+    return options.fn(context);
+  }
+  return options.inverse(context);
 });
 
 Mustache.registerHelper("option_select", function(object, attr_name, role) {
