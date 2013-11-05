@@ -40,9 +40,13 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label> 
-      {{#using program=instance.program}}
-      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="2013 {{program.title}} Audit">
-      {{/using}}
+      {{#if new_object_form}}
+        {{#using program=instance.program}}
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title program}}">
+        {{/using}}
+      {{else}}
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
+      {{/if}}
     </div>
     <div class="span3">
       <label>
