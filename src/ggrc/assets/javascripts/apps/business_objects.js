@@ -362,7 +362,10 @@ $(function() {
           , widget_name: function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
-                return far_model.title_plural;
+                if (/dashboard/.test(window.location))
+                  return "My " + far_model.title_plural;
+                else
+                  return far_model.title_plural;
               } else {
                 return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
               }

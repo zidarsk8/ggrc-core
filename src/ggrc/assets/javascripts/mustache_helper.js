@@ -1542,6 +1542,22 @@ Mustache.registerHelper("is_dashboard", function(options) {
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("is_profile", function(options) {
+  if (GGRC.page_instance() instanceof CMS.Models.Person)
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("person_owned", function(owner_id, options) {
+  owner_id = resolve_computed(owner_id);
+  var page_instance = GGRC.page_instance();
+  if (!(page_instance instanceof CMS.Models.Person) || (owner_id && page_instance.id === owner_id))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("default_audit_title", function(program, options) {
   program = resolve_computed(program) || {title : "program"};
   return new Date().getFullYear() + " " + program.title + " Audit";

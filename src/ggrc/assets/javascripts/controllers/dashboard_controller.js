@@ -404,8 +404,7 @@ can.Control("CMS.Controllers.InnerNav", {
           , count = match[2]
           ;
 
-        if (title.substr(0, 6).match(/(Mapped|Linked)/))
-          title = title.slice(6);
+        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
 
         widget_list.push({
             selector: "#" + $widget.attr("id")
