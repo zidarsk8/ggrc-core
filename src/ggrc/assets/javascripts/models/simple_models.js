@@ -999,7 +999,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , init : function() {
     this._super && this._super.apply(this, arguments);
     $(function() {
-      CMS.Models.Audit.defaults.owner = CMS.Models.get_instance("Person", GGRC.current_user.id, GGRC.current_user).stub();
+      CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
     });
   }
 }, {
