@@ -549,7 +549,6 @@
       , related_objects: Multi(['requests', 'responses_via_requests'])
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
-          console.log(result.instance.owner, result.instance.assignee);
           return !person 
             || (result.instance.owner && result.instance.owner.id === person.id) 
             || (result.instance.assignee && result.instance.assignee.id === person.id)
