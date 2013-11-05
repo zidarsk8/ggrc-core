@@ -54,6 +54,10 @@ class Request(Described, Base, db.Model):
     'auditor_contact',
   ]
 
+  def _display_name(self):
+    return 'Request with id={0} for Audit "{1}"'.format(
+        self.id, self.audit.display_name)
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
