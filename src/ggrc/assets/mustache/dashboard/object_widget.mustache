@@ -13,7 +13,7 @@
           <i class="{{widget_icon}}"></i>
           {{widget_name}}
           <span class="object_count">
-            {{#widget_count}}({{count}}{{#with_page_object_as 'page_object'}}{{#if_equals page_object.constructor.shortName 'Person'}}{{#global_count model.model_singular}}/{{.}}{{/global_count}}{{/if_equals}}{{/with_page_object_as}}){{/widget_count}}</span>
+            {{#widget_count}}{{#count}}({{count}}{{#with_page_object_as 'page_object'}}{{#if_equals page_object.constructor.shortName 'Person'}}{{#global_count model.model_singular}}/{{.}}{{/global_count}}{{/if_equals}}{{/with_page_object_as}}){{/count}}{{/widget_count.count}}</span>
           <span class="explanation">{{widget_info}}</span>
         </h2>
       </div>
