@@ -493,7 +493,7 @@ def export_controls(directive_id):
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
 @app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
+@app.route("/contracts/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
 def import_controls_template(directive_id):
   from flask import current_app
