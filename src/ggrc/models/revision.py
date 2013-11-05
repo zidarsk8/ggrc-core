@@ -48,23 +48,23 @@ class Revision(Base, db.Model):
     if 'display_name' not in self.content:
       return ''
     display_name = self.content['display_name']
-    if '<->' in display_name:
+    if u'<->' in display_name:
       #TODO: Fix too many values to unpack below
       source, destination = display_name.split('<->')[:2]
       if self.resource_type in link_objects:
         if self.action == 'created':
-          result = "{1} linked to {0}".format(source, destination)
+          result = u"{1} linked to {0}".format(source, destination)
         elif self.action == 'deleted':
-          result = "{1} unlinked from {0}".format(source, destination)
+          result = u"{1} unlinked from {0}".format(source, destination)
         else:
-          result = "{0} {1}".format(display_name, self.action)
+          result = u"{0} {1}".format(display_name, self.action)
       else:
         if self.action == 'created':
-          result = "{1} mapped to {0}".format(source, destination)
+          result = u"{1} mapped to {0}".format(source, destination)
         elif self.action == 'deleted':
-          result = "{1} unmapped from {0}".format(source, destination)
+          result = u"{1} unmapped from {0}".format(source, destination)
         else:
-          result = "{0} {1}".format(display_name, self.action)
+          result = u"{0} {1}".format(display_name, self.action)
     else:
-      result = "{0} {1}".format(display_name, self.action)
+      result = u"{0} {1}".format(display_name, self.action)
     return result

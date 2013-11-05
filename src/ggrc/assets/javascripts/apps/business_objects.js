@@ -366,6 +366,8 @@ $(function() {
                   return "My " + far_model.title_plural;
                 else
                   return far_model.title_plural;
+              } else if (far_model.title_plural === "Audits") {
+                return "Mapped Audits <small>BETA</small>";
               } else {
                 return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
               }

@@ -10,7 +10,11 @@
   %li{ 'class': ['{{ li_class }}', 'accordion-group'], 'data-model-name': '={type}', 'data-tooltip-view' : '={tooltip_view}', 'data-template' : '={template_view}' }
     %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
-      {{ type_plural|title }}
+      -if type_plural|title == 'Audits'
+        Audits
+        %small BETA
+      -else
+        {{ type_plural|title }}
       %small
         (
         %span.item-count> ...
