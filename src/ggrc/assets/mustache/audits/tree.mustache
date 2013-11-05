@@ -202,11 +202,20 @@
     {{#if draw_children}}
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         <div class="inner-tree">
-          <h6>PBC Requests ({{child_count}})</h6>
-          {{#child_options}}
+          <h6>PBC Requests ({{child_options.0.list.length}})</h6>
+          {{#child_options.0}}
             <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-          {{/child_options}}
+          {{/child_options.0}}
         </div>
+
+        {{#is_profile}}
+          <div class="inner-tree">
+            <h6>PBC Responses ({{child_options.1.list.length}})</h6>
+            {{#child_options.1}}
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options.1}}
+          </div>
+        {{/is_profile}}
       {{/if_null}}
     {{/if}}
 
