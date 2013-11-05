@@ -637,6 +637,24 @@
       }
   });
 
+  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.CustomFilteredListLoader", {
+  }, {
+      _refresh_stubs: function(binding) {
+        var self = this
+          ;
+
+        return binding.source_binding.refresh_instances()
+          .then(function(results) {
+            var matching_results = can.map(can.makeArray(results), function(result) {
+              result.instance.reify();
+              if (self.filter_fn(result))
+                return self.make_result(result.instance, [result], binding);
+            });
+            self.insert_results(binding, matching_results);
+          });
+      }
+  });
+
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.MultiListLoader", {
   }, {
       init: function(sources) {
