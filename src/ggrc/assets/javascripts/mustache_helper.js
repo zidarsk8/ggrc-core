@@ -1081,13 +1081,13 @@ Mustache.registerHelper("is_allowed", function() {
       resource = arg;
     }
   });
-  if (options.hash && typeof options.hash.context !== undefined) {
+  if (options.hash && options.hash.hasOwnProperty("context")) {
     context_id = options.hash.context;
     if (typeof context_id === 'function' && context_id.isComputed)
       context_id = context_id();
     //  Using `context=null` in Mustache templates, when `null` is not defined,
     //  causes `context_id` to be `""`.
-    if (context_id === "")
+    if (context_id === "" || context_id === undefined)
       context_id = null;
   }
 
