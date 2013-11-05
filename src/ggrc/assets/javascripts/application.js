@@ -757,6 +757,19 @@ $(window).load(function(){
       }
     });
   }
+  
+  // Watermark trigger
+  $('body').on('click', '.watermark-trigger', function() {
+    var $this = $(this),
+        $showWatermark = $this.closest('.tree-item').find('.watermark-icon');
+    
+    $showWatermark.fadeIn('fast');
+    $this.addClass("active");
+    $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
+    
+    return false;
+    
+  });
 
 });
 
