@@ -31,7 +31,7 @@ Feature: Full text search
     When fulltext search grouped by type for "fortytwo" as "results"
     Then "control1" is in the "Control" group of "results"
     And "control2" isn't in the "Control" group of "results"
-    And "audit1" is in the "Audit" group of "results"
+    #And "audit1" is in the "Audit" group of "results"
 
   Scenario: Search finds a document with a matching description but only in authorized contexts
     Given the current user

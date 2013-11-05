@@ -83,7 +83,6 @@ $.extend(Permission, (function() {
   };
 
   _is_allowed_for = function(permissions, instance, action) {
-    debugger;
     var action_obj = permissions[action] || {}
       , instance_type =
           instance.constructor ? instance.constructor.shortName : instance.type
