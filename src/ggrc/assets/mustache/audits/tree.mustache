@@ -3,7 +3,7 @@
   <div class="item-main" data-model="true" {{data 'model'}}>
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
-        <div class="span11">
+        <div class="span10">
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
@@ -17,6 +17,8 @@
             </div>
           </div>
         </div>
+        {{#with_page_object_as 'page_object'}}
+        {{#if_equals page_object.constructor.shortName 'Person'}}
         <div class="span1">
           <div class="counter">
             {{^instance.owner}}
@@ -24,6 +26,27 @@
             {{/instance.owner}}
           </div>
         </div>
+        <div class="span1">
+          <div class="counter">
+            <i class="grcicon-object-black"></i>
+            {{#mapping_count instance 'related_objects'}}
+              {{.}}
+            {{else}}
+              ...
+            {{/mapping_count}}
+          </div>
+        </div>
+        {{else}}
+        <div class="span1"></div>
+        <div class="span1">
+          <div class="counter">
+            {{^instance.owner}}
+              <i class="grcicon-people-warning"></i>
+            {{/instance.owner}}
+          </div>
+        </div>
+        {{/if_equals}}
+        {{/with_page_object_as}}
       </div>
     </a>
   </div>

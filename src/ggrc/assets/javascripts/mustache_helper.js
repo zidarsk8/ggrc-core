@@ -1308,7 +1308,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
   var args = can.makeArray(arguments)
     , mappings = args.slice(1, args.length - 1)
     , options = args[args.length-1]
-    , root = options.contexts[0]
+    , root = get_binding_observe('__mapping_count', options)
     , refresh_queue = new RefreshQueue()
     , mapping
     ;
