@@ -308,21 +308,14 @@ def create_public_program_audit_role_implications(audit_context):
   #Roles implied from Private Program context for Audit context
   db.session.add(RoleImplication(
       source_context=None,
-      source_role_id=basic_roles.object_editor(),
+      source_role=basic_roles.object_editor(),
       context=audit_context,
       role=basic_roles.program_audit_editor(),
       modified_by=get_current_user(),
       ))
   db.session.add(RoleImplication(
       source_context=None,
-      source_role_id=basic_roles.reader(),
-      role=basic_roles.program_audit_reader(),
-      context=audit_context,
-      modified_by=get_current_user(),
-      ))
-  db.session.add(RoleImplication(
-      source_context=None,
-      source_role_id=basic_roles.reader(),
+      source_role=basic_roles.reader(),
       role=basic_roles.program_audit_reader(),
       context=audit_context,
       modified_by=get_current_user(),
