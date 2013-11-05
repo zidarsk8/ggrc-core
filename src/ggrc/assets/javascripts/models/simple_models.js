@@ -985,7 +985,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
-    , owner: {id : null}
+    , owner: {id : null}//gets replaced in init()
   }
   , tree_view_options : {
     draw_children : true
@@ -995,6 +995,12 @@ can.Model.Cacheable("CMS.Models.Audit", {
       , allow_creating : true
       , parent_find_param : "audit.id"
     }]
+  }
+  , init : function() {
+    this._super && this._super.apply(this, arguments);
+    $(function() {
+      CMS.Models.Audit.defaults.owner = CMS.Models.get_instance("Person", GGRC.current_user.id, GGRC.current_user).stub();
+    });
   }
 }, {
 
@@ -1043,7 +1049,18 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   }
 }, {
-  response_model_class : function() {
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    function setAssigneeFromAudit() {
+      if(!this.selfLink && !this.assignee && this.audit) {
+        this.attr("assignee", this.audit.reify().owner || {id : null});
+      }
+    }
+    setAssigneeFromAudit.call(this);
+
+    this.bind("audit", setAssigneeFromAudit);
+  }
+  , response_model_class : function() {
     return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";
   }
 });
