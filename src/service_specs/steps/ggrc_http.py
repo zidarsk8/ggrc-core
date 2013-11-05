@@ -316,3 +316,9 @@ def check_DELETE_is_allowed(context, resource_name):
 def fail(context):
   """Handy force failure so the trace can be retrieved when debugging tests."""
   assert False
+
+@given('link property "{property1}" of "{resource1}" is link property "{property2}" of "{resource2}"')
+def copy_link_property(context, property1, resource1, property2, resource2):
+  resource1 = getattr(context, resource1)
+  resource2 = getattr(context, resource2)
+  resource1.set(property1, resource2.get(property2))
