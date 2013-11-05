@@ -1104,6 +1104,8 @@ Mustache.registerHelper("is_allowed", function() {
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
       context_id = null;
+    else if (context_id === 'for')
+      context_id = undefined;
   }
 
   if (resource_type && context_id === context_unset) {
@@ -1122,8 +1124,9 @@ Mustache.registerHelper("is_allowed", function() {
 
   // Check permissions
   can.each(actions, function(action) {
-    passed =
-      passed && Permission.is_allowed(action, resource_type, context_id);
+    if (context_id !== undefined) {
+      passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    }
     if (resource) {
       passed = passed && Permission.is_allowed_for(action, resource);
     }
