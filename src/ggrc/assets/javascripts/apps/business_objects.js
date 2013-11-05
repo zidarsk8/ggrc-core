@@ -261,7 +261,6 @@ $(function() {
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Contract: {
                 mapping: "extended_related_contracts_via_search"
@@ -269,7 +268,6 @@ $(function() {
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Policy: {
                 mapping: "extended_related_policies_via_search"
@@ -277,61 +275,58 @@ $(function() {
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
             , Audit : { 
                 mapping: "extended_related_audits_via_search"
               , allow_mapping : false
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
-              , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
               }
             , Section : {
                 model : CMS.Models.Section
               , mapping : "extended_related_sections_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
-              , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"
               , draw_children : true
               } 
             , Objective: {
                 mapping: "extended_related_objectives_via_search"
               , draw_children: true
               , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               }
             , Control: {
-                  mapping: "extended_related_controls_via_search"
-                , draw_children: true
-                , show_view: GGRC.mustache_path + "/controls/tree.mustache"
-                , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-                }
+                mapping: "extended_related_controls_via_search"
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              }
             , DataAsset: {
-                  mapping: "extended_related_data_assets_via_search"
-                }
+                mapping: "extended_related_data_assets_via_search"
+              }
             , Facility: {
-                  mapping: "extended_related_facilities_via_search"
-                }
+                mapping: "extended_related_facilities_via_search"
+              }
             , Market: {
-                  mapping: "extended_related_markets_via_search"
-                }
+                mapping: "extended_related_markets_via_search"
+              }
             , OrgGroup: {
-                  mapping: "extended_related_org_groups_via_search"
-                }
+                mapping: "extended_related_org_groups_via_search"
+              }
             , Process: {
-                  mapping: "extended_related_processes_via_search"
-                }
+                mapping: "extended_related_processes_via_search"
+              }
             , Product: {
-                  mapping: "extended_related_products_via_search"
-                }
+                mapping: "extended_related_products_via_search"
+              }
             , Project: {
-                  mapping: "extended_related_projects_via_search"
-                }
+                mapping: "extended_related_projects_via_search"
+              }
             , System: {
-                  mapping: "extended_related_systems_via_search"
-                }
+                mapping: "extended_related_systems_via_search"
+              }
             , Document: {
-                  mapping: "extended_related_documents_via_search"
-                }
+                mapping: "extended_related_documents_via_search"
+              }
         }
       })
     ;

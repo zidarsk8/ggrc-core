@@ -4,22 +4,23 @@
 -# Created By: brad@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 -#
+
 -extends "layouts/dashboard.haml"
 
 -block title
-  Dashboard
+  GRC: My Work
 
 -block page_help
   dashboard
 
--block header
-  %h1.dashboard-title
-    %i.grciconlarge-dashboard
-    Dashboard
+-block extra_javascript
+  =super()
+  GGRC.page_object = { "person": ={ current_user_json()|safe } };
 
--block main
-  .clearfix
-    .object-area.dashboard-area
-      #show_columns.column-set{ 'data-resize': "true" }
-        #middle_column.widget-area
-          -block widget_area
+-block header
+  %h1{ 'class': "={ model_display_class }" }
+    .grcobject{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Person", 'class': "" }
+      %i.grcicon-person
+    My Work
+
+-block widget_area

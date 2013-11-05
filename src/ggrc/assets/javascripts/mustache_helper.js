@@ -1525,4 +1525,11 @@ Mustache.registerHelper("global_count", function(model_type, options) {
   }
 });
 
+Mustache.registerHelper("is_dashboard", function(options) {
+  if (/dashboard/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 })(this, jQuery, can);

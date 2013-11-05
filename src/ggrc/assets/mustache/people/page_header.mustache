@@ -9,5 +9,9 @@
   <div class="grcobject {{model.category}}" rel="tooltip" data-placement="bottom" title="{{model.title_singular}}">
     <i class="grcicon-{{model.table_singular}}"></i>
   </div>
-  {{firstnonempty instance.name instance.email}}
+  {{#is_dashboard}}
+  	My Work
+  {{else}}
+  	{{firstnonempty instance.name instance.email}}
+  {{/is_dashboard}}
 </h1>

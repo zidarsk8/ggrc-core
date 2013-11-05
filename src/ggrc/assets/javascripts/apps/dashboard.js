@@ -443,13 +443,15 @@ $(function() {
             header_view: GGRC.mustache_path + "/people/page_header.mustache"
           , page_title: function(controller) {
               var instance = controller.options.instance;
-              return "GRC Profile: " + (instance.name && instance.name.trim()) || (instance.email && instance.email.trim());
+              return /dashboard/.test(window.location)
+                ? "GRC: My Work"
+                : "GRC Profile: " + (instance.name && instance.name.trim()) || (instance.email && instance.email.trim());
             }
 
         }
     };
 
-    if (/\w+\/\d+($|\?|\#)/.test(window.location)) {
+    if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
@@ -466,12 +468,6 @@ $(function() {
             return controller.options.instance.constructor.table_singular;
           }
         }, extra_page_options[model_name]));
-    } else if (/dashboard/.test(window.location)) {
-      $area.cms_controllers_dashboard({
-          model_descriptors: model_descriptors
-        , menu_tree_spec: dashboard_menu_spec
-        , default_widgets: ['program']
-        })
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({
           widget_descriptors: admin_widget_descriptors

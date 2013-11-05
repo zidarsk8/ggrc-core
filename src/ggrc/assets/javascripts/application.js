@@ -174,6 +174,9 @@ jQuery.extend(GGRC, {
   }
 
   , page_instance : function() {
+    if (!GGRC.page_object && /dashboard/.test(window.location)) {
+      GGRC.page_object = { person: GGRC.current_user };
+    }
     if (!GGRC._page_instance && GGRC.page_object) {
       GGRC._page_instance = GGRC.make_model_instance(GGRC.page_object);
     }
