@@ -7,8 +7,6 @@
 
 {{#if allow_mapping_or_creating}}
 {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
-{{#with_page_object_as 'page_object'}}
-{{^if_equals page_object.constructor.shortName 'Person'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
 <li class="tree-footer tree-item tree-item-add">
@@ -66,7 +64,5 @@
 </li>
 {{/is_allowed_to_map}}
 {{/if}}
-{{/if_equals}}
-{{/with_page_object_as}}
 {{/if_match}}
 {{/if}}
