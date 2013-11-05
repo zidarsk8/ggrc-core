@@ -233,15 +233,6 @@ var admin_list_descriptors = {
     , object_display : "Events"
     , list_view : "/static/mustache/events/object_list.mustache"
   }
-  //, "authorizations" : {
-      //model : CMS.Models.UserRole
-    //, object_type : "user-role"
-    //, object_category : "governance"
-    //, object_route : "authorizations"
-    //, object_display : "Authorizations"
-    //, list_view : GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
-    //, list_loader : authorizations_list_loader
-  //}
 };
 
 function collated_user_roles_by_person(user_roles) {
@@ -355,24 +346,10 @@ var admin_widget_descriptors = {
       return "";
     }
   }
-  , "authorizations" : {
-      "content_controller": GGRC.Controllers.ListView
-    , "content_controller_options": {
-        list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
-      , list_loader: authorizations_list_loader
-      , fetch_post_process : sort_by_name_email
-    }
-    , "widget_id" : "authorizations_list"
-    , "widget_name" : "Authorizations"
-    , "widget_icon" : "authorization"
-    , extra_widget_actions_view : GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache"
-  }
 };
 
 if (/admin\/\d+/.test(window.location)) {
-  var widget_ids = [
-        'authorizations'
-      ]
+  var widget_ids = [];
 
   if (!GGRC.extra_widget_descriptors)
     GGRC.extra_widget_descriptors = {};
@@ -402,7 +379,7 @@ dashboard_menu_spec = [
 //function make_admin_menu(widget_descriptors) {
 var admin_menu_spec = [
   { title : "Admin"
-  , objects: [ "roles", "events", "people", "authorizations" ]
+  , objects: [ "roles", "events", "people" ]
   }
 ]
 
@@ -467,7 +444,7 @@ $(function() {
       $area.cms_controllers_dashboard({
           widget_descriptors: admin_widget_descriptors
         , menu_tree_spec: admin_menu_spec
-        , default_widgets : ["people", "roles", "events", "authorizations"]
+        , default_widgets : ["people", "roles", "events"]
       });
     } else {
       $area.cms_controllers_dashboard({ model_descriptors: [] });
