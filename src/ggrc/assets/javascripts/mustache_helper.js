@@ -1527,7 +1527,7 @@ Mustache.registerHelper("global_count", function(model_type, options) {
   if (state.attr('status') === 'failed') {
     return '';
   }
-  else if (state.attr('status') === 'loading') {
+  else if (state.attr('status') === 'loading' || state.count === undefined) {
     return options.inverse(options.contexts);
   }
   else {
