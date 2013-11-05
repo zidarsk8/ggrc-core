@@ -142,7 +142,8 @@
     background-position:-200px -32px;
   }
 }
-.grcicon-user {
+.grcicon-user,
+.grcicon-person {
   background-position:-6px -32px;
 }
 
@@ -152,7 +153,8 @@
   background-position:-6px -8px;
 }
 
-.grcicon-user-black {
+.grcicon-user-black,
+.grcicon-person-black {
   background-position:-6px -8px;
   .active & {
     background-position:-6px -32px;
@@ -440,7 +442,8 @@
   &.programs {
     background-position: 0 -36px;
   }
-  &.business {
+  &.business,
+  &.entities {
     background-position: 0 -72px;
   }
   &.risk {

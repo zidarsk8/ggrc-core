@@ -18,14 +18,20 @@ $(function() {
     , object = GGRC.page_instance();
 
   var info_widget_views = {
-    'programs': GGRC.mustache_path + "/programs/info.mustache"
+      'programs': GGRC.mustache_path + "/programs/info.mustache"
+    , 'people': GGRC.mustache_path + "/people/info.mustache"
   }
   default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
 
   var info_widget_descriptors = {
       info: {
           widget_id: "info"
-        , widget_name: object_class.title_singular + " Info"
+        , widget_name: function() {
+            if (object_class.title_singular === 'Person')
+              return 'Info';
+            else
+              return object_class.title_singular + " Info";
+          }
         , widget_icon: "grcicon-info"
         , content_controller: GGRC.Controllers.InfoWidget
         , content_controller_options: {
@@ -359,7 +365,7 @@ $(function() {
           , widget_id: far_model.table_singular
           , widget_name: function() {
               var $objectArea = $(".object-area");
-              if ( $objectArea.hasClass("dashboard-area") ) {
+              if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
                 return far_model.title_plural;
               } else {
                 return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;

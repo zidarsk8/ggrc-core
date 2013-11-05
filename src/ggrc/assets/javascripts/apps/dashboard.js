@@ -439,6 +439,14 @@ $(function() {
             }
 
         }
+      , Person: {
+            header_view: GGRC.mustache_path + "/people/page_header.mustache"
+          , page_title: function(controller) {
+              var instance = controller.options.instance;
+              return "GRC Profile: " + (instance.name && instance.name.trim()) || (instance.email && instance.email.trim());
+            }
+
+        }
     };
 
     if (/\w+\/\d+($|\?|\#)/.test(window.location)) {

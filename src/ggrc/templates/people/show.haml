@@ -6,11 +6,11 @@
 -extends "base_objects/show.haml"
 
 -block title
-  GRC Person: ={ instance.name }
+  GRC Profile: ={ instance.name }
 
 -block header
   %h1.people
-    .grcobject.people{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Person" }
+    .grcobject.people{ 'rel': "tooltip", 'data-placement': "bottom", 'title': "Profile" }
       %i.grcicon-person
     =instance.name
 
