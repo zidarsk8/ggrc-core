@@ -67,16 +67,21 @@ class Revision(Base, db.Model):
         else:
           result = u"{0} {1}".format(display_name, self.action)
     else:
-      if self.resource_type in ["Section", "Control"] and self.content.get(u'directive_id'):
-        # then get the corresponding directive
-        #TODO: a way to avoid this db hit?
-        directive = Directive.query.get(self.content[u'directive_id'])
-        result = "New {0}, {1}, created under {2}: {3}".format(
-            self.resource_type,
-            display_name,
-            directive.kind,
-            directive.display_name
-        )
+      if 'mapped_directive' in self.content:
+        # then this is a special case of combined map/creation
+        # should happen only for Section and Control
+        mapped_directive = self.content['mapped_directive']
+        if self.action == 'created':
+          result = "New {0}, {1}, created and mapped to {2}".format(
+              self.resource_type,
+              display_name,
+              mapped_directive
+          )
+        elif self.action == 'deleted':
+          result = "{0} unmapped from {1} and deleted".format(
+              display_name, mapped_directive)
+        else:
+          result = "{0} {1}".format(display_name, self.action)
       else:
         # otherwise, it's a normal creation event
         result = "{0} {1}".format(display_name, self.action)
