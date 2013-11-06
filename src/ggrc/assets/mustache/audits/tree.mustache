@@ -1,3 +1,11 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+
 {{!tree node mustache}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
   <div class="item-main" data-model="true" {{data 'model'}}>
@@ -193,10 +201,17 @@
         </li>
         -->
         <li>
-          <a href="#"><i class="grcicon-export"></i> Export PBC List</a>
+        <a href="{{parent_instance.viewLink}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
+        </li>
+
+        <li>
+        <a href="{{parent_instance.viewLink}}/import_pbcs"><i class="grcicon-import"></i> Import PBC List</a>
+        </li>
+
+        <li>
+        <a href="{{parent_instance.viewLink}}/import_pbc_template"><i class="grcicon-imp-exp"></i> Download PBC Import Template</a>
         </li>
       </ul>
-      
     </div>
 
     {{#if draw_children}}
