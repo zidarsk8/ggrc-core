@@ -234,8 +234,8 @@ def import_controls(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
 
-@app.route("/programs/<program_id>/import_pbcs", methods=['GET', 'POST'])
-def import_requests(program_id):
+@app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
+def import_requests(audit_id):
   from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
   from ggrc.converters.requests import RequestsConverter
@@ -243,9 +243,8 @@ def import_requests(program_id):
   from ggrc.models import Audit, Program
   import ggrc.views
 
-  program = Program.query.get(program_id)
-  audit = Audit.query.get(program_id)
-  #audit = Audit.query.filter_by(program_id=int(program_id)).first()
+  audit = Audit.query.get(audit_id)
+  program = audit.program
   program_url =\
     getattr(ggrc.views, program.__class__.__name__).url_for(program)
 
@@ -263,7 +262,7 @@ def import_requests(program_id):
 
         if dry_run:
           return render_template("programs/import_request_result.haml",
-              program_id=int(program_id), converter=converter,
+              converter=converter,
               results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
@@ -271,26 +270,27 @@ def import_requests(program_id):
           return import_redirect(program_url + "#audit_widget")
       else:
         file_msg = "Could not import: invalid csv file."
-        return render_template("audits/import_request_errors.haml",
-              program_id = program_id, exception_message = file_msg)
+        return render_template("programs/import_request_errors.haml",
+              exception_message = file_msg)
 
     except ImportException as e:
       if e.show_preview:
         converter = e.converter
         return render_template("programs/import_request_result.haml", exception_message=e,
             converter=converter, results=converter.objects,
-            program_id=int(program_id), heading_map=converter.object_map)
+            heading_map=converter.object_map)
       return render_template("programs/import_request_errors.haml",
-            program_id=int(program_id), exception_message=e)
+            exception_message=e)
 
-  return render_template("programs/import_request.haml", program_id=program_id, import_kind='Requests')
+  return render_template("programs/import_request.haml", import_kind='Requests')
 
 
-@app.route("/programs/<program_id>/import_pbc_template", methods=['GET'])
-def import_requests_template(program_id):
+@app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])
+def import_requests_template(audit_id):
   from flask import current_app
-  from ggrc.models.all_models import Program
-  program = Program.query.filter_by(id=int(program_id)).first()
+  from ggrc.models.all_models import Audit, Program
+  audit = Audit.query.get(audit_id)
+  program = audit.program
   template = "Request_Import_Template.csv"
   filename = "{}-requests.csv".format(program.slug)
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
