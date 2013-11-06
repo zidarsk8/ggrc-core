@@ -1001,6 +1001,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     $(function() {
       CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
     });
+    this.validatePresenceOf("program");
   }
 }, {
 

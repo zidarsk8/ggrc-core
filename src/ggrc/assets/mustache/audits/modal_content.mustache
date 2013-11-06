@@ -24,7 +24,7 @@
             Program
           </label>
           <select class="input-block-level" name="program.id">
-            {{#all 'Program'}}
+            {{#all 'Program' '{ "context_id__null" : false }'}}
             <option value="{{id}}">{{title}}</option>
             {{/all}}
           </select>
