@@ -518,15 +518,15 @@ def import_contract_clauses_template(directives_kind, directive_id):
   body = render_template("csv_files/" + filename, **options)
   return current_app.make_response((body, 200, headers))
 
-@app.route("/programs/<program_id>/export_pbcs", methods=['GET'])
-def export_requests(program_id):
+@app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])
+def export_requests(audit_id):
   from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Audit, Request, Program
+  from ggrc.models.all_models import Audit, Request
 
   options = {}
-  program = Program.query.filter_by(id=int(program_id)).first()
-  audit = Audit.query.filter_by(program_id=int(program_id)).first()
+  audit = Audit.query.get(audit_id)
+  program = audit.program
   options['program'] = program
   filename = "{}-requests.csv".format(program.slug)
   if 'ids' in request.args:
