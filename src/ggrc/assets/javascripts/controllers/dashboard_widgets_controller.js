@@ -109,10 +109,16 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         , mapping_model_name = GGRC.JoinDescriptor.join_model_name_for(
             page_model_name, list_model_name)
         ;
-      options.allow_reading = Permission.is_allowed(
-          "read", mapping_model_name, Permission.page_context_id());
-      options.allow_creating = Permission.is_allowed(
-          "create", mapping_model_name, Permission.page_context_id());
+      if (mapping_model_name) {
+        options.allow_reading = Permission.is_allowed_for(
+            "read", mapping_model_name);
+        options.allow_creating = Permission.is_allowed_for(
+            "create", mapping_model_name);
+      }
+      else {
+        options.allow_reading = Permission.is_allowed(
+            "read", mapping_model_name, Permission.page_context_id());
+      }
 
       if (options.allow_reading) {
         controller_content
