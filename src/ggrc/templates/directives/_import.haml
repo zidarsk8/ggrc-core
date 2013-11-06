@@ -28,6 +28,9 @@
             -if import_kind == "Controls"
               %a.section-import{"href": 'import_controls_template'}
                 Download Import Controls template
+            -elif import_kind == "Clauses"
+              %a.section-import{"href": 'import_clauses_template'}
+                Download Import Clauses template
             -else
               %a.section-import{"href": 'import_sections_template'}
                 Download Import Sections template
