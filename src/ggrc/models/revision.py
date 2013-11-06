@@ -4,6 +4,7 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
+from .all_models import Directive
 from .mixins import Base
 from .types import JsonType
 from .computed_property import computed_property
@@ -66,5 +67,22 @@ class Revision(Base, db.Model):
         else:
           result = u"{0} {1}".format(display_name, self.action)
     else:
-      result = u"{0} {1}".format(display_name, self.action)
+      if 'mapped_directive' in self.content:
+        # then this is a special case of combined map/creation
+        # should happen only for Section and Control
+        mapped_directive = self.content['mapped_directive']
+        if self.action == 'created':
+          result = u"New {0}, {1}, created and mapped to {2}".format(
+              self.resource_type,
+              display_name,
+              mapped_directive
+          )
+        elif self.action == 'deleted':
+          result = u"{0} unmapped from {1} and deleted".format(
+              display_name, mapped_directive)
+        else:
+          result = u"{0} {1}".format(display_name, self.action)
+      else:
+        # otherwise, it's a normal creation event
+        result = u"{0} {1}".format(display_name, self.action)
     return result

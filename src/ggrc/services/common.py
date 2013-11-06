@@ -14,11 +14,11 @@ from flask import url_for, request, current_app, g, has_request_context
 from flask.ext.sqlalchemy import Pagination
 from flask.views import View
 from ggrc import db
-from ggrc.models.cache import Cache
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
+from ggrc.models.cache import Cache
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
@@ -80,13 +80,13 @@ def log_event(session, obj=None, current_user_id=None):
     current_user_id = get_current_user_id()
   cache = get_cache()
   for o in cache.dirty:
-    revision = Revision(o, current_user_id, 'modified', o.to_json())
+    revision = Revision(o, current_user_id, 'modified', o.log_json())
     revisions.append(revision)
   for o in cache.deleted:
-    revision = Revision(o, current_user_id, 'deleted', o.to_json())
+    revision = Revision(o, current_user_id, 'deleted', o.log_json())
     revisions.append(revision)
   for o in cache.new:
-    revision = Revision(o, current_user_id, 'created', o.to_json())
+    revision = Revision(o, current_user_id, 'created', o.log_json())
     revisions.append(revision)
   if obj is None:
     resource_id = 0

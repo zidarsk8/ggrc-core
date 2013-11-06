@@ -27,7 +27,7 @@ def get_permissions_json():
 
 def get_current_user_json():
   current_user = get_current_user()
-  return as_json(current_user.to_json())
+  return as_json(current_user.log_json())
 
 @app.context_processor
 def base_context():
