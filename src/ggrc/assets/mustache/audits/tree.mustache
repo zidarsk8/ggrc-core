@@ -1,3 +1,11 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+
 {{!tree node mustache}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
   <div class="item-main" data-model="true" {{data 'model'}}>
@@ -193,7 +201,15 @@
         </li>
         -->
         <li>
-          <a href="#"><i class="grcicon-export"></i> Export PBC List</a>
+        <a href="{{parent_instance.viewLink}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
+        </li>
+
+        <li>
+        <a href="{{parent_instance.viewLink}}/import_pbcs"><i class="grcicon-import"></i> Import PBC List</a>
+        </li>
+
+        <li>
+        <a href="{{parent_instance.viewLink}}/import_pbc_template"><i class="grcicon-imp-exp"></i> Download PBC Import Template</a>
         </li>
         <li>
 <div class="widget-action pull-right" rel="tooltip" title="Manage Authorized Auditors">
@@ -204,21 +220,20 @@
 </div>
         </li>
       </ul>
-      
     </div>
 
     {{#if draw_children}}
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
           <div class="inner-tree">
-            <h6>My PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
             {{#child_options.1}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
-            <h6>My PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
             {{#child_options.2}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options.2}}

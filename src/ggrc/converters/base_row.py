@@ -244,12 +244,56 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
-class TextOrHtmlColumnHandler(ColumnHandler):
+class RequestTypeColumnHandler(ColumnHandler):
+
+    def parse_item(self, value):
+      from ggrc.models import Request
+      formatted_type = value.lower()
+      if formatted_type in Request.VALID_TYPES:
+        return formatted_type
+      else:
+        self.add_error("Value must be one of the following: {}".format(
+            Request.VALID_TYPES
+        ))
+        return None
+
+
+class RequestTypeColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
-    if value:
-      value = value.strip()
-    return value or ''
+    from ggrc.models import Request
+    formatted_type = value.strip().lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
+
+
+class RequestStatusColumnHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    from ggrc.models import Request
+    words = value.strip().split()
+    formatted_type = u" ".join(s.capitalize() for s in words)
+    if formatted_type in Request.VALID_STATES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_STATES
+      ))
+      return None
+
+
+class TextOrHtmlColumnHandler(ColumnHandler):
+
+ def parse_item(self, value):
+   if value:
+     value = value.strip()
+   return value or ''
+
 
 class ContactEmailHandler(ColumnHandler):
 
@@ -570,6 +614,35 @@ class LinksHandler(ColumnHandler):
       # Overwrite with only imported links
       if hasattr(obj, self.options.get('association')):
         setattr(obj, self.options.get('association'), self.imported_links())
+
+class ObjectiveHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the objective_id, otherwise throw error
+    objective = Objective.query.filter_by(slug=value.upper()).first()
+    if not objective:
+      self.add_error("Objective code {} does not exist.".format(value))
+    else:
+      return objective.id
+
+  def export(self):
+    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    if objective_id:
+      objective = Objective.query.filter_by(id=objective_id).first()
+      return objective.slug
+    else:
+      return objective_id
+
+  def display(self):
+    # self.importer.obj[self.key] only returns objective id
+    # need to return corresponding objective slug or empty string
+    objective_id = getattr(self.importer.obj, self.key, '') or ''
+    if objective_id:
+      objective = Objective.query.get(objective_id)
+      if objective:
+        return objective.slug
+    return ''
+
 
 class LinkControlsHandler(LinksHandler):
 
