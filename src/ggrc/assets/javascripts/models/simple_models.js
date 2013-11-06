@@ -263,7 +263,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
 can.Model.Cacheable("CMS.Models.OrgGroup", {
   root_object : "org_group"
   , root_collection : "org_groups"
-  , category : "business"
+  , category : "entities"
   , findAll : "GET /api/org_groups"
   , findOne : "GET /api/org_groups/{id}"
   , create : "POST /api/org_groups"
@@ -999,7 +999,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , init : function() {
     this._super && this._super.apply(this, arguments);
     $(function() {
-      CMS.Models.Audit.defaults.owner = CMS.Models.get_instance("Person", GGRC.current_user.id, GGRC.current_user).stub();
+      CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
     });
   }
 }, {

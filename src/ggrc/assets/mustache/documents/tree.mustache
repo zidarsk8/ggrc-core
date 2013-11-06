@@ -17,6 +17,11 @@
                 {{firstnonempty instance.title instance.link}}
                 <span class="option">
                 </span>
+                {{#infer_roles instance}}
+                  <span class="role">
+                    {{.}}
+                  </span>
+                {{/infer_roles}}
               </div>
             </div>
           </div>

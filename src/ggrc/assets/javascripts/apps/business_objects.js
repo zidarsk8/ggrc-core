@@ -18,14 +18,20 @@ $(function() {
     , object = GGRC.page_instance();
 
   var info_widget_views = {
-    'programs': GGRC.mustache_path + "/programs/info.mustache"
+      'programs': GGRC.mustache_path + "/programs/info.mustache"
+    , 'people': GGRC.mustache_path + "/people/info.mustache"
   }
   default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
 
   var info_widget_descriptors = {
       info: {
           widget_id: "info"
-        , widget_name: object_class.title_singular + " Info"
+        , widget_name: function() {
+            if (object_class.title_singular === 'Person')
+              return 'Info';
+            else
+              return object_class.title_singular + " Info";
+          }
         , widget_icon: "grcicon-info"
         , content_controller: GGRC.Controllers.InfoWidget
         , content_controller_options: {
@@ -243,7 +249,87 @@ $(function() {
         , Contract : {
               _mixins: ["directive"]
             }
-        })
+
+        , Person : {
+             Program : {
+                mapping: "extended_related_programs_via_search"
+              , fetch_post_process: sort_sections
+              }
+            , Regulation: {
+                mapping: "extended_related_regulations_via_search"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              }
+            , Contract: {
+                mapping: "extended_related_contracts_via_search"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              }
+            , Policy: {
+                mapping: "extended_related_policies_via_search"
+              , draw_children: true
+              , child_options: [section_child_options]
+              , fetch_post_process: sort_sections
+              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+              }
+            , Audit : { 
+                mapping: "extended_related_audits_via_search"
+              , allow_mapping : false
+              , draw_children : true
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              }
+            , Section : {
+                model : CMS.Models.Section
+              , mapping : "extended_related_sections_via_search"
+              , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , draw_children : true
+              } 
+            , Objective: {
+                mapping: "extended_related_objectives_via_search"
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              }
+            , Control: {
+                mapping: "extended_related_controls_via_search"
+              , draw_children: true
+              , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              }
+            , DataAsset: {
+                mapping: "extended_related_data_assets_via_search"
+              }
+            , Facility: {
+                mapping: "extended_related_facilities_via_search"
+              }
+            , Market: {
+                mapping: "extended_related_markets_via_search"
+              }
+            , OrgGroup: {
+                mapping: "extended_related_org_groups_via_search"
+              }
+            , Process: {
+                mapping: "extended_related_processes_via_search"
+              }
+            , Product: {
+                mapping: "extended_related_products_via_search"
+              }
+            , Project: {
+                mapping: "extended_related_projects_via_search"
+              }
+            , System: {
+                mapping: "extended_related_systems_via_search"
+              }
+            , Document: {
+                mapping: "extended_related_documents_via_search"
+              }
+        }
+      })
     ;
 
   can.each(far_models, function(join_descriptors, model_name) {
@@ -275,8 +361,11 @@ $(function() {
           , widget_id: far_model.table_singular
           , widget_name: function() {
               var $objectArea = $(".object-area");
-              if ( $objectArea.hasClass("dashboard-area") ) {
-                return far_model.title_plural;
+              if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
+                if (/dashboard/.test(window.location))
+                  return "My " + far_model.title_plural;
+                else
+                  return far_model.title_plural;
               } else if (far_model.title_plural === "Audits") {
                 return "Mapped Audits <small>BETA</small>";
               } else {
@@ -285,6 +374,7 @@ $(function() {
             }
           , widget_icon: far_model.table_singular
           , object_category: far_model.category || 'default'
+          , model: far_model
           , content_controller_options: {
                 child_options: []
               , draw_children: false

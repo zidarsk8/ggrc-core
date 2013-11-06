@@ -25,6 +25,21 @@ function get_template_path(url) {
   return match && match[1];
 }
 
+// Returns an observable object in the current context
+// This allows the helper to inject asynchronous additional content
+function get_binding_observe(name, options) {
+  var context,
+    i = 0
+    ;
+  do {
+    context = options.contexts[i++]
+  } while (!(context instanceof can.Observe));
+  if (!context.attr(name)) {
+    context.attr(name, new can.Observe());
+  }
+  return context.attr(name);
+}
+
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
@@ -1336,7 +1351,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
   var args = can.makeArray(arguments)
     , mappings = args.slice(1, args.length - 1)
     , options = args[args.length-1]
-    , root = options.contexts[0]
+    , root = get_binding_observe('__mapping_count', options)
     , refresh_queue = new RefreshQueue()
     , mapping
     ;
@@ -1471,6 +1486,126 @@ function is_join(mapping) {
   }
   return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
 }
+
+// Determines and serializes the roles for a user
+var program_roles;
+Mustache.registerHelper("infer_roles", function(instance, options) {
+  instance = resolve_computed(instance);
+  var state = get_binding_observe("__infer_roles", options)
+    , page_instance = GGRC.page_instance()
+    , person = page_instance instanceof CMS.Models.Person ? page_instance : null
+    ;
+
+  if (person && !state.attr('status')) {
+    state.attr({
+        status: 'loading'
+      , count: 0
+      , roles: new can.Observe.List()
+    });
+
+    // Check for owner
+    if (instance.owner && instance.owner.id === person.id) {
+      state.attr('roles').push('Owner/POC');
+    }
+
+    // Check for people
+    if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
+      state.attr('roles').push('Mapped');
+    }
+
+    // Check for authorizations
+    if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
+      person.get_list_loader("authorizations").done(function(authorizations) {
+        authorizations = can.map(authorizations, function(auth) {
+          if (auth.instance.context && auth.instance.context.id === instance.context.id) {
+            return auth.instance;
+          }
+        });
+        !program_roles && (program_roles = CMS.Models.Role.findAll({ scope: "Private Program" }));
+        program_roles.done(function(roles) {
+          can.each(authorizations, function(auth) {
+            var role = CMS.Models.Role.findInCacheById(auth.role.id);
+            role && state.attr('roles').push(role.name);
+          });
+        });
+      });
+    }
+  }
+
+  // Return the result
+  if (!person || state.attr('status') === 'failed') {
+    return '';
+  }
+  else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
+    return options.inverse(options.contexts);
+  }
+  else {
+    if (state.attr('roles').attr('length')) {
+      var result = [];
+      can.each(state.attr('roles'), function(role) {
+        result.push(options.fn(role));
+      });
+      return result.join('');
+    }
+  }
+});
+
+// Uses search to find the counts for a model type
+Mustache.registerHelper("global_count", function(model_type, options) {
+  model_type = resolve_computed(model_type);
+  var state = get_binding_observe("__global_count", options)
+    ;
+
+  if (!state.attr('status')) {
+    state.attr('status', 'loading');
+    GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+      state.attr({
+          status: 'loaded'
+        , count: result.counts[model_type]
+      });
+    })
+  }
+
+  // Return the result
+  if (state.attr('status') === 'failed') {
+    return '';
+  }
+  else if (state.attr('status') === 'loading' || state.count === undefined) {
+    return options.inverse(options.contexts);
+  }
+  else {
+    return options.fn(state.count);
+  }
+});
+
+Mustache.registerHelper("is_dashboard", function(options) {
+  if (/dashboard/.test(window.location))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("is_profile", function(parent_instance, options) {
+  var instance;
+  if (options)
+    instance = resolve_computed(parent_instance);
+  else
+    options = parent_instance;
+
+  if (GGRC.page_instance() instanceof CMS.Models.Person && (!instance || instance.constructor.shortName !== 'DocumentationResponse'))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("person_owned", function(owner_id, options) {
+  owner_id = resolve_computed(owner_id);
+  var page_instance = GGRC.page_instance();
+  if (!(page_instance instanceof CMS.Models.Person) || (owner_id && page_instance.id === owner_id))
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
 
 Mustache.registerHelper("default_audit_title", function(program, options) {
   program = resolve_computed(program) || {title : "program"};

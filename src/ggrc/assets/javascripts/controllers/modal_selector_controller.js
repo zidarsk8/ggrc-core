@@ -755,7 +755,12 @@
       }
 
     , init_menu: function() {
-        var menu;
+        var menu
+          , lookup = {
+              governance: 0
+            , business: 1
+            , entities: 2
+            };
 
         if (!this.options.option_type_menu) {
           menu = [
@@ -765,9 +770,12 @@
             , { category: "Assets/Business"
               , items: []
               }
+            , { category: "People/Groups"
+              , items: []
+              }
             ];
           can.each(this.options.option_descriptors, function(descriptor) {
-            menu[descriptor.model.category === "governance" ? 0 : 1].items.push({
+            menu[lookup[descriptor.model.category] || 0].items.push({
                 model_name: descriptor.model.shortName
               , model_display: descriptor.model.title_plural
             })
