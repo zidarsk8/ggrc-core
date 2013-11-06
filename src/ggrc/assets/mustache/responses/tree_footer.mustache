@@ -1,3 +1,5 @@
+{{#if allow_creating}}
+{{#is_allowed 'create' model.shortName context=parent_instance.context.id}}
   <li class="tree-item tree-item-add tree-footer">
     <div class="row-fluid">
       <div class="span12 section-expandable">
@@ -15,3 +17,5 @@
       </div>
     </div>
   </li>
+{{/is_allowed}}
+{{/if}}
