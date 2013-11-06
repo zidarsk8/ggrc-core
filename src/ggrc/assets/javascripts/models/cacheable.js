@@ -539,6 +539,9 @@ can.Model("can.Model.Cacheable", {
         if (!params.__page) {
           params.__page = 1;
         }
+        if (!params.__page_size) {
+          params.__page_size = 100;
+        }
         return findPageFunc(collection_url, params);
       };
     }
