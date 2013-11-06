@@ -178,7 +178,8 @@ class Control(
         )
 
   def log_json(self):
-    out_json = super(Section, self).log_json()
+    out_json = super(Control, self).log_json()
     # so that event log can refer to deleted directive
-    out_json["mapped_directive"] = self.directive.display_name
+    if self.directive:
+      out_json["mapped_directive"] = self.directive.display_name
     return out_json
