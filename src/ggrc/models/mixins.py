@@ -204,7 +204,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   case.
   """
 
-  def to_json(self):
+  def log_json(self):
     d = {}
     for column in self.__table__.columns:
       try:

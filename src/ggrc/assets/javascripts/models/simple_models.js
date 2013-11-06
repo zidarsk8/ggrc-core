@@ -263,7 +263,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
 can.Model.Cacheable("CMS.Models.OrgGroup", {
   root_object : "org_group"
   , root_collection : "org_groups"
-  , category : "business"
+  , category : "entities"
   , findAll : "GET /api/org_groups"
   , findOne : "GET /api/org_groups/{id}"
   , create : "POST /api/org_groups"
@@ -985,7 +985,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
-    , owner: {id : null}
+    , owner: {id : null}//gets replaced in init()
   }
   , tree_view_options : {
     draw_children : true
@@ -994,7 +994,26 @@ can.Model.Cacheable("CMS.Models.Audit", {
       , mapping: "requests"
       , allow_creating : true
       , parent_find_param : "audit.id"
+    },
+    {
+      model : "Request"
+      , mapping: "related_owned_requests"
+      , allow_creating : true
+      , parent_find_param : "audit.id"
+    },
+    {
+      model : "Response"
+      , mapping: "related_owned_responses"
+      , allow_creating : true
+      , parent_find_param : "audit.id"
     }]
+  }
+  , init : function() {
+    this._super && this._super.apply(this, arguments);
+    $(function() {
+      CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
+    });
+    this.validatePresenceOf("program");
   }
 }, {
 
@@ -1043,7 +1062,18 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   }
 }, {
-  response_model_class : function() {
+  init : function() {
+    this._super && this._super.apply(this, arguments);
+    function setAssigneeFromAudit() {
+      if(!this.selfLink && !this.assignee && this.audit) {
+        this.attr("assignee", this.audit.reify().owner || {id : null});
+      }
+    }
+    setAssigneeFromAudit.call(this);
+
+    this.bind("audit", setAssigneeFromAudit);
+  }
+  , response_model_class : function() {
     return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";
   }
 });

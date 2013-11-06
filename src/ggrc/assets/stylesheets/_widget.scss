@@ -831,6 +831,7 @@
 // Profile Info Widget
 .profile-info {
   padding-top: 12px;
+  padding-bottom: 9px;
   ul {
     @include reset-list();
     li {

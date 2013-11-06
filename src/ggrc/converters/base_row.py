@@ -373,6 +373,12 @@ class OptionColumnHandler(ColumnHandler):
           value.lower()))
       return option
 
+  def export(self):
+    value = getattr(self.importer.obj, self.key, '') or ''
+    if not isinstance(value, basestring):
+      value = value.title
+    return value
+
   def display(self):
     if self.has_errors():
       return self.original
@@ -410,16 +416,17 @@ class DateColumnHandler(ColumnHandler):
     try:
       from datetime import datetime
       date_result = None
-      if isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
-        date_result = datetime.strptime(value, "%m/%d/%Y")
-      elif isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%m/%d/%y")
-      elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%Y/%m/%d")
-      elif isinstance(value, basestring) and re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
-        date_result = datetime.strptime(value, "%Y-%m-%d")
-      elif value:
-        raise ValueError("Error parsing the date string")
+      if isinstance(value, basestring):
+        if re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
+          date_result = datetime.strptime(value, "%m/%d/%Y")
+        elif re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%m/%d/%y")
+        elif re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%Y/%m/%d")
+        elif re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
+          date_result = datetime.strptime(value, "%Y-%m-%d")
+        elif value:
+          raise ValueError("Error parsing the date string")
 
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)

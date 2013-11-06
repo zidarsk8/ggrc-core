@@ -4,6 +4,7 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
+from .all_models import Directive
 from .mixins import Base
 from .types import JsonType
 from .computed_property import computed_property
@@ -48,23 +49,40 @@ class Revision(Base, db.Model):
     if 'display_name' not in self.content:
       return ''
     display_name = self.content['display_name']
-    if '<->' in display_name:
+    if u'<->' in display_name:
       #TODO: Fix too many values to unpack below
       source, destination = display_name.split('<->')[:2]
       if self.resource_type in link_objects:
         if self.action == 'created':
-          result = "{1} linked to {0}".format(source, destination)
+          result = u"{1} linked to {0}".format(source, destination)
         elif self.action == 'deleted':
-          result = "{1} unlinked from {0}".format(source, destination)
+          result = u"{1} unlinked from {0}".format(source, destination)
         else:
-          result = "{0} {1}".format(display_name, self.action)
+          result = u"{0} {1}".format(display_name, self.action)
       else:
         if self.action == 'created':
-          result = "{1} mapped to {0}".format(source, destination)
+          result = u"{1} mapped to {0}".format(source, destination)
         elif self.action == 'deleted':
-          result = "{1} unmapped from {0}".format(source, destination)
+          result = u"{1} unmapped from {0}".format(source, destination)
         else:
-          result = "{0} {1}".format(display_name, self.action)
+          result = u"{0} {1}".format(display_name, self.action)
     else:
-      result = "{0} {1}".format(display_name, self.action)
+      if 'mapped_directive' in self.content:
+        # then this is a special case of combined map/creation
+        # should happen only for Section and Control
+        mapped_directive = self.content['mapped_directive']
+        if self.action == 'created':
+          result = u"New {0}, {1}, created and mapped to {2}".format(
+              self.resource_type,
+              display_name,
+              mapped_directive
+          )
+        elif self.action == 'deleted':
+          result = u"{0} unmapped from {1} and deleted".format(
+              display_name, mapped_directive)
+        else:
+          result = u"{0} {1}".format(display_name, self.action)
+      else:
+        # otherwise, it's a normal creation event
+        result = u"{0} {1}".format(display_name, self.action)
     return result

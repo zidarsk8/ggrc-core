@@ -48,4 +48,4 @@ reciprocitynow.com/about","*Can be ""Corp"" or ""Prod""","*Optional.
 Can be ""Yes"", ""True"", or ""1"" to result in the System being labeled as ""Infrastructure"".
 
 Can be ""No"", ""False"", ""0"" to result in System being labeled as ""Not Infrastructure"""
-Process Code,Title,Description,Effective Date,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Map:References,Network Zone,Infrastructure
+Process Code,Title,Description,Effective Date,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Link:References,Network Zone,Infrastructure

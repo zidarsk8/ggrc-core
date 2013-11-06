@@ -11,15 +11,22 @@
   <div class="item-main" data-model="true" {{data 'model'}}>
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
-        <div class="span11">
+        <div class="span10">
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
               {{instance.title}}
               <span class="small gray">Planned</span>
+              {{#infer_roles instance}}
+                <span class="role">
+                  {{.}}
+                </span>
+              {{/infer_roles}}
             </div>
           </div>
         </div>
+        {{#with_page_object_as 'page_object'}}
+        {{#if_equals page_object.constructor.shortName 'Person'}}
         <div class="span1">
           <div class="counter">
             {{^instance.owner}}
@@ -27,6 +34,27 @@
             {{/instance.owner}}
           </div>
         </div>
+        <div class="span1">
+          <div class="counter">
+            <i class="grcicon-object-black"></i>
+            {{#mapping_count instance 'related_owned_objects'}}
+              {{.}}
+            {{else}}
+              ...
+            {{/mapping_count}}
+          </div>
+        </div>
+        {{else}}
+        <div class="span1"></div>
+        <div class="span1">
+          <div class="counter">
+            {{^instance.owner}}
+              <i class="grcicon-people-warning"></i>
+            {{/instance.owner}}
+          </div>
+        </div>
+        {{/if_equals}}
+        {{/with_page_object_as}}
       </div>
     </a>
   </div>
@@ -188,12 +216,28 @@
 
     {{#if draw_children}}
       {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-        <div class="inner-tree">
-          <h6>PBC Requests ({{child_count}})</h6>
-          {{#child_options}}
-          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-          {{/child_options}}
-        </div>
+        {{#is_profile}}
+          <div class="inner-tree">
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+            {{#child_options.1}}
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options.1}}
+          </div>
+
+          <div class="inner-tree">
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+            {{#child_options.2}}
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options.2}}
+          </div>
+        {{else}}
+          <div class="inner-tree">
+            <h6>PBC Requests ({{child_options.0.list.length}})</h6>
+            {{#child_options.0}}
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            {{/child_options.0}}
+          </div>
+        {{/is_profile}}
       {{/if_null}}
     {{/if}}
 

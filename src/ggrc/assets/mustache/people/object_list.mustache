@@ -15,12 +15,24 @@
             <div class="item-data">
               <div class="tree-title-area">
                 {{firstnonempty name email}}
+                {{#person_roles this "System|Admin"}}
+                  {{#roles}}
+                    <span class="role">
+                      {{permission_summary}}
+                    </span>
+                  {{/roles}}
+                {{/person_roles}}
               </div>
             </div>
           </div>
           <div class="span1">
-            <div class="counter">
-              <a data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit">
+            <div class="counter pull-left">
+              <a data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
+                <i class="grcicon-role-color"></i>
+              </a>
+            </div>
+            <div class="counter pull-left">
+              <a data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit Details">
                 <i class="grcicon-edit"></i>
               </a>
             </div>
@@ -29,10 +41,17 @@
       </div>
     </li>
   {{/list}}
-  <li class="tree-item tree-item-add">
+  <li class="tree-footer tree-item tree-item-add">
 
     <a class="btn-add" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
       + Person
     </a>
+
+    {{#pager.next}}
+    <a href="javascript://" class="pull-right view-more-paging">
+      View More
+      <i class="grcicon-down"></i>
+    </a>
+    {{/pager.next}}
   </li>
 </ul>

@@ -154,7 +154,7 @@
           return new can.Observe({
             option: CMS.Models.get_instance(
               CMS.Models.get_link_type(join, self.options.option_attr),
-              join[self.options.option_id_field] || join[self.options.option_attr].id)
+              join[self.options.option_attr].id)
           , join: join
           });
         }));
@@ -165,9 +165,12 @@
         ;
 
       return this.options.object_model.findAll(
-        $.extend({}, this.object_query),
+        $.extend({}, this.options.object_query),
         function(objects) {
           self.object_list.replace(objects)
+          if (self.object_list.length === 1) {
+            self.context.attr('selected_object', self.object_list[0]);
+          }
         });
     },
 
@@ -328,26 +331,23 @@
     },
 
     match_join: function(option_id, join) {
-      return join[this.options.option_id_field] == option_id ||
-        (join[this.options.option_attr]
-         && join[this.options.option_attr].id == option_id)
+      return (join[this.options.option_attr]
+              && join[this.options.option_attr].id == option_id);
     },
 
     get_new_join: function(option_id, option_scope, option_type) {
       var join_params = {};
-      join_params[this.options.option_id_field] = option_id;
-      if (this.options.option_type_field) {
-        join_params[this.options.option_type_field] = option_type;
-      }
-      join_params[this.options.join_id_field] = this.get_join_object_id();
-      if (this.options.join_type_field) {
-        join_params[this.options.join_type_field] = this.get_join_object_type();
-      }
+      join_params[this.options.option_attr] = {};
+      join_params[this.options.option_attr].id = option_id;
+      join_params[this.options.option_attr].type = option_type;
+      join_params[this.options.join_attr] = {};
+      join_params[this.options.join_attr].id = this.get_join_object_id();
+      join_params[this.options.join_attr].type = this.get_join_object_type();
+
       $.extend(join_params, this.options.extra_join_fields);
       if (option_scope == 'Admin') {
         join_params.context = { id: 0, type: 'Context' };
-      } // otherwise, go with the current value
-
+      }
       return new (this.options.join_model)(join_params);
     },
 
@@ -371,7 +371,7 @@
 
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
-    var context;
+    var context, object_query = {};
     if (GGRC.page_object) {
       context = GGRC.make_model_instance(GGRC.page_object).context;
       if (!context)
@@ -381,6 +381,10 @@
     } else {
       context = {id: null};
       extra_join_query = { context_id__in: [context.id,0] }
+    }
+
+    if (data.person_id) {
+      object_query = { id: data.person_id };
     }
 
     return {
@@ -403,6 +407,8 @@
       , object_model: CMS.Models.Person
       , option_model: CMS.Models.Role
       , join_model: CMS.Models.UserRole
+
+      , object_query: object_query
 
       //join_object_attr
       , option_attr: 'role'
@@ -430,9 +436,14 @@
         ;
 
       can.each($this.data(), function(v, k) {
-        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
-        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+        //  This is just a mapping of keys to underscored keys
+        var new_key = k.replace(
+                /[A-Z]/g, function(s) { return "_" + s.toLowerCase(); });
+        data_set[new_key] = v;
+        //  If we changed the key at all, delete the original
+        if (new_key !== k) {
           delete data_set[k];
+        }
       });
 
       if (typeof(options) === "string")
