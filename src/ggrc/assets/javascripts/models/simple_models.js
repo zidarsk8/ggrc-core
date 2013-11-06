@@ -994,6 +994,18 @@ can.Model.Cacheable("CMS.Models.Audit", {
       , mapping: "requests"
       , allow_creating : true
       , parent_find_param : "audit.id"
+    },
+    {
+      model : "Request"
+      , mapping: "related_owned_requests"
+      , allow_creating : true
+      , parent_find_param : "audit.id"
+    },
+    {
+      model : "Response"
+      , mapping: "related_owned_responses"
+      , allow_creating : true
+      , parent_find_param : "audit.id"
     }]
   }
   , init : function() {

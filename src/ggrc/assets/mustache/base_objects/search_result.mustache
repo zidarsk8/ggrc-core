@@ -32,7 +32,7 @@
 <li class="spinner">
 </li>
 {{/list}}
-{{^is_allowed 'read' model.shortName context=null}}
+{{^is_allowed 'read' model.shortName context='for'}}
 <li class="no-access">
   You do not have access to read this information.
 </li>

@@ -111,6 +111,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         ;
       options.allow_reading = Permission.is_allowed(
           "read", mapping_model_name, Permission.page_context_id());
+      options.allow_creating = Permission.is_allowed(
+          "create", mapping_model_name, Permission.page_context_id());
 
       if (options.allow_reading) {
         controller_content
@@ -122,7 +124,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
               top: '40px'
             }));
       }
-      else {
+      
+      if (!options.allow_creating && !options.allow_reading) {
         options.footer_view = GGRC.mustache_path + "/base_objects/tree_footer_no_access.mustache"
       }
 

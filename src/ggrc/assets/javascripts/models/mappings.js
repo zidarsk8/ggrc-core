@@ -35,6 +35,10 @@
     return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
   }
 
+  function CustomFilter(source, filter_fn) {
+    return new GGRC.ListLoaders.CustomFilteredListLoader(source, filter_fn);
+  }
+
   function Cross(local_mapping, remote_mapping) {
     return new GGRC.ListLoaders.CrossListLoader(local_mapping, remote_mapping);
   }
@@ -532,7 +536,7 @@
       , extended_related_products_via_search:    TypeFilter("related_objects_via_search", "Product")
       , extended_related_projects_via_search:    TypeFilter("related_objects_via_search", "Project")
       , extended_related_systems_via_search:     TypeFilter("related_objects_via_search", "System")
-      , extended_related_audits_via_search:     TypeFilter("related_objects_via_search", "Audit")
+      , extended_related_audits_via_search:      TypeFilter("related_objects_via_search", "Audit")
     }
 
     , UserRole : {
@@ -543,6 +547,21 @@
         requests: Direct("Request", "audit")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
+      , related_owned_objects: CustomFilter("related_objects", function(result) {
+          var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
+          return !person 
+            || (result.instance.owner && result.instance.owner.id === person.id) 
+            || (result.instance.assignee && result.instance.assignee.id === person.id)
+            ;
+        })
+      , related_owned_requests: TypeFilter("related_owned_objects", "Request")
+      , related_owned_documentation_responses: TypeFilter("related_owned_objects", "DocumentationResponse")
+      , related_owned_interview_responses: TypeFilter("related_owned_objects", "InterviewResponse")
+      , related_owned_population_sample_responses: TypeFilter("related_owned_objects", "PopulationSampleResponse")
+      , related_owned_responses: Multi(["related_owned_documentation_responses"
+                                      , "related_owned_interview_responses"
+                                      , "related_owned_population_sample_responses"
+                                      ])
     }
     , Request : {
       responses: Direct("Response", "request")
