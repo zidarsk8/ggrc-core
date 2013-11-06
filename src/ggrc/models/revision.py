@@ -72,17 +72,17 @@ class Revision(Base, db.Model):
         # should happen only for Section and Control
         mapped_directive = self.content['mapped_directive']
         if self.action == 'created':
-          result = "New {0}, {1}, created and mapped to {2}".format(
+          result = u"New {0}, {1}, created and mapped to {2}".format(
               self.resource_type,
               display_name,
               mapped_directive
           )
         elif self.action == 'deleted':
-          result = "{0} unmapped from {1} and deleted".format(
+          result = u"{0} unmapped from {1} and deleted".format(
               display_name, mapped_directive)
         else:
-          result = "{0} {1}".format(display_name, self.action)
+          result = u"{0} {1}".format(display_name, self.action)
       else:
         # otherwise, it's a normal creation event
-        result = "{0} {1}".format(display_name, self.action)
+        result = u"{0} {1}".format(display_name, self.action)
     return result
