@@ -191,8 +191,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , update : "PUT /api/policies/{id}"
   , destroy : "DELETE /api/policies/{id}"
   , defaults : {
-    kind : "Company Policy"
-  }
+      kind : null
+    }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     }
