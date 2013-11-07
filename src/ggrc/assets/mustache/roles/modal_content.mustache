@@ -15,7 +15,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Enter Role Name"></i>
       </label>
-      <input class="input-block-level" placeholder="Enter Role Name" name="name" type="text" value="{{name}}">
+      <input tabindex="1" class="input-block-level" placeholder="Enter Role Name" name="name" type="text" value="{{name}}" autofocus>
     </div>
     <div class="span6">
       <label>
@@ -23,7 +23,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Describe the role and provide examples of what permissions this role does and doesn't give."></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="role_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+        <textarea tabindex="2" id="role_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
       </div>
     </div>
   </div>
@@ -48,7 +48,7 @@
         Role Scope
         <i class="grcicon-help-black" rel="tooltip" title="Page scope to limit permissions to"></i>
       </label>
-      <select name="scope">
+      <select name="scope" tabindex="5">
         {{#scopes}}
           {{! System roles are hard-coded }}
           {{^if_equals . 'System'}}

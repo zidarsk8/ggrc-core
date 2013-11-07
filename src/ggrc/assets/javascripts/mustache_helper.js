@@ -760,7 +760,7 @@ Mustache.registerHelper("private_program", function(modal_title) {
     , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
-    , '<input name="private" value="private" type="checkbox"> Private Program'
+    , '<input tabindex="2" name="private" value="private" type="checkbox"> Private Program'
     , '</div>'
   ].join("");
 });
