@@ -119,6 +119,22 @@ describe("can.Model.LocalStorage", function() {
       expect(success).toBe(true);
     });
 
+    it("creates a model with an appropriate ID when the array of IDs is empty", function() {
+      var success = false;
+      window.localStorage.setItem("spec_model:ids", "[]");
+      new SpecModel({ foo : model1.foo }).save().done(function(item) {
+        expect(item.id + 1).not.toBe(item.id); //not infinity, not NaN
+        expect(item.foo).toEqual(model1.foo);
+
+        var ids = JSON.parse(window.localStorage.getItem("spec_model:ids"));
+        expect(ids.length).toEqual(1);
+        expect(window.localStorage.getItem("spec_model:" + ids[0])).toBeDefined();
+        success = true;
+      });
+      window.localStorage.removeItem("spec_model:-Infinity"); //the problem key
+      expect(success).toBe(true);
+    });
+
   });
 
   describe("::update", function() {
