@@ -691,7 +691,7 @@ Mustache.registerHelper("all", function(type, params, options) {
         if(val) {
           $parent.find("option[value=" + val + "]").attr("selected", true);
         } else {
-          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
+          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
         }
       }
       $parent.parent().find(":data(spinner)").each(function(i, el) {
