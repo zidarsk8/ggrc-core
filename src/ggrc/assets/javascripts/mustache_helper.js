@@ -813,13 +813,17 @@ Mustache.registerHelper("is_private", function(options) {
   return options.inverse(context);
 });
 
-Mustache.registerHelper("option_select", function(object, attr_name, role) {
+Mustache.registerHelper("option_select", function(object, attr_name, role, options) {
   var selected_option = object.attr(attr_name)
     , selected_id = selected_option ? selected_option.id : null
     , options_dfd = CMS.Models.Option.for_role(role)
     , tag_prefix =
         'select class="span12" model="Option" name="' + attr_name + '"'
     ;
+
+  if(options.hash && options.hash.tabindex) {
+    tag_prefix += ' tabindex=' + resolve_computed(options.hash.tabindex);
+  }
 
   function get_select_html(options) {
     return [
