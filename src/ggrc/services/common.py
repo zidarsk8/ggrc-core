@@ -14,7 +14,7 @@ from flask import url_for, request, current_app, g, has_request_context
 from flask.ext.sqlalchemy import Pagination
 from flask.views import View
 from ggrc import db
-from ggrc.utils import as_json, UnicodeSafeJsonWrapper
+from ggrc.utils import as_json, UnicodeSafeJsonWrapper, benchmark
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id
@@ -344,7 +344,8 @@ class Resource(ModelView):
 
   # Default JSON request handlers
   def get(self, id):
-    obj = self.get_object(id)
+    with benchmark("Query for object"):
+      obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
     if 'Accept' in self.request.headers and \
@@ -355,7 +356,8 @@ class Resource(ModelView):
       raise Forbidden()
     if not permissions.is_allowed_read_for(obj):
       raise Forbidden()
-    object_for_json = self.object_for_json(obj)
+    with benchmark("Serialize object"):
+      object_for_json = self.object_for_json(obj)
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
       return current_app.make_response((
@@ -389,7 +391,8 @@ class Resource(ModelView):
     ggrc.builder.json.update(obj, src)
 
   def put(self, id):
-    obj = self.get_object(id)
+    with benchmark("Query for object"):
+      obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
     if self.request.headers['Content-Type'] != 'application/json':
@@ -413,19 +416,25 @@ class Resource(ModelView):
     if new_context != obj.context_id \
         and not permissions.is_allowed_update(self.model.__name__, new_context):
       raise Forbidden()
-    self.json_update(obj, src)
+    with benchmark("Deserialize object"):
+      self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
-    db.session.commit()
-    obj = self.get_object(id)
+    with benchmark("Commit"):
+      db.session.commit()
+    with benchmark("Query for object"):
+      obj = self.get_object(id)
     update_index(db.session, modified_objects)
+    with benchmark("Serialize collection"):
+      object_for_json = self.object_for_json(obj)
     return self.json_success_response(
-        self.object_for_json(obj), self.modified_at(obj))
+        object_for_json, self.modified_at(obj))
 
   def delete(self, id):
-    obj = self.get_object(id)
+    with benchmark("Query for object"):
+      obj = self.get_object(id)
 
     if obj is None:
       return self.not_found_response()
@@ -439,10 +448,13 @@ class Resource(ModelView):
     db.session.delete(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
-    db.session.commit()
+    with benchmark("Commit"):
+      db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Query for object"):
+      object_for_json = self.object_for_json(obj)
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj))
+      object_for_json, self.modified_at(obj))
 
   def collection_get(self):
     if 'Accept' in self.request.headers and \
@@ -450,8 +462,11 @@ class Resource(ModelView):
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
-    objs = self.get_collection()
-    collection = self.collection_for_json(objs)
+    with benchmark("Query for collection"):
+      objs = self.get_collection()
+    with benchmark("Serialize collection"):
+      collection = self.collection_for_json(objs)
+
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(collection):
       return current_app.make_response((
@@ -519,16 +534,20 @@ class Resource(ModelView):
       if not permissions.is_allowed_create(
           self.model.__name__, self.get_context_id_from_json(src)):
         raise Forbidden()
-    self.json_create(obj, src)
+    with benchmark("Deserialize object"):
+      self.json_create(obj, src)
     self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
-    db.session.commit()
+    with benchmark("Commit"):
+      db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Serialize object"):
+      object_for_json = self.object_for_json(obj)
     return self.json_success_response(
-      self.object_for_json(obj), self.modified_at(obj), id=obj.id, status=201)
+      object_for_json, self.modified_at(obj), id=obj.id, status=201)
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
