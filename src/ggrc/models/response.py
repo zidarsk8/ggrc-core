@@ -33,6 +33,10 @@ class Response(BusinessObject, db.Model):
   _sanitize_html = [
       ]
 
+  def _display_name(self):
+    return u'Response with id={0} for Audit "{1}"'.format(
+        self.id, self.request.audit.display_name)
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
