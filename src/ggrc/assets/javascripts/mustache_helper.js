@@ -687,7 +687,10 @@ Mustache.registerHelper("all", function(type, params, options) {
           context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
         }
       }
-      $parent.parent().find(":data(spinner)").data("spinner").stop();
+      $parent.parent().find(":data(spinner)").each(function(i, el) {
+        var spinner = $(el).data("spinner");
+        spinner && spinner.stop();
+      });
       $el.remove();
       //since we are removing the original live bound element, replace the
       // live binding reference to it, with a reference to the new 
