@@ -1536,7 +1536,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
             return auth.instance;
           }
         });
-        !program_roles && (program_roles = CMS.Models.Role.findAll({ scope: "Private Program" }));
+        !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
         program_roles.done(function(roles) {
           can.each(authorizations, function(auth) {
             var role = CMS.Models.Role.findInCacheById(auth.role.id);
