@@ -300,16 +300,21 @@ def import_requests_template(audit_id):
 
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
-@app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
+@app.route("/contracts/<directive_id>/import_clauses", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Directive
+  from ggrc.models import Directive, Contract
   import ggrc.views
 
   directive = Directive.query.get(directive_id)
+  if isinstance(directive, Contract):
+    import_kind = "Clauses"
+  else:
+    import_kind = "Sections"
+
   directive_url =\
     getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
 
@@ -331,7 +336,8 @@ def import_sections(directive_id):
               results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
-          flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
+          flash(u'Successfully imported {} {}{}'.format(
+            count, 's' if count > 1 else ''), import_kind, 'notice')
           return import_redirect(directive_url + "#section_widget")
       else:
         file_msg = "Could not import: invalid csv file."
@@ -347,7 +353,8 @@ def import_sections(directive_id):
       return render_template("directives/import_errors.haml",
             directive_id=int(directive_id), exception_message=e)
 
-  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Sections')
+  return render_template(
+      "directives/import.haml", directive_id=directive_id, import_kind=import_kind)
 
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
@@ -481,7 +488,7 @@ def export_systems():
 
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
-@app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
 def export_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
@@ -494,15 +501,19 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
-@app.route("/<directives_kind>/<directive_id>/import_sections_template", methods=['GET'])
-def import_contract_clauses_template(directives_kind, directive_id):
+@app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
+@app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
+@app.route("/contracts/<directive_id>/import_clauses_template", methods=['GET'])
+def import_directive_sections_template(directive_id):
   from flask import current_app
   from ggrc.models.all_models import Directive
   DIRECTIVE_NAMES_MAP = {
-      'contracts': 'Contract_Clause',
-      'regulations': 'Regulation_Section',
-      'policies': 'Policy_Section',
+      'Contract': 'Contract_Clause',
+      'Regulation': 'Regulation_Section',
+      'Policy': 'Policy_Section',
   }
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  directives_kind = directive.__class__.__name__
   if directives_kind not in DIRECTIVE_NAMES_MAP:
     return current_app.make_response((
         "No template for that type.", 404, []))
@@ -510,7 +521,6 @@ def import_contract_clauses_template(directives_kind, directive_id):
       DIRECTIVE_NAMES_MAP[directives_kind]
   )
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
-  directive = Directive.query.filter_by(id=int(directive_id)).first()
   options = {
     # (Policy/Regulation/Contract) Code
     'directive_slug': directive.slug,
