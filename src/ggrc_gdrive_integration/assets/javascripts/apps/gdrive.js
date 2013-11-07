@@ -39,8 +39,9 @@
       var o2d = new $.Deferred();
       if(!authresult && !use_popup) {
         doGAuth(true);
+        return new $.Deferred().reject("login required. Switching to non-immediate");
       } else if(!authresult) {
-        oauth_dfd.reject("auth failed");
+        window.oauth_dfd.reject("auth failed");
         return new $.Deferred.reject();
       } else {
         gapi.client.oauth2.userinfo.get().execute(function(user) {
