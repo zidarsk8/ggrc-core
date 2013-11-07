@@ -142,16 +142,19 @@
     background-position:-200px -32px;
   }
 }
-.grcicon-user {
+.grcicon-user,
+.grcicon-person {
   background-position:-6px -32px;
 }
 
 .grcicon-objectperson-color,
-.grcicon-person-color {
+.grcicon-person-color,
+.grcicon-person-black {
   background-position:-6px -8px;
 }
 
-.grcicon-user-black {
+.grcicon-user-black,
+.grcicon-person-black {
   background-position:-6px -8px;
   .active & {
     background-position:-6px -32px;
@@ -361,6 +364,13 @@
 .grcicon-gchat {
   background-position:-246px -344px;
 }
+.grcicon-left-carot-arrow {
+  background-position:-150px -344px;
+}
+
+.grcicon-up {
+  background-position:-54px -368px;
+}
 
 // Large icons
 .grciconlarge-dashboard {
@@ -368,6 +378,9 @@
 }
 .grciconlarge-dashboard-white {
   background-position:-8px -40px;
+}
+.grciconlarge-arrow-left {
+  background-position: -40px -8px;
 }
 
 .showhide {
@@ -429,7 +442,8 @@
   &.programs {
     background-position: 0 -36px;
   }
-  &.business {
+  &.business,
+  &.entities {
     background-position: 0 -72px;
   }
   &.risk {
@@ -503,7 +517,7 @@
 .grcicon-project-color { background-position:-222px -296px; }
 .grcicon-orggroup, .grcicon-org_group { background-position:-78px -248px;}
 .grcicon-orggroup-black, .grcicon-org_group-black { background-position:-78px -224px; }
-.grcicon-orggroup-color, .grcicon-org_group-color { background-position:-246px -296px; }
+.grcicon-orggroup-color, .grcicon-org_group-color { background-position:-78px -224px; }/*{ background-position:-246px -296px; }*/
 .grcicon-dataasset, .grcicon-data_asset { background-position:-174px -248px; }
 .grcicon-dataasset-black, .grcicon-data_asset-black { background-position:-174px -224px; }
 .grcicon-dataasset-color, .grcicon-data_asset-color { background-position:-54px -320px; }

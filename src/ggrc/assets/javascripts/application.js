@@ -144,6 +144,7 @@ jQuery.extend(GGRC, {
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
       , "section_objective" : CMS.Models.SectionObjective
+      , "person" : CMS.Models.Person
       , "role" : CMS.Models.Role
     };
 
@@ -752,6 +753,23 @@ $(window).load(function(){
     $this.removeClass("active");
     return false;
   });
+  
+  // References popup preview
+  $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
+    if($(this).width() > $('.new-tree .tree-info').width()) {
+      $(this).addClass('shrink-it');
+    } 
+  });
+  
+  // Popover trigger for person tooltip in styleguide
+  if($('.person-tooltip-trigger').length > 0) {
+    $('.person-tooltip-trigger').popover({
+      html: true,
+      content: function() {
+        return $(this).closest('.person-holder').find('.custom-popover-content').html();
+      }
+    });
+  }
 
 });
 

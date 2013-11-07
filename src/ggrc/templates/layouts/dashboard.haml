@@ -10,7 +10,11 @@
   %li{ 'class': ['{{ li_class }}', 'accordion-group'], 'data-model-name': '={type}', 'data-tooltip-view' : '={tooltip_view}', 'data-template' : '={template_view}' }
     %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
       %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
-      {{ type_plural|title }}
+      -if type_plural|title == 'Audits'
+        Audits
+        %small BETA
+      -else
+        {{ type_plural|title }}
       %small
         (
         %span.item-count> ...
@@ -153,8 +157,12 @@
       .affix-holder
         #lhs.lhs.accordion
           -#NEW LHS
-          .lhs-search
-            %input{ 'type': 'text', 'class': 'input-block-level widgetsearch', 'placeholder': 'Enter text to search' }
+          %form.form-search{ 'onsubmit': 'return false' }
+            .lhs-search.input-append<
+              %input.widgetsearch{ 'type': 'text', 'placeholder': 'Enter text to search' }>
+              %label.checkbox.btn<
+                %input.my-work{ 'type': 'checkbox' }
+                My Work
           .lhs-bg
           .lhs-nav.emphesized
             %ul.top-level
@@ -177,7 +185,10 @@
               =search_result('Project', 'projects', 'business')
               =search_result('Facility', 'facilities', 'business')
               =search_result('Market', 'markets', 'business')
-              =search_result('OrgGroup', 'org groups', 'business')
+            %h2.entities People/Groups
+            %ul.top-level
+              =search_result('Person', 'people', 'entities')
+              =search_result('OrgGroup', 'org groups', 'entities')
             -#%h2.risk Risk Management
             -#%ul.top-level
               =search_result('Risk', 'risks', 'risk')

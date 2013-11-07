@@ -13,12 +13,18 @@
           <div class="span10">
             <div class="item-data">
               <div class="tree-title-area">
+                <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{#instance.title}}
                   {{instance.title}}
                 {{/instance.title}}
                 {{^instance.title}}
                   {{{firstnonempty instance.description_inline ''}}}
                 {{/instance.title}}
+                {{#infer_roles instance}}
+                  <span class="role">
+                    {{.}}
+                  </span>
+                {{/infer_roles}}
               </div>
             </div>
           </div>

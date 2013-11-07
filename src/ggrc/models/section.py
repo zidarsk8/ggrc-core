@@ -62,6 +62,13 @@ class Section(
       ]
 
   @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    from directive import Contract
+    if obj.directive and isinstance(obj.directive, Contract):
+      return "CLAUSE"
+    return super(Section, cls).generate_slug_prefix_for(obj)
+
+  @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
@@ -71,3 +78,9 @@ class Section(
         orm.subqueryload('control_sections'),
         orm.subqueryload('section_objectives'),
         orm.subqueryload('object_sections'))
+
+  def log_json(self):
+    out_json = super(Section, self).log_json()
+    # so that event log can refer to deleted directive
+    out_json["mapped_directive"] = self.directive.display_name
+    return out_json

@@ -20,9 +20,22 @@
   %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
     .import-interface
       .row-fluid
-        .span12
+        .span8
           %h3
             Choose CSV file to upload
+        .span4
+          .download-template
+            -if import_kind == "Controls"
+              %a.section-import{"href": 'import_controls_template'}
+                Download Import Controls template
+            -elif import_kind == "Clauses"
+              %a.section-import{"href": 'import_clauses_template'}
+                Download Import Clauses template
+            -else
+              %a.section-import{"href": 'import_sections_template'}
+                Download Import Sections template
+      .row-fluid
+        .span12
           %input{ 'name': 'file', 'value': 'choose file' , 'type': 'file' }
           .import-buttons
             %input{ 'value': 'Upload and Review', 'class': 'btn btn-primary', 'type': 'submit' }

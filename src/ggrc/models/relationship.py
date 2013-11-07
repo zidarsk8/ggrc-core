@@ -6,10 +6,9 @@
 import ggrc.models
 from ggrc import db
 from .mixins import deferred, Base, Described
-from .object_owner import Ownable
 from sqlalchemy.ext.declarative import declared_attr
 
-class Relationship(Ownable, Base, db.Model):
+class Relationship(Base, db.Model):
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
   source_type = db.Column(db.String, nullable=False)

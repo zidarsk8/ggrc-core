@@ -35,6 +35,9 @@ $.extend(Permission, (function() {
   _is_allowed = function(permissions, permission) {
     if (!permissions)
       return false; //?
+    // Prohibit all activity on profile pages
+    if (GGRC.page_instance() instanceof CMS.Models.Person && permission.action !== 'read' && !/dashboard/.test(window.location))
+      return false;
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
@@ -50,11 +53,13 @@ $.extend(Permission, (function() {
   };
 
   _resolve_permission_variable = function (value) {
-    if (value[0] == '$') {
-      if (value == '$current_user') {
-        return GGRC.current_user;
+    if ($.type(value) == 'string') {
+      if (value[0] == '$') {
+        if (value == '$current_user') {
+          return GGRC.current_user;
+        }
+        throw new Error('unknown permission variable: ' + value);
       }
-      throw new Error('unknown permission variable: ' + value);
     }
     return value;
   };
@@ -67,6 +72,16 @@ $.extend(Permission, (function() {
         if (list_value[i].id == value.id) return true;
       }
       return false;
+    }
+    , is: function(instance, argss) {
+      var value = _resolve_permission_variable(args.value);
+      var property_value = instance[args.property_name];
+      return value == property_value;
+    }
+    , in: function(instance, args) {
+      var value = _resolve_permission_variable(args.value);
+      var property_value = instance[args.property_name];
+      return value.indexOf(property_value) >= 0;
     }
   };
 

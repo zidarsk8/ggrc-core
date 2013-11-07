@@ -28,7 +28,6 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 }, {
 
   init : function() {
-
     if(!this.options.model && GGRC.page_model) {
       this.options.model = GGRC.infer_object_type(GGRC.page_object);
     }
@@ -56,6 +55,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         top: '10px'
         }))
     .trigger("section_created");
+
+    this.options.widget_count = new can.Observe();
 
     $.when(
       can.view(this.options.widget_view, $.when(this.options))
@@ -108,8 +109,16 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         , mapping_model_name = GGRC.JoinDescriptor.join_model_name_for(
             page_model_name, list_model_name)
         ;
-      options.allow_reading = Permission.is_allowed(
-          "read", mapping_model_name, Permission.page_context_id());
+      if (mapping_model_name) {
+        options.allow_reading = Permission.is_allowed_for(
+            "read", mapping_model_name);
+        options.allow_creating = Permission.is_allowed_for(
+            "create", mapping_model_name);
+      }
+      else {
+        options.allow_reading = Permission.is_allowed(
+            "read", mapping_model_name, Permission.page_context_id());
+      }
 
       if (options.allow_reading) {
         controller_content
@@ -121,7 +130,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
               top: '40px'
             }));
       }
-      else {
+      
+      if (!options.allow_creating && !options.allow_reading) {
         options.footer_view = GGRC.mustache_path + "/base_objects/tree_footer_no_access.mustache"
       }
 
@@ -148,7 +158,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   }
 
   , " updateCount" : function(el, ev, count) {
-    this.element.find(".header .object_count").html("(" + count + ")");
+    this.options.widget_count.attr('count', ''+count);
     this.element.trigger("widgets_updated");
   }
 });
