@@ -37,11 +37,14 @@ class DefaultUserPermissionsProvider(object):
     return DefaultUserPermissions()
 
 def resolve_permission_variable(value):
-  if value.startswith('$'):
-    if value == '$current_user':
-      return current_user
-    raise Exception(
-        'The permission condition variable {0} is not defined!'.format(name))
+  if type(value) is str or type(value) is unicode:
+    if value.startswith('$'):
+      if value == '$current_user':
+        return current_user
+      raise Exception(
+          'The permission condition variable {0} is not defined!'.format(name))
+    else:
+      return value
   else:
     return value
 
@@ -49,6 +52,16 @@ def ContainsCondition(instance, value, list_property):
   value = resolve_permission_variable(value)
   list_value = getattr(instance, list_property)
   return value in list_value
+
+def IsCondition(instance, value, property_name):
+  value = resolve_permission_variable(value)
+  property_value = getattr(instance, property_name)
+  return value == property_value
+
+def InCondition(instance, value, property_name):
+  value = resolve_permission_variable(value)
+  property_value = getattr(instance, property_name)
+  return property_value in value
 
 """
 All functions with a signature
@@ -59,6 +72,8 @@ All functions with a signature
 """
 _CONDITIONS_MAP = {
   'contains': ContainsCondition,
+  'is': IsCondition,
+  'in': InCondition,
   }
 
 class DefaultUserPermissions(UserPermissions):

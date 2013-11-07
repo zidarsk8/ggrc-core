@@ -617,10 +617,11 @@ ul.new-tree {
   .info-audit {
     @include reset-list();
     @include clearfix();
-    margin: 10px 0;
+    margin: 10px 0 0;
     li {
       float: left;
       margin-right: 20px;
+      margin-bottom: 10px;
       a {
         font-size:11px;
         font-weight:bold;

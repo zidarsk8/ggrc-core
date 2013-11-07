@@ -74,8 +74,10 @@
       var href = $trigger.attr('data-href') || $trigger.attr('href')
         , modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '')
         , $target = $('<div id="' + modal_id + '" class="modal modal-selector hide"></div>')
+        , scope = $trigger.attr('data-modal-scope') || null
         ;
 
+      options.scope = scope;
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
       return $target;
@@ -181,7 +183,10 @@
         ;
 
       // If this is a private model, set the scope
-      if (instance && instance.constructor.shortName === "Program" && instance.context) {
+      if (self.options.scope) {
+        params.scope = self.options.scope;
+      }
+      else if (instance && instance.constructor.shortName === "Program" && instance.context) {
         params.scope = "Private Program";
       }
       else if (/admin/.test(window.location)) {
