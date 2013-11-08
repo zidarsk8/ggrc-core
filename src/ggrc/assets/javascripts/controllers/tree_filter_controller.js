@@ -29,7 +29,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
         var val = states[key]
         , test = that.resolve_object(model, key);
         
-        if(val.isAfter) {
+        if(val && val.isAfter) {
           if(!test || !moment(test).isAfter(val)) {
             return false;
           } else {
