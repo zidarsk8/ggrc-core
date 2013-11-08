@@ -144,6 +144,7 @@ jQuery.extend(GGRC, {
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
       , "section_objective" : CMS.Models.SectionObjective
+      , "person" : CMS.Models.Person
       , "role" : CMS.Models.Role
     };
 
@@ -714,6 +715,61 @@ $(window).load(function(){
       $('.header-content').next('.content').removeClass('affixed');
     }
   });
+  
+  // pbc filters show-hide
+  $('body').on('click', '.advanced-filter-trigger', function() {
+    var $this = $(this),
+        $filters = $this.closest('.inner-tree').find('.pbc-filters');
+    
+    if($this.hasClass("active")) {
+      $filters.slideUp('fast');
+      $this.removeClass("active");
+      $this.html('<i class="grcicon-search"></i> Show Filters');
+    } else {
+      $filters.slideDown('fast');
+      $this.addClass("active");
+      $this.html('<i class="grcicon-search"></i> Hide Filters');
+    }
+    
+    return false;
+    
+  });
+  
+  // Google Circle CTA Button
+  $('body').on('mouseenter', '.square-trigger', function() {
+    var $this = $(this),
+        $popover = $this.closest('.circle-holder').find('.square-popover');
+    
+    $popover.slideDown('fast');
+    $this.addClass("active");
+    return false;
+  });
+  $('body').on('mouseleave', '.square-popover', function() {
+    var $this = $(this),
+        $trigger = $this.closest('.circle-holder').find('.square-trigger');
+    
+    $this.slideUp('fast');
+    $trigger.removeClass('active');
+    $this.removeClass("active");
+    return false;
+  });
+  
+  // References popup preview
+  $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
+    if($(this).width() > $('.new-tree .tree-info').width()) {
+      $(this).addClass('shrink-it');
+    } 
+  });
+  
+  // Popover trigger for person tooltip in styleguide
+  if($('.person-tooltip-trigger').length > 0) {
+    $('.person-tooltip-trigger').popover({
+      html: true,
+      content: function() {
+        return $(this).closest('.person-holder').find('.custom-popover-content').html();
+      }
+    });
+  }
 
 });
 

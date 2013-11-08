@@ -92,6 +92,40 @@ can.Model("can.Model.Cacheable", {
   , title_singular : ""
   , title_plural : ""
   , findOne : "GET {href}"
+  , makeFindAll: function(finder) {
+      return function(params, success, error) {
+        var deferred = $.Deferred()
+          , sourceDeferred = finder.call(this, params)
+          , self = this
+          ;
+
+        deferred.then(success, error);
+        sourceDeferred.then(function(sourceData) {
+          var obsList = new self.List([]);
+          
+          if(sourceData[self.root_collection + "_collection"]) {
+            sourceData = sourceData[self.root_collection + "_collection"];
+          }
+          if(sourceData[self.root_collection]) {
+            sourceData = sourceData[self.root_collection];
+          }
+
+          setTimeout(function(){
+            var piece = sourceData.splice(0,Math.min(sourceData.length, 5));
+            obsList.push.apply(obsList, self.models(piece));
+
+            if(sourceData.length) {
+              setTimeout(arguments.callee, 10);
+            } else {
+              deferred.resolve(obsList);
+            }
+          }, 10);
+        });
+
+        return deferred;
+      };
+    }
+
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
     if(this.fullName === "can.Model.Cacheable") {
@@ -536,6 +570,9 @@ can.Model("can.Model.Cacheable", {
         if (!params.__page) {
           params.__page = 1;
         }
+        if (!params.__page_size) {
+          params.__page_size = 100;
+        }
         return findPageFunc(collection_url, params);
       };
     }
@@ -616,28 +653,39 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function(params) {
-    var href = this.selfLink || this.href;
+    var href = this.selfLink || this.href
+    , that = this;
 
     if (!href)
       return (new can.Deferred()).reject();
-
-    if(this._pending_refresh) {
-      return this._pending_refresh;
+    if(!this._pending_refresh) {
+      this._pending_refresh = {
+        dfd : new $.Deferred()
+        , fn : $.debounce(1000, function() {
+          var dfd = that._pending_refresh.dfd;
+          delete that._pending_refresh;
+          $.ajax({
+            url : href
+            , params : params
+            , type : "get"
+            , dataType : "json"
+          })
+          .then(can.proxy(that.constructor, "model"))
+          .done(function(d) {
+            d.updated();
+            //  Trigger complete refresh of object -- slow, but fixes live-binding
+            //  redraws in some cases
+            can.trigger(d, "change", "*");
+            dfd.resolve(d);
+          })
+          .fail(function() {
+            dfd.reject.apply(dfd, arguments);
+          });
+        })
+      };
     }
-    return (this._pending_refresh = $.ajax({
-      url : href
-      , params : params
-      , type : "get"
-      , dataType : "json"
-    })
-    .then(can.proxy(this.constructor, "model"))
-    .done(function(d) {
-      delete d._pending_refresh;
-      d.updated();
-      //  Trigger complete refresh of object -- slow, but fixes live-binding
-      //  redraws in some cases
-      can.trigger(d, "change", "*");
-    }));
+    this._pending_refresh.fn();
+    return this._pending_refresh.dfd;
   }
   , attr : function() {
     if(arguments.length < 1) {

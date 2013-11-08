@@ -12,7 +12,7 @@
   admin
   
 -block extra_javascript
-  GGRC.permissions = ={ permissions_json()|safe };
+  =super()
 
 -block header
   %h1.dashboard-title
@@ -37,10 +37,6 @@
           %a{ 'href': "/systems/export" }
             %i.grcicon-system-color
             %span Export Systems
-        %li
-          %a{ 'href': "/systems/import_template" }
-            %i.grcicon-system-color
-            %span System Import Template
         %li.divider
         %li.title
           Processes
@@ -52,10 +48,6 @@
           %a{ 'href': "/processes/export" }
             %i.grcicon-process-color
             %span Export Processes
-        %li
-          %a{ 'href': "/processes/import_template" }
-            %i.grcicon-process-color
-            %span Process Import Template
         %li.divider
         %li.title
           People
@@ -67,10 +59,6 @@
           %a{ 'href': "/admin/export_people" }
             %i.grcicon-user-black
             %span Export People
-        %li
-          %a{ 'href': "/admin/import_template" }
-            %i.grcicon-user-black
-            %span People Import Template
 
         -#%li.title
           risks

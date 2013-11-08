@@ -1,4 +1,4 @@
-"""
+"""Fix system roles.
 
 Revision ID: 8f33d9bd2043
 Revises: 758b4012b5f

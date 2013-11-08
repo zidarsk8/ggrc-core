@@ -18,17 +18,23 @@
     </div>
   {{/if}}
   <div class="owner">
-    <strong>Owner:</strong>
-    {{#if owner}}
-    {{#using owner=owner}}
-    {{owner.name}}
-    {{/using}}
-    {{/if}}
+    {{#if link}}
+    {{else}}
+      <strong>Owner:</strong>
+      {{#if owner}}
+      {{#using owner=owner}}
+      {{owner.name}}
+      {{/using}}
+      {{/if}}
+    {{/link}}
   </div>
   <div class="object-url">
     <strong>URL:</strong>
     {{#if url}}
     <a href="{{schemed_url url}}" target="_blank">{{url}}</a>
     {{/if}}
+    {{#if link}}
+    <a href="{{link}}" target="_blank">{{link}}</a>
+    {{/link}}
   </div>
 </div>

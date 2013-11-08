@@ -9,11 +9,12 @@ can.Model.LocalStorage("GGRC.Models.RecentlyViewedObject", {
 
   newInstance : function(attrs) {
     if(attrs instanceof can.Model) {
+      var title = (attrs.title && attrs.title.trim()) || (attrs.name && attrs.name.trim()) || (attrs.email && attrs.email.trim());
       return new this({
         type : attrs.constructor.shortName
         , model : attrs.constructor
         , viewLink : attrs.viewLink
-        , title : attrs.title
+        , title : title
       });
     } else {
       return this._super(attrs);

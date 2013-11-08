@@ -244,6 +244,53 @@ ul.new-tree {
     }
   }
   
+  &.text-color {
+    li.tree-item {
+      &.rq-draft {
+        background: $white;
+        .tree-title-area {
+          color: $rqDraft;
+        }
+      }
+      &.rq-requested {
+        background: $white;
+        .tree-title-area {
+          color: $rqStarted;
+        }
+      }
+      &.rq-responded {
+        background: $white;
+        .tree-title-area {
+          color: $rqStarted;
+        }
+      }
+      &.rq-amended-request {
+        background: $white;
+        .tree-title-area {
+          color: $rqStarted;
+        }
+      }
+      &.rq-updated-response {
+        background: $white;
+        .tree-title-area {
+          color: $rqStarted;
+        }
+      }
+      &.rq-accepted {
+        background: $white;
+        .tree-title-area {
+          color: $rqAccepted;
+        }
+      }
+      &.rq-warning {
+        background: $white;
+        .tree-title-area {
+          color: $orange;
+        }
+      }
+    }
+  }
+  
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:31px;
@@ -252,6 +299,38 @@ ul.new-tree {
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
+    }
+    .inner-item-count {
+      padding-right: 20px;
+      color: $black;
+      font-size: 12px;
+      font-weight: bold;
+      @include opacity(0.3);
+    }
+    .response-connect {
+      font-style: italic;
+      span {
+        text-transform: uppercase;
+      }
+    }
+    &.deleted-item {
+      .item-data {
+        background: #fff2cc;
+        @include border-radius(10px);
+        border: 3px dashed $red;
+        .tree-title-area {
+          color: $red;
+          .delete-approve {
+            background: none;
+            border: none;
+            margin-top: 6px;
+            margin-right: 20px;
+            padding: 0;
+            text-decoration: underline;
+            color: $gray;
+          }
+        }
+      }
     }
     &.governance,
     &.control,
@@ -290,6 +369,27 @@ ul.new-tree {
         color:$programs;
       }
     }
+    &.rq-draft {
+      background: $rqDraft;
+    }
+    &.rq-requested {
+      background: $rqStarted;
+    }
+    &.rq-responded {
+      background: $rqStarted;
+    }
+    &.rq-amended-request {
+      background: $rqStarted;
+    }
+    &.rq-updated-response {
+      background: $rqStarted;
+    }
+    &.rq-accepted {
+      background: $rqAccepted;
+    }
+    &.rq-warning {
+      background: $orange;
+    }
     .small {
       font-size:$f-small;
       display: inline-block;
@@ -298,12 +398,20 @@ ul.new-tree {
     .gray {
       color: $gray;
     }
+    .assignee {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+      margin-left: 6px;
+    }
     .section-item-count {
       float: right;
       max-width: 3.5em;
       margin-left: 0.5em;
     }
-    &.request-list {
+    &.request-list,
+    &.responses-list {
       .short-field {
         min-height: 23px;
         margin-bottom: 0;
@@ -339,20 +447,6 @@ ul.new-tree {
         .request-status {
           font-size: 11px;
           font-style: italic;
-        }
-      }
-    }
-    &.responses-list {
-      .utility-link {
-        font-size:11px;
-        font-weight:bold;
-        color:#111;
-        text-transform:uppercase;
-        @include opacity(0.4);
-        @include transition(opacity 0.2s);
-        &:hover {
-          @include opacity(1);
-          text-decoration:none;
         }
       }
     }
@@ -401,6 +495,15 @@ ul.new-tree {
   }
   .tree-info {
     @include oneline();
+    a {
+      &.reference {
+        display: inline;
+      }
+      &.shrink-it {
+        display: inline-block;
+        @include oneline();
+      }
+    }
     font-size:13px;
     .tree-info-list {
       @include reset-list();
@@ -419,6 +522,9 @@ ul.new-tree {
       }
       &.item-open {
         .tree-title-area {
+          @include opacity(1);
+        }
+        .inner-item-count {
           @include opacity(1);
         }
       }
@@ -511,10 +617,11 @@ ul.new-tree {
   .info-audit {
     @include reset-list();
     @include clearfix();
-    margin: 10px 0;
+    margin: 10px 0 0;
     li {
       float: left;
       margin-right: 20px;
+      margin-bottom: 10px;
       a {
         font-size:11px;
         font-weight:bold;
@@ -662,6 +769,42 @@ ul.new-tree {
     margin-left:20px;
     margin-right:20px;
     line-height:24px;
+    .advanced-filter-trigger {
+      margin-right: 20px;
+      float: right;
+      color: $gray;
+      font-size: 11px;
+      @include transition(color 0.2s ease-in-out);
+      i {
+        @include opacity(0.3);
+        @include transition(opacity 0.2s ease-in-out);
+        margin-top: 4px;
+      }
+      &:hover {
+        color: $black;
+        text-decoration: none;
+        i {
+          @include opacity(1);
+        }
+      }
+      &.active {
+        color: $black;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+    .title-path {
+      text-transform: none;
+      color: $gray;
+      font-weight: normal;
+      float: right;
+      margin-right: 20px;
+      i {
+        margin-top: 4px;
+        @include opacity(0.3);
+      }
+    }
   }
 }
 

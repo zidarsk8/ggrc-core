@@ -244,12 +244,56 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
-class TextOrHtmlColumnHandler(ColumnHandler):
+class RequestTypeColumnHandler(ColumnHandler):
+
+    def parse_item(self, value):
+      from ggrc.models import Request
+      formatted_type = value.lower()
+      if formatted_type in Request.VALID_TYPES:
+        return formatted_type
+      else:
+        self.add_error("Value must be one of the following: {}".format(
+            Request.VALID_TYPES
+        ))
+        return None
+
+
+class RequestTypeColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
-    if value:
-      value = value.strip()
-    return value or ''
+    from ggrc.models import Request
+    formatted_type = value.strip().lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
+
+
+class RequestStatusColumnHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    from ggrc.models import Request
+    words = value.strip().split()
+    formatted_type = u" ".join(s.capitalize() for s in words)
+    if formatted_type in Request.VALID_STATES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_STATES
+      ))
+      return None
+
+
+class TextOrHtmlColumnHandler(ColumnHandler):
+
+ def parse_item(self, value):
+   if value:
+     value = value.strip()
+   return value or ''
+
 
 class ContactEmailHandler(ColumnHandler):
 
@@ -329,6 +373,12 @@ class OptionColumnHandler(ColumnHandler):
           value.lower()))
       return option
 
+  def export(self):
+    value = getattr(self.importer.obj, self.key, '') or ''
+    if not isinstance(value, basestring):
+      value = value.title
+    return value
+
   def display(self):
     if self.has_errors():
       return self.original
@@ -366,16 +416,17 @@ class DateColumnHandler(ColumnHandler):
     try:
       from datetime import datetime
       date_result = None
-      if isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
-        date_result = datetime.strptime(value, "%m/%d/%Y")
-      elif isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%m/%d/%y")
-      elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%Y/%m/%d")
-      elif isinstance(value, basestring) and re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
-        date_result = datetime.strptime(value, "%Y-%m-%d")
-      elif value:
-        raise ValueError("Error parsing the date string")
+      if isinstance(value, basestring):
+        if re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
+          date_result = datetime.strptime(value, "%m/%d/%Y")
+        elif re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%m/%d/%y")
+        elif re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%Y/%m/%d")
+        elif re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
+          date_result = datetime.strptime(value, "%Y-%m-%d")
+        elif value:
+          raise ValueError("Error parsing the date string")
 
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
@@ -563,6 +614,35 @@ class LinksHandler(ColumnHandler):
       # Overwrite with only imported links
       if hasattr(obj, self.options.get('association')):
         setattr(obj, self.options.get('association'), self.imported_links())
+
+class ObjectiveHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the objective_id, otherwise throw error
+    objective = Objective.query.filter_by(slug=value.upper()).first()
+    if not objective:
+      self.add_error("Objective code {} does not exist.".format(value))
+    else:
+      return objective.id
+
+  def export(self):
+    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    if objective_id:
+      objective = Objective.query.filter_by(id=objective_id).first()
+      return objective.slug
+    else:
+      return objective_id
+
+  def display(self):
+    # self.importer.obj[self.key] only returns objective id
+    # need to return corresponding objective slug or empty string
+    objective_id = getattr(self.importer.obj, self.key, '') or ''
+    if objective_id:
+      objective = Objective.query.get(objective_id)
+      if objective:
+        return objective.slug
+    return ''
+
 
 class LinkControlsHandler(LinksHandler):
 

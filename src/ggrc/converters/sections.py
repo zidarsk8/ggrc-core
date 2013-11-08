@@ -80,21 +80,24 @@ class SectionsConverter(BaseConverter):
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
     if self.options.get('directive'):
-      self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive().kind), v) \
+      self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
   # Called in case the object_map headers change amongst similar imports
   def create_object_map(self):
-    if self.directive().kind == "Contract":
+    if self.directive_kind() == "Contract":
       self.object_map = OrderedDict( [(k.replace("Section", "Clause"), v) \
                           if 'Section' in k else (k, v) for k, v in self.object_map.items()] )
+
+  def directive_kind(self):
+    return self.directive().kind or self.directive().meta_kind
 
   def directive(self):
     return self.options.get('directive')
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield [self.directive().kind, self.directive().slug]
+    yield [self.directive_kind(), self.directive().slug]
     yield []
     yield []
     yield self.object_map.keys()
