@@ -583,7 +583,7 @@
           , new_results = can.map(results, function(result) {
               return self.make_result(result.instance, [result], binding);
             })
-          , inserted_results = this.insert_results(binding, new_results);
+          , inserted_results = this.insert_results(binding, new_results)
           ;
       }
 
@@ -634,6 +634,41 @@
         };
 
         this._super(source, filter_fn);
+      }
+  });
+
+  GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.FirstElementLoader", {
+  }, {
+
+    init_listeners: function(binding) {
+        var self = this;
+
+        binding.source_binding = binding.instance.get_binding(this.source);
+
+        binding.source_binding.list.bind("add", function(ev, results) {
+          var matching_results = results[0];
+          if(self.list.length < 1)
+            self.insert_results(binding, [matching_results]);
+        });
+
+        binding.source_binding.list.bind("remove", function(ev, results) {
+          can.each(results, function(result) {
+            self.remove_instance(binding, result.instance, result);
+          });
+          if(self.list.length < 1)
+            self.insert_results(binding, [binding.source_binding.list[0]]);
+        });
+      }
+
+    , _refresh_stubs: function(binding) {
+        var self = this
+          ;
+
+        return binding.source_binding.refresh_stubs()
+          .then(function(results) {
+            var matching_results = results[0];
+            self.insert_results(binding, matching_results);
+          });
       }
   });
 

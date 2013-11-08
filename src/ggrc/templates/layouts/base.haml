@@ -17,6 +17,10 @@
       -block title
         Governance, Risk and Compliance
 
+    %script{ 'type': 'text/javascript' }
+      GGRC = window.GGRC || {};
+      -block extra_javascript
+
     -assets "dashboard-css"
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL}" }
     -endassets
@@ -28,9 +32,6 @@
     -assets "dashboard-js-templates"
       %script{ type:'text/javascript', src:"={ASSET_URL}" }
     -endassets
-
-    %script{ 'type': 'text/javascript' }
-      -block extra_javascript
 
     -#FIXME: (?) HTML5 shim?
 

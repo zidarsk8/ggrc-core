@@ -33,6 +33,9 @@
     {{/if}}
     {{/using}}
   </p>
+
+  {{{render_hooks 'Program.extended_info'}}}
+
   {{#is_allowed 'update' instance}}
   <p>
     <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">

@@ -564,6 +564,13 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, context);
 });
 
+Mustache.registerHelper("render_hooks", function(hook, options) {
+
+  return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
+    return can.Mustache.getHelper("renderLive").fn(hook_tmpl, options.contexts, options);
+  }).join("\n");
+});
+
 function defer_render(tag_prefix, func, deferred) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
@@ -587,17 +594,24 @@ function defer_render(tag_prefix, func, deferred) {
   return ["<", tag_prefix, " ", hook, ">", "</", tag_name, ">"].join("");
 }
 
-Mustache.registerHelper("defer", function(tag_name, options) {
+Mustache.registerHelper("defer", function(prop, deferred, options) {
   var context = this;
-
+  var tag_name;
   if (!options) {
-    options = tag_name;
-    tag_name = "span";
+    options = prop;
+    prop = "result";
   }
 
-  return defer_render(tag_name, function() {
-    return options.fn(context);
-  });
+  tag_name = (options.hash || {}).tag_name || "span";
+
+  deferred = resolve_computed(deferred);
+  typeof deferred === "function" && (deferred = deferred());
+
+  return defer_render(tag_name, function(items) {
+    var ctx = {};
+    ctx[prop] = items;
+    return options.fn(ctx);
+  }, deferred);
 });
 
 Mustache.registerHelper("pbc_is_read_only", function() {
@@ -684,10 +698,13 @@ Mustache.registerHelper("all", function(type, params, options) {
         if(val) {
           $parent.find("option[value=" + val + "]").attr("selected", true);
         } else {
-          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0]);
+          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
         }
       }
-      $parent.parent().find(":data(spinner)").data("spinner").stop();
+      $parent.parent().find(":data(spinner)").each(function(i, el) {
+        var spinner = $(el).data("spinner");
+        spinner && spinner.stop();
+      });
       $el.remove();
       //since we are removing the original live bound element, replace the
       // live binding reference to it, with a reference to the new 
@@ -946,13 +963,13 @@ Mustache.registerHelper("show_long", function() {
   ].join('');
 });
 
-Mustache.registerHelper("using", function(args, options) {
+Mustache.registerHelper("using", function(options) {
   var refresh_queue = new RefreshQueue()
     , context
     , frame = new can.Observe()
+    , args = can.makeArray(arguments)
     , i, arg;
 
-  args = can.makeArray(arguments);
   options = args.pop();
   context = options.contexts || this;
 
@@ -977,6 +994,29 @@ Mustache.registerHelper("using", function(args, options) {
 
   return defer_render('span', finish, refresh_queue.trigger());
 });
+
+Mustache.registerHelper("with_mapping", function(binding, options) {
+  var refresh_queue = new RefreshQueue()
+    , context = arguments.length > 2 ? resolve_computed(options) : this
+    , frame = new can.Observe()
+    , loader
+    , stack;
+
+  if(!context) // can't find an object to map to.  Do nothing;
+    return;
+
+  loader = context.get_binding(binding);
+  frame.attr(binding, loader.list);
+
+  options = arguments[2] || options;
+
+  function finish(list) {
+    return options.fn(frame);
+  }
+
+  return defer_render('span', finish, loader.refresh_instances());
+});
+
 
 Mustache.registerHelper("person_roles", function(person, scope, options) {
   var roles_deferred = new $.Deferred()

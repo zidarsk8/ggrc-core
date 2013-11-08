@@ -39,6 +39,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       that.element.html(frag);
     });
+
   }
 
   , get_widget_view: function(el) {
