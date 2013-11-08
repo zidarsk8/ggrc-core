@@ -191,16 +191,13 @@ def import_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
-  import ggrc.views
 
   return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
-  directive_url =\
-    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
 
   if request.method == 'POST':
     if 'cancel' in request.form:
-      return import_redirect(directive_url + "#control_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -218,7 +215,7 @@ def import_controls(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url + "#control_widget")
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
