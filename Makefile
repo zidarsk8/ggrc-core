@@ -122,6 +122,8 @@ src/app.yaml : src/app.yaml.dist
 		APPENGINE_INSTANCE="$(APPENGINE_INSTANCE)" \
 		SETTINGS_MODULE="$(SETTINGS_MODULE)" \
 		DATABASE_URI="$(DATABASE_URI)" \
+		GAPI_KEY="$(GAPI_KEY)" \
+		GAPI_CLIENT_ID="$(GAPI_CLIENT_ID)" \
 		BOOTSTRAP_ADMIN_USERS="$(BOOTSTRAP_ADMIN_USERS)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
