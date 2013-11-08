@@ -118,23 +118,26 @@ can.Control("StickyHeader", {
       , parent = el.parent()
       , offset = data.offset
       , pos = parent.position().top
-      , margin = pos + parent.outerHeight() - el.outerHeight()
+      , height = el.outerHeight()
+        // If the header is taller than the margin, it'll disappear early instead of scrolling away smoothly
+      , global_margin = Math.max(this.options.margin, height)
+      , margin = pos + parent.outerHeight() - height
       , scroll_height = this.options.scroll_area.outerHeight()
       ;
 
     if (type === 'footer') {
       offset = scroll_height - data.offset;
-      margin = offset - pos - el.outerHeight();
+      margin = offset - pos - height;
     }
 
     // If the content is in the viewport...
     if (type === 'header' && pos < offset && margin > offset) {
       // Return zero or the amount that the header should start scrolling away if applicable
       margin -= offset;
-      return data.margin = margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
+      return data.margin = margin <= global_margin ? -Math.max(0, global_margin - margin) : 0;
     }
-    else if (type === 'footer' && pos < scroll_height && (el.position().top + el.outerHeight()) > offset && margin > 0) {
-      return data.margin = margin <= this.options.margin ? -Math.max(0, this.options.margin - margin) : 0;
+    else if (type === 'footer' && pos < scroll_height && (el.position().top + height) > offset && margin > 0) {
+      return data.margin = margin <= global_margin ? -Math.max(0, global_margin - margin) : 0;
     }
     else
       return data.margin = false;
