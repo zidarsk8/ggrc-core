@@ -193,6 +193,7 @@ def import_controls(directive_id):
   from ggrc.models import Directive
   import ggrc.views
 
+  return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
   directive_url =\
     getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
@@ -221,7 +222,7 @@ def import_controls(directive_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-              directive_id = directive_id, exception_message = file_msg)
+            directive_id = directive_id, exception_message = file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -230,9 +231,9 @@ def import_controls(directive_id):
             exception_message=e, converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = str(e))
+          directive_id = directive_id, exception_message = str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
+  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to)
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
