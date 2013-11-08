@@ -3,29 +3,31 @@ can.Control("GGRC.Controllers.TreeFilter", {
 }, {
   
   init : function() {
+    var parent_control;
     this._super && this._super.apply(this, arguments);
-    this.options.states = {};
+    this.options.states = new can.Observe();
+    parent_control = this.element.closest(".cms_controllers_tree_view").control();
+    parent_control && parent_control.options.attr("states", this.options.states);
     this.on();
   }
 
   , "input, select change" : function(el, ev) {
     var name = el.attr("name");
     if(el.is(".hasDatepicker")) {
-      this.options.states[name] = moment(el.val(), "MM/DD/YYYY");
+      this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
     } else {
-      this.options.states[name] = el.val();
+      this.options.states.attr(name, el.val());
     }
-    this.statechange(this.options.states);
     ev.stopPropagation();
   }
 
-  , "statechange" : function(states) {
+  , "{states} change" : function(states) {
     var that = this;
     this.element
     .closest(".tree-structure")
     .children(":has(> [data-model],:data(model))").each(function(i, el) {
       var model = $(el).children("[data-model],:data(model)").data("model");
-      if(can.reduce(Object.keys(states), function(st, key) {
+      if(can.reduce(Object.keys(states._data), function(st, key) {
         var val = states[key]
         , test = that.resolve_object(model, key);
         

@@ -24,7 +24,7 @@
         <span class="pull-left request-type">type:</span>
         <select name="request_type" class="span9 short-field">
           {{#iterate " " "Documentation" "Interview" "Population Sample"}}
-          <option value="{{firstnonempty iterator.toLowerCase}}" {{^iterator.trim}}selected="true"{{/iterator.trim}}>{{firstnonempty iterator "Any"}}</option>
+          <option value="{{firstnonempty iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
           {{/iterate}}
         </select>
       </div>
