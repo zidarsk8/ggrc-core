@@ -95,23 +95,29 @@ can.Model("can.Model.Cacheable", {
   , makeFindAll: function(finder) {
       return function(params, success, error) {
         var deferred = $.Deferred()
-          , sourceDeferred = finder(params)
+          , sourceDeferred = finder.call(this, params)
           , self = this
           ;
 
         deferred.then(success, error);
         sourceDeferred.then(function(sourceData) {
-          var obsList = new self.List([])
-            , sourceList = sourceData[self.root_collection + "_collection"][self.root_collection]
-            ;
-          setTimeout(function(){
-            var piece = sourceList.splice(0,Math.min(sourceList.length, 5))
-            obsList.push.apply(obsList, self.models(piece))
+          var obsList = new self.List([]);
+          
+          if(sourceData[self.root_collection + "_collection"]) {
+            sourceData = sourceData[self.root_collection + "_collection"];
+          }
+          if(sourceData[self.root_collection]) {
+            sourceData = sourceData[self.root_collection];
+          }
 
-            if(sourceList.length){
-              setTimeout(arguments.callee, 10)
+          setTimeout(function(){
+            var piece = sourceData.splice(0,Math.min(sourceData.length, 5));
+            obsList.push.apply(obsList, self.models(piece));
+
+            if(sourceData.length) {
+              setTimeout(arguments.callee, 10);
             } else {
-              deferred.resolve(obsList)
+              deferred.resolve(obsList);
             }
           }, 10);
         });

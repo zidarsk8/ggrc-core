@@ -61,9 +61,15 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   , create_audit_folder : partial_proxy(create_folder, CMS.Models.Audit, function(inst) { return inst.title; }, "program")
   , "{CMS.Models.Audit} created" : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Audit) {
+      var that = this;
       this._audit_create_in_progress = true;
-      this.create_audit_folder(model, ev, instance)
-      delete this._audit_create_in_progress;
+      instance.program.reify().refresh()
+      .then(this.proxy("create_folder_if_nonexistent"))
+      .then($.proxy(instance.program.reify(), "refresh"))
+      .then(function() {
+        that.create_audit_folder(model, ev, instance);
+        delete that._audit_create_in_progress;
+      });
     }
   }
 
