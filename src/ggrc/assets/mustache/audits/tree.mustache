@@ -198,7 +198,7 @@
         </li>
         <li>
           <div class="widget-action pull-right" rel="tooltip" title="Manage Authorized Auditors">
-            <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit">
+            <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'>
               <i class="grcicon-user-black"></i>
               Auditors
             </a>
