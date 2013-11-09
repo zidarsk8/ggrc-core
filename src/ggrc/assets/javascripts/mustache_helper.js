@@ -777,7 +777,7 @@ Mustache.registerHelper("private_program", function(modal_title) {
     , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
     , '</label>'
     , '<div class="checkbox-area">'
-    , '<input name="private" value="private" type="checkbox"> Private Program'
+    , '<input tabindex="2" name="private" value="private" type="checkbox"> Private Program'
     , '</div>'
   ].join("");
 });
@@ -830,13 +830,17 @@ Mustache.registerHelper("is_private", function(options) {
   return options.inverse(context);
 });
 
-Mustache.registerHelper("option_select", function(object, attr_name, role) {
+Mustache.registerHelper("option_select", function(object, attr_name, role, options) {
   var selected_option = object.attr(attr_name)
     , selected_id = selected_option ? selected_option.id : null
     , options_dfd = CMS.Models.Option.for_role(role)
     , tag_prefix =
         'select class="span12" model="Option" name="' + attr_name + '"'
     ;
+
+  if(options.hash && options.hash.tabindex) {
+    tag_prefix += ' tabindex=' + resolve_computed(options.hash.tabindex);
+  }
 
   function get_select_html(options) {
     return [

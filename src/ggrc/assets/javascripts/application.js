@@ -771,6 +771,19 @@ $(window).load(function(){
     });
   }
   
+  // Tab indexing form fields in modal
+  $('body').on('focus', '.modal', function() {
+    $('.wysiwyg-area').each(function() {
+      var $this = $(this),
+          $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
+          $descriptionField = $this.find('iframe.wysihtml5-sandbox');
+      
+      function addingTabindex() {
+        $descriptionField.attr('tabindex', $textarea);
+      }
+      setTimeout(addingTabindex,100)
+    });
+  });
   // Watermark trigger
   $('body').on('click', '.watermark-trigger', function() {
     var $this = $(this),

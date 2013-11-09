@@ -9,7 +9,7 @@
         <span class="required">*</span>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="response_description" class="span12 double wysihtml5" name="description" placeholder="Response Description">{{{description}}}</textarea>
+        <textarea tabindex="1" id="response_description" class="span12 double wysihtml5" name="description" placeholder="Response Description" autofocus>{{{description}}}</textarea>
       </div>
     </div>
     
@@ -20,7 +20,7 @@
           <label>
             Status
           </label>
-          <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
+          <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}} tabindex="2">
             {{#iterate 'Assigned' 'Accepted' 'Completed'}}
             <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
@@ -38,7 +38,7 @@
           </label>
           <i class="grcicon-person-green pull-left icon-field"></i>
           <div class="objective-selector">
-            <input type="text" name="owner.email" class="input-wide" data-lookup="Person" value="{{firstnonempty owner.email current_user.email ''}}">
+            <input tabindex="3" type="text" name="owner.email" class="input-wide" data-lookup="Person" value="{{firstnonempty owner.email current_user.email ''}}">
             <input type="hidden" name="owner.id" value="{{firstnonempty owner.id current_user.id ''}}">
           </div>
         </div>
