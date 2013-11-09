@@ -195,15 +195,13 @@ def import_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
-  import ggrc.views
 
+  return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
-  directive_url =\
-    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
 
   if request.method == 'POST':
     if 'cancel' in request.form:
-      return import_redirect(directive_url + "#control_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -221,11 +219,11 @@ def import_controls(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url + "#control_widget")
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-              directive_id = directive_id, exception_message = file_msg)
+            directive_id = directive_id, exception_message = file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -234,9 +232,9 @@ def import_controls(directive_id):
             exception_message=e, converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = str(e))
+          directive_id = directive_id, exception_message = str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
+  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to)
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
@@ -311,21 +309,18 @@ def import_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive, Contract
-  import ggrc.views
 
+  return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
   if isinstance(directive, Contract):
     import_kind = "Clauses"
   else:
     import_kind = "Sections"
 
-  directive_url =\
-    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
-
   if request.method == 'POST':
 
     if 'cancel' in request.form:
-      return import_redirect(directive_url + "#section_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -340,9 +335,9 @@ def import_sections(directive_id):
               results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
-          flash(u'Successfully imported {} {}{}'.format(
-            count, 's' if count > 1 else ''), import_kind, 'notice')
-          return import_redirect(directive_url + "#section_widget")
+          flash(u'Successfully imported {0} {2}{1}'.format(
+              count, 's' if count > 1 else '', import_kind[:-1]), 'notice')
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
@@ -358,7 +353,7 @@ def import_sections(directive_id):
             directive_id=int(directive_id), exception_message=e)
 
   return render_template(
-      "directives/import.haml", directive_id=directive_id, import_kind=import_kind)
+      "directives/import.haml", directive_id=directive_id, import_kind=import_kind, return_to=return_to)
 
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():

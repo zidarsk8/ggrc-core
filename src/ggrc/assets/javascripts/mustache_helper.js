@@ -1671,4 +1671,11 @@ Mustache.registerHelper("default_audit_title", function(program, options) {
   return new Date().getFullYear() + " " + program.title + " Audit";
 });
 
+Mustache.registerHelper("param_current_location", function() {
+  var path = window.location.pathname
+  , fragment = window.location.hash;
+  return window.encodeURIComponent(path + fragment);
+});
+
+
 })(this, jQuery, can);
