@@ -296,6 +296,9 @@ ul.new-tree {
     line-height:31px;
     min-height:31px;
     background:#fafafa;
+    .black-font {
+      color: $black;
+    }
     .watermark-icon {
       display: none;
       margin-right: 20px;
