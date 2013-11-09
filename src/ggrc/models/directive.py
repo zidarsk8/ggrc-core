@@ -85,6 +85,8 @@ class Directive(Timeboxed, Ownable, BusinessObject, db.Model):
 
   @validates('kind')
   def validate_kind(self, key, value):
+    if not value:
+      return None
     if value not in self.valid_kinds:
       message = "Invalid value '{}' for attribute {}.{}.".format(
         value, self.__class__.__name__, key)
