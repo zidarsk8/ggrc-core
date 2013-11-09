@@ -339,6 +339,35 @@ class ContactEmailHandler(ColumnHandler):
   def validate(self, data):
     pass
 
+
+class AssigneeHandler(ContactEmailHandler):
+
+  def parse_item(self, value):
+    stripped_value = value.strip()
+    if len(stripped_value) == 0:
+      # Audit should exist; was passed from view function
+      audit = self.importer.options.get('audit')
+      audit_owner = getattr(audit, 'owner', None)
+      if audit_owner:
+        # Owner should exist, and if so, return that Person
+        self.add_warning("Blank field; will be assigned to audit owner, {}.".format(audit_owner.display_name))
+        return audit_owner
+      else:
+        self.add_error("Need to assign owner to this audit or enter a user here.")
+      return audit_owner
+    else:
+      # if there is content, treat is as a normal contact field
+      return super(AssigneeHandler, self).parse_item(value)
+
+  def go_import(self, content):
+    # override to always parse_item, even with empty content, so as
+    # to trigger default behavior (assign to audit owner)
+    data = self.parse_item(content)
+    self.validate(data)
+    self.value = data
+    self.set_attr(data)
+
+
 class SlugColumnHandler(ColumnHandler):
 
   # Dont overwrite slug on object

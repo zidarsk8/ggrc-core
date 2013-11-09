@@ -165,12 +165,12 @@ class BaseConverter(object):
   def isblank(self, string):
     return not len(string) or string.isspace()
 
-  def do_import(self, dry_run = True):
+  def do_import(self, dry_run = True, **options):
     self.import_metadata()
     object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
-      row = self.row_converter(self, row_attrs, index)
+      row = self.row_converter(self, row_attrs, index, **options)
       row.setup()
       row.reify()
       self.objects.append(row)
