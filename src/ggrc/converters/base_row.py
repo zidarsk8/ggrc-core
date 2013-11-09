@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .common import *
-from ggrc.models.all_models import *
+from ggrc.models.all_models import Control, Objective, Person
 from ggrc.models.exceptions import ValidationError
 
 def unpack_list(vals):
@@ -313,7 +313,6 @@ class ContactEmailHandler(ColumnHandler):
     return value
 
   def find_contact(self, email_str, is_required=False):
-    from ggrc.models.person import Person
 
     existing_person = Person.query.filter_by(email=email_str).first()
     if not existing_person and is_required:
@@ -814,7 +813,7 @@ class LinkPeopleHandler(LinksHandler):
       return obj.email
 
 class LinkSystemsHandler(LinksHandler):
-  from ggrc.models.all_models import System, Process
+  from ggrc.models.all_models import System, Process, SystemOrProcess
   model_class = System
 
   def parse_item(self, value):

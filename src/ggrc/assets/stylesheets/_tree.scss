@@ -296,6 +296,22 @@ ul.new-tree {
     line-height:31px;
     min-height:31px;
     background:#fafafa;
+    .black-font {
+      color: $black;
+    }
+    .watermark-icon {
+      display: none;
+      margin-right: 20px;
+    }
+    .watermark-trigger {
+      &.active {
+        .utility-link {
+          &:hover {
+            @include opacity(0.4);
+          }
+        }
+      }
+    }
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
@@ -316,8 +332,7 @@ ul.new-tree {
     &.deleted-item {
       .item-data {
         background: #fff2cc;
-        @include border-radius(10px);
-        border: 3px dashed $red;
+        border: 2px dashed $red;
         .tree-title-area {
           color: $red;
           .delete-approve {
@@ -327,7 +342,7 @@ ul.new-tree {
             margin-right: 20px;
             padding: 0;
             text-decoration: underline;
-            color: $gray;
+            color: #222;
           }
         }
       }

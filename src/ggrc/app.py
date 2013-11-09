@@ -14,6 +14,8 @@ from werkzeug import secure_filename
 
 app = Flask('ggrc', instance_relative_config=True)
 app.config.from_object(settings)
+if("public_config" not in app.config):
+  app.config.public_config = {}
 
 # Configure Flask-SQLAlchemy for app
 from . import db

@@ -191,8 +191,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , update : "PUT /api/policies/{id}"
   , destroy : "DELETE /api/policies/{id}"
   , defaults : {
-    kind : "Company Policy"
-  }
+      kind : null
+    }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     }
@@ -1011,7 +1011,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , init : function() {
     this._super && this._super.apply(this, arguments);
     $(function() {
-      CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
+      if (GGRC.current_user) {
+        CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
+      }
     });
     this.validatePresenceOf("program");
   }
@@ -1060,6 +1062,12 @@ can.Model.Cacheable("CMS.Models.Request", {
         }
       });
     }
+  }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("due_on");
+    this.validatePresenceOf("assignee");
+    this.validatePresenceOf("objective");
   }
 }, {
   init : function() {

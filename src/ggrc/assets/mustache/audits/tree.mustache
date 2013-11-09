@@ -179,14 +179,7 @@
         </div>
       </div>
       
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="tree-info">
-            <strong>gDrive Evidence Folder: </strong>
-            /{{parent_instance.title}}/{{instance.title}}
-          </div>
-        </div>
-      </div>
+      {{{render_hooks 'Audit.tree_view_info'}}}
       
       {{#is_allowed 'update' instance context=instance.context.id}}
       <ul class="info-audit">
@@ -215,11 +208,11 @@
 
         <li>
         {{! FIXME: Better way to get the Audit link }}
-        <a href="/audits/{{instance.id}}/import_pbcs"><i class="grcicon-import"></i> Import PBC List</a>
+        <a href="/audits/{{instance.id}}/import_pbcs"><i class="grcicon-imp-exp"></i> Import PBC List</a>
         </li>
 
         <li>
-        <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-imp-exp"></i> Download PBC Import Template</a>
+        <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
         </li>
       </ul>
       {{/is_allowed}}

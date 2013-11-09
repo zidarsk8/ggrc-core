@@ -559,21 +559,23 @@ $(function() {
 
 // Resize search input as necessary
 var $lhs = $("#lhs")
-  , last_width = $lhs[0].offsetWidth;
-function resize_search() {
-  var input = $('#lhs input.widgetsearch')
-    , width = input.closest('.form-search').width() - input.parent().outerWidth() + input.parent().width()
-              - input.next().outerWidth() - input.outerWidth() + input.width();
-  input.css('width', width + 'px');
-};
-$(document.body).on("focus", "#lhs input.widgetsearch", resize_search);
-$(document.body).on("click", "#lhs", resize_search);
-setInterval(function() {
-  if (last_width !== $lhs[0].offsetWidth) {
-    last_width = $lhs[0].offsetWidth;
-    resize_search(); 
-  }
-}, 25);
+  , last_width = $lhs.length && $lhs[0].offsetWidth;
+if ($lhs.length) {
+  function resize_search() {
+    var input = $('#lhs input.widgetsearch')
+      , width = input.closest('.form-search').width() - input.parent().outerWidth() + input.parent().width()
+                - input.next().outerWidth() - input.outerWidth() + input.width();
+    input.css('width', width + 'px');
+  };
+  $(document.body).on("focus", "#lhs input.widgetsearch", resize_search);
+  $(document.body).on("click", "#lhs", resize_search);
+  setInterval(function() {
+    if (last_width !== $lhs[0].offsetWidth) {
+      last_width = $lhs[0].offsetWidth;
+      resize_search(); 
+    }
+  }, 25);
+}
 
   $(document.body).on("click", ".lhs-closed", function(ev) {
     
