@@ -29,7 +29,7 @@ class RequestRowConverter(BaseRowConverter):
     self.handle_text_or_html('test')
     self.handle_text_or_html('notes')
     self.handle_raw_attr('auditor_contact')  # default to audit lead
-    self.handle('assignee', ContactEmailHandler, person_must_exist=True)
+    self.handle('assignee', AssigneeHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
     if options.get('audit'):
