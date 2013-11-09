@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .common import *
-from ggrc.models.all_models import *
+from ggrc.models.all_models import Control
 from ggrc.models.exceptions import ValidationError
 
 def unpack_list(vals):
