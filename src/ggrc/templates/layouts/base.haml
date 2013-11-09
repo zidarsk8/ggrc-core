@@ -22,15 +22,15 @@
       -block extra_javascript
 
     -assets "dashboard-css"
-      %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL}" }
+      %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
     -assets "dashboard-js"
-      %script{ type:'text/javascript', src:"={ASSET_URL}" }
+      %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
     -assets "dashboard-js-templates"
-      %script{ type:'text/javascript', src:"={ASSET_URL}" }
+      %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
     -#FIXME: (?) HTML5 shim?
