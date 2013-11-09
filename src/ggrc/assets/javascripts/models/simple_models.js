@@ -1011,7 +1011,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , init : function() {
     this._super && this._super.apply(this, arguments);
     $(function() {
-      CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
+      if (GGRC.current_user) {
+        CMS.Models.Audit.defaults.owner = CMS.Models.Person.model(GGRC.current_user).stub();
+      }
     });
     this.validatePresenceOf("program");
   }
