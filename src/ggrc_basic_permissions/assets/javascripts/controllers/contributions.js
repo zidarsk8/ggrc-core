@@ -377,7 +377,13 @@
   function get_option_set(name, data) {
     // Construct options for Authorizations selector
     var context, object_query = {};
-    if (GGRC.page_object) {
+    // Set object-specific context if requested (for Audits)
+    if (data.params && data.params.context) {
+      context = data.params.context;
+      extra_join_query = { context_id: context.id };
+    }
+    // Otherwise use the page context
+    else if (GGRC.page_object) {
       context = GGRC.make_model_instance(GGRC.page_object).context;
       if (!context)
         throw new Error("`context` is required for Assignments model");
@@ -438,7 +444,9 @@
       var $this = $(this)
         , options = $this.data('modal-selector-options')
         , data_set = can.extend({}, $this.data())
+        , object_params = $this.attr('data-object-params')
         ;
+      data_set.params = object_params && JSON.parse(object_params.replace(/\\n/g, "\\n"));
 
       can.each($this.data(), function(v, k) {
         //  This is just a mapping of keys to underscored keys

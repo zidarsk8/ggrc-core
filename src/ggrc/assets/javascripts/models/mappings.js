@@ -544,7 +544,9 @@
     }
 
     , Audit : {
-        requests: Direct("Request", "audit")
+      requests: Direct("Request", "audit")
+      , _program: Indirect("Program", "audit")
+      , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
       , related_owned_objects: CustomFilter("related_objects", function(result) {
