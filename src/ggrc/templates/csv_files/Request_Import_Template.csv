@@ -1,5 +1,5 @@
 Type,Program Code,,,,,,,,,
 Requests,{{program_slug}},,,,,,,,,
-,,REQUIRED,,,,,,,REQUIRED,
-Documentation / Interview / Population Sample,HTML Allowed,"If not specified, field will remain blank, highlighted red",,,"If not specified, value will default to Audit Lead",,,MM/DD/YYYY,Draft / Requested / Responded / Ammended Request / Updated Response / Accepted
+REQUIRED,,REQUIRED,,,,,,,REQUIRED,
+Documentation / Interview / Population Sample,HTML Allowed,"Import of PBC Requests will be blocked if Objective Code not specified.","Optional Text Field","Optional Text Field","If not specified, value will default to Audit Lead",,MM/DD/YYYY,MM/DD/YYYY,Draft / Requested / Responded / Ammended Request / Updated Response / Accepted
 Request Type,Request Description,Objective Code,Notes,Test,Assignee,Audit Contact,Requested On,Due On,Status

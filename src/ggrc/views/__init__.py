@@ -294,7 +294,7 @@ def import_requests_template(audit_id):
   audit = Audit.query.get(audit_id)
   program = audit.program
   template = "Request_Import_Template.csv"
-  filename = "{}-requests.csv".format(program.slug)
+  filename = "PBC Request Import Template.csv"
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   options = {'program_slug': program.slug}
   body = render_template("csv_files/" + template, **options)
