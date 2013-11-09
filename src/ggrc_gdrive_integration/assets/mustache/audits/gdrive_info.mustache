@@ -1,0 +1,18 @@
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tree-info">
+        <strong>gDrive Evidence Folder: </strong>
+        {{#with_mapping 'folders' instance}}
+          {{#if folders.length}}
+          <a href="{{folders.0.instance.alternateLink}}" target="_blank">
+            /{{#with_mapping 'folders' parent_instance}}{{folders.0.instance.title}}{{/with_mapping}}/{{folders.0.instance.title}}
+          </a>
+          {{else}}
+            No evidence folder for this {{instance.constructor.title_singular}}.
+            <a href="javascript://" class="create-folder" {{#instance}}{{data 'model'}}{{/instance}}>Create one now</a>
+          {{/if}}
+        {{/with_mapping}}
+      </div>
+    </div>
+  </div>

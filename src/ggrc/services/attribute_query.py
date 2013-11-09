@@ -56,7 +56,6 @@ class AttributeQueryBuilder(object):
             'Error message was: {2}'.format(value, arg, e.message)
             )
     elif attr_type is Integer and value == '':
-      print 'coercing empty string to None'
       return None
     return value
 

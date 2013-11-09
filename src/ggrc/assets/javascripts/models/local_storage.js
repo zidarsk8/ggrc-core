@@ -98,7 +98,7 @@
             //add to list
           if(data) {
             data = JSON.parse(data);
-            newkey = Math.max.apply(Math, data) + 1;
+            newkey = Math.max.apply(Math, data.concat([0])) + 1;
             data.push(newkey);
           } else {
             data = [newkey];

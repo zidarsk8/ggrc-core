@@ -5,7 +5,6 @@
 
 import re
 from ggrc import db
-from pprint import pprint
 from copy import *
 
 # Temporary as I test new import functionality

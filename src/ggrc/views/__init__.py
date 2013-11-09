@@ -25,6 +25,9 @@ def get_permissions_json():
   permissions.permissions_for(permissions.get_user())
   return json.dumps(session['permissions'])
 
+def get_config_json():
+  return json.dumps(app.config.public_config)
+
 def get_current_user_json():
   current_user = get_current_user()
   return as_json(current_user.log_json())
@@ -36,6 +39,7 @@ def base_context():
       get_model=get_model,
       permissions_json=get_permissions_json,
       permissions=permissions,
+      config_json=get_config_json,
       current_user_json=get_current_user_json,
       )
 

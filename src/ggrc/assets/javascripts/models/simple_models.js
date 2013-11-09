@@ -1061,6 +1061,12 @@ can.Model.Cacheable("CMS.Models.Request", {
       });
     }
   }
+  , init : function() {
+    this._super.apply(this, arguments);
+    this.validatePresenceOf("due_on");
+    this.validatePresenceOf("assignee");
+    this.validatePresenceOf("objective");
+  }
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);

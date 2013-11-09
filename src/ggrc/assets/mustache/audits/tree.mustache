@@ -179,14 +179,7 @@
         </div>
       </div>
       
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="tree-info">
-            <strong>gDrive Evidence Folder: </strong>
-            /{{parent_instance.title}}/{{instance.title}}
-          </div>
-        </div>
-      </div>
+      {{{render_hooks 'Audit.tree_view_info'}}}
       
       {{#is_allowed 'update' instance context=instance.context.id}}
       <ul class="info-audit">
@@ -198,7 +191,7 @@
         </li>
         <li>
           <div class="widget-action pull-right" rel="tooltip" title="Manage Authorized Auditors">
-            <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit">
+            <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'>
               <i class="grcicon-user-black"></i>
               Auditors
             </a>

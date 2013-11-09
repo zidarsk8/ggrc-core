@@ -14,6 +14,8 @@ from werkzeug import secure_filename
 
 app = Flask('ggrc', instance_relative_config=True)
 app.config.from_object(settings)
+if("public_config" not in app.config):
+  app.config.public_config = {}
 
 # Configure Flask-SQLAlchemy for app
 from . import db
@@ -72,3 +74,19 @@ if settings.ENABLE_JASMINE:
 
   jasmine.specs(
       Asset("dashboard-js-specs"))
+
+if hasattr(settings, 'SQLALCHEMY_RECORD_QUERIES')\
+    and settings.SQLALCHEMY_RECORD_QUERIES:
+
+  def with_prefix(statement, prefix):
+    return "\n".join([prefix + line for line in statement.splitlines()])
+
+  @app.after_request
+  def display_queries(response):
+    from flask.ext.sqlalchemy import get_debug_queries
+    for query in get_debug_queries():
+      app.logger.info("{:.8f} {}\n{}".format(
+        query.duration,
+        query.context,
+        with_prefix(query.statement, "       ")))
+    return response
