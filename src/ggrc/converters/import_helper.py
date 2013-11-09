@@ -30,7 +30,11 @@ def handle_csv_import(converter_class, filepath, **options):
 
   csv_file.close()
   converter = converter_class.from_rows(rows, **options)
-  return converter.do_import(options.get('dry_run', True))
+  # remove 'dry_run' key to allow passing dict w/out keyword arg collision
+  # on 'dry_run' parameter:
+  is_dry_run = options.get('dry_run', True)
+  del options['dry_run']
+  return converter.do_import(is_dry_run, **options)
 
 def csv_reader(csv_data, dialect=csv.excel, **kwargs):
   reader = csv.reader(utf_8_encoder(csv_data), dialect=dialect, **kwargs)
