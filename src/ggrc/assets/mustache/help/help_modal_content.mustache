@@ -18,14 +18,14 @@
       <div class="row-fluid">
         <div class="well">     
           <label for="help_help_title">Help title</label>
-          <input class="span12" id="help_title" name="title" size="30" type="text" value="{{title}}">
+          <input tabindex="1" class="span12" id="help_title" name="title" size="30" type="text" value="{{title}}" autofocus>
           <label for="help_help_content">Help content</label>
           <div class="wysiwyg-area">
-            <textarea class="span12 double wysihtml5 rtftextarea" id="help_content" name="content" rows="8">{{{content}}}</textarea>
+            <textarea tabindex="2" class="span12 double wysihtml5 rtftextarea" id="help_content" name="content" rows="8">{{{content}}}</textarea>
           </div>
           <div class="row-fluid">
             <div class="span12">
-              <input class="btn btn-warning pull-right" name="commit" type="submit" value="Save">
+              <input tabindex="3" class="btn btn-warning pull-right" name="commit" type="submit" value="Save">
             </div>
           </div>
           <input id="help_slug" name="slug" type="hidden" value="{{slug}}">

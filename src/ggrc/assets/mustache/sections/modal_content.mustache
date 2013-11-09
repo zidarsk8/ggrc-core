@@ -16,7 +16,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Enter Title"></i>
       </label>
-      <input id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}">
+      <input tabindex="1" id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
     <div class="span6">
       &nbsp;
@@ -30,7 +30,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Enter text of section or clause"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}">{{{description}}}</textarea>
+        <textarea tabindex="2" id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}">{{{description}}}</textarea>
       </div>
     </div>
   </div>
@@ -61,7 +61,7 @@
           Code
           <i class="grcicon-help-black" rel="tooltip" title="Enter Code"></i>
         </label>
-        <input id="section-code" class="input-block-level" name="slug" placeholder="{{#if_equals instance.directive.type 'Contract'}}CLAUSE{{else}}SECTION{{/if_equals}}-XXX" type="text" value="{{slug}}">
+        <input tabindex="3" id="section-code" class="input-block-level" name="slug" placeholder="{{#if_equals instance.directive.type 'Contract'}}CLAUSE{{else}}SECTION{{/if_equals}}-XXX" type="text" value="{{slug}}">
       </div>
     </div>
   </div>

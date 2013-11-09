@@ -48,7 +48,12 @@ for module_name in settings_modules.split(" "):
         pathname, os.path.join(*module_name_parts[1:]))
 
   try:
+    _EXT = EXTENSIONS if "EXTENSIONS" in vars() else []
     execfile(fullpath)
+    if "EXTENSIONS" in vars() and _EXT != EXTENSIONS:
+      _EXT += EXTENSIONS
+    EXTENSIONS = _EXT
+    del _EXT
   except Exception, e:
     raise
 

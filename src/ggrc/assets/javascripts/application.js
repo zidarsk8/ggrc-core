@@ -30,8 +30,20 @@ jQuery(document).ready(function($) {
   }).next().hide();
 });*/
 
-var GGRC = {
-  mustache_path: '/static/mustache'
+var GGRC = window.GGRC || {};
+GGRC.mustache_path = '/static/mustache';
+
+GGRC.hooks = GGRC.hooks || {};
+GGRC.register_hook = function(path, hook) {
+  var h, parent_path, last;
+  parent_path = path.split(".");
+  last = parent_path.pop();
+  parent_path = can.getObject(parent_path.join("."), GGRC.hooks, true);
+  if(!(h = parent_path[last])) {
+    h = new can.Observe.List();
+    parent_path[last] = h;
+  }
+  h.push(hook);
 };
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
@@ -213,7 +225,6 @@ jQuery.extend(GGRC, {
 var etags = {};
 $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   var data = originalOptions.data;
-  jqXHR.setRequestHeader("X-Requested-By", "gGRC");
 
   function attach_provisional_id(prop) {
     jqXHR.done(function(obj) {
@@ -237,6 +248,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     options.cache = false;
   }
   if( /^\/api\/\w+/.test(options.url)) {
+    jqXHR.setRequestHeader("X-Requested-By", "gGRC");
     jqXHR.done(function(data, status, xhr) {
       if(!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
         return;
@@ -758,6 +770,32 @@ $(window).load(function(){
       }
     });
   }
+  
+  // Tab indexing form fields in modal
+  $('body').on('focus', '.modal', function() {
+    $('.wysiwyg-area').each(function() {
+      var $this = $(this),
+          $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
+          $descriptionField = $this.find('iframe.wysihtml5-sandbox');
+      
+      function addingTabindex() {
+        $descriptionField.attr('tabindex', $textarea);
+      }
+      setTimeout(addingTabindex,100)
+    });
+  });
+  // Watermark trigger
+  $('body').on('click', '.watermark-trigger', function() {
+    var $this = $(this),
+        $showWatermark = $this.closest('.tree-item').find('.watermark-icon');
+    
+    $showWatermark.fadeIn('fast');
+    $this.addClass("active");
+    $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
+    
+    return false;
+    
+  });
 
 });
 
