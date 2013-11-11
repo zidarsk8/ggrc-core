@@ -13,6 +13,9 @@
       -if type_plural|title == 'Audits'
         Audits
         %small BETA
+      -elif type_plural|title == 'People'
+        People
+        %small BETA
       -else
         {{ type_plural|title }}
       %small
