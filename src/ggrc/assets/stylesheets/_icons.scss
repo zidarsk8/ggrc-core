@@ -30,6 +30,14 @@
   }
 }
 
+// Top level tree items don't need icons
+.tree-item .tree-title-area [class^="grcicon-"] {
+  display: none;
+}
+.tree-item .tree-item .tree-title-area [class^="grcicon-"] {
+  display: inline-block;
+}
+
 [class^="grciconlarge-"] {
   display: inline-block;
   width: 24px;
