@@ -260,7 +260,6 @@ can.Control("CMS.Controllers.LHN_Search", {
       } else {
         // Use a cached max-height if one exists
         var holder = el.closest('.lhs-holder')
-          , maxHeight = parseInt(holder.find(this.options.list_content_selector).filter(':visible').css('maxHeight'),10)
           ;
 
         // Collapse other lists
@@ -270,10 +269,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         $ul.slideDown().addClass("in");
 
         // Determine the expandable height
-        $ul.filter(this.options.list_content_selector).css('maxHeight', Math.max(160, (maxHeight || (holder[0].offsetHeight
-          - el.closest('#lhs')[0].offsetHeight
-          - $ul.filter(this.options.actions_content_selector)[0].scrollHeight
-          - 25))) + 'px');
+        $ul.filter(this.options.list_content_selector).css('maxHeight', Math.max(160, ~~(0.5 * holder.height())) + 'px');
 
         this.on_show_list($ul);
       }
