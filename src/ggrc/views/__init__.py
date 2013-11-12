@@ -251,11 +251,10 @@ def import_controls_to_program(program_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Program
-  import ggrc.views
+  from ggrc.utils import view_url_for
 
   program = Program.query.get(program_id)
-  program_url =\
-    getattr(ggrc.views, program.__class__.__name__).url_for(program)
+  program_url = view_url_for(program)
   return_to = unicode(request.args.get('return_to', program_url))
 
   if request.method == 'POST':
