@@ -143,6 +143,11 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
     this.element.trigger('kill-all-popovers');
   }
 
+  , "{observer} my_work" : function(el, ev, newval) {
+    this.filter(null, newval ? { "owner_id": GGRC.current_user.id } : null);
+    this.element.trigger('kill-all-popovers');
+  }
+
   // @override
   , redo_last_filter : function(id_to_add) {
     var that = this;
@@ -210,7 +215,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
       this.init_object_lists();
       this.init_list_views();
-      this.run_search("");
+      this.run_search("", this.options.observer.my_work ? { "owner_id": GGRC.current_user.id } : null);
 
       can.Model.Cacheable.bind("created", function(ev, instance) {
         var visible_model_names =
@@ -255,24 +260,54 @@ can.Control("CMS.Controllers.LHN_Search", {
       } else {
         // Use a cached max-height if one exists
         var holder = el.closest('.lhs-holder')
-          , maxHeight = parseInt(holder.find(this.options.list_content_selector).filter(':visible').css('maxHeight'),10)
+          , $content = $ul.filter(this.options.list_content_selector)
+          , $siblings = $ul.closest(".lhs").find(selector)
+          , extra_height = 0
+          , top
           ;
 
         // Collapse other lists
-        $ul.closest(".lhs").find(selector)
-          .slideUp().removeClass("in");
+        $siblings.slideUp().removeClass("in");
         // Expand this list
         $ul.slideDown().addClass("in");
 
+        // Compute the extra height to add to the expandable height, 
+        // based on the size of the content that is sliding away.
+        top = $content.offset().top;
+        $siblings.filter(':visible').each(function() {
+          var sibling_top = $(this).offset().top;
+          if (sibling_top <= top) {
+            extra_height += this.offsetHeight + (sibling_top < 0 ? -holder[0].scrollTop : 0);
+          }
+        });
+
         // Determine the expandable height
-        $ul.filter(this.options.list_content_selector).css('maxHeight', Math.max(160, (maxHeight || (holder[0].offsetHeight
-          - el.closest('#lhs')[0].offsetHeight
-          - $ul.filter(this.options.actions_content_selector)[0].scrollHeight
-          - 25))) + 'px');
+        this._holder_height = holder.outerHeight();
+        $content.filter(this.options.list_content_selector).css(
+            'maxHeight'
+          , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
+        );
 
         this.on_show_list($ul);
       }
       ev.preventDefault();
+    }
+
+  , " resize": function() {
+      var $content = this.element.find(this.options.list_content_selector).filter(':visible');
+
+
+      if ($content.length) {
+        var last_height = this._holder_height
+          , holder = this.element.closest('.lhs-holder')
+          ;
+        this._holder_height = holder.outerHeight();
+
+        $content.css(
+            'maxHeight'
+          , (parseFloat($content.css('maxHeight')) + this._holder_height - last_height) + 'px'
+        );
+      }
     }
 
   , on_show_list: function(el, ev) {
@@ -284,9 +319,12 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 
   , "{observer} value" : function(el, ev, newval) {
-      this.run_search(newval);
-      //this.element.trigger('kill-all-popovers');
+      this.run_search(newval, this.current_params);
     }
+
+  , "{observer} my_work" : function(el, ev, newval) {
+    this.run_search(this.current_term, newval ? { "owner_id": GGRC.current_user.id } : null);
+  }
 
   , show_more: function($el) {
       if (this._show_more_pending)
@@ -467,7 +505,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       models = can.map(this.get_lists(), this.proxy("get_list_model"));
 
       // Retrieve and display counts
-      GGRC.Models.Search.counts_for_types(this.current_term, models)
+      GGRC.Models.Search.counts_for_types(this.current_term, models, this.current_params)
         .then(this.proxy("display_counts"));
     }
 
@@ -494,14 +532,14 @@ can.Control("CMS.Controllers.LHN_Search", {
           $list.find('.spinner').html(self.make_spinner());
         });
 
-        GGRC.Models.Search.search_for_types(this.current_term, models)
+        GGRC.Models.Search.search_for_types(this.current_term, models, this.current_params)
           .then(this.proxy("display_lists"));
       }
     }
 
-  , run_search: function(term) {
+  , run_search: function(term, extra_params) {
       var self = this;
-      if (term !== this.current_term) {
+      if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
         can.each(this.options.results_lists, function(list) {
           list.replace([]);
@@ -512,6 +550,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         this.options.loaded_lists = [];
 
         this.current_term = term;
+        this.current_params = extra_params;
         this.refresh_counts();
         // Retrieve and display results for visible lists
         this.refresh_visible_lists();

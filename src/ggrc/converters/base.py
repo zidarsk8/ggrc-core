@@ -29,6 +29,9 @@ class BaseConverter(object):
     self.final_results = []
     self.import_exception = None
     self.import_slug = None
+    self.total_imported = 0
+    self.objects_created = 0
+    self.objects_updated = 0
 
     self.create_metadata_map()
     self.create_object_map()
@@ -57,7 +60,7 @@ class BaseConverter(object):
     self.all_objects[model_class.__name__][key] = newObject
 
   def created_objects(self):
-    return [result for result in self.objects if result.id is None]
+    return [result for result in self.objects if result.obj.id is None]
 
   def updated_objects(self):
     pass
@@ -162,16 +165,17 @@ class BaseConverter(object):
   def isblank(self, string):
     return not len(string) or string.isspace()
 
-  def do_import(self, dry_run = True):
+  def do_import(self, dry_run = True, **options):
     self.import_metadata()
     object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
-      row = self.row_converter(self, row_attrs, index)
+      row = self.row_converter(self, row_attrs, index, **options)
       row.setup()
       row.reify()
       self.objects.append(row)
 
+    self.set_import_stats()
     if not dry_run:
       if self.has_errors():
         raise ImportException("Attempted import with errors")
@@ -188,6 +192,12 @@ class BaseConverter(object):
     log_event(db.session)
     db.session.commit()
     update_index(db.session, modified_objects)
+
+  def set_import_stats(self):
+    self.total_imported = len(self.objects)
+    new_objects = self.created_objects()
+    self.objects_created = len(new_objects)
+    self.objects_updated = self.total_imported - self.objects_created
 
   def read_objects(self, headers, rows):
     attrs_collection = []

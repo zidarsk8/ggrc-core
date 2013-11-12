@@ -6,8 +6,10 @@
 import datetime
 from flask import session, Blueprint
 import sqlalchemy.orm
+from sqlalchemy import and_, or_
 from ggrc import db, settings
 from ggrc.login import get_current_user, login_required
+from ggrc.models.audit import Audit
 from ggrc.models.context import Context
 from ggrc.models.program import Program
 from ggrc.rbac import permissions
@@ -15,7 +17,8 @@ from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
 from ggrc.views import object_view
-from .models import Role, UserRole
+from . import basic_roles
+from .models import Role, RoleImplication, UserRole
 
 blueprint = Blueprint(
     'permissions',
@@ -99,6 +102,29 @@ class UserPermissions(DefaultUserPermissions):
       session['permissions'] = load_permissions_for(user)
       session['permissions__ts'] = None
 
+def collect_permissions(src_permissions, context_id, permissions):
+  for action, resource_permissions in src_permissions.items():
+    for resource_permission in resource_permissions:
+      if type(resource_permission) in [str, unicode]:
+        resource_type = resource_permission
+        condition = None
+      else:
+        resource_type = resource_permission['type']
+        condition = resource_permission.get('condition', None)
+        terms = resource_permission.get('terms', [])
+      permissions.setdefault(action, {})\
+          .setdefault(resource_type, dict())\
+          .setdefault('contexts', list())\
+          .append(context_id)
+      if condition:
+        permissions[action][resource_type]\
+            .setdefault('conditions', dict())\
+            .setdefault(context_id, list())\
+            .append({
+              'condition': condition,
+              'terms': terms,
+              })
+
 def load_permissions_for(user):
   """Permissions is dictionary that can be exported to json to share with
   clients. Structure is:
@@ -138,30 +164,35 @@ def load_permissions_for(user):
         .filter(UserRole.person_id==user.id)\
         .order_by(UserRole.updated_at.desc())\
         .all()
+    roles_contexts = {}
     for user_role in user_roles:
+      roles_contexts.setdefault(user_role.role_id, set())
+      roles_contexts[user_role.role_id].add(user_role.context_id)
       if isinstance(user_role.role.permissions, dict):
-        for action, resource_permissions in user_role.role.permissions.items():
-          for resource_permission in resource_permissions:
-            if type(resource_permission) in [str, unicode]:
-              resource_type = resource_permission
-              condition = None
-            else:
-              resource_type = resource_permission['type']
-              condition = resource_permission.get('condition', None)
-              terms = resource_permission.get('terms', [])
-            permissions.setdefault(action, {})\
-                .setdefault(resource_type, dict())\
-                .setdefault('contexts', list())\
-                .append(user_role.context_id)
-            if condition:
-              permissions[action][resource_type]\
-                  .setdefault('conditions', dict())\
-                  .setdefault(user_role.context_id, list())\
-                  .append({
-                    'condition': condition,
-                    'terms': terms,
-                    })
-                  
+        collect_permissions(
+            user_role.role.permissions, user_role.context_id, permissions)
+
+    # Collate roles/contexts to eager load all required implications
+    implications_queries = []
+    for role_id, context_ids in roles_contexts.items():
+      implications_queries.append(and_(
+        RoleImplication.source_role_id == role_id,
+        RoleImplication.source_context_id.in_(context_ids)))
+    if len(implications_queries) > 0:
+      implications = RoleImplication.query\
+          .filter(or_(*implications_queries))\
+          .options(
+              sqlalchemy.orm.undefer_group('Role_complete'),
+              sqlalchemy.orm.joinedload('role'))\
+          .all()
+    else:
+      implications = []
+
+    for implication in implications:
+      if isinstance(implication.role.permissions, dict):
+        collect_permissions(
+            implication.role.permissions, implication.context_id, permissions)
+
     #grab personal context
     personal_context = db.session.query(Context).filter(
         Context.related_object_id == user.id,
@@ -210,8 +241,7 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 
     # add a user_roles mapping assigning the user creating the program
     # the ProgramOwner role in the program's context.
-    program_owner_role = db.session.query(Role)\
-        .filter(Role.name == 'ProgramOwner').first()
+    program_owner_role = basic_roles.program_owner()
     user_role = UserRole(
         person=get_current_user(),
         role=program_owner_role,
@@ -221,6 +251,86 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     db.session.flush()
 
     assign_role_reader(get_current_user())
+
+@Resource.model_posted.connect_via(Audit)
+def handle_audit_post(sender, obj=None, src=None, service=None):
+  #Create an audit context
+  context = Context(
+      context=obj.context,
+      name='Audit Context {timestamp}'.format(
+        timestamp=datetime.datetime.now()),
+      description='',
+      modified_by=get_current_user(),
+      )
+  db.session.add(context)
+
+  #Create the role implications
+  if obj.context and obj.context.id is not None:
+    create_private_program_audit_role_implications(obj.context, context)
+  else:
+    create_public_program_audit_role_implications(context)
+  #Create the role implication for Auditor from Audit for default context
+  db.session.add(RoleImplication(
+      source_context=context,
+      source_role=basic_roles.auditor(),
+      role=basic_roles.auditor_reader(),
+      context=None,
+      modified_by=get_current_user(),
+      ))
+  db.session.flush()
+
+  #Place the audit in the audit context
+  obj.context = context
+
+def create_private_program_audit_role_implications(
+    program_context, audit_context):
+  #Roles implied from Private Program context for Audit context
+  db.session.add(RoleImplication(
+      source_context=program_context,
+      source_role=basic_roles.program_owner(),
+      context=audit_context,
+      role=basic_roles.program_audit_owner(),
+      modified_by=get_current_user(),
+      ))
+  db.session.add(RoleImplication(
+      source_context=program_context,
+      source_role=basic_roles.program_editor(),
+      role=basic_roles.program_audit_editor(),
+      context=audit_context,
+      modified_by=get_current_user(),
+      ))
+  db.session.add(RoleImplication(
+      source_context=program_context,
+      source_role=basic_roles.program_reader(),
+      role=basic_roles.program_audit_reader(),
+      context=audit_context,
+      modified_by=get_current_user(),
+      ))
+  #Role implied from Audit for Private Program context
+  db.session.add(RoleImplication(
+      source_context=audit_context,
+      source_role=basic_roles.auditor(),
+      role=basic_roles.auditor_program_reader(),
+      context=program_context,
+      modified_by=get_current_user(),
+      ))
+
+def create_public_program_audit_role_implications(audit_context):
+  #Roles implied from Private Program context for Audit context
+  db.session.add(RoleImplication(
+      source_context=None,
+      source_role=basic_roles.object_editor(),
+      context=audit_context,
+      role=basic_roles.program_audit_editor(),
+      modified_by=get_current_user(),
+      ))
+  db.session.add(RoleImplication(
+      source_context=None,
+      source_role=basic_roles.reader(),
+      role=basic_roles.program_audit_reader(),
+      context=audit_context,
+      modified_by=get_current_user(),
+      ))
 
 @Resource.model_posted.connect_via(UserRole)
 def handle_program_owner_role_assignment(
@@ -241,7 +351,6 @@ def assign_role_reader(user):
           context_id=None,
           )
       db.session.add(role_reader_for_user)
-      db.session.flush()
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.

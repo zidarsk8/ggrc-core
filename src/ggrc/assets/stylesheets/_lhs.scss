@@ -67,10 +67,18 @@
       visibility:hidden;
     }
   }
+  >.form-search {
+    margin: 0;
+  }
   .lhs-search {
     padding:10px;
-    input {
-      @include border-radius(10px);
+    > input {
+         -webkit-border-top-left-radius: 10px;
+             -moz-border-radius-topleft: 10px;
+                 border-top-left-radius: 10px;
+      -webkit-border-bottom-left-radius: 10px;
+          -moz-border-radius-bottomleft: 10px;
+              border-bottom-left-radius: 10px;
       margin-bottom: 0;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
@@ -78,7 +86,19 @@
       background-position:-268px -195px;
       padding-left: 23px;
       font-size:12px;
-      
+      width: 105px;
+    }
+    .checkbox.btn {
+      position: absolute;
+      right: 10px;
+      margin-left: 0;
+      padding-left: 4px;
+         -webkit-border-top-right-radius: 10px;
+             -moz-border-radius-topright: 10px;
+                 border-top-right-radius: 10px;
+      -webkit-border-bottom-right-radius: 10px;
+          -moz-border-radius-bottomright: 10px;
+              border-bottom-right-radius: 10px;
     }
   }
 }
@@ -145,6 +165,13 @@
       &.business {
         a {
           color:$business;
+        }
+      }
+    }
+    li {
+      &.entities {
+        a {
+          color:$entities;
         }
       }
     }

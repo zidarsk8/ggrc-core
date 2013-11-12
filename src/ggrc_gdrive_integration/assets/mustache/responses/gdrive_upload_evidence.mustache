@@ -1,0 +1,22 @@
+{{! upload evidence to GDrive by clicking this button}}
+{{#if allow_mapping_or_creating}}
+{{#is_allowed_to_map parent_instance "Document"}}
+<li class="tree-footer tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <a
+        href="javascript://"
+        data-placement="left"
+        data-toggle="gdrive-picker"
+        data-response-id="{{parent_instance.id}}"
+        title="Upload Evidence"
+        >
+        + Upload Evidence
+      </a>
+
+    </div>
+  </div>
+</li>
+{{/is_allowed_to_map}}
+{{/if}}

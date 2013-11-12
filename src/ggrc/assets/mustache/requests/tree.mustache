@@ -8,7 +8,7 @@
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
-        <div class="span4">
+        <div class="span3">
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-objective-color"></i>
@@ -22,24 +22,38 @@
           <i class="grcicon-person-green pull-left"></i>
         {{#using assignee=instance.assignee}}
           <div class="objective-selector">
-            <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
+            <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
           </div>
         {{/using}}
         </div>
-        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <span class="pull-left request-type">type:</span>
-          <select name="request_type" class="span9 short-field">
+        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <span class="pull-left request-type black-font">type:</span>
+          <select name="request_type" class="span8 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
             {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
             <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
         </div>
-        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <select name="status" class="span9 short-field">
-            {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-            {{/iterate}}
-          </select>
+        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <div class="row-fluid">
+            <div class="span5">
+              <select name="status" class="span12 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
+                {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+                <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            </div>
+            <div class="span6">
+              <div class="black-font">
+                &nbsp;&nbsp;
+                {{#if instance.due_on}}
+                  {{#using due_on=instance.due_on}}
+                  <strong>due on: </strong>{{localize_date due_on}}
+                  {{/using}}
+                {{/if}}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </a>
@@ -63,10 +77,15 @@
             <p><strong>requested on: </strong>{{localize_date requested_on}}</p>
             {{/using}}
           {{/if}}
-          <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            Edit PBC {{model.title_singular}}
-          </a>
+
+          {{{render_hooks 'Request.tree_view_info'}}}
+
+          {{#is_allowed 'update' instance context=instance.context.id}}
+            <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit PBC {{model.title_singular}}
+            </a>
+          {{/is_allowed}}
         </div>
       </div>
     </div>

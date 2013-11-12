@@ -15,6 +15,7 @@ var COLLAPSE = "collapse"
 , HEIGHTS = "heights"
 , COLUMNS = "columns"
 , PBC_LISTS = "pbc_lists"
+, GLOBAL = "global"
 , path = window.location.pathname;
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -84,7 +85,9 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   }
 
   , getObject : function() {
-    return can.getObject(can.makeArray(arguments).join("."), this);
+    var args = can.makeArray(arguments);
+    args[0] === null && args.splice(0,1);
+    return can.getObject(args.join("."), this);
   }
 
   // collapsed state
@@ -104,6 +107,22 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     }
 
     return widget_id ? collapsed.attr(widget_id) : collapsed;
+  }
+
+  , setGlobal : function(widget_id, attrs) {
+    var global = this.getObject(null, GLOBAL) && this.getObject(null, GLOBAL).attr(widget_id);
+    if (!global) {
+      global = this.makeObject(null, GLOBAL).attr(widget_id, new can.Observe(attrs));
+    }
+    else {
+      global.attr(attrs);
+    }
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getGlobal : function(widget_id) {
+    return this.getObject(null, GLOBAL) && this.getObject(null, GLOBAL).attr(widget_id);
   }
 
   // sorts = position of widgets in each column on a page
@@ -232,6 +251,7 @@ if(typeof jasmine !== "undefined") {
     , SORTS : SORTS
     , HEIGHTS : HEIGHTS
     , COLUMNS : COLUMNS
+    , GLOBAL : GLOBAL
     , PBC_LISTS : PBC_LISTS
     , path : path
   };

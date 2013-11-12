@@ -15,6 +15,11 @@
               <div class='tree-title-area'>
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
                 {{firstnonempty instance.name instance.email}}
+                {{#infer_roles instance}}
+                  <span class="role">
+                    {{.}}
+                  </span>
+                {{/infer_roles}}
               </div>
             </div>
           </div>

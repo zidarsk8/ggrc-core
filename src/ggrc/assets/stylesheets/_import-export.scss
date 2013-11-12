@@ -20,6 +20,9 @@ form.import {
     padding-top:16px;
     border-top:1px solid #ddd;
   }
+  input[type="file"] {
+    width: 100%;
+  }
 }
 
 .results-table {
@@ -110,4 +113,9 @@ form.import {
     }
   }
 
+}
+
+.download-template {
+  text-align: right;
+  font-weight: bold;
 }

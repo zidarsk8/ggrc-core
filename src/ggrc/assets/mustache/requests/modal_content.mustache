@@ -15,7 +15,7 @@
         <span class="required">*</span>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="request_description" class="span12 double wysihtml5" name="description" placeholder="State your request here...">{{{description}}}</textarea>
+        <textarea tabindex="1" id="request_description" class="span12 double wysihtml5" name="description" placeholder="State your request here..." autofocus>{{{description}}}</textarea>
       </div>
     </div>
     <div class="span3">
@@ -23,7 +23,7 @@
         Request Type
         <span class="required">*</span>
       </label>
-      <select name="request_type" class="input-block-level">
+      <select name="request_type" class="input-block-level" tabindex="2">
         {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
         <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
@@ -32,13 +32,13 @@
         Requested On
         <span class="required">*</span>
       </label>
-      <input class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
+      <input tabindex="3" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
     </div>
     <div class="span3">
       <label>
         Status
       </label>
-      <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
+      <select class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}} tabindex="4">
         {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
         <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
@@ -47,7 +47,7 @@
         Due On
         <span class="required">*</span>
       </label>
-      <input class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+      <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
     </div>
   </div>
   
@@ -60,7 +60,7 @@
       </label>
       <i class="grcicon-objective-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input type="text" name="objective.title" data-lookup="Objective" class="span10" value="{{firstnonempty objective.title ''}}">
+        <input tabindex="6" type="text" name="objective.title" data-lookup="Objective" class="span10" value="{{firstnonempty objective.title ''}}">
       </div>
     </div>
     {{/using}}
@@ -72,7 +72,7 @@
       </label>
       <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
-        <input type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
+        <input tabindex="7" type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
       </div>
     </div>
     {{/using}}
@@ -104,7 +104,7 @@
           Test
         </label>
         <div class="wysiwyg-area">
-          <textarea id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
+          <textarea tabindex="8" id="test_description" class="span12 double wysihtml5" name="test" placeholder="Enter Test">{{{test}}}</textarea>
         </div>
       </div>
       <div class="span6">
@@ -112,7 +112,7 @@
           Notes
         </label>
         <div class="wysiwyg-area">
-          <textarea id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+          <textarea tabindex="9" id="notes_description" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
         </div>
       </div>
     </div>
@@ -121,7 +121,7 @@
         <label>
           Audit Contact
         </label>
-        <input class="span6" name="auditor_contact" type="text" placeholder="Enter Auditor's contact email" value="{{auditor_contact}}">
+        <input tabindex="10" class="span6" name="auditor_contact" type="text" placeholder="Enter Auditor's contact email" value="{{auditor_contact}}">
       </div>
     </div>
   </div>

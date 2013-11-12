@@ -3,8 +3,13 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from datetime import datetime
+import re
 from .common import *
-from ggrc.models.all_models import *
+from ggrc.models.all_models import (
+    Category, Control, Document, Objective, ObjectControl, ObjectPerson,
+    Option, Person, Process, Relationship, Request, System, SystemOrProcess,
+    )
 from ggrc.models.exceptions import ValidationError
 
 def unpack_list(vals):
@@ -244,12 +249,53 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
-class TextOrHtmlColumnHandler(ColumnHandler):
+class RequestTypeColumnHandler(ColumnHandler):
+
+    def parse_item(self, value):
+      formatted_type = value.lower()
+      if formatted_type in Request.VALID_TYPES:
+        return formatted_type
+      else:
+        self.add_error("Value must be one of the following: {}".format(
+            Request.VALID_TYPES
+        ))
+        return None
+
+
+class RequestTypeColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
-    if value:
-      value = value.strip()
-    return value or ''
+    formatted_type = value.strip().lower()
+    if formatted_type in Request.VALID_TYPES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_TYPES
+      ))
+      return None
+
+
+class RequestStatusColumnHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    words = value.strip().split()
+    formatted_type = u" ".join(s.capitalize() for s in words)
+    if formatted_type in Request.VALID_STATES:
+      return formatted_type
+    else:
+      self.add_error("Value must be one of the following: {}".format(
+          Request.VALID_STATES
+      ))
+      return None
+
+
+class TextOrHtmlColumnHandler(ColumnHandler):
+
+ def parse_item(self, value):
+   if value:
+     value = value.strip()
+   return value or ''
+
 
 class ContactEmailHandler(ColumnHandler):
 
@@ -269,8 +315,6 @@ class ContactEmailHandler(ColumnHandler):
     return value
 
   def find_contact(self, email_str, is_required=False):
-    from ggrc.models.person import Person
-
     existing_person = Person.query.filter_by(email=email_str).first()
     if not existing_person and is_required:
       self.add_error("{} was not found. Please enter a valid email address"
@@ -296,6 +340,35 @@ class ContactEmailHandler(ColumnHandler):
   def validate(self, data):
     pass
 
+
+class AssigneeHandler(ContactEmailHandler):
+
+  def parse_item(self, value):
+    stripped_value = value.strip()
+    if len(stripped_value) == 0:
+      # Audit should exist; was passed from view function
+      audit = self.importer.options.get('audit')
+      audit_owner = getattr(audit, 'owner', None)
+      if audit_owner:
+        # Owner should exist, and if so, return that Person
+        self.add_warning("Blank field; will be assigned to audit owner, {}.".format(audit_owner.display_name))
+        return audit_owner
+      else:
+        self.add_error("Need to assign owner to this audit or enter a user here.")
+      return audit_owner
+    else:
+      # if there is content, treat is as a normal contact field
+      return super(AssigneeHandler, self).parse_item(value)
+
+  def go_import(self, content):
+    # override to always parse_item, even with empty content, so as
+    # to trigger default behavior (assign to audit owner)
+    data = self.parse_item(content)
+    self.validate(data)
+    self.value = data
+    self.set_attr(data)
+
+
 class SlugColumnHandler(ColumnHandler):
 
   # Dont overwrite slug on object
@@ -312,7 +385,6 @@ class SlugColumnHandler(ColumnHandler):
     return content
 
 class OptionColumnHandler(ColumnHandler):
-  from ggrc.models.option import Option
 
   def parse_item(self, value):
     if value:
@@ -328,6 +400,12 @@ class OptionColumnHandler(ColumnHandler):
           "proceed with import, the current data will be ignored.".format(
           value.lower()))
       return option
+
+  def export(self):
+    value = getattr(self.importer.obj, self.key, '') or ''
+    if not isinstance(value, basestring):
+      value = value.title
+    return value
 
   def display(self):
     if self.has_errors():
@@ -364,18 +442,18 @@ class DateColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
     try:
-      from datetime import datetime
       date_result = None
-      if isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
-        date_result = datetime.strptime(value, "%m/%d/%Y")
-      elif isinstance(value, basestring) and re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%m/%d/%y")
-      elif isinstance(value, basestring) and re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
-        date_result = datetime.strptime(value, "%Y/%m/%d")
-      elif isinstance(value, basestring) and re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
-        date_result = datetime.strptime(value, "%Y-%m-%d")
-      elif value:
-        raise ValueError("Error parsing the date string")
+      if isinstance(value, basestring):
+        if re.match(r'\d{1,2}\/\d{1,2}\/\d{4}', value):
+          date_result = datetime.strptime(value, "%m/%d/%Y")
+        elif re.match(r'\d{1,2}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%m/%d/%y")
+        elif re.match(r'\d{4}\/\d{1,2}\/\d{2}', value):
+          date_result = datetime.strptime(value, "%Y/%m/%d")
+        elif re.match(r'\d{4}-\d{1,2}-\d{1,2}', value):
+          date_result = datetime.strptime(value, "%Y-%m-%d")
+        elif value:
+          raise ValueError("Error parsing the date string")
 
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
@@ -564,6 +642,35 @@ class LinksHandler(ColumnHandler):
       if hasattr(obj, self.options.get('association')):
         setattr(obj, self.options.get('association'), self.imported_links())
 
+class ObjectiveHandler(ColumnHandler):
+
+  def parse_item(self, value):
+    # if this slug exists, return the objective_id, otherwise throw error
+    objective = Objective.query.filter_by(slug=value.upper()).first()
+    if not objective:
+      self.add_error("Objective code {} does not exist.".format(value))
+    else:
+      return objective.id
+
+  def export(self):
+    objective_id = getattr(self.importer.obj, 'objective_id', '')
+    if objective_id:
+      objective = Objective.query.filter_by(id=objective_id).first()
+      return objective.slug
+    else:
+      return objective_id
+
+  def display(self):
+    # self.importer.obj[self.key] only returns objective id
+    # need to return corresponding objective slug or empty string
+    objective_id = getattr(self.importer.obj, self.key, '') or ''
+    if objective_id:
+      objective = Objective.query.get(objective_id)
+      if objective:
+        return objective.slug
+    return ''
+
+
 class LinkControlsHandler(LinksHandler):
 
   model_class = Control
@@ -576,7 +683,6 @@ class LinkControlsHandler(LinksHandler):
     return None
 
 class LinkCategoriesHandler(LinksHandler):
-  from ggrc.models.category import Category
   model_class = Category
 
   def parse_item(self, data):
@@ -604,8 +710,6 @@ class LinkCategoriesHandler(LinksHandler):
     return obj.name
 
 class LinkDocumentsHandler(LinksHandler):
-  from ggrc.models.document import Document
-  import re
   model_class = Document
 
   def is_valid_url(self, url_string):
@@ -638,10 +742,7 @@ class LinkDocumentsHandler(LinksHandler):
     return u"[{} {}] {}".format(item.link, item.title, item.description)
 
 class LinkPeopleHandler(LinksHandler):
-  from ggrc.models.person import Person
-  from ggrc.models.all_models import ObjectPerson
   model_class = Person
-  import re
 
   def parse_item(self, value):
     data = {}
@@ -705,7 +806,6 @@ class LinkPeopleHandler(LinksHandler):
       return obj.email
 
 class LinkSystemsHandler(LinksHandler):
-  from ggrc.models.all_models import System, Process
   model_class = System
 
   def parse_item(self, value):
@@ -734,8 +834,6 @@ class LinkSystemsHandler(LinksHandler):
     return None
 
 class LinkRelationshipsHandler(LinksHandler):
-  from ggrc.models.relationship import Relationship
-  import re
 
   def parse_item(self, value):
     if value and value[0] == '[':
@@ -792,8 +890,6 @@ class LinkRelationshipsHandler(LinksHandler):
     return model_class.query.filter_by(**where_params).first() if model_class else None
 
 class LinkObjectControl(LinksHandler):
-  from ggrc.models import ObjectControl
-  import re
 
   def parse_item(self, value):
     if value and value[0] == '[':

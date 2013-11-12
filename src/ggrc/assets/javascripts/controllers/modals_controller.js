@@ -74,7 +74,10 @@ can.Control("GGRC.Controllers.Modals", {
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
-      .then(function() { that.element.trigger('preload') })
+      .then(function() { 
+        // If the modal is closed early, the element no longer exists
+        that.element && that.element.trigger('preload') 
+      })
       .then(this.proxy("autocomplete"));
   }
 
@@ -375,6 +378,7 @@ can.Control("GGRC.Controllers.Modals", {
       //   `context` to be present even if `null`, unlike other attributes
       if (!instance.context)
         instance.attr('context', { id: null });
+      // FIXME: This should not depend on presence of `<model>.attributes`
       if (instance.isNew() && instance.constructor.attributes.owners &&
           !instance.owners) {
         instance.attr('owners', [{ id: GGRC.current_user.id }]);

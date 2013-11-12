@@ -53,8 +53,14 @@ function dateConverter(d) {
   return ret ? ret.toDate() : undefined;
 }
 
-function makeDateSerializer(type) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
+function makeDateUnpacker(key) {
+  return function(d) {
+    return dateConverter(d[key] ? d[key] : d);
+  };
+}
+
+function makeDateSerializer(type, key) {
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
   return function(d) {
     if(d == null) {
       return "";
@@ -62,7 +68,15 @@ function makeDateSerializer(type) {
     if(typeof d !== "number") {
       d = d.getTime();
     }
-    return moment((d / 1000).toString(), "X").utc().format(conversion);
+    var retstr = moment((d / 1000).toString(), "X").utc().format(conversion);
+    var retval;
+    if(key) {
+      retval = {};
+      retval[key] = retstr;
+    } else {
+      retval = retstr;
+    }
+    return retval;
   };
 }
 
@@ -78,6 +92,40 @@ can.Model("can.Model.Cacheable", {
   , title_singular : ""
   , title_plural : ""
   , findOne : "GET {href}"
+  , makeFindAll: function(finder) {
+      return function(params, success, error) {
+        var deferred = $.Deferred()
+          , sourceDeferred = finder.call(this, params)
+          , self = this
+          ;
+
+        deferred.then(success, error);
+        sourceDeferred.then(function(sourceData) {
+          var obsList = new self.List([]);
+          
+          if(sourceData[self.root_collection + "_collection"]) {
+            sourceData = sourceData[self.root_collection + "_collection"];
+          }
+          if(sourceData[self.root_collection]) {
+            sourceData = sourceData[self.root_collection];
+          }
+
+          setTimeout(function(){
+            var piece = sourceData.splice(0,Math.min(sourceData.length, 5));
+            obsList.push.apply(obsList, self.models(piece));
+
+            if(sourceData.length) {
+              setTimeout(arguments.callee, 10);
+            } else {
+              deferred.resolve(obsList);
+            }
+          }, 10);
+        });
+
+        return deferred;
+      };
+    }
+
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
     if(this.fullName === "can.Model.Cacheable") {
@@ -123,16 +171,17 @@ can.Model("can.Model.Cacheable", {
     return ret;
   }
   , init : function() {
+    var id_key = this.id;
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
-      if(new_obj.id) {
-        cache[new_obj.id] = new_obj;
+      if(new_obj[id_key]) {
+        cache[new_obj[id_key]] = new_obj;
         if(cache[undefined] === new_obj)
           delete cache[undefined];
       }
     });
     this.bind("destroyed", function(ev, old_obj) {
-      delete can.getObject("cache", old_obj.constructor, true)[old_obj.id];
+      delete can.getObject("cache", old_obj.constructor, true)[old_obj[id_key]];
     });
     //can.getObject("cache", this, true);
 
@@ -244,13 +293,13 @@ can.Model("can.Model.Cacheable", {
 
   , newInstance : function(args) {
     var cache = can.getObject("cache", this, true);
-    if(args && args.id && cache[args.id]) {
+    if(args && args[this.id] && cache[args[this.id]]) {
       //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging 
                                           // (merging -- adding properties from an object without removing existing ones 
                                           //  -- doesn't work in nested objects).  So we're just going to not merge properties.
-      return cache[args.id];
+      return cache[args[this.id]];
     } else {
-      return can.Model.Cacheable.prototype.__proto__.constructor.newInstance.apply(this, arguments);
+      return this._super.apply(this, arguments);
     }
   }
   , process_args : function(args, names) {
@@ -331,7 +380,7 @@ can.Model("can.Model.Cacheable", {
     if (!params)
       return params;
     var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
-    m = this.findInCacheById(params.id)
+    m = this.findInCacheById(params[this.id])
         || (params.provisional_id && can.getObject("provisional_cache", can.Model.Cacheable, true)[params.provisional_id]);
     if(m) {
       if(m.provisional_id) {
@@ -412,10 +461,12 @@ can.Model("can.Model.Cacheable", {
   , convert : {
     "date" : dateConverter
     , "datetime" : dateConverter
+    , "packaged_datetime" : makeDateUnpacker("dateTime")
   }
   , serialize : {
     "datetime" : makeDateSerializer("datetime")
     , "date" : makeDateSerializer("date")
+    , "packaged_datetime" : makeDateSerializer("datetime", "dateTime")
   }
   , tree_view_options : {}
   , list_view_options : {}
@@ -462,9 +513,17 @@ can.Model("can.Model.Cacheable", {
        * "GET /api/programs". If this assumption is invalid, this function
        * WILL NOT work correctly.
        */
-      var parts = findAllSpec.split(" ");
-      var method = parts.length == 2 ? parts[0] : "GET";
-      var collection_url = parts.length == 2 ? parts[1] : parts[0];
+      var parts, method, collection_url;
+      if(typeof findAllSpec === "string") {
+        parts = findAllSpec.split(" ");
+        method = parts.length == 2 ? parts[0] : "GET";
+        collection_url = parts.length == 2 ? parts[1] : parts[0];
+      } else if(typeof findAllSpec === "object") {
+        method = findAllSpec.type || "GET";
+        collection_url = findAllSpec.url;
+      } else {
+        return; // TODO make a pager if findAllSpec is a function.
+      }
       var base_params = {
         type: method
         , dataType: "json"
@@ -511,14 +570,18 @@ can.Model("can.Model.Cacheable", {
         if (!params.__page) {
           params.__page = 1;
         }
+        if (!params.__page_size) {
+          params.__page_size = 100;
+        }
         return findPageFunc(collection_url, params);
       };
     }
 }, {
   init : function() {
-    var cache = can.getObject("cache", this.constructor, true);
-    if (this.id)
-      cache[this.id] = this;
+    var cache = can.getObject("cache", this.constructor, true)
+    , id_key = this.constructor.id;
+    if (this[id_key])
+      cache[this[id_key]] = this;
   }
   , computed_errors : function() {
       var that = this
@@ -590,23 +653,39 @@ can.Model("can.Model.Cacheable", {
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
   }
   , refresh : function(params) {
-    var href = this.selfLink || this.href;
+    var href = this.selfLink || this.href
+    , that = this;
 
     if (!href)
       return (new can.Deferred()).reject();
-    return $.ajax({
-      url : href
-      , params : params
-      , type : "get"
-      , dataType : "json"
-    })
-    .then(can.proxy(this.constructor, "model"))
-    .done(function(d) {
-      d.updated();
-      //  Trigger complete refresh of object -- slow, but fixes live-binding
-      //  redraws in some cases
-      can.trigger(d, "change", "*");
-    });
+    if(!this._pending_refresh) {
+      this._pending_refresh = {
+        dfd : new $.Deferred()
+        , fn : $.debounce(1000, function() {
+          var dfd = that._pending_refresh.dfd;
+          delete that._pending_refresh;
+          $.ajax({
+            url : href
+            , params : params
+            , type : "get"
+            , dataType : "json"
+          })
+          .then(can.proxy(that.constructor, "model"))
+          .done(function(d) {
+            d.updated();
+            //  Trigger complete refresh of object -- slow, but fixes live-binding
+            //  redraws in some cases
+            can.trigger(d, "change", "*");
+            dfd.resolve(d);
+          })
+          .fail(function() {
+            dfd.reject.apply(dfd, arguments);
+          });
+        })
+      };
+    }
+    this._pending_refresh.fn();
+    return this._pending_refresh.dfd;
   }
   , attr : function() {
     if(arguments.length < 1) {
@@ -718,11 +797,16 @@ can.Observe.prototype.stub = function() {
   if (!this.id)
     return null;
 
-  return new can.Observe({
+  var obj = {
     id : this.id,
     href : this.selfLink || this.href,
     type : type
-  });
+  };
+  if(this.constructor.id && this.constructor.id !== "id") {
+    obj[this.constructor.id] = this[this.constructor.id];
+  }
+
+  return new can.Observe(obj);
 };
 
 can.Observe.List.prototype.stubs = function() {
@@ -733,13 +817,14 @@ can.Observe.List.prototype.stubs = function() {
 
 can.Observe.prototype.reify = function() {
   var type = this.constructor.shortName || this.type;
+  var model;
   if (this.selfLink) {
     return this;
-  } else if (CMS.Models[type]) {
-    if (CMS.Models[type].cache
-        && CMS.Models[type].cache[this.id]) {
+  } else if (model = (CMS.Models[type] || GGRC.Models[type])) {
+    if (model.cache
+        && model.cache[this[model.id]]) {
         //&& CMS.Models[this.type].cache[this.id].selfLink) {
-      return CMS.Models[type].cache[this.id];
+      return model.cache[this[model.id]];
     } else {
       return null;
     }

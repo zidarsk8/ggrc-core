@@ -25,9 +25,12 @@ def get_permissions_json():
   permissions.permissions_for(permissions.get_user())
   return json.dumps(session['permissions'])
 
+def get_config_json():
+  return json.dumps(app.config.public_config)
+
 def get_current_user_json():
   current_user = get_current_user()
-  return as_json(current_user.to_json())
+  return as_json(current_user.log_json())
 
 @app.context_processor
 def base_context():
@@ -36,6 +39,7 @@ def base_context():
       get_model=get_model,
       permissions_json=get_permissions_json,
       permissions=permissions,
+      config_json=get_config_json,
       current_user_json=get_current_user_json,
       )
 
@@ -74,7 +78,7 @@ def admin_reindex():
     raise Forbidden()
 
   from ggrc.fulltext import get_indexer
-  from ggrc.fulltext.recordbuilder import fts_record_for
+  from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
 
   indexer = get_indexer()
   indexer.delete_all_records(False)
@@ -83,8 +87,13 @@ def admin_reindex():
   from ggrc.app import db
 
   # Find all models then remove base classes
-  models = set(all_models.all_models) -\
-      set([all_models.Directive, all_models.SystemOrProcess])
+  #   (If we don't remove base classes, we get duplicates in the index.)
+  inheritance_base_models = [
+      all_models.Directive, all_models.SystemOrProcess, all_models.Response
+      ]
+  models = set(all_models.all_models) - set(inheritance_base_models)
+  models = [model for model in models if model_is_indexed(model)]
+
   for model in models:
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
@@ -191,15 +200,15 @@ def import_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
-  import ggrc.views
+  from ggrc.utils import view_url_for
 
   directive = Directive.query.get(directive_id)
-  directive_url =\
-    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
+  directive_url = view_url_for(directive)
+  return_to = unicode(request.args.get('return_to', directive_url))
 
   if request.method == 'POST':
     if 'cancel' in request.form:
-      return import_redirect(directive_url + "#control_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -217,11 +226,11 @@ def import_controls(directive_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url + "#control_widget")
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-              directive_id = directive_id, exception_message = file_msg)
+            directive_id = directive_id, exception_message = file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -230,29 +239,97 @@ def import_controls(directive_id):
             exception_message=e, converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = str(e))
+          directive_id = directive_id, exception_message = str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls')
+  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to)
+
+@app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
+def import_requests(audit_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.requests import RequestsConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Audit, Program
+  import ggrc.views
+
+  audit = Audit.query.get(audit_id)
+  program = audit.program
+  program_url =\
+    getattr(ggrc.views, program.__class__.__name__).url_for(program)
+
+  if request.method == 'POST':
+
+    if 'cancel' in request.form:
+      return import_redirect(program_url + "#audit_widget")
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        converter = handle_csv_import(RequestsConverter, csv_file,
+          program = program, audit = audit, dry_run = dry_run)
+
+        if dry_run:
+          return render_template("programs/import_request_result.haml",
+              converter=converter,
+              results=converter.objects, heading_map=converter.object_map)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect(program_url + "#audit_widget")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("programs/import_request_errors.haml",
+              exception_message = file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("programs/import_request_result.haml", exception_message=e,
+            converter=converter, results=converter.objects,
+            heading_map=converter.object_map)
+      return render_template("programs/import_request_errors.haml",
+            exception_message=e)
+
+  return render_template("programs/import_request.haml", import_kind='Requests')
+
+
+@app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])
+def import_requests_template(audit_id):
+  from flask import current_app
+  from ggrc.models.all_models import Audit, Program
+  audit = Audit.query.get(audit_id)
+  program = audit.program
+  template = "Request_Import_Template.csv"
+  filename = "PBC Request Import Template.csv"
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  options = {'program_slug': program.slug}
+  body = render_template("csv_files/" + template, **options)
+  return current_app.make_response((body, 200, headers))
 
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
-@app.route("/contracts/<directive_id>/import_sections", methods=['GET', 'POST'])
+@app.route("/contracts/<directive_id>/import_clauses", methods=['GET', 'POST'])
 def import_sections(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Directive
-  import ggrc.views
+  from ggrc.models import Directive, Contract
+  from ggrc.utils import view_url_for
 
   directive = Directive.query.get(directive_id)
-  directive_url =\
-    getattr(ggrc.views, directive.__class__.__name__).url_for(directive)
+  directive_url = view_url_for(directive)
+  return_to = unicode(request.args.get('return_to', directive_url))
+  if isinstance(directive, Contract):
+    import_kind = "Clauses"
+  else:
+    import_kind = "Sections"
 
   if request.method == 'POST':
 
     if 'cancel' in request.form:
-      return import_redirect(directive_url + "#section_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -267,8 +344,9 @@ def import_sections(directive_id):
               results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
-          flash(u'Successfully imported {} section{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(directive_url + "#section_widget")
+          flash(u'Successfully imported {0} {2}{1}'.format(
+              count, 's' if count > 1 else '', import_kind[:-1]), 'notice')
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
@@ -283,7 +361,8 @@ def import_sections(directive_id):
       return render_template("directives/import_errors.haml",
             directive_id=int(directive_id), exception_message=e)
 
-  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Sections')
+  return render_template(
+      "directives/import.haml", directive_id=directive_id, import_kind=import_kind, return_to=return_to)
 
 @app.route("/systems/import", methods=['GET', 'POST'])
 def import_systems():
@@ -417,7 +496,7 @@ def export_systems():
 
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
-@app.route("/contracts/<directive_id>/export_sections", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
 def export_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
@@ -430,13 +509,26 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
-@app.route("/contracts/<directive_id>/import_sections_template", methods=['GET'])
-def import_contract_clauses_template(directive_id):
+@app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
+@app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
+@app.route("/contracts/<directive_id>/import_clauses_template", methods=['GET'])
+def import_directive_sections_template(directive_id):
   from flask import current_app
   from ggrc.models.all_models import Directive
-  filename = "Contract_Clause_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  DIRECTIVE_NAMES_MAP = {
+      'Contract': 'Contract_Clause',
+      'Regulation': 'Regulation_Section',
+      'Policy': 'Policy_Section',
+  }
   directive = Directive.query.filter_by(id=int(directive_id)).first()
+  directives_kind = directive.__class__.__name__
+  if directives_kind not in DIRECTIVE_NAMES_MAP:
+    return current_app.make_response((
+        "No template for that type.", 404, []))
+  filename = "{}_Import_Template.csv".format(
+      DIRECTIVE_NAMES_MAP[directives_kind]
+  )
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   options = {
     # (Policy/Regulation/Contract) Code
     'directive_slug': directive.slug,
@@ -444,33 +536,24 @@ def import_contract_clauses_template(directive_id):
   body = render_template("csv_files/" + filename, **options)
   return current_app.make_response((body, 200, headers))
 
-@app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
-def import_regulation_sections_template(directive_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive
-  filename = "Regulation_Section_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  directive = Directive.query.filter_by(id=int(directive_id)).first()
-  options = {
-    'directive_slug': directive.slug,
-  }
-  body = render_template("csv_files/" + filename, **options)
-  return current_app.make_response((body, 200, headers))
+@app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])
+def export_requests(audit_id):
+  from ggrc.converters.requests import RequestsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Audit, Request
 
-
-@app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
-def import_policy_sections_template(directive_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive
-  filename = "Policy_Section_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  directive = Directive.query.filter_by(id=int(directive_id)).first()
-  options = {
-    'directive_slug': directive.slug,
-  }
-  body = render_template("csv_files/" + filename, **options)
-  return current_app.make_response((body, 200, headers))
-
+  options = {}
+  audit = Audit.query.get(audit_id)
+  program = audit.program
+  options['program'] = program
+  filename = "{}-requests.csv".format(program.slug)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    requests = Request.query.filter(Request.id.in_(ids))
+  else:
+    requests = audit.requests
+  options['export'] = True
+  return handle_converter_csv_export(filename, requests, RequestsConverter, **options)
 
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])
@@ -493,7 +576,7 @@ def export_controls(directive_id):
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
 @app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
+@app.route("/contracts/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
 def import_controls_template(directive_id):
   from flask import current_app
@@ -523,7 +606,6 @@ def tooltip_view(model_class, base_service_class=TooltipView):
 def all_object_views():
   from ggrc import models
   return [
-      object_view(models.Audit),
       object_view(models.Program),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),

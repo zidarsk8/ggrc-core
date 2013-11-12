@@ -367,6 +367,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
   governance_object_types =
     directive_object_types.concat(["Control", "Section", "Objective"]);
 
+  person_object_types = governance_object_types.concat(business_plus_program_object_types).concat(["Audit"])
+
   all_object_types =
     governance_object_types.concat(business_plus_program_object_types).concat(response_object_types);
 
@@ -389,6 +391,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ControlControl", "control", "implemented_control", "implementing_control_controls"]
       , [all_object_types,
           "Person", "ObjectPerson", "person", "personable"]
+      , ["Person", person_object_types,
+          "ObjectPerson", "personable", "person", "object_people"]
       , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
       , ["Section", business_object_types,
@@ -413,7 +417,7 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Audit", "Request", null, null, "audit"]
       , ["Request", "Objective", null, null, "objective"]
       , ["Request", response_object_types, null, null, "request"]
-      , ["Person", "Request", null, null, "assignee"]
+      // , ["Person", "Request", null, null, "assignee"]
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
@@ -461,7 +465,38 @@ $(function() {
     if(ev.which === 13)
       obs.attr("value", $(ev.target).val());
   });
-  $("#lhs").cms_controllers_lhn_search({ observer: obs });
+  $("#lhs").bind("click", "input.my-work", function(ev) {
+    var target = $(ev.target);
+    if (target.is('input.my-work')) {
+      var checked = target.prop("checked");
+      obs.attr("my_work", checked);
+      target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+        if(prefs.length < 1) {
+          prefs.push(new CMS.Models.DisplayPrefs());
+          prefs[0].save();
+        }
+        prefs[0].setGlobal("lhs", { my_work: checked });
+      });
+    }
+  });
+  CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+    var settings, checked
+      , target = $('#lhs input.my-work')
+      ;
+      
+    if(prefs.length < 1) {
+      prefs.push(new CMS.Models.DisplayPrefs());
+      prefs[0].save();
+    }
+    settings = prefs[0].getGlobal("lhs");
+    checked = !!(settings && settings.my_work);
+    target.prop('checked', checked);
+    obs.attr("my_work", checked);
+    target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+
+    $("#lhs").cms_controllers_lhn_search({ observer: obs });
+  });
 
   function bindQuickSearch(ev, opts) {
 
@@ -521,6 +556,26 @@ $(function() {
     var collapsed = prefs[0].getCollapsed(null, "lhs");
     collapsed && $(".bar-v").trigger('click');
   });
+
+// Resize search input as necessary
+var $lhs = $("#lhs")
+  , last_width = $lhs.length && $lhs[0].offsetWidth;
+if ($lhs.length) {
+  function resize_search() {
+    var input = $('#lhs input.widgetsearch')
+      , width = input.closest('.form-search').width() - input.parent().outerWidth() + input.parent().width()
+                - input.next().outerWidth() - input.outerWidth() + input.width();
+    input.css('width', width + 'px');
+  };
+  $(document.body).on("focus", "#lhs input.widgetsearch", resize_search);
+  $(document.body).on("click", "#lhs", resize_search);
+  setInterval(function() {
+    if (last_width !== $lhs[0].offsetWidth) {
+      last_width = $lhs[0].offsetWidth;
+      resize_search(); 
+    }
+  }, 25);
+}
 
   $(document.body).on("click", ".lhs-closed", function(ev) {
     

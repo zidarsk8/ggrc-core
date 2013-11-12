@@ -22,7 +22,7 @@
         </a>
         &nbsp;
         &nbsp;
-        <a href="{{parent_instance.viewLink}}/import_controls" class="section-import">
+        <a href="{{parent_instance.viewLink}}/import_controls?return_to={{param_current_location}}" class="section-import">
           <i class="grcicon-imp-exp"></i>
           Import Controls
         </a>
@@ -30,13 +30,8 @@
         &nbsp;
         {{#if list.length}}
         <a href="{{parent_instance.viewLink}}/export_controls?ids={{instance_ids list}}" class="section-import">
-          <i class="grcicon-imp-exp"></i>
+          <i class="grcicon-export"></i>
           Export Controls
-        </a>
-        {{else}}
-        <a href="{{parent_instance.viewLink}}/import_controls_template?ids={{instance_ids list}}" class="section-import">
-          <i class="grcicon-imp-exp"></i>
-          Download Import Template
         </a>
         {{/if}}
       </span>

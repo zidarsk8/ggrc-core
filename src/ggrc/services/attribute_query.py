@@ -56,7 +56,6 @@ class AttributeQueryBuilder(object):
             'Error message was: {2}'.format(value, arg, e.message)
             )
     elif attr_type is Integer and value == '':
-      print 'coercing empty string to None'
       return None
     return value
 
@@ -95,7 +94,10 @@ class AttributeQueryBuilder(object):
       value = [self.coerce_value_for_query_param(attr, arg, v) for v in value]
       filters.append(attr.in_(value))
     elif arg.endswith('__null'):
-      filters.append(attr == None)
+      if(value in [0, 'false', 'False', 'FALSE', False]):
+        filters.append(attr != None)
+      else:
+        filters.append(attr == None)
     elif clean_arg == '__include':
       options.extend(self.process_eager_loading(value))
     else:

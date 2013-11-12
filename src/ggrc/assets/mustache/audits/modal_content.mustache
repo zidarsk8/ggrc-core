@@ -20,11 +20,11 @@
     <div class="row-fluid">
       <div class="span6">
         <div class="spacing-bottom">
-          <label>
+          <label {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}>
             Program
           </label>
-          <select class="input-block-level" name="program.id">
-            {{#all 'Program'}}
+          <select class="input-block-level" name="program.id" tabindex="1" autofocus>
+            {{#all 'Program' '{ "context_id__null" : false }'}}
             <option value="{{id}}">{{title}}</option>
             {{/all}}
           </select>
@@ -40,9 +40,13 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label> 
-      {{#using program=instance.program}}
-      <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="2013 {{program.title}} Audit">
-      {{/using}}
+      {{#if new_object_form}}
+        {{#using program=instance.program}}
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title program}}" tabindex="2">
+        {{/using}}
+      {{else}}
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2">
+      {{/if}}
     </div>
     <div class="span3">
       <label>
@@ -59,8 +63,8 @@
   <div class="row-fluid">
     <div class="span12">
       <label class="spacing">
-        <input type="checkbox" name="auto_generate" value="checked">
-        Auto-Generate PBC List based on Objectives <span class="small">({{#using program=instance.program}}{{program.objectives.length}}{{/using}} Objectives Found)</span>
+        <input type="checkbox" name="auto_generate" value="checked" tabindex="3">
+        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#using program=instance.program}}{{#with_mapping 'extended_related_objectives' program}}{{extended_related_objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)</a></span>
       </label>
     </div>
   </div>
@@ -70,13 +74,13 @@
       <label>
         Planned Start Date 
       </label>
-      <input class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+      <input tabindex="4" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
     </div>
     <div class="span3">
       <label>
         Planned End Date 
       </label>
-      <input class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
     </div>
     <div class="span6">
       <label>
@@ -84,10 +88,10 @@
       </label>
       <div class="row-fluid">
         <div class="span6">
-          <input class="input-block-level date" name="report_start_date" data-toggle="datepicker" data-before="report_end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_start_date}}">
+          <input tabindex="6" class="input-block-level date" name="report_start_date" data-toggle="datepicker" data-before="report_end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_start_date}}">
         </div>
         <div class="span6">
-          <input class="input-block-level date" name="report_end_date" data-toggle="datepicker" data-after="report_start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_end_date}}">
+          <input tabindex="7" class="input-block-level date" name="report_end_date" data-toggle="datepicker" data-after="report_start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_end_date}}">
         </div>
       </div>
     </div>
@@ -120,17 +124,18 @@
           <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
         <div class="wysiwyg-area">
-          <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+          <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="8">{{{description}}}</textarea>
         </div>
       </div>
       <div class="span6">
         <label>
           Audit Lead
+          <span class="required">*</span>
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using owner=instance.owner}}
-          <input type="text" name="owner.email" data-lookup="Person" class="span8 audit-selector" value="{{firstnonempty owner.email ''}}">
+          <input tabindex="9" type="text" name="owner.email" data-lookup="Person" class="span8 audit-selector" value="{{firstnonempty owner.email ''}}">
           {{/using}}
         </div>
         
@@ -139,7 +144,7 @@
         </label>
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
         <div class="objective-selector">
-          <input type="text" name="audit_firm" class="span8" value="{{audit_firm}}">
+          <input tabindex="10" type="text" name="audit_firm" class="span8" value="{{audit_firm}}">
         </div>
       </div>
     </div>
