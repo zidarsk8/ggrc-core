@@ -178,8 +178,15 @@ def load_permissions_for(user):
       implications_queries.append(and_(
         RoleImplication.source_role_id == role_id,
         RoleImplication.source_context_id.in_(context_ids)))
-    implications =\
-        RoleImplication.query.filter(or_(*implications_queries)).all()
+    if len(implications_queries) > 0:
+      implications = RoleImplication.query\
+          .filter(or_(*implications_queries))\
+          .options(
+              sqlalchemy.orm.undefer_group('Role_complete'),
+              sqlalchemy.orm.joinedload('role'))\
+          .all()
+    else:
+      implications = []
 
     for implication in implications:
       if isinstance(implication.role.permissions, dict):
