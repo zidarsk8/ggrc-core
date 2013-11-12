@@ -34,7 +34,7 @@ dashboard-js-files:
   - moment.js
   - permission.js
   - application.js
-  - fastfix.js
+  - jquerypp.custom.js
   - related_selector.js
   - single_selector.js
   - spin.min.js
