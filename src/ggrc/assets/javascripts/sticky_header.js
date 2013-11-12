@@ -60,7 +60,6 @@ can.Control("StickyHeader", {
 
     for (var i = items.length - 1; i >= 0; i--) {
       var el = items.eq(i)
-        , clone = this.clone(el)
         , margin = el.data('sticky').margin
         ;
 
@@ -70,10 +69,15 @@ can.Control("StickyHeader", {
       }
       // Otherwise inject the clone
       else {
-        !clone[0].parentNode && el.parent().append(clone);
+        var clone = this.clone(el);
+
+        // Inject the clone to take up the original's space
+        if (clone[0] && !clone[0].parentNode) {
+          clone.insertAfter(el);
+        }
 
         // When the content is close to scrolling away, also scroll the header away
-        clone.css('margin' + (type === 'footer' ? 'Bottom' : 'Top'), margin + 'px');
+        el.css('margin' + (type === 'footer' ? 'Bottom' : 'Top'), margin + 'px');
       }
     }
   }
@@ -81,7 +85,7 @@ can.Control("StickyHeader", {
     // Find all sticky-able headers in the document
   , find_items : function(type) {
     var old_items = this['_'+type] || $()
-      , items = this['_'+type] = this.element.find(this.options[type + '_selector']).filter(':not(.sticky):visible')
+      , items = this['_'+type] = this.element.find(this.options[type + '_selector']).filter(':not(.sticky-clone):visible')
       , self = this
       , increment = type === 'footer' ? -1 : 1
       , i = type === 'footer' ? items.length - 1 : 0
@@ -114,7 +118,11 @@ can.Control("StickyHeader", {
     // Determine whether a header's content section is within the scrolling viewport
   , in_viewport : function(el) {
     var data = el.data('sticky')
-      , type = data.type
+    if (data.clone && data.clone[0] && data.clone[0].parentNode) {
+      el = data.clone;
+    }
+
+    var type = data.type
       , parent = el.parent()
       , offset = data.offset
       , pos = parent.position().top
@@ -186,8 +194,10 @@ can.Control("StickyHeader", {
   , clone : function(el) {
     // Compute heights of above items
     var data = el.data('sticky');
-    data.clone = data.clone || el.clone(true, true).addClass("sticky sticky-" + data.type);
-    return this.position_clone(el);
+    !data.clone && (data.clone = el.clone(true).addClass("sticky-clone"));
+    this.position_element(el);
+    el.addClass("sticky sticky-" + data.type);
+    return data.clone;
   }
 
     // Determine the selector that "selected" a given element
@@ -201,30 +211,48 @@ can.Control("StickyHeader", {
   }
 
     // Reposition a clone
-  , position_clone : function(el) {
-    var data = el.data('sticky');
-    return data.clone.css({
+  , position_element : function(el) {
+    var data = el.data('sticky')
+      , clone = data.clone
+      , source = el
+      ;
+
+    return el.css({
           position: 'fixed'
-        , left: el.offset().left + 'px'
-        , width: (el[0].getBoundingClientRect().width
-            - parseFloat(el.css('paddingLeft')) 
-            - parseFloat(el.css('paddingRight'))) 
+        , left: source.offset().left + 'px'
+        , width: (source[0].getBoundingClientRect().width
+            - parseFloat(source.css('paddingLeft')) 
+            - parseFloat(source.css('paddingRight'))) 
             + 'px'
+        , marginTop: '0px'
+        , marginBottom: '0px'
+        , zIndex: 9999 - data.depth
       }).css(
           data.type === 'footer' ? 'bottom' : 'top'
-          , (
-              data.type === 'footer'
-              ? data.offset + $(window).height() - this.options.scroll_area.outerHeight() - parseFloat(this.options.scroll_area.position().top)
-              : data.offset + parseFloat(this.options.scroll_area.position().top)
-            ) + 'px'
+        , (
+            data.type === 'footer'
+            ? data.offset + $(window).height() - this.options.scroll_area.outerHeight() - parseFloat(this.options.scroll_area.position().top)
+            : data.offset + parseFloat(this.options.scroll_area.position().top)
+          ) + 'px'
       );
   }
 
     // Detach an element's sticky data
   , remove : function(el) {
-    var clone = el.data('sticky').clone;
+    var data = el.data('sticky')
+      , clone = data.clone
+      ;
     if (clone && clone[0] && clone[0].parentNode) {
       clone.remove();
+      el.removeClass('sticky sticky-' + data.type).css(clone.styles(
+          'position'
+        , 'left'
+        , 'width'
+        , 'marginTop'
+        , 'marginBottom'
+        , 'zIndex'
+        , data.type === 'footer' ? 'bottom' : 'top'
+      ));
     }
     $.removeData(el, 'sticky');
   }
@@ -235,7 +263,7 @@ can.Control("StickyHeader", {
       , self = this
       ;
     items.each(function() {
-      self.destroy($(this));
+      self.remove($(this));
     });
     delete this._header;
     delete this._footer;
