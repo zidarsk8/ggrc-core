@@ -195,9 +195,11 @@ def import_controls(directive_id):
   from ggrc.converters.controls import ControlsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
+  from ggrc.utils import view_url_for
 
-  return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
+  directive_url = view_url_for(directive)
+  return_to = unicode(request.args.get('return_to', directive_url))
 
   if request.method == 'POST':
     if 'cancel' in request.form:
@@ -309,9 +311,11 @@ def import_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive, Contract
+  from ggrc.utils import view_url_for
 
-  return_to = unicode(request.args.get('return_to'))
   directive = Directive.query.get(directive_id)
+  directive_url = view_url_for(directive)
+  return_to = unicode(request.args.get('return_to', directive_url))
   if isinstance(directive, Contract):
     import_kind = "Clauses"
   else:
