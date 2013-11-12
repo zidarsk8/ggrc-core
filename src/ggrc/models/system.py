@@ -65,7 +65,6 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'owner',
       ]
   _update_attrs = [
       'infrastructure',
@@ -74,7 +73,6 @@ class SystemOrProcess(
       'version',
       'notes',
       'network_zone',
-      'owner',
       ]
   _sanitize_html = [
       'notes',
