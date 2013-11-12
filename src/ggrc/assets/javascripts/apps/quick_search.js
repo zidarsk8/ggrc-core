@@ -490,7 +490,7 @@ $(function() {
       prefs[0].save();
     }
     settings = prefs[0].getGlobal("lhs");
-    checked = !!(settings && settings.my_work);
+    checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
     target.prop('checked', checked);
     obs.attr("my_work", checked);
     target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
