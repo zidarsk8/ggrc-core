@@ -78,7 +78,7 @@ def admin_reindex():
     raise Forbidden()
 
   from ggrc.fulltext import get_indexer
-  from ggrc.fulltext.recordbuilder import fts_record_for
+  from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
 
   indexer = get_indexer()
   indexer.delete_all_records(False)
@@ -87,8 +87,13 @@ def admin_reindex():
   from ggrc.app import db
 
   # Find all models then remove base classes
-  models = set(all_models.all_models) -\
-      set([all_models.Directive, all_models.SystemOrProcess])
+  #   (If we don't remove base classes, we get duplicates in the index.)
+  inheritance_base_models = [
+      all_models.Directive, all_models.SystemOrProcess, all_models.Response
+      ]
+  models = set(all_models.all_models) - set(inheritance_base_models)
+  models = [model for model in models if model_is_indexed(model)]
+
   for model in models:
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
