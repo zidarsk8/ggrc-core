@@ -14,29 +14,21 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 
   "{CMS.Models.Audit} created" : function(model, ev, instance) {
     var refresh_queue
-    , that = this
+    , that = this;
+    
     if(instance instanceof CMS.Models.Audit) {
       if(instance.auto_generate) {
         refresh_queue = new RefreshQueue();
 
         instance.program.reify().refresh()
         .then(function(program) {
-          return program.get_binding("extended_related_objectives").refresh_instances()
+          return program.get_binding("extended_related_objectives").refresh_instances();
         }).then(function(objective_mappings) {
           can.each(objective_mappings, function(objective_mapping) {
             that.create_request(instance, objective_mapping.instance)
             .then(that.proxy("create_response"));
           });
         });
-      } else {
-        this.create_objective(instance)
-        .then(this.proxy("map_objective_to_program", instance.program.reify()))
-        .then(function(object_objective) {
-          return object_objective.objective.reify();
-        })
-        .then(that.proxy("create_request", instance))
-        .done(that.proxy("update_objective_title"))
-        .done(this.proxy("create_response"));
       }
     }
   }
