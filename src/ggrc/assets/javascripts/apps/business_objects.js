@@ -119,7 +119,7 @@ $(function() {
       }
     // Prevent widget creation with <model_name>: false
     // e.g. to prevent ever creating People widget:
-    //     { Person: false }
+    //     { all : { Person: false }}
     // or to prevent creating People widget on Objective page:
     //     { Objective: { Person: false } }
     , overridden_models = {
@@ -129,6 +129,11 @@ $(function() {
             //, Regulation: false
             //, Policy: false
             //, Contract: false
+          }
+          , all : {
+            DocumentationResponse : false
+            , InterviewResponse : false
+            , PopulationSampleResponse : false
           }
       }
 
