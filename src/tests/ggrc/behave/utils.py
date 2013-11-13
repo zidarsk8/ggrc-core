@@ -59,8 +59,8 @@ def handle_get_resource_and_name_it(context, url, name):
   assert response.status_code == 200
   setattr(context, name, response.json())
 
-def get_resource(context, url):
-  headers={
+def get_resource(context, url, headers=None):
+  headers = headers or {
       'Accept': 'application/json',
       'X-Requested-By': 'Reciprocity Behave Tests',
       }
