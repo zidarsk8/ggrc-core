@@ -149,8 +149,12 @@ class Hyperlinked(object):
   def url(cls):
     return deferred(db.Column(db.String), cls.__name__)
 
+  @declared_attr
+  def reference_url(cls):
+    return deferred(db.Column(db.String), cls.__name__)
+
   # REST properties
-  _publish_attrs = ['url']
+  _publish_attrs = ['url', 'reference_url']
 
 
 class Hierarchical(object):
