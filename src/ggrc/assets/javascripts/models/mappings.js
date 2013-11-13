@@ -133,6 +133,7 @@
       , directives: Multi(["joined_directives"]) // "direct_directives"
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
+      , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
       , orphaned_objects: Multi([
           "related_objects"
@@ -268,6 +269,7 @@
           null, "directive", "ProgramDirective", "program", "program_directives")
       , contracts: TypeFilter("directives", "Contract")
       , policies: TypeFilter("directives", "Policy")
+      , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
       , audits: Direct("Audit", "program")
 
@@ -416,6 +418,9 @@
     , Contract: {
         _mixins: ["directive_object"]
       }
+    , Standard: {
+        _mixins: ["directive_object"]
+      }
     , Policy: {
         _mixins: ["directive_object"]
       }
@@ -462,28 +467,30 @@
       }
 
     , Person: {
-        owned_programs: Indirect("Program", "owner")
-      , owned_regulations: Indirect("Regulation", "owner")
-      , owned_contracts: Indirect("Contract", "owner")
-      , owned_policies: Indirect("Policy", "owner")
-      , owned_objectives: Indirect("Objective", "owner")
-      , owned_controls: Indirect("Control", "owner")
-      , owned_sections: Indirect("Section", "owner")
-      , owned_data_assets: Indirect("DataAsset", "owner")
-      , owned_facilities: Indirect("Facility", "owner")
-      , owned_markets: Indirect("Market", "owner")
-      , owned_org_groups: Indirect("OrgGroup", "owner")
-      , owned_processes: Indirect("Process", "owner")
-      , owned_products: Indirect("Product", "owner")
-      , owned_projects: Indirect("Project", "owner")
-      , owned_systems: Indirect("System", "owner")
-      
+        owned_programs: Indirect("Program", "contact")
+      , owned_regulations: Indirect("Regulation", "contact")
+      , owned_contracts: Indirect("Contract", "contact")
+      , owned_policies: Indirect("Policy", "contact")
+      , owned_standards: Indirect("Standard", "contact")
+      , owned_objectives: Indirect("Objective", "contact")
+      , owned_controls: Indirect("Control", "contact")
+      , owned_sections: Indirect("Section", "contact")
+      , owned_data_assets: Indirect("DataAsset", "contact")
+      , owned_facilities: Indirect("Facility", "contact")
+      , owned_markets: Indirect("Market", "contact")
+      , owned_org_groups: Indirect("OrgGroup", "contact")
+      , owned_processes: Indirect("Process", "contact")
+      , owned_products: Indirect("Product", "contact")
+      , owned_projects: Indirect("Project", "contact")
+      , owned_systems: Indirect("System", "contact")
+
       , related_objects: Proxy(
           null, "personable", "ObjectPerson", "person", "object_people")
       , related_programs:    TypeFilter("related_objects", "Program")
       , related_regulations: TypeFilter("related_objects", "Regulation")
       , related_contracts:   TypeFilter("related_objects", "Contract")
       , related_policies:    TypeFilter("related_objects", "Policy")
+      , related_standards:    TypeFilter("related_objects", "Standard")
       , related_objectives:  TypeFilter("related_objects", "Objective")
       , related_controls:    TypeFilter("related_objects", "Control")
       , related_sections:    TypeFilter("related_objects", "Section")
@@ -516,15 +523,16 @@
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
 
       , related_objects_via_search: Search("", [
-          "Program",  "Regulation", "Contract", "Policy", "Section", "Objective",
+          "Program",  "Regulation", "Contract", "Policy", "Standard", "Section", "Objective",
           "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility",
           "Market", "OrgGroup", "Audit"//, "Request", "Response"
-        ], { owner_id: "id" })
+        ], { contact_id: "id" })
 
       , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
       , extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation")
       , extended_related_contracts_via_search:   TypeFilter("related_objects_via_search", "Contract")
       , extended_related_policies_via_search:    TypeFilter("related_objects_via_search", "Policy")
+      , extended_related_standards_via_search:    TypeFilter("related_objects_via_search", "Standard")
       , extended_related_objectives_via_search:  TypeFilter("related_objects_via_search", "Objective")
       , extended_related_controls_via_search:    TypeFilter("related_objects_via_search", "Control")
       , extended_related_sections_via_search:    TypeFilter("related_objects_via_search", "Section")
@@ -551,8 +559,8 @@
       , related_objects: Multi(['requests', 'responses_via_requests'])
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
-          return !person 
-            || (result.instance.owner && result.instance.owner.id === person.id) 
+          return !person
+            || (result.instance.contact && result.instance.contact.id === person.id)
             || (result.instance.assignee && result.instance.assignee.id === person.id)
             ;
         })
