@@ -18,7 +18,9 @@ class Audit(
     u'Ready for External Review', u'Completed')
   report_start_date = deferred(db.Column(db.Date), 'Audit')
   report_end_date = deferred(db.Column(db.Date), 'Audit')
-  audit_firm = deferred(db.Column(db.String), 'Audit')
+  audit_firm_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('org_groups.id')), 'Audit')
+  audit_firm = db.relationship('OrgGroup', uselist=False)
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
     'Audit')
   gdrive_evidence_folder = deferred(db.Column(db.String), 'Audit')
@@ -36,7 +38,6 @@ class Audit(
     'requests',
   ]
   _sanitize_html = [
-    'audit_firm',
     'gdrive_evidence_folder',
   ]
 
