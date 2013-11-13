@@ -1061,6 +1061,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
       }
     });
     this.validatePresenceOf("program");
+    this.validatePresenceOf("owner");
+    this.validatePresenceOf("title");
   }
 }, {
 
@@ -1083,7 +1085,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , defaults : {
     status : "Draft"
     , requested_on : new Date()
-    , due_on : new Date()
+    , due_on : null
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
