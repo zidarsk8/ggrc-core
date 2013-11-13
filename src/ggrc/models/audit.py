@@ -32,6 +32,7 @@ class Audit(
       'Audit')
   requests = db.relationship(
       'Request', backref='audit', cascade='all, delete-orphan')
+
   _publish_attrs = [
     'report_start_date',
     'report_end_date',
@@ -40,10 +41,15 @@ class Audit(
     'gdrive_evidence_folder',
     'program',
     'requests',
-  ]
+    ]
+
   _sanitize_html = [
     'gdrive_evidence_folder',
-  ]
+    ]
+
+  _include_links = [
+    'requests',
+    ]
 
   @classmethod
   def eager_query(cls):

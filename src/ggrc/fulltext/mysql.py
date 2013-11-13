@@ -6,6 +6,7 @@
 from ggrc import db
 from ggrc.models.all_models import all_models
 from ggrc.models.object_person import ObjectPerson
+from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.request import Request
 from ggrc.models.response import Response
 from ggrc_basic_permissions.models import UserRole
@@ -113,6 +114,14 @@ class MysqlIndexer(SqlIndexer):
                 and_(
                   ObjectPerson.person_id == contact_id,
                   ObjectPerson.personable_type == model_name
+                )
+              )
+            ),
+            MysqlRecordProperty.key.in_(
+              db.session.query(ObjectOwner.ownable_id).filter(
+                and_(
+                  ObjectOwner.person_id == owner_id,
+                  ObjectOwner.ownable_type == model_name
                 )
               )
             ),

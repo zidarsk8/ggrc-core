@@ -1567,9 +1567,45 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       state.attr('roles').push('Contact');
     }
 
+    // Check for Audit roles
+    if (instance instanceof CMS.Models.Audit) {
+      var requests = instance.requests
+        , refresh_queue = new RefreshQueue()
+        ;
+
+      refresh_queue.enqueue(requests.reify());
+      refresh_queue.trigger().then(function(requests) {
+        can.each(requests, function(request) {
+          var responses = request.responses
+            , refresh_queue = new RefreshQueue()
+            ;
+
+          refresh_queue.enqueue(responses.reify());
+          refresh_queue.trigger().then(function(responses) {
+            can.each(responses, function(response) {
+              if (response.owner && response.owner.id === person.id
+                  && !~can.inArray('Response Owner', state.attr('roles'))) {
+                state.attr('roles').push('Response Owner');
+              }
+            })
+          });
+
+          if (request.assignee && request.assignee.id === person.id
+              && !~can.inArray('Request Assignee', state.attr('roles'))) {
+            state.attr('roles').push('Request Assignee');
+          };
+        });
+      });
+    }
+
     // Check for people
     if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
       state.attr('roles').push('Mapped');
+    }
+
+    // Check for ownership
+    if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
+      state.attr('roles').push('Owner');
     }
 
     // Check for authorizations
