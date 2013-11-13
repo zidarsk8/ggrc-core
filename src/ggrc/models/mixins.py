@@ -41,11 +41,15 @@ class Identifiable(object):
   id = db.Column(db.Integer, primary_key=True)
 
   # REST properties
-  _publish_attrs = ['id']
+  _publish_attrs = ['id', 'type']
   _update_attrs = []
-  _stub_attrs = ['id']
+  _stub_attrs = ['id', 'type']
 
   _inflector = ModelInflectorDescriptor()
+
+  @computed_property
+  def type(self):
+    return self.__class__.__name__
 
   @classmethod
   def eager_query(cls):
