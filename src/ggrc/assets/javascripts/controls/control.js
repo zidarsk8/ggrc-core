@@ -50,6 +50,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     "Section" : "ControlSection"
     , "Regulation" : "DirectiveControl"
     , "Policy" : "DirectiveControl"
+    , "Standard" : "DirectiveControl"
     , "Contract" : "DirectiveControl"
     , "Risk" : {}
     , "Program" : "ProgramControl"

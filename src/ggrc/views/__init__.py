@@ -191,6 +191,7 @@ def import_people():
 
   return render_template("people/import.haml", import_kind = 'People')
 
+@app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_controls", methods=['GET', 'POST'])
@@ -307,6 +308,7 @@ def import_requests_template(audit_id):
   body = render_template("csv_files/" + template, **options)
   return current_app.make_response((body, 200, headers))
 
+@app.route("/standards/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/policies/<directive_id>/import_sections", methods=['GET', 'POST'])
 @app.route("/contracts/<directive_id>/import_clauses", methods=['GET', 'POST'])
@@ -494,6 +496,7 @@ def export_systems():
   filename = "SYSTEMS.csv"
   return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
+@app.route("/standards/<directive_id>/export_sections", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
@@ -509,6 +512,7 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
+@app.route("/standards/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/contracts/<directive_id>/import_clauses_template", methods=['GET'])
@@ -518,6 +522,7 @@ def import_directive_sections_template(directive_id):
   DIRECTIVE_NAMES_MAP = {
       'Contract': 'Contract_Clause',
       'Regulation': 'Regulation_Section',
+      'Standard': 'Standard_Section',
       'Policy': 'Policy_Section',
   }
   directive = Directive.query.filter_by(id=int(directive_id)).first()
@@ -530,7 +535,7 @@ def import_directive_sections_template(directive_id):
   )
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   options = {
-    # (Policy/Regulation/Contract) Code
+    # (Policy/Standard/Regulation/Contract) Code
     'directive_slug': directive.slug,
   }
   body = render_template("csv_files/" + filename, **options)
@@ -555,6 +560,7 @@ def export_requests(audit_id):
   options['export'] = True
   return handle_converter_csv_export(filename, requests, RequestsConverter, **options)
 
+@app.route("/standards/<directive_id>/export_controls", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_controls", methods=['GET'])
 @app.route("/policies/<directive_id>/export_controls", methods=['GET'])
 @app.route("/contracts/<directive_id>/export_controls", methods=['GET'])
@@ -575,6 +581,7 @@ def export_controls(directive_id):
   options['export'] = True
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
+@app.route("/standards/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/contracts/<directive_id>/import_controls_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
@@ -585,7 +592,7 @@ def import_controls_template(directive_id):
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
   directive = Directive.query.filter_by(id=int(directive_id)).first()
   options = {
-    # (Policy/Regulation/Contract) Code
+    # (Policy/Standard/Regulation/Contract) Code
     'directive_kind': directive.meta_kind,
     'directive_slug': directive.slug,
   }
@@ -611,6 +618,7 @@ def all_object_views():
       object_view(models.Contract),
       object_view(models.Policy),
       object_view(models.Regulation),
+      object_view(models.Standard),
       object_view(models.Control),
       object_view(models.Objective),
       object_view(models.System),
@@ -635,6 +643,7 @@ def all_tooltip_views():
       tooltip_view(models.Contract),
       tooltip_view(models.Policy),
       tooltip_view(models.Regulation),
+      tooltip_view(models.Standard),
       tooltip_view(models.Control),
       tooltip_view(models.Objective),
       tooltip_view(models.System),

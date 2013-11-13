@@ -139,6 +139,19 @@ class Regulation(Relatable, Objectiveable, Documentable, Personable, Directive):
   def validates_meta_kind(self, key, value):
     return 'Regulation'
 
+
+class Standard(Relatable, Objectiveable, Documentable, Personable, Directive):
+  __mapper_args__ = {
+      'polymorphic_identity': 'Standard'
+      }
+  _table_plural = 'standards'
+  valid_kinds = ("Standard",)
+
+  @validates('meta_kind')
+  def validates_meta_kind(self, key, value):
+    return 'Standard'
+
+
 class Contract(Relatable, Objectiveable, Documentable, Personable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'

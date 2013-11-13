@@ -207,6 +207,11 @@ class RegulationFactory(ModelFactory):
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+class StandardFactory(ModelFactory):
+  MODEL = models.Standard
+  kind = FuzzyChoice(MODEL.valid_kinds)
+  status = FuzzyChoice(MODEL.VALID_STATES)
+
 class ObjectiveFactory(ModelFactory):
   MODEL = models.Objective
   status = FuzzyChoice(MODEL.VALID_STATES)
