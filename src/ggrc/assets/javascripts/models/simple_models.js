@@ -1016,6 +1016,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       }
     });
     this.validatePresenceOf("program");
+    this.validatePresenceOf("owner");
   }
 }, {
 
