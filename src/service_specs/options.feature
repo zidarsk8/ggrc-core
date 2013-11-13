@@ -19,7 +19,6 @@ Feature: Options relationships
 
   Examples:
       | role             | resource_type | link_property    |
-      | control_type     | Control       | type             |
       | control_kind     | Control       | kind             |
       | control_means    | Control       | means            |
       | verify_frequency | Control       | verify_frequency |

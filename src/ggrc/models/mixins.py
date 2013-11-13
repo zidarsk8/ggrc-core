@@ -333,7 +333,10 @@ class WithContact(object):
 
   @declared_attr
   def contact(cls):
-    return db.relationship('Person', uselist=False)
+    return db.relationship(
+        'Person',
+        uselist=False,
+        foreign_keys='{}.contact_id'.format(cls.__name__))
 
   _publish_attrs = ['contact']
 
