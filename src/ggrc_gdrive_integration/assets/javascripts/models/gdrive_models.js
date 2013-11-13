@@ -75,8 +75,8 @@ var gdrive_findAll = function(extra_params, extra_path) {
       path : path
       , method : "get" //"post"
       , callback : function(dfd, result) {
-        if(!result) {
-          dfd.reject(JSON.parse(arguments[1]));
+        if(!result || result.error) {
+          dfd.reject(result ? result.error : JSON.parse(arguments[1]));
         } else if(result.items) {
           var objs = result.items;
           can.each(objs, function(obj) {
