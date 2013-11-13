@@ -4,10 +4,14 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, BusinessObject, Timeboxed
+from .mixins import (
+    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged,
+    )
 from .object_person import Personable
 
-class Audit(Personable, Timeboxed, BusinessObject, db.Model):
+class Audit(
+    Personable,
+    Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
   __tablename__ = 'audits'
 
   VALID_STATES = (u'Planned', u'In Progress', u'Manager Review',

@@ -191,6 +191,33 @@ class Timeboxed(object):
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
 
+
+class Stateful(object):
+  @declared_attr
+  def status(cls):
+    return deferred(
+        db.Column(db.String, default=cls.default_status), cls.__name__)
+
+  _publish_attrs = ['status']
+
+  @classmethod
+  def default_status(cls):
+    return cls.valid_statuses()[0]
+
+  @classmethod
+  def valid_statuses(cls):
+    return cls.VALID_STATES
+
+  @validates('status')
+  def validate_status(self, key, value):
+    if value is None:
+      value = self.default_status()
+    if value not in self.valid_statuses():
+      message = "Invalid state '{}'".format(value)
+      raise ValueError(message)
+    return value
+
+
 class ContextRBAC(object):
   @declared_attr
   def context_id(cls):
@@ -289,7 +316,14 @@ event.listen(
   Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 
-class BusinessObject(Slugged, Noted, Described, Hyperlinked):
+class Mapping(Stateful, Base):
+  VALID_STATES = [
+      'Draft',
+      'Final',
+      ]
+
+
+class WithContact(object):
   @declared_attr
   def contact_id(cls):
     return deferred(
@@ -300,3 +334,17 @@ class BusinessObject(Slugged, Noted, Described, Hyperlinked):
     return db.relationship('Person', uselist=False)
 
   _publish_attrs = ['contact']
+
+
+class BusinessObject(
+    Stateful, Noted, Described, Hyperlinked, WithContact, Slugged):
+  VALID_STATES = [
+      'Draft',
+      'Final',
+      'Effective',
+      'Ineffective',
+      'Launched',
+      'Not Launched',
+      'In Scope',
+      'Not in Scope',
+      ]
