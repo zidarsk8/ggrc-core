@@ -210,6 +210,7 @@ dashboard-js-template-files:
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
+  - org_groups/autocomplete_result.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
