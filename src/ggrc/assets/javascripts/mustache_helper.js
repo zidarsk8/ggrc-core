@@ -1572,6 +1572,11 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       state.attr('roles').push('Mapped');
     }
 
+    // Check for ownership
+    if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
+      state.attr('roles').push('Owner');
+    }
+
     // Check for authorizations
     if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
       person.get_list_loader("authorizations").done(function(authorizations) {
