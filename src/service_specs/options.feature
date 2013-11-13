@@ -24,13 +24,11 @@ Feature: Options relationships
       | verify_frequency | Control       | verify_frequency |
       | audit_frequency  | Regulation    | audit_frequency  |
       | audit_duration   | Regulation    | audit_duration   |
-      | document_type    | Document      | type             |
       | reference_type   | Document      | kind             |
       | document_year    | Document      | year             |
       | language         | Document      | language         |
       | person_language  | Person        | language         |
-      | product_type     | Product       | type             |
-      | system_type      | System        | type             |
+      | product_type     | Product       | kind             |
       | network_zone     | System        | network_zone     |
 
   Scenario: Validation of invalid option role
