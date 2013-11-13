@@ -16,7 +16,7 @@ from .utils import validate_option
 
 from sqlalchemy.orm import validates
 
-class Directive(Timeboxed, Ownable, BusinessObject, db.Model):
+class Directive(Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')
@@ -111,7 +111,8 @@ class Directive(Timeboxed, Ownable, BusinessObject, db.Model):
         orm.subqueryload('sections'))
 
 # FIXME: For subclasses, restrict kind
-class Policy(Relatable, Objectiveable, Documentable, Personable, Directive):
+class Policy(
+    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
       }
@@ -125,7 +126,8 @@ class Policy(Relatable, Objectiveable, Documentable, Personable, Directive):
   def validates_meta_kind(self, key, value):
     return 'Policy'
 
-class Regulation(Relatable, Objectiveable, Documentable, Personable, Directive):
+class Regulation(
+    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
       }
@@ -136,7 +138,8 @@ class Regulation(Relatable, Objectiveable, Documentable, Personable, Directive):
   def validates_meta_kind(self, key, value):
     return 'Regulation'
 
-class Contract(Relatable, Objectiveable, Documentable, Personable, Directive):
+class Contract(
+    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
       }
