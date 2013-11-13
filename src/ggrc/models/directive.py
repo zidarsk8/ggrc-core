@@ -16,6 +16,7 @@ from .utils import validate_option
 
 from sqlalchemy.orm import validates
 
+
 class Directive(Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
@@ -110,6 +111,7 @@ class Directive(Timeboxed, Ownable, BusinessObject, db.Model):
         orm.subqueryload('directive_controls'),
         orm.subqueryload('sections'))
 
+
 # FIXME: For subclasses, restrict kind
 class Policy(Relatable, Objectiveable, Documentable, Personable, Directive):
   __mapper_args__ = {
@@ -124,6 +126,7 @@ class Policy(Relatable, Objectiveable, Documentable, Personable, Directive):
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Policy'
+
 
 class Regulation(Relatable, Objectiveable, Documentable, Personable, Directive):
   __mapper_args__ = {

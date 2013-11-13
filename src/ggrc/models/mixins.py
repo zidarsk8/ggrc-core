@@ -148,6 +148,7 @@ class Hyperlinked(object):
   # REST properties
   _publish_attrs = ['url']
 
+
 class Hierarchical(object):
   @declared_attr
   def parent_id(cls):
@@ -178,6 +179,7 @@ class Hierarchical(object):
         #orm.joinedload('parent'),
         )
 
+
 class Timeboxed(object):
   @declared_attr
   def start_date(cls):
@@ -186,7 +188,6 @@ class Timeboxed(object):
   @declared_attr
   def end_date(cls):
     return deferred(db.Column(db.DateTime), cls.__name__)
-
 
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
@@ -237,6 +238,7 @@ class ContextRBAC(object):
     #query = super(ContextRBAC, cls).eager_query()
     #return query.options(
         #orm.subqueryload('context'))
+
 
 class Base(ChangeTracked, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
