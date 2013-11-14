@@ -11,6 +11,7 @@ from tests.ggrc.behave.utils import (
     Example,
     get_service_endpoint_url,
     get_resource,
+    get_resource_table_singular,
     handle_named_example_resource,
     post_example,
     )
@@ -148,3 +149,23 @@ def check_empty_collection(context, expect_empty=True):
     assert len(entry_list) == 0, entry_list
   else:
     assert len(entry_list) > 0, entry_list
+
+@then('GET of "{resourcename}" object page is forbidden')
+def get_view_object_page_is_forbidden(context, resourcename):
+  get_view_object_page(context, resourcename, 403)
+
+@then('GET of "{resourcename}" object page is allowed')
+def get_view_object_page_is_allowed(context, resourcename):
+  get_view_object_page(context, resourcename, 200)
+
+def get_view_object_page(context, resourcename, expected_status=200):
+  headers = {
+      'Accept': 'text/html',
+      'X-Requested-By': 'Reciprocity Behave Tests',
+      }
+  resource = getattr(context, resourcename)
+  collection_name = get_resource_table_singular(resource.resource_type)
+  uri = '/{collection_name}s/{id}'\
+      .format(collection_name=collection_name, id=resource.get('id'))
+  response = get_resource(context, uri, headers)
+  assert response.status_code == expected_status, response

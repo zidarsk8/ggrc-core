@@ -104,12 +104,14 @@ class UserPermissions(DefaultUserPermissions):
 
 def collect_permissions(src_permissions, context_id, permissions):
   for action, resource_permissions in src_permissions.items():
+    if not resource_permissions:
+      permissions.setdefault(action, dict())
     for resource_permission in resource_permissions:
       if type(resource_permission) in [str, unicode]:
-        resource_type = resource_permission
+        resource_type = str(resource_permission)
         condition = None
       else:
-        resource_type = resource_permission['type']
+        resource_type = str(resource_permission['type'])
         condition = resource_permission.get('condition', None)
         terms = resource_permission.get('terms', [])
       permissions.setdefault(action, {})\

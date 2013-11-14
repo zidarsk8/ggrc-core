@@ -80,3 +80,8 @@ def delete_contexts_for(resource_type):
   """All contexts in which the user has delete permission."""
   return permissions_for(get_user()).delete_contexts_for(resource_type)
 
+def is_allowed_view_object_page_for(instance):
+  """Whether or not the user is allwoed to access the object page view for the
+  given instance.
+  """
+  return permissions_for(get_user()).is_allowed_view_object_page_for(instance)

@@ -23,9 +23,9 @@
           </div>
           <div class="span1">
             <div class="counter">
-              {{^instance.owner}}
+              {{^instance.contact}}
                 <i class="grcicon-people-warning"></i>
-              {{/instance.owner}}
+              {{/instance.contact}}
             </div>
           </div>
           <div class="span1">
@@ -56,11 +56,13 @@
           <div class="span6">
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
+          {{^is_dashboard}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/is_dashboard}}
           {{/is_allowed_all}}
           {{/if}}
           </div>
@@ -85,15 +87,15 @@
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
-              <strong>Owner:</strong>
-              {{^instance.owner}}
+              <strong>Contact:</strong>
+              {{^instance.contact}}
                 <span class="error">
                   Not Assigned
                 </span>
-              {{/instance.owner}}
-              {{#if instance.owner}}
-                {{#using owner=instance.owner}}
-                {{owner.name}}
+              {{/instance.contact}}
+              {{#if instance.contact}}
+                {{#using contact=instance.contact}}
+                {{contact.name}}
                 {{/using}}
               {{/if}}
             </div>
@@ -102,7 +104,7 @@
             {{#instance.url}}
             <div class="span6">
               <div class="tree-info">
-                {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy NOT Directive }}
+                {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy OR Standard NOT Directive }}
                 <strong>URL:</strong>
                 <a class="url" href="{{schemed_url instance.url}}" target="_blank">
                   {{instance.url}}

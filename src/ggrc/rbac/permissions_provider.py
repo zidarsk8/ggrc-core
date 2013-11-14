@@ -91,11 +91,17 @@ class DefaultUserPermissions(UserPermissions):
         context_id)
 
   def _permission_match(self, permission, permissions):
-    return permission.context_id in \
-        permissions\
-          .get(permission.action, {})\
-          .get(permission.resource_type, {})\
-          .get('contexts', [])
+    return \
+        permission.context_id in \
+          permissions\
+            .get(permission.action, {})\
+            .get(permission.resource_type, {})\
+            .get('contexts', [])\
+        or permission.context_id in \
+          permissions\
+            .get(permission.action, {})\
+            .get(self.ADMIN_PERMISSION.resource_type, {})\
+            .get('contexts', [])
 
   def _permissions(self):
     return session['permissions']
@@ -201,3 +207,11 @@ class DefaultUserPermissions(UserPermissions):
     """All contexts in which the user has delete permission."""
     return self._get_contexts_for('delete', resource_type)
 
+  def is_allowed_view_object_page_for(self, instance):
+    return self._is_allowed(
+        Permission(
+          'view_object_page',
+          instance.__class__.__name__,
+          instance.context_id
+          )
+        )

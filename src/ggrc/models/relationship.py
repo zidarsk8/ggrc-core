@@ -5,10 +5,10 @@
 
 import ggrc.models
 from ggrc import db
-from .mixins import deferred, Base, Described
+from .mixins import deferred, Base, Described, Mapping
 from sqlalchemy.ext.declarative import declared_attr
 
-class Relationship(Base, db.Model):
+class Relationship(Mapping, db.Model):
   __tablename__ = 'relationships'
   source_id = db.Column(db.Integer, nullable=False)
   source_type = db.Column(db.String, nullable=False)
@@ -23,42 +23,34 @@ class Relationship(Base, db.Model):
       primaryjoin='foreign(RelationshipType.relationship_type) == Relationship.relationship_type_id',
       uselist=False)
 
-  def get_relationship_node(self, attr, node_type, node_id):
-    if hasattr(self, attr):
-      return getattr(self, attr)
-    if node_type is None:
-      return None
-    cls = getattr(ggrc.models, node_type)
-    value = db.session.query(cls).get(node_id)
-    setattr(self, attr, value)
-    return value
-
-  #FIXME This provides access to source and destination, but likely breaks some
-  #notification semantics in sqlalchemy. Is it necessary to go beyond this,
-  #though? Are there motivating use cases??
+  @property
+  def source_attr(self):
+    return '{0}_source'.format(self.source_type)
 
   @property
   def source(self):
-    return self.get_relationship_node(
-        '_source', self.source_type, self.source_id)
+    return getattr(self, self.source_attr)
 
   @source.setter
   def source(self, value):
-    setattr(self, '_source', value)
     self.source_id = value.id if value is not None else None
     self.source_type = value.__class__.__name__ if value is not None else None
+    return setattr(self, self.source_attr, value)
+
+  @property
+  def destination_attr(self):
+    return '{0}_destination'.format(self.destination_type)
 
   @property
   def destination(self):
-    return self.get_relationship_node(
-        '_destination', self.destination_type, self.destination_id)
+    return getattr(self, self.destination_attr)
 
   @destination.setter
   def destination(self, value):
-    setattr(self, '_destination', value)
     self.destination_id = value.id if value is not None else None
     self.destination_type = value.__class__.__name__ if value is not None \
         else None
+    return setattr(self, self.destination_attr, value)
 
   __table_args__ = (
     db.UniqueConstraint('source_id', 'source_type', 'destination_id', 'destination_type'),
@@ -73,7 +65,7 @@ class Relationship(Base, db.Model):
   def _display_name(self):
     return self.source.display_name + '<->' + self.destination.display_name
 
-class RelationshipType(Base, Described, db.Model):
+class RelationshipType(Described, Base, db.Model):
   __tablename__ = 'relationship_types'
   relationship_type = deferred(db.Column(db.String), 'RelationshipType')
   forward_phrase = deferred(db.Column(db.String), 'RelationshipType')
@@ -96,8 +88,9 @@ class Relatable(object):
     return db.relationship(
         'Relationship',
         primaryjoin=joinstr,
-        foreign_keys = 'Relationship.destination_id',
-        cascade = 'all, delete-orphan')
+        foreign_keys='Relationship.destination_id',
+        backref='{0}_destination'.format(cls.__name__),
+        cascade='all, delete-orphan')
 
   @declared_attr
   def related_destinations(cls):
@@ -107,8 +100,9 @@ class Relatable(object):
     return db.relationship(
         'Relationship',
         primaryjoin=joinstr,
-        foreign_keys = 'Relationship.source_id',
-        cascade = 'all, delete-orphan')
+        foreign_keys='Relationship.source_id',
+        backref='{0}_source'.format(cls.__name__),
+        cascade='all, delete-orphan')
 
   _publish_attrs = [
       'related_sources',

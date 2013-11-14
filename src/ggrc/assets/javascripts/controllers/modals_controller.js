@@ -160,15 +160,29 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , autocomplete_select : function(el, event, ui) {
+    var original_event;
     if(ui.item) {
       var path = el.attr("name").split(".");
       path.pop();
       path = path.join(".");
       this.options.instance.attr(path, ui.item.stub());
     } else {
-      $(event.currentTarget).one("modal:success", function(ev, new_obj) {
+      original_event = event;
+
+      $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
         el.data("ui-autocomplete").options.select(event, {item : new_obj});
+      }).one("hidden", function() {
+        setTimeout(function() {
+          $(this).off(".autocomplete");
+        }, 100);
       });
+      while(original_event = original_event.originalEvent) {
+        if(original_event.type === "keydown") {
+          //This selection event was generated from a keydown, so click the add new link.
+          el.data("ui-autocomplete").menu.active.find("a").click();
+          break;
+        }
+      }
       return false;
     }
   }

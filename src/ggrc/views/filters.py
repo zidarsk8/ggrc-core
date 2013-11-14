@@ -47,7 +47,9 @@ def get_display_class_filter(obj):
 
   if obj in ('Program'):
     return 'program'
-  elif obj in ('Control', 'Directive', 'Contract', 'Policy', 'Regulation', 'Objective'):
+  elif obj in (
+      'Control', 'Directive', 'Contract', 'Policy', 'Regulation', 'Standard',
+      'Objective'):
     return 'governance'
   elif obj in (
       'OrgGroup', 'Project', 'Facility', 'Product', 'DataAsset', 'Market',
