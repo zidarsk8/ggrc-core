@@ -644,6 +644,9 @@
     height: 24px;
     margin-bottom: 0;
   }
+  &.search-filters select {
+    width: auto;
+  }
   .objective-selector {
     @include clearfix();
     [class^="grcicon-"] {

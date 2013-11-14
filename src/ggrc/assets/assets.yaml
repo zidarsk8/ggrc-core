@@ -148,6 +148,7 @@ dashboard-js-template-files:
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
   - people/active_column.mustache
+  - people/filters.mustache
   - people/info.mustache
   - people/list.mustache
   - people/modal_content.mustache
