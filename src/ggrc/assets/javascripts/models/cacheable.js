@@ -237,50 +237,60 @@ can.Model("can.Model.Cacheable", {
   }
 
   , resolve_deferred_bindings : function(obj) {
-    var dfds = [];
+    var _pjs, refresh_dfds = [], dfds = [];
     if(obj._pending_joins) {
-      can.each(obj._pending_joins, function(pj) {
-        var inst
-        , binding = obj.get_binding(pj.through)
-        , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
-        if(pj.how === "add") {
-          //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
-          // move on to the next one
-          if(~can.inArray(pj.what, binding.list)
-             || (binding.loader.option_attr
-                && ~can.inArray(
-                  pj.what
-                  , can.map(
-                    binding.list
-                    , function(join_obj) { return join_obj[binding.loader.option_attr]; }
-                  )
-                )
-          )) {
-            return;
-          }
-          inst = pj.what instanceof model
-            ? pj.what
-            : new model({
-                context : obj.context
-              });
-          if(binding.loader.object_attr) {
-            inst.attr(binding.loader.object_attr, obj.stub());
-          }
-          if(binding.loader.option_attr) {
-            inst.attr(binding.loader.option_attr, pj.what.stub());
-          }
-          dfds.push(inst.save());
-        } else if(pj.how === "remove") {
-          can.map(binding.list, function(bound_obj) {
-            if(bound_obj === pj.what || bound_obj[binding.loader.option_attr] === pj.what) {
-              dfds.push(bound_obj.destroy());
-            }
-          });
-        }
+      _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
+      can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
+        refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
       });
-      delete obj._pending_joins;
-      return $.when.apply($, dfds).then(function() {
-        return obj;
+
+      return $.when.apply($, refresh_dfds)
+      .then(function() {
+        can.each(obj._pending_joins, function(pj) {
+          var inst
+          , binding = obj.get_binding(pj.through)
+          , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
+          if(pj.how === "add") {
+            //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
+            // move on to the next one
+            if(~can.inArray(pj.what, can.map(binding.list, function(bo) { return bo.instance; }))
+               || (binding.loader.option_attr
+                  && ~can.inArray(
+                    pj.what
+                    , can.map(
+                      binding.list
+                      , function(join_obj) { return join_obj.instance[binding.loader.option_attr]; }
+                    )
+                  )
+            )) {
+              return;
+            }
+            inst = pj.what instanceof model
+              ? pj.what
+              : new model({
+                  context : obj.context
+                });
+            if(binding.loader.object_attr) {
+              inst.attr(binding.loader.object_attr, obj.stub());
+            }
+            if(binding.loader.option_attr) {
+              inst.attr(binding.loader.option_attr, pj.what.stub());
+            }
+            dfds.push(inst.save());
+          } else if(pj.how === "remove") {
+            can.map(binding.list, function(bound_obj) {
+              if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
+                can.each(bound_obj.get_mappings(), function(mapping) {
+                  dfds.push(mapping.refresh().then(function() { mapping.destroy(); }));
+                });
+              }
+            });
+          }
+        });
+        delete obj._pending_joins;
+        return $.when.apply($, dfds).then(function() {
+          return obj;
+        });
       });
     } else {
       return obj;
