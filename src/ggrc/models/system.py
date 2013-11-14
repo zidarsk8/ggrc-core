@@ -27,7 +27,7 @@ class SystemCategorized(Categorizable):
         'categorizations', 'categories', CATEGORY_SYSTEM_TYPE_ID)
 
 class SystemOrProcess(
-    Timeboxed, SystemCategorized, Ownable, BusinessObject, db.Model):
+    Timeboxed, SystemCategorized, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
@@ -80,7 +80,7 @@ class SystemOrProcess(
 
 class System(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Relatable, SystemOrProcess):
+    Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
       }
@@ -93,7 +93,7 @@ class System(
 
 class Process(
     Documentable, Personable, Objectiveable, Controllable, Sectionable,
-    Relatable, SystemOrProcess):
+    Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
       }
