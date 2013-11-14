@@ -447,13 +447,25 @@ def import_systems_to_program(program_id):
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SystemsConverter, csv_file, dry_run=dry_run)
+        options = {
+            "dry_run": dry_run,
+            "parent_type": Program,
+            "parent_id": program_id,
+        }
+        converter = handle_csv_import(SystemsConverter, csv_file, **options)
         if dry_run:
           return render_template("systems/import_result.haml",
             converter=converter, results=converter.objects, heading_map=converter.object_map)
         else:
           count = len(converter.objects)
-          flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
+          flash(
+              u'Successfully imported {0} system{1} to {2}'.format(
+                  count,
+                  's' if count > 1 else '',
+                  program.display_name
+              ),
+              'notice'
+          )
           return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
