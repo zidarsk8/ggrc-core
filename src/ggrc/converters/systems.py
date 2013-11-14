@@ -4,8 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-
-from ggrc.models.all_models import System, OrgGroup
+from ggrc.models.all_models import System, OrgGroup, Program, Relationship
 from .base_row import *
 from collections import OrderedDict
 
@@ -47,6 +46,22 @@ class SystemRowConverter(BaseRowConverter):
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
+
+  def after_save(self, db_session, **options):
+    # Check whether a relationship has the program as source
+    # and system as destination; if not, connect the two in session
+    if options.get('parent_type'):
+      program_id = options.get('parent_id')
+      matching_relatinship_count = Relationship.query\
+        .filter(Relationship.source_id==program_id)\
+        .filter(Relationship.source_type==u'Program')\
+        .filter(Relationship.destination_id==self.obj.id)\
+        .filter(Relationship.destination_type==u'System')\
+        .count()
+      if matching_relatinship_count == 0:
+        program = Program.query.get(program_id)
+        db_session.add(Relationship(source=program, destination=self.obj))
+
 
 class SystemsConverter(BaseConverter):
 
