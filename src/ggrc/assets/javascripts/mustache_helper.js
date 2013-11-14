@@ -1562,7 +1562,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       , roles: new can.Observe.List()
     });
 
-    // Check for owner
+    // Check for contact
     if (instance.contact && instance.contact.id === person.id) {
       state.attr('roles').push('Contact');
     }
@@ -1583,9 +1583,9 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
           refresh_queue.enqueue(responses.reify());
           refresh_queue.trigger().then(function(responses) {
             can.each(responses, function(response) {
-              if (response.owner && response.owner.id === person.id
-                  && !~can.inArray('Response Owner', state.attr('roles'))) {
-                state.attr('roles').push('Response Owner');
+              if (response.contact && response.contact.id === person.id
+                  && !~can.inArray('Response Contact', state.attr('roles'))) {
+                state.attr('roles').push('Response Contact');
               }
             })
           });
