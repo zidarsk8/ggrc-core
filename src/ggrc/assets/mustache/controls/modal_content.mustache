@@ -17,24 +17,6 @@
       </label>
       <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
-    {{#with_page_object_as "page_object"}}
-      <div class="span6">
-        <label>
-          Directive
-          <i class="grcicon-help-black" rel="tooltip" title="Contract, Policy or Regulation Code"></i>
-        </label>
-        <input tabindex="2" id="directive.id" name="directive" type="hidden" model="Directive" null-if-empty="true" value="{{firstnonempty instance.directive.id ''}}">
-        <p class="modal-value">
-          {{#if instance.directive}}
-            {{#using directive=instance.directive}}
-            {{directive.title}}
-            {{/using}}
-          {{else}}
-            <i>No directive</i>
-          {{/if}}
-        </p>
-      </div>
-    {{/with_page_object_as}}
   </div>
   <div class="row-fluid">
     <div class="span6">
@@ -47,10 +29,10 @@
       </div>
     </div>
     <div class="span6">
-      {{#using contact=instance.contact}}
+      {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model.model_singular}}."></i>
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
       <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
@@ -93,7 +75,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Company Control, Kind/Nature, Fraud-Related, Significance, Type/Means, Effective Date, Stop Date, Frequency, Assertions, Categories, Principal Assessor, Secondary Assessor
+            Code, Kind/Nature, Fraud-Related, Significance, Type/Means, Notes, Effective Date, Stop Date, Frequency, Assertions, Categories, Principal Assessor, Secondary Assessor
           </span>
         </a>
       </div>
@@ -107,13 +89,6 @@
           <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         </label>
         <input tabindex="8" class="input-block-level" name="slug" placeholder="CONTROL-XXX" type="text" value="{{slug}}">
-      </div>
-      <div class="span6">
-        <label>
-            Company Control
-            <i class="grcicon-help-black" rel="tooltip" title="Is this a company control?"></i>
-        </label>
-        <label><input tabindex="9" type="checkbox" name="company_control" {{#if company_control}}checked="checked"{{/if}}/> Is this a company control?</label>
       </div>
     </div>
     <div class="row-fluid">

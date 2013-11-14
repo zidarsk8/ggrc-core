@@ -29,10 +29,10 @@
       </div>
     </div>
     <div class="span6">
-      {{#using contact=instance.contact}}
+      {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model.model_singular}}."></i>
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
