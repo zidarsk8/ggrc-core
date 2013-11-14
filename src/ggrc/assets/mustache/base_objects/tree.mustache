@@ -66,11 +66,13 @@
           <div class="span6">
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
+          {{^is_dashboard}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
               {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
               <i class="grcicon-remove"></i>
               Unmap
             </a>
+          {{/is_dashboard}}
           {{/is_allowed_all}}
           {{/if}}
           </div>
