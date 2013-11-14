@@ -120,7 +120,7 @@ class MysqlIndexer(SqlIndexer):
             MysqlRecordProperty.key.in_(
               db.session.query(ObjectOwner.ownable_id).filter(
                 and_(
-                  ObjectOwner.person_id == owner_id,
+                  ObjectOwner.person_id == contact_id,
                   ObjectOwner.ownable_type == model_name
                 )
               )
