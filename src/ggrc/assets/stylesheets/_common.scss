@@ -666,11 +666,9 @@ select.multiple-selector {
   &.sticky-header {
     @include box-shadow(inset 0 0 3px 0 #bbb);
     border-top: none !important;
-    padding-bottom:1px;
   }
   &.sticky-footer {
     @include box-shadow(inset 0 0 3px 0 #bbb);
     border-bottom: none !important;
-    padding-top:1px;
   }
 }

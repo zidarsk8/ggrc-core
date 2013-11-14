@@ -8,7 +8,7 @@
   <form class="form-search" onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span11">
-        <input name="search" type="text" class="input-xlarge search-query" value="{{search_query}}" placeholder="Filter by name, email or company">
+        <input name="search" type="text" value="" class="input-xlarge search-query" value="{{search_query}}" placeholder="Filter by name, email or company">
         <select name="user_role">
           <option value="" selected>Filter by role</option>
           {{#roles}}
@@ -17,6 +17,7 @@
         </select>
       </div>
       <div class="span1">
+        <button class="btn" type="reset">Reset</button>
       </div>
     </div>
   </form>

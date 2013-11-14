@@ -242,6 +242,11 @@ can.Control("GGRC.Controllers.ListView", {
         this.fetch_list();
       }
     }
+
+  , ".search-filters button[type=reset] click" : function(el, ev) {
+      this.options.search_params = {};
+      this.fetch_list();
+    }
   }
 );
 
