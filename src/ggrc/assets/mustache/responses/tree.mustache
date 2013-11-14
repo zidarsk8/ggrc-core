@@ -14,7 +14,7 @@
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
-                <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty instance.contact.name instance.contact.email ''}}" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
+                <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
               {{/using}}
             </div>
           </div>
@@ -95,13 +95,13 @@
       {{#if_equals instance.response_type 'interview'}}
       {{#child_options.2}}
       <div class="inner-tree">
-        <h6>Meetings ({{child_options.2.list.length}})</h6>
+        <h6>Participants ({{child_options.2.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}></ul>
       </div>
       {{/child_options.2}}
       {{#child_options.3}}
       <div class="inner-tree">
-        <h6>Participants ({{child_options.3.list.length}})</h6>
+        <h6>Meetings ({{child_options.3.list.length}})</h6>
         <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}></ul>
       </div>
       {{/child_options.3}}

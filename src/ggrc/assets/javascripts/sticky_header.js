@@ -207,7 +207,8 @@ can.Control("StickyHeader", {
 
     // Detach an element's sticky data
   , remove : function(el) {
-    el.data('sticky').clone[0].parentNode && el.data('sticky').clone.remove();
+    var sticky = el.data('sticky')
+    sticky && sticky.clone[0].parentNode && sticky.clone.remove();
     $.removeData(el, 'sticky');
   }
 
