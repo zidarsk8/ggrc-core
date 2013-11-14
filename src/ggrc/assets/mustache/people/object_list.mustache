@@ -49,16 +49,35 @@
         <div class="tier-2-info-content">
           <div class="row-fluid">
             <div class="span6">
-              {{#if email}}
-              <div class="tree-info">
-                Email:
-                <a href='mailto:{{instance.email}}' rel='tooltip' title='{{instance.email}}' target="_blank">
-                  {{email}}
+              <div class="profile-info">
+                <ul>
+                  {{#if_match name '\\\\S'}}
+                    <li>
+                      <strong>{{name}}</strong>
+                    </li>
+                  {{/if_match}}
+                  {{#if_match email '\\\\S'}}
+                    <li>
+                      <span class="email">
+                        <strong>Email:</strong> <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">{{email}}</a>
+                      </span>
+                    </li>
+                  {{/if}}
+                  {{#if_match company '\\\\S'}}
+                    <li>
+                      <span class="company">
+                        <strong>Company:</strong> {{company}}
+                      </span>
+                    </li>
+                  {{/if_match}}
+                </ul>
+              </div>
+              <div>
+                <a href="/people/{{id}}" class="info-action">
+                  View Profile Page
+                  <i class="grcicon-goto"></i>
                 </a>
               </div>
-              {{else}}
-                &nbsp;
-              {{/if}}
             </div>
             <div class="span6">
             </div>
