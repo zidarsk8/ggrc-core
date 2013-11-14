@@ -184,6 +184,7 @@ dashboard-js-template-files:
   - selectors/option_detail.mustache
   - standards/modal_content.mustache
   - systems/modal_content.mustache
+  - systems/tree_footer.mustache
   - base_objects/tree_footer.mustache
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache
