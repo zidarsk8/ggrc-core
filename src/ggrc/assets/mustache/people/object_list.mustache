@@ -9,32 +9,58 @@
 <ul class="tree-structure new-tree">
   {{#list}}
     <li class="tree-item {{object_type}}" data-model="true" {{data 'model'}}>
-      <div class="simple-link">
-        <div class="row-fluid">
-          <div class="span11">
-            <div class="item-data">
-              <div class="tree-title-area">
-                {{firstnonempty name email}}
-                {{#person_roles this "System|Admin"}}
-                  {{#roles}}
-                    <span class="role">
-                      {{permission_summary}}
-                    </span>
-                  {{/roles}}
-                {{/person_roles}}
+      <div class="item-main">
+        <div class="openclose">
+          <div class="row-fluid">
+            <div class="span11">
+              <div class="item-data">
+                <div class="tree-title-area">
+                  {{firstnonempty name email}}
+                  {{#if_match name '\\\\S'}}
+                    <span class="email">{{email}}</span>
+                  {{/if_match}}
+                  {{#person_roles this "System|Admin"}}
+                    {{#roles}}
+                      <span class="role">
+                        {{permission_summary}}
+                      </span>
+                    {{/roles}}
+                  {{/person_roles}}
+                </div>
+              </div>
+            </div>
+            <div class="span1">
+              <div class="counter pull-left">
+                <a data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
+                  <i class="grcicon-role-color"></i>
+                </a>
+              </div>
+              <div class="counter pull-left">
+                <a data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit Details">
+                  <i class="grcicon-edit"></i>
+                </a>
               </div>
             </div>
           </div>
-          <div class="span1">
-            <div class="counter pull-left">
-              <a data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
-                <i class="grcicon-role-color"></i>
-              </a>
+        </div>
+      </div>
+
+      <div class="tier-2-info item-content">
+        <div class="tier-2-info-content">
+          <div class="row-fluid">
+            <div class="span6">
+              {{#if email}}
+              <div class="tree-info">
+                Email:
+                <a href='mailto:{{instance.email}}' rel='tooltip' title='{{instance.email}}' target="_blank">
+                  {{email}}
+                </a>
+              </div>
+              {{else}}
+                &nbsp;
+              {{/if}}
             </div>
-            <div class="counter pull-left">
-              <a data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit Details">
-                <i class="grcicon-edit"></i>
-              </a>
+            <div class="span6">
             </div>
           </div>
         </div>
