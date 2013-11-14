@@ -18,7 +18,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
   , attributes : {
-      owner : "CMS.Models.Person.stub"
+      contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -41,15 +41,17 @@ can.Model.Cacheable("CMS.Models.Control", {
     , control_risks : "CMS.Models.ControlRisk.stubs"
     , risks : "CMS.Models.Risk.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
-    //, type : "CMS.Models.Option.stub"
     , kind : "CMS.Models.Option.stub"
     , means : "CMS.Models.Option.stub"
     , verify_frequency : "CMS.Models.Option.stub"
+    , principal_assessor : "CMS.Models.Person.stub"
+    , secondary_assessor : "CMS.Models.Person.stub"
   }
   , links_to : {
     "Section" : "ControlSection"
     , "Regulation" : "DirectiveControl"
     , "Policy" : "DirectiveControl"
+    , "Standard" : "DirectiveControl"
     , "Contract" : "DirectiveControl"
     , "Risk" : {}
     , "Program" : "ProgramControl"
