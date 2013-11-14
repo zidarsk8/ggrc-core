@@ -495,6 +495,9 @@
 .grcicon-event-color { background-position:-102px -176px; }
 .grcicon-info { background-position:-126px -176px; }
 .grcicon-info-white { background-position:-198px -80px; }
+.grcicon-standard { background-position:-198px -368px; }
+.grcicon-standard-color { background-position:-198px -368px; }
+.grcicon-standard-white { background-position:-222px -368px; }
 
 .grcicon-directive-color,
 .grcicon-programdirective-color { background-position:-198px -296px; }
@@ -636,6 +639,7 @@ i.short {
   .grcicon-event-color { background-position:-102px -176px; }
   .grcicon-program-color { background-position:-102px -104px; }
   .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -8px; }
+  .grcicon-standard-color { background-position:-198px -368px; }
 
   li {
     &.active,
@@ -671,6 +675,7 @@ i.short {
       .grcicon-event-color { background-position:-198px -56px; }
       .grcicon-program-color { background-position:-102px -128px; }
       .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
+      .grcicon-standard-color { background-position:-222px -368px; }
     }
   }
 }
@@ -713,6 +718,7 @@ i.short {
       .grcicon-x-grey { background-position:-174px -176px; }
       .grcicon-program-color { background-position:-102px -128px; }
       .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
+      .grcicon-standard-color { background-position:-222px -368px; }
       .widget-showhide {
         a {
           background-position: -265px -241px;
