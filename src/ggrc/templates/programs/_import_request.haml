@@ -19,6 +19,7 @@
 -block main
   %form{"class":'import', "enctype":'multipart/form-data', "method":'post', "multipart":True, "data-remote":True,'data-type':'html','data-update-target':'#results-container'}
     .import-interface
+      %input{'name': 'return_to', 'value': '{{return_to}}', 'type': 'hidden'}
       .row-fluid
         .span8
           %h3
