@@ -110,6 +110,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
         orm.subqueryload('directive_controls'),
         orm.subqueryload('sections'))
 
+
 # FIXME: For subclasses, restrict kind
 class Policy(
     Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
@@ -137,6 +138,18 @@ class Regulation(
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Regulation'
+
+class Standard(
+    Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
+  __mapper_args__ = {
+      'polymorphic_identity': 'Standard'
+      }
+  _table_plural = 'standards'
+  valid_kinds = ("Standard",)
+
+  @validates('meta_kind')
+  def validates_meta_kind(self, key, value):
+    return 'Standard'
 
 class Contract(
     Relatable, Objectiveable, Documentable, Personable, Ownable, Directive):
