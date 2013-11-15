@@ -1,4 +1,4 @@
-Type,Contract Code,Regulation Title,Regulation Description,Version,Start,Stop,Kind,Audit Start,Audit Frequency,Audit Duration,Created,Updated
+Type,Contract Code,,,,,,,,,,,
 Contract,{{directive_slug}},,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and Contract Code are very important.  
 
