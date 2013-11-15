@@ -150,6 +150,20 @@ def process_import_template(admin_kind):
   return current_app.make_response((
       "No template for that type.", 404, []))
 
+@app.route("/programs/<program_id>/import_template", methods=['GET'])
+def system_program_import_template(program_id):
+  from flask import current_app
+  from ggrc.models import Program
+  program = Program.query.get(program_id)
+  if program:
+    template_name = "System_Program_Import_Template.csv"
+    headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(template_name))]
+    options = {"program_slug": program.slug}
+    body = render_template("csv_files/" + template_name, **options)
+    return current_app.make_response((body, 200, headers))
+  return current_app.make_response((
+      "No such program.", 404, []))
+
 @app.route("/admin/import_people", methods = ['GET', 'POST'])
 def import_people():
 
@@ -452,6 +466,60 @@ def import_systems():
           count = len(converter.objects)
           flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
           return import_redirect("/admin")
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml", exception_message=file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("systems/import_result.haml", exception_message=e,
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
+      return render_template("directives/import_errors.haml", exception_message=e)
+
+  return render_template("systems/import.haml", import_kind='Systems')
+
+@app.route("/programs/<program_id>/import_systems", methods=['GET', 'POST'])
+def import_systems_to_program(program_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.systems import SystemsConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Program
+  from ggrc.utils import view_url_for
+
+  program = Program.query.get(program_id)
+  program_url = view_url_for(program)
+  return_to = unicode(request.args.get('return_to', program_url))
+
+  if request.method == 'POST':
+    if 'cancel' in request.form:
+      return import_redirect(return_to)
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        options = {
+            "dry_run": dry_run,
+            "parent_type": Program,
+            "parent_id": program_id,
+        }
+        converter = handle_csv_import(SystemsConverter, csv_file, **options)
+        if dry_run:
+          return render_template("systems/import_result.haml",
+            converter=converter, results=converter.objects, heading_map=converter.object_map)
+        else:
+          count = len(converter.objects)
+          flash(
+              u'Successfully imported {0} system{1} to {2}'.format(
+                  count,
+                  's' if count > 1 else '',
+                  program.display_name
+              ),
+              'notice'
+          )
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml", exception_message=file_msg)
