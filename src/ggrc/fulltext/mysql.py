@@ -11,7 +11,7 @@ from ggrc.models.request import Request
 from ggrc.models.response import Response
 from ggrc_basic_permissions.models import UserRole
 from ggrc.rbac import permissions, context_query_filter
-from sqlalchemy import event, and_, or_, text
+from sqlalchemy import event, and_, or_, text, literal, union, alias
 from sqlalchemy.schema import DDL
 from .sql import SqlIndexer
 
@@ -81,79 +81,122 @@ class MysqlIndexer(SqlIndexer):
       return MysqlRecordProperty.content.match(terms)
 
   # filters by "myview" for a given person
-  def _get_owner_query(self, types=None, contact_id=None):
+  def _add_owner_query(self, query, types=None, contact_id=None):
+    '''
+    Finds all objects which might appear on a user's Profile or Dashboard
+    pages, including:
+
+      Objects mapped via ObjectPerson
+      Objects owned via ObjectOwner
+      Objects in private contexts via UserRole (e.g. for Private Programs)
+      Objects for which the user is the "contact"
+      Audits for which the user is assigned a Request or Response
+
+    This method only *limits* the result set -- Contexts and Roles will still
+    filter out forbidden objects.
+    '''
     if not contact_id:
-      return True
+      return query
 
-    model_names = [model.__name__ for model in all_models]
+    models = all_models
     if types is not None:
-      model_names = [m for m in model_names if m in types]
+      models = [model for model in all_models if model.__name__ in types]
 
-    owner_queries = []
-    for model_name in model_names:
-      model = [x for x in all_models if x.__name__ == model_name][0]
-      if model_name is 'Person':
-        filter_query = False
-      else:
-        filter_query = and_(
-          MysqlRecordProperty.type == model_name,
-          or_(
-            MysqlRecordProperty.context_id.in_(
-              db.session.query(UserRole.context_id).filter(
-                and_(
-                  UserRole.person_id == contact_id,
-                  UserRole.context_id != None
-                )
-              ).distinct()
-            ),
-            MysqlRecordProperty.key.in_(
-              db.session.query(model.id).filter(model.contact_id == contact_id)
-            ),
-            MysqlRecordProperty.key.in_(
-              db.session.query(ObjectPerson.personable_id).filter(
-                and_(
-                  ObjectPerson.person_id == contact_id,
-                  ObjectPerson.personable_type == model_name
-                )
+    model_names = [model.__name__ for model in models]
+
+    type_union_queries = []
+
+    # Objects to which the user is "mapped"
+    object_people_query = db.session.query(
+        ObjectPerson.personable_id.label('id'),
+        ObjectPerson.personable_type.label('type'),
+        literal(None).label('context_id')
+      ).filter(
+          and_(
+            ObjectPerson.person_id == contact_id,
+            ObjectPerson.personable_type.in_(model_names)
+          )
+      )
+    type_union_queries.append(object_people_query)
+
+    # Objects for which the user is an "owner"
+    object_owners_query = db.session.query(
+        ObjectOwner.ownable_id.label('id'),
+        ObjectOwner.ownable_type.label('type'),
+        literal(None).label('context_id')
+      ).filter(
+          and_(
+            ObjectOwner.person_id == contact_id,
+            ObjectOwner.ownable_type.in_(model_names),
+          )
+      )
+    type_union_queries.append(object_owners_query)
+
+    # Objects in a private context in which the user may have permissions
+    context_query = db.session.query(
+        literal(None).label('id'),
+        literal(None).label('type'),
+        UserRole.context_id.label('context_id')
+      ).filter(
+          and_(
+            UserRole.person_id == contact_id,
+            UserRole.context_id != None
+          )
+      )
+    type_union_queries.append(context_query)
+
+    for model in models:
+      model_name = model.__name__
+      # Audits where the user is assigned a Request or a Response
+      if model_name == "Audit":
+        model_type_query = db.session.query(
+            Request.audit_id.label('id'),
+            literal("Audit").label('type'),
+            literal(None).label('context_id')
+          ).join(Response).filter(
+              or_(
+                Request.assignee_id == contact_id,
+                Response.contact_id == contact_id
               )
-            ),
-            MysqlRecordProperty.key.in_(
-              db.session.query(ObjectOwner.ownable_id).filter(
-                and_(
-                  ObjectOwner.person_id == contact_id,
-                  ObjectOwner.ownable_type == model_name
-                )
-              )
-            ),
-            and_(
-              model_name == 'Audit',
-              MysqlRecordProperty.key.in_(
-                db.session.query(Request.audit_id).filter(
-                  or_(
-                    Request.assignee_id == contact_id,
-                    Request.id.in_(
-                      db.session.query(Response.request_id).filter(
-                        Response.contact_id == contact_id
-                      ).distinct()
-                    )
-                  )
-                ).distinct()
-              )
-            )
+          ).distinct()
+        type_union_queries.append(model_type_query)
+
+      # Objects for which the user is the "contact"
+      if hasattr(model, 'contact_id'):
+        model_type_query = db.session.query(
+            model.id.label('id'),
+            literal(model.__name__).label('type'),
+            literal(None).label('context_id')
+          ).filter(
+              model.contact_id == contact_id
+          ).distinct()
+        type_union_queries.append(model_type_query)
+
+    # Construct and JOIN to the UNIONed result set
+    type_union_query = alias(union(*type_union_queries))
+    query = query.join(
+        type_union_query,
+        or_(
+          and_(
+            type_union_query.c.id == MysqlRecordProperty.key,
+            type_union_query.c.type == MysqlRecordProperty.type),
+          and_(
+            type_union_query.c.context_id != None,
+            type_union_query.c.context_id == MysqlRecordProperty.context_id
           )
         )
-      owner_queries.append(filter_query)
+      )
 
-    return and_(
-        MysqlRecordProperty.type.in_(model_names),
-        or_(*owner_queries))
+    return query
 
   def search(
       self, terms, types=None, permission_type='read', permission_model=None, contact_id=None):
-    query = self._get_type_query(types, permission_type, permission_model)
-    query = and_(query, self._get_filter_query(terms))
-    query = and_(query, self._get_owner_query(types, contact_id))
-    return db.session.query(self.record_type).filter(query)
+    query = db.session.query(self.record_type)
+    query = query.filter(
+        self._get_type_query(types, permission_type, permission_model))
+    query = query.filter(self._get_filter_query(terms))
+    query = self._add_owner_query(query, types, contact_id)
+    return query
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None):
     from sqlalchemy import func, distinct
@@ -162,7 +205,7 @@ class MysqlIndexer(SqlIndexer):
         self.record_type.type, func.count(distinct(self.record_type.key)))
     query = query.filter(self._get_type_query(types))
     query = query.filter(self._get_filter_query(terms))
-    query = query.filter(self._get_owner_query(types, contact_id))
+    query = self._add_owner_query(query, types, contact_id)
     query = query.group_by(self.record_type.type)
     # FIXME: Is this needed for correct group_by/count-distinct behavior?
     #query = query.order_by(self.record_type.type, self.record_type.key)
