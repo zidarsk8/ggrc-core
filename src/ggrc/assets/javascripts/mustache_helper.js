@@ -993,7 +993,8 @@ Mustache.registerHelper("using", function(options) {
   }
 
   function finish() {
-    return options.fn(frame);
+    options.contexts.unshift(frame);
+    return options.fn(options.contexts);
   }
 
   return defer_render('span', finish, refresh_queue.trigger());
