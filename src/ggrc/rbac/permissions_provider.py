@@ -187,7 +187,8 @@ class DefaultUserPermissions(UserPermissions):
     # Extend with the list of all contexts for which the user is an ADMIN
     admin_list = list(
         permissions.get(self.ADMIN_PERMISSION.action, {})\
-            .get(self.ADMIN_PERMISSION.resource_type, ()))
+            .get(self.ADMIN_PERMISSION.resource_type, {})\
+            .get('contexts', ()))
     ret.extend(admin_list)
     return ret
 
