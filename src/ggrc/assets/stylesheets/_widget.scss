@@ -493,6 +493,12 @@
   }
   .info {
     padding:5px 16px 0 16px;
+    &.person-info {
+      padding: 5px 0 0 0;
+      > div {
+        overflow: hidden;
+      }
+    }
     p {
       margin:0;
       padding-bottom:9px;
@@ -842,8 +848,13 @@
       padding-bottom: 6px;
     }
     .email,
-    .company {
+    .company,
+    .role {
       font-size: 13px;
+    }
+    .role {
+      color: $green;
+      font-weight:bold;
     }
     .name {
       font-size: 14px;

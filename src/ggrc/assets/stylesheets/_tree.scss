@@ -734,13 +734,21 @@ ul.new-tree {
       color:#777;
       font-size:11px;
     }
-    .role,
     .option,
     .scope {
       font-size:11px;
       font-weight:bold;
       text-transform:uppercase;
       color:$green;
+    }
+    .no-role,
+    .role {
+      font-size:11px;
+      font-weight:bold;
+      color:$green;
+    }
+    .no-role {
+      color:$gray;
     }
     .event-action {
       font-size:13px;
