@@ -40,11 +40,11 @@ def search():
 def do_counts(terms, types=None, contact_id=None):
   from ggrc.rbac import permissions
 
+  # FIXME: ? This would make the query more efficient, but will also prune
+  #   objects the user is allowed to read in other contexts.
   # Remove types that the user can't read
-  for type in types:
-    if not permissions.is_allowed_read(type, None):
-      types.remove(type)
-  
+  #types = [type for type in types if permissions.is_allowed_read(type, None)]
+
   indexer = get_indexer()
   with benchmark("Counts"):
     results = indexer.counts(terms, types=types, contact_id=contact_id)
