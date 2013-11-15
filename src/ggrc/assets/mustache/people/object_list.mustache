@@ -17,7 +17,9 @@
                 <div class="tree-title-area">
                   {{firstnonempty name email}}
                   {{#if_match name '\\\\S'}}
-                    <span class="email">{{email}}</span>
+                    {{#name}}
+                      <span class="email">{{email}}</span>
+                    {{/name}}
                   {{/if_match}}
                   {{#person_roles this "System|Admin"}}
                     {{#roles}}
@@ -52,23 +54,31 @@
               <div class="profile-info">
                 <ul>
                   {{#if_match name '\\\\S'}}
-                    <li>
-                      <strong>{{name}}</strong>
-                    </li>
+                    {{#name}}
+                      <li>
+                        <span class="name">
+                          <strong>{{name}}</strong>
+                        </span>
+                      </li>
+                    {{/name}}
                   {{/if_match}}
                   {{#if_match email '\\\\S'}}
-                    <li>
-                      <span class="email">
-                        <strong>Email:</strong> <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">{{email}}</a>
-                      </span>
-                    </li>
+                    {{#email}}
+                      <li>
+                        <span class="email">
+                          <strong>Email:</strong> <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">{{email}}</a>
+                        </span>
+                      </li>
+                    {{/email}}
                   {{/if}}
                   {{#if_match company '\\\\S'}}
-                    <li>
-                      <span class="company">
-                        <strong>Company:</strong> {{company}}
-                      </span>
-                    </li>
+                    {{#company}}
+                      <li>
+                        <span class="company">
+                          <strong>Company:</strong> {{company}}
+                        </span>
+                      </li>
+                    {{/company}}
                   {{/if_match}}
                 </ul>
               </div>
