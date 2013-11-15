@@ -1713,5 +1713,12 @@ Mustache.registerHelper("param_current_location", function() {
   return window.encodeURIComponent(path + fragment);
 });
 
+Mustache.registerHelper("sum", function() {
+  var sum = 0;
+  for (var i = 0; i < arguments.length - 1; i++) {
+    sum += parseInt(resolve_computed(arguments[i]), 10);
+  }
+  return ''+sum;
+});
 
 })(this, jQuery, can);

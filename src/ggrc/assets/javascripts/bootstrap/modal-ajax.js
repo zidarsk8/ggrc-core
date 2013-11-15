@@ -472,6 +472,7 @@
 
       e.preventDefault();
       e.originalEvent && e.originalEvent.preventDefault();
+      e.stopPropagation();
 
       modal_type = $this.data('modal-type');
       if (!modal_type) {

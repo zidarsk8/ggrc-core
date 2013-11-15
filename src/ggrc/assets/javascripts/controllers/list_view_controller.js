@@ -42,11 +42,15 @@ can.Control("GGRC.Controllers.ListView", {
   defaults : {
     is_related : false
     , model : null
+    , extra_params : null
+    , search_query : ""
+    , search_params : null
     , parent_instance : null
     , object_type : null
     , parent_type : null
     , object_display : null
     , parent_display : null
+    , header_view : null
     , list_view : "/static/mustache/dashboard/object_list.mustache"
     , list_objects : null
     , list_loader : null
@@ -55,6 +59,10 @@ can.Control("GGRC.Controllers.ListView", {
 }, {
 
   init : function() {
+    var that = this;
+    !this.options.extra_params && (this.options.extra_params = {});
+    !this.options.search_params && (this.options.search_params = {});
+
     if(this.options.is_related) {
       if (!this.options.parent_instance)
         this.options.parent_instance = GGRC.page_instance();
@@ -76,6 +84,14 @@ can.Control("GGRC.Controllers.ListView", {
         this.options.object_type.split("_").map(can.capitalize).join("");
       this.options.parent_display =
         this.options.parent_type.split("_").map(can.capitalize).join(" ");
+    }
+
+    if(this.options.header_view) {
+      can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+        if (that.element) {
+          that.element.prepend(frag);
+        }
+      });
     }
 
     if (this.options.list) {
@@ -110,7 +126,7 @@ can.Control("GGRC.Controllers.ListView", {
 
             var collection_name = that.options.model.root_collection+"_collection"
               , find_function = that.options.model.list_view_options.find_function
-              , find_params = that.options.model.list_view_options.find_params || {}
+              , find_params = can.extend({}, that.options.extra_params, that.options.model.list_view_options.find_params || {})
               ;
             return that.options.model[find_function](find_params).then(function(result) {
               can.each(result[collection_name], function(instance) {
@@ -130,6 +146,29 @@ can.Control("GGRC.Controllers.ListView", {
   }
 
   , fetch_list : function(params) {
+    // Assemble extra search params
+    var extra_params = this.options.extra_params = {}
+      , search_params = this.options.search_params
+      ;
+    if (search_params.search_ids || search_params.user_role_ids) {
+      var ids = search_params.search_ids || search_params.user_role_ids || [];
+
+      // If there is a search for both a query an user roles, 
+      // only use the ids in both lists.
+      if (search_params.search_ids && search_params.user_role_ids) {
+        var found = {};
+        ids = [];
+        can.each([].concat(search_params.search_ids, search_params.user_role_ids), function(id) {
+          if (found[''+id])
+            ids.push(id);
+          else
+            found[''+id] = true;
+        });
+      }
+
+      extra_params.id__in = ids.join(',');
+    }
+
     this.element.trigger("loading");
     this.options.list_loader(this).then(this.proxy("draw_list"));
   }
@@ -146,8 +185,9 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
     can.view(this.options.list_view, this.options, function(frag) {
+      that.element.find('.spinner, .tree-structure').remove();
       that.element
-        .html(frag)
+        .append(frag)
         .trigger("loaded");
       that.update_count();
     });
@@ -175,6 +215,37 @@ can.Control("GGRC.Controllers.ListView", {
           that.options.pager = data.paging;
         });
       }
+    }
+
+  , ".search-filters input[name=search] change" : function(el, ev) {
+      var that = this;
+      delete this.options.search_params.search_ids;
+      this.options.search_query = el.val();
+      GGRC.Models.Search.search_for_types(this.options.search_query, [this.options.model.model_singular], {}).then(function(results) {
+        var ids = $.map(results.entries, function(person) { return person.id; });
+        that.options.search_params.search_ids = ids;
+        that.fetch_list();
+      });
+    }
+
+  , ".search-filters select[name=user_role] change" : function(el, ev) {
+      var that = this;
+      delete this.options.search_params.user_role_ids;
+      if (el.val()) {
+        CMS.Models.UserRole.findAll({ role_id: el.val() }).then(function(user_roles) {
+          var ids = $.map(user_roles, function(user_role) { return user_role.person.id; });
+          that.options.search_params.user_role_ids = ids;
+          that.fetch_list();
+        });
+      }
+      else {
+        this.fetch_list();
+      }
+    }
+
+  , ".search-filters button[type=reset] click" : function(el, ev) {
+      this.options.search_params = {};
+      this.fetch_list();
     }
   }
 );

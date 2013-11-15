@@ -240,7 +240,7 @@ can.Control("StickyHeader", {
     // Detach an element's sticky data
   , remove : function(el) {
     var data = el.data('sticky')
-      , clone = data.clone
+      , clone = data && data.clone
       ;
     if (clone && clone[0] && clone[0].parentNode) {
       clone.remove();

@@ -135,6 +135,10 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         options.footer_view = GGRC.mustache_path + "/base_objects/tree_footer_no_access.mustache"
       }
 
+      if (this.options.content_controller_options.init) {
+        this.options.content_controller_options.init();
+      }
+
       new this.options.content_controller(
           controller_content
         , this.options.content_controller_options
