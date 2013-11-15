@@ -574,6 +574,13 @@
 .grcicon-riskyattribute-color, .grcicon-risky_attribute-color { background-position:-102px -320px; }
 .grcicon-dashboard-big { background-position:-246px -224px; }
 
+.grcicon-request-black { background-position:-30px -392px; }
+.grcicon-request-white { background-position:-54px -392px; }
+.grcicon-request-color { background-position:-30px -392px; }
+.grcicon-response-black { background-position:-78px -392px; }
+.grcicon-response-white { background-position:-102px -392px; }
+.grcicon-response-color { background-position:-78px -392px; }
+
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
 
@@ -636,6 +643,8 @@ i.short {
   .grcicon-event-color { background-position:-102px -176px; }
   .grcicon-program-color { background-position:-102px -104px; }
   .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -8px; }
+  .grcicon-request-color { background-position:-30px -392px; }
+  .grcicon-response-color { background-position:-78px -392px; }
 
   li {
     &.active,
@@ -671,6 +680,8 @@ i.short {
       .grcicon-event-color { background-position:-198px -56px; }
       .grcicon-program-color { background-position:-102px -128px; }
       .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
+      .grcicon-request-color { background-position:-54px -392px; }
+      .grcicon-response-color { background-position:-102px -392px; }
     }
   }
 }
@@ -713,6 +724,8 @@ i.short {
       .grcicon-x-grey { background-position:-174px -176px; }
       .grcicon-program-color { background-position:-102px -128px; }
       .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
+      .grcicon-request-color { background-position:-54px -392px; }
+      .grcicon-response-color { background-position:-102px -392px; }
       .widget-showhide {
         a {
           background-position: -265px -241px;
