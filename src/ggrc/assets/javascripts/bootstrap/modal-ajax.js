@@ -170,11 +170,12 @@
       });
 
       $target.on('modal:success', function(e, data) {
-        var model_name = $trigger.attr("data-object-singular");
+        var model_name = $trigger.attr("data-object-plural").toLowerCase();
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
           window.location.assign('/dashboard');
-        } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
-          window.location.assign('/admin');
+        } else if (model_name  == 'people' || model_name  == 'roles') {
+          window.location.assign('/admin#' + model_name + "_list_widget");
+          window.location.reload();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
