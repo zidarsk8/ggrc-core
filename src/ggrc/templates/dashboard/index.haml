@@ -10,9 +10,6 @@
 -block title
   GRC: My Work
 
--block page_help
-  dashboard
-
 -block extra_javascript
   =super()
   GGRC.page_object = { "person": ={ current_user_json()|safe } };

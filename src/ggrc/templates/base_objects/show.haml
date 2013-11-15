@@ -13,9 +13,6 @@
 -block title
   =instance.title
 
--block page_help scoped
-  =model_name
-
 -block extra_javascript
   =super()
   GGRC.page_object = ={ instance_json()|safe };
