@@ -1049,7 +1049,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     {
       model : "Response"
       , mapping: "related_owned_responses"
-      , allow_creating : true
+      , allow_creating : false
       , parent_find_param : "audit.id"
     }]
   }
