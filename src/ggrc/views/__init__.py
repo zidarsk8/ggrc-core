@@ -223,7 +223,8 @@ def import_controls(directive_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         options = {}
-        options['directive_id'] = int(directive_id)
+        options['parent_type'] = Directive
+        options['object_id'] = int(directive_id)
         options['dry_run'] = dry_run
         converter = handle_csv_import(ControlsConverter, csv_file, **options)
         if dry_run:
@@ -249,7 +250,59 @@ def import_controls(directive_id):
       return render_template("directives/import_errors.haml",
           directive_id = directive_id, exception_message = str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to)
+  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to, parent_type = (directive.kind or directive.meta_kind))
+
+@app.route("/programs/<program_id>/import_controls", methods=['GET', 'POST'])
+def import_controls_to_program(program_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.controls import ControlsConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Program
+  from ggrc.utils import view_url_for
+
+  program = Program.query.get(program_id)
+  program_url = view_url_for(program)
+  return_to = unicode(request.args.get('return_to', program_url))
+
+  if request.method == 'POST':
+    if 'cancel' in request.form:
+      return import_redirect(return_to)
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        options = {}
+        options['parent_type'] = Program
+        options['object_id'] = int(program_id)
+        options['dry_run'] = dry_run
+        converter = handle_csv_import(ControlsConverter, csv_file, **options)
+        if dry_run:
+          options['converter'] = converter
+          options['results'] = converter.objects
+          options['heading_map'] = converter.object_map
+          return render_template("programs/import_controls_result.haml", **options)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} control{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect(return_to)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("programs/import_errors.haml",
+            program_id = program_id, exception_message = file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("programs/import_controls_result.haml",
+            exception_message=e, converter=converter, results=converter.objects,
+            program_id=int(program_id), heading_map=converter.object_map)
+      return render_template("programs/import_errors.haml",
+          program_id = program_id, exception_message = str(e))
+
+  return render_template("programs/import_controls.haml", program_id = program_id, import_kind = 'Controls', return_to = return_to, parent_type = "Program")
+
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
@@ -588,22 +641,39 @@ def export_controls(directive_id):
   options['export'] = True
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
-@app.route("/standards/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/regulations/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/contracts/<directive_id>/import_controls_template", methods=['GET'])
-@app.route("/policies/<directive_id>/import_controls_template", methods=['GET'])
-def import_controls_template(directive_id):
+@app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
+def import_controls_template(object_type, object_id):
   from flask import current_app
-  from ggrc.models.all_models import Directive
-  filename = "Control_Import_Template.csv"
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
-  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  from ggrc.models.all_models import Directive, Program
+  DIRECTIVE_TYPES = ["regulations", "contracts", "policies"]
+  OTHER_TYPES = ["programs"]
+  if object_type in DIRECTIVE_TYPES + OTHER_TYPES:
+    if object_type in DIRECTIVE_TYPES:
+      parent_object = Directive.query.get(object_id)
+      parent_kind = parent_object.meta_kind
+    else:
+      parent_object = Program.query.get(object_id)
+      parent_kind = "Program"
+  else:
+    return current_app.make_response(
+        ("No template for that type.", 404, []))
+  template_name = "Control_Import_Template.csv"
+  headers = [
+      ('Content-Type', 'text/csv'),
+      (
+          'Content-Disposition',
+          'attachment; filename="{0}_{1}"'.format(
+              parent_kind,
+              template_name
+          )
+      )
+  ]
   options = {
-    # (Policy/Standard/Regulation/Contract) Code
-    'directive_kind': directive.meta_kind,
-    'directive_slug': directive.slug,
+    # (Policy/Regulation/Contract) Code
+    'object_kind': parent_kind,
+    'object_slug': parent_object.slug,
   }
-  body = render_template("csv_files/" + filename, **options)
+  body = render_template("csv_files/" + template_name, **options)
   return current_app.make_response((body, 200, headers))
 
 ViewEntry = namedtuple('ViewEntry', 'url model_class service_class')

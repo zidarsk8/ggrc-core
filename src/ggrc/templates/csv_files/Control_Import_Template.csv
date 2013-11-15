@@ -1,5 +1,5 @@
-Type,{{directive_kind}} Code,,,,,,,,,,,,,,,,,
-Controls,{{directive_slug}},,,,,,,,,,,,,,,,,
+Type,{{object_kind}} Code,,,,,,,,,,,,,,,,,
+Controls,{{object_slug}},,,,,,,,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <Regulation Code> are very important.  
 
 For Control Import, Type should be ""Controls"", in cell A2.
