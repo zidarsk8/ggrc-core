@@ -325,17 +325,17 @@ def import_requests(audit_id):
   from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Audit, Program
-  import ggrc.views
+  from ggrc.utils import view_url_for
 
   audit = Audit.query.get(audit_id)
   program = audit.program
-  program_url =\
-    getattr(ggrc.views, program.__class__.__name__).url_for(program)
+  program_url = view_url_for(program)
+  return_to = unicode(request.args.get('return_to', program_url))
 
   if request.method == 'POST':
 
     if 'cancel' in request.form:
-      return import_redirect(program_url + "#audit_widget")
+      return import_redirect(return_to)
     dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
     try:
@@ -351,7 +351,7 @@ def import_requests(audit_id):
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect(program_url + "#audit_widget")
+          return import_redirect(return_to)
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("programs/import_request_errors.haml",
@@ -366,7 +366,7 @@ def import_requests(audit_id):
       return render_template("programs/import_request_errors.haml",
             exception_message=e)
 
-  return render_template("programs/import_request.haml", import_kind='Requests')
+  return render_template("programs/import_request.haml", import_kind='Requests', return_to=return_to)
 
 
 @app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])

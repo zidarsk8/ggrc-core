@@ -80,6 +80,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     , related_destinations : "CMS.Models.Relationship.stubs"
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
+    , contact : "CMS.Models.Person.stub"
   }
   , defaults : {
     status : "Assigned"
@@ -108,17 +109,17 @@ can.Model.Cacheable("CMS.Models.Response", {
       , mapping : "documents"
       , show_view : GGRC.mustache_path + "/documents/pbc_tree.mustache"
     }, {
-      //2: Meetings
-      model : "Meeting"
-      , mapping : "meetings"
-      , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
-      , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
-    }, {
       //3: Meeting participants
       model : "Person"
       , mapping : "people"
       , show_view : GGRC.mustache_path + "/people/tree.mustache"
       , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
+    }, {
+      //2: Meetings
+      model : "Meeting"
+      , mapping : "meetings"
+      , show_view : GGRC.mustache_path + "/meetings/tree.mustache"
+      , footer_view : GGRC.mustache_path + "/meetings/tree_footer.mustache"
     }]
   }
 }, {
@@ -162,7 +163,15 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
     params[this.root_object].response_type = "interview";
     return params;
   }
-}, {});
+}, {
+  save : function() {
+    if(this.isNew()) {
+      this.mark_for_addition("people", this.contact);
+    }
+    return this._super.apply(this, arguments);
+  }
+
+});
 
 CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
   root_object : "population_sample_response"

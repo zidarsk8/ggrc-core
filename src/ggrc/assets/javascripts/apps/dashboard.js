@@ -443,7 +443,8 @@ $(function() {
         }
     };
 
-    if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
+    if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)) {
+    //if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
