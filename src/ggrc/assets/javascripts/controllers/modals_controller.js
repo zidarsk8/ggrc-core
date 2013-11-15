@@ -116,7 +116,7 @@ can.Control("GGRC.Controllers.Modals", {
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
-          GGRC.Models.Search
+          ctl.bindXHRToButton(GGRC.Models.Search
           .search_for_types(
               request.term || '',
               [$that.data("lookup")],
@@ -141,7 +141,7 @@ can.Control("GGRC.Controllers.Modals", {
                 that._trigger( "open" );
               }
             });
-          });
+          }), $that, null, false);
         }
         , select : ctl.proxy("autocomplete_select", $that)
         , close : function() {
