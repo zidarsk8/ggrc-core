@@ -62,6 +62,7 @@ can.Control("GGRC.Controllers.ListView", {
     var that = this;
     !this.options.extra_params && (this.options.extra_params = {});
     !this.options.search_params && (this.options.search_params = {});
+    this.options.state = new can.Observe();
 
     if(this.options.is_related) {
       if (!this.options.parent_instance)
@@ -170,6 +171,7 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
     this.element.trigger("loading");
+    this.options.state.attr('loading', true);
     this.options.list_loader(this).then(this.proxy("draw_list"));
   }
 
@@ -189,6 +191,7 @@ can.Control("GGRC.Controllers.ListView", {
       that.element
         .append(frag)
         .trigger("loaded");
+      that.options.state.attr('loading', false);
       that.update_count();
     });
   }
