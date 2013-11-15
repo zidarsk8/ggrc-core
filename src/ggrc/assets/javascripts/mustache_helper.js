@@ -1178,6 +1178,7 @@ Mustache.registerHelper("is_allowed", function() {
     , resource_type
     , context_unset = new Object()
     , context_id = context_unset
+    , context_override
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1204,8 +1205,10 @@ Mustache.registerHelper("is_allowed", function() {
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
       context_id = null;
-    else if (context_id === 'for')
+    else if (context_id === 'for' || context_id === 'any') {
+      context_override = context_id;
       context_id = undefined;
+    }
   }
 
   if (resource_type && context_id === context_unset) {
@@ -1227,8 +1230,13 @@ Mustache.registerHelper("is_allowed", function() {
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
-    if (resource) {
+    else if (context_override === 'for' && resource) {
+      console.log(context_override, action, resource);
       passed = passed && Permission.is_allowed_for(action, resource);
+    }
+    else if (context_override === 'any' && resource_type) {
+      console.log(context_override, action, resource_type);
+      passed = passed && Permission.is_allowed_any(action, resource_type);
     }
   });
 
