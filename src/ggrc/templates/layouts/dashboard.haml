@@ -69,6 +69,10 @@
                         =current_user.email
                     %i.grcicon-carot-white
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+                    %li
+                      %a{'href': "/dashboard"}
+                        %i.grcicon-dashboard
+                        My Work
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
                         %a{'href': "/admin"}

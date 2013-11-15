@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Control, System, Process, DirectiveControl
+from ggrc.models import Directive, Control, System, Process, Program, DirectiveControl, ProgramControl
 from .base_row import *
 from collections import OrderedDict
 from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
@@ -53,16 +53,27 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
-    if options.get('directive_id'):
-      db_session.add(self.obj)
+    #if options.get('directive_id'):
+    db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
-    directive_id = options.get('directive_id')
-    for directive_control in self.obj.directive_controls:
-      if directive_control.directive_id == directive_id:
-        return
-    db_session.add(
-        DirectiveControl(directive_id=directive_id, control=self.obj))
+    if options.get('parent_type') == Directive:
+      directive_id = options.get('object_id')
+      for directive_control in self.obj.directive_controls:
+        if directive_control.directive_id == directive_id:
+          return
+      db_session.add(
+          DirectiveControl(directive_id=directive_id, control=self.obj))
+    elif options.get('parent_type') == Program:
+      program_id = options.get('object_id')
+      for program_control in self.obj.program_controls:
+        if program_control.program_id == program_id:
+          return
+      db_session.add(ProgramControl(
+          program=Program.query.get(program_id),
+          control=self.obj
+      ))
+
 
 class ControlsConverter(BaseConverter):
 
@@ -97,25 +108,43 @@ class ControlsConverter(BaseConverter):
 
   row_converter = ControlRowConverter
 
+  def validate_code(self, attrs):
+    if not attrs.get('slug'):
+      self.errors.append('Missing {} Code heading'.format(self.parent_type_string()))
+    elif attrs['slug'] != self.parent_object().slug:
+      self.errors.append('{0} Code must be {1}'.format(
+          self.parent_type_string(),
+          self.parent_object().slug
+      ))
+
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
-    if self.options.get('directive'):
+    parent_type = self.options.get('parent_type')
+    if parent_type == Directive:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
+    elif parent_type == Program:
+      self.metadata_map = OrderedDict( [(k.replace("Directive", "Program"), v) if 'Directive' in k else (k, v) \
+          for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Controls")
     self.validate_code(attrs)
 
-  def directive_kind(self):
-    return self.directive().kind or self.directive().meta_kind
+  def parent_object(self):
+    parent_type = self.options['parent_type']
+    return parent_type.query.get(self.options['object_id'])
 
-  def directive(self):
-    return self.options['directive']
+  def parent_type_string(self):
+    return self.options.get('parent_type').__name__
+
+  def directive_kind(self):
+    parent_object = self.parent_object()
+    return parent_object.kind or parent_object.meta_kind
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield ['Controls', self.directive().slug]
+    yield ['Controls', self.parent_object().slug]
     yield[]
     yield[]
     yield self.object_map.keys()

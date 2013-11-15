@@ -466,6 +466,7 @@
         );
 
       e.preventDefault();
+      e.stopPropagation();
 
       // Trigger the controller
       GGRC.Controllers.UserRolesModalSelector.launch($this, options)

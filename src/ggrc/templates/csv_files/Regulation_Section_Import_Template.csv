@@ -1,4 +1,4 @@
-Type,Regulation Code,Regulation Title,Regulation Description,Version,Start,Stop,Kind,Audit Start,Audit Frequency,Audit Duration,Created,Updated
+Type,Regulation Code,,,,,,,,,,,
 Regulation,{{directive_slug}},,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and Regulation Code are very important.  
 

@@ -213,11 +213,19 @@ var sort_by_name_email = function(list) {
 var admin_list_descriptors = {
   "people" : {
       model : CMS.Models.Person
+    , roles: new can.Observe.List()
+    , init : function() {
+        var self = this;
+        CMS.Models.Role.findAll({ scope__in: "System,Admin" }).done(function(roles) {
+          self.roles.replace(sort_by_name_email(roles));
+        });
+      }
     , object_type : "person"
     , object_category : "governance"
     , object_route : "people"
     , object_display : "People"
     , tooltip_view : "/static/mustache/people/object_tooltip.mustache"
+    , header_view : "/static/mustache/people/filters.mustache"
     , list_view : "/static/mustache/people/object_list.mustache"
     , fetch_post_process : sort_by_name_email
   }

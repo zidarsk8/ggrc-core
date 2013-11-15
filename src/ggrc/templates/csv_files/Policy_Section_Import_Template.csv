@@ -1,4 +1,4 @@
-Type,Policy Code,Policy Title,Policy Description,Version,Start,Stop,Kind,Audit Start,Audit Frequency,Audit Duration,Created,Updated
+Type,Policy Code,,,,,,,,,,,
 Policy,{{directive_slug}},,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and Policy Code are very important.  
 

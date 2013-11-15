@@ -148,6 +148,7 @@ dashboard-js-template-files:
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
   - people/active_column.mustache
+  - people/filters.mustache
   - people/info.mustache
   - people/list.mustache
   - people/modal_content.mustache
@@ -184,6 +185,7 @@ dashboard-js-template-files:
   - selectors/option_detail.mustache
   - standards/modal_content.mustache
   - systems/modal_content.mustache
+  - systems/tree_footer.mustache
   - base_objects/tree_footer.mustache
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache

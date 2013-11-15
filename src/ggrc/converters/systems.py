@@ -4,8 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-
-from ggrc.models.all_models import System, OrgGroup
+from ggrc.models.all_models import System, OrgGroup, Program, Relationship
 from .base_row import *
 from collections import OrderedDict
 
@@ -48,6 +47,22 @@ class SystemRowConverter(BaseRowConverter):
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
 
+  def after_save(self, db_session, **options):
+    # Check whether a relationship has the program as source
+    # and system as destination; if not, connect the two in session
+    if options.get('parent_type'):
+      program_id = options.get('parent_id')
+      matching_relatinship_count = Relationship.query\
+        .filter(Relationship.source_id==program_id)\
+        .filter(Relationship.source_type==u'Program')\
+        .filter(Relationship.destination_id==self.obj.id)\
+        .filter(Relationship.destination_type==u'System')\
+        .count()
+      if matching_relatinship_count == 0:
+        program = Program.query.get(program_id)
+        db_session.add(Relationship(source=program, destination=self.obj))
+
+
 class SystemsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
@@ -86,9 +101,38 @@ class SystemsConverter(BaseConverter):
       self.object_map = OrderedDict( [(k.replace("System Code", 'Process Code'), v) \
                         if k == 'System Code' else (k, v) for k, v in self.object_map.items()] )
 
+  def create_metadata_map(self):
+    if self.has_parent():
+      # Then put the parent code's type label in B1, slug in B2
+      parent_key = '{} Code'.format(self.parent_type_string())
+      parent_value = "slug"
+      self.metadata_map[parent_key] = parent_value
+
+  def validate_code(self, attrs):
+    # Check for parent slug if importing into another object
+    if self.has_parent():
+      if not attrs.get('slug'):
+        self.errors.append('Missing Program Code heading')
+      elif attrs['slug'] != self.parent_object().slug:
+        self.errors.append('{0} Code must be {1}'.format(
+            self.parent_type_string(), self.program().slug))
+
+  def has_parent(self):
+    return bool(self.options.get('parent_type'))
+
+  def parent_object(self):
+    parent_type = self.options['parent_type']
+    return parent_type.query.get(self.options['parent_id'])
+
+  def parent_type_string(self):
+    return self.options.get('parent_type').__name__
+
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield ['Processes' if self.options.get('is_biz_process') else 'Systems']
+    row2 = ['Processes' if self.options.get('is_biz_process') else 'Systems']
+    if self.options.get('parent_type'):
+      row2.append(self.parent_object().slug)
+    yield row2
     yield []
     yield []
     yield self.object_map.keys()

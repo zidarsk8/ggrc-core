@@ -1036,6 +1036,13 @@
         }
       }
 
+    , ".search-reset click" : function(el, ev) {
+        this.element.find("#search").val("").focus();
+        this.options.option_search_term = "";
+        this.constructor.last_option_search_term = "";
+        this.refresh_option_list();
+      }
+    
   , " ajax:flash" : function(el, ev, mesg) {
       var that = this
         , $flash = this.options.$header.find(".flash")

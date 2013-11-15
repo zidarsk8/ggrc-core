@@ -170,11 +170,12 @@
       });
 
       $target.on('modal:success', function(e, data) {
-        var model_name = $trigger.attr("data-object-singular");
+        var model_name = $trigger.attr("data-object-plural").toLowerCase();
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
           window.location.assign('/dashboard');
-        } else if (model_name  == 'Person' || model_name  == 'Role') { //FIXME: Kludge
-          window.location.assign('/admin');
+        } else if (model_name  == 'people' || model_name  == 'roles') {
+          window.location.assign('/admin#' + model_name + "_list_widget");
+          window.location.reload();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
@@ -430,11 +431,14 @@
   };
 
   $(function() {
-    $('body').on('click.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-relationship-selector"], [data-toggle="modal-ajax-single-selector"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"]', function(e) {
+    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-relationship-selector"], [data-toggle="modal-ajax-single-selector"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"]', function(e) {
 
       var $this = $(this)
         , toggle_type = $(this).data('toggle')
         , modal_id, target, $target, option, href, new_target, modal_type;
+
+      if(e.type === "keydown" && e.which !== 13)
+        return;  //activate for keydown on Enter/Return only.
 
       href = $this.attr('data-href') || $this.attr('href');
       modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
@@ -468,6 +472,7 @@
 
       e.preventDefault();
       e.originalEvent && e.originalEvent.preventDefault();
+      e.stopPropagation();
 
       modal_type = $this.data('modal-type');
       if (!modal_type) {

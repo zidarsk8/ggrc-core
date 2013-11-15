@@ -551,3 +551,21 @@ Feature: Private Program Audits and Role Implication
     Then PUT of "private_program" is forbidden
     Then GET of "private_program" is allowed
     Then DELETE of "private_program" is forbidden
+
+  Scenario: Auditors cannot access object view pages
+    Given the current user
+      """
+      { "email": "program.owner@example.com" }
+      """
+    Then GET of "audit" is allowed
+    Then PUT of "audit" is allowed
+    Then GET of "audit" is allowed
+    Then DELETE of "audit" is forbidden
+    Given a new "Objective" named "objective"
+    And "objective" is POSTed to its collection
+    Then GET of "objective" object page is allowed
+    Given the current user
+      """
+      { "email": "auditor@example.com" }
+      """
+    Then GET of "objective" object page is forbidden

@@ -853,9 +853,6 @@ jQuery(function($){
     .find(".modal-header [data-dismiss='modal']").css("opacity", 1);
   });
 
-can.reduce ||
-  (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
-
   $(document.body).on("change", ".rotate_control_assessment", function(ev) { 
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
@@ -872,4 +869,6 @@ can.reduce ||
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
 // hello
+can.reduce ||
+  (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 })(window.jQuery);

@@ -132,7 +132,8 @@ $(function() {
             //, Contract: false
           }
           , all : {
-            DocumentationResponse : false
+              Document : false
+            , DocumentationResponse : false
             , InterviewResponse : false
             , PopulationSampleResponse : false
           }
