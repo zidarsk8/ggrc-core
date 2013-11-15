@@ -24,15 +24,15 @@
       </div>
       <div class="span4">
         Participants
-        {{#using response=instance.response}}
-          {{#using people=response.people}}
+        {{#using attendees=instance.people response=instance.response}}
+          {{#using reified_people=response.people}}
           <select tabindex="5" name="people" multiple="multiple" data-binding="people" model="Person" class="input-block-level">
-            {{#people}}
-            <option value="{{id}}">
+            {{#reified_people}}
+            <option value="{{id}}" {{#in_array this attendees}}selected{{/in_array}}>
                 {{name}}
             </option>
-            {{/people}}
-        </select>
+            {{/reified_people}}
+          </select>
         {{/using}}
       {{/using}}
       </div>

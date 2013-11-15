@@ -74,20 +74,20 @@
           <div class="span6">
             <div class="tree-info">
               <strong>Participants:</strong>
-              {{^instance.people}}
+              {{#with_mapping 'people' instance}}
+              {{^people}}
                 <span class="error">
                   No participants
                 </span>
-              {{/instance.people}}
-              {{#if instance.people.length}}
-                {{#using people=instance.people}}
+              {{/people}}
+              {{#if people.length}}
                 <ul>
                   {{#people}}
-                    <li>{{name}}</li>
+                    <li>{{instance.name}}</li>
                   {{/people}}
                 </ul>
-                {{/using}}
               {{/if}}
+              {{/with_mapping}}
             </div>
           </div>
           {{#instance.url}}

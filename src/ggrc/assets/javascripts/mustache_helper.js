@@ -419,6 +419,13 @@ Mustache.registerHelper("if_match", function(val1, val2, options) {
   return exec();
 });
 
+Mustache.registerHelper("in_array", function(needle, haystack, options) {
+  needle = resolve_computed(needle);
+  haystack = resolve_computed(haystack);
+
+  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
+});
+
 Mustache.registerHelper("if_null", function(val1, options) {
   var that = this, _val1;
   function exec() {
@@ -993,7 +1000,7 @@ Mustache.registerHelper("using", function(options) {
   }
 
   function finish() {
-    return options.fn(frame);
+    return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
 
   return defer_render('span', finish, refresh_queue.trigger());
@@ -1015,7 +1022,7 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
   options = arguments[2] || options;
 
   function finish(list) {
-    return options.fn(frame);
+    return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
 
   return defer_render('span', finish, loader.refresh_instances());
