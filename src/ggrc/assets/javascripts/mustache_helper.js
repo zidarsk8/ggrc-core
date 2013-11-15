@@ -1231,11 +1231,9 @@ Mustache.registerHelper("is_allowed", function() {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
     else if (context_override === 'for' && resource) {
-      console.log(context_override, action, resource);
       passed = passed && Permission.is_allowed_for(action, resource);
     }
     else if (context_override === 'any' && resource_type) {
-      console.log(context_override, action, resource_type);
       passed = passed && Permission.is_allowed_any(action, resource_type);
     }
   });
