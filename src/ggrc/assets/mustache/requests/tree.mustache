@@ -1,4 +1,4 @@
-<li class="tree-item programs request-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
+<li class="tree-item programs request-list rq-{{to_class instance.status}} {{^instance.assignee}}rq-warning{{/instance.assignee}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
