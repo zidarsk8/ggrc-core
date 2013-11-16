@@ -1000,7 +1000,8 @@ Mustache.registerHelper("using", function(options) {
   }
 
   function finish() {
-    return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
+    return options.fn(
+        $.extend([], options.contexts, options.contexts.concat([frame])));
   }
 
   return defer_render('span', finish, refresh_queue.trigger());
@@ -1184,6 +1185,7 @@ Mustache.registerHelper("is_allowed", function() {
     , resource_type
     , context_unset = new Object()
     , context_id = context_unset
+    , context_override
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1210,8 +1212,10 @@ Mustache.registerHelper("is_allowed", function() {
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
       context_id = null;
-    else if (context_id === 'for')
+    else if (context_id === 'for' || context_id === 'any') {
+      context_override = context_id;
       context_id = undefined;
+    }
   }
 
   if (resource_type && context_id === context_unset) {
@@ -1233,8 +1237,11 @@ Mustache.registerHelper("is_allowed", function() {
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
-    if (resource) {
+    else if (context_override === 'for' && resource) {
       passed = passed && Permission.is_allowed_for(action, resource);
+    }
+    else if (context_override === 'any' && resource_type) {
+      passed = passed && Permission.is_allowed_any(action, resource_type);
     }
   });
 
@@ -1576,14 +1583,14 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
 
     // Check for Audit roles
     if (instance instanceof CMS.Models.Audit) {
-      var requests = instance.requests
+      var requests = instance.requests || new can.Observe.List()
         , refresh_queue = new RefreshQueue()
         ;
 
       refresh_queue.enqueue(requests.reify());
       refresh_queue.trigger().then(function(requests) {
         can.each(requests, function(request) {
-          var responses = request.responses
+          var responses = request.responses || new can.Observe.List()
             , refresh_queue = new RefreshQueue()
             ;
 

@@ -2,10 +2,12 @@
 {{#instance}}
   <div class="row-fluid">
     <div class="span12">
-      <a class="main-title {{constructor.category}} oneline" href="{{viewLink}}">
-        {{title}}
-        <i class="grcicon-goto"></i>
-      </a>
+      {{#using program=instance.program}}
+        <a class="main-title {{instance.constructor.category}} oneline" href="{{program.viewLink}}#audit_widget">
+          {{instance.title}}
+          <i class="grcicon-goto"></i>
+        </a>
+      {{/using}}
     </div>
   </div>
   <div class="row-fluid">
