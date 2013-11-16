@@ -58,7 +58,7 @@ class TestConsistency(TestCase):
     # import from spreadsheet to add to it
     import_options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False,
     }
     handle_csv_import(
@@ -68,7 +68,7 @@ class TestConsistency(TestCase):
     )
     export_options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'export': True,
     }
     # then export right back

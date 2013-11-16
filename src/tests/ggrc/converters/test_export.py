@@ -66,7 +66,7 @@ class TestExport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'export': True,
     }
     handle_converter_csv_export(
@@ -121,7 +121,7 @@ class TestExport(TestCase):
     cont1.categories.append(cat2)
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'export': True,
     }
     handle_converter_csv_export(

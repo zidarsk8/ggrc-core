@@ -238,7 +238,7 @@ def import_controls(directive_id):
         filename = secure_filename(csv_file.filename)
         options = {}
         options['parent_type'] = Directive
-        options['object_id'] = int(directive_id)
+        options['parent_id'] = int(directive_id)
         options['dry_run'] = dry_run
         converter = handle_csv_import(ControlsConverter, csv_file, **options)
         if dry_run:
@@ -289,7 +289,7 @@ def import_controls_to_program(program_id):
         filename = secure_filename(csv_file.filename)
         options = {}
         options['parent_type'] = Program
-        options['object_id'] = int(program_id)
+        options['parent_id'] = int(program_id)
         options['dry_run'] = dry_run
         converter = handle_csv_import(ControlsConverter, csv_file, **options)
         if dry_run:
@@ -503,7 +503,7 @@ def import_systems_to_program(program_id):
         options = {
             "dry_run": dry_run,
             "parent_type": Program,
-            "object_id": program_id,
+            "parent_id": program_id,
         }
         converter = handle_csv_import(SystemsConverter, csv_file, **options)
         if dry_run:
@@ -701,7 +701,7 @@ def export_controls(directive_id):
   options = {
       'export': True,
       'parent_type': directive.__class__,
-      'object_id': directive_id,
+      'parent_id': directive_id,
   }
   filename = "{}-controls.csv".format(directive.slug)
   if 'ids' in request.args:
@@ -721,7 +721,7 @@ def export_systems_from_program(program_id):
   options = {
       'export': True,
       'parent_type': Program,
-      'object_id': program_id
+      'parent_id': program_id
   }
   filename = "{}-systems.csv".format(program.slug)
   if 'ids' in request.args:

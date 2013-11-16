@@ -60,14 +60,14 @@ class ControlRowConverter(BaseRowConverter):
 
   def after_save(self, db_session, **options):
     if options.get('parent_type') in DIRECTIVE_CLASSES:
-      directive_id = options.get('object_id')
+      directive_id = options.get('parent_id')
       for directive_control in self.obj.directive_controls:
         if directive_control.directive_id == directive_id:
           return
       db_session.add(
           DirectiveControl(directive_id=directive_id, control=self.obj))
     elif options.get('parent_type') == Program:
-      program_id = options.get('object_id')
+      program_id = options.get('parent_id')
       for program_control in self.obj.program_controls:
         if program_control.program_id == program_id:
           return
@@ -135,7 +135,7 @@ class ControlsConverter(BaseConverter):
 
   def parent_object(self):
     parent_type = self.options['parent_type']
-    return parent_type.query.get(self.options['object_id'])
+    return parent_type.query.get(self.options['parent_id'])
 
   def parent_type_string(self):
     return self.options.get('parent_type').__name__

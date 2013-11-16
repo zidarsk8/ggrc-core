@@ -51,7 +51,7 @@ class TestImport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False,
     }
     handle_csv_import(
@@ -125,7 +125,7 @@ class TestImport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False
     }
     handle_csv_import(
@@ -191,7 +191,7 @@ class TestImport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False,
     }
     actual_titles = set()
@@ -216,7 +216,7 @@ class TestImport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False,
     }
     handle_csv_import(
@@ -285,7 +285,7 @@ class TestImport(TestCase):
     db.session.commit()
     options = {
         'parent_type': Policy,
-        'object_id': pol1.id,
+        'parent_id': pol1.id,
         'dry_run': False,
     }
     handle_csv_import(
