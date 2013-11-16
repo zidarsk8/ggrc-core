@@ -51,7 +51,7 @@ class SystemRowConverter(BaseRowConverter):
     # Check whether a relationship has the program as source
     # and system as destination; if not, connect the two in session
     if options.get('parent_type'):
-      program_id = options.get('parent_id')
+      program_id = options.get('object_id')
       matching_relatinship_count = Relationship.query\
         .filter(Relationship.source_id==program_id)\
         .filter(Relationship.source_type==u'Program')\
@@ -122,7 +122,7 @@ class SystemsConverter(BaseConverter):
 
   def parent_object(self):
     parent_type = self.options['parent_type']
-    return parent_type.query.get(self.options['parent_id'])
+    return parent_type.query.get(self.options['object_id'])
 
   def parent_type_string(self):
     return self.options.get('parent_type').__name__
