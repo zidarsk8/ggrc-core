@@ -2,9 +2,9 @@ Type,Program Code,,,,,,,,,,
 Systems,{{program_slug}},,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  
 For Systems import, Type should be ""Systems"". (in cell A2)",,,,,,,,,,
-"*Optional
+"*Required
 
-If you leave this field blank, the gGRC system will generate Codes automatically upon creation of the new object.  If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.  Otherwise, we recommend you leave this blank.
+If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
 
 Enter the Codes for already existing objects if you want to use Import as a means to edit and update those objects.","*Required
 
