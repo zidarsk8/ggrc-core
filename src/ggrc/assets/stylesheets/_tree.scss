@@ -417,7 +417,7 @@ ul.new-tree {
         }
       }
       .new-tree {
-        .responses-list {
+        li.tree-item {
           padding: 0;
           background: #fafafa;
           border-bottom: 1px solid #ddd !important;
@@ -456,9 +456,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -499,9 +496,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -542,9 +536,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -585,9 +576,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -628,9 +616,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -671,9 +656,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
@@ -714,9 +696,6 @@ ul.new-tree {
         }
         .new-tree {
           li.tree-item {
-            &:last-child {
-              border-bottom: 1px solid #ddd !important;
-            }
             .item-main {
               .row-fluid {
                 background: #fafafa;
