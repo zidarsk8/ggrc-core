@@ -503,7 +503,7 @@ def import_systems_to_program(program_id):
         options = {
             "dry_run": dry_run,
             "parent_type": Program,
-            "parent_id": program_id,
+            "object_id": program_id,
         }
         converter = handle_csv_import(SystemsConverter, csv_file, **options)
         if dry_run:
@@ -710,6 +710,28 @@ def export_controls(directive_id):
   else:
     controls = directive.controls
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
+
+@app.route("/programs/<program_id>/export_systems", methods=['GET'])
+def export_systems_from_program(program_id):
+  from ggrc.converters.systems import SystemsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Program, System
+
+  program = Program.query.get(program_id)
+  options = {
+      'export': True,
+      'parent_type': Program,
+      'object_id': program_id
+  }
+  filename = "{}-systems.csv".format(program.slug)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    systems = System.query.filter(System.id.in_(ids))
+  else:
+    # if no id list given, look up from which relationships of this
+    # program have a System as destination
+    systems = [r.System_destination for r in program.related_destinations if r.System_destination]
+  return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
 @app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
 def import_controls_template(object_type, object_id):
