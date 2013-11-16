@@ -397,7 +397,12 @@ can.Control("GGRC.Controllers.Modals", {
       // FIXME: This should not depend on presence of `<model>.attributes`
       if (instance.isNew() && instance.constructor.attributes.owners &&
           !instance.owners) {
-        instance.attr('owners', [{ id: GGRC.current_user.id }]);
+        // Do not add an owner to a private program. Ownership is managed
+        // through role assignment for private programs.
+        if (!(instance instanceof CMS.Models.Program) || !instance.private)
+        {
+          instance.attr('owners', [{ id: GGRC.current_user.id }]);
+        }
       }
 
       ajd = instance.save().done(function(obj) {

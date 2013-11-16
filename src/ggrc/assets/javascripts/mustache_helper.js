@@ -1237,10 +1237,10 @@ Mustache.registerHelper("is_allowed", function() {
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
-    else if (context_override === 'for' && resource) {
+    if (passed && context_override === 'for' && resource) {
       passed = passed && Permission.is_allowed_for(action, resource);
     }
-    else if (context_override === 'any' && resource_type) {
+    else if (passed && context_override === 'any' && resource_type) {
       passed = passed && Permission.is_allowed_any(action, resource_type);
     }
   });
