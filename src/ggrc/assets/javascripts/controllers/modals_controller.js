@@ -121,8 +121,10 @@ can.Control("GGRC.Controllers.Modals", {
               request.term || '',
               [$that.data("lookup")],
               {
-                __permission_type: 'create'
-                , __permission_model: 'Object' + $that.data("lookup")
+              // FIXME: Remove or figure out when this is necessary.
+              //{
+              //  __permission_type: 'create'
+              //  , __permission_model: 'Object' + $that.data("lookup")
               })
           .then(function(search_result) {
             var objects = search_result.getResultsForType($that.data("lookup"))

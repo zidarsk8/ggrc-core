@@ -1583,14 +1583,14 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
 
     // Check for Audit roles
     if (instance instanceof CMS.Models.Audit) {
-      var requests = instance.requests
+      var requests = instance.requests || new can.Observe.List()
         , refresh_queue = new RefreshQueue()
         ;
 
       refresh_queue.enqueue(requests.reify());
       refresh_queue.trigger().then(function(requests) {
         can.each(requests, function(request) {
-          var responses = request.responses
+          var responses = request.responses || new can.Observe.List()
             , refresh_queue = new RefreshQueue()
             ;
 
