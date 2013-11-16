@@ -697,16 +697,18 @@ def export_controls(directive_id):
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Directive, Control
 
-  options = {}
   directive = Directive.query.filter_by(id=int(directive_id)).first()
-  options['directive'] = directive
+  options = {
+      'export': True,
+      'parent_type': directive.__class__,
+      'object_id': directive_id,
+  }
   filename = "{}-controls.csv".format(directive.slug)
   if 'ids' in request.args:
     ids = request.args['ids'].split(",")
     controls = Control.query.filter(Control.id.in_(ids))
   else:
     controls = directive.controls
-  options['export'] = True
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
 @app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
