@@ -20,6 +20,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , destroy : "DELETE /api/programs/{id}"
   , attributes : {
       contact : "CMS.Models.Person.stub"
+    , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"

@@ -8,13 +8,14 @@ from .associationproxy import association_proxy
 from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_objective import Objectiveable
+from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 from .relationship import Relatable
 
 class Program(
     Documentable, Personable, Objectiveable, Relatable,
-    Timeboxed, BusinessObject, db.Model):
+    Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
 
   KINDS = [
