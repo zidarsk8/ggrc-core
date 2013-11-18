@@ -230,8 +230,7 @@ class Stateful(object):
 class ContextRBAC(object):
   @declared_attr
   def context_id(cls):
-    return deferred(
-        db.Column(db.Integer, db.ForeignKey('contexts.id')), cls.__name__)
+    return db.Column(db.Integer, db.ForeignKey('contexts.id'))
 
   @declared_attr
   def context(cls):
