@@ -3,17 +3,17 @@
 # Created By: silas@reciprocitylabs.com
 # Maintained By: silas@reciprocitylabs.com
 
-from datetime import datetime
+from datetime import date, datetime
 from os.path import abspath, dirname, join
 
 from mock import patch
 
 from ggrc import db
+from ggrc.models.all_models import Control, Policy, System
 from ggrc.converters.import_helper import handle_csv_import
 from ggrc.converters.common import ImportException
 from ggrc.converters.controls import ControlsConverter
 from ggrc.fulltext.mysql import MysqlRecordProperty
-from ggrc.models import Control, Category, Policy, System
 from tests.ggrc import TestCase
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -24,9 +24,9 @@ class TestImport(TestCase):
   def setUp(self):
     self.patcher = patch('ggrc.converters.base.log_event')
     self.mock_log = self.patcher.start()
-    self.date1 = datetime(2013, 9, 25)
-    self.date2 = datetime(2013, 9, 26)
-    self.date3 = datetime(2013, 9, 5)
+    self.date1 = date(2013, 9, 25)
+    self.date2 = date(2013, 9, 26)
+    self.date3 = date(2013, 9, 5)
     super(TestImport, self).setUp()
 
   def tearDown(self):

@@ -7,7 +7,6 @@ from .base import *
 from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Control, System, Process, Program, DirectiveControl, ProgramControl
 from .base_row import *
 from collections import OrderedDict
-from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
 
 DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
@@ -48,8 +47,8 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
-    self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
-    self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
+    self.handle('categories', LinkControlCategoriesHandler)
+    self.handle('assertions', LinkControlAssertionsHandler)
     self.handle('owner', ContactEmailHandler, person_must_exist=True)
     self.handle('systems', LinkObjectControl, model_class = System)
     self.handle('processes', LinkObjectControl, model_class = Process)

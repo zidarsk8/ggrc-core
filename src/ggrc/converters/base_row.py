@@ -7,7 +7,8 @@ from datetime import datetime
 import re
 from .common import *
 from ggrc.models.all_models import (
-    Category, Control, Document, Objective, ObjectControl, ObjectPerson,
+    ControlCategory, ControlAssertion,
+    Control, Document, Objective, ObjectControl, ObjectPerson,
     Option, Person, Process, Relationship, Request, System, SystemOrProcess,
     )
 from ggrc.models.exceptions import ValidationError
@@ -682,17 +683,17 @@ class LinkControlsHandler(LinksHandler):
     self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
-class LinkCategoriesHandler(LinksHandler):
-  model_class = Category
+class LinkControlCategoriesHandler(LinksHandler):
+  model_class = ControlCategory
 
   def parse_item(self, data):
     return { 'name' : data }
 
   def get_where_params(self, data):
-    return {'name' : data.get('name'), 'scope_id' : self.options.get('scope_id')}
+    return {'name' : data.get('name')}
 
   def find_existing_item(self, data):
-    params = {'scope_id': self.options.get('scope_id'), 'name': data.get('name')}
+    params = {'name': data.get('name')}
     items = self.model_class.query.filter_by(**params).all()
 
     if len(items) > 1:
@@ -708,6 +709,11 @@ class LinkCategoriesHandler(LinksHandler):
 
   def display_link(self, obj):
     return obj.name
+
+
+class LinkControlAssertionsHandler(LinkControlCategoriesHandler):
+  model_class = ControlAssertion
+
 
 class LinkDocumentsHandler(LinksHandler):
   model_class = Document
