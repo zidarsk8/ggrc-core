@@ -797,6 +797,27 @@ $(window).load(function(){
     return false;
     
   });
+  
+  // Evidence cleanup
+  $('body').on('click', '.generated-tree li .item-main .row-fluid', function() {
+    $('.generated-tree li').each(function() {
+      var $this = $(this),
+          $urlOneline = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:nth-child(3n) .span12'),
+          $spacingRemove = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:nth-child(4n)'),
+          $editLink = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:last-child a');
+      
+      function tierClean() {
+        $urlOneline.removeClass('span12').addClass('span6');
+        $editLink.addClass('info-action');
+        $editLink.find('i.grcicon-edit').css('margin-top', '7px');
+        $editLink.closest('.span12').css('margin-top', '-7px');
+        if($spacingRemove.find('.span12 .tree-info span span').text('')) {
+          $spacingRemove.hide();
+        }
+      }
+      setTimeout(tierClean,100)
+    });
+  });
 
 });
 
