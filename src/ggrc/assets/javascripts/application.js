@@ -814,7 +814,6 @@ $(window).load(function(){
       setTimeout(tierClean,100)
     });
   });
-
 });
 
 jQuery(function($){
