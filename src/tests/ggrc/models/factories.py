@@ -47,8 +47,8 @@ class ControlFactory(ModelFactory, SlugFactory):
   active = None
   notes = None
 
-class CategoryFactory(ModelFactory):
-  FACTORY_FOR = Category
+class ControlCategoryFactory(ModelFactory):
+  FACTORY_FOR = ControlCategory
   name = factory.LazyAttribute(lambda m: random_string('name'))
   lft = None
   rgt = None

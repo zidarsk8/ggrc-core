@@ -11,7 +11,9 @@ from mock import patch
 from ggrc import db
 from ggrc.converters.import_helper import handle_converter_csv_export
 from ggrc.converters.controls import ControlsConverter
-from ggrc.models import Category, Control, Policy, ObjectControl, Option, System
+from ggrc.models.all_models import (
+    ControlCategory, Control, Policy, ObjectControl, Option, System,
+    )
 from tests.ggrc import TestCase
 
 
@@ -107,8 +109,8 @@ class TestExport(TestCase):
       created_at=sample_day,
       updated_at=sample_day,
     )
-    cat1 = Category(name="Governance")
-    cat2 = Category(name="Authorization")
+    cat1 = ControlCategory(name="Governance")
+    cat2 = ControlCategory(name="Authorization")
     sys1 = System(slug="ACLS", title="System1")
     ob_cont1 = ObjectControl(
         controllable=sys1,
@@ -116,9 +118,13 @@ class TestExport(TestCase):
     )
     cont1.object_controls.append(ob_cont1)
     db.session.add(cont1)
+    db.session.add(cat1)
+    db.session.add(cat2)
     db.session.commit()
     cont1.categories.append(cat1)
     cont1.categories.append(cat2)
+    db.session.add(cont1)
+    db.session.commit()
     options = {
         'parent_type': Policy,
         'parent_id': pol1.id,
