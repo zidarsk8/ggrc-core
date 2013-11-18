@@ -1503,6 +1503,8 @@ Mustache.registerHelper("delete_counts", function(instance, options) {
       }
       else
         root.attr('orphaned_status', 'failed');
+    }).fail(function(){
+      root.attr('orphaned_status', 'failed');
     });
   }
 
