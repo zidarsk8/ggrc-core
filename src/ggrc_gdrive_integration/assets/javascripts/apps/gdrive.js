@@ -28,7 +28,7 @@
     });
     window.gapi.auth.authorize({
       'client_id': GGRC.config.GAPI_CLIENT_ID
-      , 'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.email']
+      , 'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/apps.groups.settings']
       , 'immediate': !use_popup
       , 'login_hint' : GGRC.current_user.email
     }, function(authresult) {

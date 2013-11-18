@@ -334,8 +334,8 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
       , method : "post"
       , body : {
         role : params.role || "writer"
-        , type : "user"
-        , value : CMS.Models.get_instance("Person", params.person.id).email
+        , type : params.permission_type || "user"
+        , value : params.email || CMS.Models.get_instance("Person", params.person.id).email
       }
       , callback : function(dfd, result) {
         if(result.error) {
@@ -373,8 +373,8 @@ CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
       , method : "post"
       , body : {
         role : params.role || "writer"
-        , type : "user"
-        , value : CMS.Models.get_instance("Person", params.person.id).email
+        , type : params.permission_type || "user"
+        , value : params.email || CMS.Models.get_instance("Person", params.person.id).email
       }
       , callback : function(dfd, result) {
         if(result.error) {

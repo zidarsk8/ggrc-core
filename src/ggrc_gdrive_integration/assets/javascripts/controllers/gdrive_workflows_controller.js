@@ -105,12 +105,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     }
   }
 
-  , update_owner_permission : function(model, ev, instance) {
-    var owner = instance instanceof CMS.Models.Request ? "assignee" : "owner";
-    var person
-    , dfd;
-    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && instance[owner]) {
-      person = instance[owner].reify();
+  , update_owner_permission : function(model, ev, instance, role, person) {
+    var dfd
+    , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
+
+    role = role || "writer";
+    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
+      person = (person || instance[owner]).reify();
       if(person.selfLink) {
         dfd = $.when(person);
       } else {
@@ -132,7 +133,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 if(permission.type === "user"
                   && (permission.id === user_permission_id
                       || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.email.toLowerCase()))
-                  && (permission.role === "owner" || permission.role === "writer")
+                  && (permission.role === "owner" || permission.role === "writer" || permission.role === role)
                 ) {
                   return permission;
                 }
@@ -141,7 +142,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 new CMS.Models.GDriveFolderPermission({
                   folder : binding.instance
                   , person : person
-                  , role : "writer"
+                  , role : role
                 }).save();
               }
             });
@@ -244,6 +245,19 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
       }
     });
+  }
+
+
+  , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.UserRole && GGRC.page_instance() instanceof CMS.Models.Program) {
+      this.update_owner_permission(
+        model
+        , ev
+        , GGRC.page_instance()
+        , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
+        , instance.person
+      );
+    }
   }
 });
 
