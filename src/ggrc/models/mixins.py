@@ -191,11 +191,11 @@ class Hierarchical(object):
 class Timeboxed(object):
   @declared_attr
   def start_date(cls):
-    return deferred(db.Column(db.DateTime), cls.__name__)
+    return deferred(db.Column(db.Date), cls.__name__)
 
   @declared_attr
   def end_date(cls):
-    return deferred(db.Column(db.DateTime), cls.__name__)
+    return deferred(db.Column(db.Date), cls.__name__)
 
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
