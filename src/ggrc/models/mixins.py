@@ -191,11 +191,11 @@ class Hierarchical(object):
 class Timeboxed(object):
   @declared_attr
   def start_date(cls):
-    return deferred(db.Column(db.DateTime), cls.__name__)
+    return deferred(db.Column(db.Date), cls.__name__)
 
   @declared_attr
   def end_date(cls):
-    return deferred(db.Column(db.DateTime), cls.__name__)
+    return deferred(db.Column(db.Date), cls.__name__)
 
   # REST properties
   _publish_attrs = ['start_date', 'end_date']
@@ -230,8 +230,7 @@ class Stateful(object):
 class ContextRBAC(object):
   @declared_attr
   def context_id(cls):
-    return deferred(
-        db.Column(db.Integer, db.ForeignKey('contexts.id')), cls.__name__)
+    return db.Column(db.Integer, db.ForeignKey('contexts.id'))
 
   @declared_attr
   def context(cls):

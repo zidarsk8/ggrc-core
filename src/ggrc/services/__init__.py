@@ -21,7 +21,9 @@ def all_collections():
   ret = [
     service('audits', models.Audit),
     service('categorizations', models.Categorization),
-    service('categories', models.Category),
+    service('category_bases', models.CategoryBase),
+      service('control_categories', models.ControlCategory),
+      service('control_assertions', models.ControlAssertion),
     service('contexts', models.Context),
     service('controls', models.Control),
     service('control_controls', models.ControlControl),
