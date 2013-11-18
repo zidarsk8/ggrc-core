@@ -385,7 +385,8 @@ $(function() {
           , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
           , widget_id: far_model.table_singular
           , widget_guard: function(){
-              if(far_model.title_plural === "Audits"){
+              if (far_model.title_plural === "Audits"
+                  && GGRC.page_instance() instanceof CMS.Models.Program){
                 return "context" in GGRC.page_instance() && !!(GGRC.page_instance().context.id);
               }
               return true;
