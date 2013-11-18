@@ -869,14 +869,16 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("category_select", function(object, attr_name, scope) {
-  var selected_options = object.attr(attr_name) || []
+Mustache.registerHelper("category_select", function(object, attr_name, category_type) {
+  var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
     , selected_ids = can.map(selected_options, function(selected_option) {
         return selected_option.id;
       })
-    , options_dfd = CMS.Models.Category.for_scope(scope)
+    , options_dfd = CMS.Models[category_type].findAll()
     , tag_prefix =
-        'select class="span12" model="Category" multiple="multiple"' +
+        'select class="span12"' +
+        ' model="' + category_type + '"' +
+        ' multiple="multiple"' +
         ' name="' + attr_name + '"'
     ;
 

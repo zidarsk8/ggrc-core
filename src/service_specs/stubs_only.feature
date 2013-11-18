@@ -16,9 +16,10 @@ Feature: Return collections that only provide stub representations
 
   Examples: Resources
       | resource_type      |
-      | Category           |
-      | Control            |
       #| Audit              |
+      | Control            |
+      | ControlCategory    |
+      | ControlAssertion   |
       | DataAsset          |
       | Contract           |
       | Policy             |

@@ -9,9 +9,9 @@
 #from .account import Account
 from .audit import Audit
 from .categorization import Categorization
-from .category import Category
+from .category import CategoryBase
 from .context import Context
-from .control import Control
+from .control import Control, ControlCategory, ControlAssertion
 from .control_control import ControlControl
 from .control_risk import ControlRisk
 from .control_section import ControlSection
@@ -57,7 +57,9 @@ from .event import Event
 all_models = [
   Audit,
   Categorization,
-  Category,
+  CategoryBase,
+    ControlCategory,
+    ControlAssertion,
   Context,
   Control,
   ControlControl,

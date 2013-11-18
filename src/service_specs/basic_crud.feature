@@ -18,7 +18,8 @@ Feature: Basic RESTful CRUD Support
 
   Examples: Resources
       | resource_type      |
-      | Category           |
+      | ControlAssertion   |
+      | ControlCategory    |
       | Control            |
       | ControlRisk        |
       | DataAsset          |

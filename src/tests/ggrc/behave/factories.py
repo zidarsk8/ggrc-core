@@ -291,6 +291,17 @@ class PopulationSampleResponseFactory(ResponseFactory):
   response_type = 'population sample'
 
 
+# Category Objects
+
+class ControlCategoryFactory(ModelFactory):
+  MODEL = models.ControlCategory
+  type = "ControlCategory"
+
+class ControlAssertionFactory(ModelFactory):
+  MODEL = models.ControlAssertion
+  type = "ControlAssertion"
+
+
 # Mapping Objects
 
 class ControlControlFactory(ModelFactory):

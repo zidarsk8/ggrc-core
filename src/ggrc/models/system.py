@@ -18,16 +18,9 @@ from .object_section import Sectionable
 from .relationship import Relatable
 from .utils import validate_option
 
-CATEGORY_SYSTEM_TYPE_ID = 101
-
-class SystemCategorized(Categorizable):
-  @declared_attr
-  def categorizations(cls):
-    return cls._categorizations(
-        'categorizations', 'categories', CATEGORY_SYSTEM_TYPE_ID)
 
 class SystemOrProcess(
-    Timeboxed, SystemCategorized, BusinessObject, db.Model):
+    Timeboxed, BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'

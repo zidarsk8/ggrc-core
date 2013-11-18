@@ -11,7 +11,7 @@ Feature: Many resources can be "categorized". This feature will exercise
     Given service description
 
   Scenario Outline:
-    Given a Category resource named "some_category" for scope "<scope>"
+    Given a new "<category_type>" named "some_category"
     And "some_category" is POSTed to its collection
     And a new "<resource_type>" named "categorized_resource"
     And "some_category" is added to links property "<category_property>" of "categorized_resource"
@@ -20,19 +20,21 @@ Feature: Many resources can be "categorized". This feature will exercise
     And GET of the resource "some_category"
     Then the "<category_property>" property of the "categorized_resource" is not empty
     And "some_category" is in the links property "<category_property>" of "categorized_resource"
-    And the "<categorizable_property>" property of the "some_category" is not empty
-    And "categorized_resource" is in the links property "<categorizable_property>" of "some_category"
+    # FIXME: For now, we don't provide link properties on Category instances
+    #   to the categorized objects
+    #And the "<categorizable_property>" property of the "some_category" is not empty
+    #And "categorized_resource" is in the links property "<categorizable_property>" of "some_category"
 
   Examples:
-      | resource_type | category_property | categorizable_property | scope |
-      | Control       | categories        | controls               | 100   |
-      | Control       | assertions        | controls               | 102   |
-      | Risk          | categories        | risks                  | 100   |
+      | resource_type | category_property | categorizable_property | category_type    |
+      | Control       | categories        | controls               | ControlCategory  |
+      | Control       | assertions        | controls               | ControlAssertion |
+      #| Risk          | categories        | risks                  | RiskCategory     |
 
   Scenario: Control categories and assertions are independent
-    Given a Category resource named "a_control_category" for scope "100"
+    Given a new "ControlCategory" named "a_control_category"
     And "a_control_category" is POSTed to its collection
-    And a Category resource named "a_control_assertion" for scope "102"
+    And a new "ControlAssertion" named "a_control_assertion"
     And "a_control_assertion" is POSTed to its collection
     And a new "Control" named "control"
     And "a_control_category" is added to links property "categories" of "control"
@@ -41,7 +43,7 @@ Feature: Many resources can be "categorized". This feature will exercise
     When GET of the resource "control"
     Then the "categories" property of the "control" is not empty
     And the "assertions" property of the "control" is not empty
-    #And "a_control_category" is in the links property "categories" of "control"
+    And "a_control_category" is in the links property "categories" of "control"
     And "a_control_category" is not in the links property "assertions" of "control"
-    #And "a_control_assertion" is not in the links property "categories" of "control"
+    And "a_control_assertion" is not in the links property "categories" of "control"
     And "a_control_assertion" is in the links property "assertions" of "control"
