@@ -758,6 +758,7 @@ ul.new-tree {
   }
   .tree-info {
     @include oneline();
+    vertical-align: middle;
     a {
       &.reference {
         display: inline;
@@ -765,6 +766,9 @@ ul.new-tree {
       &.shrink-it {
         display: inline-block;
         @include oneline();
+        line-height: 12px;
+        width: 80% !important;
+        margin-bottom: -2px;
       }
     }
     font-size:13px;
