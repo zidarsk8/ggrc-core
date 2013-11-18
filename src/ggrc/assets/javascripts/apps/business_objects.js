@@ -288,7 +288,7 @@ $(function() {
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
             , Standard: {
-                mapping: "extended_related_policies_via_search"
+                mapping: "extended_related_standards_via_search"
               , draw_children: true
               , child_options: [section_child_options]
               , fetch_post_process: sort_sections
