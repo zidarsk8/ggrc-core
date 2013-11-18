@@ -840,6 +840,9 @@ ul.new-tree {
       //&:last-child {
       //  border-bottom:1px solid #ccc;
       //}
+      .generated-link {
+        @include oneline();
+      }
     }
     &.pbc-list {
       li.tree-item {
