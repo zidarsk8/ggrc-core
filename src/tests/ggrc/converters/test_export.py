@@ -62,7 +62,13 @@ class TestExport(TestCase):
       created_at=date1,
       updated_at=date1
     )
-    options = {'directive': pol1, 'export': True}
+    db.session.add(pol1)
+    db.session.commit()
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'export': True,
+    }
     handle_converter_csv_export(
         self.csv_filename,
         pol1.controls,
@@ -113,7 +119,11 @@ class TestExport(TestCase):
     db.session.commit()
     cont1.categories.append(cat1)
     cont1.categories.append(cat2)
-    options = {'directive': pol1, 'export': True}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'export': True,
+    }
     handle_converter_csv_export(
         self.csv_filename,
         pol1.controls,

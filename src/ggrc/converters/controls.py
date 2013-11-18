@@ -4,10 +4,12 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Control, System, Process, Program, DirectiveControl, ProgramControl
+from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Control, System, Process, Program, DirectiveControl, ProgramControl
 from .base_row import *
 from collections import OrderedDict
 from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
+
+DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
 class ControlRowConverter(BaseRowConverter):
   model_class = Control
@@ -57,15 +59,15 @@ class ControlRowConverter(BaseRowConverter):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
-    if options.get('parent_type') == Directive:
-      directive_id = options.get('object_id')
+    if options.get('parent_type') in DIRECTIVE_CLASSES:
+      directive_id = options.get('parent_id')
       for directive_control in self.obj.directive_controls:
         if directive_control.directive_id == directive_id:
           return
       db_session.add(
           DirectiveControl(directive_id=directive_id, control=self.obj))
     elif options.get('parent_type') == Program:
-      program_id = options.get('object_id')
+      program_id = options.get('parent_id')
       for program_control in self.obj.program_controls:
         if program_control.program_id == program_id:
           return
@@ -120,7 +122,7 @@ class ControlsConverter(BaseConverter):
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
     parent_type = self.options.get('parent_type')
-    if parent_type == Directive:
+    if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
     elif parent_type == Program:
@@ -133,14 +135,14 @@ class ControlsConverter(BaseConverter):
 
   def parent_object(self):
     parent_type = self.options['parent_type']
-    return parent_type.query.get(self.options['object_id'])
+    return parent_type.query.get(self.options['parent_id'])
 
   def parent_type_string(self):
     return self.options.get('parent_type').__name__
 
   def directive_kind(self):
     parent_object = self.parent_object()
-    return parent_object.kind or parent_object.meta_kind
+    return parent_object.meta_kind
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()

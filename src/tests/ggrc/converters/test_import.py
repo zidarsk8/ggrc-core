@@ -49,7 +49,11 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
     handle_csv_import(
         ControlsConverter,
         csv_filename,
@@ -69,7 +73,7 @@ class TestImport(TestCase):
     self.assertEqual(
         expected_titles,
         actual_titles,
-        "Control titles not imported correctly"
+        "Control titles not imported correctly: " + str(expected_titles) + " != " + str(actual_titles)
     )
     self.assertEqual(
         expected_slugs,
@@ -119,7 +123,11 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False
+    }
     handle_csv_import(
         ControlsConverter,
         csv_filename,
@@ -181,7 +189,11 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
     actual_titles = set()
     actual_slugs = set()
     self.assertRaises(ImportException, handle_csv_import, ControlsConverter, csv_filename, **options)
@@ -202,7 +214,11 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
     handle_csv_import(
         ControlsConverter,
         csv_filename,
@@ -267,7 +283,11 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
+    options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
     handle_csv_import(
         ControlsConverter,
         csv_filename,
