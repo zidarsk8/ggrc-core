@@ -853,7 +853,7 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
     return [
         '<option value=""'
       ,   !selected_id ? ' selected=selected' : ''
-      , '>None</option>'
+      , '>---</option>'
       , can.map(options, function(option) {
           return [
             '<option value="', option.id, '"'
