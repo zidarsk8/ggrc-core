@@ -384,6 +384,12 @@ $(function() {
           , content_controller_selector: "ul"
           , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
           , widget_id: far_model.table_singular
+          , widget_guard: function(){
+              if(far_model.title_plural === "Audits"){
+                return "context" in GGRC.page_instance() && !!(GGRC.page_instance().context.id);
+              }
+              return true;
+            }
           , widget_name: function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
