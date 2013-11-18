@@ -43,7 +43,7 @@ var model_descriptors = {
     , object_type : "standard"
     , object_category : "governance"
     , object_route : "directives"
-    , object_display : "Policies"
+    , object_display : "Standards"
   }
   , "policy" : {
     model : CMS.Models.Policy
