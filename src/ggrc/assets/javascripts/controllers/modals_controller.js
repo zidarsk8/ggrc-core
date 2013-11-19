@@ -222,9 +222,12 @@ can.Control("GGRC.Controllers.Modals", {
               that.options.attr("instance", new that.options.model(params));
               return that.options.instance;
             }
+          }).done(function() {
+            that.on(); //listen to instance.
           });
     } else {
       this.options.attr("instance", new can.Observe(params));
+      that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
@@ -460,6 +463,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     });
   }
+
+  , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
       if (this.options.instance instanceof can.Model
