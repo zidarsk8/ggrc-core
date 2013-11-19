@@ -266,9 +266,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     });
   }
 
-
+  // FIXME I can't figure out from the UserRole what context it applies to.  Assuming that we are on
+  //  the program page and adding ProgramReader/ProgramEditor/ProgramOwner.
   , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
-    if(instance instanceof CMS.Models.UserRole && GGRC.page_instance() instanceof CMS.Models.Program) {
+    if(instance instanceof CMS.Models.UserRole 
+       && GGRC.page_instance() instanceof CMS.Models.Program 
+       && /^Program/.test(instance.role.reify().name)
+    ) {
       this.update_owner_permission(
         model
         , ev
