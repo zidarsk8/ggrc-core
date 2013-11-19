@@ -105,12 +105,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     }
   }
 
-  , update_owner_permission : function(model, ev, instance) {
-    var owner = instance instanceof CMS.Models.Request ? "assignee" : "owner";
-    var person
-    , dfd;
-    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && instance[owner]) {
-      person = instance[owner].reify();
+  , update_owner_permission : function(model, ev, instance, role, person) {
+    var dfd
+    , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
+
+    role = role || "writer";
+    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
+      person = (person || instance[owner]).reify();
       if(person.selfLink) {
         dfd = $.when(person);
       } else {
@@ -120,10 +121,21 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         $.when(
           CMS.Models.GDriveFilePermission.findUserPermissionId(person)
           , instance.get_binding("folders").refresh_instances()
-        ).then(function(user_permission_id, list) {
+          , GGRC.config.GAPI_ADMIN_GROUP 
+            ? CMS.Models.GDriveFilePermission.findUserPermissionId(GGRC.config.GAPI_ADMIN_GROUP)
+            : undefined
+        ).then(function(user_permission_id, list, admin_permission_id) {
           can.each(list, function(binding) {
             binding.instance.findPermissions().then(function(permissions) {
+              var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
               var matching = can.map(permissions, function(permission) {
+                if(admin_permission_id
+                   && permission.type === "group"
+                   && (permission.id === admin_permission_id)
+                       || (permission.emailAddress && permission.emailAddress.toLowerCase() === GGRC.config.GAPI_ADMIN_GROUP.toLowerCase())
+                ) {
+                  owners_matched = true;
+                }
                 /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
                    Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
                    while "Permission IDs" will match on internal account permissions (where email address is
@@ -132,7 +144,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 if(permission.type === "user"
                   && (permission.id === user_permission_id
                       || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.email.toLowerCase()))
-                  && (permission.role === "owner" || permission.role === "writer")
+                  && (permission.role === "owner" || permission.role === "writer" || permission.role === role)
                 ) {
                   return permission;
                 }
@@ -141,7 +153,15 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 new CMS.Models.GDriveFolderPermission({
                   folder : binding.instance
                   , person : person
+                  , role : role
+                }).save();
+              }
+              if(!owners_matched) {
+                new CMS.Models.GDriveFolderPermission({
+                  folder : binding.instance
+                  , email : GGRC.config.GAPI_ADMIN_GROUP
                   , role : "writer"
+                  , permission_type : "group"
                 }).save();
               }
             });
@@ -244,6 +264,23 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
       }
     });
+  }
+
+  // FIXME I can't figure out from the UserRole what context it applies to.  Assuming that we are on
+  //  the program page and adding ProgramReader/ProgramEditor/ProgramOwner.
+  , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.UserRole 
+       && GGRC.page_instance() instanceof CMS.Models.Program 
+       && /^Program/.test(instance.role.reify().name)
+    ) {
+      this.update_owner_permission(
+        model
+        , ev
+        , GGRC.page_instance()
+        , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
+        , instance.person
+      );
+    }
   }
 });
 

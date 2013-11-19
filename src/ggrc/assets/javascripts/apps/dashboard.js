@@ -314,7 +314,7 @@ function authorizations_list_loader() {
     .then(collated_user_roles_by_person);
 }
 
-var admin_widget_descriptors = {
+GGRC.admin_widget_descriptors = {
   "people" : {
       "model" : CMS.Models.Person
     , "content_controller": GGRC.Controllers.ListView
@@ -393,7 +393,7 @@ dashboard_menu_spec = [
 ]
 
 //function make_admin_menu(widget_descriptors) {
-var admin_menu_spec = [
+GGRC.admin_menu_spec = [
   { title : "Admin"
   , objects: [ "roles", "events", "people" ]
   }
@@ -463,8 +463,8 @@ $(function() {
         }, extra_page_options[model_name]));
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({
-          widget_descriptors: admin_widget_descriptors
-        , menu_tree_spec: admin_menu_spec
+          widget_descriptors: GGRC.admin_widget_descriptors
+        , menu_tree_spec: GGRC.admin_menu_spec
         , default_widgets : ["people", "roles", "events"]
       });
     } else {

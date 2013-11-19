@@ -330,12 +330,12 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
     var file = typeof params.file === "object" ? params.file.id : params.file;
 
     return gapi_request_with_auth({
-      path : "/drive/v2/files/" + file + "/permissions"
+      path : "/drive/v2/files/" + file + "/permissions?sendNotificationEmails=false"
       , method : "post"
       , body : {
         role : params.role || "writer"
-        , type : "user"
-        , value : CMS.Models.get_instance("Person", params.person.id).email
+        , type : params.permission_type || "user"
+        , value : params.email || CMS.Models.get_instance("Person", params.person.id).email
       }
       , callback : function(dfd, result) {
         if(result.error) {
@@ -369,12 +369,12 @@ CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
     var folder = typeof params.folder === "object" ? params.folder.id : params.folder;
 
     return gapi_request_with_auth({
-      path : "/drive/v2/files/" + folder + "/permissions"
+      path : "/drive/v2/files/" + folder + "/permissions?sendNotificationEmails=false"
       , method : "post"
       , body : {
         role : params.role || "writer"
-        , type : "user"
-        , value : CMS.Models.get_instance("Person", params.person.id).email
+        , type : params.permission_type || "user"
+        , value : params.email || CMS.Models.get_instance("Person", params.person.id).email
       }
       , callback : function(dfd, result) {
         if(result.error) {
