@@ -28,7 +28,7 @@ dashboard-js-files:
   - bootstrap/scrollspy.js
   - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
-  - wysihtml5-0.3.0_rc2.js
+  - wysihtml5-0.4.0pre.js
   - bootstrap-wysihtml5-0.0.2.js
   - bootstrap/wysihtml5.js
   - moment.js
