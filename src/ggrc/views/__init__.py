@@ -294,7 +294,7 @@ def import_objectives(directive_id):
         options['parent_type'] = Directive
         options['parent_id'] = int(directive_id)
         options['dry_run'] = dry_run
-        converter = handle_csv_import(ControlsConverter, csv_file, **options)
+        converter = handle_csv_import(ObjectivesConverter, csv_file, **options)
         if dry_run:
           options['converter'] = converter
           options['results'] = converter.objects

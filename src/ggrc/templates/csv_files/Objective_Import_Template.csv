@@ -1,5 +1,5 @@
 Type,{{object_kind}} Code,,,,,,,,,,,,,,,,,
-Controls,{{object_slug}},,,,,,,,,,,,,,,,,
+Objectives,{{object_slug}},,,,,,,,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <Regulation Code> are very important.  
 
 For Control Import, Type should be ""Controls"", in cell A2.
@@ -68,4 +68,4 @@ Can be ""No"", ""False"", or ""0"" to result in control being labeled as ""Not A
 Can be ""Yes"", ""True"", or ""1"" to result in the control being labeled as Fraud Related.
 
 Can be ""No"", ""False"", or ""0"" to result in control being labeled as Not Fraud Related.",*Not yet implemented.  Ignore for now.
-Control Code,Title,Description,Kind,Means,Start Date,Stop Date,URL,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,Link:References,Map:Person of Contact,Key Control,Active,Fraud Related,Version
+Objective Code,Title

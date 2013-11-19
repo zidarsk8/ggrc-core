@@ -16,7 +16,7 @@ class ObjectiveRowConverter(BaseRowConverter):
   def find_by_slug(self, slug):
     from sqlalchemy import orm
     return self.model_class.query.filter_by(slug=slug).options(
-        orm.joinedload('directive_controls')).first()
+        orm.joinedload('object_objectives')).first()
 
   def setup_object(self):
     self.obj = self.setup_object_by_slug(self.attrs)
@@ -25,46 +25,29 @@ class ObjectiveRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
-    self.handle_date('start_date')
-    self.handle_date('end_date')
-    self.handle_date('created_at', no_import=True)
-    self.handle_date('updated_at', no_import=True)
-    self.handle_text_or_html('description')
-
     self.handle_raw_attr('title', is_required=True)
-    self.handle_raw_attr('url')
-
-    self.handle_option('kind', role='control_kind')
-    self.handle_option('means', role='control_means')
-    self.handle_option('verify_frequency')
-
-    self.handle_boolean('key_control', truthy_values=['key', 'key_control',
-                        'key control'], no_values=[])
-    fraud_truthy = ['fraud', 'fraud_related', 'fraud related']
-    fraud_falses = ['not fraud', 'not_fraud','not fraud_related', 'not fraud related']
-    self.handle_boolean('fraud_related', truthy_values=fraud_truthy,
-      no_values=fraud_falses)
-    self.handle_boolean('active', truthy_values = ['active'], no_values = [])
-
-    self.handle('documents', LinkDocumentsHandler)
-    self.handle('categories', LinkControlCategoriesHandler)
-    self.handle('assertions', LinkControlAssertionsHandler)
-    self.handle('owner', ContactEmailHandler, person_must_exist=True)
-    self.handle('systems', LinkObjectControl, model_class = System)
-    self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
-    #if options.get('directive_id'):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
+    parent_type = options.get('parent_type')
     if options.get('parent_type') in DIRECTIVE_CLASSES:
-      directive_id = options.get('parent_id')
-      for directive_control in self.obj.directive_controls:
-        if directive_control.directive_id == directive_id:
-          return
-      db_session.add(
-          ObjectObjective(directive_id=directive_id, objective=self.obj))
+      parent_id = options.get('parent_id')
+      parent_obj = parent_type.query.get(parent_id)
+      parent_string = unicode(parent_obj.__class__.__name__)
+      # check if no such directive/object mapping exists; if none, add
+      matching_relationship = ObjectObjective.query\
+        .filter(ObjectObjective.objectiveable_id==parent_id)\
+        .filter(ObjectObjective.objectiveable_type==parent_string)\
+        .filter(ObjectObjective.objective_id==self.obj.id)\
+        .count()
+      if matching_relationship == 0:
+        db_session.add(ObjectObjective(
+            objectiveable_type=parent_string,
+            objectiveable_id=parent_id,
+            objective=self.obj
+        ))
 
 
 class ObjectivesConverter(BaseConverter):
@@ -75,27 +58,8 @@ class ObjectivesConverter(BaseConverter):
   ])
 
   object_map = OrderedDict([
-    ('Control Code', 'slug'),
+    ('Objective Code', 'slug'),
     ('Title', 'title'),
-    ('Description', 'description'),
-    ('Kind', 'kind'),
-    ('Means', 'means'),
-    ('Version', 'version'),
-    ('Start Date', 'start_date'),
-    ('Stop Date', 'end_date'),
-    ('URL', 'url'),
-    ('Map:Systems', 'systems'),
-    ('Map:Processes', 'processes'),
-    ('Map:Categories', 'categories'),
-    ('Map:Assertions', 'assertions'),
-    ('Frequency', 'verify_frequency'),
-    ('Link:References', 'documents'),
-    ('Map:Person of Contact', 'owner'),
-    ('Key Control', 'key_control'),
-    ('Active', 'active'),
-    ('Fraud Related', 'fraud_related'),
-    ('Created', 'created_at'),
-    ('Updated' ,'updated_at')
   ])
 
   row_converter = ObjectiveRowConverter
@@ -117,7 +81,7 @@ class ObjectivesConverter(BaseConverter):
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
-    self.validate_metadata_type(attrs, "Controls")
+    self.validate_metadata_type(attrs, "Objectives")
     self.validate_code(attrs)
 
   def parent_object(self):
@@ -133,7 +97,7 @@ class ObjectivesConverter(BaseConverter):
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield ['Controls', self.parent_object().slug]
+    yield ['Objectives', self.parent_object().slug]
     yield[]
     yield[]
     yield self.object_map.keys()
