@@ -152,6 +152,25 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
     });
   }
 
+  , copyToParent : function(object, parent) {
+    if(typeof parent === "string") {
+      parent = { id : parent };
+    }
+
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + object.id + "/copy"
+      , method : "post"
+      , body : { parents : [{id : parent.id }], title : object.title }
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve(result);
+        }
+      }
+    });
+  }
+
   , removeFromParent : function(object, parent_id) {
     if(typeof object !== "object") {
       object = this.store[object];
@@ -212,6 +231,9 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   }
   , addToParent : function(parent) {
     return this.constructor.addToParent(this, parent);
+  }
+  , copyToParent : function(parent) {
+    return this.constructor.copyToParent(this, parent);
   }
 });
 
