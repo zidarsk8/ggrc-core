@@ -3,9 +3,9 @@
 -# Created By: silas@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 
--set width_pcts = [5, 5, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3]
--set column_names = ["slug", "title", "description", "kind", "means", "start_date", "end_date", "url", "systems", "processes", "categories", "assertions","documentation_description", "verify_frequency", "documents", "owner", "key_control", "active", "fraud_related"]
--set header_overrides = { "documents" : "References", "systems" : "Systems", "processes" : "Processes", "categories" : "Categories","assertions" : "Assertions", "owner" : "Person of Contact" }
+-set width_pcts = [5, 5, 10, 5, 5, 5, 5]
+-set column_names = ["slug", "title", "description", "url", "notes", "created_at", "updated_at"]
+-set header_overrides = {}
 -set all_errors = converter.errors
 -set has_errors = converter.has_errors()
 -set all_warnings = converter.warnings
