@@ -1745,4 +1745,94 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
   return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
 });
 
+/*
+  Evaluates multiple helpers as if they were a single condition
+  
+  Each new statement is begun with a newline-prefixed string. The type of logic 
+  to apply as well as whether it should be a truthy or falsy evaluation may also 
+  be included with the statement in addition to the helper name.
+
+  Currently, if_helpers only supports all logic being 'and' or all logic being 'or'.
+
+  Statement syntax:
+    '\
+    [LOGIC] [TRUTHY_FALSY]HELPER_NAME' arg1 arg2 argN
+
+  Defaults:
+    LOGIC = and (accepts: and or)
+    TRUTHY_FALSEY = # (accepts: # ^)
+    HELPER_NAME = some_helper_name
+
+  Example:
+    {{#if_helpers '\
+      #if_match' page_object.constructor.shortName 'Project' '\
+      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+    '}}
+      matched all conditions
+    {{else}}
+      failed
+    {{/if_helpers}}
+*/
+Mustache.registerHelper("if_helpers", function() {
+  var args = arguments
+    , options = arguments[arguments.length - 1]
+    , helper_result
+    , helper_options = can.extend({}, options, {
+        fn: function() { helper_result = 'fn'; }
+      , inverse: function() { helper_result = 'inverse'; }
+      })
+    ;
+
+  // Parse statements
+  var statements = []
+    , statement
+    , match
+    ;
+  can.each(args, function(arg, i) {
+    if (i < args.length - 1) {
+      if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
+        statement && statements.push(statement);
+        if (match = arg.match(/^\n\s*((and|or) )?([#^])?(.+?)$/)) {
+          statement = {
+              fn_name: match[3] === '^' ? 'inverse' : 'fn'
+            , helper: Mustache.getHelper(match[4])
+            , args: []
+            , logic: match[2] === 'or' ? 'or' : 'and'
+          };
+        }
+        else
+          statement = null;
+      }
+      else if (statement) {
+        statement.args.push(arg);
+      }
+    }
+  });
+  statement && statements.push(statement);
+
+  if (statements.length) {
+    // Evaluate statements
+    var result = true;
+    can.each(statements, function(statement) {
+      helper_result = null;
+      statement.helper.fn.apply(statement.helper, statement.args.concat([helper_options]));
+      helper_result = helper_result === statement.fn_name;
+      if (statement.logic === 'and')
+        result = result && helper_result;
+      else if (statement.logic === 'or')
+        result = result || helper_result;
+      else
+        result = false;
+    });
+
+    // Execute based on the result
+    if (result) {
+      return options.fn(options.contexts);
+    }
+    else {
+      return options.inverse(options.contexts);
+    }
+  }
+})
+
 })(this, jQuery, can);
