@@ -694,6 +694,24 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
+@app.route("/standards/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/regulations/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/policies/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_objectives", methods=['GET'])
+def export_objectives(directive_id):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Directive
+
+  directive = Directive.query.get(directive_id)
+  options = {
+      'parent_type': directive.__class__,
+      'parent_id': directive_id,
+      'export': True,
+  }
+  filename = "{}.csv".format(directive.slug)
+  return handle_converter_csv_export(filename, directive.objectives, ObjectivesConverter, **options)
+
 @app.route("/standards/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
