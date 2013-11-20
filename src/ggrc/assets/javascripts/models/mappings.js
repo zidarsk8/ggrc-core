@@ -261,6 +261,7 @@
                                                 , "related_interview_responses"
                                                 , "related_population_sample_responses"
                                                 ])
+      , related_requests_via_related_responses: Cross("related_responses", "_request")
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       }
 
@@ -573,6 +574,7 @@
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
+      
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
           return !person
@@ -587,6 +589,39 @@
       , related_owned_responses: Multi(["related_owned_documentation_responses"
                                       , "related_owned_interview_responses"
                                       , "related_owned_population_sample_responses"
+                                      ])
+
+      , related_mapped_objects: CustomFilter("related_objects", function(result) {
+          var page_instance = GGRC.page_instance()
+            , instance = result.instance
+            , is_mapped = function(responses) {
+                var i, j, response, relationships, relationship;
+                for (i = 0; response = responses[i]; i++) {
+                  relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
+                  for (j = 0; relationship = relationships[j]; j++) {
+                    if (relationship.source.reify() === page_instance || relationship.destination.reify() === page_instance) {
+                      return true;
+                    }
+                  }
+                }
+                return false;
+              }
+            ;
+
+          if (instance instanceof CMS.Models.Request)
+            return is_mapped(instance.responses.reify());
+          else if (instance instanceof CMS.Models.Response)
+            return is_mapped([instance]);
+          else
+            return false;
+        })
+      , related_mapped_requests: TypeFilter("related_mapped_objects", "Request")
+      , related_mapped_documentation_responses: TypeFilter("related_mapped_objects", "DocumentationResponse")
+      , related_mapped_interview_responses: TypeFilter("related_mapped_objects", "InterviewResponse")
+      , related_mapped_population_sample_responses: TypeFilter("related_mapped_objects", "PopulationSampleResponse")
+      , related_mapped_responses: Multi(["related_mapped_documentation_responses"
+                                      , "related_mapped_interview_responses"
+                                      , "related_mapped_population_sample_responses"
                                       ])
     }
     , Request : {
