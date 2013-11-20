@@ -246,6 +246,16 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+
+        // Audit
+      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
+      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
+      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
+      , related_responses:                      Multi(["related_documentation_responses"
+                                                , "related_interview_responses"
+                                                , "related_population_sample_responses"
+                                                ])
+      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       }
 
     // Program
@@ -575,25 +585,32 @@
     }
     , Request : {
       responses: Direct("Response", "request")
+      , _audit: Indirect("Audit", "requests")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
       //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
     }
-    , Response : {
+
+    , response : {
       _mixins : ["business_object"]
+      , _request : Indirect("Request", "responses")
+      , audit_via_request : Cross("_request", "_audit")
+    }
+    , Response : {
+      _mixins : ["response"]
     }
     , DocumentationResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people"])
     }
     , InterviewResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , meetings: Direct("Meeting", "response")
       , business_objects : Multi(["related_objects", "controls", "documents"])
     }
     , PopulationSampleResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people", "documents"])
       , population_samples : Direct("PopulationSample", "response")
     }
