@@ -95,6 +95,11 @@ $(function() {
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
     , model_default_widgets = []
+    , in_audit_descriptor_options = {
+        widget_name: function() {
+          return "Mapped in Audits";
+        }
+      }
     , extra_descriptor_options = {
           all: {
               Person: {
@@ -115,6 +120,36 @@ $(function() {
                 }
               }
             }
+          }
+        , Control : {
+            Audit: in_audit_descriptor_options
+          }
+        , DataAsset: {
+            Audit: in_audit_descriptor_options
+          }
+        , Facility: {
+            Audit: in_audit_descriptor_options
+          }
+        , Market: {
+            Audit: in_audit_descriptor_options
+          }
+        , OrgGroup: {
+            Audit: in_audit_descriptor_options
+          }
+        , Process: {
+            Audit: in_audit_descriptor_options
+          }
+        , Product: {
+            Audit: in_audit_descriptor_options
+          }
+        , Project: {
+            Audit: in_audit_descriptor_options
+          }
+        , System: {
+            Audit: in_audit_descriptor_options
+          }
+        , Document: {
+            Audit: in_audit_descriptor_options
           }
       }
     // Prevent widget creation with <model_name>: false
