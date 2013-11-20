@@ -38,6 +38,13 @@ $.extend(Permission, (function() {
     // Prohibit all activity on profile pages
     if (GGRC.page_instance() instanceof CMS.Models.Person && permission.action !== 'read' && !/dashboard/.test(window.location))
       return false;
+
+    // Prohibit audit editing for "Mapped in Audits"
+    if (permission.resource_type && permission.resource_type.match(/(Request|Response)/) && permission.action !== 'read' 
+        && !GGRC.page_instance().constructor.shortName.match(/(Audit|Program|Person)/)) {
+      return false;
+    }
+
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
@@ -73,7 +80,7 @@ $.extend(Permission, (function() {
       }
       return false;
     }
-    , is: function(instance, argss) {
+    , is: function(instance, args) {
       var value = _resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
       return value == property_value;
