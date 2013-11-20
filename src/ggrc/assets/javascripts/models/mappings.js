@@ -113,6 +113,14 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
+      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
+      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
+      , related_responses:                      Multi(["related_documentation_responses"
+                                                , "related_interview_responses"
+                                                , "related_population_sample_responses"
+                                                ])
+      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
       , controls: Proxy(
@@ -246,8 +254,6 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
-
-        // Audit
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
       , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")

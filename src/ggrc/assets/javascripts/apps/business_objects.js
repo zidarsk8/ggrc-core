@@ -268,7 +268,49 @@ $(function() {
               _mixins: ["directive"]
             }
 
+        , extended_audits: {
+            Audit: {
+              mapping: "related_audits_via_related_responses"
+              , allow_mapping : false
+              , draw_children : false
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+            }
+          }
+
+        , Control: {
+            _mixins: ["extended_audits"]
+          }
+        , DataAsset: {
+            _mixins: ["extended_audits"]
+          }
+        , Facility: {
+            _mixins: ["extended_audits"]
+          }
+        , Market: {
+            _mixins: ["extended_audits"]
+          }
+        , OrgGroup: {
+            _mixins: ["extended_audits"]
+          }
+        , Process: {
+            _mixins: ["extended_audits"]
+          }
+        , Product: {
+            _mixins: ["extended_audits"]
+          }
+        , Project: {
+            _mixins: ["extended_audits"]
+          }
+        , System: {
+            _mixins: ["extended_audits"]
+          }
+        , Document: {
+            _mixins: ["extended_audits"]
+          }
+
         , Person : {
+            // _mixins: ["extended_audits"]
              Program : {
                 mapping: "extended_related_programs_via_search"
               , fetch_post_process: sort_sections
