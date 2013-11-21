@@ -31,6 +31,7 @@ class ObjectiveRowConverter(BaseRowConverter):
     self.handle_text_or_html('notes')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
@@ -70,6 +71,7 @@ class ObjectivesConverter(BaseConverter):
     ('Notes', 'notes'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
+    ('Map:Person of Contact', 'contact'),
   ])
 
   row_converter = ObjectiveRowConverter

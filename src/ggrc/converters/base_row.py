@@ -364,7 +364,7 @@ class AssigneeHandler(ContactEmailHandler):
     if len(stripped_value) == 0:
       # Audit should exist; was passed from view function
       audit = self.importer.options.get('audit')
-      audit_owner = getattr(audit, 'owner', None)
+      audit_owner = getattr(audit, 'contact', None)
       if audit_owner:
         # Owner should exist, and if so, return that Person
         self.add_warning("Blank field; will be assigned to audit owner, {}.".format(audit_owner.display_name))
