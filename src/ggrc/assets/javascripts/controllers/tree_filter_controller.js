@@ -12,7 +12,8 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , "input, select change" : function(el, ev) {
-    var name = el.attr("name");
+    // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
+    var name = el.attr("name").replace(/\./g, '__');
     if(el.is(".hasDatepicker")) {
       this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
     } else {
@@ -29,7 +30,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
       var model = $(el).children("[data-model],:data(model)").data("model");
       if(can.reduce(Object.keys(states._data), function(st, key) {
         var val = states[key]
-        , test = that.resolve_object(model, key);
+        , test = that.resolve_object(model, key.replace(/__/g, '.'));
         
         if(val && val.isAfter) {
           if(!test || !moment(test).isAfter(val)) {
@@ -53,6 +54,10 @@ can.Control("GGRC.Controllers.TreeFilter", {
   , resolve_object : function(obj, path) {
     path = path.split(".");
     can.each(path, function(prop) {
+      // If the name is blank, use email
+      if (prop === 'name' && obj.attr && (!obj.attr(prop) || !obj.attr(prop).trim()) && obj.attr('email') && obj.attr('email').trim()) {
+        prop = 'email';
+      }
       obj = obj.attr ? obj.attr(prop) : obj.prop;
       obj = obj && obj.reify ? obj.reify() : obj;
       return obj != null; //stop iterating in case of null/undefined.
