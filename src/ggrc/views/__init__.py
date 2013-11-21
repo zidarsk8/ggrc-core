@@ -5,7 +5,7 @@
 
 import json
 from collections import namedtuple
-from flask import request, flash, session
+from flask import request, flash, session, url_for
 from flask.views import View
 from ggrc.app import app
 from ggrc.rbac import permissions
@@ -69,31 +69,13 @@ def generate_query_chunks(query):
   for offset in range(0, count, CHUNK_SIZE):
     yield query.order_by('id').limit(CHUNK_SIZE).offset(offset).all()
 
-@app.route("/admin/reindex", methods=["POST"])
-@login_required
-def admin_reindex():
-  """Simple re-index of all indexable objects
-  """
-  from ggrc import settings
-  if not permissions.is_allowed_read("/admin", 1):
-    raise Forbidden()
-  if getattr(settings, 'APP_ENGINE', False):
-    from google.appengine.api import taskqueue
-    task = taskqueue.add(url=url_for('reindex'))
-    return app.make_response((
-      'scheduled ' + task.name, 200, [('Content-Type', 'text/html')]))
-  else:
-    reindex()
-    return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
-
-
 # Needs to be secured as we are removing @login_required
 @app.route("/tasks/reindex", methods=["POST"])
 def reindex():
   """
   Web hook to update the full text search index
   """
+  
   from ggrc.fulltext import get_indexer
   from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
 
@@ -123,6 +105,24 @@ def reindex():
 
   return app.make_response((
     'success', 200, [('Content-Type', 'text/html')]))
+
+@app.route("/admin/reindex", methods=["GET"])
+@login_required
+def admin_reindex():
+  """Calls a webhook that reindexes indexable objects
+  """
+  from ggrc import settings
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+  if getattr(settings, 'APP_ENGINE', False):
+    from google.appengine.api import taskqueue
+    task = taskqueue.add(url=url_for('reindex'))
+    return app.make_response((
+      'scheduled ' + task.name, 200, [('Content-Type', 'text/html')]))
+  else:
+    #reindex()
+    return app.make_response((
+      'success', 200, [('Content-Type', 'text/html')]))
 
 @app.route("/admin")
 @login_required
