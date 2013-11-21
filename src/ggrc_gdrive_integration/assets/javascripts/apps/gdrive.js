@@ -149,6 +149,7 @@
     , "events" : "CMS.Models.GCalEvent.stubs"
   });
   can.getObject("GGRC.Mappings.Meeting", window, true).events = new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent");
+  GGRC.register_hook("Meeting.tree_view_info", GGRC.mustache_path + "/meetings/gcal_info.mustache");
 
 
 })(this.can.$, this.CMS, this.GGRC);

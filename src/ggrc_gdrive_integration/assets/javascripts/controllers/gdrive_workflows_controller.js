@@ -298,7 +298,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           , calendar : GGRC.config.DEFAULT_CALENDAR
           , event : cev
           , context : instance.context || { id : null }
-        });
+        }).save();
       });
     }
   }

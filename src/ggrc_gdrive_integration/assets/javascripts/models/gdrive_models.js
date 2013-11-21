@@ -113,6 +113,9 @@ var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request
       }
     };
     params.callback = check_auth;
+    if(typeof params.path === "function") {
+      params.path = params.path();
+    }
     gapi.client.request(params);
     return dfd.promise();
   });

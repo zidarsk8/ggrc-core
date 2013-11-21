@@ -6,10 +6,11 @@
  */
 
 (function(can, $) {
+  var gcal_findAll, gcalevent_findAll;
 
   can.Model.Cacheable("CMS.Models.GCal", {
 
-    findAll : function(params) {
+    findAll : (gcal_findAll = function(params) {
       return GGRC.gapi_request_with_auth({
         path : "/calendar/v3/users/me/calendarList"
                + (params && params.id ? "/" + params.id : "")
@@ -27,7 +28,8 @@
           }
         }
       });
-    }
+    })
+    , findOne : gcal_findAll
 
     , getPrimary : function() {
       return GGRC.gapi_request_with_auth({
@@ -46,6 +48,16 @@
         }
       }, {});
     }
+    , refresh : function(params) {
+      return this.constructor.findOne({ id : this.id })
+      .then(can.proxy(this.constructor, "model"))
+      .done(function(d) {
+        d.updated();
+        //  Trigger complete refresh of object -- slow, but fixes live-binding
+        //  redraws in some cases
+        can.trigger(d, "change", "*");
+      });
+    }
 
   });
 
@@ -54,16 +66,19 @@
   can.Model.Cacheable("CMS.Models.GCalEvent", {
 
     getPath : function(params) {
-      return "/calendar/v3/calendars/" + (params && params.calendar ? params.calendar.id : GGRC.config.DEFAULT_CALENDAR.id) + "/events";
+      return ["/calendar/v3/calendars/"
+      , (params && params.calendar ? params.calendar.id : GGRC.config.DEFAULT_CALENDAR.id)
+      , "/events"
+      , (params && params.id ? "/" + params.id : "")
+      , (params && params.q ? "?q=" + encodeURIComponent(params.q) : "")].join("");
     }
 
-    , findAll : function(params) {
-      var q = "";
+    , findAll : (gcalevent_findAll = function(params) {
       if(params && params.response) {
-        q = "PBC Response #" + params.response.id;
+        params.q = "PBC Response #" + params.response.id;
       }
       return GGRC.gapi_request_with_auth({
-        path : this.getPath(params) + "?q=" + encodeURIComponent(q)
+        path : this.proxy("getPath", params)
         , method : "get"
         , callback : function(dfd, result) {
           if(result.error) {
@@ -77,7 +92,8 @@
           }
         }
       });
-    }
+    })
+    , findOne : gcalevent_findAll
     , create : function(params) {
       return GGRC.gapi_request_with_auth({
         path : this.getPath(params)
@@ -136,20 +152,16 @@
       }
     }
   }, {
-    serialize : function(attr) {
-          var serial;
-    if(!attr) {
-      serial = this._super.apply(this, arguments);
-      serial.event_id = serial.event ? serial.event.id : serial.event_id;
-      delete serial.event;
-      serial.calendar_id = serial.calendar ? serial.calendar.id : serial.calendar_id;
-      delete serial.calendar;
-      return serial;
-    }
-      if(attr === "attendees") {
-        return can.map((this.attendees || new can.Model.List()).reify(), function(p) { return {email : p.email}; });
-      }
-      return 
+
+    refresh : function(params) {
+      return this.constructor.findOne({ calendar : calendar, id : this.id })
+      .then(can.proxy(this.constructor, "model"))
+      .done(function(d) {
+        d.updated();
+        //  Trigger complete refresh of object -- slow, but fixes live-binding
+        //  redraws in some cases
+        can.trigger(d, "change", "*");
+      });
     }
   });
 

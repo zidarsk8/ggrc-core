@@ -38,7 +38,7 @@ class ObjectEvent(Base, db.Model):
 
   _publish_attrs = [
       'event_id',
-      'parent_event_id',
+      'calendar_id',
       'eventable',
       ]
 
