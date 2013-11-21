@@ -53,9 +53,11 @@ function dateConverter(d) {
   return ret ? ret.toDate() : undefined;
 }
 
-function makeDateUnpacker(key) {
+function makeDateUnpacker(keys) {
   return function(d) {
-    return dateConverter(d[key] ? d[key] : d);
+    return can.reduce(keys, function(curr, key) {
+      return curr || (d[key] && dateConverter(d[key]));
+    }, null) || d;
   };
 }
 
@@ -471,7 +473,7 @@ can.Model("can.Model.Cacheable", {
   , convert : {
     "date" : dateConverter
     , "datetime" : dateConverter
-    , "packaged_datetime" : makeDateUnpacker("dateTime")
+    , "packaged_datetime" : makeDateUnpacker(["dateTime", "date"])
   }
   , serialize : {
     "datetime" : makeDateSerializer("datetime")

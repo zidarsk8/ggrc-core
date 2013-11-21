@@ -91,7 +91,7 @@ var gdrive_findAll = function(extra_params, extra_path) {
   };
 };
 
-function gapi_request_with_auth(params) {
+var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request_with_auth(params) {
   return window.oauth_dfd.then(function() {
     var dfd = new $.Deferred();
     var cb = params.callback;

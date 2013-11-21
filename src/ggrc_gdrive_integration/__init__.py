@@ -17,9 +17,11 @@ import ggrc_gdrive_integration.models
 
 from ggrc import db
 from ggrc.models import Program, Audit, Request, Response, \
-  DocumentationResponse, InterviewResponse, PopulationSampleResponse, Document
+  DocumentationResponse, InterviewResponse, PopulationSampleResponse, Document, \
+  Meeting
 from .models.object_folder import Folderable
 from .models.object_file import Fileable
+from .models.object_event import Eventable
 Program.__bases__ = (Folderable,) + Program.__bases__
 Program.late_init_folderable()
 Audit.__bases__ = (Folderable,) + Audit.__bases__
@@ -39,6 +41,9 @@ PopulationSampleResponse.late_init_fileable()
 Document.__bases__ = (Fileable,) + \
   Document.__bases__
 Document.late_init_fileable()
+Meeting.__bases__ = (Eventable,) + \
+  Meeting.__bases__
+Meeting.late_init_eventable()
 '''
 Some other spitballs from Dan here:
 
@@ -71,5 +76,6 @@ from ggrc.services.registry import service
 
 all_collections = [
   service('object_folders', models.ObjectFolder),
-  service('object_files', models.ObjectFile)
+  service('object_files', models.ObjectFile),
+  service('object_events', models.ObjectEvent)
 ]
