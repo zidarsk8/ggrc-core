@@ -230,7 +230,8 @@ var admin_list_descriptors = {
     , fetch_post_process : sort_by_name_email
   }
   , "roles" : {
-    model : CMS.Models.Role
+      model : CMS.Models.Role
+    , extra_params : { scope__in: "System,Admin" }
     , object_type : "role"
     , object_category : "governance"
     , object_route : "roles"
