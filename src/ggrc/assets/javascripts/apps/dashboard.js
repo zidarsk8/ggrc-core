@@ -231,7 +231,7 @@ var admin_list_descriptors = {
   }
   , "roles" : {
       model : CMS.Models.Role
-    , extra_params : { scope__in: "System,Admin" }
+    , extra_params : { scope__in: "System,Admin,Private Program" }
     , object_type : "role"
     , object_category : "governance"
     , object_route : "roles"
