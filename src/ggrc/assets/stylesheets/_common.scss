@@ -333,7 +333,7 @@ input.date {
   @include background-size(368px 416px);
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
-  background-position: -4px -244px;
+  background-position: -268px -364px;
 }
 
 //Making input 100% width of his parent element
@@ -618,6 +618,10 @@ select.multiple-selector {
   text-align: left;
 }
 
+.form-search {
+  margin: 0;
+}
+
 // Input file styling
 .input-file-main {
   width: 400px;
@@ -662,11 +666,9 @@ select.multiple-selector {
   &.sticky-header {
     @include box-shadow(inset 0 0 3px 0 #bbb);
     border-top: none !important;
-    padding-bottom:1px;
   }
   &.sticky-footer {
     @include box-shadow(inset 0 0 3px 0 #bbb);
     border-bottom: none !important;
-    padding-top:1px;
   }
 }

@@ -22,8 +22,8 @@ can.Model.Cacheable("can.Model.Join", {
         //can.proxy(this, "reinit"));
 
           can.each(instance.constructor.join_keys, function(cls, key) {
-            if (instance[key].refresh)
-              instance[key].refresh();
+            if (instance[key].reify && instance[key].reify().refresh)
+              instance[key].reify().refresh();
             else {
               var obj =
                 cls.findInCacheById(instance[key].id);

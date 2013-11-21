@@ -146,14 +146,16 @@ Feature: Private Programs
       | resource_type    |
       #FIXME add back when Auditor role is defined | Audit            |
       #| Categorization   |
-      | Category         |
       | Control          |
+      | ControlAssertion |
+      | ControlCategory  |
       | ControlControl   |
       | ControlSection   |
       | DataAsset        |
       | Contract         |
       | Policy           |
       | Regulation       |
+      | Standard         |
       | DirectiveControl |
       | Document         |
       | Facility         |

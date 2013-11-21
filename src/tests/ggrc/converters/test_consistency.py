@@ -56,13 +56,21 @@ class TestConsistency(TestCase):
     db.session.add(pol1)
     db.session.commit()
     # import from spreadsheet to add to it
-    import_options = {'directive_id': pol1.id, 'dry_run': False}
+    import_options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
     handle_csv_import(
         ControlsConverter,
         csv_filename,
         **import_options
     )
-    export_options = {'directive': pol1, 'export': True}
+    export_options = {
+        'parent_type': Policy,
+        'parent_id': pol1.id,
+        'export': True,
+    }
     # then export right back
     handle_converter_csv_export(
         "dummy_filename.csv",

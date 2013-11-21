@@ -30,8 +30,10 @@
 -block extra_javascript
   GGRC.permissions = ={ permissions_json()|safe };
   GGRC.current_user = ={ current_user_json()|safe };
+  GGRC.config = ={ config_json()|safe };
 
 -block page_help scoped
+  dashboard
 
 -block body
   -# FIXME: Fix page_type_attributes, etc
@@ -69,6 +71,10 @@
                         =current_user.email
                     %i.grcicon-carot-white
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+                    %li
+                      %a{'href': "/dashboard"}
+                        %i.grcicon-dashboard
+                        My Work
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
                         %a{'href': "/admin"}
@@ -162,7 +168,7 @@
           -#NEW LHS
           %form.form-search{ 'onsubmit': 'return false' }
             .lhs-search.input-append<
-              %input.widgetsearch{ 'type': 'text', 'placeholder': 'Enter text to search' }>
+              %input.widgetsearch{ 'type': 'text', 'placeholder': 'Enter text' }>
               %label.checkbox.btn<
                 %input.my-work{ 'type': 'checkbox' }
                 My Work
@@ -177,6 +183,7 @@
               =search_result('Regulation', 'regulations', 'governance')
               =search_result('Contract', 'contracts', 'governance')
               =search_result('Policy', 'policies', 'governance')
+              =search_result('Standard', 'standards', 'governance')
               =search_result('Objective', 'objectives', 'governance')
               =search_result('Control', 'controls', 'governance')
             %h2.business Assets/Business

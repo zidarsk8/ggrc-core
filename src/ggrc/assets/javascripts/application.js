@@ -121,6 +121,7 @@ jQuery.extend(GGRC, {
       }*/
       , "contract" : CMS.Models.Contract
       , "policy" : CMS.Models.Policy
+      , "standard" : CMS.Models.Standard
       , "regulation" : CMS.Models.Regulation
       , "org_group" : CMS.Models.OrgGroup
       , "project" : CMS.Models.Project
@@ -796,7 +797,23 @@ $(window).load(function(){
     return false;
     
   });
-
+  
+  // Evidence cleanup
+  $('body').on('click', '.generated-tree li .item-main .row-fluid', function() {
+    $('.generated-tree li').each(function() {
+      var $this = $(this),
+          $urlOneline = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:nth-child(3n) .span12'),
+          $editLink = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:last-child a');
+      
+      function tierClean() {
+        $urlOneline.removeClass('span12').addClass('span6');
+        $editLink.addClass('info-action');
+        $editLink.find('i.grcicon-edit').css('margin-top', '7px');
+        $editLink.closest('.span12').css('margin-top', '-7px');
+      }
+      setTimeout(tierClean,100)
+    });
+  });
 });
 
 jQuery(function($){
@@ -852,9 +869,6 @@ jQuery(function($){
     .find(".modal-header [data-dismiss='modal']").css("opacity", 1);
   });
 
-can.reduce ||
-  (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
-
   $(document.body).on("change", ".rotate_control_assessment", function(ev) { 
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
@@ -871,4 +885,6 @@ can.reduce ||
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
 // hello
+can.reduce ||
+  (can.reduce = function(a, f, i) { if(a==null) return null; return [].reduce.apply(a, arguments.length < 3 ? [f] : [f, i]) });
 })(window.jQuery);

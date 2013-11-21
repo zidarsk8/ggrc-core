@@ -116,13 +116,15 @@ can.Control("GGRC.Controllers.Modals", {
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
-          GGRC.Models.Search
+          ctl.bindXHRToButton(GGRC.Models.Search
           .search_for_types(
               request.term || '',
               [$that.data("lookup")],
               {
-                __permission_type: 'create'
-                , __permission_model: 'Object' + $that.data("lookup")
+              // FIXME: Remove or figure out when this is necessary.
+              //{
+              //  __permission_type: 'create'
+              //  , __permission_model: 'Object' + $that.data("lookup")
               })
           .then(function(search_result) {
             var objects = search_result.getResultsForType($that.data("lookup"))
@@ -141,7 +143,7 @@ can.Control("GGRC.Controllers.Modals", {
                 that._trigger( "open" );
               }
             });
-          });
+          }), $that, null, false);
         }
         , select : ctl.proxy("autocomplete_select", $that)
         , close : function() {
@@ -160,15 +162,29 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , autocomplete_select : function(el, event, ui) {
+    var original_event;
     if(ui.item) {
       var path = el.attr("name").split(".");
       path.pop();
       path = path.join(".");
       this.options.instance.attr(path, ui.item.stub());
     } else {
-      $(event.currentTarget).one("modal:success", function(ev, new_obj) {
+      original_event = event;
+
+      $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
         el.data("ui-autocomplete").options.select(event, {item : new_obj});
+      }).one("hidden", function() {
+        setTimeout(function() {
+          $(this).off(".autocomplete");
+        }, 100);
       });
+      while(original_event = original_event.originalEvent) {
+        if(original_event.type === "keydown") {
+          //This selection event was generated from a keydown, so click the add new link.
+          el.data("ui-autocomplete").menu.active.find("a").click();
+          break;
+        }
+      }
       return false;
     }
   }
@@ -206,9 +222,12 @@ can.Control("GGRC.Controllers.Modals", {
               that.options.attr("instance", new that.options.model(params));
               return that.options.instance;
             }
+          }).done(function() {
+            that.on(); //listen to instance.
           });
     } else {
       this.options.attr("instance", new can.Observe(params));
+      that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
@@ -381,7 +400,12 @@ can.Control("GGRC.Controllers.Modals", {
       // FIXME: This should not depend on presence of `<model>.attributes`
       if (instance.isNew() && instance.constructor.attributes.owners &&
           !instance.owners) {
-        instance.attr('owners', [{ id: GGRC.current_user.id }]);
+        // Do not add an owner to a private program. Ownership is managed
+        // through role assignment for private programs.
+        if (!(instance instanceof CMS.Models.Program) || !instance.private)
+        {
+          instance.attr('owners', [{ id: GGRC.current_user.id }]);
+        }
       }
 
       ajd = instance.save().done(function(obj) {
@@ -439,6 +463,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     });
   }
+
+  , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
       if (this.options.instance instanceof can.Model

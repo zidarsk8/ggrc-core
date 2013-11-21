@@ -17,13 +17,15 @@ Feature: String and Text column HTML sanitization
   Examples:
       | resource_type     | properties |
       #| Audit             | description, title, audit_firm, gdrive_evidence_folder |
-      | Category          | name |
       | Context           | description, name |
       | Control           | description, title, documentation_description, version, notes |
+      | ControlCategory   | name |
+      | ControlAssertion  | name |
       | DataAsset         | title, description |
       | Contract          | title, version, scope, description, organization |
       | Policy            | title, version, scope, description, organization |
       | Regulation        | title, version, scope, description, organization |
+      | Standard          | title, version, scope, description, organization |
       | Document          | title, description |
       | Facility          | title, description |
       | Help              | title, content |

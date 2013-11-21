@@ -110,12 +110,21 @@ $.extend(Permission, (function() {
 
   is_allowed_for = function(action, resource) {
     return _is_allowed_for(GGRC.permissions, resource, action);
-  }
+  };
+
+  is_allowed_any = function(action, resource_type) {
+    var allowed = is_allowed(action, resource_type);
+    if (!allowed) {
+      allowed = GGRC.permissions[action] && GGRC.permissions[action][resource_type] && GGRC.permissions[action][resource_type].contexts.length;
+    }
+    return !!allowed;
+  };
 
   return {
       _is_allowed: _is_allowed
     , is_allowed: is_allowed
     , is_allowed_for: is_allowed_for
+    , is_allowed_any: is_allowed_any
     , page_context_id: function() {
         var page_instance = GGRC.page_instance();
         return (page_instance && page_instance.context && page_instance.context.id) || null;

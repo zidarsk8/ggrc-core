@@ -46,14 +46,16 @@ Feature: RBAC Permissions enforcement for REST API
 
   Examples:
       | resource_type      |
-      | Category           |
       | Control            |
+      | ControlCategory    |
+      | ControlAssertion   |
       | ControlRisk        |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
+      | Standard           |
       | Document           |
       | Facility           |
       | Help               |
@@ -122,14 +124,16 @@ Feature: RBAC Permissions enforcement for REST API
 
   Examples:
       | resource_type      |
-      | Category           |
       | Control            |
+      | ControlCategory    |
+      | ControlAssertion   |
       | ControlRisk        |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
+      | Standard           |
       | Document           |
       | Facility           |
       | Help               |
@@ -208,14 +212,16 @@ Feature: RBAC Permissions enforcement for REST API
 
   Examples:
       | resource_type      |
-      | Category           |
       | Control            |
+      | ControlCategory    |
+      | ControlAssertion   |
       | ControlRisk        |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
+      | Standard           |
       | Document           |
       | Facility           |
       | Help               |
@@ -296,14 +302,16 @@ Feature: RBAC Permissions enforcement for REST API
 
   Examples:
       | resource_type      |
-      | Category           |
       | Control            |
+      | ControlCategory    |
+      | ControlAssertion   |
       | ControlRisk        |
       | DataAsset          |
       #| Directive          |
       | Contract           |
       | Policy             |
       | Regulation         |
+      | Standard           |
       | Document           |
       | Facility           |
       | Help               |
@@ -571,9 +579,9 @@ Feature: RBAC Permissions enforcement for REST API
     And "resource2" is not in query result
 
   Examples: Resources
-      | resource_type | property_name | match_value         |
-      | Category      | name          | category1           |
-      | Category      | scope_id      | 3                   |
-      | Help          | title         | foo                 |
-      | Program       | start_date    | 2013-06-03T00:00:00 |
+      | resource_type    | property_name | match_value         |
+      | ControlCategory  | name          | category1           |
+      | ControlAssertion | name          | assertion1          |
+      | Help             | title         | foo                 |
+      | Program          | start_date    | 2013-06-03T00:00:00 |
 

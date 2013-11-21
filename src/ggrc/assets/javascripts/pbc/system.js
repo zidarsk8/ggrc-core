@@ -100,6 +100,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "Risk" : {}
       , "Regulation" : {}
       , "Policy" : {}
+      , "Standard" : {}
       , "Contract" : {}
       , "Objective" : {}
       }
@@ -127,7 +128,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      owner : "CMS.Models.Person.stub"
+      contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -150,7 +151,13 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     }
   , init : function() {
     this._super && this._super.apply(this, arguments);
-    this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);
+    this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options, {
+      // systems is a special case; can be imported to programs
+      footer_view: GGRC.mustache_path +
+        (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program
+          ? "/systems/tree_footer.mustache"
+          : "/base_objects/tree_footer.mustache")
+    });
     this.tree_view_options.child_options[1].model = this;
     this.validatePresenceOf("title");
   } //don't rebind the ObjectDocument/ObjectPerson events.
@@ -177,7 +184,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      owner : "CMS.Models.Person.stub"
+      contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

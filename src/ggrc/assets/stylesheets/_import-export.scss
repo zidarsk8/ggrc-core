@@ -30,6 +30,7 @@ form.import {
   h2 {
     font-size:24px;
     font-weight:normal;
+    margin-bottom: 16px;
   }
   h3 {
     font-size:18px;
@@ -118,4 +119,18 @@ form.import {
 .download-template {
   text-align: right;
   font-weight: bold;
+  a {
+    font-size: 11px;
+    color: $widgetTitle;
+    text-transform: uppercase;
+    @include opacity(0.4);
+    @include transition(opacity 0.2s ease);
+    text-decoration: none;
+    i {
+      margin-top: 2px;
+    }
+    &:hover {
+      @include opacity(1);
+    }
+  }
 }

@@ -9,14 +9,14 @@
 #from .account import Account
 from .audit import Audit
 from .categorization import Categorization
-from .category import Category
+from .category import CategoryBase
 from .context import Context
-from .control import Control
+from .control import Control, ControlCategory, ControlAssertion
 from .control_control import ControlControl
 from .control_risk import ControlRisk
 from .control_section import ControlSection
 from .data_asset import DataAsset
-from .directive import Directive, Regulation, Policy, Contract
+from .directive import Directive, Regulation, Policy, Contract, Standard
 from .directive_control import DirectiveControl
 from .document import Document
 from .facility import Facility
@@ -57,7 +57,9 @@ from .event import Event
 all_models = [
   Audit,
   Categorization,
-  Category,
+  CategoryBase,
+    ControlCategory,
+    ControlAssertion,
   Context,
   Control,
   ControlControl,
@@ -68,6 +70,7 @@ all_models = [
     Contract,
     Policy,
     Regulation,
+    Standard,
   DirectiveControl,
   Document,
   Facility,

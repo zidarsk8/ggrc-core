@@ -13,13 +13,9 @@
 -block title
   =instance.title
 
--block page_help scoped
-  =model_name
-
 -block extra_javascript
   =super()
   GGRC.page_object = ={ instance_json()|safe };
-  GGRC.config = ={config_json()|safe};
 
 -block header
   %h1{ 'class': "={ model_display_class }" }
@@ -54,6 +50,8 @@
         %i.grcicon-policy
       -elif model_title == "Regulation"
         %i.grcicon-regulation
+      -elif model_title == "Standard"
+        %i.grcicon-standard
       -else
         &nbsp;
     =instance.title

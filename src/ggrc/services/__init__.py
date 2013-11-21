@@ -21,7 +21,9 @@ def all_collections():
   ret = [
     service('audits', models.Audit),
     service('categorizations', models.Categorization),
-    service('categories', models.Category),
+    service('category_bases', models.CategoryBase),
+      service('control_categories', models.ControlCategory),
+      service('control_assertions', models.ControlAssertion),
     service('contexts', models.Context),
     service('controls', models.Control),
     service('control_controls', models.ControlControl),
@@ -32,6 +34,7 @@ def all_collections():
       service('contracts', models.Contract),
       service('policies', models.Policy),
       service('regulations', models.Regulation),
+      service('standards', models.Standard),
     service('directive_controls', models.DirectiveControl),
     service('documents', models.Document),
     service('events', models.Event, ReadOnlyResource),

@@ -419,6 +419,13 @@ Mustache.registerHelper("if_match", function(val1, val2, options) {
   return exec();
 });
 
+Mustache.registerHelper("in_array", function(needle, haystack, options) {
+  needle = resolve_computed(needle);
+  haystack = resolve_computed(haystack);
+
+  return options[~can.inArray(needle, haystack) ? "fn" : "inverse"](options.contexts);
+});
+
 Mustache.registerHelper("if_null", function(val1, options) {
   var that = this, _val1;
   function exec() {
@@ -846,7 +853,7 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
     return [
         '<option value=""'
       ,   !selected_id ? ' selected=selected' : ''
-      , '>None</option>'
+      , '>---</option>'
       , can.map(options, function(option) {
           return [
             '<option value="', option.id, '"'
@@ -862,14 +869,16 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("category_select", function(object, attr_name, scope) {
-  var selected_options = object.attr(attr_name) || []
+Mustache.registerHelper("category_select", function(object, attr_name, category_type) {
+  var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
     , selected_ids = can.map(selected_options, function(selected_option) {
         return selected_option.id;
       })
-    , options_dfd = CMS.Models.Category.for_scope(scope)
+    , options_dfd = CMS.Models[category_type].findAll()
     , tag_prefix =
-        'select class="span12" model="Category" multiple="multiple"' +
+        'select class="span12"' +
+        ' model="' + category_type + '"' +
+        ' multiple="multiple"' +
         ' name="' + attr_name + '"'
     ;
 
@@ -993,7 +1002,8 @@ Mustache.registerHelper("using", function(options) {
   }
 
   function finish() {
-    return options.fn(frame);
+    return options.fn(
+        $.extend([], options.contexts, options.contexts.concat([frame])));
   }
 
   return defer_render('span', finish, refresh_queue.trigger());
@@ -1015,7 +1025,7 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
   options = arguments[2] || options;
 
   function finish(list) {
-    return options.fn(frame);
+    return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
 
   return defer_render('span', finish, loader.refresh_instances());
@@ -1177,6 +1187,7 @@ Mustache.registerHelper("is_allowed", function() {
     , resource_type
     , context_unset = new Object()
     , context_id = context_unset
+    , context_override
     , options = args[args.length-1]
     , passed = true
     ;
@@ -1203,8 +1214,10 @@ Mustache.registerHelper("is_allowed", function() {
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
       context_id = null;
-    else if (context_id === 'for')
+    else if (context_id === 'for' || context_id === 'any') {
+      context_override = context_id;
       context_id = undefined;
+    }
   }
 
   if (resource_type && context_id === context_unset) {
@@ -1226,8 +1239,11 @@ Mustache.registerHelper("is_allowed", function() {
     if (context_id !== undefined) {
       passed = passed && Permission.is_allowed(action, resource_type, context_id);
     }
-    if (resource) {
+    if (passed && context_override === 'for' && resource) {
       passed = passed && Permission.is_allowed_for(action, resource);
+    }
+    else if (passed && context_override === 'any' && resource_type) {
+      passed = passed && Permission.is_allowed_any(action, resource_type);
     }
   });
 
@@ -1487,6 +1503,8 @@ Mustache.registerHelper("delete_counts", function(instance, options) {
       }
       else
         root.attr('orphaned_status', 'failed');
+    }).fail(function(){
+      root.attr('orphaned_status', 'failed');
     });
   }
 
@@ -1562,14 +1580,50 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       , roles: new can.Observe.List()
     });
 
-    // Check for owner
-    if (instance.owner && instance.owner.id === person.id) {
-      state.attr('roles').push('Owner/POC');
+    // Check for contact
+    if (instance.contact && instance.contact.id === person.id) {
+      state.attr('roles').push('Contact');
+    }
+
+    // Check for Audit roles
+    if (instance instanceof CMS.Models.Audit) {
+      var requests = instance.requests || new can.Observe.List()
+        , refresh_queue = new RefreshQueue()
+        ;
+
+      refresh_queue.enqueue(requests.reify());
+      refresh_queue.trigger().then(function(requests) {
+        can.each(requests, function(request) {
+          var responses = request.responses || new can.Observe.List()
+            , refresh_queue = new RefreshQueue()
+            ;
+
+          refresh_queue.enqueue(responses.reify());
+          refresh_queue.trigger().then(function(responses) {
+            can.each(responses, function(response) {
+              if (response.contact && response.contact.id === person.id
+                  && !~can.inArray('Response Contact', state.attr('roles'))) {
+                state.attr('roles').push('Response Contact');
+              }
+            })
+          });
+
+          if (request.assignee && request.assignee.id === person.id
+              && !~can.inArray('Request Assignee', state.attr('roles'))) {
+            state.attr('roles').push('Request Assignee');
+          };
+        });
+      });
     }
 
     // Check for people
     if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
       state.attr('roles').push('Mapped');
+    }
+
+    // Check for ownership
+    if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
+      state.attr('roles').push('Owner');
     }
 
     // Check for authorizations
@@ -1677,5 +1731,18 @@ Mustache.registerHelper("param_current_location", function() {
   return window.encodeURIComponent(path + fragment);
 });
 
+Mustache.registerHelper("sum", function() {
+  var sum = 0;
+  for (var i = 0; i < arguments.length - 1; i++) {
+    sum += parseInt(resolve_computed(arguments[i]), 10);
+  }
+  return ''+sum;
+});
+
+Mustache.registerHelper("to_class", function(prop, delimiter, options) {
+  prop = resolve_computed(prop);
+  delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
+  return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
+});
 
 })(this, jQuery, can);

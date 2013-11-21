@@ -59,12 +59,14 @@ Feature: Collections can be paged
   Examples:
       | resource_type      |
       #| Audit              |
-      | Category           |
+      | ControlCategory    |
+      | ControlAssertion   |
       | Control            |
       | DataAsset          |
       | Contract           |
       | Policy             |
       | Regulation         |
+      | Standard           |
       | Document           |
       | Facility           |
       | Help               |

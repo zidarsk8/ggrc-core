@@ -38,6 +38,13 @@ var model_descriptors = {
     , object_route : "directives"
     , object_display : "Regulations"
   }
+  , "standard" : {
+    model : CMS.Models.Standard
+    , object_type : "standard"
+    , object_category : "governance"
+    , object_route : "directives"
+    , object_display : "Standards"
+  }
   , "policy" : {
     model : CMS.Models.Policy
     , object_type : "policy"
@@ -206,11 +213,19 @@ var sort_by_name_email = function(list) {
 var admin_list_descriptors = {
   "people" : {
       model : CMS.Models.Person
+    , roles: new can.Observe.List()
+    , init : function() {
+        var self = this;
+        CMS.Models.Role.findAll({ scope__in: "System,Admin" }).done(function(roles) {
+          self.roles.replace(sort_by_name_email(roles));
+        });
+      }
     , object_type : "person"
     , object_category : "governance"
     , object_route : "people"
     , object_display : "People"
     , tooltip_view : "/static/mustache/people/object_tooltip.mustache"
+    , header_view : "/static/mustache/people/filters.mustache"
     , list_view : "/static/mustache/people/object_list.mustache"
     , fetch_post_process : sort_by_name_email
   }
@@ -299,7 +314,7 @@ function authorizations_list_loader() {
     .then(collated_user_roles_by_person);
 }
 
-var admin_widget_descriptors = {
+GGRC.admin_widget_descriptors = {
   "people" : {
       "model" : CMS.Models.Person
     , "content_controller": GGRC.Controllers.ListView
@@ -363,7 +378,7 @@ if (/admin\/\d+/.test(window.location)) {
 
 dashboard_menu_spec = [
   { title : "Governance / Compliance"
-  , objects: [ "regulation", "policy", "contract", "control" ]
+  , objects: [ "regulation", "policy", "standard", "contract", "control" ]
   },
   { title : "Asset / Business"
   , objects: [ "system", "process", "project"
@@ -378,7 +393,7 @@ dashboard_menu_spec = [
 ]
 
 //function make_admin_menu(widget_descriptors) {
-var admin_menu_spec = [
+GGRC.admin_menu_spec = [
   { title : "Admin"
   , objects: [ "roles", "events", "people" ]
   }
@@ -428,7 +443,8 @@ $(function() {
         }
     };
 
-    if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
+    if (/^\/\w+\/\d+($|\?|\#)/.test(window.location.pathname) || /^\/dashboard/.test(window.location.pathname)) {
+    //if (/\w+\/\d+($|\?|\#)/.test(window.location) || /dashboard/.test(window.location)) {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
@@ -447,8 +463,8 @@ $(function() {
         }, extra_page_options[model_name]));
     } else if (/admin/.test(window.location)) {
       $area.cms_controllers_dashboard({
-          widget_descriptors: admin_widget_descriptors
-        , menu_tree_spec: admin_menu_spec
+          widget_descriptors: GGRC.admin_widget_descriptors
+        , menu_tree_spec: GGRC.admin_menu_spec
         , default_widgets : ["people", "roles", "events"]
       });
     } else {

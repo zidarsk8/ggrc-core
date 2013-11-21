@@ -1,13 +1,13 @@
-Type,{{directive_kind}} Code,,,,,,,,,,,,,,,,,
-Controls,{{directive_slug}},,,,,,,,,,,,,,,,,
+Type,{{object_kind}} Code,,,,,,,,,,,,,,,,,
+Controls,{{object_slug}},,,,,,,,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <Regulation Code> are very important.  
 
 For Control Import, Type should be ""Controls"", in cell A2.
 
 Then copy the Code from your Regulation Info widget on your Regulation page in gGRC to cell B2 above",,,,,,,,,,,,,,,,,
-"*Optional
+"*Required
 
-If you leave this field blank, the gGRC system will generate Codes automatically upon creation of the new object.  If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.  Otherwise, we recommend you leave this blank.
+If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
 
 Enter the Codes for already existing objects if you want to use Import as a means to edit and update those objects.","*Required
 

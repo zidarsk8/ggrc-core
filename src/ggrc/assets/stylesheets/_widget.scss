@@ -86,7 +86,8 @@
           &.text-policy,
           &.text-directive,
           &.text-contract,
-          &.text-regulation {
+          &.text-regulation,
+          &.text-standard {
             a {
               color:$governance;  
             }
@@ -492,6 +493,12 @@
   }
   .info {
     padding:5px 16px 0 16px;
+    &.person-info {
+      padding: 5px 0 0 0;
+      > div {
+        overflow: hidden;
+      }
+    }
     p {
       margin:0;
       padding-bottom:9px;
@@ -642,6 +649,9 @@
     line-height: 24px;
     height: 24px;
     margin-bottom: 0;
+  }
+  &.search-filters select {
+    width: auto;
   }
   .objective-selector {
     @include clearfix();
@@ -836,6 +846,18 @@
     @include reset-list();
     li {
       padding-bottom: 6px;
+    }
+    .email,
+    .company,
+    .role {
+      font-size: 13px;
+    }
+    .role {
+      color: $green;
+      font-weight:bold;
+    }
+    .name {
+      font-size: 14px;
     }
   }
   .profile-contact {

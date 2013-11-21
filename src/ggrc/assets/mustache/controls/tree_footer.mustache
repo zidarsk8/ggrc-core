@@ -6,7 +6,7 @@
 }}
 
 {{#if allow_mapping_or_creating}}
-{{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Contract)$'}}
+{{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Standard|Contract|Program)$'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
 <li class="tree-footer tree-item tree-item-add">
@@ -16,7 +16,7 @@
         + {{model.title_singular}}
       </a>
       <span class="section-expander">
-        <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Control" data-object-plural="controls" data-object-params='{ "directive": {{parent_instance.id}} }'>
+        <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Control" data-object-plural="controls" data-object-params='{ "directive": { "type": "{{parent_instance.constructor.shortName}}", "id": {{parent_instance.id}} } }'>
           <i class="grcicon-add-black"></i>
           Create {{model.title_singular}}
         </a>

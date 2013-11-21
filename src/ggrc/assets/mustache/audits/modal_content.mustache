@@ -41,8 +41,8 @@
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label> 
       {{#if new_object_form}}
-        {{#using program=instance.program}}
-        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title program}}" tabindex="2">
+        {{#using program_reified=instance.program}}
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title program_reified}}" tabindex="2">
         {{/using}}
       {{else}}
         <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2">
@@ -134,8 +134,8 @@
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          {{#using owner=instance.owner}}
-          <input tabindex="9" type="text" name="owner.email" data-lookup="Person" class="span8 audit-selector" value="{{firstnonempty owner.email ''}}">
+          {{#using contact=instance.contact}}
+          <input tabindex="9" type="text" name="contact.email" data-lookup="Person" class="span8 audit-selector" value="{{firstnonempty contact.email ''}}">
           {{/using}}
         </div>
         
@@ -144,7 +144,9 @@
         </label>
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
         <div class="objective-selector">
-          <input tabindex="10" type="text" name="audit_firm" class="span8" value="{{audit_firm}}">
+          {{#using audit_firm=instance.audit_firm}}
+          <input tabindex="10" type="text" name="audit_firm.email" data-lookup="OrgGroup" class="span8" value="{{firstnonempty audit_firm.title ''}}">
+          {{/using}}
         </div>
       </div>
     </div>

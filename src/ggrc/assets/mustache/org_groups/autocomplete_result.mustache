@@ -1,0 +1,31 @@
+{{#this}}
+<li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
+  <a href="javascript://">
+    {{title}} <span class="small">{{slug}}</span>
+  </a>
+  <div class="extended-content">
+    <div class="row-fluid">
+      <div class="span12">
+        {{title}}
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        {{{description}}}
+      </div>
+    </div>
+  </div>
+</li>
+{{/this}}
+{{^this}}
+<li data-ui-autocomplete-item="">
+  No results
+</li>
+{{/this}}
+{{#is_allowed "create" "OrgGroup" context=null}}
+<li class="ui-menu-item add-new">
+  <a data-object-plural="org_groups" data-modal-class="modal-wide" href="javascript://" data-object-singular="OrgGroup" data-toggle="modal-ajax-form" data-modal-reset="reset" >
+    + Create New
+  </a>
+</li>
+{{/is_allowed}}

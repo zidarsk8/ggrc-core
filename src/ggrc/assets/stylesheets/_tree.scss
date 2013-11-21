@@ -7,7 +7,8 @@
 
 ul.new-tree {
   @include reset-list();
-  a.openclose {
+  .openclose {
+    cursor: pointer;
     .row-fluid {
       &:hover {
         background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
@@ -73,7 +74,8 @@ ul.new-tree {
             &.objective,
             &.contract,
             &.policy,
-            &.regulation {
+            &.regulation,
+            &.standard {
               color:$governance;
             }
             &.business,
@@ -160,7 +162,8 @@ ul.new-tree {
               &.objective,
               &.contract,
               &.policy,
-              &.regulation {
+              &.regulation,
+              &.standard {
                 color:$governance;
               }
               &.business,
@@ -244,53 +247,6 @@ ul.new-tree {
     }
   }
   
-  &.text-color {
-    li.tree-item {
-      &.rq-draft {
-        background: $white;
-        .tree-title-area {
-          color: $rqDraft;
-        }
-      }
-      &.rq-requested {
-        background: $white;
-        .tree-title-area {
-          color: $rqStarted;
-        }
-      }
-      &.rq-responded {
-        background: $white;
-        .tree-title-area {
-          color: $rqStarted;
-        }
-      }
-      &.rq-amended-request {
-        background: $white;
-        .tree-title-area {
-          color: $rqStarted;
-        }
-      }
-      &.rq-updated-response {
-        background: $white;
-        .tree-title-area {
-          color: $rqStarted;
-        }
-      }
-      &.rq-accepted {
-        background: $white;
-        .tree-title-area {
-          color: $rqAccepted;
-        }
-      }
-      &.rq-warning {
-        background: $white;
-        .tree-title-area {
-          color: $orange;
-        }
-      }
-    }
-  }
-  
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:31px;
@@ -352,7 +308,8 @@ ul.new-tree {
     &.objective,
     &.contract,
     &.policy,
-    &.regulation
+    &.regulation,
+    &.standard
       {
       .item-data {
         color:$governance;
@@ -383,27 +340,6 @@ ul.new-tree {
       .item-data {
         color:$programs;
       }
-    }
-    &.rq-draft {
-      background: $rqDraft;
-    }
-    &.rq-requested {
-      background: $rqStarted;
-    }
-    &.rq-responded {
-      background: $rqStarted;
-    }
-    &.rq-amended-request {
-      background: $rqStarted;
-    }
-    &.rq-updated-response {
-      background: $rqStarted;
-    }
-    &.rq-accepted {
-      background: $rqAccepted;
-    }
-    &.rq-warning {
-      background: $orange;
     }
     .small {
       font-size:$f-small;
@@ -466,6 +402,324 @@ ul.new-tree {
       }
     }
   }
+  &.rq-colors {
+    li.tree-item {
+      padding: 1px 1px 0px 1px;
+      background: $white;
+      border-bottom: none !important;
+      &:last-child {
+        padding-bottom: 1px;
+        border-bottom: 1px solid #ccc !important;
+      }
+      &.tree-item-add {
+        padding: 0 0 0 20px;
+      }
+      .tree-title-area {
+        [class^="grcicon-"] {
+          display: inline-block;
+        }
+      }
+      .new-tree {
+        li.tree-item {
+          padding: 0;
+          background: #fafafa;
+          border-bottom: 1px solid #ddd !important;
+          &.tree-item-add {
+            padding: 0 0 0 20px;
+          }
+          .item-main {
+            .row-fluid {
+              background: #fafafa;
+              &:hover {
+                background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                @include background-size(30px 6px);
+              }
+            }
+          }
+        }
+      }
+      &.rq-draft {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqDraft;
+            border-bottom: 1px solid #d8d8d8;
+            .tree-title-area {
+              color: $text;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-requested {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqStarted;
+            border-bottom: 1px solid #f0f076;
+            .tree-title-area {
+              color: $darkText;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-responded {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqStarted;
+            border-bottom: 1px solid #f0f076;
+            .tree-title-area {
+              color: $darkText;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-amended-request {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqStarted;
+            border-bottom: 1px solid #f0f076;
+            .tree-title-area {
+              color: $darkText;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-updated-response {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqStarted;
+            border-bottom: 1px solid #f0f076;
+            .tree-title-area {
+              color: $darkText;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-accepted {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqAccepted;
+            border-bottom: 1px solid #a8de84;
+            .tree-title-area {
+              color: #3e7b39;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+      &.rq-warning {
+        .item-main {
+          &:hover {
+            .row-fluid {
+              background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+              @include background-size(30px 6px);
+              .row-fluid {
+                background-image: none;
+              }
+            }
+          }
+          .row-fluid {
+            background: $rqWarning;
+            border-bottom: 1px solid #f1977a;
+            .tree-title-area {
+              color: #c73535;
+            }
+            .row-fluid {
+              border-bottom: none;
+            }
+          }
+        }
+        .new-tree {
+          li.tree-item {
+            .item-main {
+              .row-fluid {
+                background: #fafafa;
+                border-bottom: none !important;
+                .tree-title-area {
+                  color: $black;
+                }
+                &:hover {
+                  background:#e0f4ff image-url("bgnds/hover.png") no-repeat 50% bottom;
+                  @include background-size(30px 6px);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   li.tree-item-add {
     padding-left:20px;
     line-height:30px;
@@ -510,6 +764,7 @@ ul.new-tree {
   }
   .tree-info {
     @include oneline();
+    vertical-align: middle;
     a {
       &.reference {
         display: inline;
@@ -517,6 +772,9 @@ ul.new-tree {
       &.shrink-it {
         display: inline-block;
         @include oneline();
+        line-height: 12px;
+        width: 80% !important;
+        margin-bottom: -2px;
       }
     }
     font-size:13px;
@@ -592,6 +850,9 @@ ul.new-tree {
       //&:last-child {
       //  border-bottom:1px solid #ccc;
       //}
+      .generated-link {
+        @include oneline();
+      }
     }
     &.pbc-list {
       li.tree-item {
@@ -629,6 +890,9 @@ ul.new-tree {
   .top-space {
     margin-top: 6px;
   }
+  .tree-info {
+    line-height: 18px;
+  }
   .info-audit {
     @include reset-list();
     @include clearfix();
@@ -651,7 +915,7 @@ ul.new-tree {
       }
     }
     [class^="grcicon-"] {
-      margin-top: 0;
+      margin-top: 2px;
     }
   }
   .population-upload {
@@ -684,17 +948,26 @@ ul.new-tree {
       font-size:13px;
       color:#777;
     }
+    .email,
     .url-link {
       color:#777;
       font-size:11px;
     }
-    .role,
     .option,
     .scope {
       font-size:11px;
       font-weight:bold;
       text-transform:uppercase;
       color:$green;
+    }
+    .no-role,
+    .role {
+      font-size:11px;
+      font-weight:bold;
+      color:$green;
+    }
+    .no-role {
+      color:$gray;
     }
     .event-action {
       font-size:13px;

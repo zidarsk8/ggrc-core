@@ -1,0 +1,31 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+%table.ggrc-table{cellspacing:"0",cellpadding:"0"}
+  -for a in width_pcts
+    %col{style:"width:{{a}}%" }
+  %thead
+    %tr
+      -for a in column_names
+        -if a in header_overrides
+          %th
+            {{header_overrides[a]}}
+        -else
+          %th
+            {{converter.get_header_for_object_column(a)}}
+  %tbody
+    %tr
+      %td{colspan:"{{width_pcts|length}}",cellspacing:"0",cellpadding:"0"}
+        .inner-ggrc-table
+          %table.inner-ggrc-table{cellspacing:"0",cellpadding:"0"}
+            -for a in width_pcts
+              %col{style:"width:{{a}}%"}
+            %tbody
+              -for result in results
+                -set parity = "even" if (loop.index % 2 == 0) else "odd"
+                %tr{class:"={parity}"}
+                  -for col_name in column_names
+                    -set cellvalue = result[col_name]
+                    -include "programs/_import_cell.haml"

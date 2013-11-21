@@ -7,6 +7,7 @@ from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from .associationproxy import association_proxy
+from .category import CategoryBase
 from .categorization import Categorizable
 from .mixins import (
     deferred, BusinessObject, Hierarchical, Timeboxed,
@@ -17,20 +18,68 @@ from .object_person import Personable
 from .reflection import PublishOnly
 from .utils import validate_option
 
-CATEGORY_CONTROL_TYPE_ID = 100
-CATEGORY_ASSERTION_TYPE_ID = 102
+
+class ControlCategory(CategoryBase):
+  __mapper_args__ = {
+      'polymorphic_identity': 'ControlCategory'
+      }
+  _table_plural = 'control_categories'
+
+
+class ControlAssertion(CategoryBase):
+  __mapper_args__ = {
+      'polymorphic_identity': 'ControlAssertion'
+      }
+  _table_plural = 'control_assertions'
+
 
 class ControlCategorized(Categorizable):
   @declared_attr
   def categorizations(cls):
-    return cls._categorizations(
-        'categorizations', 'categories', CATEGORY_CONTROL_TYPE_ID)
+    return cls.declare_categorizable(
+      "ControlCategory", "category", "categories", "categorizations")
+
+  _publish_attrs = [
+      'categories',
+      PublishOnly('categorizations'),
+      ]
+
+  _include_links = [
+      #'categories',
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+    query = super(AssertionCategorized, cls).eager_query()
+    return query.options(
+        orm.subqueryload_all('categorizations.category'),
+        )
+
 
 class AssertionCategorized(Categorizable):
   @declared_attr
   def assertations(cls):
-    return cls._categorizations(
-        'assertations', 'assertions', CATEGORY_ASSERTION_TYPE_ID)
+    return cls.declare_categorizable(
+      "ControlAssertion", "assertion", "assertions", "assertations")
+
+  _publish_attrs = [
+      'assertions',
+      PublishOnly('assertations'),
+      ]
+
+  _include_links = [
+      #'assertions',
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+    query = super(AssertionCategorized, cls).eager_query()
+    return query.options(
+        orm.subqueryload_all('assertations.category'),
+        )
+
 
 class Control(
     Documentable, Personable, ControlCategorized, AssertionCategorized,
@@ -40,7 +89,6 @@ class Control(
   company_control = deferred(db.Column(db.Boolean), 'Control')
   directive_id = deferred(
       db.Column(db.Integer, db.ForeignKey('directives.id')), 'Control')
-  type_id = deferred(db.Column(db.Integer), 'Control')
   kind_id = deferred(db.Column(db.Integer), 'Control')
   means_id = deferred(db.Column(db.Integer), 'Control')
   version = deferred(db.Column(db.String), 'Control')
@@ -49,13 +97,16 @@ class Control(
   fraud_related = deferred(db.Column(db.Boolean), 'Control')
   key_control = deferred(db.Column(db.Boolean), 'Control')
   active = deferred(db.Column(db.Boolean), 'Control')
-  notes = deferred(db.Column(db.Text), 'Control')
+  principal_assessor_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
+  secondary_assessor_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
 
-  type = db.relationship(
-      'Option',
-      primaryjoin='and_(foreign(Control.type_id) == Option.id, '\
-                  'Option.role == "control_type")',
-      uselist=False)
+  principal_assessor = db.relationship(
+      'Person', uselist=False, foreign_keys='Control.principal_assessor_id')
+  secondary_assessor = db.relationship(
+      'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
+
   kind = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Control.kind_id) == Option.id, '\
@@ -113,8 +164,6 @@ class Control(
   # REST properties
   _publish_attrs = [
       'active',
-      #'categories',
-      #'assertions',
       'company_control',
       'directive',
       'documentation_description',
@@ -124,14 +173,14 @@ class Control(
       'key_control',
       'kind',
       'means',
-      'notes',
       'risks',
       'sections',
       'objectives',
       'programs',
-      'type',
       'verify_frequency',
       'version',
+      'principal_assessor',
+      'secondary_assessor',
       PublishOnly('control_controls'),
       PublishOnly('control_risks'),
       PublishOnly('control_sections'),
@@ -145,7 +194,6 @@ class Control(
   _sanitize_html = [
       'documentation_description',
       'version',
-      'notes',
       ]
 
   _include_links = [
@@ -156,7 +204,7 @@ class Control(
       'object_controls',
       ]
 
-  @validates('type', 'kind', 'means', 'verify_frequency')
+  @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
@@ -167,6 +215,8 @@ class Control(
     query = super(Control, cls).eager_query()
     return cls.eager_inclusions(query, Control._include_links).options(
         orm.joinedload('directive'),
+        orm.joinedload('principal_assessor'),
+        orm.joinedload('secondary_assessor'),
         orm.subqueryload('control_controls'),
         orm.subqueryload('implementing_control_controls'),
         orm.subqueryload('control_risks'),

@@ -7,11 +7,11 @@
 from ggrc import db
 from ggrc.models import Control
 from tests.ggrc import TestCase
-from .factories import CategoryFactory, ControlFactory
+from .factories import ControlCategoryFactory, ControlFactory
 
 class TestControl(TestCase):
   def test_simple_categorization(self):
-    category = CategoryFactory(scope_id=100)
+    category = ControlCategoryFactory(scope_id=100)
     control = ControlFactory()
     control.categories.append(category)
     db.session.commit()

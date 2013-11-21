@@ -28,7 +28,7 @@ dashboard-js-files:
   - bootstrap/scrollspy.js
   - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
-  - wysihtml5-0.3.0_rc2.js
+  - wysihtml5-0.4.0pre.js
   - bootstrap-wysihtml5-0.0.2.js
   - bootstrap/wysihtml5.js
   - moment.js
@@ -149,6 +149,7 @@ dashboard-js-template-files:
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
   - people/active_column.mustache
+  - people/filters.mustache
   - people/info.mustache
   - people/list.mustache
   - people/modal_content.mustache
@@ -183,7 +184,9 @@ dashboard-js-template-files:
   - selectors/multitype_option_items.mustache
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
+  - standards/modal_content.mustache
   - systems/modal_content.mustache
+  - systems/tree_footer.mustache
   - base_objects/tree_footer.mustache
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache
@@ -211,6 +214,7 @@ dashboard-js-template-files:
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
   - requests/filters.mustache
+  - org_groups/autocomplete_result.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

@@ -14,29 +14,21 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 
   "{CMS.Models.Audit} created" : function(model, ev, instance) {
     var refresh_queue
-    , that = this
+    , that = this;
+    
     if(instance instanceof CMS.Models.Audit) {
       if(instance.auto_generate) {
         refresh_queue = new RefreshQueue();
 
         instance.program.reify().refresh()
         .then(function(program) {
-          return program.get_binding("extended_related_objectives").refresh_instances()
+          return program.get_binding("extended_related_objectives").refresh_instances();
         }).then(function(objective_mappings) {
           can.each(objective_mappings, function(objective_mapping) {
             that.create_request(instance, objective_mapping.instance)
             .then(that.proxy("create_response"));
           });
         });
-      } else {
-        this.create_objective(instance)
-        .then(this.proxy("map_objective_to_program", instance.program.reify()))
-        .then(function(object_objective) {
-          return object_objective.objective.reify();
-        })
-        .then(that.proxy("create_request", instance))
-        .done(that.proxy("update_objective_title"))
-        .done(this.proxy("create_response"));
       }
     }
   }
@@ -45,7 +37,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     return new CMS.Models.Objective({
       title : "Generic request"
       , context : audit.context
-      , owner : audit.owner || CMS.Models.Person.model(GGRC.current_user)
+      , contact : audit.contact || CMS.Models.Person.model(GGRC.current_user)
     }).save();
   }
 
@@ -59,7 +51,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 
   , create_request : function(audit, objective) {
     return new CMS.Models.Request({
-      assignee : audit.owner || CMS.Models.Person.model(GGRC.current_user)
+      assignee : audit.contact || CMS.Models.Person.model(GGRC.current_user)
       , audit : audit.stub()
       , start_at : new Date()
       , end_at : moment().add(30, "days").toDate()
@@ -83,7 +75,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
       pbc_response : "Generic response"
       , request : request.stub()
       , context : request.context
-      , owner : request.assignee
+      , contact : request.assignee
     }).save();
   }
 
