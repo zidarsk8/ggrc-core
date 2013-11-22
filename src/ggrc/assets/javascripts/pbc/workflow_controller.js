@@ -55,6 +55,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
       , audit : audit.stub()
       , start_at : new Date()
       , end_at : moment().add(30, "days").toDate()
+      , due_on : audit.stop_date || moment().add(30, "days").toDate()
       , objective : objective.stub()
       , request_type : "documentation"
       , description : "Please provide evidence of the type requested to demonstrate this Objective has been met."
