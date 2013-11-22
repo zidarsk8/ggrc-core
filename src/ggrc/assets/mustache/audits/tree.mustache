@@ -248,7 +248,12 @@
           </div>
         {{else}}
           <div class="inner-tree">
-            <h6>PBC Requests ({{child_options.0.list.length}})</h6>
+            <h6>
+              PBC Requests ({{child_options.0.list.length}})
+              {{#child_options.0.header_view}}
+              <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
+              {{/child_options.0.header_view}}
+            </h6>
             {{#child_options.0}}
               <ul class="tree-structure new-tree rq-colors" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options.0}}
