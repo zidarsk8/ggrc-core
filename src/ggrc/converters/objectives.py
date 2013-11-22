@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
+from ggrc.models import Control, Directive, Policy, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
 from .base_row import *
 from collections import OrderedDict
 
@@ -32,6 +32,7 @@ class ObjectiveRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
     self.handle('section', LinkSectionObjective)
+    self.handle('control', LinkControlObjective)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
@@ -88,6 +89,7 @@ class ObjectivesConverter(BaseConverter):
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
     ('Map:Section', 'section'),
+    ('Map:Control', 'control'),
     ('Map:Person of Contact', 'contact'),
   ])
 

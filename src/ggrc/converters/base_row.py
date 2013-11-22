@@ -8,9 +8,9 @@ import re
 from .common import *
 from ggrc.models.all_models import (
     ControlCategory, ControlAssertion,
-    Control, Document, Objective, ObjectControl, ObjectPerson,
-    Option, Person, Process, Relationship, Request, Section,
-    SectionObjective, System, SystemOrProcess,
+    Control, Document, Objective, ObjectControl, ObjectiveControl,
+    ObjectPerson, ObjectObjective, Option, Person, Process, Relationship,
+    Request, Section, SectionObjective, System, SystemOrProcess,
     )
 from ggrc.models.exceptions import ValidationError
 
@@ -955,6 +955,46 @@ class LinkObjectControl(LinkObjectHandler):
       db.session.add(object_control)
 
 
+class LinkObjectObjective(LinkObjectHandler):
+
+  def get_existing_items(self):
+    objects = []
+    model_class = self.options.get('model_class') or self.model_class
+    importer_cls_name = self.importer.obj.__class__.__name__
+    where_params = {}
+    where_params['objective_id'] = self.importer.obj.id
+    where_params['objectiveable_type'] = model_class.__name__
+    object_objectives = ObjectObjective.query.filter_by(**where_params).all()
+    return [obj_objec.objectiveable for obj_objec in object_objectives]
+
+  def after_save(self, obj):
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      object_objective = ObjectObjective()
+      object_objective.objective = self.importer.obj
+      object_objective.objectiveable = linked_object
+      db.session.add(object_objective)
+
+
+# class for connecting existing control to new objective
+class LinkControlObjective(LinkObjectHandler):
+
+  model_class = Control
+
+  def get_existing_items(self):
+    where_params = {'objective_id': self.importer.obj.id}
+    objective_controls = ObjectiveControl.query.filter_by(**where_params).all()
+    return [objctv_cont.control for objctv_cont in objective_controls]
+
+  def after_save(self, obj):
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      objective_control = ObjectiveControl()
+      objective_control.objective = self.importer.obj
+      objective_control.control = linked_object
+      db.session.add(objective_control)
+
+
 class LinkSectionObjective(LinkObjectHandler):
 
   model_class = Section
@@ -965,10 +1005,6 @@ class LinkSectionObjective(LinkObjectHandler):
     where_params['objective_id'] = self.importer.obj.id
     section_objectives = SectionObjective.query.filter_by(**where_params).all()
     return [sec_cont.section for sec_cont in section_objectives]
-
-#  def add_created_link(self, obj):
-#    self.link_status[self.link_index] = 'created'
-#    self.link_objects[self.link_index] = obj
 
   def after_save(self, obj):
     # Assumption: only one linked section, at most, at this point
