@@ -25,7 +25,7 @@ class Revision(Base, db.Model):
       'content',
       'description',
   ]
-  
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
