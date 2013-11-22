@@ -4,10 +4,10 @@
 # Maintained By: anze@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Timeboxed, Base, Stateful
+from .mixins import deferred, Base, Stateful
 from .types import JsonType
 
-class Task(Base, Timeboxed, Stateful, db.Model):
+class Task(Base, Stateful, db.Model):
   __tablename__ = 'tasks'
   
   VALID_STATES = [
