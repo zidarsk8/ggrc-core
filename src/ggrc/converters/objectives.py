@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Objective, ObjectObjective
+from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
 from .base_row import *
 from collections import OrderedDict
 
@@ -31,29 +31,45 @@ class ObjectiveRowConverter(BaseRowConverter):
     self.handle_text_or_html('notes')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
+    self.handle('section', LinkSectionObjective)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
-    parent_type = options.get('parent_type')
-    if options.get('parent_type') in DIRECTIVE_CLASSES:
+    super(ObjectiveRowConverter, self).after_save(db_session, **options)
+    # use self.options, which will, if relevant, be overwritten
+    # with data about section instead of directive
+    parent_type = self.options.get('parent_type')
+    if parent_type in DIRECTIVE_CLASSES:
       parent_id = options.get('parent_id')
       parent_obj = parent_type.query.get(parent_id)
       parent_string = unicode(parent_obj.__class__.__name__)
       # check if no such directive/object mapping exists; if none, add
-      matching_relationship = ObjectObjective.query\
+      matching_relationship_count = ObjectObjective.query\
         .filter(ObjectObjective.objectiveable_id==parent_id)\
         .filter(ObjectObjective.objectiveable_type==parent_string)\
         .filter(ObjectObjective.objective_id==self.obj.id)\
         .count()
-      if matching_relationship == 0:
+      if matching_relationship_count == 0:
         db_session.add(ObjectObjective(
             objectiveable_type=parent_string,
             objectiveable_id=parent_id,
             objective=self.obj
         ))
+    elif parent_type == Section:
+      # if section given, connect to that rather than directive if
+      # no such mapping currently exists
+      parent_id = self.options.get('parent_id')
+      parent_obj = parent_type.query.get(parent_id)
+      matching_relationship_count = SectionObjective.query\
+        .filter(SectionObjective.objective_id==self.obj.id)\
+        .filter(SectionObjective.section_id==parent_id)\
+        .count()
+      if matching_relationship_count == 0:
+        db_session.add(SectionObjective(
+            section=parent_obj, objective=self.obj))
 
 
 class ObjectivesConverter(BaseConverter):
@@ -71,6 +87,7 @@ class ObjectivesConverter(BaseConverter):
     ('Notes', 'notes'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
+    ('Map:Section', 'section'),
     ('Map:Person of Contact', 'contact'),
   ])
 
