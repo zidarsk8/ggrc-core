@@ -293,12 +293,39 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         , end : instance.end_at
         , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
       }).save().then(function(cev) {
+        var subwin;
+
+        function poll() {
+          if(subwin.closed) {
+            cev.refresh().then(function() {
+              instance.attr({
+                title : cev.summary
+                , start_at : cev.start
+                , end_at : cev.end
+              });
+              can.each(instance.get_mapping("people"), function(person_binding) {
+                instance.mark_for_deletion("people", person_binding.instance);
+              });
+              can.each(cev.attendees, function(attendee) {
+                instance.mark_for_addition("people", attendee);
+              });
+              instance.save();
+            });
+          } else {
+            setTimeout(poll, 5000);
+          }
+        }
+
         new CMS.Models.ObjectEvent({
           eventable : instance
           , calendar : GGRC.config.DEFAULT_CALENDAR
           , event : cev
           , context : instance.context || { id : null }
         }).save();
+
+        subwin = window.open(cev.htmlLink, cev.summary);
+        setTimeout(poll, 5000);
+
       });
     }
   }

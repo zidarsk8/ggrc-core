@@ -83,12 +83,15 @@
         , callback : function(dfd, result) {
           if(result.error) {
             dfd.reject(result.error);
-          } else {
+          } else if(result.items) {
             var objs = result.items;
             can.each(objs, function(obj) {
               obj.selfLink = obj.selfLink || "#";
             });
             dfd.resolve(objs);
+          } else {
+            result.selfLink = "#";
+            dfd.resolve(result);
           }
         }
       });
@@ -127,18 +130,12 @@
     }
     , convert : {
       email_only : function(val) {
-        var cache = {}
-        , finds = []
+        var finds = []
         , result = new CMS.Models.Person.List();
-        can.each(Object.keys(CMS.Models.Person.cache), function(id) {
-          var person = CMS.Models.Person.cache[id];
-          if(person.email) {
-            cache[person.email] = person;
-          }
-        });
         can.each(val, function(g_person) {
-          if(cache[g_person.email]) {
-            result.push(cache[g_person.email]);
+          var p;
+          if(p = CMS.Models.Person.findInCacheByEmail(g_person.email)) {
+            result.push(p);
           } else {
             finds.push(g_person.email);
           }
@@ -154,7 +151,7 @@
   }, {
 
     refresh : function(params) {
-      return this.constructor.findOne({ calendar : calendar, id : this.id })
+      return this.constructor.findOne({ calendar : this.calendar, id : this.id })
       .then(can.proxy(this.constructor, "model"))
       .done(function(d) {
         d.updated();

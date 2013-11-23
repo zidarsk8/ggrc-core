@@ -62,7 +62,7 @@ function makeDateUnpacker(keys) {
 }
 
 function makeDateSerializer(type, key) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
   return function(d) {
     if(d == null) {
       return "";
