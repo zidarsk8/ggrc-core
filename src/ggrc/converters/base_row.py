@@ -216,6 +216,9 @@ class ColumnHandler(object):
 
     self.errors = []
     self.warnings = []
+    # hack for giving haml template the ancestor classes at ALL levels
+    from inspect import getmro
+    self.ancestor_names = [x.__name__ for x in getmro(self.__class__)]
 
   def add_error(self, message):
     self.errors.append(message)

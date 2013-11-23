@@ -5,7 +5,7 @@
 
 -set cell = result[col_name]
 -set cell_handler = cell.__class__.__name__
--set cell_handler_base = cell.__class__.__base__.__name__
+-set cell_handler_ancestors = cell.ancestor_names
 -set td_class = ''
 -if not cell
   -set td_class = ''
@@ -49,7 +49,7 @@
       .help-inline-warning 
         ={", ".join(warnings)}
 
-  -elif "LinksHandler" == cell_handler_base
+  -elif "LinksHandler" in cell_handler_ancestors
     -set first = True
     -for all_details in cell.links_with_details()
       -set status = all_details[0]
