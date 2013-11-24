@@ -16,17 +16,19 @@ class Context(Described, Base, db.Model):
       db.Column(db.String(128), nullable=True), 'Context')
 
   @property
-  def related_object(self, obj=[]):
-    if len(obj) == 0:
+  def related_object(self):
+    if not hasattr(self, '_related_object'):
       if self.related_object_type:
         import ggrc.models
         import ggrc.services.util
         service = ggrc.services.util.service_for(str(self.related_object_type))
         model_class = service._model
-        obj.append(db.session.query(model_class).get(self.related_object_id))
+
+        self._related_object = db.session.query(model_class)\
+            .get(selfkrelated_object_id)
       else:
-        obj.append(None)
-    return obj[0]
+        self._related_object = None
+    return self._related_object
 
   @related_object.setter
   def related_object(self, obj):
@@ -36,6 +38,7 @@ class Context(Described, Base, db.Model):
     else:
       self.related_object_id = None
       self.related_object_type = None
+    self._related_object = obj
 
   _publish_attrs = ['name', 'related_object',]
   _sanitize_html = ['name',]

@@ -237,6 +237,7 @@ def handle_program_post(sender, obj=None, src=None, service=None):
           timestamp=datetime.datetime.now()),
         description='',
         )
+    context.related_object = obj
     db.session.add(context)
     db.session.flush()
     obj.context = context
