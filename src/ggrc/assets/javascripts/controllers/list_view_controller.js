@@ -7,7 +7,7 @@
 
 (function(can, $) {
 
-function model_list_loader(controller) {
+function model_list_loader(controller, extra_params) {
   var list = new can.Observe.List();
 
   function insert_instance(instance) {
@@ -29,7 +29,7 @@ function model_list_loader(controller) {
     }
   });
 
-  return controller.options.model.findAll().then(function(instances) {
+  return controller.options.model.findAll(extra_params).then(function(instances) {
     can.each(instances.reverse(), function(instance) {
       if (instance.constructor == controller.options.model)
         insert_instance(instance);
@@ -148,7 +148,7 @@ can.Control("GGRC.Controllers.ListView", {
 
   , fetch_list : function(params) {
     // Assemble extra search params
-    var extra_params = this.options.extra_params = {}
+    var extra_params = this.options.extra_params || {}
       , search_params = this.options.search_params
       ;
     if (search_params.search_ids || search_params.user_role_ids) {
@@ -172,7 +172,7 @@ can.Control("GGRC.Controllers.ListView", {
 
     this.element.trigger("loading");
     this.options.state.attr('loading', true);
-    this.options.list_loader(this).then(this.proxy("draw_list"));
+    this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
   }
 
   , draw_list : function(list) {

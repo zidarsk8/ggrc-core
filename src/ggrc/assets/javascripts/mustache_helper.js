@@ -587,8 +587,14 @@ function defer_render(tag_prefix, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      var frag_or_html = func.apply(this, arguments);
-      $(element).html(frag_or_html);
+      var frag_or_html = func.apply(this, arguments)
+        , $element = $(element)
+        ;
+      $element.after(frag_or_html);
+      if ($element.next().get(0)) {
+        can.view.live.nodeLists.replace($element.get(), $element.next().get());
+        $element.remove();
+      }
     };
     if (deferred) {
       deferred.done(f);
@@ -841,17 +847,16 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
   var selected_option = object.attr(attr_name)
     , selected_id = selected_option ? selected_option.id : null
     , options_dfd = CMS.Models.Option.for_role(role)
-    , tag_prefix =
-        'select class="span12" model="Option" name="' + attr_name + '"'
+    , tabindex = options.hash && options.hash.tabindex
+    , tag_prefix = 'select class="span12"'
     ;
-
-  if(options.hash && options.hash.tabindex) {
-    tag_prefix += ' tabindex=' + resolve_computed(options.hash.tabindex);
-  }
 
   function get_select_html(options) {
     return [
-        '<option value=""'
+        '<select class="span12" model="Option" name="' + attr_name + '"'
+      ,   tabindex ? ' tabindex=' + tabindex : ''
+      , '>'
+      , '<option value=""'
       ,   !selected_id ? ' selected=selected' : ''
       , '>---</option>'
       , can.map(options, function(option) {
@@ -863,6 +868,7 @@ Mustache.registerHelper("option_select", function(object, attr_name, role, optio
           , '</option>'
           ].join('');
         }).join('\n')
+      , '</select>'
     ].join('');
   }
 
@@ -875,16 +881,16 @@ Mustache.registerHelper("category_select", function(object, attr_name, category_
         return selected_option.id;
       })
     , options_dfd = CMS.Models[category_type].findAll()
-    , tag_prefix =
-        'select class="span12"' +
-        ' model="' + category_type + '"' +
-        ' multiple="multiple"' +
-        ' name="' + attr_name + '"'
+    , tag_prefix = 'select class="span12" multiple="multiple"'
     ;
 
   function get_select_html(options) {
     return [
-        can.map(options, function(option) {
+        '<select class="span12" multiple="multiple"'
+      ,   ' model="' + category_type + '"'
+      ,   ' name="' + attr_name + '"'
+      , '>'
+      , can.map(options, function(option) {
           return [
             '<option value="', option.id, '"'
           ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
@@ -893,6 +899,7 @@ Mustache.registerHelper("category_select", function(object, attr_name, category_
           , '</option>'
           ].join('');
         }).join('\n')
+      , '</select>'
     ].join('');
   }
 
