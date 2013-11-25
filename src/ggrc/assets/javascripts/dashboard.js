@@ -298,9 +298,51 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
+  var uploadReview = $('input[value="Upload and Review"]');
+  
+  function checkStatus(target, data, result){
+    Task.findOne({id: result.id}, function(task){
+      task = task.task;
+      console.log(task.status)
+
+      if(task.status == "Pending" || task.status == "Running"){
+        
+        uploadReview
+          .addClass('disabled', true)
+          .val(task.status + "...");
+        // Task has not finished yet, check again in a while:
+        setTimeout(function(){checkStatus(target, data, result)}, 3000);
+      }
+      else if(task.status == "Success"){
+        $("#results-container").html(task.result);
+        uploadReview
+        .removeClass('disabled')
+        .val("Upload and Review");
+      }
+      else if(task.status == "Failed"){
+        // TODO: Error reporting
+      }
+    });
+
+  }
+  
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
-      window.location.assign($.parseJSON(data).location);
+      var result = $.parseJSON(data);
+      if("location" in result){
+        // Redirect
+        window.location.assign(result.location);
+      }
+      // Check if task has completed:
+      uploadReview
+      .addClass('disabled', true)
+      .val("Pending" + "...");
+      setTimeout(function(){
+        
+        
+        
+        checkStatus(e.target, data, result);
+      }, 1000)
     }
   });
 });

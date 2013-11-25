@@ -24,11 +24,14 @@ def handle_csv_import(converter_class, filepath, **options):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
 
   try:
-    rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
+    if isinstance(csv_file, list):
+      rows = [row for row in csv_reader(csv_file)]
+    else:
+      rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
   except UnicodeDecodeError: # Decode error occurs when a special character symbol is inserted in excel.
     raise ImportException("Could not import: invalid character encountered, verify the file is correctly formatted.")
-
-  csv_file.close()
+  if not isinstance(csv_file, list):
+    csv_file.close()
   converter = converter_class.from_rows(rows, **options)
   # remove 'dry_run' key to allow passing dict w/out keyword arg collision
   # on 'dry_run' parameter:

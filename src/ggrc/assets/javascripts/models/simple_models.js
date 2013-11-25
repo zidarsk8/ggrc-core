@@ -1134,6 +1134,18 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
 });
 
+Task = can.Model.extend({
+  root_object : "task"
+  , root_collection : "tasks"
+  , findAll : "GET /api/tasks"
+  , findOne : "GET /api/tasks/{id}"
+  , update : "PUT /api/tasks/{id}"
+  , destroy : "DELETE /api/tasks/{id}"
+  , create : "POST /api/tasks"
+  , scopes : []
+  , defaults : {}
+}, {});
+
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   var model, params = {}, instance = null;
 

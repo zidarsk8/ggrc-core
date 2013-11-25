@@ -13,7 +13,6 @@ down_revision = '22ed1c0cd379'
 
 from alembic import op
 import sqlalchemy as sa
-from ggrc.models.types import JsonType
 from sqlalchemy.dialects import mysql
 
 def upgrade():
@@ -21,7 +20,7 @@ def upgrade():
     op.create_table('tasks',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=250), nullable=True),
-    sa.Column('parameters', JsonType(), nullable=True),
+    sa.Column('parameters', sa.LargeBinary(length=16777215), nullable=True),
     sa.Column('result', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('modified_by_id', sa.Integer(), nullable=True),

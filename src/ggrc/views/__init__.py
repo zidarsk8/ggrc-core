@@ -16,6 +16,7 @@ from werkzeug.exceptions import Forbidden
 from . import filters
 from .common import BaseObjectView, RedirectedPolymorphView
 from .tooltip import TooltipView
+from ggrc.models.task import Task, queued_task, create_task
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -71,6 +72,7 @@ def generate_query_chunks(query):
 
 # Needs to be secured as we are removing @login_required
 @app.route("/tasks/reindex", methods=["POST"])
+@queued_task
 def reindex():
   """
   Web hook to update the full text search index
@@ -106,7 +108,7 @@ def reindex():
   return app.make_response((
     'success', 200, [('Content-Type', 'text/html')]))
 
-@app.route("/admin/reindex", methods=["GET"])
+@app.route("/admin/reindex", methods=["POST"])
 @login_required
 def admin_reindex():
   """Calls a webhook that reindexes indexable objects
@@ -115,10 +117,9 @@ def admin_reindex():
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
   if getattr(settings, 'APP_ENGINE', False):
-    from google.appengine.api import taskqueue
-    task = taskqueue.add(url=url_for('reindex'))
+    tq = create_task("reindex", url_for('reindex'))    
     return app.make_response((
-      'scheduled ' + task.name, 200, [('Content-Type', 'text/html')]))
+      'scheduled ' + tq.name, 200, [('Content-Type', 'text/html')]))
   else:
     #reindex()
     return app.make_response((
@@ -181,53 +182,72 @@ def system_program_import_template(program_id):
   return current_app.make_response((
       "No such program.", 404, []))
 
-@app.route("/admin/import_people", methods = ['GET', 'POST'])
-def import_people():
+@app.route("/task/import_people", methods = ['POST'])
+@queued_task
+def import_people_task(task):
 
-  from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
   from ggrc.converters.people import PeopleConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Person
   import ggrc.views
+  
+  csv_file = task.parameters.get("csv_file")
+  dry_run = task.parameters.get("dry_run")
+  try:
+    options = {}
+    options['dry_run'] = dry_run
+    converter = handle_csv_import(PeopleConverter, csv_file.splitlines(True), **options)
+    if dry_run:
+      options['converter'] = converter
+      options['results'] = converter.objects
+      options['heading_map'] = converter.object_map
+      return render_template("people/import_result.haml", **options)
+    else:
+      count = len(converter.objects)
+      flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return import_redirect("/admin")
+
+  except ImportException as e:
+    if e.show_preview:
+      converter = e.converter
+      return render_template("people/import_result.haml", exception_message=e,
+          converter=converter, results=converter.objects, heading_map=converter.object_map)
+    return render_template("directives/import_errors.haml",
+          directive_id="People", exception_message=str(e))
+  
+  return app.make_response((
+        'this should be removed', 200, [('Content-Type', 'text/html')]))
+  
+  
+
+@app.route("/admin/import_people", methods = ['GET', 'POST'])
+def import_people():
 
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
 
-  if request.method == 'POST':
-    if 'cancel' in request.form:
-      return import_redirect("/admin")
-    dry_run = not ('confirm' in request.form)
-    csv_file = request.files['file']
-    try:
-      if csv_file and allowed_file(csv_file.filename):
-        filename = secure_filename(csv_file.filename)
-        options = {}
-        options['dry_run'] = dry_run
-        converter = handle_csv_import(PeopleConverter, csv_file, **options)
-        if dry_run:
-          options['converter'] = converter
-          options['results'] = converter.objects
-          options['heading_map'] = converter.object_map
-          return render_template("people/import_result.haml", **options)
-        else:
-          count = len(converter.objects)
-          flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
-          return import_redirect("/admin")
-      else:
-        file_msg = "Could not import: invalid csv file."
-        return render_template("directives/import_errors.haml",
-              directive_id = "People", exception_message = file_msg)
+  if request.method != 'POST':
+    return render_template("people/import.haml", import_kind = 'People')
 
-    except ImportException as e:
-      if e.show_preview:
-        converter = e.converter
-        return render_template("people/import_result.haml", exception_message=e,
-            converter=converter, results=converter.objects, heading_map=converter.object_map)
-      return render_template("directives/import_errors.haml",
-            directive_id="People", exception_message=str(e))
+  if 'cancel' in request.form:
+    return import_redirect("/admin")
+  
+  dry_run = not ('confirm' in request.form)
+  csv_file = request.files['file']
+  
+  if csv_file and allowed_file(csv_file.filename):
+    from werkzeug.utils import secure_filename
+    filename = secure_filename(csv_file.filename)
+  else: 
+    file_msg = "Could not import: invalid csv file."
+    return render_template("directives/import_errors.haml",
+        directive_id = "People", exception_message = file_msg)
 
-  return render_template("people/import.haml", import_kind = 'People')
+  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename}
+  tq = create_task("import_people", url_for('import_people_task'), parameters)
+  return import_dump({"id":tq.id, "status": tq.status})
+
 
 @app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
@@ -550,6 +570,13 @@ def import_systems_to_program(program_id):
 
   return render_template("systems/import.haml", import_kind='Systems')
 
+def import_dump(data):
+  # The textarea here is a custom response for 'remoteipart' to
+  # proxy a JSON response through an iframe.
+  return app.make_response((
+    '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
+      json.dumps(data)), 200, [('Content-Type', 'text/html')]))
+
 def import_redirect(location):
   # The textarea here is a custom response for 'remoteipart' to
   # proxy a JSON response through an iframe.
@@ -799,6 +826,7 @@ def tooltip_view(model_class, base_service_class=TooltipView):
 def all_object_views():
   from ggrc import models
   return [
+      object_view(models.Task),
       object_view(models.Program),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
