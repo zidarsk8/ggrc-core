@@ -48,6 +48,7 @@ class SystemRowConverter(BaseRowConverter):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
+    super(SystemRowConverter, self).after_save(db_session, **options)
     # Check whether a relationship has the program as source
     # and system as destination; if not, connect the two in session
     if options.get('parent_type'):

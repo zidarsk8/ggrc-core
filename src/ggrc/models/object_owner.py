@@ -29,7 +29,6 @@ class ObjectOwner(Mapping, db.Model):
     self.ownable_id = value.id if value is not None else None
     self.ownable_type = \
         value.__class__.__name__ if value is not None else None
-    self.dump_self()
     return setattr(self, self.ownable_attr, value)
 
   __table_args__ = (
