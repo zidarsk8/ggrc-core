@@ -31,6 +31,8 @@ class Task(Base, Stateful, db.Model):
   
   def start(self):
     self.status = "Running"
+    db.session.add(self)
+    db.session.commit()
     
   def finish(self, status, result):
     self.result = result
@@ -45,6 +47,7 @@ def create_task(name, url, parameters):
   from ggrc.app import db
   db.session.add(task)
   db.session.commit()  
+  db.session.flush()
 
   # schedule a task queue
   from google.appengine.api import taskqueue
