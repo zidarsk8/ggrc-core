@@ -25,7 +25,7 @@ class Context(Described, Base, db.Model):
         model_class = service._model
 
         self._related_object = db.session.query(model_class)\
-            .get(selfkrelated_object_id)
+            .get(self.related_object_id)
       else:
         self._related_object = None
     return self._related_object
