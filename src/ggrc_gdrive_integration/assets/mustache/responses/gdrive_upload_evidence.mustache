@@ -1,8 +1,6 @@
 {{! upload evidence to GDrive by clicking this button}}
 {{#if allow_mapping_or_creating}}
 {{#is_allowed_to_map parent_instance "Document"}}
-{{#with_page_object_as 'page_object'}}
-{{#if_match page_object.constructor.shortName 'Audit|Program|Person'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -20,7 +18,5 @@
     </div>
   </div>
 </li>
-{{/if_match}}
-{{/with_page_object_as}}
 {{/is_allowed_to_map}}
 {{/if}}
