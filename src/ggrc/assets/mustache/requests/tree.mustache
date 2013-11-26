@@ -29,7 +29,12 @@
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <span class="pull-left request-type black-font">type:</span>
           {{#with_mapping 'responses' instance}}
-            <select name="request_type" class="span8 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}} {{#if responses.length}}disabled="true" readonly="true" rel="tooltip" title="Can't change Request Type since responses already exist"{{/if}}>
+            {{#if responses.length}}
+              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
+            {{/if}}
+          {{/with_mapping}}
+          {{#with_mapping 'responses' instance}}
+            <select name="request_type" class="span8 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}} {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
               {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
               <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
               {{/iterate}}
