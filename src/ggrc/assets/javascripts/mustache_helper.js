@@ -1761,6 +1761,11 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
 
   Currently, if_helpers only supports all logic being 'and' or all logic being 'or'.
 
+  All hash arguments (some_val=37) must go in the last line and should be prefixed by the 
+  zero-based index of the corresponding helper. This is necessary because all hash arguments 
+  are required to be the final arguments for a helper. Here's an example:
+    _0_some_val=37 would pass some_val=37 to the first helper.
+
   Statement syntax:
     '\
     [LOGIC] [TRUTHY_FALSY]HELPER_NAME' arg1 arg2 argN
@@ -1774,7 +1779,7 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
     {{#if_helpers '\
       #if_match' page_object.constructor.shortName 'Project' '\
       and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
-    '}}
+    ' _1_hash_arg_for_second_statement=something}}
       matched all conditions
     {{else}}
       failed
@@ -1799,13 +1804,30 @@ Mustache.registerHelper("if_helpers", function() {
     if (i < args.length - 1) {
       if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
         statement && statements.push(statement);
-        if (match = arg.match(/^\n\s*((and|or) )?([#^])?(.+?)$/)) {
+        if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
             , helper: Mustache.getHelper(match[4])
             , args: []
             , logic: match[2] === 'or' ? 'or' : 'and'
           };
+
+          // Add hash arguments
+          if (options.hash) {
+            var hash = {}
+              , prefix = '_' + statements.length + '_'
+              , prop
+              ;
+            for (prop in options.hash) {
+              if (prop.indexOf(prefix) === 0) {
+                hash[prop.substr(prefix.length)] = options.hash[prop];
+              }
+            }
+            for (prop in hash) {
+              statement.hash = hash;
+              break;
+            } 
+          }
         }
         else
           statement = null;
@@ -1819,12 +1841,16 @@ Mustache.registerHelper("if_helpers", function() {
 
   if (statements.length) {
     // Evaluate statements
-    var result = true;
+    var result;
     can.each(statements, function(statement) {
       helper_result = null;
-      statement.helper.fn.apply(statement.helper, statement.args.concat([helper_options]));
+      statement.helper.fn.apply(statement.helper, statement.args.concat([
+        can.extend({}, helper_options, { hash: statement.hash || helper_options.hash })
+      ]));
       helper_result = helper_result === statement.fn_name;
-      if (statement.logic === 'and')
+      if (result === undefined)
+        result = helper_result;
+      else if (statement.logic === 'and')
         result = result && helper_result;
       else if (statement.logic === 'or')
         result = result || helper_result;
