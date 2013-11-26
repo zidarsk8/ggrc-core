@@ -75,7 +75,6 @@ class ControlRowConverter(BaseRowConverter):
           control=self.obj
       ))
 
-
 class ControlsConverter(BaseConverter):
 
   metadata_map = OrderedDict([
