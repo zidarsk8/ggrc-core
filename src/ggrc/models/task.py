@@ -53,7 +53,8 @@ def create_task(name, url, parameters):
 
   # schedule a task queue
   from google.appengine.api import taskqueue
-  taskqueue = taskqueue.add(url=url, name=task.name, params={'task_id': task.id})
+  cookie_header = [header for header in request.headers if header[0] == 'Cookie']
+  taskqueue = taskqueue.add(url=url, name=task.name, params={'task_id': task.id}, headers = cookie_header)
   
   return task
 
