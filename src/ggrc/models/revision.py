@@ -85,4 +85,6 @@ class Revision(Base, db.Model):
       else:
         # otherwise, it's a normal creation event
         result = u"{0} {1}".format(display_name, self.action)
+    if self.event.action == "IMPORT":
+      result += ", via spreadsheet import"
     return result
