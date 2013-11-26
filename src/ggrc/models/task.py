@@ -34,11 +34,13 @@ class Task(Base, Stateful, db.Model):
     db.session.add(self)
     db.session.commit()
     
+    
   def finish(self, status, result):
     self.result = result
     self.status = status
     db.session.add(self)
     db.session.commit()
+    
   
 def create_task(name, url, parameters):
   from time import time
@@ -47,7 +49,7 @@ def create_task(name, url, parameters):
   from ggrc.app import db
   db.session.add(task)
   db.session.commit()  
-  db.session.flush()
+  
 
   # schedule a task queue
   from google.appengine.api import taskqueue
@@ -60,7 +62,7 @@ def queued_task(func):
   @wraps(func)
   def decorated_view(*args, **kwargs):
     task = Task.query.get(request.form.get("task_id"))
-    # task.start()
+    task.start()
     try:
       result = func(task)
     except:
