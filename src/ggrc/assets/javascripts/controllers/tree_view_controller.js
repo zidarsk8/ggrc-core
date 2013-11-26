@@ -99,6 +99,17 @@ can.Control("CMS.Controllers.TreeView", {
 
     this.options.attr("allow_mapping_or_creating",
       this.options.allow_mapping || this.options.allow_creating);
+
+    // Override nested child options for allow_* properties
+    var allowed = {};
+    this.options.each(function(item, prop) {
+      if (prop.indexOf('allow') === 0 && item === false)
+        allowed[prop] = item;
+    });
+    this.options.child_options = this.options.child_options.slice(0);
+    can.each(this.options.child_options, function(options, i) {
+      that.options.child_options[i] = new can.Observe(can.extend(options.attr(), allowed));
+    });
   }
 
   , init_view : function() {

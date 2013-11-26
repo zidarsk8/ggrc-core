@@ -307,6 +307,7 @@ $(function() {
             Audit: {
               mapping: "related_audits_via_related_responses"
               , allow_mapping : false
+              , allow_creating : false
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view : null
