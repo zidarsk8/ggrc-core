@@ -42,7 +42,7 @@
         return new $.Deferred().reject("login required. Switching to non-immediate");
       } else if(!authresult) {
         window.oauth_dfd.reject("auth failed");
-        return new $.Deferred.reject();
+        return new $.Deferred().reject();
       } else {
         gapi.client.oauth2.userinfo.get().execute(function(user) {
           if(user.error) {
