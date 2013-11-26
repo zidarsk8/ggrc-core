@@ -21,18 +21,41 @@
       {{url}}
     </a>
   </p>
-  <p>
-    <strong>Contact:</strong>
-    {{#using contact=instance.contact}}
-    {{#if contact}}
-      {{contact.name}}
-    {{else}}
-      <span class="error">
-        Not Assigned
-      </span>
-    {{/if}}
-    {{/using}}
-  </p>
+  <div class="row-fluid">
+    <div class="span6">
+      {{#if owners.length}}
+        {{#using contacts=instance.owners}}
+        {{#contacts}}
+          <p>
+            <strong>Owner:</strong>
+            <span class="person-tooltip-trigger" data-placement="top">{{firstnonempty name email}}</span>
+          </p>
+        {{/contacts}}
+        {{/using}}
+      {{else}}
+        <p>
+          <strong>Owner:</strong>
+          <span class="error">
+            Not Assigned
+          </span>
+        </p>
+      {{/if}}
+    </div>
+    <div class="span6">
+      <p>
+        <strong>Contact:</strong>
+        {{#using contact=instance.contact}}
+        {{#if contact}}
+          <span class="person-tooltip-trigger" data-placement="top">{{firstnonempty contact.name contact.email}}</span>
+        {{else}}
+          <span class="error">
+            Not Assigned
+          </span>
+        {{/if}}
+        {{/using}}
+      </p>
+    </div>
+  </div>
 
   {{{render_hooks 'Program.extended_info'}}}
 
