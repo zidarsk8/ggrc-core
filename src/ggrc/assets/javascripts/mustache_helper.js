@@ -1100,6 +1100,31 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap"
 });
 
+Mustache.registerHelper("if_result_has_direct_mappings", function(
+    bindings, parent_instance, options) {
+  //  Render the `true` / `fn` block if the `result` contains a direct mapping
+  //  to `parent_instance`.  Otherwise render the `false` / `inverse` block.
+  bindings = Mustache.resolve(bindings);
+  bindings = resolve_computed(bindings);
+  parent_instance = Mustache.resolve(parent_instance);
+  var has_direct_mappings = false
+    , i
+    ;
+
+  if (bindings && bindings.length > 0) {
+    for (i=0; i<bindings.length; i++) {
+      if (bindings[i].instance && parent_instance
+          && bindings[i].instance.reify() === parent_instance.reify())
+        has_direct_mappings = true;
+    }
+  }
+
+  if (has_direct_mappings)
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("if_result_has_extended_mappings", function(
     bindings, parent_instance, options) {
   //  Render the `true` / `fn` block if the `result` exists (in this list)
@@ -1112,9 +1137,12 @@ Mustache.registerHelper("if_result_has_extended_mappings", function(
     , i
     ;
 
-  for (i=0; i<bindings.length; i++) {
-    if (bindings[i].instance !== parent_instance)
-      has_extended_mappings = true;
+  if (bindings && bindings.length > 0) {
+    for (i=0; i<bindings.length; i++) {
+      if (bindings[i].instance && parent_instance
+          && bindings[i].instance.reify() !== parent_instance.reify())
+        has_extended_mappings = true;
+    }
   }
 
   if (has_extended_mappings)
@@ -1147,10 +1175,15 @@ Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
     frame.index = i;
     frame.isFirst = i == 0;
     frame.isLast = i == length - 1;
+    frame.isSecondToLast = i == length - 2;
     frame.length = length;
     frame[name] = list[i];
     output.push(options.fn(new can.Observe(frame)));
+
     //  FIXME: Is this legit?  It seems necessary in some cases.
+    //context = $.extend([], options.contexts, options.contexts.concat([frame]));
+    //output.push(options.fn(context));
+    // ...or...
     //contexts = options.contexts.concat([frame]);
     //contexts.___st4ck3d = true;
     //output.push(options.fn(contexts));

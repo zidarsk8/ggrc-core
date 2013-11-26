@@ -13,3 +13,7 @@
   @include box-shadow(0 0 2px $darkGray);
   cursor:move;
 }
+
+.popover-data-title, .popover-data-content {
+  display: none;
+}
