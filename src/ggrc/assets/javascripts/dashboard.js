@@ -298,29 +298,41 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
-  var uploadReview = $('input[value="Upload and Review"]');
   
-  function checkStatus(target, data, result){
+  function checkStatus(result){
     Task.findOne({id: result.id}, function(task){
       task = task.task;
-      console.log(task.status)
 
       if(task.status == "Pending" || task.status == "Running"){
         
-        uploadReview
-          .addClass('disabled', true)
-          .val(task.status + "...");
+        $('body').trigger(
+          'ajax:flash', 
+            { "success" : "Import " +  task.status.toLowerCase() + "..."}
+        );
         // Task has not finished yet, check again in a while:
-        setTimeout(function(){checkStatus(target, data, result)}, 3000);
+        setTimeout(function(){checkStatus(result)}, 3000);
       }
       else if(task.status == "Success"){
+        // Check if redirect:
+        try{
+          var jsonResult = $.parseJSON($(task.result).html());
+          if("location" in jsonResult){
+            window.location.assign(jsonResult.location);
+            return;
+          }
+        } catch(e){}
+        
         $("#results-container").html(task.result);
-        uploadReview
-        .removeClass('disabled')
-        .val("Upload and Review");
+        $('body').trigger(
+          'ajax:flash', 
+            { "success" : "Import successful."}
+        );
       }
       else if(task.status == "Failed"){
-        // TODO: Error reporting
+        $('body').trigger(
+          'ajax:flash', 
+            { "error" : "Import failed."}
+        );
       }
     });
 
@@ -334,14 +346,12 @@ jQuery(function($) {
         window.location.assign(result.location);
       }
       // Check if task has completed:
-      uploadReview
-      .addClass('disabled', true)
-      .val("Pending" + "...");
+      $('body').trigger(
+          'ajax:flash', 
+          { "success" : "Import pending..." }
+        );
       setTimeout(function(){
-        
-        
-        
-        checkStatus(e.target, data, result);
+        checkStatus(result);
       }, 1000)
     }
   });
