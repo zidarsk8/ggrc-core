@@ -60,7 +60,12 @@ class SystemRowConverter(BaseRowConverter):
         .count()
       if matching_relatinship_count == 0:
         program = Program.query.get(program_id)
-        db_session.add(Relationship(source=program, destination=self.obj))
+        if program:
+            db_session.add(Relationship(
+                source=program,
+                context_id=program.context_id,
+                destination=self.obj
+            ))
 
 
 class SystemsConverter(BaseConverter):

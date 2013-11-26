@@ -70,10 +70,13 @@ class ControlRowConverter(BaseRowConverter):
       for program_control in self.obj.program_controls:
         if program_control.program_id == program_id:
           return
-      db_session.add(ProgramControl(
-          program=Program.query.get(program_id),
-          control=self.obj
-      ))
+      program = Program.query.get(program_id)
+      if program:
+          db_session.add(ProgramControl(
+              program=program,
+              context_id=program.context_id,
+              control=self.obj
+          ))
 
 
 class ControlsConverter(BaseConverter):
