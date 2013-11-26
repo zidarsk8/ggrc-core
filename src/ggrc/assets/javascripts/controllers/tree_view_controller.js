@@ -106,9 +106,9 @@ can.Control("CMS.Controllers.TreeView", {
       if (prop.indexOf('allow') === 0 && item === false)
         allowed[prop] = item;
     });
-    this.options.child_options = this.options.child_options.slice(0);
+    this.options.attr('child_options', this.options.child_options.slice(0));
     can.each(this.options.child_options, function(options, i) {
-      that.options.child_options[i] = new can.Observe(can.extend(options.attr(), allowed));
+      that.options.child_options.attr(i, new can.Observe(can.extend(options.attr(), allowed)));
     });
   }
 

@@ -39,12 +39,6 @@ $.extend(Permission, (function() {
     if (GGRC.page_instance() instanceof CMS.Models.Person && permission.action !== 'read' && !/dashboard/.test(window.location))
       return false;
 
-    // Prohibit audit editing for "Mapped in Audits"
-    if (permission.resource_type && permission.resource_type.match(/(Request|Response)/) && permission.action !== 'read' 
-        && !GGRC.page_instance().constructor.shortName.match(/(Audit|Program|Person)/)) {
-      return false;
-    }
-
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
