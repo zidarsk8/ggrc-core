@@ -9,7 +9,8 @@ from .common import *
 from ggrc.models.all_models import (
     ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectPerson,
-    Option, Person, Process, Relationship, Request, System, SystemOrProcess,
+    ObjectOwner, Option, Person, Process, Relationship, Request,
+    System, SystemOrProcess
     )
 from ggrc.models.exceptions import ValidationError
 
@@ -128,6 +129,20 @@ class BaseRowConverter(object):
 
   def save(self, db_session, **options):
     self.save_object(db_session, **options)
+
+  def after_save(self, db_session, **options):
+    from ggrc.login import get_current_user_id
+    current_user_id = get_current_user_id()
+    # assign owner if it's ownable
+    if hasattr(self.obj, 'owners') and current_user_id:
+      current_user = Person.query.get(current_user_id)
+      if current_user and current_user not in self.obj.owners:
+        # then create an ObjectOwner connector, add to session
+        db_session.add(ObjectOwner(
+            person_id=current_user_id,
+            ownable=self.obj,
+            modified_by_id=current_user_id
+        ))
 
   def add_after_save_hook(self, hook = None, funct = None):
     if hook: self.after_save_hooks.append(hook)

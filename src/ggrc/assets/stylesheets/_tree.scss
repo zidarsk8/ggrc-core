@@ -27,6 +27,19 @@ ul.new-tree {
     
   }
   
+  .request-readonly {
+    width: 6px;
+    height: 8px;
+    line-height: 8px;
+    float: right;
+    margin-top: 11px;
+    i {
+      width: 6px;
+      height: 8px;
+      margin-top: 0;
+    }
+  }
+  
   &.event-tree {
     [class^="grcicon-"] {
       margin-top: 1px;

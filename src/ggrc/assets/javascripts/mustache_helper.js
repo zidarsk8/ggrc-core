@@ -1678,23 +1678,36 @@ Mustache.registerHelper("global_count", function(model_type, options) {
 
   if (!state.attr('status')) {
     state.attr('status', 'loading');
-    GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
-      state.attr({
-          status: 'loaded'
-        , count: result.counts[model_type]
-      });
-    })
+
+    var model = CMS.Models[model_type]
+      , update_count = function(ev, instance) {
+          if (!instance || instance instanceof model) {
+            GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+              state.attr({
+                  status: 'loaded'
+                , count: result.counts[model_type]
+              });
+            });
+          }
+        }
+      ;
+
+    update_count();
+    if (model) {
+      model.bind('created', update_count);
+      model.bind('destroyed', update_count);
+    }
   }
 
   // Return the result
   if (state.attr('status') === 'failed') {
     return '';
   }
-  else if (state.attr('status') === 'loading' || state.count === undefined) {
+  else if (state.attr('status') === 'loading' || state.attr('count') === undefined) {
     return options.inverse(options.contexts);
   }
   else {
-    return options.fn(state.count);
+    return options.fn(state.attr('count'));
   }
 });
 

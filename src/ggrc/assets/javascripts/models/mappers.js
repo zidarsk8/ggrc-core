@@ -1188,6 +1188,59 @@
       }
 
     , init_listeners: function(binding) {
+        var model = can.Model.Cacheable
+          , that = this
+          ;
+
+        model.bind("created", function(ev, mapping) {
+          if (mapping instanceof model) {
+            var model_type = mapping.constructor.model_singular || mapping.constructor.shortName
+              , types = $.grep(that.types, function(type) { return type === model_type; })
+              ;
+
+            // Ensure that this model exists in the list of types
+            if (types.length) {
+              GGRC.Models.Search.search_for_types(
+                  that.term
+                , types
+                , that.get_params(binding)
+              ).pipe(function(mappings) {
+                // Check for the new mapping existing in the search
+                var entries = $.map(mappings.entries, function(entry) {
+                  if (entry.type === model_type && entry.id === mapping.id) {
+                    return entry;
+                  }
+                });
+
+                // If we found one, insert the mapping
+                entries.length && that.filter_and_insert_instances_from_mappings(binding, [mapping]);
+                
+                return mappings.entries;
+              });
+            }
+          }
+        });
+
+        model.bind("destroyed", function(ev, mapping) {
+          if (mapping instanceof model)
+            self.remove_instance_from_mapping(binding, mapping);
+        });
+
+        //  FIXME: This is only needed in DirectListLoader, right?
+        model.bind("orphaned", function(ev, mapping) {
+          if (mapping instanceof model)
+            self.remove_instance_from_mapping(binding, mapping);
+        });
+      }
+
+    , get_params: function(binding) {
+        var params = can.extend({}, this.params);
+        for (var prop in params) {
+          if (params[prop] && binding.instance[params[prop]]) {
+            params[prop] = binding.instance[params[prop]];
+          }
+        }
+        return params;
       }
 
     , is_valid_mapping: function(binding, mapping) {
@@ -1256,7 +1309,6 @@
     , _refresh_stubs: function(binding) {
         var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural))
           , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
-          , params = can.extend({}, this.params)
           , self = this
           ;
 
@@ -1265,12 +1317,7 @@
           return new $.Deferred().resolve(mappings);
         }
         else {
-          for (var prop in params) {
-            if (params[prop] && binding.instance[params[prop]]) {
-              params[prop] = binding.instance[params[prop]];
-            }
-          }
-          return GGRC.Models.Search.search_for_types(this.term, this.types, params).pipe(function(mappings) {
+          return GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding)).pipe(function(mappings) {
             can.each(mappings.entries, function(entry, i) {
               var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
               mappings.entries[i] = new _class({ id: entry.id });
