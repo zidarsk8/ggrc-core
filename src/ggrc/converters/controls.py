@@ -54,10 +54,10 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('processes', LinkObjectControl, model_class = Process)
 
   def save_object(self, db_session, **options):
-    #if options.get('directive_id'):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
+    super(ControlRowConverter, self).after_save(db_session, **options)
     if options.get('parent_type') in DIRECTIVE_CLASSES:
       directive_id = options.get('parent_id')
       for directive_control in self.obj.directive_controls:
@@ -74,7 +74,6 @@ class ControlRowConverter(BaseRowConverter):
           program=Program.query.get(program_id),
           control=self.obj
       ))
-
 
 class ControlsConverter(BaseConverter):
 
