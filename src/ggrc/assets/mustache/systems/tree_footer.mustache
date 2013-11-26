@@ -7,7 +7,6 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-{{^is_profile parent_instance}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -73,6 +72,5 @@
     </div>
   </div>
 </li>
-{{/is_profile}}
 {{/if}}
 {{/is_allowed_to_map}}

@@ -381,7 +381,6 @@ $(function() {
               }
             , Audit : { 
                 mapping: "extended_related_audits_via_search"
-              , allow_mapping : false
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               }
@@ -434,6 +433,19 @@ $(function() {
         }
       })
     ;
+
+  // Disable editing on profile pages, as long as it isn't audits on the dashboard
+  if (GGRC.page_instance() instanceof CMS.Models.Person) {
+    var person_options = extra_content_controller_options.Person;
+    can.each(person_options, function(options, model_name) {
+      if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
+        can.extend(options, {
+            allow_creating: false
+          , allow_mapping: false
+        });
+      }
+    });
+  }
 
   can.each(far_models, function(join_descriptors, model_name) {
     if ((overridden_models.all

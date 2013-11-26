@@ -7,13 +7,6 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-{{^is_profile parent_instance}}
-{{#with_page_object_as 'page_object'}}
-{{! Blocks the footer if this is mapping an object to a Response on a non-Audit/Program/Person page }}
-{{#if_helpers '\
-  ^if_match' parent_instance.constructor.shortName 'Response' '\
-  or #if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
-'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -76,8 +69,5 @@
     </div>
   </div>
 </li>
-{{/if_helpers}}
-{{/with_page_object_as}}
-{{/is_profile}}
 {{/if}}
 {{/is_allowed_to_map}}

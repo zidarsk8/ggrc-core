@@ -173,7 +173,14 @@
           </div>
         </div>
         <div class="span2" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-          <select class="input-block-level top-space" name="status" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}} {{#with_page_object_as 'page_object'}}{{^if_match page_object.constructor.shortName 'Audit|Program|Person'}}disabled readonly{{/if_match}}{{/with_page_object_as}}>
+          <select class="input-block-level top-space" name="status" 
+          {{#if_helpers '\
+            ^if' allow_mapping_or_creating '\
+            or ^is_allowed' 'update' instance '\
+            or #if' responses.length '\
+          ' _1_context=instance.context.id}}
+            disabled="true" readonly="true"
+          {{/if_helpers}}>
             {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
             <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
@@ -192,9 +199,10 @@
           </a>
           {{/using}}
         </li>
-        {{#is_allowed 'update' instance context=instance.context.id}}
-        {{#with_page_object_as 'page_object'}}
-        {{#if_match page_object.constructor.shortName 'Audit|Program|Person'}}
+        {{#if_helpers '\
+          #if' allow_mapping_or_creating '\
+          and #is_allowed' 'update' instance '\
+        ' _1_context=instance.context.id}}
           <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.constructor.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
               <i class="grcicon-edit"></i>
@@ -228,9 +236,7 @@
           <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
           </li>
           -->
-        {{/if_match}}
-        {{/with_page_object_as}}
-        {{/is_allowed}}
+        {{/if_helpers}}
       </ul>
     </div>
 
