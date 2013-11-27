@@ -6,7 +6,7 @@
       {{#contacts}}
         <p>
           <strong>Owner:</strong>
-          <span class="person-tooltip-trigger" data-placement="top">{{firstnonempty name email}}</span>
+          <span>{{firstnonempty name email}}</span>
         </p>
       {{/contacts}}
       {{/using}}
@@ -24,7 +24,7 @@
       <strong>Contact:</strong>
       {{#using contact=contact}}
       {{#if contact}}
-        <span class="person-tooltip-trigger" data-placement="top">{{firstnonempty contact.name contact.email}}</span>
+        <span>{{firstnonempty contact.name contact.email}}</span>
       {{else}}
         <span class="error">
           Not Assigned
