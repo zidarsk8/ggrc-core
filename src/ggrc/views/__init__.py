@@ -73,7 +73,7 @@ def generate_query_chunks(query):
 # Needs to be secured as we are removing @login_required
 @app.route("/tasks/reindex", methods=["POST"])
 @queued_task
-def reindex():
+def reindex(task):
   """
   Web hook to update the full text search index
   """
@@ -116,14 +116,10 @@ def admin_reindex():
   from ggrc import settings
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-  if getattr(settings, 'APP_ENGINE', False):
-    tq = create_task("reindex", url_for('reindex'))    
-    return app.make_response((
-      'scheduled ' + tq.name, 200, [('Content-Type', 'text/html')]))
-  else:
-    #reindex()
-    return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
+  tq = create_task("reindex", reindex)   
+  response = "scheduled %s" % tq.name if tq.result == None else tq.result 
+  return app.make_response((
+    response, 200, [('Content-Type', 'text/html')]))
 
 @app.route("/admin")
 @login_required
