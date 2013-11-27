@@ -429,6 +429,8 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
       , [all_object_types,
           "Document", "ObjectDocument", "document", "documentable"]
+      , [business_object_types.concat(["Control"]),
+          "Audit", null, null, null]
       ];
 
 

@@ -64,6 +64,7 @@
           </div>
 
           <div class="span6">
+          {{#if allow_mapping}}
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
           {{^is_dashboard}}
@@ -74,6 +75,7 @@
             </a>
           {{/is_dashboard}}
           {{/is_allowed_all}}
+          {{/if}}
           {{/if}}
           </div>
 

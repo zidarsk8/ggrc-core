@@ -95,6 +95,11 @@ $(function() {
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
     , model_default_widgets = []
+    , in_audit_descriptor_options = {
+        widget_name: function() {
+          return "Mapped in Audits";
+        }
+      }
     , extra_descriptor_options = {
           all: {
               Person: {
@@ -115,6 +120,36 @@ $(function() {
                 }
               }
             }
+          }
+        , Control : {
+            Audit: in_audit_descriptor_options
+          }
+        , DataAsset: {
+            Audit: in_audit_descriptor_options
+          }
+        , Facility: {
+            Audit: in_audit_descriptor_options
+          }
+        , Market: {
+            Audit: in_audit_descriptor_options
+          }
+        , OrgGroup: {
+            Audit: in_audit_descriptor_options
+          }
+        , Process: {
+            Audit: in_audit_descriptor_options
+          }
+        , Product: {
+            Audit: in_audit_descriptor_options
+          }
+        , Project: {
+            Audit: in_audit_descriptor_options
+          }
+        , System: {
+            Audit: in_audit_descriptor_options
+          }
+        , Document: {
+            Audit: in_audit_descriptor_options
           }
       }
     // Prevent widget creation with <model_name>: false
@@ -268,7 +303,50 @@ $(function() {
               _mixins: ["directive"]
             }
 
+        , extended_audits: {
+            Audit: {
+              mapping: "related_audits_via_related_responses"
+              , allow_mapping : false
+              , allow_creating : false
+              , draw_children : true
+              , show_view : GGRC.mustache_path + "/audits/tree.mustache"
+              , footer_view : null
+            }
+          }
+
+        , Control: {
+            _mixins: ["extended_audits"]
+          }
+        , DataAsset: {
+            _mixins: ["extended_audits"]
+          }
+        , Facility: {
+            _mixins: ["extended_audits"]
+          }
+        , Market: {
+            _mixins: ["extended_audits"]
+          }
+        , OrgGroup: {
+            _mixins: ["extended_audits"]
+          }
+        , Process: {
+            _mixins: ["extended_audits"]
+          }
+        , Product: {
+            _mixins: ["extended_audits"]
+          }
+        , Project: {
+            _mixins: ["extended_audits"]
+          }
+        , System: {
+            _mixins: ["extended_audits"]
+          }
+        , Document: {
+            _mixins: ["extended_audits"]
+          }
+
         , Person : {
+            // _mixins: ["extended_audits"]
              Program : {
                 mapping: "extended_related_programs_via_search"
               , fetch_post_process: sort_sections
@@ -303,7 +381,6 @@ $(function() {
               }
             , Audit : { 
                 mapping: "extended_related_audits_via_search"
-              , allow_mapping : false
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               }
@@ -356,6 +433,19 @@ $(function() {
         }
       })
     ;
+
+  // Disable editing on profile pages, as long as it isn't audits on the dashboard
+  if (GGRC.page_instance() instanceof CMS.Models.Person) {
+    var person_options = extra_content_controller_options.Person;
+    can.each(person_options, function(options, model_name) {
+      if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
+        can.extend(options, {
+            allow_creating: false
+          , allow_mapping: false
+        });
+      }
+    });
+  }
 
   can.each(far_models, function(join_descriptors, model_name) {
     if ((overridden_models.all
