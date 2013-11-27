@@ -117,9 +117,9 @@ def admin_reindex():
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
   tq = create_task("reindex", reindex)   
-  response = "scheduled %s" % tq.name if tq.result == None else tq.result 
-  return app.make_response((
-    response, 200, [('Content-Type', 'text/html')]))
+  return tq.make_response(app.make_response(("scheduled %s" % tq.name, 
+                                            200, 
+                                            [('Content-Type', 'text/html')])))
 
 @app.route("/admin")
 @login_required
@@ -240,9 +240,11 @@ def import_people():
     return render_template("directives/import_errors.haml",
         directive_id = "People", exception_message = file_msg)
 
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename}
-  tq = create_task("import_people", url_for('import_people_task'), parameters)
-  return import_dump({"id":tq.id, "status": tq.status})
+  parameters = {"dry_run": dry_run, 
+                "csv_file": csv_file.read(), 
+                "csv_filename": filename}
+  tq = create_task("import_people", import_people_task, parameters)
+  return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
 
 
 @app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])

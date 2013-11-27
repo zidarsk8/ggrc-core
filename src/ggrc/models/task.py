@@ -36,6 +36,13 @@ class Task(Base, Stateful, db.Model):
     self.status = status
     db.session.add(self)
     db.session.commit()
+    
+  def make_response(self, default):
+    if self.result == None:
+      return default
+    from ggrc.app import app
+    return app.make_response((self.result, 200, 
+                              [('Content-Type', 'text/html')])) 
 
 def create_task(name, queued_task, parameters={}):
   from time import time
