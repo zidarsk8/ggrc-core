@@ -1,0 +1,16 @@
+  <div class="row-fluid">
+    <div class="span8">
+      <div class="tree-info">
+        <strong>gCal Event Link: </strong>
+        {{#with_mapping 'events' instance}}
+          {{#if events.length}}
+          <a href="{{events.0.instance.htmlLink}}" target="_blank">
+            {{events.0.instance.summary}}
+          </a>
+          {{else}}
+            No event found in gCal
+          {{/if}}
+        {{/with_mapping}}
+      </div>
+    </div>
+  </div>

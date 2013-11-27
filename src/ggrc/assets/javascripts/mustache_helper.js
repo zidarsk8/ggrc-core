@@ -1438,10 +1438,10 @@ Mustache.registerHelper("instance_ids", function(list, options) {
 Mustache.registerHelper("local_time_range", function(value, start, end, options) {
   var tokens = [];
   var sod;
-  value = resolve_computed(value);
+  value = resolve_computed(value) || undefined;
   sod = moment.utc(value).startOf("day");
-  start = moment(value || undefined).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
-  end = moment(value || undefined).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
+  start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
+  end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
 
   function selected(time) {
     if(time
