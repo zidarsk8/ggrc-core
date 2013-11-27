@@ -592,7 +592,7 @@ function defer_render(tag_prefix, func, deferred) {
         ;
       $element.after(frag_or_html);
       if ($element.next().get(0)) {
-        can.view.live.nodeLists.replace($element.get(), $element.next().get());
+        can.view.live.nodeLists.replace($element.get(), $element.nextAll().last().get());
         $element.remove();
       }
     };
