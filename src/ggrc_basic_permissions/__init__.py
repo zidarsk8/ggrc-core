@@ -147,6 +147,10 @@ def load_permissions_for(user):
   """
   permissions = {}
 
+  # Add default `Help` permissions for everyone, always
+  help_permissions = { "read": [ "Help" ] }
+  collect_permissions(help_permissions, None, permissions)
+
   # Add `ADMIN_PERMISSION` for "bootstrap admin" users
   if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
       and user.email in settings.BOOTSTRAP_ADMIN_USERS:
