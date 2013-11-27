@@ -21,7 +21,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=250), nullable=True),
     sa.Column('parameters', sa.LargeBinary(length=16777215), nullable=True),
-    sa.Column('result', sa.Text(), nullable=True),
+    sa.Column('result', sa.LargeBinary(length=16777215), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('modified_by_id', sa.Integer(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),

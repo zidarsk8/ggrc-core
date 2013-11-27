@@ -298,8 +298,8 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
-  
-  function checkStatus(result){
+
+  function checkStatus(result, type){
     Task.findOne({id: result.id}, function(task){
       task = task.task;
 
@@ -307,31 +307,39 @@ jQuery(function($) {
         
         $('body').trigger(
           'ajax:flash', 
-            { "success" : "Import " +  task.status.toLowerCase() + "..."}
+            { "success" : type + " " +  task.status.toLowerCase() + "..."}
         );
         // Task has not finished yet, check again in a while:
-        setTimeout(function(){checkStatus(result)}, 3000);
+        setTimeout(function(){checkStatus(result, type)}, 3000);
       }
       else if(task.status == "Success"){
         // Check if redirect:
         try{
-          var jsonResult = $.parseJSON($(task.result).html());
+          var jsonResult = $.parseJSON($(task.result.content).html());
           if("location" in jsonResult){
             window.location.assign(jsonResult.location);
             return;
           }
         } catch(e){}
-        
-        $("#results-container").html(task.result);
+        // Check if file download (export):
+        if("headers" in task.result){
+          var headers = task.result.headers
+          for(var i = 0; i < headers.length; i++){
+            if(headers[i][0] == "Content-Type" && headers[i][1] == "text/csv"){
+              window.location.assign("/task/"+task.id);
+            }
+          }
+        }
+        $("#results-container").html(task.result.content);
         $('body').trigger(
           'ajax:flash', 
-            { "success" : "Import successful."}
+            { "success" : type + " successful."}
         );
       }
       else if(task.status == "Failed"){
         $('body').trigger(
           'ajax:flash', 
-            { "error" : "Import failed."}
+            { "error" : type + " failed."}
         );
       }
     });
@@ -347,9 +355,23 @@ jQuery(function($) {
       }
       // Check if task has completed:
       setTimeout(function(){
-        checkStatus(result);
+        checkStatus(result, "Import");
       }, 500)
     }
+  });
+  
+  $('body').on('click', 'a.export-link', function(e, el){
+    e.preventDefault();
+    var url = e.currentTarget.href;
+    can.ajax({
+      url: url,
+      success: function(data, status, xhr) {
+        var jsonResult = $.parseJSON($(data).html());
+        setTimeout(function(){
+          checkStatus(jsonResult, "Export");
+        }, 500);
+      }
+    });
   });
 });
 

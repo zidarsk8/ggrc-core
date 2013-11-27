@@ -16,7 +16,7 @@ from werkzeug.exceptions import Forbidden
 from . import filters
 from .common import BaseObjectView, RedirectedPolymorphView
 from .tooltip import TooltipView
-from ggrc.models.task import Task, queued_task, create_task
+from ggrc.models.task import Task, queued_task, create_task, make_task_response
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -181,7 +181,6 @@ def system_program_import_template(program_id):
 @app.route("/task/import_people", methods = ['POST'])
 @queued_task
 def import_people_task(task):
-
   from ggrc.converters.common import ImportException
   from ggrc.converters.people import PeopleConverter
   from ggrc.converters.import_helper import handle_csv_import
@@ -211,20 +210,15 @@ def import_people_task(task):
           converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("directives/import_errors.haml",
           directive_id="People", exception_message=str(e))
-  
-  return app.make_response((
-        'this should be removed', 200, [('Content-Type', 'text/html')]))
-  
-  
 
-@app.route("/admin/import_people", methods = ['GET', 'POST'])
+@app.route("/admin/import_people", methods=['GET', 'POST'])
 def import_people():
 
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
 
   if request.method != 'POST':
-    return render_template("people/import.haml", import_kind = 'People')
+    return render_template("people/import.haml", import_kind='People')
 
   if 'cancel' in request.form:
     return import_redirect("/admin")
@@ -245,7 +239,6 @@ def import_people():
                 "csv_filename": filename}
   tq = create_task("import_people", import_people_task, parameters)
   return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
-
 
 @app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_controls", methods=['GET', 'POST'])
@@ -690,21 +683,30 @@ def export_processes():
   filename = "PROCESSES.csv"
   return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
 
-@app.route("/admin/export_people", methods=['GET'])
-def export_people():
+@app.route("/tasks/export_people", methods=['POST'])
+@queued_task
+def export_people_task(task):
   from ggrc.converters.people import PeopleConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Person
-
-  if not permissions.is_allowed_read("/admin", 1):
-    raise Forbidden()
-
   options = {}
   options['export'] = True
   people = Person.query.all()
   filename = "PEOPLE.csv"
   return handle_converter_csv_export(filename, people, PeopleConverter, **options)
 
+@app.route("/admin/export_people", methods=['GET'])
+def export_people():
+  if not permissions.is_allowed_read("/admin", 1):
+    raise Forbidden()
+  
+  tq = create_task("export_people", export_people_task)
+  return import_dump({"id":tq.id, "status":tq.status})
+
+@app.route("/task/<id_task>", methods=['GET'])
+def get_task_response(id_task):
+  return make_task_response(id_task)
+  
 @app.route("/systems/export", methods=['GET'])
 def export_systems():
   from ggrc.converters.systems import SystemsConverter
