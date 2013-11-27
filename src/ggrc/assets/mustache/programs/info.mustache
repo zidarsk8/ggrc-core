@@ -21,7 +21,7 @@
       {{url}}
     </a>
   </p>
-  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_private_program=instance.context}}}
 
   {{{render_hooks 'Program.extended_info'}}}
 
