@@ -1100,6 +1100,31 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap"
 });
 
+Mustache.registerHelper("if_result_has_direct_mappings", function(
+    bindings, parent_instance, options) {
+  //  Render the `true` / `fn` block if the `result` contains a direct mapping
+  //  to `parent_instance`.  Otherwise render the `false` / `inverse` block.
+  bindings = Mustache.resolve(bindings);
+  bindings = resolve_computed(bindings);
+  parent_instance = Mustache.resolve(parent_instance);
+  var has_direct_mappings = false
+    , i
+    ;
+
+  if (bindings && bindings.length > 0) {
+    for (i=0; i<bindings.length; i++) {
+      if (bindings[i].instance && parent_instance
+          && bindings[i].instance.reify() === parent_instance.reify())
+        has_direct_mappings = true;
+    }
+  }
+
+  if (has_direct_mappings)
+    return options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("if_result_has_extended_mappings", function(
     bindings, parent_instance, options) {
   //  Render the `true` / `fn` block if the `result` exists (in this list)
@@ -1112,9 +1137,12 @@ Mustache.registerHelper("if_result_has_extended_mappings", function(
     , i
     ;
 
-  for (i=0; i<bindings.length; i++) {
-    if (bindings[i].instance !== parent_instance)
-      has_extended_mappings = true;
+  if (bindings && bindings.length > 0) {
+    for (i=0; i<bindings.length; i++) {
+      if (bindings[i].instance && parent_instance
+          && bindings[i].instance.reify() !== parent_instance.reify())
+        has_extended_mappings = true;
+    }
   }
 
   if (has_extended_mappings)
@@ -1147,10 +1175,15 @@ Mustache.registerHelper("each_with_extras_as", function(name, list, options) {
     frame.index = i;
     frame.isFirst = i == 0;
     frame.isLast = i == length - 1;
+    frame.isSecondToLast = i == length - 2;
     frame.length = length;
     frame[name] = list[i];
     output.push(options.fn(new can.Observe(frame)));
+
     //  FIXME: Is this legit?  It seems necessary in some cases.
+    //context = $.extend([], options.contexts, options.contexts.concat([frame]));
+    //output.push(options.fn(context));
+    // ...or...
     //contexts = options.contexts.concat([frame]);
     //contexts.___st4ck3d = true;
     //output.push(options.fn(contexts));
@@ -1405,10 +1438,10 @@ Mustache.registerHelper("instance_ids", function(list, options) {
 Mustache.registerHelper("local_time_range", function(value, start, end, options) {
   var tokens = [];
   var sod;
-  value = resolve_computed(value);
+  value = resolve_computed(value) || undefined;
   sod = moment.utc(value).startOf("day");
-  start = moment(value || undefined).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
-  end = moment(value || undefined).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
+  start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
+  end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
 
   function selected(time) {
     if(time
@@ -1678,23 +1711,36 @@ Mustache.registerHelper("global_count", function(model_type, options) {
 
   if (!state.attr('status')) {
     state.attr('status', 'loading');
-    GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
-      state.attr({
-          status: 'loaded'
-        , count: result.counts[model_type]
-      });
-    })
+
+    var model = CMS.Models[model_type]
+      , update_count = function(ev, instance) {
+          if (!instance || instance instanceof model) {
+            GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+              state.attr({
+                  status: 'loaded'
+                , count: result.counts[model_type]
+              });
+            });
+          }
+        }
+      ;
+
+    update_count();
+    if (model) {
+      model.bind('created', update_count);
+      model.bind('destroyed', update_count);
+    }
   }
 
   // Return the result
   if (state.attr('status') === 'failed') {
     return '';
   }
-  else if (state.attr('status') === 'loading' || state.count === undefined) {
+  else if (state.attr('status') === 'loading' || state.attr('count') === undefined) {
     return options.inverse(options.contexts);
   }
   else {
-    return options.fn(state.count);
+    return options.fn(state.attr('count'));
   }
 });
 
@@ -1751,5 +1797,121 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
   delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
   return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
 });
+
+/*
+  Evaluates multiple helpers as if they were a single condition
+  
+  Each new statement is begun with a newline-prefixed string. The type of logic 
+  to apply as well as whether it should be a truthy or falsy evaluation may also 
+  be included with the statement in addition to the helper name.
+
+  Currently, if_helpers only supports all logic being 'and' or all logic being 'or'.
+
+  All hash arguments (some_val=37) must go in the last line and should be prefixed by the 
+  zero-based index of the corresponding helper. This is necessary because all hash arguments 
+  are required to be the final arguments for a helper. Here's an example:
+    _0_some_val=37 would pass some_val=37 to the first helper.
+
+  Statement syntax:
+    '\
+    [LOGIC] [TRUTHY_FALSY]HELPER_NAME' arg1 arg2 argN
+
+  Defaults:
+    LOGIC = and (accepts: and or)
+    TRUTHY_FALSEY = # (accepts: # ^)
+    HELPER_NAME = some_helper_name
+
+  Example:
+    {{#if_helpers '\
+      #if_match' page_object.constructor.shortName 'Project' '\
+      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+    ' _1_hash_arg_for_second_statement=something}}
+      matched all conditions
+    {{else}}
+      failed
+    {{/if_helpers}}
+*/
+Mustache.registerHelper("if_helpers", function() {
+  var args = arguments
+    , options = arguments[arguments.length - 1]
+    , helper_result
+    , helper_options = can.extend({}, options, {
+        fn: function() { helper_result = 'fn'; }
+      , inverse: function() { helper_result = 'inverse'; }
+      })
+    ;
+
+  // Parse statements
+  var statements = []
+    , statement
+    , match
+    ;
+  can.each(args, function(arg, i) {
+    if (i < args.length - 1) {
+      if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
+        statement && statements.push(statement);
+        if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
+          statement = {
+              fn_name: match[3] === '^' ? 'inverse' : 'fn'
+            , helper: Mustache.getHelper(match[4])
+            , args: []
+            , logic: match[2] === 'or' ? 'or' : 'and'
+          };
+
+          // Add hash arguments
+          if (options.hash) {
+            var hash = {}
+              , prefix = '_' + statements.length + '_'
+              , prop
+              ;
+            for (prop in options.hash) {
+              if (prop.indexOf(prefix) === 0) {
+                hash[prop.substr(prefix.length)] = options.hash[prop];
+              }
+            }
+            for (prop in hash) {
+              statement.hash = hash;
+              break;
+            } 
+          }
+        }
+        else
+          statement = null;
+      }
+      else if (statement) {
+        statement.args.push(arg);
+      }
+    }
+  });
+  statement && statements.push(statement);
+
+  if (statements.length) {
+    // Evaluate statements
+    var result;
+    can.each(statements, function(statement) {
+      helper_result = null;
+      statement.helper.fn.apply(statement.helper, statement.args.concat([
+        can.extend({}, helper_options, { hash: statement.hash || helper_options.hash })
+      ]));
+      helper_result = helper_result === statement.fn_name;
+      if (result === undefined)
+        result = helper_result;
+      else if (statement.logic === 'and')
+        result = result && helper_result;
+      else if (statement.logic === 'or')
+        result = result || helper_result;
+      else
+        result = false;
+    });
+
+    // Execute based on the result
+    if (result) {
+      return options.fn(options.contexts);
+    }
+    else {
+      return options.inverse(options.contexts);
+    }
+  }
+})
 
 })(this, jQuery, can);

@@ -109,6 +109,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     var dfd
     , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
 
+    // TODO check whether person is the logged-in user, and use OAuth2 identifier if so?
     role = role || "writer";
     if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
       person = (person || instance[owner]).reify();
@@ -183,10 +184,27 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     if(!parent_folder) {
       el.trigger("ajax:flash", { warning : 'No GDrive folder found for PBC Request "' + request.objective.reify().title + '"'});
     }
+    //NB: resources returned from uploadFiles() do not match the properties expected from getting
+    // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
+    // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
+    // URL has a query parameter difference, "usp=drive_web" vs "usp=drivesdk".  For consistency,
+    // when getting file references back from Picker, always put them in a RefreshQueue before
+    // using their properties. --BM 11/19/2013
     parent_folder.uploadFiles().then(function(files) {
+      return new RefreshQueue().enqueue(files).trigger().then(function(fs) {
+        return $.when.apply($, can.map(fs, function(f) {
+          if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
+            return f.copyToParent(parent_folder);
+          } else {
+            return f;
+          }
+        }));
+      });
+    }).done(function() {
+      var files = can.makeArray(arguments);
       can.each(files, function(file) {
         //Since we can re-use existing file references from the picker, check for that case.
-        CMS.Models.Document.findAll({link : file.url}).done(function(d) {
+        CMS.Models.Document.findAll({link : file.alternateLink }).done(function(d) {
           if(d.length) {
             //file found, just link to Response
             new CMS.Models.ObjectDocument({
@@ -208,8 +226,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             //file not found, make Document object.
             new CMS.Models.Document({
               context : response.context || {id : null}
-              , title : file.name
-              , link : file.url
+              , title : file.title
+              , link : file.alternateLink
             }).save().then(function(doc) {
               new CMS.Models.ObjectDocument({
                 context : response.context || {id : null}
@@ -222,13 +240,6 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 , fileable : doc
               }).save();
             });
-          }
-        });
-      });
-      new RefreshQueue().enqueue(files).trigger().done(function(fs) {
-        can.each(fs, function(f) {
-          if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
-            f.addToParent(parent_folder);
           }
         });
       });
@@ -280,6 +291,52 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
         , instance.person
       );
+    }
+  }
+
+  , "{CMS.Models.Meeting} created" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.Meeting) {
+      new CMS.Models.GCalEvent({
+        calendar : GGRC.config.DEFAULT_CALENDAR
+        , summary : instance.title
+        , start : instance.start_at
+        , end : instance.end_at
+        , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
+      }).save().then(function(cev) {
+        var subwin;
+
+        function poll() {
+          if(subwin.closed) {
+            cev.refresh().then(function() {
+              instance.attr({
+                title : cev.summary
+                , start_at : cev.start
+                , end_at : cev.end
+              });
+              can.each(instance.get_mapping("people"), function(person_binding) {
+                instance.mark_for_deletion("people", person_binding.instance);
+              });
+              can.each(cev.attendees, function(attendee) {
+                instance.mark_for_addition("people", attendee);
+              });
+              instance.save();
+            });
+          } else {
+            setTimeout(poll, 5000);
+          }
+        }
+
+        new CMS.Models.ObjectEvent({
+          eventable : instance
+          , calendar : GGRC.config.DEFAULT_CALENDAR
+          , event : cev
+          , context : instance.context || { id : null }
+        }).save();
+
+        subwin = window.open(cev.htmlLink, cev.summary);
+        setTimeout(poll, 5000);
+
+      });
     }
   }
 });

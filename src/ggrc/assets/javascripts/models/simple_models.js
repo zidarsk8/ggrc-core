@@ -1021,8 +1021,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
     , modified_by : "CMS.Models.Person.stub"
-    , start_date : "datetime"
-    , end_date : "datetime"
+    , start_date : "date"
+    , end_date : "date"
     , report_start_date : "date"
     , report_end_date : "date"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -1050,6 +1050,18 @@ can.Model.Cacheable("CMS.Models.Audit", {
     {
       model : "Response"
       , mapping: "related_owned_responses"
+      , allow_creating : false
+      , parent_find_param : "audit.id"
+    },
+    {
+      model : "Request"
+      , mapping: "related_mapped_requests"
+      , allow_creating : false
+      , parent_find_param : "audit.id"
+    },
+    {
+      model : "Response"
+      , mapping: "related_mapped_responses"
       , allow_creating : false
       , parent_find_param : "audit.id"
     }]
@@ -1090,6 +1102,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
+    , header_view : GGRC.mustache_path + "/requests/filters.mustache"
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , draw_children : true
     , child_options : [{

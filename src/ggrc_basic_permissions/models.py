@@ -91,7 +91,12 @@ class UserRole(Base, db.Model):
         orm.subqueryload('person'))
 
   def _display_name(self):
-    return self.person.display_name + '<->' + self.role.display_name
+    if self.context and self.context.related_object:
+      context_related = ' in ' + self.context.related_object.display_name
+    else:
+      context_related = ''
+    return '{0} <-> {1}{2}'.format(
+        self.person.display_name, self.role.display_name, context_related)
 
 class RoleImplication(Base, db.Model):
   __tablename__ = 'role_implications'

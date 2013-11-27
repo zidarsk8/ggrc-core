@@ -6,12 +6,14 @@
 import sqlalchemy.types as types
 import json
 from ggrc.utils import as_json
+from .exceptions import ValidationError
 
 class JsonType(types.TypeDecorator):
   '''
   Marshals Python structures to and from JSON stored
   as Text in the db
   '''
+  # FIXME: Change this to a larger column type and fix validation below
   impl = types.Text
 
   def process_result_value(self, value, dialect):
@@ -23,5 +25,9 @@ class JsonType(types.TypeDecorator):
     if value is None or isinstance(value, basestring):
       pass
     else:
-        value = as_json(value)
+      value = as_json(value)
+      # Detect if the byte-length of the encoded JSON is larger than the
+      # database "TEXT" column type can handle
+      if len(value.encode('utf-8')) > 65534:
+        raise ValidationError("Log record content too long")
     return value

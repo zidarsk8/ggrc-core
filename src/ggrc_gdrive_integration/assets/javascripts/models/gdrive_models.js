@@ -91,7 +91,7 @@ var gdrive_findAll = function(extra_params, extra_path) {
   };
 };
 
-function gapi_request_with_auth(params) {
+var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request_with_auth(params) {
   return window.oauth_dfd.then(function() {
     var dfd = new $.Deferred();
     var cb = params.callback;
@@ -113,6 +113,9 @@ function gapi_request_with_auth(params) {
       }
     };
     params.callback = check_auth;
+    if(typeof params.path === "function") {
+      params.path = params.path();
+    }
     gapi.client.request(params);
     return dfd.promise();
   });
@@ -149,6 +152,25 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
       }
     }).done(function() {
       object.refresh();
+    });
+  }
+
+  , copyToParent : function(object, parent) {
+    if(typeof parent === "string") {
+      parent = { id : parent };
+    }
+
+    return gapi_request_with_auth({
+      path : "/drive/v2/files/" + object.id + "/copy"
+      , method : "post"
+      , body : { parents : [{id : parent.id }], title : object.title }
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          dfd.resolve(result);
+        }
+      }
     });
   }
 
@@ -212,6 +234,9 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   }
   , addToParent : function(parent) {
     return this.constructor.addToParent(this, parent);
+  }
+  , copyToParent : function(parent) {
+    return this.constructor.copyToParent(this, parent);
   }
 });
 
