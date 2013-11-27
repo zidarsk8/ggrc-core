@@ -28,7 +28,7 @@ class SystemRowConverter(BaseRowConverter):
   def reify(self):
     self.handle('slug', SlugColumnHandler)
     self.handle('controls', LinkControlsHandler)
-    self.handle('owner', ContactEmailHandler, person_must_exist=True)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('documents', LinkDocumentsHandler)
     self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
         direction='from')
@@ -89,7 +89,7 @@ class SystemsConverter(BaseConverter):
     ('Description' , 'description'),
     ('Link:References', 'documents'),
     ('Infrastructure', 'infrastructure'),
-    ('Map:Person of Contact', 'owner'),
+    ('Map:Person of Contact', 'contact'),
     ('Map:Controls', 'controls'),
     ('Map:System', 'sub_systems'),
     ('Map:Process', 'sub_processes'),
