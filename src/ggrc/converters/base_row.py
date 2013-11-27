@@ -9,8 +9,8 @@ from .common import *
 from ggrc.models.all_models import (
     ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
-    ObjectPerson, ObjectObjective, Option, Person, Process, Relationship,
-    Request, Section, SectionObjective, System, SystemOrProcess,
+    ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
+    Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
     )
 from ggrc.models.exceptions import ValidationError
 
