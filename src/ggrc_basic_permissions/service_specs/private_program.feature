@@ -159,7 +159,7 @@ Feature: Private Programs
       | DirectiveControl |
       | Document         |
       | Facility         |
-      | Help             |
+      #| Help             |
       | Market           |
       | Objective        |
       | ObjectiveControl |

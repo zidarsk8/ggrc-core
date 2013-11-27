@@ -145,75 +145,78 @@ def load_permissions_for(user):
   'condition' is the string name of a conditional operator, such as 'contains'.
   'terms' are the arguments to the 'condition'.
   """
+  permissions = {}
+
+  # Add `ADMIN_PERMISSION` for "bootstrap admin" users
   if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
       and user.email in settings.BOOTSTRAP_ADMIN_USERS:
-    permissions = {
-        DefaultUserPermissions.ADMIN_PERMISSION.action: {
-          DefaultUserPermissions.ADMIN_PERMISSION.resource_type: {
-            'contexts': [
-              DefaultUserPermissions.ADMIN_PERMISSION.context_id,
-              ],
-            }
-          },
+    admin_permissions = {
+        DefaultUserPermissions.ADMIN_PERMISSION.action: [
+          DefaultUserPermissions.ADMIN_PERMISSION.resource_type
+          ]
         }
-  else:
-    permissions = {}
-    user_roles = db.session.query(UserRole)\
+    collect_permissions(
+        admin_permissions,
+        DefaultUserPermissions.ADMIN_PERMISSION.context_id,
+        permissions)
+
+  # Now add permissions from all DB-managed roles
+  user_roles = db.session.query(UserRole)\
+      .options(
+          sqlalchemy.orm.undefer_group('UserRole_complete'),
+          sqlalchemy.orm.undefer_group('Role_complete'),
+          sqlalchemy.orm.joinedload('role'))\
+      .filter(UserRole.person_id==user.id)\
+      .order_by(UserRole.updated_at.desc())\
+      .all()
+  roles_contexts = {}
+  for user_role in user_roles:
+    roles_contexts.setdefault(user_role.role_id, set())
+    roles_contexts[user_role.role_id].add(user_role.context_id)
+    if isinstance(user_role.role.permissions, dict):
+      collect_permissions(
+          user_role.role.permissions, user_role.context_id, permissions)
+
+  # Collate roles/contexts to eager load all required implications
+  implications_queries = []
+  for role_id, context_ids in roles_contexts.items():
+    implications_queries.append(and_(
+      RoleImplication.source_role_id == role_id,
+      RoleImplication.source_context_id.in_(context_ids)))
+  if len(implications_queries) > 0:
+    implications = RoleImplication.query\
+        .filter(or_(*implications_queries))\
         .options(
-            sqlalchemy.orm.undefer_group('UserRole_complete'),
             sqlalchemy.orm.undefer_group('Role_complete'),
             sqlalchemy.orm.joinedload('role'))\
-        .filter(UserRole.person_id==user.id)\
-        .order_by(UserRole.updated_at.desc())\
         .all()
-    roles_contexts = {}
-    for user_role in user_roles:
-      roles_contexts.setdefault(user_role.role_id, set())
-      roles_contexts[user_role.role_id].add(user_role.context_id)
-      if isinstance(user_role.role.permissions, dict):
-        collect_permissions(
-            user_role.role.permissions, user_role.context_id, permissions)
+  else:
+    implications = []
 
-    # Collate roles/contexts to eager load all required implications
-    implications_queries = []
-    for role_id, context_ids in roles_contexts.items():
-      implications_queries.append(and_(
-        RoleImplication.source_role_id == role_id,
-        RoleImplication.source_context_id.in_(context_ids)))
-    if len(implications_queries) > 0:
-      implications = RoleImplication.query\
-          .filter(or_(*implications_queries))\
-          .options(
-              sqlalchemy.orm.undefer_group('Role_complete'),
-              sqlalchemy.orm.joinedload('role'))\
-          .all()
-    else:
-      implications = []
+  for implication in implications:
+    if isinstance(implication.role.permissions, dict):
+      collect_permissions(
+          implication.role.permissions, implication.context_id, permissions)
 
-    for implication in implications:
-      if isinstance(implication.role.permissions, dict):
-        collect_permissions(
-            implication.role.permissions, implication.context_id, permissions)
-
-    #grab personal context
-    personal_context = db.session.query(Context).filter(
-        Context.related_object_id == user.id,
-        Context.related_object_type == 'Person',
-        ).first()
-    if not personal_context:
-      personal_context = Context(
-          name='Personal Context for {0}'.format(user.id),
-          description='',
-          context_id=1,
-          related_object_id=user.id,
-          related_object_type='Person',
-          )
-      db.session.add(personal_context)
-      db.session.commit()
-    permissions.setdefault('__GGRC_ADMIN__',{})\
-        .setdefault('__GGRC_ALL__', dict())\
-        .setdefault('contexts', list())\
-        .append(personal_context.id)
+  #grab personal context
+  personal_context = db.session.query(Context).filter(
+      Context.related_object_id == user.id,
+      Context.related_object_type == 'Person',
+      ).first()
+  if not personal_context:
+    personal_context = Context(
+        name='Personal Context for {0}'.format(user.id),
+        description='',
+        context_id=1,
+        related_object_id=user.id,
+        related_object_type='Person',
+        )
+    db.session.add(personal_context)
+    db.session.commit()
+  permissions.setdefault('__GGRC_ADMIN__',{})\
+      .setdefault('__GGRC_ALL__', dict())\
+      .setdefault('contexts', list())\
+      .append(personal_context.id)
   return permissions
 
 def all_collections():
