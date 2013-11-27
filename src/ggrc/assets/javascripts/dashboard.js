@@ -346,13 +346,9 @@ jQuery(function($) {
         window.location.assign(result.location);
       }
       // Check if task has completed:
-      $('body').trigger(
-          'ajax:flash', 
-          { "success" : "Import pending..." }
-        );
       setTimeout(function(){
         checkStatus(result);
-      }, 1000)
+      }, 500)
     }
   });
 });
