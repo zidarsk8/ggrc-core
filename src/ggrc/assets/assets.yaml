@@ -121,6 +121,8 @@ dashboard-js-template-files:
   - dashboard/internav_list.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
+  - dashboard/lhn.mustache
+  - dashboard/lhn_search.mustache
   - documents/list.mustache
   - documents/modal_content.mustache
   - documents/option_column.mustache
