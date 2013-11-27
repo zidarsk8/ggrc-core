@@ -721,7 +721,8 @@ can.Model("can.Model.Cacheable", {
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
         if (fun_name === "stubs" || fun_name === "get_stubs"
             ||fun_name === "models" || fun_name === "get_instances") {
-          serial[name] = val.stubs().serialize();
+          // val can be null in some cases
+          val && (serial[name] = val.stubs().serialize());
         } else if (fun_name === "stub" || fun_name === "get_stub"
                    || fun_name === "model" || fun_name === "get_instance") {
           serial[name] = (val ? val.stub().serialize() : null);
