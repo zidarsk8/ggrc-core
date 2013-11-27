@@ -65,22 +65,9 @@
         </div>
         {{/description}}
         
+        {{{render '/static/mustache/base_objects/contacts.mustache' instance=this}}}
+        {{#url}}
         <div class="row-fluid">
-          <div class="span6">
-            <div class="tree-info">
-              <strong>Contact:</strong>
-              {{^contact}}
-                <span class="error">
-                  Not Assigned
-                </span>
-              {{/contact}}
-              {{#if contact}}
-                {{contact.name}}
-              {{/if}}
-            </div>
-          </div>
-
-          {{#url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
@@ -89,9 +76,8 @@
                 </a>
             </div>
           </div>
-          {{/url}}
-
         </div>
+        {{/url}}
       </div>
     </div>
   </li>

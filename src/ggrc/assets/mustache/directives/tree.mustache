@@ -84,36 +84,20 @@
 
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
+        {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+        {{#instance.url}}
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
-              <strong>Contact:</strong>
-              {{^instance.contact}}
-                <span class="error">
-                  Not Assigned
-                </span>
-              {{/instance.contact}}
-              {{#if instance.contact}}
-                {{#using contact=instance.contact}}
-                {{contact.name}}
-                {{/using}}
-              {{/if}}
+              {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy OR Standard NOT Directive }}
+              <strong>URL:</strong>
+              <a class="url" href="{{schemed_url instance.url}}" target="_blank">
+                {{instance.url}}
+              </a>
             </div>
-          </div>
-          <div class="span6">
-            {{#instance.url}}
-            <div class="span6">
-              <div class="tree-info">
-                {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy OR Standard NOT Directive }}
-                <strong>URL:</strong>
-                <a class="url" href="{{schemed_url instance.url}}" target="_blank">
-                  {{instance.url}}
-                </a>
-              </div>
-            </div>
-            {{/instance.url}}
           </div>
         </div>
+        {{/instance.url}}
       </div>
       
       {{#if draw_children}}

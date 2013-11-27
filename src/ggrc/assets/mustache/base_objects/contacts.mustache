@@ -1,6 +1,6 @@
 {{#instance}}
 <div class="row-fluid">
-  <div class="span6">
+  <div {{^if stacked}}class="span6"{{/if}}>
     {{#if owners.length}}
       {{#using contacts=owners}}
       {{#contacts}}
@@ -19,7 +19,7 @@
       </p>
     {{/if}}
   </div>
-  <div class="span6">
+  <div {{^if stacked}}class="span6"{{/if}}>
     <p>
       <strong>Contact:</strong>
       {{#using contact=contact}}
