@@ -1912,6 +1912,13 @@ Mustache.registerHelper("if_helpers", function() {
       return options.inverse(options.contexts);
     }
   }
-})
+});
+
+Mustache.registerHelper("with_model_as", function(var_name, model_name, options) {
+  var frame = {};
+  model_name = resolve_computed(Mustache.resolve(model_name));
+  frame[var_name] = CMS.Models[model_name];
+  return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
+});
 
 })(this, jQuery, can);

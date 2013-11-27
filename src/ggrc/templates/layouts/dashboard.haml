@@ -6,27 +6,6 @@
 -#
 -extends 'layouts/base.haml'
 
--macro search_result(type, type_plural, li_class='', tooltip_view='', template_view='')
-  %li{ 'class': ['{{ li_class }}', 'accordion-group'], 'data-model-name': '={type}', 'data-tooltip-view' : '={tooltip_view}', 'data-template' : '={template_view}' }
-    %a{ 'href': '#={ type_plural|underscore }_sub_level', 'class': '={li_class}', 'data-parent' : ".top-level", 'data-object-singular' : '={type}' }
-      %i{ 'class': 'grcicon-{{ type|lower|nospace }}-color' }
-      -if type_plural|title == 'Audits'
-        Audits
-        %small BETA
-      -elif type_plural|title == 'People'
-        People
-        %small BETA
-      -else
-        {{ type_plural|title }}
-      %small
-        (
-        %span.item-count> ...
-        )
-    %div.content
-      %ul.sub-level{ 'id' : '={ type_plural|underscore }_sub_level' }
-      %ul.sub-actions
--endmacro
-
 -block extra_javascript
   GGRC.permissions = ={ permissions_json()|safe };
   GGRC.current_user = ={ current_user_json()|safe };
@@ -161,52 +140,8 @@
             Version
             =config.get('VERSION')
 
-    .bar-v
-    .lhs-holder
-      .affix-holder
-        #lhs.lhs.accordion
-          -#NEW LHS
-          %form.form-search{ 'onsubmit': 'return false' }
-            .lhs-search.input-append<
-              %input.widgetsearch{ 'type': 'text', 'placeholder': 'Enter text' }>
-              %label.checkbox.btn<
-                %input.my-work{ 'type': 'checkbox' }
-                My Work
-          .lhs-bg
-          .lhs-nav.emphesized
-            %ul.top-level
-              =search_result('Program', 'programs', 'programs', '/programs/extended_info.mustache')
-              =search_result('Audit', 'audits', 'programs', '/audits/extended_info.mustache', '/static/mustache/audits/search_result.mustache')
-          .lhs-nav
-            %h2.governance Governance
-            %ul.top-level
-              =search_result('Regulation', 'regulations', 'governance')
-              =search_result('Contract', 'contracts', 'governance')
-              =search_result('Policy', 'policies', 'governance')
-              =search_result('Standard', 'standards', 'governance')
-              =search_result('Objective', 'objectives', 'governance')
-              =search_result('Control', 'controls', 'governance')
-            %h2.business Assets/Business
-            %ul.top-level
-              =search_result('System', 'systems', 'business')
-              =search_result('Process', 'processes', 'business')
-              =search_result('DataAsset', 'data assets', 'business')
-              =search_result('Product', 'products', 'business')
-              =search_result('Project', 'projects', 'business')
-              =search_result('Facility', 'facilities', 'business')
-              =search_result('Market', 'markets', 'business')
-            %h2.entities People/Groups
-            %ul.top-level
-              =search_result('Person', 'people', 'entities')
-              =search_result('OrgGroup', 'org groups', 'entities')
-            -#%h2.risk Risk Management
-            -#%ul.top-level
-              =search_result('Risk', 'risks', 'risk')
-              =search_result('RiskyAttribute', 'risky attributes', 'risk')
-          .bar-h
-          -#.lhs-nav
-            -#%h2 My Work
-          -#.bar-h
-          .lhs-nav.recent
-            %h2 Recently Viewed
-            %ul.top-level
+    #lhn
+      .bar-v
+      .lhs-holder
+        .affix-holder
+          #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
