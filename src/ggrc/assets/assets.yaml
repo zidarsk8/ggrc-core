@@ -122,6 +122,8 @@ dashboard-js-template-files:
   - dashboard/internav_list.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
+  - dashboard/lhn.mustache
+  - dashboard/lhn_search.mustache
   - documents/list.mustache
   - documents/modal_content.mustache
   - documents/option_column.mustache
@@ -183,6 +185,7 @@ dashboard-js-template-files:
   - selectors/multitype_option_column.mustache
   - selectors/multitype_option_detail.mustache
   - selectors/multitype_option_items.mustache
+  - selectors/multitype_option_mappings_popover.mustache
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
   - standards/modal_content.mustache

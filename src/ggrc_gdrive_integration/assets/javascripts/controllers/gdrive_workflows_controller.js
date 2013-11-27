@@ -109,6 +109,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     var dfd
     , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
 
+    // TODO check whether person is the logged-in user, and use OAuth2 identifier if so?
     role = role || "writer";
     if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
       person = (person || instance[owner]).reify();
@@ -290,6 +291,52 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
         , instance.person
       );
+    }
+  }
+
+  , "{CMS.Models.Meeting} created" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.Meeting) {
+      new CMS.Models.GCalEvent({
+        calendar : GGRC.config.DEFAULT_CALENDAR
+        , summary : instance.title
+        , start : instance.start_at
+        , end : instance.end_at
+        , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
+      }).save().then(function(cev) {
+        var subwin;
+
+        function poll() {
+          if(subwin.closed) {
+            cev.refresh().then(function() {
+              instance.attr({
+                title : cev.summary
+                , start_at : cev.start
+                , end_at : cev.end
+              });
+              can.each(instance.get_mapping("people"), function(person_binding) {
+                instance.mark_for_deletion("people", person_binding.instance);
+              });
+              can.each(cev.attendees, function(attendee) {
+                instance.mark_for_addition("people", attendee);
+              });
+              instance.save();
+            });
+          } else {
+            setTimeout(poll, 5000);
+          }
+        }
+
+        new CMS.Models.ObjectEvent({
+          eventable : instance
+          , calendar : GGRC.config.DEFAULT_CALENDAR
+          , event : cev
+          , context : instance.context || { id : null }
+        }).save();
+
+        subwin = window.open(cev.htmlLink, cev.summary);
+        setTimeout(poll, 5000);
+
+      });
     }
   }
 });

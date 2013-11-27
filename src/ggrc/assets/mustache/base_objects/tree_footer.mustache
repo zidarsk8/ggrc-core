@@ -7,7 +7,6 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-{{^is_profile parent_instance}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -19,6 +18,7 @@
         rel="tooltip"
         data-placement="left"
         data-toggle="multitype-modal-selector"
+        data-join-mapping="{{mapping}}"
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
@@ -41,6 +41,7 @@
         rel="tooltip"
         data-placement="left"
         data-toggle="multitype-modal-selector"
+        data-join-mapping="{{mapping}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
         data-exclude-option-types="{{exclude_option_types}}"
@@ -70,6 +71,5 @@
     </div>
   </div>
 </li>
-{{/is_profile}}
 {{/if}}
 {{/is_allowed_to_map}}

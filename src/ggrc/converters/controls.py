@@ -49,7 +49,7 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('documents', LinkDocumentsHandler)
     self.handle('categories', LinkControlCategoriesHandler)
     self.handle('assertions', LinkControlAssertionsHandler)
-    self.handle('owner', ContactEmailHandler, person_must_exist=True)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('systems', LinkObjectControl, model_class = System)
     self.handle('processes', LinkObjectControl, model_class = Process)
 
@@ -101,7 +101,7 @@ class ControlsConverter(BaseConverter):
     ('Map:Assertions', 'assertions'),
     ('Frequency', 'verify_frequency'),
     ('Link:References', 'documents'),
-    ('Map:Person of Contact', 'owner'),
+    ('Map:Person of Contact', 'contact'),
     ('Key Control', 'key_control'),
     ('Active', 'active'),
     ('Fraud Related', 'fraud_related'),
