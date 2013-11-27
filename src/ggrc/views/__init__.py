@@ -266,6 +266,60 @@ def import_controls(directive_id):
 
   return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to, parent_type = (directive.kind or directive.meta_kind))
 
+@app.route("/standards/<directive_id>/import_objectives", methods=['GET', 'POST'])
+@app.route("/regulations/<directive_id>/import_objectives", methods=['GET', 'POST'])
+@app.route("/policies/<directive_id>/import_objectives", methods=['GET', 'POST'])
+@app.route("/contracts/<directive_id>/import_objectives", methods=['GET', 'POST'])
+def import_objectives(directive_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Directive
+  from ggrc.utils import view_url_for
+
+  directive = Directive.query.get(directive_id)
+  directive_url = view_url_for(directive)
+  return_to = unicode(request.args.get('return_to', directive_url))
+
+  if request.method == 'POST':
+    if 'cancel' in request.form:
+      return import_redirect(return_to)
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        options = {}
+        options['parent_type'] = Directive
+        options['parent_id'] = int(directive_id)
+        options['dry_run'] = dry_run
+        converter = handle_csv_import(ObjectivesConverter, csv_file, **options)
+        if dry_run:
+          options['converter'] = converter
+          options['results'] = converter.objects
+          options['heading_map'] = converter.object_map
+          return render_template("directives/import_objectives_result.haml", **options)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} objective{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect(return_to)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("directives/import_errors.haml",
+            directive_id = directive_id, exception_message = file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("directives/import_objectives_result.haml",
+            exception_message=e, converter=converter, results=converter.objects,
+            directive_id=int(directive_id), heading_map=converter.object_map)
+      return render_template("directives/import_errors.haml",
+          directive_id = directive_id, exception_message = str(e))
+
+  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Objectives', return_to = return_to, parent_type = (directive.kind or directive.meta_kind))
+
 @app.route("/programs/<program_id>/import_controls", methods=['GET', 'POST'])
 def import_controls_to_program(program_id):
   from werkzeug import secure_filename
@@ -640,6 +694,24 @@ def export_sections(directive_id):
   filename = "{}.csv".format(directive.slug)
   return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
 
+@app.route("/standards/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/regulations/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/policies/<directive_id>/export_objectives", methods=['GET'])
+@app.route("/contracts/<directive_id>/export_objectives", methods=['GET'])
+def export_objectives(directive_id):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Directive
+
+  directive = Directive.query.get(directive_id)
+  options = {
+      'parent_type': directive.__class__,
+      'parent_id': directive_id,
+      'export': True,
+  }
+  filename = "{}.csv".format(directive.slug)
+  return handle_converter_csv_export(filename, directive.objectives, ObjectivesConverter, **options)
+
 @app.route("/standards/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
@@ -667,6 +739,30 @@ def import_directive_sections_template(directive_id):
     'directive_slug': directive.slug,
   }
   body = render_template("csv_files/" + filename, **options)
+  return current_app.make_response((body, 200, headers))
+
+@app.route("/standards/<directive_id>/import_objectives_template", methods=['GET'])
+@app.route("/regulations/<directive_id>/import_objectives_template", methods=['GET'])
+@app.route("/policies/<directive_id>/import_objectives_template", methods=['GET'])
+@app.route("/contracts/<directive_id>/import_objectives_template", methods=['GET'])
+def import_directive_objectives_template(directive_id):
+  from flask import current_app
+  from ggrc.models.all_models import Directive
+  DIRECTIVE_TYPES = ['Contract', 'Regulation', 'Standard', 'Policy']
+  directive = Directive.query.get(directive_id)
+  directive_kind = directive.__class__.__name__
+  if directive_kind not in DIRECTIVE_TYPES:
+    return current_app.make_response((
+        "No template for that type.", 404, []))
+  template_name = "Objective_Import_Template.csv"
+  filename = "{0}_{1}".format(directive_kind, template_name)
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  options = {
+    # (Policy/Standard/Regulation/Contract) Code
+    'object_kind': directive_kind,
+    'object_slug': directive.slug,
+  }
+  body = render_template("csv_files/" + template_name, **options)
   return current_app.make_response((body, 200, headers))
 
 @app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])

@@ -8,9 +8,9 @@ import re
 from .common import *
 from ggrc.models.all_models import (
     ControlCategory, ControlAssertion,
-    Control, Document, Objective, ObjectControl, ObjectPerson,
-    ObjectOwner, Option, Person, Process, Relationship, Request,
-    System, SystemOrProcess
+    Control, Document, Objective, ObjectControl, ObjectiveControl,
+    ObjectPerson, ObjectObjective, Option, Person, Process, Relationship,
+    Request, Section, SectionObjective, System, SystemOrProcess,
     )
 from ggrc.models.exceptions import ValidationError
 
@@ -216,6 +216,9 @@ class ColumnHandler(object):
 
     self.errors = []
     self.warnings = []
+    # hack for giving haml template the ancestor classes at ALL levels
+    from inspect import getmro
+    self.ancestor_names = [x.__name__ for x in getmro(self.__class__)]
 
   def add_error(self, message):
     self.errors.append(message)
@@ -364,7 +367,7 @@ class AssigneeHandler(ContactEmailHandler):
     if len(stripped_value) == 0:
       # Audit should exist; was passed from view function
       audit = self.importer.options.get('audit')
-      audit_owner = getattr(audit, 'owner', None)
+      audit_owner = getattr(audit, 'contact', None)
       if audit_owner:
         # Owner should exist, and if so, return that Person
         self.add_warning("Blank field; will be assigned to audit owner, {}.".format(audit_owner.display_name))
@@ -698,6 +701,7 @@ class LinkControlsHandler(LinksHandler):
     self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
+
 class LinkControlCategoriesHandler(LinksHandler):
   model_class = ControlCategory
 
@@ -910,7 +914,8 @@ class LinkRelationshipsHandler(LinksHandler):
     model_class = self.options.get('model_class') or self.model_class
     return model_class.query.filter_by(**where_params).first() if model_class else None
 
-class LinkObjectControl(LinksHandler):
+
+class LinkObjectHandler(LinksHandler):
 
   def parse_item(self, value):
     if value and value[0] == '[':
@@ -922,6 +927,18 @@ class LinkObjectControl(LinksHandler):
     else:
       return {'slug' : value.upper()}
 
+  def create_item(self, data):
+    model_class = self.options.get('model_class') or self.model_class
+    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+      model_class.__name__, data.get('slug')))
+
+  def find_existing_item(self, data):
+    where_params = self.get_where_params(data)
+    model_class = self.options.get('model_class') or self.model_class
+    return model_class.query.filter_by(**where_params).first() if model_class else None
+
+class LinkObjectControl(LinkObjectHandler):
+
   def get_existing_items(self):
     objects = []
     model_class = self.options.get('model_class') or self.model_class
@@ -932,11 +949,6 @@ class LinkObjectControl(LinksHandler):
     object_controls = ObjectControl.query.filter_by(**where_params).all()
     return [obj_cont.controllable for obj_cont in object_controls]
 
-  def create_item(self, data):
-    model_class = self.options.get('model_class') or self.model_class
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(
-      model_class.__name__, data.get('slug')))
-
   def after_save(self, obj):
     for linked_object in self.created_links():
       db.session.add(linked_object)
@@ -945,8 +957,67 @@ class LinkObjectControl(LinksHandler):
       object_control.controllable = linked_object
       db.session.add(object_control)
 
-  def find_existing_item(self, data):
-    where_params = self.get_where_params(data)
+
+class LinkObjectObjective(LinkObjectHandler):
+
+  def get_existing_items(self):
+    objects = []
     model_class = self.options.get('model_class') or self.model_class
-    return model_class.query.filter_by(**where_params).first() if model_class else None
+    importer_cls_name = self.importer.obj.__class__.__name__
+    where_params = {}
+    where_params['objective_id'] = self.importer.obj.id
+    where_params['objectiveable_type'] = model_class.__name__
+    object_objectives = ObjectObjective.query.filter_by(**where_params).all()
+    return [obj_objec.objectiveable for obj_objec in object_objectives]
+
+  def after_save(self, obj):
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      object_objective = ObjectObjective()
+      object_objective.objective = self.importer.obj
+      object_objective.objectiveable = linked_object
+      db.session.add(object_objective)
+
+
+# class for connecting existing control to new objective
+class LinkControlObjective(LinkObjectHandler):
+
+  model_class = Control
+
+  def get_existing_items(self):
+    where_params = {'objective_id': self.importer.obj.id}
+    objective_controls = ObjectiveControl.query.filter_by(**where_params).all()
+    return [objctv_cont.control for objctv_cont in objective_controls]
+
+  def after_save(self, obj):
+    for linked_object in self.created_links():
+      db.session.add(linked_object)
+      objective_control = ObjectiveControl()
+      objective_control.objective = self.importer.obj
+      objective_control.control = linked_object
+      db.session.add(objective_control)
+
+
+class LinkSectionObjective(LinkObjectHandler):
+
+  model_class = Section
+
+  def get_existing_items(self):
+    importer_cls_name = self.importer.obj.__class__.__name__
+    where_params = {}
+    where_params['objective_id'] = self.importer.obj.id
+    section_objectives = SectionObjective.query.filter_by(**where_params).all()
+    return [sec_cont.section for sec_cont in section_objectives]
+
+  def after_save(self, obj):
+    # Assumption: only one linked section, at most, at this point
+    # If it's present, overwrite ObjectiveRowImporter's options
+    # to have the section as a parent instead of directive
+    # so that it ONLY maps to that section, not the section's directive
+    section_list = [x for x in self.created_links() if type(x) == Section]
+    if len(section_list) >= 1:
+      section = section_list[0]
+      db.session.add(section)
+      self.importer.options['parent_id'] = section.id
+      self.importer.options['parent_type'] = Section
 

@@ -1,11 +1,11 @@
 -# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
--# Created By: brad@reciprocitylabs.com
+-# Created By: silas@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 
--set width_pcts = [5, 5, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3]
--set column_names = ["slug", "title", "description", "kind", "means", "start_date", "end_date", "url", "systems", "processes", "categories", "assertions","documentation_description", "verify_frequency", "documents", "contact", "key_control", "active", "fraud_related"]
--set header_overrides = { "documents" : "References", "systems" : "Systems", "processes" : "Processes", "categories" : "Categories","assertions" : "Assertions", "contact" : "Person of Contact" }
+-set width_pcts = [5, 5, 10, 5, 5, 5, 5, 5, 5, 5]
+-set column_names = ["slug", "title", "description", "url", "notes", "created_at", "updated_at", "section", "control", "contact"]
+-set header_overrides = {"section": "Section", "control": "Control", "contact": "Person of Contact"}
 -set all_errors = converter.errors
 -set has_errors = converter.has_errors()
 -set all_warnings = converter.warnings
@@ -40,9 +40,9 @@
           Correct Errors on gSheet and Upload a new CSV
 
   -if objects_imported > 1
-    {{objects_imported}} Controls will be imported,
+    {{objects_imported}} Objective will be imported,
   -else
-    {{objects_imported}} Controls will be imported,
+    {{objects_imported}} Objectives will be imported,
   %br/
   {{objects_created}} will be created,
   %br/

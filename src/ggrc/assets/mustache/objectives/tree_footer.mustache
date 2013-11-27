@@ -5,13 +5,49 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-{{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
+{{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Standard|Contract)$'}}
+{{#if allow_creating}}
+{{#is_allowed 'create' model.shortName context=null}}
+<li class="tree-footer tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12 section-expandable">
+      <a href="javascript://" class="section-add">
+        + Objective
+      </a>
+      <span class="section-expander">
+        <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="Objective" data-object-plural="objectives" data-object-params='{ "directive": {{parent_instance.id}} }'>
+          <i class="grcicon-add-black"></i>
+          Create Objective
+        </a>
+        &nbsp;
+        &nbsp;
+        <a href="{{parent_instance.viewLink}}/import_objectives?return_to={{param_current_location}}" class="section-import">
+          <i class="grcicon-imp-exp"></i>
+          Import Objectives
+        </a>
+        &nbsp;
+        &nbsp;
+        {{#if list.length}}
+        <a href="{{parent_instance.viewLink}}/export_objectives?ids={{instance_ids list}}" class="section-import">
+          <i class="grcicon-export"></i>
+          Export Objectives
+        </a>
+        {{/if}}
+      </span>
+    </div>
+  </div>
+</li>
+{{/is_allowed}}
+{{/if}}
+
+{{else}}
+
+{{#if allow_mapping}}
+{{#is_allowed_to_map parent_instance model.shortName}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
-
-      {{#if allow_mapping}}
       <a
         href="javascript://"
         rel="tooltip"
@@ -22,12 +58,12 @@
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
-        + {{model.title_singular}}
+        + Objective
       </a>
-      {{/if}}
-
     </div>
   </div>
 </li>
-{{/if}}
 {{/is_allowed_to_map}}
+{{/if}}
+{{/if_match}}
+{{/if}}
