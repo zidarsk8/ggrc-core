@@ -1,14 +1,14 @@
 """Add roles and role implications for gdrive connectors
 
 Revision ID: 24c56d737c18
-Revises: 420f0f384465
+Revises: 18bf74925b9
 Create Date: 2013-11-22 00:10:39.635553
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '24c56d737c18'
-down_revision = '420f0f384465'
+down_revision = '18bf74925b9'
 
 import sqlalchemy as sa
 from alembic import op

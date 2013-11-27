@@ -2,14 +2,14 @@
 """Add meetings to permissions
 
 Revision ID: 13b49798db19
-Revises: 22ed1c0cd379
+Revises: 24c56d737c18
 Create Date: 2013-11-26 00:30:26.022227
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '13b49798db19'
-down_revision = '22ed1c0cd379'
+down_revision = '24c56d737c18'
 
 import sqlalchemy as sa
 from alembic import op
