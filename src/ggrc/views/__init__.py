@@ -195,7 +195,7 @@ def import_people_task(task):
     converter = handle_csv_import(PeopleConverter, csv_file.splitlines(True), **options)
     if dry_run:
       options['converter'] = converter
-      options['results'] = [o for i,o in enumerate(converter.objects) if i < 20 or o.errors or o.warnings or o.messages][:50]   # Limit displayed table to a small sample
+      options['results'] = converter.objects
       options['heading_map'] = converter.object_map
       return render_template("people/import_result.haml", **options)
     else:
