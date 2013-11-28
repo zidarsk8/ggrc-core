@@ -672,3 +672,52 @@ select.multiple-selector {
     border-bottom: none !important;
   }
 }
+
+// Datepicker
+.ui-datepicker {
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    top: 4px !important;
+    .ui-icon {
+      width: 20px;
+      height: 16px;
+      line-height: 16px;
+      vertical-align: top;
+      background-image: image-url("grcicons/icons.png");
+      background-position: -2000px -2000px;
+      background-repeat: no-repeat;
+      @include background-size(368px 416px);
+      margin-top: -7px;
+    }
+  }
+  .ui-datepicker-prev-hover,
+  .ui-datepicker-next-hover {
+    .ui-icon {
+      margin-top: -8px;
+    }
+  }
+  .ui-datepicker-prev {
+    left: 4px !important;
+    .ui-icon-circle-triangle-w {
+      background-position:-294px -176px;
+      margin-left: -9px;
+    }
+    &.ui-datepicker-prev-hover {
+      .ui-icon-circle-triangle-w {
+        margin-left: -10px;
+      }
+    }
+  }
+  .ui-datepicker-next {
+    right: 4px !important;
+    .ui-icon-circle-triangle-e {
+      background-position:-198px -176px;
+      margin-left: -11px;
+    }
+    &.ui-datepicker-next-hover {
+      .ui-icon-circle-triangle-e {
+        margin-left: -10px;
+      }
+    }
+  }
+}
