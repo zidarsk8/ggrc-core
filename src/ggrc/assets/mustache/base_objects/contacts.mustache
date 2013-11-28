@@ -1,0 +1,39 @@
+{{#instance}}
+<div class="row-fluid">
+  {{^is_private_program}}
+  <div {{^if stacked}}class="span6"{{/if}}>
+    {{#if owners.length}}
+      {{#using contacts=owners}}
+      {{#contacts}}
+        <p>
+          <strong>Owner:</strong>
+          <span>{{firstnonempty name email}}</span>
+        </p>
+      {{/contacts}}
+      {{/using}}
+    {{else}}
+      <p>
+        <strong>Owner:</strong>
+        <span class="error">
+          Not Assigned
+        </span>
+      </p>
+    {{/if}}
+  </div>
+  {{/is_private_program}}
+  <div {{^if stacked}}class="span6"{{/if}}>
+    <p>
+      <strong>Contact:</strong>
+      {{#using contact=contact}}
+      {{#if contact}}
+        <span>{{firstnonempty contact.name contact.email}}</span>
+      {{else}}
+        <span class="error">
+          Not Assigned
+        </span>
+      {{/if}}
+      {{/using}}
+    </p>
+  </div>
+</div>
+{{/instance}}

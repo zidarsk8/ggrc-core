@@ -1611,82 +1611,95 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
   var state = get_binding_observe("__infer_roles", options)
     , page_instance = GGRC.page_instance()
     , person = page_instance instanceof CMS.Models.Person ? page_instance : null
+    , init_state = function() {
+        !state.roles && state.attr({
+            status: 'loading'
+          , count: 0
+          , roles: new can.Observe.List()
+        });
+      }
     ;
 
-  if (person && !state.attr('status')) {
-    state.attr({
-        status: 'loading'
-      , count: 0
-      , roles: new can.Observe.List()
-    });
+  if (!state.attr('status')) {  
+    if (person) {
+      init_state();
 
-    // Check for contact
-    if (instance.contact && instance.contact.id === person.id) {
-      state.attr('roles').push('Contact');
-    }
+      // Check for contact
+      if (instance.contact && instance.contact.id === person.id) {
+        state.attr('roles').push('Contact');
+      }
 
-    // Check for Audit roles
-    if (instance instanceof CMS.Models.Audit) {
-      var requests = instance.requests || new can.Observe.List()
-        , refresh_queue = new RefreshQueue()
-        ;
+      // Check for Audit roles
+      if (instance instanceof CMS.Models.Audit) {
+        var requests = instance.requests || new can.Observe.List()
+          , refresh_queue = new RefreshQueue()
+          ;
 
-      refresh_queue.enqueue(requests.reify());
-      refresh_queue.trigger().then(function(requests) {
-        can.each(requests, function(request) {
-          var responses = request.responses || new can.Observe.List()
-            , refresh_queue = new RefreshQueue()
-            ;
+        refresh_queue.enqueue(requests.reify());
+        refresh_queue.trigger().then(function(requests) {
+          can.each(requests, function(request) {
+            var responses = request.responses || new can.Observe.List()
+              , refresh_queue = new RefreshQueue()
+              ;
 
-          refresh_queue.enqueue(responses.reify());
-          refresh_queue.trigger().then(function(responses) {
-            can.each(responses, function(response) {
-              if (response.contact && response.contact.id === person.id
-                  && !~can.inArray('Response Contact', state.attr('roles'))) {
-                state.attr('roles').push('Response Contact');
-              }
-            })
-          });
+            refresh_queue.enqueue(responses.reify());
+            refresh_queue.trigger().then(function(responses) {
+              can.each(responses, function(response) {
+                if (response.contact && response.contact.id === person.id
+                    && !~can.inArray('Response Contact', state.attr('roles'))) {
+                  state.attr('roles').push('Response Contact');
+                }
+              })
+            });
 
-          if (request.assignee && request.assignee.id === person.id
-              && !~can.inArray('Request Assignee', state.attr('roles'))) {
-            state.attr('roles').push('Request Assignee');
-          };
-        });
-      });
-    }
-
-    // Check for people
-    if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
-      state.attr('roles').push('Mapped');
-    }
-
-    // Check for ownership
-    if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
-      state.attr('roles').push('Owner');
-    }
-
-    // Check for authorizations
-    if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
-      person.get_list_loader("authorizations").done(function(authorizations) {
-        authorizations = can.map(authorizations, function(auth) {
-          if (auth.instance.context && auth.instance.context.id === instance.context.id) {
-            return auth.instance;
-          }
-        });
-        !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
-        program_roles.done(function(roles) {
-          can.each(authorizations, function(auth) {
-            var role = CMS.Models.Role.findInCacheById(auth.role.id);
-            role && state.attr('roles').push(role.name);
+            if (request.assignee && request.assignee.id === person.id
+                && !~can.inArray('Request Assignee', state.attr('roles'))) {
+              state.attr('roles').push('Request Assignee');
+            };
           });
         });
-      });
+      }
+
+      // Check for people
+      if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
+        state.attr('roles').push('Mapped');
+      }
+
+      // Check for ownership
+      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
+        state.attr('roles').push('Owner');
+      }
+
+      // Check for authorizations
+      if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
+        person.get_list_loader("authorizations").done(function(authorizations) {
+          authorizations = can.map(authorizations, function(auth) {
+            if (auth.instance.context && auth.instance.context.id === instance.context.id) {
+              return auth.instance;
+            }
+          });
+          !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
+          program_roles.done(function(roles) {
+            can.each(authorizations, function(auth) {
+              var role = CMS.Models.Role.findInCacheById(auth.role.id);
+              role && state.attr('roles').push(role.name);
+            });
+          });
+        });
+      }
+    }
+    // When we're not on a profile page
+    else {
+      // Check for ownership
+      if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function(person) { return person.id; }))) {
+        init_state();
+        state.attr('roles').push('Yours');
+      }
     }
   }
 
   // Return the result
-  if (!person || state.attr('status') === 'failed') {
+  if (!state.attr('roles') || state.attr('status') === 'failed') {
     return '';
   }
   else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {

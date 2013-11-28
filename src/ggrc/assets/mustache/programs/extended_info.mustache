@@ -34,21 +34,8 @@
       {{/if_null}}
     </div>
   </div>
+  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
   <div class="row-fluid">
-    <div class="span7">
-      <div class="info">
-        <strong>Contact:</strong>
-        {{#using contact=instance.contact}}
-        {{#if contact}}
-          {{contact.name}}
-        {{else}}
-        <span class="error">
-          Not Assigned
-        </span>
-        {{/if}}
-        {{/using}}
-      </div>
-    </div>
     <div class="span5">
       {{#visibility_delay 500}}
       <div class="info">
