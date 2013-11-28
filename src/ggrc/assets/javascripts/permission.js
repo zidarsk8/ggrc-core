@@ -83,6 +83,10 @@ $.extend(Permission, (function() {
   };
 
   _is_allowed_for = function(permissions, instance, action) {
+    // Check for admin permission
+    if (_permission_match(permissions, _admin_permission_for_context(0)))
+      return true;
+
     var action_obj = permissions[action] || {}
       , instance_type =
           instance.constructor ? instance.constructor.shortName : instance.type
@@ -90,13 +94,13 @@ $.extend(Permission, (function() {
       , conditions_by_context = type_obj['conditions'] || {}
       , context = instance.context || {id: null}
       , conditions = conditions_by_context[context.id] || [];
-    if (conditions.length == 0) return true;
     for (var i = 0; i < conditions.length; i++) {
       var condition = conditions[i];
       if (_CONDITIONS_MAP[condition.condition](instance, condition.terms)) {
         return true;
       }
     }
+
     return false;
   };
 
