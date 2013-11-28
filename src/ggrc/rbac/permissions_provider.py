@@ -119,13 +119,14 @@ class DefaultUserPermissions(UserPermissions):
         permissions)
 
   def _is_allowed_for(self, instance, action):
+    if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
+      return True
+      
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
-    if not conditions:
-      return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]
       terms = condition.setdefault('terms', {})
