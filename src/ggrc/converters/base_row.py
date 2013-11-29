@@ -281,31 +281,26 @@ class RequestTypeColumnHandler(ColumnHandler):
         return None
 
 
-class RequestTypeColumnHandler(ColumnHandler):
+class StatusColumnHandler(ColumnHandler):
 
-  def parse_item(self, value):
-    formatted_type = value.strip().lower()
-    if formatted_type in Request.VALID_TYPES:
-      return formatted_type
-    else:
-      self.add_error("Value must be one of the following: {}".format(
-          Request.VALID_TYPES
-      ))
-      return None
-
-
-class RequestStatusColumnHandler(ColumnHandler):
-
-  def parse_item(self, value):
-    words = value.strip().split()
-    formatted_type = u" ".join(s.capitalize() for s in words)
-    if formatted_type in Request.VALID_STATES:
-      return formatted_type
-    else:
-      self.add_error("Value must be one of the following: {}".format(
-          Request.VALID_STATES
-      ))
-      return None
+   def parse_item(self, value):
+    # compare on fully-lower-cased version of valid states list
+    valid_states = self.options.get('valid_states') or self.valid_states
+    formatted_valid_states = [
+        valid_state.lower() for valid_state in valid_states
+    ]
+    if value:
+      words = value.strip().split()
+      formatted_input_state = u" ".join(s.lower() for s in words)
+      if formatted_input_state in formatted_valid_states:
+        # return the nearest match
+        nearest_match_index = formatted_valid_states.index(formatted_input_state)
+        return valid_states[nearest_match_index]
+      else:
+        self.add_error('Value must be one of the following: "{}"'.format(
+            ", ".join(valid_states)
+        ))
+        return None
 
 
 class TextOrHtmlColumnHandler(ColumnHandler):
