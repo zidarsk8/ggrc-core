@@ -807,6 +807,26 @@ def export_controls(directive_id):
     controls = directive.controls
   return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
 
+@app.route("/programs/<program_id>/export_controls", methods=['GET'])
+def export_controls_from_program(program_id):
+  from ggrc.converters.controls import ControlsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Program, Control
+
+  program = Program.query.filter_by(id=int(program_id)).first()
+  options = {
+      'export': True,
+      'parent_type': Program,
+      'parent_id': program_id,
+  }
+  filename = "{}-controls.csv".format(program.slug)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    controls = Control.query.filter(Control.id.in_(ids))
+  else:
+    controls = program.controls
+  return handle_converter_csv_export(filename, controls, ControlsConverter, **options)
+
 @app.route("/programs/<program_id>/export_systems", methods=['GET'])
 def export_systems_from_program(program_id):
   from ggrc.converters.systems import SystemsConverter
