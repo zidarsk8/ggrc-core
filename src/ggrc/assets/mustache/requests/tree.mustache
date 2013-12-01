@@ -35,21 +35,30 @@
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <span class="pull-left request-type black-font">type:</span>
           {{#with_mapping 'responses' instance}}
-            {{#if responses.length}}
-              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
-            {{/if}}
-            <select name="request_type" class="span8 short-field" 
             {{#if_helpers '\
               ^if' allow_mapping_or_creating '\
               or ^is_allowed' 'update' instance '\
               or #if' responses.length '\
             ' _1_context=instance.context.id}}
-              disabled="true" readonly="true"
-            {{/if_helpers}}>
-              {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-              <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
-            </select>
+              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
+              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
+                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            {{/if_helpers}}
+            
+            {{^if_helpers '\
+              ^if' allow_mapping_or_creating '\
+              or ^is_allowed' 'update' instance '\
+              or #if' responses.length '\
+            ' _1_context=instance.context.id}}
+              <select name="request_type" class="span8 short-field">
+                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            {{/if_helpers}}
           {{/with_mapping}}
         </div>
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
