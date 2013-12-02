@@ -119,6 +119,7 @@ class DefaultUserPermissions(UserPermissions):
         permissions)
 
   def _is_allowed_for(self, instance, action):
+    # Check for admin permission
     if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
       return True
       
@@ -127,6 +128,11 @@ class DefaultUserPermissions(UserPermissions):
         .setdefault(instance._inflector.model_singular, {})\
         .setdefault('conditions', {})\
         .setdefault(instance.context_id, [])
+    #FIXME Check for basic resource permission
+
+    #Check any conditions applied per resource
+    if not conditions:
+      return True
     for condition in conditions:
       func = _CONDITIONS_MAP[str(condition['condition'])]
       terms = condition.setdefault('terms', {})
