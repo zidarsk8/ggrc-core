@@ -40,25 +40,9 @@ class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
-  optional_metadata = [
-    'title', 'description', 'start_date', 'end_date', 'kind',
-    'audit_start_date', 'audit_frequency', 'audit_duration', 'version'
-  ]
-
   metadata_map = OrderedDict([
     ('Type','type'),
     ('Directive Code','slug'),
-    ('Directive Title' , 'title'),
-    ('Directive Description' , 'description'),
-    ('Created' ,'created_at'),
-    ('Updated', 'updated_at'),
-    ('Start','start_date'),
-    ('Stop' , 'end_date'),
-    ('Kind', 'kind'),
-    ('Audit Start', 'audit_start_date'),
-    ('Audit Frequency', 'audit_frequency'),
-    ('Audit Duration','audit_duration'),
-    ('Version' ,'version')
   ])
 
   object_export_order = [

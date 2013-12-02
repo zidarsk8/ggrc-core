@@ -469,7 +469,7 @@ def import_sections(directive_id):
           directive_id = directive_id, dry_run = dry_run)
 
         if dry_run:
-          return render_template("directives/import_result.haml",
+          return render_template("directives/import_sections_result.haml",
               directive_id=int(directive_id), converter=converter,
               results=converter.objects, heading_map=converter.object_map)
         else:
@@ -485,7 +485,7 @@ def import_sections(directive_id):
     except ImportException as e:
       if e.show_preview:
         converter = e.converter
-        return render_template("directives/import_result.haml", exception_message=e,
+        return render_template("directives/import_sections_result.haml", exception_message=e,
             converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
@@ -719,26 +719,25 @@ def export_objectives(directive_id):
 def import_directive_sections_template(directive_id):
   from flask import current_app
   from ggrc.models.all_models import Directive
-  DIRECTIVE_NAMES_MAP = {
-      'Contract': 'Contract_Clause',
-      'Regulation': 'Regulation_Section',
-      'Standard': 'Standard_Section',
-      'Policy': 'Policy_Section',
-  }
   directive = Directive.query.filter_by(id=int(directive_id)).first()
-  directives_kind = directive.__class__.__name__
-  if directives_kind not in DIRECTIVE_NAMES_MAP:
+  directive_kind = directive.__class__.__name__
+  DIRECTIVE_TYPES = ['Contract', 'Regulation', 'Standard', 'Policy']
+  if directive_kind not in DIRECTIVE_TYPES:
     return current_app.make_response((
         "No template for that type.", 404, []))
-  filename = "{}_Import_Template.csv".format(
-      DIRECTIVE_NAMES_MAP[directives_kind]
-  )
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
+  if directive_kind == "Contract":
+    section_term = "Clause"
+  else:
+    section_term = "Section"
+  output_filename = "{0}_{1}_Import_Template.csv".format(
+      directive_kind, section_term)
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(output_filename))]
   options = {
-    # (Policy/Standard/Regulation/Contract) Code
+    'section_term': section_term,
+    'directive_kind': directive_kind,
     'directive_slug': directive.slug,
   }
-  body = render_template("csv_files/" + filename, **options)
+  body = render_template("csv_files/Section_Import_Template.csv", **options)
   return current_app.make_response((body, 200, headers))
 
 @app.route("/standards/<directive_id>/import_objectives_template", methods=['GET'])
