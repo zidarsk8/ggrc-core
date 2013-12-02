@@ -19,6 +19,7 @@ def all_collections():
   from ggrc import settings
 
   ret = [
+    service('tasks', models.Task),
     service('audits', models.Audit),
     service('categorizations', models.Categorization),
     service('category_bases', models.CategoryBase),

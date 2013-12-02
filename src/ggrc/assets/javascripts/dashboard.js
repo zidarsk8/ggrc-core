@@ -298,10 +298,81 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
+
+  function checkStatus(result, type){
+    Task.findOne({id: result.id}, function(task){
+      task = task.task;
+
+      if(task.status == "Pending" || task.status == "Running"){
+
+        $('body').trigger(
+          'ajax:flash', 
+            { "success" : type + " " +  task.status.toLowerCase() + "..."}
+        );
+        // Task has not finished yet, check again in a while:
+        setTimeout(function(){checkStatus(result, type)}, 3000);
+      }
+      else if(task.status == "Success"){
+        // Check if redirect:
+        try{
+          var jsonResult = $.parseJSON($(task.result.content).html());
+          if("location" in jsonResult){
+            window.location.assign(jsonResult.location);
+            return;
+          }
+        } catch(e){}
+        // Check if file download (export):
+        if("headers" in task.result){
+          var headers = task.result.headers
+          for(var i = 0; i < headers.length; i++){
+            if(headers[i][0] == "Content-Type" && headers[i][1] == "text/csv"){
+              window.location.assign("/task/"+task.id);
+            }
+          }
+        }
+        $("#results-container").html(task.result.content);
+        $('body').trigger(
+          'ajax:flash', 
+            { "success" : type + " successful."}
+        );
+      }
+      else if(task.status == "Failure"){
+        console.log(task);
+        $('body').trigger(
+          'ajax:flash', 
+            { "error" : type + " failed."}
+        );
+      }
+    });
+
+  }
+  
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
-      window.location.assign($.parseJSON(data).location);
+      var result = $.parseJSON(data);
+      if("location" in result){
+        // Redirect
+        window.location.assign(result.location);
+      }
+      // Check if task has completed:
+      setTimeout(function(){
+        checkStatus(result, "Import");
+      }, 500)
     }
+  });
+  
+  $('body').on('click', 'a.export-link', function(e, el){
+    e.preventDefault();
+    var url = e.currentTarget.href;
+    can.ajax({
+      url: url,
+      success: function(data, status, xhr) {
+        var jsonResult = $.parseJSON($(data).html());
+        setTimeout(function(){
+          checkStatus(jsonResult, "Export");
+        }, 500);
+      }
+    });
   });
 });
 

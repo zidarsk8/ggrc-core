@@ -18,17 +18,20 @@ def handle_csv_import(converter_class, filepath, **options):
   rows = []
   csv_file = filepath
   if isinstance(filepath, basestring):
-    csv_file = open(filepath,'rbU')
+    csv_file = open(filepath, 'rbU')
 
   if options.get('directive_id') and not options.get('directive'):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
 
   try:
-    rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
+    if isinstance(csv_file, list):
+      rows = [row for row in csv_reader(csv_file)]
+    else:
+      rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
   except UnicodeDecodeError: # Decode error occurs when a special character symbol is inserted in excel.
     raise ImportException("Could not import: invalid character encountered, verify the file is correctly formatted.")
-
-  csv_file.close()
+  if not isinstance(csv_file, list):
+    csv_file.close()
   converter = converter_class.from_rows(rows, **options)
   # remove 'dry_run' key to allow passing dict w/out keyword arg collision
   # on 'dry_run' parameter:
@@ -59,7 +62,7 @@ def utf_8_encoder(csv_data):
       yield line.decode(encoding_guess).encode('utf-8')
 
 def handle_converter_csv_export(filename, objects, converter_class, **options):
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   status_code = 200
 
   exporter = converter_class(objects, **options)
