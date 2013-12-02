@@ -304,7 +304,7 @@ jQuery(function($) {
       task = task.task;
 
       if(task.status == "Pending" || task.status == "Running"){
-        
+
         $('body').trigger(
           'ajax:flash', 
             { "success" : type + " " +  task.status.toLowerCase() + "..."}
@@ -336,7 +336,8 @@ jQuery(function($) {
             { "success" : type + " successful."}
         );
       }
-      else if(task.status == "Failed"){
+      else if(task.status == "Failure"){
+        console.log(task);
         $('body').trigger(
           'ajax:flash', 
             { "error" : type + " failed."}
