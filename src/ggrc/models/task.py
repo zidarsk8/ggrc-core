@@ -11,7 +11,7 @@ from flask.wrappers import Response
 
 class Task(Base, Stateful, db.Model):
   __tablename__ = 'tasks'
-  
+
   VALID_STATES = [
     "Pending",
     "Running",
@@ -21,60 +21,59 @@ class Task(Base, Stateful, db.Model):
   name = deferred(db.Column(db.String), 'Task')
   parameters = deferred(db.Column(db.PickleType), 'Task')
   result = deferred(db.Column(db.PickleType), 'Task')
-  
+
   _publish_attrs = [
       'name',
       'result'
   ]
-  
+
   def start(self):
     self.status = "Running"
     db.session.add(self)
     db.session.commit()
-    
+
   def finish(self, status, result):
     # Ensure to not commit any not-yet-committed changes
     db.session.rollback()
 
     if isinstance(result, Response):
-      
-      self.result = {'content': result.response[0], 
+      self.result = {'content': result.response[0],
                      'status_code': result.status_code,
                      'headers': result.headers.items()}
     else:
-      self.result = {'content': result, 
+      self.result = {'content': result,
                      'status_code': 200,
                      'headers': [('Content-Type', 'text/html')]}
     self.status = status
     db.session.add(self)
     db.session.commit()
-    
+
   def make_response(self, default=None):
     if self.result == None:
       return default
     from ggrc.app import app
-    return app.make_response((self.result['content'], self.result['status_code'], 
-                              self.result['headers'])) 
+    return app.make_response((self.result['content'], self.result['status_code'],
+                              self.result['headers']))
 
 def create_task(name, queued_task, parameters={}):
   from time import time
-  task = Task(name = name + str(int(time()))) # task name must be unique
+  task = Task(name=name + str(int(time()))) # task name must be unique
   task.parameters = parameters
   from ggrc.app import db
   db.session.add(task)
-  db.session.commit()  
+  db.session.commit()
 
   # schedule a task queue
   if getattr(settings, 'APP_ENGINE', False):
     from google.appengine.api import taskqueue
     from flask import url_for
     cookie_header = [h for h in request.headers if h[0] == 'Cookie']
-    taskqueue = taskqueue.add(url=url_for(queued_task.__name__), name=task.name, 
-                              params={'task_id': task.id}, 
-                              headers = cookie_header)
+    taskqueue = taskqueue.add(url=url_for(queued_task.__name__), name=task.name,
+                              params={'task_id': task.id},
+                              headers=cookie_header)
   else:
     queued_task(task)
-  
+
   return task
 
 def make_task_response(id):
@@ -82,7 +81,7 @@ def make_task_response(id):
   return task.make_response()
 
 def queued_task(func):
-  
+
   @wraps(func)
   def decorated_view(*args, **kwargs):
     if len(args) > 0 and isinstance(args[0], Task):
@@ -97,11 +96,10 @@ def queued_task(func):
       from ggrc.app import app
       task.finish("Failure", app.make_response((
         traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
-      
+
       # Return 200 so that the task is not retried
       return app.make_response((
         'failure', 200, [('Content-Type', 'text/html')]))
     task.finish("Success", result)
     return result
   return decorated_view
-  

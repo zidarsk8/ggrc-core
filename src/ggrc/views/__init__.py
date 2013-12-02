@@ -77,7 +77,7 @@ def reindex(task):
   """
   Web hook to update the full text search index
   """
-  
+
   from ggrc.fulltext import get_indexer
   from ggrc.fulltext.recordbuilder import fts_record_for, model_is_indexed
 
@@ -98,7 +98,7 @@ def reindex(task):
   for model in models:
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
-        db.undefer_group(mapper_class.__name__+'_complete'),
+        db.undefer_group(mapper_class.__name__ + '_complete'),
         )
     for query_chunk in generate_query_chunks(query):
       for instance in query_chunk:
@@ -116,9 +116,9 @@ def admin_reindex():
   from ggrc import settings
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-  tq = create_task("reindex", reindex)   
-  return tq.make_response(app.make_response(("scheduled %s" % tq.name, 
-                                            200, 
+  tq = create_task("reindex", reindex)
+  return tq.make_response(app.make_response(("scheduled %s" % tq.name,
+                                            200,
                                             [('Content-Type', 'text/html')])))
 
 @app.route("/admin")
@@ -145,7 +145,7 @@ def styleguide():
   return render_template("styleguide/styleguide.haml")
 
 def allowed_file(filename):
-  return filename.rsplit('.',1)[1] == 'csv'
+  return filename.rsplit('.', 1)[1] == 'csv'
 
 ADMIN_KIND_TEMPLATES = {
   "processes": "Process_Import_Template.csv",
@@ -158,7 +158,7 @@ def process_import_template(admin_kind):
   from flask import current_app
   if admin_kind in ADMIN_KIND_TEMPLATES:
     filename = ADMIN_KIND_TEMPLATES[admin_kind]
-    headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+    headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
     body = render_template("csv_files/" + filename)
     return current_app.make_response((body, 200, headers))
   return current_app.make_response((
@@ -171,14 +171,14 @@ def system_program_import_template(program_id):
   program = Program.query.get(program_id)
   if program:
     template_name = "System_Program_Import_Template.csv"
-    headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(template_name))]
+    headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(template_name))]
     options = {"program_slug": program.slug}
     body = render_template("csv_files/" + template_name, **options)
     return current_app.make_response((body, 200, headers))
   return current_app.make_response((
       "No such program.", 404, []))
 
-@app.route("/task/import_people", methods = ['POST'])
+@app.route("/task/import_people", methods=['POST'])
 @queued_task
 def import_people_task(task):
   from ggrc.converters.common import ImportException
@@ -186,7 +186,7 @@ def import_people_task(task):
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Person
   import ggrc.views
-  
+
   csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
   try:
@@ -222,20 +222,20 @@ def import_people():
 
   if 'cancel' in request.form:
     return import_redirect("/admin")
-  
+
   dry_run = not ('confirm' in request.form)
   csv_file = request.files['file']
-  
+
   if csv_file and allowed_file(csv_file.filename):
     from werkzeug.utils import secure_filename
     filename = secure_filename(csv_file.filename)
-  else: 
+  else:
     file_msg = "Could not import: invalid csv file."
     return render_template("directives/import_errors.haml",
-        directive_id = "People", exception_message = file_msg)
+        directive_id="People", exception_message=file_msg)
 
-  parameters = {"dry_run": dry_run, 
-                "csv_file": csv_file.read(), 
+  parameters = {"dry_run": dry_run,
+                "csv_file": csv_file.read(),
                 "csv_filename": filename}
   tq = create_task("import_people", import_people_task, parameters)
   return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
@@ -281,7 +281,7 @@ def import_controls(directive_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = file_msg)
+            directive_id=directive_id, exception_message=file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -290,9 +290,9 @@ def import_controls(directive_id):
             exception_message=e, converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-          directive_id = directive_id, exception_message = str(e))
+          directive_id=directive_id, exception_message=str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Controls', return_to = return_to, parent_type = (directive.kind or directive.meta_kind))
+  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Controls', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
 
 @app.route("/standards/<directive_id>/import_objectives", methods=['GET', 'POST'])
 @app.route("/regulations/<directive_id>/import_objectives", methods=['GET', 'POST'])
@@ -335,7 +335,7 @@ def import_objectives(directive_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-            directive_id = directive_id, exception_message = file_msg)
+            directive_id=directive_id, exception_message=file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -344,9 +344,9 @@ def import_objectives(directive_id):
             exception_message=e, converter=converter, results=converter.objects,
             directive_id=int(directive_id), heading_map=converter.object_map)
       return render_template("directives/import_errors.haml",
-          directive_id = directive_id, exception_message = str(e))
+          directive_id=directive_id, exception_message=str(e))
 
-  return render_template("directives/import.haml", directive_id = directive_id, import_kind = 'Objectives', return_to = return_to, parent_type = (directive.kind or directive.meta_kind))
+  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Objectives', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
 
 @app.route("/programs/<program_id>/import_controls", methods=['GET', 'POST'])
 def import_controls_to_program(program_id):
@@ -386,7 +386,7 @@ def import_controls_to_program(program_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("programs/import_errors.haml",
-            program_id = program_id, exception_message = file_msg)
+            program_id=program_id, exception_message=file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -395,9 +395,9 @@ def import_controls_to_program(program_id):
             exception_message=e, converter=converter, results=converter.objects,
             program_id=int(program_id), heading_map=converter.object_map)
       return render_template("programs/import_errors.haml",
-          program_id = program_id, exception_message = str(e))
+          program_id=program_id, exception_message=str(e))
 
-  return render_template("programs/import_controls.haml", program_id = program_id, import_kind = 'Controls', return_to = return_to, parent_type = "Program")
+  return render_template("programs/import_controls.haml", program_id=program_id, import_kind='Controls', return_to=return_to, parent_type="Program")
 
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
@@ -424,7 +424,7 @@ def import_requests(audit_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(RequestsConverter, csv_file,
-          program = program, audit = audit, dry_run = dry_run)
+          program=program, audit=audit, dry_run=dry_run)
 
         if dry_run:
           return render_template("programs/import_request_result.haml",
@@ -437,7 +437,7 @@ def import_requests(audit_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("programs/import_request_errors.haml",
-              exception_message = file_msg)
+              exception_message=file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -494,7 +494,7 @@ def import_sections(directive_id):
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
         converter = handle_csv_import(SectionsConverter, csv_file,
-          directive_id = directive_id, dry_run = dry_run)
+          directive_id=directive_id, dry_run=dry_run)
 
         if dry_run:
           return render_template("directives/import_result.haml",
@@ -508,7 +508,7 @@ def import_sections(directive_id):
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("directives/import_errors.haml",
-              directive_id = directive_id, exception_message = file_msg)
+              directive_id=directive_id, exception_message=file_msg)
 
     except ImportException as e:
       if e.show_preview:
@@ -699,14 +699,14 @@ def export_people_task(task):
 def export_people():
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-  
+
   tq = create_task("export_people", export_people_task)
   return import_dump({"id":tq.id, "status":tq.status})
 
 @app.route("/task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
-  
+
 @app.route("/systems/export", methods=['GET'])
 def export_systems():
   from ggrc.converters.systems import SystemsConverter

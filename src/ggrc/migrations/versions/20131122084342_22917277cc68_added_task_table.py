@@ -27,7 +27,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('context_id', sa.Integer(), nullable=True),
     sa.Column('status', sa.String(length=250), nullable=True),
-    sa.ForeignKeyConstraint(['context_id'], ['contexts.id'], ),
+    sa.ForeignKeyConstraint(['context_id'], ['contexts.id'],),
     sa.PrimaryKeyConstraint('id')
     )
     ### end Alembic commands ###

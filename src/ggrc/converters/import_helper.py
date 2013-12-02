@@ -18,7 +18,7 @@ def handle_csv_import(converter_class, filepath, **options):
   rows = []
   csv_file = filepath
   if isinstance(filepath, basestring):
-    csv_file = open(filepath,'rbU')
+    csv_file = open(filepath, 'rbU')
 
   if options.get('directive_id') and not options.get('directive'):
     options['directive'] = Directive.query.filter_by(id=int(options['directive_id'])).first()
@@ -62,7 +62,7 @@ def utf_8_encoder(csv_data):
       yield line.decode(encoding_guess).encode('utf-8')
 
 def handle_converter_csv_export(filename, objects, converter_class, **options):
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition','attachment; filename="{}"'.format(filename))]
+  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   status_code = 200
 
   exporter = converter_class(objects, **options)
