@@ -619,6 +619,9 @@
 }
 
 .advanced-filters {
+  form {
+    margin-bottom: 0;
+  }
   background: $widgetHeader;
   border-bottom: 1px solid $widgetBorder;
   padding: 10px 20px;

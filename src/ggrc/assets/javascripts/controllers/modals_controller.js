@@ -167,6 +167,13 @@ can.Control("GGRC.Controllers.Modals", {
       var path = el.attr("name").split(".");
       path.pop();
       path = path.join(".");
+
+      // Create a new list if one doesn't exist (for object owners)
+      if (!this.options.instance.attr(path) && /\.\d+$/.test(path)) {
+        var prop = path.split('.')[0];
+        this.options.instance.attr(prop, new can.Observe.List());
+      }
+
       this.options.instance.attr(path, ui.item.stub());
     } else {
       original_event = event;

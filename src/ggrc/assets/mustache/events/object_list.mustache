@@ -34,6 +34,13 @@
     </div>
     <div class="span4">
       <div class="objective-selector">
+        {{#using contacts=instance.owners model_singular=model.model_singular}}
+        <label>
+          Owner
+          <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        </label>
+        <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contacts.0.email ''}}" />
+        {{/using}}
         {{#using contact=contact}}
         <input type="text" name="contact.email" data-lookup="Person" class="span9 audit-selector" value="{{firstnonempty contact.email ''}}">
         <i class="grcicon-person-green"></i>

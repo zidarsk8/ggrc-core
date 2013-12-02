@@ -25,10 +25,7 @@
     {{{description}}}
   </div>
   <div class="owner">
-    <strong>Contact:</strong>
-    {{#if contact}}
-    {{contact}}
-    {{/if}}
+    {{{render '/static/mustache/base_objects/contacts.mustache' instance=this stacked=true}}}
   </div>
   <div class="object-url">
     <strong>URL:</strong>
