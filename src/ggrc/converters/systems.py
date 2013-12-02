@@ -47,7 +47,6 @@ class SystemRowConverter(BaseRowConverter):
     self.handle_text_or_html('description')
     self.handle_boolean('infrastructure', truthy_values=['infrastructure'])
     self.handle_raw_attr('title', is_required=True)
-    import ipdb;ipdb.set_trace()
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
