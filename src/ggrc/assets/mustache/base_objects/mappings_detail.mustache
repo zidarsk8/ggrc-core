@@ -22,7 +22,11 @@
       {{/using}}
     {{/if}}
     {{else}}
+    {{#if_match binding.instance.constructor.shortName '^.*Response'}}
+    a <i class="grcicon-response-color"></i><b>{{binding.instance.constructor.title_singular}}</b> in <i class="grcicon-audit-color"></i><b>{{#using request=binding.instance.request}}{{#using audit=request.audit}}{{audit.title}}{{/using}}{{/using}}</b>{{#if isLast}}.{{else}},{{/if}}
+    {{else}}
     <i class="grcicon-{{binding.instance.constructor.table_singular}}-color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>{{#if isLast}}.{{else}},{{/if}}
+    {{/if_match}}
     {{/if_equals}}
     {{/if_equals}}
   {{/each_with_extras_as}}
