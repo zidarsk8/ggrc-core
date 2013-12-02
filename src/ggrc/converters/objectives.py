@@ -5,6 +5,7 @@
 
 from .base import *
 from ggrc.models import Control, Directive, Policy, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
+from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
 
@@ -28,12 +29,14 @@ class ObjectiveRowConverter(BaseRowConverter):
     self.handle_raw_attr('title', is_required=True)
     self.handle_text_or_html('description')
     self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
     self.handle_text_or_html('notes')
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
     self.handle('section', LinkSectionObjective)
     self.handle('control', LinkControlObjective)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
@@ -85,12 +88,14 @@ class ObjectivesConverter(BaseConverter):
     ('Title', 'title'),
     ('Description', 'description'),
     ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
     ('Notes', 'notes'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
     ('Map:Section', 'section'),
     ('Map:Control', 'control'),
     ('Map:Person of Contact', 'contact'),
+    ('State', 'status'),
   ])
 
   row_converter = ObjectiveRowConverter
