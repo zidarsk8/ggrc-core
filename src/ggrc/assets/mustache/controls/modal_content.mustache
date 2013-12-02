@@ -184,8 +184,8 @@
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          {{#using contact=instance.contact}}
-          <input tabindex="19" type="text" name="contact.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty contact.email ''}}">
+          {{#using assessor=instance.principal_assessor}}
+          <input tabindex="19" type="text" name="assessor.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty assessor.email ''}}">
           {{/using}}
         </div>
       </div>
@@ -196,8 +196,8 @@
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          {{#using contact=instance.contact}}
-          <input tabindex="20" type="text" name="contact.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty contact.email ''}}">
+          {{#using assessor=instance.secondary_assessor}}
+          <input tabindex="20" type="text" name="assessor.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty assessor.email ''}}">
           {{/using}}
         </div>
       </div>

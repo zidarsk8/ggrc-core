@@ -5,6 +5,7 @@
 
 from .base import *
 from ggrc.models.all_models import System, OrgGroup, Program, Relationship
+from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
 
@@ -29,6 +30,9 @@ class SystemRowConverter(BaseRowConverter):
     self.handle('slug', SlugColumnHandler)
     self.handle('controls', LinkControlsHandler)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
+    self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
     self.handle('documents', LinkDocumentsHandler)
     self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
         direction='from')
@@ -89,6 +93,8 @@ class SystemsConverter(BaseConverter):
     ('Description' , 'description'),
     ('Link:References', 'documents'),
     ('Infrastructure', 'infrastructure'),
+    ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
     ('Map:Person of Contact', 'contact'),
     ('Map:Controls', 'controls'),
     ('Map:System', 'sub_systems'),
@@ -97,7 +103,8 @@ class SystemsConverter(BaseConverter):
     ('Effective Date', 'start_date'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
-    ('Network Zone', 'network_zone')
+    ('Network Zone', 'network_zone'),
+    ('State', 'status'),
   ])
 
   row_converter = SystemRowConverter
