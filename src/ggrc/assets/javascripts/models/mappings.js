@@ -289,6 +289,9 @@
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
       , audits: Direct("Audit", "program")
+      , related_objects_via_audits: Cross("audits", "extended_related_objects")
+      , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
+      , related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
       , sections_via_directives: Cross("directives", "sections")
       , controls_via_directives: Cross("directives", "controls")
@@ -305,6 +308,7 @@
             "controls_via_extended_objectives"
           , "controls_via_directive_sections"
           , "controls_via_directives"
+          , "related_controls_via_audits"
           , "controls"
           ])
 
@@ -327,6 +331,7 @@
               "people"
             , "related_people_via_extended_controls"
             , "related_people_via_extended_objectives"
+            , "related_people_via_audits"
             , "related_people_via_sections"
             ])
 
@@ -341,6 +346,7 @@
               "related_objects_via_extended_controls"
             , "related_objects_via_extended_objectives"
             , "related_objects_via_sections"
+            , "related_objects_via_audits"
             , "related_objects"
             ])
       , extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
@@ -574,7 +580,7 @@
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
-      
+
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
           return !person
@@ -623,6 +629,7 @@
                                       , "related_mapped_interview_responses"
                                       , "related_mapped_population_sample_responses"
                                       ])
+      , extended_related_objects: Cross("requests", "extended_related_objects")
     }
     , Request : {
       responses: Direct("Response", "request")
@@ -630,6 +637,8 @@
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
+      , related_objects_via_responses : Cross("responses", "business_objects")
+      , extended_related_objects: Multi(["related_objects_via_responses"])
       //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
     }
 
