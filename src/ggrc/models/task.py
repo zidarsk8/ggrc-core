@@ -33,6 +33,9 @@ class Task(Base, Stateful, db.Model):
     db.session.commit()
     
   def finish(self, status, result):
+    # Ensure to not commit any not-yet-committed changes
+    db.session.rollback()
+
     if isinstance(result, Response):
       
       self.result = {'content': result.response[0], 
