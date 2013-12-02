@@ -27,6 +27,9 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
     self.handle_text_or_html('description')
+    self.handle_text_or_html('notes')
+    self.handle_raw_attr('reference_url')
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
     self.handle_raw_attr('title', is_required=True)
 
@@ -54,6 +57,9 @@ class SectionsConverter(BaseConverter):
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
+    ('Notes', 'notes'),
+    ('Reference URL', 'reference_url'),
+    ('Map:Person of Contact', 'contact'),
     ('Controls', 'controls'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')
