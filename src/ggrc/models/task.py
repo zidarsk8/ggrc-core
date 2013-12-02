@@ -68,7 +68,8 @@ def create_task(name, queued_task, parameters={}):
     from google.appengine.api import taskqueue
     from flask import url_for
     cookie_header = [h for h in request.headers if h[0] == 'Cookie']
-    taskqueue = taskqueue.add(url=url_for(queued_task.__name__), name=task.name,
+    taskqueue = taskqueue.add(queue_name="ggrc",
+                              url=url_for(queued_task.__name__), name=task.name,
                               params={'task_id': task.id},
                               headers=cookie_header)
   else:
