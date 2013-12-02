@@ -178,7 +178,7 @@ def system_program_import_template(program_id):
   return current_app.make_response((
       "No such program.", 404, []))
 
-@app.route("/task/import_people", methods=['POST'])
+@app.route("/tasks/import_people", methods=['POST'])
 @queued_task
 def import_people_task(task):
   from ggrc.converters.common import ImportException
