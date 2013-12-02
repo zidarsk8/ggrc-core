@@ -8,6 +8,7 @@ from .mixins import deferred, Base, Stateful
 from functools import wraps
 from flask import request
 from flask.wrappers import Response
+from ggrc.models.types import CompressedType
 
 class Task(Base, Stateful, db.Model):
   __tablename__ = 'tasks'
@@ -19,8 +20,8 @@ class Task(Base, Stateful, db.Model):
     "Failure"
   ]
   name = deferred(db.Column(db.String), 'Task')
-  parameters = deferred(db.Column(db.PickleType), 'Task')
-  result = deferred(db.Column(db.PickleType), 'Task')
+  parameters = deferred(db.Column(CompressedType), 'Task')
+  result = deferred(db.Column(CompressedType), 'Task')
 
   _publish_attrs = [
       'name',
