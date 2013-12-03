@@ -20,6 +20,7 @@ $(function() {
   var info_widget_views = {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
+    , 'policies': GGRC.mustache_path + "/policies/info.mustache"
   }
   default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
 
