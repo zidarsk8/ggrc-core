@@ -5,21 +5,102 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<ul class="new-tree">
+<ul class="tree-structure new-tree">
   {{#list}}
-    <li data-model="true" {{data 'person'}} class="tree-item {{object_type}}">
+    {{#person}}
+    <li data-model="true" {{data 'person'}} class="tree-item {{person.object_type}} person">
       <div class="item-main">
-        <div class="simple-link">
+        <div class="openclose">
           <div class="row-fluid">
-            <div class="span12">
+            <div class="span9">
               <div class="item-data">
                 <div class="tree-title-area">
-                  {{person.email}}
+                  {{firstnonempty name email}}
+                  {{#if_match name '\\\\S'}}
+                    {{#name}}
+                      <span class="email">{{email}}</span>
+                    {{/name}}
+                  {{/if_match}}
+                </div>
+              </div>
+            </div>
+            <div class="span3">
+              <div class="item-data">
+                <div class="tree-title-area">
+                  {{#if roles.length}}
+                    <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
+                      {{roles.0.permission_summary}}
+                      {{#roles.1}}
+                        + {{sum roles.length '-1'}}
+                      {{/roles.1}}
+                    </span>
+                  {{else}}
+                    <span class="no-role">
+                      No Access
+                    </span>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tier-2-info item-content">
+        <div class="tier-2-info-content">
+          <div class="row-fluid">
+            <div class="span6">
+              <div class="profile-info">
+                <ul>
+                  {{#if_match name '\\\\S'}}
+                    {{#name}}
+                      <li>
+                        <span class="name">
+                          <strong>{{name}}</strong>
+                        </span>
+                      </li>
+                    {{/name}}
+                  {{/if_match}}
+                  {{#if_match email '\\\\S'}}
+                    {{#email}}
+                      <li>
+                        <span class="email">
+                          <strong>Email:</strong> <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">{{email}}</a>
+                        </span>
+                      </li>
+                    {{/email}}
+                  {{/if}}
+                  {{#if_match company '\\\\S'}}
+                    {{#company}}
+                      <li>
+                        <span class="company">
+                          <strong>Company:</strong> {{company}}
+                        </span>
+                      </li>
+                    {{/company}}
+                  {{/if_match}}
+                  <li>
                     {{#roles}}
                       <span class="role">
                         {{permission_summary}}
                       </span>
                     {{/roles}}
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <a href="/people/{{id}}" class="info-action">
+                  View Profile Page
+                  <i class="grcicon-goto"></i>
+                </a>
+              </div>
+            </div>
+            <div class="span6 info person-info">
+              <div>
+                <div class="pull-right">
+                  <a class="info-edit" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
+                    <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
+                  </a>
                 </div>
               </div>
             </div>
@@ -27,5 +108,6 @@
         </div>
       </div>
     </li>
+    {{/person}}
   {{/list}}
 </ul>
