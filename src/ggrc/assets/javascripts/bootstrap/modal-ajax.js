@@ -212,6 +212,7 @@
         , object_params : object_params
         , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
         , model : model
+        , current_user : GGRC.current_user
         , instance : instance
         , modal_title : object_params.modal_title || modal_title
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
