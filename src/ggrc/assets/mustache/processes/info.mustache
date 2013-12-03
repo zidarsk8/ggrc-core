@@ -122,7 +122,7 @@
         <p>
           <strong>Network Zone</strong>
           <br>
-          <span>{{network_zone}}</span>
+          <span>{{#using network_zone=network_zone}}{{network_zone.title}}{{/using}}</span>
         </p>
       </div>
     </div>
@@ -145,7 +145,7 @@
         <p>
           <strong>State</strong>
           <br>
-          <span>{{state}}</span>
+          <span>{{status}}</span>
         </p>
       </div>
     </div>
@@ -162,9 +162,9 @@
     <p>
       <small>
         <em>
-          Created by {{#if owners.length}}{{#using contacts=owners}}{{#contacts}}{{firstnonempty name email}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+          Created on {{date created_at}}
           <br>
-          Modified by {{date modified_at}}
+          Modified by {{#using person=modified_by}}{{firstnonempty person.name person.email}}{{/using}} on {{date updated_at}}
         </em>
       </small>
     </p>
