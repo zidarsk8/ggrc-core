@@ -220,8 +220,13 @@
       $target.on('modal:success', function(e, data, xhr) {
         if (form_target == 'refresh') {
           refresh_page();
-        } else if (form_target == 'redirect') {
-          window.location.assign(xhr.getResponseHeader('location'));
+        } else if (form_target == 'redirect' && data.type != 'Audit' && data.type != 'Program') {
+          if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
+            window.location.assign(xhr.getResponseHeader('location'));
+          }
+          else {
+            window.location.assign(data.selfLink.replace('/api', ''));
+          }
         } else {
           var dirty;
           $target.modal_form('hide');
