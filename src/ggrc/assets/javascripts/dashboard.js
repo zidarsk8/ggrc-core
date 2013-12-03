@@ -298,21 +298,24 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
-
-  function checkStatus(result, type){
+  function disableButton(){
+    $(this).addClass("disabled");
+  }
+  function checkStatus(result, type, $btn){
     Task.findOne({id: result.id}, function(task){
       task = task.task;
-
+      var msg = ($btn && $btn.val() == "Upload and Review") ? $btn.val() : type;
       if(task.status == "Pending" || task.status == "Running"){
 
         $('body').trigger(
           'ajax:flash', 
-            { "success" : type + " " +  task.status.toLowerCase() + "..."}
+            { "progress" : msg + " " +  task.status.toLowerCase() + "..."}
         );
         // Task has not finished yet, check again in a while:
-        setTimeout(function(){checkStatus(result, type)}, 3000);
+        setTimeout(function(){checkStatus(result, type, $btn)}, 3000);
       }
       else if(task.status == "Success"){
+        $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
           var jsonResult = $.parseJSON($(task.result.content).html());
@@ -331,24 +334,25 @@ jQuery(function($) {
           }
         }
         $("#results-container").html(task.result.content);
+        $('form.import .btn').unbind().unbind().click(disableButton);
         $('body').trigger(
           'ajax:flash', 
-            { "success" : type + " successful."}
+            { "success" : msg + " successful."}
         );
       }
       else if(task.status == "Failure"){
-        console.log(task);
+        $btn && $btn.removeClass("disabled");
         $('body').trigger(
           'ajax:flash', 
-            { "error" : type + " failed."}
+            { "error" : msg + " failed."}
         );
       }
     });
-
-  }
-  
+  };
+  $('form.import .btn').unbind().click(disableButton);
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
+      var $btn = $('form.import .btn.disabled').first();
       var result = $.parseJSON(data);
       if("location" in result){
         // Redirect
@@ -356,11 +360,11 @@ jQuery(function($) {
       }
       // Check if task has completed:
       setTimeout(function(){
-        checkStatus(result, "Import");
+        checkStatus(result, "Import", $btn);
       }, 500)
     }
   });
-  
+
   $('body').on('click', 'a.export-link', function(e, el){
     e.preventDefault();
     var url = e.currentTarget.href;
