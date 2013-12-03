@@ -64,6 +64,7 @@
           </div>
 
           <div class="span6">
+          {{#if allow_mapping}}
           {{#if mappings}}
           {{#is_allowed_all 'delete' mappings}}
           {{^is_dashboard}}
@@ -74,6 +75,7 @@
             </a>
           {{/is_dashboard}}
           {{/is_allowed_all}}
+          {{/if}}
           {{/if}}
           </div>
 
@@ -94,23 +96,9 @@
 
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
+        {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+        {{#instance.url}}
         <div class="row-fluid">
-          <div class="span6">
-            <div class="tree-info">
-              <strong>Contact:</strong>
-              {{^instance.contact}}
-                <span class="error">
-                  Not Assigned
-                </span>
-              {{/instance.contact}}
-              {{#if instance.contact}}
-                {{#using contact=instance.contact}}
-                {{contact.name}}
-                {{/using}}
-              {{/if}}
-            </div>
-          </div>
-          {{#instance.url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
@@ -119,8 +107,8 @@
               </a>
             </div>
           </div>
-          {{/instance.url}}
         </div>
+        {{/instance.url}}
       </div>
 
       {{#if draw_children}}

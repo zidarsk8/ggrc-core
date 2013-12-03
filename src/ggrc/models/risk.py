@@ -5,14 +5,13 @@
 
 from ggrc import db
 from .associationproxy import association_proxy
-from .control import ControlCategorized
 from .mixins import deferred, BusinessObject, Timeboxed
 from .object_document import Documentable
 from .object_person import Personable
 from .reflection import PublishOnly
 
 class Risk(
-    Documentable, Personable, Timeboxed, ControlCategorized, BusinessObject,
+    Documentable, Personable, Timeboxed, BusinessObject,
     db.Model):
   __tablename__ = 'risks'
 
@@ -40,7 +39,6 @@ class Risk(
       'risk_risky_attributes', 'risky_attribute', 'RiskRiskyAttribute')
 
   _publish_attrs = [
-      #'categories',
       'controls',
       'financial_impact_rating',
       'inherent_risk',
@@ -78,6 +76,4 @@ class Risk(
     query = super(Risk, cls).eager_query()
     return query.options(
         orm.subqueryload_all('control_risks.control'),
-        # FIXME: make eager-loading work for categorizations
-        #orm.subqueryload_all('categorizations.categories'),
         orm.subqueryload_all('risk_risky_attributes.risky_attribute'))

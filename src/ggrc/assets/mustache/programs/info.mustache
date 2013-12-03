@@ -21,18 +21,7 @@
       {{url}}
     </a>
   </p>
-  <p>
-    <strong>Contact:</strong>
-    {{#using contact=instance.contact}}
-    {{#if contact}}
-      {{contact.name}}
-    {{else}}
-      <span class="error">
-        Not Assigned
-      </span>
-    {{/if}}
-    {{/using}}
-  </p>
+  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_private_program=instance.context.id}}}
 
   {{{render_hooks 'Program.extended_info'}}}
 

@@ -5,6 +5,7 @@
 
 from .base import *
 from ggrc.models.all_models import System, OrgGroup, Program, Relationship
+from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
 
@@ -28,7 +29,10 @@ class SystemRowConverter(BaseRowConverter):
   def reify(self):
     self.handle('slug', SlugColumnHandler)
     self.handle('controls', LinkControlsHandler)
-    self.handle('owner', ContactEmailHandler, person_must_exist=True)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
+    self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
     self.handle('documents', LinkDocumentsHandler)
     self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
         direction='from')
@@ -48,6 +52,7 @@ class SystemRowConverter(BaseRowConverter):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
+    super(SystemRowConverter, self).after_save(db_session, **options)
     # Check whether a relationship has the program as source
     # and system as destination; if not, connect the two in session
     if options.get('parent_type'):
@@ -60,7 +65,12 @@ class SystemRowConverter(BaseRowConverter):
         .count()
       if matching_relatinship_count == 0:
         program = Program.query.get(program_id)
-        db_session.add(Relationship(source=program, destination=self.obj))
+        if program:
+            db_session.add(Relationship(
+                source=program,
+                context_id=program.context_id,
+                destination=self.obj
+            ))
 
 
 class SystemsConverter(BaseConverter):
@@ -83,7 +93,9 @@ class SystemsConverter(BaseConverter):
     ('Description' , 'description'),
     ('Link:References', 'documents'),
     ('Infrastructure', 'infrastructure'),
-    ('Map:Person of Contact', 'owner'),
+    ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
+    ('Map:Person of Contact', 'contact'),
     ('Map:Controls', 'controls'),
     ('Map:System', 'sub_systems'),
     ('Map:Process', 'sub_processes'),
@@ -91,7 +103,8 @@ class SystemsConverter(BaseConverter):
     ('Effective Date', 'start_date'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at'),
-    ('Network Zone', 'network_zone')
+    ('Network Zone', 'network_zone'),
+    ('State', 'status'),
   ])
 
   row_converter = SystemRowConverter
@@ -108,14 +121,19 @@ class SystemsConverter(BaseConverter):
       parent_value = "slug"
       self.metadata_map[parent_key] = parent_value
 
+  def validate_metadata(self, attrs):
+    self.validate_metadata_type(attrs, "Systems")
+    self.validate_code(attrs)
+
   def validate_code(self, attrs):
     # Check for parent slug if importing into another object
     if self.has_parent():
       if not attrs.get('slug'):
-        self.errors.append('Missing Program Code heading')
+        self.errors.append('Missing {} Code heading'.format(
+            self.parent_type_string()))
       elif attrs['slug'] != self.parent_object().slug:
         self.errors.append('{0} Code must be {1}'.format(
-            self.parent_type_string(), self.program().slug))
+            self.parent_type_string(), self.parent_object().slug))
 
   def has_parent(self):
     return bool(self.options.get('parent_type'))

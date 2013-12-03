@@ -8,11 +8,12 @@
 //= require can.jquery-all
 //= require models/cacheable
 
-can.Model.Cacheable("CMS.Models.Category", {
-  root_object : "category"
-  , root_collection : "categories"
-  , findAll : "GET /api/categories"
-  , findOne : "GET /api/categories/{id}"
+can.Model.Cacheable("CMS.Models.CategoryBase", {
+    root_object : "category_base"
+  , root_collection : "category_bases"
+  , root_model : "CategoryBase"
+  , findAll : "GET /api/category_bases"
+  , findOne : "GET /api/category_bases/{id}"
   , cache_by_scope: {}
   , for_scope: function(scope) {
       var self = this;
@@ -70,7 +71,7 @@ can.Model.Cacheable("CMS.Models.Category", {
   }
   , attributes : {
       children : "CMS.Models.Category.stubs"
-    , controls : "CMS.Models.Control.stubs"
+    //, controls : "CMS.Models.Control.stubs"
     , owners : "CMS.Models.Person.stubs"
   }
   , tree_view_options : {
@@ -86,7 +87,7 @@ can.Model.Cacheable("CMS.Models.Category", {
     }]
 
   }
-  , init : function() {
+  /*, init : function() {
     this._super && this._super.apply(this, arguments);
     this.tree_view_options.child_options[0].model = this;
 
@@ -99,9 +100,9 @@ can.Model.Cacheable("CMS.Models.Category", {
       , controls : []
       , selfLink : "#"
     });
-  }
+  }*/
 }, {
-  init : function() {
+  /*init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
 
@@ -111,5 +112,21 @@ can.Model.Cacheable("CMS.Models.Category", {
         return a.concat(can.makeArray(b.descendant_controls()));
       }, ctls);
     }));
-  }
+  }*/
+});
+
+CMS.Models.CategoryBase("CMS.Models.ControlCategory", {
+    root_object : "control_category"
+  , root_collection : "control_categories"
+  , findAll : "GET /api/control_categories"
+  , findOne : "GET /api/control_categories/{id}"
+}, {
+});
+
+CMS.Models.CategoryBase("CMS.Models.ControlAssertion", {
+    root_object : "control_assertion"
+  , root_collection : "control_assertions"
+  , findAll : "GET /api/control_assertions"
+  , findOne : "GET /api/control_assertions/{id}"
+}, {
 });

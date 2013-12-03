@@ -25,7 +25,7 @@ class Revision(Base, db.Model):
       'content',
       'description',
   ]
-  
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
@@ -85,4 +85,6 @@ class Revision(Base, db.Model):
       else:
         # otherwise, it's a normal creation event
         result = u"{0} {1}".format(display_name, self.action)
+    if self.event.action == "IMPORT":
+      result += ", via spreadsheet import"
     return result

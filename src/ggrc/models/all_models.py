@@ -9,9 +9,9 @@
 #from .account import Account
 from .audit import Audit
 from .categorization import Categorization
-from .category import Category
+from .category import CategoryBase
 from .context import Context
-from .control import Control
+from .control import Control, ControlCategory, ControlAssertion
 from .control_control import ControlControl
 from .control_risk import ControlRisk
 from .control_section import ControlSection
@@ -42,6 +42,7 @@ from .relationship import Relationship, RelationshipType
 from .request import Request
 from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .meeting import Meeting
+from .task import Task
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -57,7 +58,9 @@ from .event import Event
 all_models = [
   Audit,
   Categorization,
-  Category,
+  CategoryBase,
+    ControlCategory,
+    ControlAssertion,
   Context,
   Control,
   ControlControl,
@@ -108,6 +111,7 @@ all_models = [
     Process,
   Revision,
   Event,
+  Task,
   ]
 
 __all__ = [model.__name__ for model in all_models]

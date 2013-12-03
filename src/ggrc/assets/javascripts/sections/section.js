@@ -59,8 +59,15 @@ can.Model.Cacheable("CMS.Models.Section", {
         model : can.Model.Cacheable
       , mapping : "related_and_able_objects"
       , title_plural : "Business Objects"
-      , draw_children : false
+      , draw_children : true
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+      , child_options : [{
+            model: CMS.Models.Control
+          , title_plural: "Controls"
+          , mapping: "controls"
+          , draw_children: false
+          , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+          }]
     }]
   }
 

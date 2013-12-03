@@ -1,11 +1,11 @@
 -# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
--# Created By: silas@reciprocitylabs.com
+-# Created By: brad@reciprocitylabs.com
 -# Maintained By: brad@reciprocitylabs.com
 
--set width_pcts = [5, 5, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3]
--set column_names = ["slug", "title", "description", "kind", "means", "start_date", "end_date", "url", "systems", "processes", "categories", "assertions","documentation_description", "verify_frequency", "documents", "owner", "key_control", "active", "fraud_related"]
--set header_overrides = { "documents" : "References", "systems" : "Systems", "processes" : "Processes", "categories" : "Categories","assertions" : "Assertions", "owner" : "Person of Contact" }
+-set width_pcts = [4, 4, 10, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 2, 5, 5, 5]
+-set column_names = ["slug", "title", "description", "kind", "means", "start_date", "end_date", "url", "reference_url", "systems", "processes", "categories", "assertions", "verify_frequency", "documents", "contact", "key_control", "active", "fraud_related", "principal_assessor", "secondary_assessor", "status"]
+-set header_overrides = {"documents" : "References", "systems" : "Systems", "processes" : "Processes", "categories" : "Categories","assertions" : "Assertions", "contact" : "Person of Contact"}
 -set all_errors = converter.errors
 -set has_errors = converter.has_errors()
 -set all_warnings = converter.warnings
@@ -18,10 +18,6 @@
   %h2
     Data to Import
 
-  %h3
-    Program:
-    %strong {{converter.import_slug}}
-
   .row-fluid
     #sampleData.span12
       -if has_errors
@@ -33,7 +29,7 @@
           %p.label-warning
             =all_warnings[loop.index0]
 
-      -include "programs/_import_table.haml"
+      -include "directives/_import_table.haml"
         
       -if has_errors
         .alert.alert-error

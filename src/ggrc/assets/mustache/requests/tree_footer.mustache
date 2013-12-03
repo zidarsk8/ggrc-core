@@ -1,3 +1,9 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
 {{#if allow_mapping_or_creating}}
 {{#if_equals parent_instance.constructor.shortName 'Audit'}}
 {{#if allow_creating}}
@@ -32,6 +38,7 @@
         rel="tooltip"
         data-placement="left"
         data-toggle="multitype-modal-selector"
+        data-join-mapping="{{mapping}}"
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.constructor.shortName}}"

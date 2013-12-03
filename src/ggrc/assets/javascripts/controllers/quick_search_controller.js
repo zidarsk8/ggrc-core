@@ -195,6 +195,154 @@ CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   }
 });
 
+can.Control("CMS.Controllers.LHN", {
+    defaults: {
+    }
+}, {
+    init: function() {
+      var self = this
+        ;
+
+      this.obs = new can.Observe();
+
+      if (this.should_show_lhn()) {
+        this.init_lhn();
+      }
+      else {
+        this.hide_lhn();
+      }
+    }
+
+  , should_show_lhn: function() {
+      return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
+    }
+
+  , "input.widgetsearch keypress": function(el, ev) {
+      if(ev.which === 13)
+        this.obs.attr("value", $(ev.target).val());
+    }
+
+  , "input.my-work click": function(el, ev) {
+      var target = $(ev.target);
+      if (target.is('input.my-work')) {
+        var checked = target.prop("checked");
+        this.obs.attr("my_work", checked);
+        target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+        CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+          if(prefs.length < 1) {
+            prefs.push(new CMS.Models.DisplayPrefs());
+            prefs[0].save();
+          }
+          prefs[0].setGlobal("lhs", { my_work: checked });
+        });
+      }
+    }
+
+  , init_lhn: function() {
+      var self = this;
+
+      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+        var settings, checked
+          ;
+
+        if(prefs.length < 1) {
+          prefs.push(new CMS.Models.DisplayPrefs());
+          prefs[0].save();
+        }
+
+        settings = prefs[0].getGlobal("lhs");
+        checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
+        self.obs.attr("my_work", checked);
+
+        $("#lhs").cms_controllers_lhn_search({ observer: self.obs });
+        $("#lhs").cms_controllers_lhn_tooltips();
+
+        // Delay LHN initializations until after LHN is rendered
+        setTimeout(function() {
+          var target = self.element.find('#lhs input.my-work')
+            , checked = self.obs.attr('my_work')
+            ;
+
+          target.prop('checked', checked);
+          target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+
+          $(".recent").ggrc_controllers_recently_viewed();
+        }, 200);
+
+        // Collapse the LHN if they did it on a previous page
+        var collapsed = prefs[0].getCollapsed(null, "lhs");
+        collapsed && $(".bar-v").trigger('click');
+      });
+    }
+
+  , hide_lhn: function() {
+      var $area = $(".area")
+        , $lhsHolder = $(".lhs-holder")
+        ;
+
+      this.element.hide();
+      $lhsHolder.css("width", 0);
+      $area.css("margin-left", 0);
+
+      window.resize_areas();
+    }
+
+  , toggle_lhs: function() {
+      var $lhs = $("#lhs")
+        , $lhsHolder = $(".lhs-holder")
+        , $area = $(".area")
+        , $bar = $(".bar-v")
+        ;
+
+      if($lhs.hasClass("lhs-closed")) {
+        $lhs.removeClass("lhs-closed");
+        $bar.removeClass("bar-closed");
+        $lhsHolder.css("width","240px");
+        $area.css("margin-left","248px");
+      } else {
+        $lhs.addClass("lhs-closed");
+        $bar.addClass("bar-closed");
+        $lhsHolder.css("width","40px");
+        $area.css("margin-left","48px");
+      }
+
+      window.resize_areas();
+
+      CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
+        prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
+      })
+    }
+
+  , ".bar-v click": function(el, ev) {
+      this.toggle_lhs();
+    }
+
+  , "#lhs click": function(el, ev) {
+      this.resize_search();
+    }
+
+  , resize_search: function() {
+      // Resize search input as necessary
+      var input = this.element.find('#lhs input.widgetsearch')
+        , width;
+
+      width =
+        input.closest('.form-search').width()
+        - input.parent().outerWidth() + input.parent().width()
+        - input.next().outerWidth() - input.outerWidth() + input.width();
+
+      input.css('width', width + 'px');
+    }
+
+  , "#lhs input.widgetsearch focus": function(el, ev) {
+      this.resize_search();
+    }
+
+  , ".lhs-closed click": function(el, ev) {
+      this.toggle_lhs();
+    }
+});
+
 can.Control("CMS.Controllers.LHN_Search", {
     defaults : {
         list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
@@ -211,8 +359,18 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 }, {
     init: function() {
-      var self = this;
+      var self = this
+        , template_path = GGRC.mustache_path + this.element.data('template')
+        ;
 
+      can.view(template_path, {}, function(frag, xhr) {
+        self.element.html(frag);
+        self.post_init();
+      });
+    }
+
+  , post_init: function() {
+      var self = this;
       this.init_object_lists();
       this.init_list_views();
       this.run_search("", this.options.observer.my_work ? { "contact_id": GGRC.current_user.id } : null);

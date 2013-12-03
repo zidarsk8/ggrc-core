@@ -14,8 +14,9 @@ Feature: Rather than have clients keep a list of the endpoint URLs for
       | endpoint           | max_query_count |
       | Audit              | 14              |
       | Categorization     | -1              |
-      | Category           | -1              |
       | Control            | 12              |
+      | ControlCategory    | -1              |
+      | ControlAssertion   | -1              |
       | ControlRisk        | 10              |
       | DataAsset          | 10              |
       | Directive          | -1              |

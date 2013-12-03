@@ -1,3 +1,9 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
@@ -17,11 +23,13 @@
         Request Type
         <span class="required">*</span>
       </label>
-      <select name="request_type" class="input-block-level" tabindex="2">
+      {{#with_mapping 'responses' instance}}
+      <select name="request_type" class="input-block-level" tabindex="2" {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
         {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
         <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
       </select>
+      {{/with_mapping}}
       <label>
         Requested On
         <span class="required">*</span>

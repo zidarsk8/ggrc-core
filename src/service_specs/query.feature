@@ -38,34 +38,34 @@ Feature: Collection filtering via query parameters
     And "resource3" is not in query result
 
   Examples: Resources
-      | resource_type | property_name | match_value1        | match_value2        | match_value3        | nomatch_value       |
-      | Category      | name          | category1           | category2           | category3           | none_match          |
-      | Category      | scope_id      | 3                   | 2                   | 1                   | 5                   |
-      | Help          | slug          | foo                 | bar                 | baz                 | never               |
-      | Program       | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
-      #| Audit         | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
+      | resource_type    | property_name | match_value1        | match_value2        | match_value3        | nomatch_value       |
+      | ControlCategory  | name          | category1           | category2           | category3           | none_match          |
+      | ControlAssertion | name          | assertion1          | assertion2          | assertion3          | 5                   |
+      | Help             | slug          | foo                 | bar                 | baz                 | never               |
+      | Program          | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
+      #| Audit            | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
 
   Scenario: A single boolean query parameter supplied to a collection finds matching resources
-    Given a new "Category" named "resource1"
-    And a new "Category" named "resource2"
+    Given a new "ControlCategory" named "resource1"
+    And a new "ControlCategory" named "resource2"
     And "resource1" property "required" is literal "True"
     And "resource2" property "required" is literal "False"
     And "resource1" is POSTed to its collection
     And "resource2" is POSTed to its collection
-    When Querying "Category" with "required=True"
+    When Querying "ControlCategory" with "required=True"
     And GET of the resource "resource1"
     And GET of the resource "resource2"
     Then query result selfLink query string is "required=True"
     And "resource1" is in query result
     And "resource2" is not in query result
-    When Querying "Category" with "required=False"
+    When Querying "ControlCategory" with "required=False"
     Then query result selfLink query string is "required=False"
     And "resource1" is not in query result
     And "resource2" is in query result
 
   @wip
   Scenario: An invalid boolean query parameter supplied to a collection receives 400
-    When Querying "Category" with bad argument "required=random"
+    When Querying "ControlCategory" with bad argument "required=random"
     Then a "400" status code is received
 
   @wip
@@ -74,9 +74,9 @@ Feature: Collection filtering via query parameters
     Then a "400" status code is received
 
   Examples:
-      | resource_type | querystring          |
-      | Category      | _update_attrs=foobar |
-      | Category      | foobar=baz           |
+      | resource_type   | querystring          |
+      | ControlCategory | _update_attrs=foobar |
+      | ControlCategory | foobar=baz           |
 
   @wip
   Scenario Outline: Query parameters can be property paths

@@ -101,7 +101,10 @@
           </div>
           {{/instance.url}}
         </div>
+
+        {{{render_hooks 'Meeting.tree_view_info'}}}
       </div>
+
 
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}

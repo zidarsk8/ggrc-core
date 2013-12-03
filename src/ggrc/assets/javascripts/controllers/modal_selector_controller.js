@@ -736,10 +736,26 @@
       }
   }, {
       init: function() {
+        var self = this;
+
         this.object_list = new can.Observe.List();
         this.option_list = new can.Observe.List();
         this.options.join_list = new can.Observe.List();
         this.active_list = new can.Observe.List();
+        this.results_lists = {};
+
+        if (this.options.binding) {
+          this.options.binding.refresh_list().then(function(mappings) {
+            can.each(can.makeArray(mappings), function(mapping, i) {
+              var instance = mapping.instance
+                , model_name = instance.constructor.shortName
+                ;
+              if (!self.results_lists[model_name])
+                self.results_lists[model_name] = {};
+              self.results_lists[model_name][instance.id] = mapping;
+            });
+          });
+        }
 
         this.options.option_search_term = this.constructor.last_option_search_term;
 
@@ -840,9 +856,34 @@
         return this.context;
       }
 
+    , get_result_for_option: function(option) {
+        var self = this
+          , option_model_name = option && option.constructor.shortName
+          , option_result = {
+              instance: option
+            , binding: null
+            , mappings: []
+            }
+          ;
+        if (self.results_lists[option_model_name]) {
+          if (self.results_lists[option_model_name][option.id]) {
+            option_result = self.results_lists[option_model_name][option.id];
+          }
+        }
+        return option_result;
+      }
+
     , insert_options: function(options, prepend) {
-        var self = this;
-        can.view(this.options.option_items_view, { options: options }, function(frag) {
+        var self = this
+          , option_results
+          , context = {}
+          ;
+        options_results = can.map(can.makeArray(options), function(option) {
+          return self.get_result_for_option(option);
+        });
+        context.options = options_results;
+        context.selected_object = this.options.selected_object;
+        can.view(this.options.option_items_view, context, function(frag) {
           if (self.element) {
             if (prepend)
               self.element.find('.option_column ul').prepend(frag);
@@ -917,7 +958,8 @@
       }
 
     , set_option_descriptor: function(option_type) {
-        var descriptor = this.options.option_descriptors[option_type]
+        var self = this
+          , descriptor = this.options.option_descriptors[option_type]
           ;
 
         this.constructor.last_selected_option_type = option_type;
@@ -929,6 +971,9 @@
         this.context.attr('option_detail_view', descriptor.detail_view);
         this.context.attr('option_descriptor', descriptor);
         this.context.attr('selected_option', null);
+        this.context.attr('selected_result', can.compute(function() {
+          return self.get_result_for_option(self.context.attr('selected_option'));
+        }));
         this.context.attr('related_table_plural', descriptor.related_table_plural);
         this.context.attr('related_table_singular', descriptor.related_table_singular);
         this.context.attr('related_model_singular', descriptor.related_model_singular);
@@ -1208,6 +1253,8 @@
 
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
+      options.binding = options.selected_object.get_binding(
+          data_set.join_mapping)
 
       options.object_params = $this.data("object-params");
 

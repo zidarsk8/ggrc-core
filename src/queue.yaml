@@ -1,0 +1,13 @@
+# # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+#
+# See https://developers.google.com/appengine/docs/python/config/appconfig
+
+queue:
+- name: ggrc
+  rate: 5/s
+  retry_parameters:
+    task_retry_limit: 1
+

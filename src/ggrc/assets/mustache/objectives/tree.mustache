@@ -80,23 +80,9 @@
 
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
+        {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+        {{#instance.url}}
         <div class="row-fluid">
-          <div class="span6">
-            <div class="tree-info">
-              <strong>Contact:</strong>
-              {{^instance.contact}}
-                <span class="error">
-                  Not Assigned
-                </span>
-              {{/instance.contact}}
-              {{#instance.contact}}
-                {{#using contact=instance.contact}}
-                {{contact.name}}
-                {{/using}}
-              {{/}}
-            </div>
-          </div>
-          {{#instance.url}}
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
@@ -105,23 +91,21 @@
               </a>
             </div>
           </div>
-          {{/instance.url}}
         </div>
+        {{/instance.url}}
       </div>
 
       {{#if draw_children}}
         {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
-          <div class="inner-tree">
-            <h6>Mapped Objects ({{child_count}})</h6>
-            {{#child_options}}
+          {{#child_options}}
+            <div class="inner-tree">
+              <h6>{{firstnonempty title_plural "Business Objects"}} ({{child_count}})</h6>
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-            {{/child_options}}
-          </div>
+            </div>
+          {{/child_options}}
         {{/if_null}}
       {{/if}}
 
     </div>
     {{/if}}
   </li>
-
-

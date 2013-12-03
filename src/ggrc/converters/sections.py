@@ -27,6 +27,9 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_date('created_at', no_import=True)
     self.handle_date('updated_at', no_import=True)
     self.handle_text_or_html('description')
+    self.handle_text_or_html('notes')
+    self.handle_raw_attr('reference_url')
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
     self.handle_raw_attr('title', is_required=True)
 
@@ -40,25 +43,9 @@ class SectionsConverter(BaseConverter):
 
   metadata_export_order = ['type', 'slug']
 
-  optional_metadata = [
-    'title', 'description', 'start_date', 'end_date', 'kind',
-    'audit_start_date', 'audit_frequency', 'audit_duration', 'version'
-  ]
-
   metadata_map = OrderedDict([
     ('Type','type'),
     ('Directive Code','slug'),
-    ('Directive Title' , 'title'),
-    ('Directive Description' , 'description'),
-    ('Created' ,'created_at'),
-    ('Updated', 'updated_at'),
-    ('Start','start_date'),
-    ('Stop' , 'end_date'),
-    ('Kind', 'kind'),
-    ('Audit Start', 'audit_start_date'),
-    ('Audit Frequency', 'audit_frequency'),
-    ('Audit Duration','audit_duration'),
-    ('Version' ,'version')
   ])
 
   object_export_order = [
@@ -70,6 +57,9 @@ class SectionsConverter(BaseConverter):
     ('Section Code', 'slug'),
     ('Section Title', 'title'),
     ('Section Description' , 'description'),
+    ('Notes', 'notes'),
+    ('Reference URL', 'reference_url'),
+    ('Map:Person of Contact', 'contact'),
     ('Controls', 'controls'),
     ('Created', 'created_at'),
     ('Updated', 'updated_at')

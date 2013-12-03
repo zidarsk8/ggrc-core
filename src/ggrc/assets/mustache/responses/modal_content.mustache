@@ -49,10 +49,12 @@
     </div>
   </div>
   
+  {{#new_object_form}}
   {{#using request=instance.request}}
   <input type="hidden" name="request.id" value="{{request.id}}">
   <input type="hidden" name="response_type" value="{{request.request_type}}">
   {{/using}}
+  {{/new_object_form}}
 </form>
 {{/instance}}
 {{!/div}}

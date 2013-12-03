@@ -1,0 +1,44 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+<div class="advanced-filters pbc-filters extra-header" style="display: none;" {{ (el) -> el.ggrc_controllers_tree_filter() }}>
+  <form>
+    <div class="row-fluid">
+      <div class="span5">
+        <ul class="filter-date-range">
+          <li>FILTERS:</li>
+          <li class="pull-right">
+            <span>requested on or after:</span>
+            <input class="input-small date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
+          </li>
+        </ul>
+      </div>
+      <div class="span3">
+        <i class="grcicon-person-green pull-left"></i>
+        <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="">
+      </div>
+      <div class="span2">
+        <span class="pull-left request-type">type:</span>
+        <select name="request_type" class="span8 short-field">
+          {{#iterate " " "Documentation" "Interview" "Population Sample"}}
+          <option value="{{firstnonempty iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
+          {{/iterate}}
+        </select>
+      </div>
+      <div class="span2">
+        <select name="status" class="span9 short-field">
+          <option value="" selected="true">Any</option>
+          <option>Draft</option>
+          <option>Requested</option>
+          <option>Responded</option>
+          <option>Amended Request</option>
+          <option>Updated Response</option>
+          <option>Accepted</option>
+        </select>
+      </div>
+    </div>
+  </form>
+</div>

@@ -167,6 +167,13 @@ can.Control("GGRC.Controllers.Modals", {
       var path = el.attr("name").split(".");
       path.pop();
       path = path.join(".");
+
+      // Create a new list if one doesn't exist (for object owners)
+      if (!this.options.instance.attr(path) && /\.\d+$/.test(path)) {
+        var prop = path.split('.')[0];
+        this.options.instance.attr(prop, new can.Observe.List());
+      }
+
       this.options.instance.attr(path, ui.item.stub());
     } else {
       original_event = event;
@@ -222,9 +229,12 @@ can.Control("GGRC.Controllers.Modals", {
               that.options.attr("instance", new that.options.model(params));
               return that.options.instance;
             }
+          }).done(function() {
+            that.on(); //listen to instance.
           });
     } else {
       this.options.attr("instance", new can.Observe(params));
+      that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
@@ -448,7 +458,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     ev.stopPropagation();
 
-    can.each(["success", "warning", "error"], function(type) {
+    can.each(["success", "warning", "error", "progress"], function(type) {
       var tmpl;
       if(mesg[type]) {
         tmpl = '<div class="alert alert-'
@@ -460,6 +470,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     });
   }
+
+  , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
       if (this.options.instance instanceof can.Model

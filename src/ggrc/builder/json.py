@@ -194,10 +194,13 @@ class UpdateAttrHandler(object):
     try:
       return datetime.strptime(value, "%Y-%m-%d") if value else None
     except ValueError as e:
-      raise BadRequest(
-          'Malformed Date {0} for parameter {1}. '
-          'Error message was: {2}'.format(value, attr_name, e.message)
-          )
+      try:
+        return datetime.strptime(value, "%m/%d/%Y") if value else None
+      except ValueError as e:
+        raise BadRequest(
+            'Malformed Date {0} for parameter {1}. '
+            'Error message was: {2}'.format(value, attr_name, e.message)
+            )
 
   @classmethod
   def query_for(cls, rel_class, json_obj, attr_name, uselist):

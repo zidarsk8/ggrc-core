@@ -1,3 +1,9 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
 <li class="tree-item programs request-list rq-{{to_class instance.status}} {{^instance.assignee}}rq-warning{{/instance.assignee}}" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
@@ -16,22 +22,49 @@
           <i class="grcicon-person-green pull-left"></i>
         {{#using assignee=instance.assignee}}
           <div class="objective-selector">
-            <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
+            <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}" 
+              {{#if_helpers '\
+                ^if' allow_mapping_or_creating '\
+                or ^is_allowed' 'update' instance '\
+              ' _1_context=instance.context.id}}
+                disabled="true" readonly="true"
+              {{/if_helpers}}>
           </div>
         {{/using}}
         </div>
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <span class="pull-left request-type black-font">type:</span>
-          <select name="request_type" class="span8 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
-            {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-            <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-            {{/iterate}}
-          </select>
+          {{#with_mapping 'responses' instance}}
+            {{#if_helpers '\
+              ^if' allow_mapping_or_creating '\
+              or ^is_allowed' 'update' instance '\
+              or #if' responses.length '\
+            ' _1_context=instance.context.id}}
+              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
+              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
+                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            {{else}}
+              <select name="request_type" class="span8 short-field">
+                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                {{/iterate}}
+              </select>
+            {{/if_helpers}}
+          {{/with_mapping}}
         </div>
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="row-fluid">
             <div class="span5">
-              <select name="status" class="span12 short-field" {{^is_allowed 'update' instance context=instance.context.id}}disabled readonly{{/is_allowed}}>
+              <select name="status" class="span12 short-field" 
+              {{#if_helpers '\
+                ^if' allow_mapping_or_creating '\
+                or ^is_allowed' 'update' instance '\
+              ' _1_context=instance.context.id}}
+                disabled="true" readonly="true"
+              {{/if_helpers}}>
                 {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
                 <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}
@@ -73,13 +106,16 @@
           {{/if}}
 
           {{{render_hooks 'Request.tree_view_info'}}}
-
-          {{#is_allowed 'update' instance context=instance.context.id}}
+ 
+          {{#if_helpers '\
+            #if' allow_mapping_or_creating '\
+            and #is_allowed' 'update' instance '\
+          ' _1_context=instance.context.id}}
             <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
               <i class="grcicon-edit"></i>
               Edit PBC {{model.title_singular}}
             </a>
-          {{/is_allowed}}
+          {{/if_helpers}}
         </div>
       </div>
     </div>

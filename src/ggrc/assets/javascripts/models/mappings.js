@@ -113,6 +113,14 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
+      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
+      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
+      , related_responses:                      Multi(["related_documentation_responses"
+                                                , "related_interview_responses"
+                                                , "related_population_sample_responses"
+                                                ])
+      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
       , controls: Proxy(
@@ -246,6 +254,15 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
+      , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
+      , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
+      , related_responses:                      Multi(["related_documentation_responses"
+                                                , "related_interview_responses"
+                                                , "related_population_sample_responses"
+                                                ])
+      , related_requests_via_related_responses: Cross("related_responses", "_request")
+      , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       }
 
     // Program
@@ -272,6 +289,9 @@
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
       , audits: Direct("Audit", "program")
+      , related_objects_via_audits: Cross("audits", "extended_related_objects")
+      , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
+      , related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
       , sections_via_directives: Cross("directives", "sections")
       , controls_via_directives: Cross("directives", "controls")
@@ -288,6 +308,7 @@
             "controls_via_extended_objectives"
           , "controls_via_directive_sections"
           , "controls_via_directives"
+          , "related_controls_via_audits"
           , "controls"
           ])
 
@@ -310,6 +331,7 @@
               "people"
             , "related_people_via_extended_controls"
             , "related_people_via_extended_objectives"
+            , "related_people_via_audits"
             , "related_people_via_sections"
             ])
 
@@ -324,6 +346,7 @@
               "related_objects_via_extended_controls"
             , "related_objects_via_extended_objectives"
             , "related_objects_via_sections"
+            , "related_objects_via_audits"
             , "related_objects"
             ])
       , extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
@@ -557,6 +580,7 @@
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
+
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
           return !person
@@ -572,28 +596,71 @@
                                       , "related_owned_interview_responses"
                                       , "related_owned_population_sample_responses"
                                       ])
+
+      , related_mapped_objects: CustomFilter("related_objects", function(result) {
+          var page_instance = GGRC.page_instance()
+            , instance = result.instance
+            , is_mapped = function(responses) {
+                var i, j, response, relationships, relationship;
+                for (i = 0; response = responses[i]; i++) {
+                  relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
+                  for (j = 0; relationship = relationships[j]; j++) {
+                    if (relationship.source.reify() === page_instance || relationship.destination.reify() === page_instance) {
+                      return true;
+                    }
+                  }
+                }
+                return false;
+              }
+            ;
+
+          if (instance instanceof CMS.Models.Request)
+            return is_mapped(instance.responses.reify());
+          else if (instance instanceof CMS.Models.Response)
+            return is_mapped([instance]);
+          else
+            return false;
+        })
+      , related_mapped_requests: TypeFilter("related_mapped_objects", "Request")
+      , related_mapped_documentation_responses: TypeFilter("related_mapped_objects", "DocumentationResponse")
+      , related_mapped_interview_responses: TypeFilter("related_mapped_objects", "InterviewResponse")
+      , related_mapped_population_sample_responses: TypeFilter("related_mapped_objects", "PopulationSampleResponse")
+      , related_mapped_responses: Multi(["related_mapped_documentation_responses"
+                                      , "related_mapped_interview_responses"
+                                      , "related_mapped_population_sample_responses"
+                                      ])
+      , extended_related_objects: Cross("requests", "extended_related_objects")
     }
     , Request : {
       responses: Direct("Response", "request")
+      , _audit: Indirect("Audit", "requests")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
+      , related_objects_via_responses : Cross("responses", "business_objects")
+      , extended_related_objects: Multi(["related_objects_via_responses"])
       //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
     }
-    , Response : {
+
+    , response : {
       _mixins : ["business_object"]
+      , _request : Indirect("Request", "responses")
+      , audit_via_request : Cross("_request", "_audit")
+    }
+    , Response : {
+      _mixins : ["response"]
     }
     , DocumentationResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people"])
     }
     , InterviewResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , meetings: Direct("Meeting", "response")
       , business_objects : Multi(["related_objects", "controls", "documents"])
     }
     , PopulationSampleResponse : {
-      _mixins : ["business_object"]
+      _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people", "documents"])
       , population_samples : Direct("PopulationSample", "response")
     }

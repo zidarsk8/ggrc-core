@@ -4,10 +4,15 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Control, System, Process, Program, DirectiveControl, ProgramControl
+from ggrc.models import (
+    Directive, Policy, Regulation, Contract, Standard, Control, System,
+    System, Process, Program, DirectiveControl, ProgramControl
+)
+from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
-from ggrc.models.control import CATEGORY_CONTROL_TYPE_ID, CATEGORY_ASSERTION_TYPE_ID
+
+DIRECTIVE_CLASSES = [Directive, Policy, Regulation, Contract, Standard]
 
 class ControlRowConverter(BaseRowConverter):
   model_class = Control
@@ -32,6 +37,7 @@ class ControlRowConverter(BaseRowConverter):
 
     self.handle_raw_attr('title', is_required=True)
     self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
 
     self.handle_option('kind', role='control_kind')
     self.handle_option('means', role='control_means')
@@ -46,34 +52,39 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
     self.handle('documents', LinkDocumentsHandler)
-    self.handle('categories', LinkCategoriesHandler, scope_id = CATEGORY_CONTROL_TYPE_ID)
-    self.handle('assertions', LinkCategoriesHandler, scope_id = CATEGORY_ASSERTION_TYPE_ID)
-    self.handle('owner', ContactEmailHandler, person_must_exist=True)
+    self.handle('categories', LinkControlCategoriesHandler)
+    self.handle('assertions', LinkControlAssertionsHandler)
+    self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('systems', LinkObjectControl, model_class = System)
     self.handle('processes', LinkObjectControl, model_class = Process)
+    self.handle('principal_assessor', ContactEmailHandler, person_must_exist=True)
+    self.handle('secondary_assessor', ContactEmailHandler, person_must_exist=True)
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
 
   def save_object(self, db_session, **options):
-    #if options.get('directive_id'):
     db_session.add(self.obj)
 
   def after_save(self, db_session, **options):
-    if options.get('parent_type') == Directive:
-      directive_id = options.get('object_id')
+    super(ControlRowConverter, self).after_save(db_session, **options)
+    if options.get('parent_type') in DIRECTIVE_CLASSES:
+      directive_id = options.get('parent_id')
       for directive_control in self.obj.directive_controls:
         if directive_control.directive_id == directive_id:
           return
       db_session.add(
           DirectiveControl(directive_id=directive_id, control=self.obj))
     elif options.get('parent_type') == Program:
-      program_id = options.get('object_id')
+      program_id = options.get('parent_id')
       for program_control in self.obj.program_controls:
         if program_control.program_id == program_id:
           return
-      db_session.add(ProgramControl(
-          program=Program.query.get(program_id),
-          control=self.obj
-      ))
-
+      program = Program.query.get(program_id)
+      if program:
+          db_session.add(ProgramControl(
+              program=program,
+              context_id=program.context_id,
+              control=self.obj
+          ))
 
 class ControlsConverter(BaseConverter):
 
@@ -86,22 +97,26 @@ class ControlsConverter(BaseConverter):
     ('Control Code', 'slug'),
     ('Title', 'title'),
     ('Description', 'description'),
-    ('Kind', 'kind'),
-    ('Means', 'means'),
+    ('Kind/Nature', 'kind'),
+    ('Type/Means', 'means'),
     ('Version', 'version'),
     ('Start Date', 'start_date'),
     ('Stop Date', 'end_date'),
     ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
     ('Map:Systems', 'systems'),
     ('Map:Processes', 'processes'),
     ('Map:Categories', 'categories'),
     ('Map:Assertions', 'assertions'),
     ('Frequency', 'verify_frequency'),
     ('Link:References', 'documents'),
-    ('Map:Person of Contact', 'owner'),
+    ('Map:Person of Contact', 'contact'),
     ('Key Control', 'key_control'),
     ('Active', 'active'),
     ('Fraud Related', 'fraud_related'),
+    ('Principal Assessor', 'principal_assessor'),
+    ('Secondary Assessor', 'secondary_assessor'),
+    ('State', 'status'),
     ('Created', 'created_at'),
     ('Updated' ,'updated_at')
   ])
@@ -120,7 +135,7 @@ class ControlsConverter(BaseConverter):
   # Creates the correct metadata_map for the specific directive kind.
   def create_metadata_map(self):
     parent_type = self.options.get('parent_type')
-    if parent_type == Directive:
+    if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
     elif parent_type == Program:
@@ -133,14 +148,14 @@ class ControlsConverter(BaseConverter):
 
   def parent_object(self):
     parent_type = self.options['parent_type']
-    return parent_type.query.get(self.options['object_id'])
+    return parent_type.query.get(self.options['parent_id'])
 
   def parent_type_string(self):
     return self.options.get('parent_type').__name__
 
   def directive_kind(self):
     parent_object = self.parent_object()
-    return parent_object.kind or parent_object.meta_kind
+    return parent_object.meta_kind
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()

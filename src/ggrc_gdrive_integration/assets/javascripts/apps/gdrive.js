@@ -28,7 +28,7 @@
     });
     window.gapi.auth.authorize({
       'client_id': GGRC.config.GAPI_CLIENT_ID
-      , 'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.email']
+      , 'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/apps.groups.settings']
       , 'immediate': !use_popup
       , 'login_hint' : GGRC.current_user.email
     }, function(authresult) {
@@ -42,7 +42,7 @@
         return new $.Deferred().reject("login required. Switching to non-immediate");
       } else if(!authresult) {
         window.oauth_dfd.reject("auth failed");
-        return new $.Deferred.reject();
+        return new $.Deferred().reject();
       } else {
         gapi.client.oauth2.userinfo.get().execute(function(user) {
           if(user.error) {
@@ -143,6 +143,13 @@
   //   [["Program", "Audit", "Request"], "GDriveFolder", "ObjectFolder", "folder", "folderable"]
   //   , ["Response", "GDriveFile", "ObjectFile", "file", "fileable"]
   // ]);
+
+  $.extend(true, CMS.Models.Meeting.attributes, {
+    "object_events" : "CMS.Models.ObjectEvent.stubs"
+    , "events" : "CMS.Models.GCalEvent.stubs"
+  });
+  can.getObject("GGRC.Mappings.Meeting", window, true).events = new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent");
+  GGRC.register_hook("Meeting.tree_view_info", GGRC.mustache_path + "/meetings/gcal_info.mustache");
 
 
 })(this.can.$, this.CMS, this.GGRC);

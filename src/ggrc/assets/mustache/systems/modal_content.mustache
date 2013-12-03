@@ -29,6 +29,13 @@
       </div>
     </div>
     <div class="span6">
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      <label>
+        Owner
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+      </label>
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
@@ -36,11 +43,6 @@
       </label>
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
-      <label>
-        {{constructor.title_singular}} URL
-        <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
-      </label>
-      <input tabindex="4" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
     </div>
   </div>
   <div class="row-fluid">
@@ -54,6 +56,11 @@
       </div>
     </div>
     <div class="span6">
+      <label>
+        {{constructor.title_singular}} URL
+        <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
+      </label>
+      <input tabindex="4" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
       <label>
         Reference URL
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
@@ -75,7 +82,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Network Zone, Effective Date, Stop Date
+            Code, Network Zone, Effective Date, Stop Date, State
           </span>
         </a>
       </div>
@@ -99,19 +106,31 @@
       </div>
     </div>
     <div class="row-fluid">
-      <div class="span6">
+      <div class="span4">
         <label>
           Effective Date
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
         <input tabindex="9" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
       </div>
-      <div class="span6">
+      <div class="span4">
         <label>
           Stop Date
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
         <input tabindex="10" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      </div>
+      <div class="span4">
+        <label>
+          State
+          <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        </label>
+        <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="11">
+          <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
+          {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          {{/iterate}}
+        </select>
       </div>
     </div>
     

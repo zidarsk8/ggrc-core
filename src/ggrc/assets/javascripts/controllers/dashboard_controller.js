@@ -18,7 +18,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
 }, {
-    init: function(options) {
+    init: function(el, options) {
       this.init_page_title();
       this.init_page_help();
       this.init_page_header();

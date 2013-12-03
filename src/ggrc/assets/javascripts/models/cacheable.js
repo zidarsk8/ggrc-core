@@ -53,14 +53,16 @@ function dateConverter(d) {
   return ret ? ret.toDate() : undefined;
 }
 
-function makeDateUnpacker(key) {
+function makeDateUnpacker(keys) {
   return function(d) {
-    return dateConverter(d[key] ? d[key] : d);
+    return can.reduce(keys, function(curr, key) {
+      return curr || (d[key] && dateConverter(d[key]));
+    }, null) || d;
   };
 }
 
 function makeDateSerializer(type, key) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\Thh:mm:ss\\Z";
+  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
   return function(d) {
     if(d == null) {
       return "";
@@ -471,7 +473,7 @@ can.Model("can.Model.Cacheable", {
   , convert : {
     "date" : dateConverter
     , "datetime" : dateConverter
-    , "packaged_datetime" : makeDateUnpacker("dateTime")
+    , "packaged_datetime" : makeDateUnpacker(["dateTime", "date"])
   }
   , serialize : {
     "datetime" : makeDateSerializer("datetime")
@@ -721,7 +723,8 @@ can.Model("can.Model.Cacheable", {
         fun_name = fun_name.substr(fun_name.lastIndexOf(".") + 1);
         if (fun_name === "stubs" || fun_name === "get_stubs"
             ||fun_name === "models" || fun_name === "get_instances") {
-          serial[name] = val.stubs().serialize();
+          // val can be null in some cases
+          val && (serial[name] = val.stubs().serialize());
         } else if (fun_name === "stub" || fun_name === "get_stub"
                    || fun_name === "model" || fun_name === "get_instance") {
           serial[name] = (val ? val.stub().serialize() : null);

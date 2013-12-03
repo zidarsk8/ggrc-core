@@ -22,7 +22,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     if(this !== CMS.Models.Response) {
       CMS.Models.Response.subclasses.push(this);
     } else {
-      this.bind("created", function(ev, instance) {
+      this.bind("created destroyed", function(ev, instance) {
         if(instance instanceof CMS.Models.Response) {
           instance.request.reify().refresh();
         }
@@ -33,6 +33,7 @@ can.Model.Cacheable("CMS.Models.Response", {
   , update : "PUT /api/responses/{id}"
 
   , findAll : "GET /api/responses"
+  , findOne : "GET /api/responses/{id}"
   , destroy : "DELETE /api/responses/{id}"
   , model : function(params) {
     var found = false;
@@ -131,6 +132,7 @@ CMS.Models.Response("CMS.Models.DocumentationResponse", {
   , create : "POST /api/documentation_responses"
   , update : "PUT /api/documentation_responses/{id}"
   , findAll : "GET /api/documentation_responses"
+  , findOne : "GET /api/documentation_responses/{id}"
   , destroy : "DELETE /api/documentation_responses/{id}"
   , attributes : {}
   , init : function() {
@@ -151,6 +153,7 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   , create : "POST /api/interview_responses"
   , update : "PUT /api/interview_responses/{id}"
   , findAll : "GET /api/interview_responses"
+  , findOne : "GET /api/interview_responses/{id}"
   , destroy : "DELETE /api/interview_responses/{id}"
   , attributes : {}
   , init : function() {
@@ -179,6 +182,7 @@ CMS.Models.Response("CMS.Models.PopulationSampleResponse", {
   , create : "POST /api/population_sample_responses"
   , update : "PUT /api/population_sample_responses/{id}"
   , findAll : "GET /api/population_sample_responses"
+  , findOne : "GET /api/population_sample_responses/{id}"
   , destroy : "DELETE /api/population_sample_responses/{id}"
   , attributes : {}
   , init : function() {

@@ -29,7 +29,7 @@ can.Control("GGRC.Controllers.RecentlyViewed", {
 
       for(var i = objs.length - 1; i >= 0; i--) {
         if((page_model && page_model.viewLink === objs[i].viewLink)
-          || objs.length - i > max_history
+          || objs.length - i > max_history || !("viewLink" in objs[i])
           ) {
           objs.splice(i, 1)[0].destroy(); //remove duplicate of current page object or excessive objects
         } else if(instance_list.length < that.options.max_display) {

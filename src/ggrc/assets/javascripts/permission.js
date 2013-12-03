@@ -35,9 +35,6 @@ $.extend(Permission, (function() {
   _is_allowed = function(permissions, permission) {
     if (!permissions)
       return false; //?
-    // Prohibit all activity on profile pages
-    if (GGRC.page_instance() instanceof CMS.Models.Person && permission.action !== 'read' && !/dashboard/.test(window.location))
-      return false;
     if (_permission_match(permissions, permission))
       return true;
     if (_permission_match(permissions, ADMIN_PERMISSION))
@@ -73,7 +70,7 @@ $.extend(Permission, (function() {
       }
       return false;
     }
-    , is: function(instance, argss) {
+    , is: function(instance, args) {
       var value = _resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
       return value == property_value;
@@ -86,6 +83,10 @@ $.extend(Permission, (function() {
   };
 
   _is_allowed_for = function(permissions, instance, action) {
+    // Check for admin permission
+    if (_permission_match(permissions, _admin_permission_for_context(0)))
+      return true;
+
     var action_obj = permissions[action] || {}
       , instance_type =
           instance.constructor ? instance.constructor.shortName : instance.type
@@ -93,6 +94,13 @@ $.extend(Permission, (function() {
       , conditions_by_context = type_obj['conditions'] || {}
       , context = instance.context || {id: null}
       , conditions = conditions_by_context[context.id] || [];
+
+    // FIXME Check for basic resource permission
+    //if (!_is_allowed(permissions, new Permission(action, instance_type, context.id))) {
+      //return false;
+    //}
+
+    // Check any conditions applied per instance
     if (conditions.length == 0) return true;
     for (var i = 0; i < conditions.length; i++) {
       var condition = conditions[i];
@@ -100,6 +108,7 @@ $.extend(Permission, (function() {
         return true;
       }
     }
+
     return false;
   };
 

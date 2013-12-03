@@ -29,6 +29,13 @@
       </div>
     </div>
     <div class="span6">
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      <label>
+        Owner
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+      </label>
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
@@ -36,11 +43,6 @@
       </label>
       <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
-      <label>
-        Control URL
-        <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
-      </label>
-      <input tabindex="5" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
     </div>
   </div>
   <div class="row-fluid">
@@ -54,6 +56,11 @@
       </div>
     </div>
     <div class="span6">
+      <label>
+        Control URL
+        <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
+      </label>
+      <input tabindex="5" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
       <label>
         Reference URL
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
@@ -75,7 +82,7 @@
           </span>
           Advanced
           <span class="hidden-fields out">
-            Code, Kind/Nature, Fraud-Related, Significance, Type/Means, Notes, Effective Date, Stop Date, Frequency, Assertions, Categories, Principal Assessor, Secondary Assessor
+            Code, Kind/Nature, Fraud-Related, Significance, Type/Means, Notes, Effective Date, Stop Date, Frequency, Assertions, Categories, Principal Assessor, Secondary Assessor, State
           </span>
         </a>
       </div>
@@ -151,87 +158,60 @@
           Frequency
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
-        <select class="input-block-level" name="frequency" null-if-empty="null-if-empty" tabindex="16">
-          <option value="" {{#if_equals frequency ""}}selected{{/if_equals}}>---</option>
-          <option value="0" {{#if_equals frequency "0"}}selected{{/if_equals}}>Daily</option>
-          <option value="1" {{#if_equals frequency "1"}}selected{{/if_equals}}>Bi-Weekly</option>
-          <option value="2" {{#if_equals frequency "2"}}selected{{/if_equals}}>Weekly</option>
-          <option value="3" {{#if_equals frequency "3"}}selected{{/if_equals}}>Bi-Monthly</option>
-          <option value="4" {{#if_equals frequency "4"}}selected{{/if_equals}}>Monthly</option>
-          <option value="5" {{#if_equals frequency "5"}}selected{{/if_equals}}>Quarterly</option>
-          <option value="6" {{#if_equals frequency "6"}}selected{{/if_equals}}>Semi-Annually</option>
-          <option value="7" {{#if_equals frequency "7"}}selected{{/if_equals}}>Yearly</option>
-          <option value="8" {{#if_equals frequency "8"}}selected{{/if_equals}}>Indeterminate</option>
-          <option value="9" {{#if_equals frequency "9"}}selected{{/if_equals}}>Transactional</option>
-          <option value="10" {{#if_equals frequency "10"}}selected{{/if_equals}}>Continuous</option>
-        </select>
+        {{{option_select this "verify_frequency" "verify_frequency" tabindex=16}}}
       </div>
       <div class="span4">
         <label>
           Assertions
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
-        <select multiple="multiple" class="input-block-level" name="assertions" null-if-empty="null-if-empty" tabindex="17">
-          <option value="0" {{#if_equals assertions "0"}}selected{{/if_equals}}>Confidentiality</option>
-          <option value="1" {{#if_equals assertions "1"}}selected{{/if_equals}}>Integrity</option>
-          <option value="2" {{#if_equals assertions "2"}}selected{{/if_equals}}>Availability</option>
-          <option value="3" {{#if_equals assertions "3"}}selected{{/if_equals}}>Security</option>
-          <option value="4" {{#if_equals assertions "4"}}selected{{/if_equals}}>Privacy</option>
-        </select>
+        {{{category_select this "assertions" "ControlAssertion"}}}
       </div>
       <div class="span4">
         <label>
           Categories
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
-        <select multiple="multiple" class="input-block-level" name="categories" null-if-empty="null-if-empty" tabindex="18" disabled>
-          <option value="1" {{#if_equals categories "1"}}selected{{/if_equals}}>Access Control</option>
-          <option value="2" {{#if_equals categories "2"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Access Management</option>
-          <option value="3" {{#if_equals categories "3"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Authorization</option>
-          <option value="4" {{#if_equals categories "4"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Authentication</option>
-          <option value="11" {{#if_equals categories "11"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Governance</option>
-          <option value="12" {{#if_equals categories "12"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Training</option>
-          <option value="13" {{#if_equals categories "13"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Policies &amp; Procedures</option>
-          <option value="14" {{#if_equals categories "14"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Monitoring</option>
-          <option value="5" {{#if_equals categories "5"}}selected{{/if_equals}}>Change Management</option>
-          <option value="6" {{#if_equals categories "6"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Segregation of Duties</option>
-          <option value="7" {{#if_equals categories "7"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Configuration Management</option>
-          <option value="15" {{#if_equals categories "15"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Ken's Kategory</option>
-          <option value="8" {{#if_equals categories "8"}}selected{{/if_equals}}>Business Continuity</option>
-          <option value="9" {{#if_equals categories "9"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Disaster Recovery</option>
-          <option value="10" {{#if_equals categories "10"}}selected{{/if_equals}}>&nbsp;&nbsp;&nbsp;Physical Security</option>
-          <option value="16" {{#if_equals categories "16"}}selected{{/if_equals}}>Core</option>
-          <option value="26" {{#if_equals categories "26"}}selected{{/if_equals}}>Availability</option>
-          <option value="27" {{#if_equals categories "27"}}selected{{/if_equals}}>Integrity</option>
-          <option value="28" {{#if_equals categories "28"}}selected{{/if_equals}}>Confidentiality</option>
-        </select>
+        {{{category_select this "categories" "ControlCategory"}}}
       </div>
     </div>
     
     <div class="row-fluid">
-      <div class="span6">
+      <div class="span4">
         <label>
           Principal Assessor
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          {{#using contact=instance.contact}}
-          <input tabindex="19" type="text" name="contact.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty contact.email ''}}">
+          {{#using assessor=instance.principal_assessor}}
+          <input tabindex="19" type="text" name="assessor.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty assessor.email ''}}">
           {{/using}}
         </div>
       </div>
-      <div class="span6">
+      <div class="span4">
         <label>
           Secondary Assessor
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
         <i class="grcicon-person-green pull-left icon-field"></i>
         <div class="objective-selector">
-          {{#using contact=instance.contact}}
-          <input tabindex="20" type="text" name="contact.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty contact.email ''}}">
+          {{#using assessor=instance.secondary_assessor}}
+          <input tabindex="20" type="text" name="assessor.email" data-lookup="Person" class="span11 audit-selector" value="{{firstnonempty assessor.email ''}}">
           {{/using}}
         </div>
+      </div>
+      <div class="span4">
+        <label>
+          State
+          <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        </label>
+        <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="21">
+          <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
+          {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          {{/iterate}}
+        </select>
       </div>
     </div>
     
