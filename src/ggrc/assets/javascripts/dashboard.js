@@ -307,7 +307,7 @@ jQuery(function($) {
 
         $('body').trigger(
           'ajax:flash', 
-            { "success" : type + " " +  task.status.toLowerCase() + "..."}
+            { "progress" : type + " " +  task.status.toLowerCase() + "..."}
         );
         // Task has not finished yet, check again in a while:
         setTimeout(function(){checkStatus(result, type)}, 3000);

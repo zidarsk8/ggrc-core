@@ -458,7 +458,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     ev.stopPropagation();
 
-    can.each(["success", "warning", "error"], function(type) {
+    can.each(["success", "warning", "error", "progress"], function(type) {
       var tmpl;
       if(mesg[type]) {
         tmpl = '<div class="alert alert-'
