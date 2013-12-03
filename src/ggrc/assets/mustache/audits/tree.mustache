@@ -16,7 +16,7 @@
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
               {{instance.title}}
-              <span class="small gray">Planned</span>
+              <span class="small gray">{{instance.status}}</span>
               {{#infer_roles instance}}
                 <span class="role">
                   {{.}}
