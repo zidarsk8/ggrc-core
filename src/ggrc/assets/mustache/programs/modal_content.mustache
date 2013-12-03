@@ -37,7 +37,7 @@
     <div class="span6">
       {{#using contacts=instance.owners model_singular=model.model_singular}}
         {{#if_helpers '\
-          ^if' instance.context '\
+          ^if' instance.context.id '\
           and ^if' instance.private '\
         '}}
           <label>
