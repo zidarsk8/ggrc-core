@@ -121,14 +121,19 @@ class SystemsConverter(BaseConverter):
       parent_value = "slug"
       self.metadata_map[parent_key] = parent_value
 
+  def validate_metadata(self, attrs):
+    self.validate_metadata_type(attrs, "Systems")
+    self.validate_code(attrs)
+
   def validate_code(self, attrs):
     # Check for parent slug if importing into another object
     if self.has_parent():
       if not attrs.get('slug'):
-        self.errors.append('Missing Program Code heading')
+        self.errors.append('Missing {} Code heading'.format(
+            self.parent_type_string()))
       elif attrs['slug'] != self.parent_object().slug:
         self.errors.append('{0} Code must be {1}'.format(
-            self.parent_type_string(), self.program().slug))
+            self.parent_type_string(), self.parent_object().slug))
 
   def has_parent(self):
     return bool(self.options.get('parent_type'))
