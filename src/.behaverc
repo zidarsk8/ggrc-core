@@ -1,5 +1,0 @@
-[behave]
-paths=service_specs
-  ggrc_basic_permissions/service_specs
-tags=~wip
-default_format=progress
