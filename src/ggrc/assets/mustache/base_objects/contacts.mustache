@@ -2,23 +2,22 @@
 <div class="row-fluid">
   {{^is_private_program}}
   <div {{^if stacked}}class="span6"{{/if}}>
-    {{#if owners.length}}
-      {{#using contacts=owners}}
+    {{#using contacts=instance.owners}}
       {{#contacts}}
         <p>
           <strong>Owner:</strong>
           <span>{{firstnonempty name email}}</span>
         </p>
       {{/contacts}}
-      {{/using}}
-    {{else}}
-      <p>
-        <strong>Owner:</strong>
-        <span class="error">
-          Not Assigned
-        </span>
-      </p>
-    {{/if}}
+      {{^contacts}}
+        <p>
+          <strong>Owner:</strong>
+          <span class="error">
+            Not Assigned
+          </span>
+        </p>
+      {{/contacts}}
+    {{/using}}
   </div>
   {{/is_private_program}}
   <div {{^if stacked}}class="span6"{{/if}}>
