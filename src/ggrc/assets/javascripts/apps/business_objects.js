@@ -21,6 +21,11 @@ $(function() {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
     , 'policies': GGRC.mustache_path + "/policies/info.mustache"
+    , 'objectives': GGRC.mustache_path + "/objectives/info.mustache"
+    , 'controls': GGRC.mustache_path + "/controls/info.mustache"
+    , 'systems': GGRC.mustache_path + "/systems/info.mustache"
+    , 'processes': GGRC.mustache_path + "/processes/info.mustache"
+    , 'products': GGRC.mustache_path + "/products/info.mustache"
   }
   default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
 
