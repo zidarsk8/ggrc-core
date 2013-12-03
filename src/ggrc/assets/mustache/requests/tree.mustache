@@ -46,13 +46,7 @@
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}
               </select>
-            {{/if_helpers}}
-            
-            {{^if_helpers '\
-              ^if' allow_mapping_or_creating '\
-              or ^is_allowed' 'update' instance '\
-              or #if' responses.length '\
-            ' _1_context=instance.context.id}}
+            {{else}}
               <select name="request_type" class="span8 short-field">
                 {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
