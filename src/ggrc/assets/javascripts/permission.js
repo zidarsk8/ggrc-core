@@ -94,6 +94,14 @@ $.extend(Permission, (function() {
       , conditions_by_context = type_obj['conditions'] || {}
       , context = instance.context || {id: null}
       , conditions = conditions_by_context[context.id] || [];
+
+    // FIXME Check for basic resource permission
+    //if (!_is_allowed(permissions, new Permission(action, instance_type, context.id))) {
+      //return false;
+    //}
+
+    // Check any conditions applied per instance
+    if (conditions.length == 0) return true;
     for (var i = 0; i < conditions.length; i++) {
       var condition = conditions[i];
       if (_CONDITIONS_MAP[condition.condition](instance, condition.terms)) {

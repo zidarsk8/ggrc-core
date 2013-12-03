@@ -209,7 +209,8 @@ class BaseConverter(object):
 
   def validate_metadata(self, attrs):
     if self.options.get('directive'):
-      self.validate_metadata_type(attrs, self.directive().kind)
+      self.validate_metadata_type(
+          attrs, self.directive().__class__.__name__)
       self.validate_code(attrs)
     elif self.__class__.__name__ == 'SystemsConverter':
       model_name = "Processes" if self.options.get('is_biz_process') else "Systems"

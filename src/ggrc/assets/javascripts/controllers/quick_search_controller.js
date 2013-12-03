@@ -243,7 +243,6 @@ can.Control("CMS.Controllers.LHN", {
 
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         var settings, checked
-          , target = $('#lhs input.my-work')
           ;
 
         if(prefs.length < 1) {
@@ -253,14 +252,20 @@ can.Control("CMS.Controllers.LHN", {
 
         settings = prefs[0].getGlobal("lhs");
         checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
-        target.prop('checked', checked);
         self.obs.attr("my_work", checked);
-        target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
 
         $("#lhs").cms_controllers_lhn_search({ observer: self.obs });
         $("#lhs").cms_controllers_lhn_tooltips();
-        // Delay Recently Viewed until after LHN is initialized
+
+        // Delay LHN initializations until after LHN is rendered
         setTimeout(function() {
+          var target = self.element.find('#lhs input.my-work')
+            , checked = self.obs.attr('my_work')
+            ;
+
+          target.prop('checked', checked);
+          target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+
           $(".recent").ggrc_controllers_recently_viewed();
         }, 200);
 

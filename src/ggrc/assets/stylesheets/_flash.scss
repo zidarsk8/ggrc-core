@@ -48,3 +48,10 @@
 .alert-error {
   border: 1px solid #e00;
 }
+.alert-progress {
+  color: #333333;
+  border: 1px solid #00e;
+  background: image-url('ajax-loader.gif') no-repeat 10px 9px;
+  background-color: #ddf;
+  padding-left: 35px;
+}

@@ -4,7 +4,11 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Directive, Policy, Regulation, Contract, Standard, Control, System, Process, Program, DirectiveControl, ProgramControl
+from ggrc.models import (
+    Directive, Policy, Regulation, Contract, Standard, Control, System,
+    System, Process, Program, DirectiveControl, ProgramControl
+)
+from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
 
@@ -33,6 +37,7 @@ class ControlRowConverter(BaseRowConverter):
 
     self.handle_raw_attr('title', is_required=True)
     self.handle_raw_attr('url')
+    self.handle_raw_attr('reference_url')
 
     self.handle_option('kind', role='control_kind')
     self.handle_option('means', role='control_means')
@@ -52,6 +57,9 @@ class ControlRowConverter(BaseRowConverter):
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('systems', LinkObjectControl, model_class = System)
     self.handle('processes', LinkObjectControl, model_class = Process)
+    self.handle('principal_assessor', ContactEmailHandler, person_must_exist=True)
+    self.handle('secondary_assessor', ContactEmailHandler, person_must_exist=True)
+    self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
@@ -89,12 +97,13 @@ class ControlsConverter(BaseConverter):
     ('Control Code', 'slug'),
     ('Title', 'title'),
     ('Description', 'description'),
-    ('Kind', 'kind'),
-    ('Means', 'means'),
+    ('Kind/Nature', 'kind'),
+    ('Type/Means', 'means'),
     ('Version', 'version'),
     ('Start Date', 'start_date'),
     ('Stop Date', 'end_date'),
     ('URL', 'url'),
+    ('Reference URL', 'reference_url'),
     ('Map:Systems', 'systems'),
     ('Map:Processes', 'processes'),
     ('Map:Categories', 'categories'),
@@ -105,6 +114,9 @@ class ControlsConverter(BaseConverter):
     ('Key Control', 'key_control'),
     ('Active', 'active'),
     ('Fraud Related', 'fraud_related'),
+    ('Principal Assessor', 'principal_assessor'),
+    ('Secondary Assessor', 'secondary_assessor'),
+    ('State', 'status'),
     ('Created', 'created_at'),
     ('Updated' ,'updated_at')
   ])

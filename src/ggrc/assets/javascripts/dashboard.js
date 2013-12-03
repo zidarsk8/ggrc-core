@@ -298,10 +298,85 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
+  function disableButton(){
+    $(this).addClass("disabled");
+  }
+  function checkStatus(result, type, $btn){
+    Task.findOne({id: result.id}, function(task){
+      task = task.task;
+      var msg = ($btn && $btn.val() == "Upload and Review") ? $btn.val() : type;
+      if(task.status == "Pending" || task.status == "Running"){
+
+        $('body').trigger(
+          'ajax:flash', 
+            { "progress" : msg + " " +  task.status.toLowerCase() + "..."}
+        );
+        // Task has not finished yet, check again in a while:
+        setTimeout(function(){checkStatus(result, type, $btn)}, 3000);
+      }
+      else if(task.status == "Success"){
+        $btn && $btn.removeClass("disabled");
+        // Check if redirect:
+        try{
+          var jsonResult = $.parseJSON($(task.result.content).html());
+          if("location" in jsonResult){
+            window.location.assign(jsonResult.location);
+            return;
+          }
+        } catch(e){}
+        // Check if file download (export):
+        if("headers" in task.result){
+          var headers = task.result.headers
+          for(var i = 0; i < headers.length; i++){
+            if(headers[i][0] == "Content-Type" && headers[i][1] == "text/csv"){
+              window.location.assign("/task/"+task.id);
+            }
+          }
+        }
+        $("#results-container").html(task.result.content);
+        $('form.import .btn').unbind().unbind().click(disableButton);
+        $('body').trigger(
+          'ajax:flash', 
+            { "success" : msg + " successful."}
+        );
+      }
+      else if(task.status == "Failure"){
+        $btn && $btn.removeClass("disabled");
+        $('body').trigger(
+          'ajax:flash', 
+            { "error" : msg + " failed."}
+        );
+      }
+    });
+  };
+  $('form.import .btn').unbind().click(disableButton);
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
-      window.location.assign($.parseJSON(data).location);
+      var $btn = $('form.import .btn.disabled').first();
+      var result = $.parseJSON(data);
+      if("location" in result){
+        // Redirect
+        window.location.assign(result.location);
+      }
+      // Check if task has completed:
+      setTimeout(function(){
+        checkStatus(result, "Import", $btn);
+      }, 500)
     }
+  });
+
+  $('body').on('click', 'a.export-link', function(e, el){
+    e.preventDefault();
+    var url = e.currentTarget.href;
+    can.ajax({
+      url: url,
+      success: function(data, status, xhr) {
+        var jsonResult = $.parseJSON($(data).html());
+        setTimeout(function(){
+          checkStatus(jsonResult, "Export");
+        }, 500);
+      }
+    });
   });
 });
 

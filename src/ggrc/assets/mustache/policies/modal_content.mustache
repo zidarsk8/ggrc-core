@@ -29,12 +29,12 @@
       </div>
     </div>
     <div class="span6">
-      {{#using contacts=instance.owners model_singular=model.model_singular}}
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
       <label>
         Owner
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contacts.0.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
       {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
@@ -133,16 +133,11 @@
           State
           <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
         </label>
-        <select class="input-block-level" name="state" null-if-empty="null-if-empty" tabindex="11">
-          <option value="" {{#if_equals state ""}}selected{{/if_equals}}>---</option>
-          <option value="0" {{#if_equals state "0"}}selected{{/if_equals}}>Draft</option>
-          <option value="1" {{#if_equals state "1"}}selected{{/if_equals}}>Final</option>
-          <option value="2" {{#if_equals state "2"}}selected{{/if_equals}}>Effective</option>
-          <option value="3" {{#if_equals state "3"}}selected{{/if_equals}}>Ineffective</option>
-          <option value="4" {{#if_equals state "4"}}selected{{/if_equals}}>Launched</option>
-          <option value="5" {{#if_equals state "5"}}selected{{/if_equals}}>Not Launched</option>
-          <option value="6" {{#if_equals state "6"}}selected{{/if_equals}}>In Scope</option>
-          <option value="7" {{#if_equals state "7"}}selected{{/if_equals}}>Not in Scope</option>
+        <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="11">
+          <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
+          {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+            <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          {{/iterate}}
         </select>
       </div>
     </div>

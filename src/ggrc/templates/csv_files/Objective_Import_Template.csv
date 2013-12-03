@@ -1,10 +1,10 @@
-Type,{{object_kind}} Code,,,,,,,,
-Objectives,{{object_slug}},,,,,,,,
+Type,{{object_kind}} Code,,,,,,,,,,
+Objectives,{{object_slug}},,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <{{object_kind}} Code> are very important.  
 
 For Objective Import, Type should be ""Objectives"", in cell A2.
 
-Then copy the Code from your {{object_kind}} Info widget on your {{object_kind}} page in gGRC to cell B2 above",,,,,,,,
+Then copy the Code from your {{object_kind}} Info widget on your {{object_kind}} page in gGRC to cell B2 above",,,,,,,,,,
 "*Required
 
 If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
@@ -13,7 +13,7 @@ Enter the Codes for already existing objects if you want to use Import as a mean
 
 Objective Titles are required text fields.  You MUST fill in a title for all Objectives in order to import them.","*Optional
 
-Description is an optional text field.  If you have the description available, we recommend entering it now.  Otherwise, it can be filled in later after creating your control. ",*Optional.  Enter a valid URL,"*Optional.  
+Description is an optional text field.  If you have the description available, we recommend entering it now.  Otherwise, it can be filled in later after creating your control. ",*Optional.  Enter a valid URL,*Optional.  Enter a valid URL,"*Optional.  
 Will be integrated with labels","*Optional.
 
 Date fields should always follow standard formats such as year/month/date in the form of xxxx/xx/xx ","*Optional.
@@ -36,5 +36,6 @@ You can map a person to be the Owner/Person of Contact for the Control by enter 
 Example:
 
 jeff@reciprocitylabs.com
-"
-Objective Code,Title,Description,URL,Notes,Created,Updated,Map:Section,Map:Control,Map:Person of Contact
+","*Optional.
+Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope"""
+Objective Code,Title,Description,URL,Reference URL,Notes,Created,Updated,Map:Section,Map:Control,Map:Person of Contact,State

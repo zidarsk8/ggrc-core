@@ -13,10 +13,11 @@ from factory.compat import UTC
 from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 
-def random_string(prefix=''):
-  return '{prefix}{suffix}'.format(
+def random_string(prefix='', no_unicode=False):
+  return u'{prefix}{suffix}{extra}'.format(
       prefix=prefix,
       suffix=random.randint(0,9999999999),
+      extra='' if no_unicode else u'\xff'
       )
 
 def random_string_attribute(prefix=''):
@@ -24,8 +25,8 @@ def random_string_attribute(prefix=''):
 
 class FuzzyEmail(BaseFuzzyAttribute):
   def fuzz(self):
-    return "{0}@{1}.{2}".format(
-        random_string('user-'), random_string('domain-'), 'com')
+    return u"{0}@{1}.{2}".format(
+        random_string('user-', True), random_string('domain-', True), 'com')
 
 class FactoryStubMarker(object):
   def __init__(self, class_):
