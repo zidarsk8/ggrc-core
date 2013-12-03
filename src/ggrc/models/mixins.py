@@ -359,4 +359,5 @@ class BusinessObject(
       'Not Launched',
       'In Scope',
       'Not in Scope',
+      'Deprecated',
       ]
