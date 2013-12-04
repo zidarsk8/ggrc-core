@@ -29,7 +29,7 @@
                 <div class="tree-title-area">
                   {{#if roles.length}}
                     <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
-                      {{roles.0.permission_summary}}
+                      {{roles.0.role.permission_summary}}
                       {{#roles.1}}
                         + {{sum roles.length '-1'}}
                       {{/roles.1}}
@@ -83,7 +83,7 @@
                     <ul>
                     {{#roles}}
                       <li class="role">
-                        {{permission_summary}}{{#if_equals permission_summary 'Auditor'}}: {{/if_equal}}
+                        {{role.permission_summary}}{{#if_equals role.permission_summary 'Auditor'}}: {{#with_mapping 'audit_via_context' user_role}}{{audit_via_context.0.instance.title}}{{/with_mapping}}{{/if_equal}}
                       </li>
                     {{/roles}}
                     </ul>

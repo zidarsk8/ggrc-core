@@ -222,11 +222,12 @@ function authorizations_list_loader() {
     var found = false
       , person = user_role.person.reify()
       , role = user_role.role.reify()
+      , role_data = { user_role: user_role, role: role }
       ;
 
     can.each(person_roles, function(data, index) {
       if (person.id == data.person.id) {
-        data.attr('roles').push(role);
+        data.attr('roles').push(role_data);
         refresh_queue.enqueue(role);
         found = true;
       }
@@ -234,7 +235,7 @@ function authorizations_list_loader() {
     if (!found) {
       person_roles.push({
         person: person,
-        roles: [role]
+        roles: [role_data]
       });
       refresh_queue.enqueue(person);
       refresh_queue.enqueue(role);

@@ -1078,7 +1078,8 @@
         return (mapping instanceof model
                 && mapping[this.object_attr]
                 && (mapping[this.object_attr].reify() === binding.instance
-                    || (mapping[this.object_attr].reify()
+                    || (mapping[this.object_attr].type !== 'Context'
+                        && mapping[this.object_attr].reify()
                         && mapping[this.object_attr].reify().constructor === object_model 
                         && mapping[this.object_attr].id == binding.instance.id)));
       }
