@@ -12,27 +12,36 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
                           // GDriveFolder.create will translate that into 'root'
     }
     return dfd.then(function(parent_folders) {
-      return new CMS.Models.GDriveFolder({
+      var xhr = new CMS.Models.GDriveFolder({
         title : title_generator(instance)
         , parents : parent_folders[0].instance
       }).save();
+
+      report_progress("Creating Drive folder for " + title_generator(instance), xhr);
+      return xhr;
     }).then(function(folder) {
       var refresh_queue;
 
-      new CMS.Models.ObjectFolder({
-        folder : folder
-        , folderable : instance
-        , context : instance.context || { id : null }
-      }).save();
+      report_progress(
+        'Linking folder "' + folder.title + '" to ' + instance.constructor.title_singular
+        , new CMS.Models.ObjectFolder({
+          folder : folder
+          , folderable : instance
+          , context : instance.context || { id : null }
+        }).save()
+      );
 
       if(instance[owner] && instance[owner].id !== GGRC.current_user.id) {
         refresh_queue = new RefreshQueue().enqueue(instance[owner].reify());
         refresh_queue.trigger().done(function() {
-          new CMS.Models.GDriveFolderPermission({
-            folder : folder
-            , person : instance[owner]
-            , role : "writer"
-          }).save();
+          report_progress(
+            'Creating writer permission on folder "' + folder.title + '" for ' + owner
+            , new CMS.Models.GDriveFolderPermission({
+              folder : folder
+              , person : instance[owner]
+              , role : "writer"
+            }).save()
+          );
         });
       }
     });
@@ -48,6 +57,54 @@ function partial_proxy(fn) {
   return function() {
     return fn.apply(this, args.concat(can.makeArray(arguments)));
   };
+}
+
+var allops = [];
+function report_progress(str, xhr) {
+
+  function build_flashes() {
+    var flash = {}
+    , successes = []
+    , failures = []
+    , pendings = [];
+
+    can.each(allops, function(op) {
+      switch(op.xhr.state()) {
+        case "resolved":
+        successes.push(op.str + " -- Done<br>");
+        break;
+        case "rejected":
+        failures.push(op.str + " -- FAILED<br>");
+        break;
+        case "pending":
+        pendings.push(op.str + "...<br>");
+      }
+    });
+
+    if(successes.length) {
+      flash.success = successes;
+    }
+    if(failures.length) {
+      flash.error = failures;
+    }
+    if(pendings.length) {
+      flash.warning = pendings.concat(["Please wait until" + (pendings.length === 1 ? "this operation completes" : "these operations complete")]);
+    } else {
+      setTimeout(function() {
+        if(can.map(allops, function(op) {
+          return op.xhr.state() === "pending" ? op : undefined;
+        }).length < 1) {
+          allops = [];
+        }
+      }, 1000);
+    }
+    $(document.body).trigger("ajax:flash", flash);
+  }
+
+  allops.push({str : str, xhr : xhr});
+  xhr.always(build_flashes);
+  build_flashes();
+  return xhr;
 }
 
 can.Control("GGRC.Controllers.GDriveWorkflow", {
@@ -155,19 +212,25 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 }
               });
               if(matching.length < 1) {
-                new CMS.Models.GDriveFolderPermission({
-                  folder : binding.instance
-                  , person : person
-                  , role : role
-                }).save();
+                report_progress(
+                  "Creating Drive folder " + (role.name || role) + " permission for " + person.email + ' on folder "' + binding.instance.title + '"'
+                  , new CMS.Models.GDriveFolderPermission({
+                    folder : binding.instance
+                    , person : person
+                    , role : role
+                  }).save()
+                );
               }
               if(!owners_matched) {
-                new CMS.Models.GDriveFolderPermission({
-                  folder : binding.instance
-                  , email : GGRC.config.GAPI_ADMIN_GROUP
-                  , role : "writer"
-                  , permission_type : "group"
-                }).save();
+                report_progress(
+                  'Creating admin group permission on folder "' + binding.instance.title + '"'
+                  , new CMS.Models.GDriveFolderPermission({
+                    folder : binding.instance
+                    , email : GGRC.config.GAPI_ADMIN_GROUP
+                    , role : "writer"
+                    , permission_type : "group"
+                  }).save()
+                );
               }
             });
           });
@@ -211,38 +274,53 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         CMS.Models.Document.findAll({link : file.alternateLink }).done(function(d) {
           if(d.length) {
             //file found, just link to Response
-            new CMS.Models.ObjectDocument({
-              context : response.context || {id : null}
-              , documentable : response
-              , document : d[0]
-            }).save();
+            report_progress(
+              "Linking GGRC Evidence object for \"" + d[0].title + "\" to Response"
+              , new CMS.Models.ObjectDocument({
+                context : response.context || {id : null}
+                , documentable : response
+                , document : d[0]
+              }).save()
+            );
             CMS.Models.ObjectFile.findAll({ file_id : file.id, fileable : d[0] })
             .done(function(ofs) {
               if(ofs.length < 1) {
-                new CMS.Models.ObjectFile({
-                  context : response.context || {id : null}
-                  , file : file
-                  , fileable : d[0]
-                }).save();
+                report_progress(
+                  "Linking Drive file \"" + file.title + "\" to GGRC Evidence object"
+                  , new CMS.Models.ObjectFile({
+                    context : response.context || {id : null}
+                    , file : file
+                    , fileable : d[0]
+                  }).save()
+                );
               }
             });
           } else {
             //file not found, make Document object.
-            new CMS.Models.Document({
-              context : response.context || {id : null}
-              , title : file.title
-              , link : file.alternateLink
-            }).save().then(function(doc) {
-              new CMS.Models.ObjectDocument({
+            report_progress(
+              "Creating GGRC Evidence for Drive file \"" + file.title + "\""
+              , new CMS.Models.Document({
                 context : response.context || {id : null}
-                , documentable : response
-                , document : doc
-              }).save();
-              new CMS.Models.ObjectFile({
-                context : response.context || {id : null}
-                , file : file
-                , fileable : doc
-              }).save();
+                , title : file.title
+                , link : file.alternateLink
+              }).save()
+            ).then(function(doc) {
+              report_progress(
+                "Linking GGRC Evidence object for \"" + doc.title + "\" to Response"
+                , new CMS.Models.ObjectDocument({
+                  context : response.context || {id : null}
+                  , documentable : response
+                  , document : doc
+                }).save()
+              );
+              report_progress(
+                "Linking Drive file \"" + file.title + "\" to GGRC Evidence object"
+                , new CMS.Models.ObjectFile({
+                  context : response.context || {id : null}
+                  , file : file
+                  , fileable : doc
+                }).save()
+              );
             });
           }
         });
