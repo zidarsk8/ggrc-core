@@ -56,7 +56,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   request_create_queue : []
 
   , create_program_folder : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
-  , "{CMS.Models.Program} created" : "create_program_folder"
+  , "{CMS.Models.Program} created" : function(model, ev, instance) {
+    if((instance.context && instance.context.id) || instance.context_id) {
+      this.create_program_folder(model, ev, instance);
+    }
+  }
 
   , create_audit_folder : partial_proxy(create_folder, CMS.Models.Audit, function(inst) { return inst.title; }, "program")
   , "{CMS.Models.Audit} created" : function(model, ev, instance) {
