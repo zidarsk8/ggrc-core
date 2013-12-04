@@ -184,9 +184,15 @@ def load_permissions_for(user):
   # Collate roles/contexts to eager load all required implications
   implications_queries = []
   for role_id, context_ids in roles_contexts.items():
-    implications_queries.append(and_(
-      RoleImplication.source_role_id == role_id,
-      RoleImplication.source_context_id.in_(context_ids)))
+    if None in context_ids:
+      implications_queries.append(and_(
+        RoleImplication.source_role_id == role_id,
+        RoleImplication.source_context_id == None))
+      context_ids.remove(None)
+    if len(context_ids) > 0:
+      implications_queries.append(and_(
+        RoleImplication.source_role_id == role_id,
+        RoleImplication.source_context_id.in_(context_ids)))
   if len(implications_queries) > 0:
     implications = RoleImplication.query\
         .filter(or_(*implications_queries))\
