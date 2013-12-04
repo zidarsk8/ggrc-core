@@ -1,10 +1,10 @@
-Type,{{object_kind}} Code,,,,,,,,,,,,,,,,,,,,,,
-Controls,{{object_slug}},,,,,,,,,,,,,,,,,,,,,,
+Type,{{object_kind}} Code,,,,,,,,,,,,,,,,,,,,,
+Controls,{{object_slug}},,,,,,,,,,,,,,,,,,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <{{object_kind}} Code> are very important.  
 
 For Control Import, Type should be ""Controls"", in cell A2.
 
-Then copy the Code from your {{object_kind}} Info widget on your {{object_kind}} page in gGRC to cell B2 above",,,,,,,,,,,,,,,,,,,,,,
+Then copy the Code from your {{object_kind}} Info widget on your {{object_kind}} page in gGRC to cell B2 above",,,,,,,,,,,,,,,,,,,,,
 "*Required
 
 If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
