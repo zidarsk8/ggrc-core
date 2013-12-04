@@ -47,6 +47,8 @@ can.Construct("ModelRefreshQueue", {
           this.model.findAll({ id__in: this.ids.join(",") }).then(function() {
             self.completed = true;
             self.deferred.resolve();
+          }, function() {
+            self.deferred.reject.apply(self.deferred, arguments);
           });
         else {
           this.completed = true;
@@ -201,6 +203,8 @@ can.Construct("RefreshQueue", {
           self.deferred.resolve(can.map(self.objects, function(obj) {
             return obj.reify();
           }));
+        }, function() {
+          self.deferred.reject.apply(self.deferred, arguments);
         });
       else
         return this.deferred.resolve(this.objects);

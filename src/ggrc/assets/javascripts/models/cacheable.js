@@ -122,6 +122,8 @@ can.Model("can.Model.Cacheable", {
               deferred.resolve(obsList);
             }
           }, 10);
+        }, function() {
+          deferred.reject.apply(deferred, arguments);
         });
 
         return deferred;

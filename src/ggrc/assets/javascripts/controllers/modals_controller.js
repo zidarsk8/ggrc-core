@@ -277,6 +277,7 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "input:not([data-lookup]), textarea, select keyup" : function(el, ev) {
     this.set_value_from_element(el);
+    ev.stopPropagation();
   }
 
   , serialize_form : function() {
