@@ -251,8 +251,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     , request = response.request.reify()
     , parent_folder = (request.get_mapping("folders")[0] || {}).instance;
 
-    if(!parent_folder) {
+    if(!parent_folder || !parent_folder.selfLink) {
       el.trigger("ajax:flash", { warning : 'No GDrive folder found for PBC Request "' + request.objective.reify().title + '"'});
+      return;
     }
     //NB: resources returned from uploadFiles() do not match the properties expected from getting
     // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
