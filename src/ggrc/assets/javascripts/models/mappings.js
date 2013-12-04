@@ -293,6 +293,11 @@
       , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
       , related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
+      , authorizations: Indirect("UserRole", "context")
+      , authorizations_via_audits: Cross("audits", "authorizations")
+      , extended_authorizations: Multi([
+          "authorizations", "authorizations_via_audits"])
+
       , sections_via_directives: Cross("directives", "sections")
       , controls_via_directives: Cross("directives", "controls")
 
@@ -572,6 +577,7 @@
 
     , UserRole : {
         program_via_context: Indirect("Program", "context")
+      , audit_via_context: Indirect("Audit", "context")
     }
 
     , Audit : {
@@ -580,6 +586,7 @@
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
+      , authorizations: Indirect("UserRole", "context")
 
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();

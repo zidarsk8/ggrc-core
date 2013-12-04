@@ -8,7 +8,7 @@
 <ul class="tree-structure new-tree">
   {{#list}}
     {{#person}}
-    <li data-model="true" {{data 'person'}} class="tree-item {{person.object_type}} person">
+    <li data-model="true" {{data 'person'}} class="tree-item person">
       <div class="item-main">
         <div class="openclose">
           <div class="row-fluid">
@@ -80,11 +80,13 @@
                     {{/company}}
                   {{/if_match}}
                   <li>
+                    <ul>
                     {{#roles}}
-                      <span class="role">
-                        {{permission_summary}}
-                      </span>
+                      <li class="role">
+                        {{permission_summary}}{{#if_equals permission_summary 'Auditor'}}: {{/if_equal}}
+                      </li>
                     {{/roles}}
+                    </ul>
                   </li>
                 </ul>
               </div>
