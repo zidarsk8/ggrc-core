@@ -2,7 +2,7 @@
 var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
   var that = this
   , dfd
-  , owner = cls === CMS.Models.Request ? "assignee" : "owner";
+  , owner = cls === CMS.Models.Request ? "assignee" : "contact";
 
   if(instance instanceof cls) {
     if(parent_attr) {
