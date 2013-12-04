@@ -188,6 +188,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             : undefined
         ).then(function(user_permission_id, list, admin_permission_id) {
           can.each(list, function(binding) {
+            if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
+              return;  //short circuit any operation if the user isn't allowed to add permissions
+
             binding.instance.findPermissions().then(function(permissions) {
               var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
               var matching = can.map(permissions, function(permission) {
