@@ -682,7 +682,16 @@ Mustache.registerHelper("show_expander", function() {
 
 Mustache.registerHelper("allow_help_edit", function() {
   var options = arguments[arguments.length - 1];
-  return options.fn(this); //always true for now
+  var instance = this && this.instance ? this.instance : options.contexts[0]._data.instance;
+  if (instance) {
+    var action = instance.isNew() ? "create" : "update";
+    if (Permission.is_allowed(action, "Help", null)) {
+      return options.fn(this);
+    } else {
+      return options.inverse(this);
+    }
+  }
+  return options.inverse(this);
 });
 
 Mustache.registerHelper("all", function(type, params, options) {

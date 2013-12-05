@@ -275,9 +275,11 @@ can.Control("GGRC.Controllers.Modals", {
       this.set_value_from_element(el);
   }
 
-  , "input:not([data-lookup]), textarea, select keyup" : function(el, ev) {
-    this.set_value_from_element(el);
-    ev.stopPropagation();
+  , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
+      if (el.prop('value').length == 0 || el.attr('value').length == 0) {
+        this.set_value_from_element(el);
+        ev.stopPropagation();
+      }
   }
 
   , serialize_form : function() {

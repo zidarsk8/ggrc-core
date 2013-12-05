@@ -251,7 +251,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     , request = response.request.reify()
     , parent_folder = (request.get_mapping("folders")[0] || {}).instance;
 
-    if(!parent_folder || !parent_folder.selfLink) { //no ObjectFolder or cannot access folder from GAPI
+    if(!parent_folder || !parent_folder.selfLink) {
+      //no ObjectFolder or cannot access folder from GAPI
       el.trigger("ajax:flash", { warning : 'Can\'t upload: No GDrive folder found for PBC Request "' + request.objective.reify().title + '"'});
       return;
     }
