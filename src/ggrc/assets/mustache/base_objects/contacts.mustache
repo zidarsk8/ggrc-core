@@ -1,38 +1,46 @@
 {{#instance}}
 <div class="row-fluid">
   {{^is_private_program}}
-  <div {{^if stacked}}class="span6"{{/if}}>
-    {{#using contacts=instance.owners}}
+    <div {{^if stacked}}class="span6"{{/if}}>
+    {{#if owners.length}}
+      {{#using contacts=owners}}
       {{#contacts}}
         <p>
-          <strong>Owner:</strong>
+          <strong>Owner</strong>
+          <br>
           <span>{{firstnonempty name email}}</span>
         </p>
       {{/contacts}}
-      {{^contacts}}
-        <p>
-          <strong>Owner:</strong>
-          <span class="error">
-            Not Assigned
-          </span>
-        </p>
-      {{/contacts}}
-    {{/using}}
-  </div>
-  {{/is_private_program}}
-  <div {{^if stacked}}class="span6"{{/if}}>
-    <p>
-      <strong>Contact:</strong>
-      {{#using contact=contact}}
-      {{#if contact}}
-        <span>{{firstnonempty contact.name contact.email}}</span>
-      {{else}}
+      {{/using}}
+    {{else}}
+      <p>
+        <strong>Owner</strong>
+        <br>
         <span class="error">
           Not Assigned
         </span>
-      {{/if}}
-      {{/using}}
-    </p>
-  </div>
+      </p>
+    {{/if}}
+    </div>
+  {{/is_private_program}}
+  {{#using contact=contact}}
+    <div {{^if stacked}}class="span6"{{/if}}>   
+    {{#if contact}}
+      <p>
+        <strong>Contact</strong>
+        <br>
+        <span>{{firstnonempty contact.name contact.email}}</span>
+      </p>
+    {{else}}
+      <p>
+        <strong>Contact</strong>
+        <br>
+        <span class="error">
+          Not Assigned
+        </span>
+      </p>
+    {{/if}}
+    </div>
+  {{/using}}
 </div>
 {{/instance}}
