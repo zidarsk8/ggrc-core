@@ -745,7 +745,7 @@ def export_sections(directive_id):
 def export_objectives(directive_id):
   from ggrc.converters.objectives import ObjectivesConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import Directive
+  from ggrc.models.all_models import Directive, Objective
 
   directive = Directive.query.get(directive_id)
   options = {
@@ -753,8 +753,13 @@ def export_objectives(directive_id):
       'parent_id': directive_id,
       'export': True,
   }
-  filename = "{}.csv".format(directive.slug)
-  return handle_converter_csv_export(filename, directive.objectives, ObjectivesConverter, **options)
+  filename = "{}-objectives.csv".format(directive.slug)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    objectives = Objective.query.filter(Objective.id.in_(ids))
+  else:
+    objectives = directive.objectives
+  return handle_converter_csv_export(filename, objectives, ObjectivesConverter, **options)
 
 @app.route("/standards/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
