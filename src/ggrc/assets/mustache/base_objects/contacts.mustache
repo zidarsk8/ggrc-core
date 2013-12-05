@@ -1,6 +1,6 @@
 {{#instance}}
 <div class="row-fluid">
-  {{^is_private_program}}
+  {{^instance.context.id}}
   <div {{^if stacked}}class="span6"{{/if}}>
     {{#using contacts=instance.owners}}
       {{#contacts}}
@@ -19,7 +19,7 @@
       {{/contacts}}
     {{/using}}
   </div>
-  {{/is_private_program}}
+  {{/instance.context.id}}
   <div {{^if stacked}}class="span6"{{/if}}>
     <p>
       <strong>Contact:</strong>
