@@ -278,7 +278,6 @@ can.Control("GGRC.Controllers.Modals", {
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
       if (el.prop('value').length == 0 || el.attr('value').length == 0) {
         this.set_value_from_element(el);
-        ev.stopPropagation();
       }
   }
 
