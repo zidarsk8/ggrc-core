@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="span6">
-      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance stacked=true}}}
     </div>
   </div>
   <div class="row-fluid">
@@ -88,28 +88,30 @@
         <p>
           <strong>Kind/Nature</strong>
           <br>
-          {{control_kind}}
+          <span>{{#using kind=kind}}{{kind.title}}{{/using}}</span>
         </p>
       </div>
       <div class="span3">
         <p>
           <strong>Fraud Related</strong>
           <br>
-          {{fraud_related}}
+          {{#if_equals fraud_related "0"}}<span>No</span>{{/if}}
+          {{#if_equals fraud_related "1"}}<span>Yes</span>{{/if}}
         </p>
       </div>
       <div class="span3">
         <p>
           <strong>Significance</strong>
           <br>
-          {{key_control}}
+          {{#if_equals key_control "0"}}<span>Key</span>{{/if}}
+          {{#if_equals key_control "1"}}<span>Non-Key</span>{{/if}}
         </p>
       </div>
       <div class="span3">
         <p>
           <strong>Type/Means</strong>
           <br>
-          {{control_means}}
+          <span>{{#using means=means}}{{means.title}}{{/using}}</span>
         </p>
       </div>
     </div>
@@ -134,21 +136,29 @@
         <p>
           <strong>Frequency</strong>
           <br>
-          <span>{{verify_frequency}}</span>
+          <span>{{#using verify_frequency=verify_frequency}}{{verify_frequency.title}}{{/using}}</span>
         </p>
       </div>
       <div class="span4">
         <p>
           <strong>Assertions</strong>
           <br>
-          <span>{{ControlAssertion}}</span>
+          {{#using items=assertions}}
+            {{#items}}
+              <span>{{name}}</span>
+            {{/items}}
+          {{/using}}
         </p>
       </div>
       <div class="span4">
         <p>
           <strong>Categories</strong>
           <br>
-          <span>{{ControlCategory}}</span>
+          {{#using items=categories}}
+            {{#items}}
+              <span>{{name}}</span>
+            {{/items}}
+          {{/using}}
         </p>
       </div>
     </div>
