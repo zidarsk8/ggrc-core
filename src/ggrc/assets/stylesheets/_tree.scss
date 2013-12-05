@@ -374,14 +374,6 @@ ul.new-tree {
       max-width: 3.5em;
       margin-left: 0.5em;
     }
-    &.request-list {
-      .objective-selector {
-        .person-name {
-          color: $black;
-          display: inline-block;
-        }
-      }
-    }
     &.request-list,
     &.responses-list {
       .short-field {
