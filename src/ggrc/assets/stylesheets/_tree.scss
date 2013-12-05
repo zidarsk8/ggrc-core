@@ -162,6 +162,9 @@ ul.new-tree {
             @include oneline();
             height: 31px;
             min-height: 31px;
+            i {
+              display: inline-block;
+            }
             span {
               margin-right: 10px;
               &:last-child {
