@@ -1,10 +1,9 @@
-Type,,,,,,,,,,,,,,
-Processes,,,,,,,,,,,,,,
-*Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  
-For Process import, Type should be ""Processes"". (in cell A2)",,,,,,,,,,,,,
-"*Required
+Type,,,,,,,,,,,,,,,
+Processes,,,,,,,,,,,,,,,
+*Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  For Process import, Type should be ""Process"", in cell A2.",,,,,,,,,,,,,,
+"*Optional
 
-If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
+If you leave this field blank, the gGRC system will generate Codes automatically upon creation of the new object.  If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.  Otherwise, we recommend you leave this blank.
 
 Enter the Codes for already existing objects if you want to use Import as a means to edit and update those objects.","*Required
 
@@ -18,7 +17,8 @@ www.reciprocitylabs.com","*Optional.
 Enter a valid reference URL
 
 Example:
-www.reciprocitylabs.com","*Optional.
+www.reciprocitylabs.com","* Notes
+Use this text field to keep notes about this Process","*Optional.
 You can map a person to be the Owner/Person of Contact for the Process by entering an email address that already exists in your gGRC instance. Only 1 email address may be entered.
 
 Example:
@@ -26,13 +26,13 @@ Example:
 jeff@reciprocitylabs.com
 ","*Optional.  
 
-You can link Controls to Processes on import by specifying the Control code.  Use <option><return> to delineate between Control Codes.
+You can map Controls to Processes on import by specifying the Control code.  Use <option><return> to delineate between Control Codes.
 Example:
 
 CONTROL-1
 CONTROL-2","*Optional.  
 
-You can link Processes to Systems on import by specifying the System code.  Use <option><return> to delineate between System Codes.
+You can map Systems to Processes on import by specifying the System code.  Use <option><return> to delineate between System Codes.
 Example:
 
 SYSTEM-1
@@ -44,7 +44,7 @@ Example:
 PROCESS-1
 PROCESS-2","*Optional.  
 
-You can link Processes to Org Groups on import by specifying the Org Groups code.  Use <option><return> to delineate between Org Groups.
+You can map Org Groups to Processes on import by specifying the Org Groups code.  Use <option><return> to delineate between Org Groups.
 Example:
 
 ORGGROUP-1
@@ -56,6 +56,6 @@ www.reciprocitylabs.com
 reciprocitynow.com/about","*Can be ""Corp"" or ""Prod""","*Optional.  
 Can be ""Yes"", ""True"", or ""1"" to result in the System being labeled as ""Infrastructure"".
 
-Can be ""No"", ""False"", ""0"" to result in Process being labeled as ""Not Infrastructure""","*Optional.
+Can be ""No"", ""False"", ""0"" to result in System being labeled as ""Not Infrastructure""","*Optional.
 Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope"""
-Process Code,Title,Description,Effective Date,URL,Reference URL,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Link:References,Network Zone,Infrastructure,State
+Process Code,Title,Description,Effective Date,URL,Reference URL,Notes,Map:Person of Contact,Map:Controls,Map:System,Map:Process,Map:Org Group,Link:References,Network Zone,Infrastructure,State

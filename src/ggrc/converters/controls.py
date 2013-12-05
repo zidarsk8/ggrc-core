@@ -38,7 +38,7 @@ class ControlRowConverter(BaseRowConverter):
     self.handle_raw_attr('title', is_required=True)
     self.handle_raw_attr('url')
     self.handle_raw_attr('reference_url')
-
+    self.handle_text_or_html('notes')
     self.handle_option('kind', role='control_kind')
     self.handle_option('means', role='control_means')
     self.handle_option('verify_frequency')
@@ -104,6 +104,7 @@ class ControlsConverter(BaseConverter):
     ('Stop Date', 'end_date'),
     ('URL', 'url'),
     ('Reference URL', 'reference_url'),
+    ('Notes', 'notes'),
     ('Map:Systems', 'systems'),
     ('Map:Processes', 'processes'),
     ('Map:Categories', 'categories'),

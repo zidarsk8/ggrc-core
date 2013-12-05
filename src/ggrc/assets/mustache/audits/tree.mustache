@@ -16,7 +16,7 @@
             <div class="tree-title-area">
               <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
               {{instance.title}}
-              <span class="small gray">Planned</span>
+              <span class="small gray">{{instance.status}}</span>
               {{#infer_roles instance}}
                 <span class="role">
                   {{.}}
@@ -144,7 +144,7 @@
             </ul>
           </div>
         </div>
-        <div class="span5">
+        <div class="span3">
           <div class="tree-info">
             <ul class="tree-info-list">
               <li>
@@ -172,19 +172,28 @@
             </ul>
           </div>
         </div>
-        <div class="span2" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-          <select class="input-block-level top-space" name="status" 
+        <div class="span4" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
           {{#if_helpers '\
             ^if' allow_mapping_or_creating '\
             or ^is_allowed' 'update' instance '\
             or #if' responses.length '\
           ' _1_context=instance.context.id}}
-            disabled="true" readonly="true"
-          {{/if_helpers}}>
-            {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
-            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-            {{/iterate}}
-          </select>
+            <div class="tree-info">
+              <ul class="tree-info-list">
+                <li>
+                  <strong>Status: </strong>
+                  {{instance.status}}
+                </li>
+              </ul>
+            </div>
+          {{else}}
+            <select class="input-medium top-space" name="status">
+              {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
+              <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+              {{/iterate}}
+            </select>
+          {{/if_helpers}}
+          
         </div>
       </div>
       

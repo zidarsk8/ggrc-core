@@ -103,7 +103,7 @@ $(function() {
     , model_default_widgets = []
     , in_audit_descriptor_options = {
         widget_name: function() {
-          return "Mapped in Audits";
+          return "Mapped Audits";
         }
       }
     , extra_descriptor_options = {

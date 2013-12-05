@@ -578,7 +578,7 @@ Mustache.registerHelper("render_hooks", function(hook, options) {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, func, deferred) {
+function defer_render(tag_prefix, func, deferred, failfunc) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
@@ -587,17 +587,27 @@ function defer_render(tag_prefix, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      var frag_or_html = func.apply(this, arguments)
+      var g = deferred && deferred.state() === "rejected" ? failfunc : func;
+      var frag_or_html = g.apply(this, arguments)
         , $element = $(element)
+        , term = element.nextSibling
         ;
-      $element.after(frag_or_html);
-      if ($element.next().get(0)) {
-        can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
-        $element.remove();
+
+      if(element.parentNode) {
+        can.view.live.list(element, new can.Observe.List([arguments[0]]), g, this, parent);
+      } else {
+        $element.after(frag_or_html);
+        if ($element.next().get(0)) {
+          can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
+          $element.remove();
+        }
       }
     };
     if (deferred) {
       deferred.done(f);
+      if (failfunc) {
+        deferred.fail(f);
+      }
     }
     else
       setTimeout(f, 13);
@@ -678,7 +688,16 @@ Mustache.registerHelper("show_expander", function() {
 
 Mustache.registerHelper("allow_help_edit", function() {
   var options = arguments[arguments.length - 1];
-  return options.fn(this); //always true for now
+  var instance = this && this.instance ? this.instance : options.contexts[0]._data.instance;
+  if (instance) {
+    var action = instance.isNew() ? "create" : "update";
+    if (Permission.is_allowed(action, "Help", null)) {
+      return options.fn(this);
+    } else {
+      return options.inverse(this);
+    }
+  }
+  return options.inverse(this);
 });
 
 Mustache.registerHelper("all", function(type, params, options) {
@@ -1034,8 +1053,11 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
   function finish(list) {
     return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
+  function fail(error) {
+    return options.inverse($.extend([], options.contexts, options.contexts.concat([{error : error}])));
+  }
 
-  return defer_render('span', finish, loader.refresh_instances());
+  return defer_render('span', finish, loader.refresh_instances(), fail);
 });
 
 

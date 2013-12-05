@@ -32,6 +32,7 @@ class SystemRowConverter(BaseRowConverter):
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle_raw_attr('url')
     self.handle_raw_attr('reference_url')
+    self.handle_raw_attr('notes')
     self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
     self.handle('documents', LinkDocumentsHandler)
     self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
@@ -95,6 +96,7 @@ class SystemsConverter(BaseConverter):
     ('Infrastructure', 'infrastructure'),
     ('URL', 'url'),
     ('Reference URL', 'reference_url'),
+    ('Notes', 'notes'),
     ('Map:Person of Contact', 'contact'),
     ('Map:Controls', 'controls'),
     ('Map:System', 'sub_systems'),

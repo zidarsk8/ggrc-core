@@ -18,21 +18,22 @@
             </div>
           </div>
         </div>
-        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <i class="grcicon-person-green pull-left"></i>
         {{#using assignee=instance.assignee}}
           <div class="objective-selector">
-            <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}" 
               {{#if_helpers '\
                 ^if' allow_mapping_or_creating '\
                 or ^is_allowed' 'update' instance '\
               ' _1_context=instance.context.id}}
-                disabled="true" readonly="true"
-              {{/if_helpers}}>
+                <span class="black-font">{{firstnonempty assignee.name assignee.email ''}}</span>
+              {{else}}
+                <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
+              {{/if_helpers}}
           </div>
         {{/using}}
         </div>
-        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <span class="pull-left request-type black-font">type:</span>
           {{#with_mapping 'responses' instance}}
             {{#if_helpers '\
@@ -41,13 +42,13 @@
               or #if' responses.length '\
             ' _1_context=instance.context.id}}
               <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
-              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
+              <select name="request_type" class="span9 short-field" disabled="true" readonly="true">
                 {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}
               </select>
             {{else}}
-              <select name="request_type" class="span8 short-field">
+              <select name="request_type" class="span9 short-field">
                 {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}
@@ -58,17 +59,18 @@
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="row-fluid">
             <div class="span5">
-              <select name="status" class="span12 short-field" 
               {{#if_helpers '\
                 ^if' allow_mapping_or_creating '\
                 or ^is_allowed' 'update' instance '\
               ' _1_context=instance.context.id}}
-                disabled="true" readonly="true"
-              {{/if_helpers}}>
-                {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-                <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
+                <span class="black-font">{{instance.status}}</span>
+              {{else}}
+                <select name="status" class="span12 short-field">
+                  {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
+                  <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                  {{/iterate}}
+                </select>
+              {{/if_helpers}}
             </div>
             <div class="span6">
               <div class="black-font">
