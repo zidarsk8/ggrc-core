@@ -14,29 +14,31 @@
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
-                <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}"  
                 {{#if_helpers '\
                   ^if' allow_mapping_or_creating '\
                   or ^is_allowed' 'update' instance '\
                 ' _1_context=instance.context.id}}
-                  disabled="true" readonly="true"
-                {{/if_helpers}}>
+                  <span class="black-font">{{firstnonempty contact.name contact.email ''}}</span>
+                {{else}}
+                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
+                {{/if_helpers}}
               {{/using}}
             </div>
           </div>
           
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-            <select name="status" class="span10 short-field" 
               {{#if_helpers '\
                 ^if' allow_mapping_or_creating '\
                 or ^is_allowed' 'update' instance '\
               ' _1_context=instance.context.id}}
-                disabled="true" readonly="true"
-              {{/if_helpers}}>
-              {{#iterate 'Assigned' 'Accepted' 'Completed'}}
-              <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
-            </select>
+                <span class="black-font">{{instance.status}}</span>
+              {{else}}
+                <select name="status" class="span10 short-field">
+                  {{#iterate 'Assigned' 'Accepted' 'Completed'}}
+                  <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                  {{/iterate}}
+                </select>
+              {{/if_helpers}}
           </div>
         </div>
       </a>
