@@ -16,6 +16,9 @@
             {{/if_equals}}
             {{/using}}
           {{/if}}
+        {{else}}
+          {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
+          The GDrive folder for this {{instance.constructor.title_singular}} could not be accessed.
         {{/with_mapping}}
       </div>
     </div>

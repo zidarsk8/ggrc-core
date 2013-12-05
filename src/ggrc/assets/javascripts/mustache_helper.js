@@ -578,7 +578,7 @@ Mustache.registerHelper("render_hooks", function(hook, options) {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, func, deferred) {
+function defer_render(tag_prefix, func, deferred, failfunc) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
@@ -587,7 +587,8 @@ function defer_render(tag_prefix, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      var frag_or_html = func.apply(this, arguments)
+      var g = deferred && deferred.state() === "rejected" ? failfunc : func;
+      var frag_or_html = g.apply(this, arguments)
         , $element = $(element)
         ;
       $element.after(frag_or_html);
@@ -598,6 +599,9 @@ function defer_render(tag_prefix, func, deferred) {
     };
     if (deferred) {
       deferred.done(f);
+    }
+    if (deferred && failfunc) {
+      deferred.fail(f);
     }
     else
       setTimeout(f, 13);
@@ -1043,8 +1047,11 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
   function finish(list) {
     return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
+  function fail(error) {
+    return options.inverse($.extend([], options.contexts, options.contexts.concat([{error : error}])));
+  }
 
-  return defer_render('span', finish, loader.refresh_instances());
+  return defer_render('span', finish, loader.refresh_instances(), fail);
 });
 
 
