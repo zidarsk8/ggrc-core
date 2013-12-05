@@ -255,9 +255,11 @@ class ColumnHandler(object):
       self.go_import(content)
 
   def go_import(self, content):
+    # validate first to trigger error in case field is required but None
+    # TODO: Unit tests of imports with and without required fields
+    self.validate(content)
     if content is not None:
       data = self.parse_item(content)
-      self.validate(data)
       if data is not None:
         self.value = data
         self.set_attr(data)
@@ -358,8 +360,8 @@ class ContactEmailHandler(ColumnHandler):
 class AssigneeHandler(ContactEmailHandler):
 
   def parse_item(self, value):
-    stripped_value = value.strip()
-    if len(stripped_value) == 0:
+    # in case Assignee field does not exist or stripped version is empty
+    if not value or len(value.strip()) == 0:
       # Audit should exist; was passed from view function
       audit = self.importer.options.get('audit')
       audit_owner = getattr(audit, 'contact', None)
