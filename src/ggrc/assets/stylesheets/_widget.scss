@@ -616,6 +616,25 @@
     display: inline-block;
     margin: 0 0 0 10px;
   }
+  .info-expand {
+    border-top: 1px dotted $footerBorder;
+    padding: 0 0 12px 0;
+    .in, .out.active, .active .out {
+      display : none;
+    };
+    .in.active, .active .in, .out {
+      display : inline;
+    }
+    .show-hidden-fields {
+      &.active {
+        border-top: none;
+      }
+    }
+  }
+  .info-widget-footer {
+    border-top: 1px solid $footerBorder;
+    padding-top: 10px;
+  }
 }
 
 .advanced-filters {

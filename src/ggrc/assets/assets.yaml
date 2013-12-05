@@ -115,6 +115,7 @@ dashboard-js-template-files:
   - base_objects/tree_footer_no_access.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
+  - controls/info.mustache
   - controls/list_popover.mustache
   - controls/modal_content.mustache
   - controls/object_list.mustache
@@ -147,6 +148,7 @@ dashboard-js-template-files:
   - modals/modal_header.mustache
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
+  - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
   - objectives/tree.mustache
@@ -163,8 +165,11 @@ dashboard-js-template-files:
   - people/option_detail.mustache
   - people/page_header.mustache
   - people/tree.mustache
+  - policies/info.mustache
   - policies/modal_content.mustache
+  - processes/info.mustache
   - processes/modal_content.mustache
+  - products/info.mustache
   - products/modal_content.mustache
   - programs/extended_info.mustache
   - programs/info.mustache
@@ -189,6 +194,7 @@ dashboard-js-template-files:
   - selectors/option_column.mustache
   - selectors/option_detail.mustache
   - standards/modal_content.mustache
+  - systems/info.mustache
   - systems/modal_content.mustache
   - systems/tree_footer.mustache
   - base_objects/tree_footer.mustache
