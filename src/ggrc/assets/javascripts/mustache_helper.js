@@ -578,7 +578,7 @@ Mustache.registerHelper("render_hooks", function(hook, options) {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, func, deferred) {
+function defer_render(tag_prefix, func, deferred, failfunc) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
@@ -587,17 +587,27 @@ function defer_render(tag_prefix, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      var frag_or_html = func.apply(this, arguments)
+      var g = deferred && deferred.state() === "rejected" ? failfunc : func;
+      var frag_or_html = g.apply(this, arguments)
         , $element = $(element)
+        , term = element.nextSibling
         ;
-      $element.after(frag_or_html);
-      if ($element.next().get(0)) {
-        can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
-        $element.remove();
+      
+      if(element.parentNode) {
+        can.view.live.list(element, new can.Observe.List([arguments[0]]), g, this, parent);
+      } else {
+        $element.after(frag_or_html);
+        if ($element.next().get(0)) {
+          can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
+          $element.remove();
+        }
       }
     };
     if (deferred) {
       deferred.done(f);
+      if (failfunc) {
+        deferred.fail(f);
+      }
     }
     else
       setTimeout(f, 13);
