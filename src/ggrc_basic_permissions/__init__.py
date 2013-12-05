@@ -238,35 +238,57 @@ def all_collections():
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
-  if src.get('private', False):
-    # get the personal context for this logged in user
-    personal_context = service.personal_context()
+  # get the personal context for this logged in user
+  personal_context = service.personal_context()
 
-    # create a context specific to the program
-    context = Context(
-        context=personal_context,
-        name='{object_type} Context {timestamp}'.format(
-          object_type=service.model.__name__,
-          timestamp=datetime.datetime.now()),
-        description='',
-        )
-    context.related_object = obj
-    db.session.add(context)
-    db.session.flush()
-    obj.context = context
+  # create a context specific to the program
+  context = Context(
+      context=personal_context,
+      name='{object_type} Context {timestamp}'.format(
+        object_type=service.model.__name__,
+        timestamp=datetime.datetime.now()),
+      description='',
+      )
+  context.related_object = obj
+  db.session.add(context)
+  db.session.flush()
+  obj.context = context
 
-    # add a user_roles mapping assigning the user creating the program
-    # the ProgramOwner role in the program's context.
-    program_owner_role = basic_roles.program_owner()
-    user_role = UserRole(
-        person=get_current_user(),
-        role=program_owner_role,
+  # add a user_roles mapping assigning the user creating the program
+  # the ProgramOwner role in the program's context.
+  program_owner_role = basic_roles.program_owner()
+  user_role = UserRole(
+      person=get_current_user(),
+      role=program_owner_role,
+      context=context,
+      )
+  db.session.add(user_role)
+  db.session.flush()
+
+  assign_role_reader(get_current_user())
+  if not src.get('private'):
+    # Add role implication - all users can read a public program
+    db.session.add(RoleImplication(
+        source_context=None,
+        source_role=basic_roles.reader(),
         context=context,
-        )
-    db.session.add(user_role)
-    db.session.flush()
-
-    assign_role_reader(get_current_user())
+        role=basic_roles.program_reader(),
+        modified_by=get_current_user(),
+        ))
+    db.session.add(RoleImplication(
+        source_context=None,
+        source_role=basic_roles.object_editor(),
+        context=context,
+        role=basic_roles.program_reader(),
+        modified_by=get_current_user(),
+        ))
+    db.session.add(RoleImplication(
+        source_context=None,
+        source_role=basic_roles.program_creator(),
+        context=context,
+        role=basic_roles.program_reader(),
+        modified_by=get_current_user(),
+        ))
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
