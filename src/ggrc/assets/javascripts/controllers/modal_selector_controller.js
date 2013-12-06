@@ -1063,6 +1063,7 @@
         this.insert_options([data], true);
         // Scroll so the top element (the one just added) is in view
         this.element.find(".option_column ul").parent().scrollTop(0);
+        this.search_reset();
       }
 
     , "#search keyup": function(el, ev) {
@@ -1080,13 +1081,13 @@
           }, 200);
         }
       }
-
-    , ".search-reset click" : function(el, ev) {
-        this.element.find("#search").val("").focus();
-        this.options.option_search_term = "";
-        this.constructor.last_option_search_term = "";
-        this.refresh_option_list();
-      }
+    , search_reset : function(){
+      this.element.find("#search").val("").focus();
+      this.options.option_search_term = "";
+      this.constructor.last_option_search_term = "";
+      this.refresh_option_list();
+    }
+    , ".search-reset click" : this.search_reset
     
   , " ajax:flash" : function(el, ev, mesg) {
       var that = this
