@@ -273,6 +273,8 @@ can.Control("GGRC.Controllers.ListView", {
 
   , ".search-filters button[type=reset] click" : function(el, ev) {
       this.options.search_params = {};
+      this.options.search_query = '';
+      this.element.find('.search-filters').find('input[name=search], select[name=user_role]').val('');
       this.fetch_list();
     }
   }
