@@ -96,6 +96,9 @@ def log_event(session, obj=None, current_user_id=None):
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
     action = request.method
+  # Filter out unwanted revisions:
+  blacklist = ["Context"]
+  revisions = [r for r in revisions if r.resource_type not in blacklist]
   if revisions:
     event = Event(
       modified_by_id=current_user_id,
