@@ -87,8 +87,18 @@ can.Control("GGRC.Controllers.ListView", {
         this.options.parent_type.split("_").map(can.capitalize).join(" ");
     }
 
+    this.context = new can.Observe({
+      // FIXME: Needed?  Default `pager` to avoid binding issues.
+      pager: { has_next: function() { return false; } }
+    });
+    this.context.attr("has_next_page", can.compute(function() {
+      var pager = that.context.attr("pager");
+      return pager && pager.has_next && pager.has_next();
+    }));
+    this.context.attr(this.options);
+
     if(this.options.header_view) {
-      can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+      can.view(this.options.header_view, $.when(this.context)).then(function(frag) {
         if (that.element) {
           that.element.prepend(frag);
         }
@@ -135,6 +145,7 @@ can.Control("GGRC.Controllers.ListView", {
                   insert_instance(instance);
               });
               that.options.pager = result.paging;
+              that.context.attr("pager", result.paging);
               return result[collection_name];
             });
           };
@@ -151,8 +162,15 @@ can.Control("GGRC.Controllers.ListView", {
     var extra_params = this.options.extra_params || {}
       , search_params = this.options.search_params
       ;
+
+    this.element.trigger("loading");
+    this.options.state.attr('loading', true);
+
     if (search_params.search_ids || search_params.user_role_ids) {
-      var ids = search_params.search_ids || search_params.user_role_ids || [];
+      var model = this.options.model
+        , ids = search_params.search_ids || search_params.user_role_ids || []
+        , refresh_queue = new RefreshQueue()
+        ;
 
       // If there is a search for both a query an user roles, 
       // only use the ids in both lists.
@@ -160,19 +178,24 @@ can.Control("GGRC.Controllers.ListView", {
         var found = {};
         ids = [];
         can.each([].concat(search_params.search_ids, search_params.user_role_ids), function(id) {
-          if (found[''+id])
+          if (found[''+id]) {
             ids.push(id);
-          else
+          }
+          else {
             found[''+id] = true;
+          }
         });
       }
 
-      extra_params.id__in = ids.join(',');
+      can.each(ids, function(id) {
+        refresh_queue.enqueue(CMS.Models.get_instance(model.shortName, id));
+      });
+      refresh_queue.trigger().then(function(instances) {
+        return new can.Observe.List(instances);
+      }).then(this.proxy("draw_list"));
+    } else {
+      this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
     }
-
-    this.element.trigger("loading");
-    this.options.state.attr('loading', true);
-    this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
   }
 
   , draw_list : function(list) {
@@ -186,7 +209,8 @@ can.Control("GGRC.Controllers.ListView", {
       this.on();
     }
 
-    can.view(this.options.list_view, this.options, function(frag) {
+    this.context.attr(this.options);
+    can.view(this.options.list_view, this.context, function(frag) {
       that.element.find('.spinner, .tree-structure').remove();
       that.element
         .append(frag)
@@ -216,6 +240,7 @@ can.Control("GGRC.Controllers.ListView", {
             that.options.list.push.apply(that.options.list, data[collection_name]);
           }
           that.options.pager = data.paging;
+          that.context.attr("pager", data.paging);
         });
       }
     }

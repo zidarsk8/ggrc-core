@@ -51,7 +51,7 @@
 </div>
 -->
 <ul class="tree-structure new-tree event-tree">
-  {{#list}}
+  {{#each list}}
     <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}>
       <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
         <div class="row-fluid">
@@ -86,13 +86,18 @@
         </div>
       </div>
     </li>
-  {{/list}}
-  {{#pager.next}}
-  <li class="view-more-paging">
-    <a href="javascript://">
+  {{/each}}
+
+  <li class="tree-footer tree-item tree-item-add">
+    {{#if has_next_page}}
+    <a href="javascript://" class="view-more-paging">
       View More
       <i class="grcicon-down"></i>
     </a>
+    {{else}}
+    <span class="view-more-paging">
+      All results shown
+    </span>
+    {{/if}}
   </li>
-  {{/pager.next}}
 </ul>
