@@ -458,7 +458,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
       });
     }, 20);
   }
-
+  , should_draw_children : function(){
+    var draw_children = this.options.draw_children;
+    if(can.isFunction(draw_children)) 
+      return draw_children.apply(this.options);
+    return draw_children;
+  }
   // add all child options to one TreeViewOptions object
   , add_child_lists_to_child : function() {
     var that = this
@@ -468,7 +473,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     if (original_child_options.length == null)
       original_child_options = [original_child_options]
 
-    if(this.options.draw_children) {
+    if(this.should_draw_children()) {
       can.each(original_child_options, function(data, i) {
         var options = new can.Observe();
         data.each(function(v, k) {
@@ -555,7 +560,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
     ev.stopPropagation();
     this.options.attr('expanded', true);
     this.element.trigger("kill-all-popovers"); //special case for changing evidence links to non-popover ones
-    if(!this.options.child_options && this.options.draw_children) {
+    if(!this.options.child_options && this.should_draw_children()) {
       this.add_child_lists_to_child();
     }
   }
