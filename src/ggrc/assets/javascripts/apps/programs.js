@@ -254,7 +254,7 @@ function authorizations_list_loader() {
     can.each(person_roles, function(data, index) {
       if (user_role.person.id == data.person.id) {
         roles = data.attr('roles');
-        role_index = roles.indexOf(user_role.role.reify());
+        role_index = $.map(roles, function(role) { return role.role; }).indexOf(user_role.role.reify());
         if (role_index > -1) {
           roles.splice(role_index, 1);
           if (roles.length == 0)
