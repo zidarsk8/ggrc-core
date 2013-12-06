@@ -87,8 +87,18 @@ can.Control("GGRC.Controllers.ListView", {
         this.options.parent_type.split("_").map(can.capitalize).join(" ");
     }
 
+    this.context = new can.Observe({
+      // FIXME: Needed?  Default `pager` to avoid binding issues.
+      pager: { has_next: function() { return false; } }
+    });
+    this.context.attr("has_next_page", can.compute(function() {
+      var pager = that.context.attr("pager");
+      return pager && pager.has_next && pager.has_next();
+    }));
+    this.context.attr(this.options);
+
     if(this.options.header_view) {
-      can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
+      can.view(this.options.header_view, $.when(this.context)).then(function(frag) {
         if (that.element) {
           that.element.prepend(frag);
         }
@@ -135,6 +145,7 @@ can.Control("GGRC.Controllers.ListView", {
                   insert_instance(instance);
               });
               that.options.pager = result.paging;
+              that.context.attr("pager", result.paging);
               return result[collection_name];
             });
           };
@@ -198,7 +209,8 @@ can.Control("GGRC.Controllers.ListView", {
       this.on();
     }
 
-    can.view(this.options.list_view, this.options, function(frag) {
+    this.context.attr(this.options);
+    can.view(this.options.list_view, this.context, function(frag) {
       that.element.find('.spinner, .tree-structure').remove();
       that.element
         .append(frag)
@@ -228,6 +240,7 @@ can.Control("GGRC.Controllers.ListView", {
             that.options.list.push.apply(that.options.list, data[collection_name]);
           }
           that.options.pager = data.paging;
+          that.context.attr("pager", data.paging);
         });
       }
     }

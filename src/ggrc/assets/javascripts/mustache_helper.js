@@ -1052,6 +1052,8 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
   person = Mustache.resolve(person);
   person = person.reify();
   refresh_queue.enqueue(person);
+  // Force monitoring of changes to `person.user_roles`
+  person.attr("user_roles");
   refresh_queue.trigger().then(function() {
     var user_roles = person.user_roles.reify()
       , user_roles_refresh_queue = new RefreshQueue()

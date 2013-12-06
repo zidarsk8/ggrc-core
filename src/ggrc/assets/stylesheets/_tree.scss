@@ -53,17 +53,6 @@ ul.new-tree {
       font-size:13px;
       color:#777;
     }
-    .view-more-paging {
-      line-height: 31px;
-      min-height: 31px;
-      padding-left: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      [class^="grcicon-"] {
-        margin-top: 7px;
-      }
-    }
     .item-data {
       padding-right: 20px;
       .tree-title-area {
@@ -758,6 +747,17 @@ ul.new-tree {
     p {
       line-height:18px;
       font-size:13px;
+    }
+  }
+  .view-more-paging {
+    line-height: 31px;
+    min-height: 31px;
+    padding-left: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    [class^="grcicon-"] {
+      margin-top: 7px;
     }
   }
   a.show-long {
