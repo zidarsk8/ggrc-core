@@ -522,6 +522,9 @@ jQuery(document).ready(function($) {
   $.fn.showhide = showhide(".widget", ".content, .filter");
   $.fn.modal_showhide = showhide(".modal", ".hidden-fields-area");
   $('body').on('click', ".expand-link a", $.fn.modal_showhide);
+  
+  $.fn.widget_showhide = showhide(".info", ".hidden-fields-area");
+  $('body').on('click', ".info-expand a", $.fn.widget_showhide);
 
   // Show/hide tree leaf content
   $('body').on('click', '.tree-structure .oneline, .tree-structure .description, .tree-structure .view-more', oneline);

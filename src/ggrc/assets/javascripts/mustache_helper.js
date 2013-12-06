@@ -592,7 +592,7 @@ function defer_render(tag_prefix, func, deferred, failfunc) {
         , $element = $(element)
         , term = element.nextSibling
         ;
-      
+
       if(element.parentNode) {
         can.view.live.list(element, new can.Observe.List([arguments[0]]), g, this, parent);
       } else {
@@ -608,9 +608,6 @@ function defer_render(tag_prefix, func, deferred, failfunc) {
       if (failfunc) {
         deferred.fail(f);
       }
-    }
-    if (deferred && failfunc) {
-      deferred.fail(f);
     }
     else
       setTimeout(f, 13);
