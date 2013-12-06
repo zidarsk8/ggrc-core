@@ -14,7 +14,6 @@
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                <span class="tree-code">{{instance.slug}}</span>
                 {{instance.title}}
                 {{#infer_roles instance}}
                   <span class="role">
@@ -100,6 +99,10 @@
             </div>
           </div>
         </div>
+        
+        <span class="tier-2-code">
+          Code: {{instance.slug}}
+        </span>
 
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 

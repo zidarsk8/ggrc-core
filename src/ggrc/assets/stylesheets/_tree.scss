@@ -903,6 +903,11 @@ ul.new-tree {
 .tier-2-info-content {
   padding:0 20px;
   position:relative;
+  .tier-2-code {
+    color: #777;
+    font-style: italic;
+    font-size: 13px;
+  }
   .top-space {
     margin-top: 6px;
   }
