@@ -35,12 +35,11 @@
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
       <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" 
-        {{#new_object_form}}
+        {{#if new_object_form}}
            value="{{current_user.email}}"
-        {{/new_object_form}}
-        {{^new_object_form}}
+        {{else}}
            value="{{firstexist owner.email ''}}" 
-        {{/new_object_form}}
+        {{/if}}
       />
       {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
@@ -48,14 +47,7 @@
         Contact
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" 
-        {{#new_object_form}}
-           value="{{current_user.email}}"
-        {{/new_object_form}}
-        {{^new_object_form}}
-           value="{{firstexist contact.email ''}}" 
-        {{/new_object_form}}
-      />
+      <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
     </div>
   </div>
