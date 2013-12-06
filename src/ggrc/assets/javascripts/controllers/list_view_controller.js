@@ -151,8 +151,15 @@ can.Control("GGRC.Controllers.ListView", {
     var extra_params = this.options.extra_params || {}
       , search_params = this.options.search_params
       ;
+
+    this.element.trigger("loading");
+    this.options.state.attr('loading', true);
+
     if (search_params.search_ids || search_params.user_role_ids) {
-      var ids = search_params.search_ids || search_params.user_role_ids || [];
+      var model = this.options.model
+        , ids = search_params.search_ids || search_params.user_role_ids || []
+        , refresh_queue = new RefreshQueue()
+        ;
 
       // If there is a search for both a query an user roles, 
       // only use the ids in both lists.
@@ -160,19 +167,24 @@ can.Control("GGRC.Controllers.ListView", {
         var found = {};
         ids = [];
         can.each([].concat(search_params.search_ids, search_params.user_role_ids), function(id) {
-          if (found[''+id])
+          if (found[''+id]) {
             ids.push(id);
-          else
+          }
+          else {
             found[''+id] = true;
+          }
         });
       }
 
-      extra_params.id__in = ids.join(',');
+      can.each(ids, function(id) {
+        refresh_queue.enqueue(CMS.Models.get_instance(model.shortName, id));
+      });
+      refresh_queue.trigger().then(function(instances) {
+        return new can.Observe.List(instances);
+      }).then(this.proxy("draw_list"));
+    } else {
+      this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
     }
-
-    this.element.trigger("loading");
-    this.options.state.attr('loading', true);
-    this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
   }
 
   , draw_list : function(list) {
