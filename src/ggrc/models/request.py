@@ -12,9 +12,12 @@ class Request(Described, Base, db.Model):
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request',
     u'Updated Response', u'Accepted')
+  requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'),
+    nullable=False)
+  requestor = db.relationship('Person', foreign_keys=[requestor_id])
   assignee_id = db.Column(db.Integer, db.ForeignKey('people.id'),
     nullable=False)
-  assignee = db.relationship('Person')
+  assignee = db.relationship('Person', foreign_keys=[assignee_id])
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
     'Request')
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
@@ -35,6 +38,7 @@ class Request(Described, Base, db.Model):
 
   _publish_attrs = [
     'assignee',
+    'requestor',
     'request_type',
     'gdrive_upload_path',
     'requested_on',

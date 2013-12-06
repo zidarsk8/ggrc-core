@@ -586,6 +586,7 @@
           return !person
             || (result.instance.contact && result.instance.contact.id === person.id)
             || (result.instance.assignee && result.instance.assignee.id === person.id)
+            || (result.instance.requestor && result.instance.requestor.id === person.id)
             ;
         })
       , related_owned_requests: TypeFilter("related_owned_objects", "Request")
