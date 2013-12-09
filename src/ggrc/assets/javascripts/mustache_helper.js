@@ -1074,6 +1074,8 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
   person = Mustache.resolve(person);
   person = person.reify();
   refresh_queue.enqueue(person);
+  // Force monitoring of changes to `person.user_roles`
+  person.attr("user_roles");
   refresh_queue.trigger().then(function() {
     var user_roles = person.user_roles.reify()
       , user_roles_refresh_queue = new RefreshQueue()
@@ -1954,6 +1956,21 @@ Mustache.registerHelper("with_model_as", function(var_name, model_name, options)
   model_name = resolve_computed(Mustache.resolve(model_name));
   frame[var_name] = CMS.Models[model_name];
   return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
+});
+
+Mustache.registerHelper("private_program_owner", function(instance, modal_title, options) {
+  var state = get_binding_observe('__private_program_owner', options);
+  if (resolve_computed(modal_title).indexOf('New ') === 0) {
+    return GGRC.current_user.email;
+  }
+  else {
+    var loader = resolve_computed(instance).get_binding('authorizations');
+    return $.map(loader.list, function(binding) {
+      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+        return binding.instance.person.reify().attr('email');
+      }
+    }).join(', ');
+  }
 });
 
 })(this, jQuery, can);
