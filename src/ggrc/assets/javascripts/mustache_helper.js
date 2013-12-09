@@ -802,19 +802,6 @@ Mustache.registerHelper("role_checkbox", function(role, model, operation) {
   ].join("");
 });
 
-Mustache.registerHelper("private_program", function(modal_title) {
-  return [
-      '<label>'
-    , 'Privacy'
-    , '<i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>'
-    , '</label>'
-    , '<div class="checkbox-area">'
-    , '<input tabindex="2" name="private" value="private" type="checkbox"> Private Program'
-    , '</div>'
-  ].join("");
-});
-
-
 Mustache.registerHelper("can_link_to_page_object", function(context, options) {
   if(!options) {
     options = context;
@@ -855,8 +842,8 @@ Mustache.registerHelper("is_private", function(options) {
     context = resolve_computed(options);
     options = arguments[1];
   }
-  var context_id = context && context.attr('context.id');
-  if (context_id != undefined && context_id != null) {
+  var private = context && context.attr('private');
+  if (private) {
     return options.fn(context);
   }
   return options.inverse(context);
