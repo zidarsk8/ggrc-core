@@ -352,7 +352,7 @@
             return $.inArray("preventdoublesubmit", this.namespace.split(".")) > -1;
           }).length < 1) {
       $el.on('keypress.preventdoublesubmit', function(ev) {
-        if(ev.which === 13) {
+        if(ev.which === 13 && !$(document.activeElement).hasClass('wysihtml5')) {
           ev.preventDefault();
           if(ev.originalEvent) {
             ev.originalEvent.preventDefault();
