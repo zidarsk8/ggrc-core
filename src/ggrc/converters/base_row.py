@@ -11,8 +11,9 @@ from ggrc.models.all_models import (
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
     Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
-    )
+)
 from ggrc.models.exceptions import ValidationError
+
 
 def unpack_list(vals):
   result = []
@@ -285,7 +286,7 @@ class RequestTypeColumnHandler(ColumnHandler):
 
 class StatusColumnHandler(ColumnHandler):
 
-   def parse_item(self, value):
+  def parse_item(self, value):
     # compare on fully-lower-cased version of valid states list
     valid_states = self.options.get('valid_states') or self.valid_states
     formatted_valid_states = [
@@ -303,7 +304,23 @@ class StatusColumnHandler(ColumnHandler):
             ", ".join(valid_states)
         ))
         return None
+    else:
+      default_value = self.options.get('default_value') or self.default_value
+      if default_value:
+        # default_value should be in valid_states list
+        self.add_warning("This field will be set to {}".format(
+            default_value))
+        return default_value
 
+  def go_import(self, content):
+    # override in case empty (None) items need to be set to a default
+    if self.options.get('default_value'):
+      data = self.parse_item(content)
+      self.validate(data)
+      self.value = data
+      self.set_attr(data)
+    else:  # treat as normal if there are no defaults
+      return super(StatusColumnHandler, self).go_import(content)
 
 class TextOrHtmlColumnHandler(ColumnHandler):
 
