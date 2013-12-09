@@ -168,12 +168,6 @@ can.Control("GGRC.Controllers.Modals", {
       path.pop();
       path = path.join(".");
 
-      // Create a new list if one doesn't exist (for object owners)
-      if (!this.options.instance.attr(path) && /\.\d+$/.test(path)) {
-        var prop = path.split('.')[0];
-        this.options.instance.attr(prop, new can.Observe.List());
-      }
-
       this.options.instance.attr(path, ui.item.stub());
     } else {
       original_event = event;
@@ -296,8 +290,6 @@ can.Control("GGRC.Controllers.Modals", {
         , that = this;
         ;
 
-      if ($el.is('select[multiple]'))
-        value = value || [];
       if (name)
         this.set_value({ name: name, value: value });
 
@@ -382,7 +374,21 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
     }
-    instance.attr(name[0], value && value.serialize ? value.serialize() : value);
+
+    value = value && value.serialize ? value.serialize() : value;
+    if ($elem.is('[data-list]')) {
+      var list_path = name.slice(0, name.length-1).join(".")
+        , cur = instance.attr(list_path)
+        ;
+      if (!cur || !(cur instanceof can.Observe.List)) {
+        instance.attr(list_path, []);
+        cur = instance.attr(list_path);
+      }
+      value = value || [];
+      cur.splice.apply(cur, [0, cur.length].concat(value));
+    } else {
+      instance.attr(name[0], value);
+    }
   }
 
   , "[data-before], [data-after] change" : function(el, ev) {
