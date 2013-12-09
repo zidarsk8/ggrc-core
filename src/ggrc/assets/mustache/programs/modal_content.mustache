@@ -51,7 +51,7 @@
           ^if' instance.context.id '\
           and ^if' instance.private '\
         '}}
-          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email current_user.email ''}}" />
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email current_user.email ''}}" />
         {{else}}
           <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
           <input tabindex="3" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
