@@ -98,8 +98,13 @@ can.Control("GGRC.Controllers.Modals", {
     var ctl = this;
     // Add autocomplete to the owner field
     var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this);
-      var prop = $that.attr("name").substr($that.attr("name").lastIndexOf(".") + 1);
+      var $that = $(this)
+        , name = $that.attr("name") || ""
+        , prop = name.substr(name.lastIndexOf(".") + 1);
+
+      // Return if this field temporarily isn't storing data
+      if (!name) return false;
+
       return $that.autocomplete({
         // Ensure that the input.change event still occurs
         change : function(event, ui) {
