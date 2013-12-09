@@ -5,7 +5,7 @@
 
 import json
 from collections import namedtuple
-from flask import request, flash, session, url_for
+from flask import request, flash, session, url_for, redirect
 from flask.views import View
 from ggrc.app import app
 from ggrc.rbac import permissions
@@ -200,8 +200,7 @@ def import_people_task(task):
       return render_template("people/import_result.haml", **options)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
-      return import_redirect("/admin")
+      return import_redirect("/admin/people_redirect/{}".format(count))
 
   except ImportException as e:
     if e.show_preview:
@@ -210,6 +209,11 @@ def import_people_task(task):
           converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("directives/import_errors.haml",
           directive_id="People", exception_message=str(e))
+
+@app.route("/admin/people_redirect/<count>", methods=["GET"])
+def people_redirect(count):
+  flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
+  return redirect("/admin")
 
 @app.route("/admin/import_people", methods=['GET', 'POST'])
 def import_people():
