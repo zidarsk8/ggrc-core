@@ -64,17 +64,23 @@ def init_app(app):
   from .cache import Cache
   from ggrc.services.common import get_cache
 
-  def update_cache(session, flush_context):
+  def update_cache_before_flush(session, flush_context, objects):
     cache = get_cache(create = True)
     if cache:
-      cache.update(session)
+      cache.update_before_flush(session, flush_context)
+
+  def update_cache_after_flush(session, flush_context):
+    cache = get_cache(create = False)
+    if cache:
+      cache.update_after_flush(session, flush_context)
 
   def clear_cache(session):
     cache = get_cache()
     if cache:
       cache.clear()
 
-  event.listen(Session, 'after_flush', update_cache)
+  event.listen(Session, 'before_flush', update_cache_before_flush)
+  event.listen(Session, 'after_flush', update_cache_after_flush)
   event.listen(Session, 'after_commit', clear_cache)
   event.listen(Session, 'after_rollback', clear_cache)
 
