@@ -124,7 +124,10 @@ class SystemsConverter(BaseConverter):
       self.metadata_map[parent_key] = parent_value
 
   def validate_metadata(self, attrs):
-    self.validate_metadata_type(attrs, "Systems")
+    if self.options.get('is_biz_process'):
+      self.validate_metadata_type(attrs, "Processes")
+    else:
+      self.validate_metadata_type(attrs, "Systems")
     self.validate_code(attrs)
 
   def validate_code(self, attrs):
