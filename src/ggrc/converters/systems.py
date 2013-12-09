@@ -34,7 +34,6 @@ class SystemRowConverter(BaseRowConverter):
     self.handle_raw_attr('reference_url')
     self.handle_raw_attr('notes')
     self.handle('status', StatusColumnHandler, valid_states=BusinessObject.VALID_STATES)
-    self.handle('documents', LinkDocumentsHandler)
     self.handle('sub_systems', LinkRelationshipsHandler, model_class=System,
         direction='from')
     self.handle('sub_processes', LinkRelationshipsHandler, model_class=Process,
@@ -92,7 +91,6 @@ class SystemsConverter(BaseConverter):
     ('System Code', 'slug'),
     ('Title', 'title'),
     ('Description' , 'description'),
-    ('Link:References', 'documents'),
     ('Infrastructure', 'infrastructure'),
     ('URL', 'url'),
     ('Reference URL', 'reference_url'),
