@@ -309,6 +309,18 @@ class Resource(ModelView):
       :service: The instance of Resource handling the POST request.  
     """,
     )
+  model_put = signals.signal('Model PUT',
+      """
+      Indicates that a model object update was received via PUT and will be
+      updated in the database. The sender in the signal will be the model class
+      of the PUT resource. The following arguments will be sent along with the
+      signal:
+
+        :obj: The model instance updated from the PUT JSON.
+        :src: The original PUT JSON dictionary.
+        :service: The instance of Resource handling the PUT request.
+      """,
+      )
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -420,6 +432,7 @@ class Resource(ModelView):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Commit"):

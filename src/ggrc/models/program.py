@@ -26,6 +26,7 @@ class Program(
       'Company Controls Policy',
       ]
 
+  private = db.Column(db.Boolean, default=False, nullable=False)
   kind = deferred(db.Column(db.String), 'Program')
 
   program_controls = db.relationship(
@@ -46,6 +47,7 @@ class Program(
       'program_directives',
       'directives',
       'audits',
+      'private',
       ]
 
   _include_links = [

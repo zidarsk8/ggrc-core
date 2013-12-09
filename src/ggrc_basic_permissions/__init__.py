@@ -6,6 +6,7 @@
 import datetime
 from flask import session, Blueprint
 import sqlalchemy.orm
+from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import and_, or_
 from ggrc import db, settings
 from ggrc.login import get_current_user, login_required
@@ -268,27 +269,46 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   assign_role_reader(get_current_user())
   if not src.get('private'):
     # Add role implication - all users can read a public program
-    db.session.add(RoleImplication(
-        source_context=None,
-        source_role=basic_roles.reader(),
-        context=context,
-        role=basic_roles.program_reader(),
-        modified_by=get_current_user(),
-        ))
-    db.session.add(RoleImplication(
-        source_context=None,
-        source_role=basic_roles.object_editor(),
-        context=context,
-        role=basic_roles.program_reader(),
-        modified_by=get_current_user(),
-        ))
-    db.session.add(RoleImplication(
-        source_context=None,
-        source_role=basic_roles.program_creator(),
-        context=context,
-        role=basic_roles.program_reader(),
-        modified_by=get_current_user(),
-        ))
+    add_public_program_role_implication(basic_roles.reader(), context)
+    add_public_program_role_implication(basic_roles.object_editor(), context)
+    add_public_program_role_implication(basic_roles.program_creator(), context)
+
+def add_public_program_role_implication(
+    source_role, context, check_exists=False):
+  if check_exists and db.session.query(RoleImplication)\
+      .filter(RoleImplication.context_id == context.id
+            and RoleImplication.source_context_id == None)\
+      .count() > 0:
+    return
+  db.session.add(RoleImplication(
+    source_context=None,
+    source_role=source_role,
+    context=context,
+    role=basic_roles.program_reader(),
+    modified_by=get_current_user(),
+    ))
+
+@Resource.model_put.connect_via(Program)
+def handle_program_put(sender, obj=None, src=None, service=None):
+  #Check to see if the private property of the program has changed
+  if get_history(obj, 'private').has_changes():
+    if obj.private:
+      #ensure that any implications from null context are removed
+      implications = db.session.query(RoleImplication)\
+          .filter(
+              RoleImplication.context_id == obj.context_id,
+              RoleImplication.source_context_id == None)\
+                  .delete()
+      db.session.flush()
+    else:
+      #ensure that implications from null are present
+      add_public_program_role_implication(
+          basic_roles.reader(), obj.context, check_exists=True)
+      add_public_program_role_implication(
+          basic_roles.object_editor(), obj.context, check_exists=True)
+      add_public_program_role_implication(
+          basic_roles.program_creator(), obj.context, check_exists=True)
+      db.session.flush()
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
