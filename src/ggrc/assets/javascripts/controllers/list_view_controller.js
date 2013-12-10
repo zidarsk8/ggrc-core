@@ -229,7 +229,12 @@ can.Control("GGRC.Controllers.ListView", {
         this.element.trigger("widget_updated");
       }
     }
-
+  , reset_search: function(el, ev){
+      this.options.search_params = {};
+      this.options.search_query = '';
+      this.element.find('.search-filters').find('input[name=search], select[name=user_role]').val('');
+      this.fetch_list();
+  }
   , "{list} change": "update_count"
   , ".view-more-paging click" : function(el, ev) {
       var that = this;
@@ -271,12 +276,8 @@ can.Control("GGRC.Controllers.ListView", {
       }
     }
 
-  , ".search-filters button[type=reset] click" : function(el, ev) {
-      this.options.search_params = {};
-      this.options.search_query = '';
-      this.element.find('.search-filters').find('input[name=search], select[name=user_role]').val('');
-      this.fetch_list();
-    }
+  , ".search-filters button[type=reset] click" : "reset_search"
+  , ".btn-add modal:success" : "reset_search"
   }
 );
 
