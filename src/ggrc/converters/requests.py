@@ -4,7 +4,7 @@
 # Maintained By: silas@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Request
+from ggrc.models import Audit, Request
 from .base_row import *
 from collections import OrderedDict
 
@@ -34,8 +34,10 @@ class RequestRowConverter(BaseRowConverter):
         person_must_exist=True)
 
   def save_object(self, db_session, **options):
-    if options.get('audit'):
-      self.obj.audit_id = options.get('audit').id
+    audit = options.get('audit')
+    if audit:
+      self.obj.audit = audit
+      self.obj.context = audit.context
       db_session.add(self.obj)
 
 class RequestsConverter(BaseConverter):
