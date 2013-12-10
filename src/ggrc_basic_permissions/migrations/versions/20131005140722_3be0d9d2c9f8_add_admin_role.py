@@ -14,7 +14,7 @@ import json
 import sqlalchemy as sa
 from alembic import op
 from datetime import datetime
-from sqlalchemy.sql import table, column
+from sqlalchemy.sql import table, column, and_
 
 roles_table = table('roles',
     column('id', sa.Integer),
@@ -65,7 +65,8 @@ def upgrade():
 def downgrade():
   op.execute(
       roles_table.delete().where(
-        roles_table.c.name=='System Administrator',
-        roles_table.c.scope=='Admin'
+        and_(
+          roles_table.c.name=='System Administrator',
+          roles_table.c.scope=='Admin')
         ))
   op.execute(contexts_table.delete().where(contexts_table.c.id==0))
