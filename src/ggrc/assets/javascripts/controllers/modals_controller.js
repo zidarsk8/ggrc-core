@@ -169,11 +169,24 @@ can.Control("GGRC.Controllers.Modals", {
   , autocomplete_select : function(el, event, ui) {
     var original_event;
     if(ui.item) {
-      var path = el.attr("name").split(".");
-      path.pop();
-      path = path.join(".");
+      var path = el.attr("name").split(".")
+        , instance = this.options.instance
+        , index = 0
+        ;
 
-      this.options.instance.attr(path, ui.item.stub());
+      path.pop();
+      if (/^\d+$/.test(path[path.length - 1])) {
+        index = parseInt(path.pop(), 10);
+        path = path.join(".");
+        if (!this.options.instance.attr(path)) {
+          this.options.instance.attr(path, []);
+        }
+        this.options.instance.attr(path).splice(index, 1, ui.item.stub());
+      }
+      else {
+        path = path.join(".");
+        this.options.instance.attr(path, ui.item.stub());
+      }
     } else {
       original_event = event;
 
