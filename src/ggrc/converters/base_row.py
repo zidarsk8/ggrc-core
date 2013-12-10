@@ -497,7 +497,7 @@ class DateColumnHandler(ColumnHandler):
 
   def display(self):
     if self.has_errors():
-      return self.original
+      return self.original or u''
     else:
       return self.value or getattr(self.importer.obj, self.key, '') or ''
 
