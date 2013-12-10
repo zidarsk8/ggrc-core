@@ -2,14 +2,14 @@
 """Drop create Program permission from ProgramOwner and ProgramEditor roles.
 
 Revision ID: 40a621571ac7
-Revises: eab1d38baee
+Revises: 1a22bb208258
 Create Date: 2013-12-05 22:12:46.273929
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '40a621571ac7'
-down_revision = '1f865f61312'
+down_revision = '1a22bb208258'
 
 import sqlalchemy as sa
 from alembic import op
