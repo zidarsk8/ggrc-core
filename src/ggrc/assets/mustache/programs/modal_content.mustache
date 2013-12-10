@@ -36,16 +36,21 @@
     </div>
     <div class="span6">
       {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#with_current_user_as 'current_user'}}
+        <label>
+          Owner
+          <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        </label>
         {{#if_helpers '\
           ^if' instance.context.id '\
           and ^if' instance.private '\
         '}}
-          <label>
-            Owner
-            <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
-          </label>
-          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email current_user.email ''}}" />
+        {{else}}
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
+          <input tabindex="3" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
         {{/if_helpers}}
+      {{/with_current_user_as}}
       {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>

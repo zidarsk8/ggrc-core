@@ -877,6 +877,7 @@
         var self = this
           , option_results
           , context = {}
+          , dfd = $.Deferred()
           ;
         options_results = can.map(can.makeArray(options), function(option) {
           return self.get_result_for_option(option);
@@ -890,7 +891,9 @@
             else
               self.element.find('.option_column ul').append(frag);
           }
+          dfd.resolve();
         });
+        return dfd;
       }
 
     , refresh_option_list: function() {
@@ -1058,11 +1061,38 @@
       }
 
     , ".btn-add modal:success" : function(el, ev, data) {
-        this.option_list.unshift(data);
-        this.context.attr('selected_option', data);
-        this.insert_options([data], true);
+        var self = this;
         // Scroll so the top element (the one just added) is in view
         this.element.find(".option_column ul").parent().scrollTop(0);
+        this.search_reset().then(function() {
+          // Move the just-created object to the top
+          self.move_option_to_top_and_select(data);
+        });
+      }
+
+    , move_option_to_top_and_select: function(option) {
+        var self = this
+          , index = this.option_list.indexOf(option)
+          , option_column = this.element.find('.option_column ul').first()
+          , option_row = option_column.find('li[data-id=' + option.id + ']')
+          ;
+        if (index > -1) {
+          this.option_list.splice(index, 1);
+          this.option_list.unshift(option);
+        }
+        else {
+          this.option_list.unshift(option);
+        }
+        option_row.remove();
+        this.context.attr('selected_option', option);
+        // Explicitly insert the option -- with paging, the object may not yet
+        //   be in the list.
+        this.insert_options([option], true).then(function() {
+          var option_column = self.element.find('.option_column ul').first()
+            , option_row = option_column.find('li[data-id=' + option.id + ']')
+            ;
+          option_row.addClass('selected');
+        });
       }
 
     , "#search keyup": function(el, ev) {
@@ -1081,13 +1111,15 @@
         }
       }
 
-    , ".search-reset click" : function(el, ev) {
+    , search_reset : function() {
         this.element.find("#search").val("").focus();
         this.options.option_search_term = "";
         this.constructor.last_option_search_term = "";
-        this.refresh_option_list();
+        return this.refresh_option_list();
       }
-    
+
+    , ".search-reset click" : "search_reset"
+
   , " ajax:flash" : function(el, ev, mesg) {
       var that = this
         , $flash = this.options.$header.find(".flash")

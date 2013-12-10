@@ -98,8 +98,13 @@ can.Control("GGRC.Controllers.Modals", {
     var ctl = this;
     // Add autocomplete to the owner field
     var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this);
-      var prop = $that.attr("name").substr($that.attr("name").lastIndexOf(".") + 1);
+      var $that = $(this)
+        , name = $that.attr("name") || ""
+        , prop = name.substr(name.lastIndexOf(".") + 1);
+
+      // Return if this field temporarily isn't storing data
+      if (!name) return false;
+
       return $that.autocomplete({
         // Ensure that the input.change event still occurs
         change : function(event, ui) {
@@ -167,12 +172,6 @@ can.Control("GGRC.Controllers.Modals", {
       var path = el.attr("name").split(".");
       path.pop();
       path = path.join(".");
-
-      // Create a new list if one doesn't exist (for object owners)
-      if (!this.options.instance.attr(path) && /\.\d+$/.test(path)) {
-        var prop = path.split('.')[0];
-        this.options.instance.attr(prop, new can.Observe.List());
-      }
 
       this.options.instance.attr(path, ui.item.stub());
     } else {
@@ -276,7 +275,8 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
-      if (el.prop('value').length == 0 || el.attr('value').length == 0) {
+      if (el.prop('value').length == 0 || 
+        (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
         this.set_value_from_element(el);
       }
   }
@@ -296,8 +296,6 @@ can.Control("GGRC.Controllers.Modals", {
         , that = this;
         ;
 
-      if ($el.is('select[multiple]'))
-        value = value || [];
       if (name)
         this.set_value({ name: name, value: value });
 
@@ -382,7 +380,21 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
     }
-    instance.attr(name[0], value && value.serialize ? value.serialize() : value);
+
+    value = value && value.serialize ? value.serialize() : value;
+    if ($elem.is('[data-list]')) {
+      var list_path = name.slice(0, name.length-1).join(".")
+        , cur = instance.attr(list_path)
+        ;
+      if (!cur || !(cur instanceof can.Observe.List)) {
+        instance.attr(list_path, []);
+        cur = instance.attr(list_path);
+      }
+      value = value || [];
+      cur.splice.apply(cur, [0, cur.length].concat(value));
+    } else {
+      instance.attr(name[0], value);
+    }
   }
 
   , "[data-before], [data-after] change" : function(el, ev) {

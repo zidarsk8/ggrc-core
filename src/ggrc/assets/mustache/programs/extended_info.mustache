@@ -34,7 +34,7 @@
       {{/if_null}}
     </div>
   </div>
-  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_private_program=instance.context.id}}}
   <div class="row-fluid">
     <div class="span5">
       {{#visibility_delay 500}}

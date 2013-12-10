@@ -578,7 +578,7 @@ Mustache.registerHelper("render_hooks", function(hook, options) {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, func, deferred) {
+function defer_render(tag_prefix, func, deferred, failfunc) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
@@ -587,17 +587,27 @@ function defer_render(tag_prefix, func, deferred) {
 
   function hookup(element, parent, view_id) {
     var f = function() {
-      var frag_or_html = func.apply(this, arguments)
+      var g = deferred && deferred.state() === "rejected" ? failfunc : func;
+      var frag_or_html = g.apply(this, arguments)
         , $element = $(element)
+        , term = element.nextSibling
         ;
-      $element.after(frag_or_html);
-      if ($element.next().get(0)) {
-        can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
-        $element.remove();
+
+      if(element.parentNode) {
+        can.view.live.list(element, new can.Observe.List([arguments[0]]), g, this, parent);
+      } else {
+        $element.after(frag_or_html);
+        if ($element.next().get(0)) {
+          can.view.live.nodeLists.replace($element.get(), $element.nextAll().get());
+          $element.remove();
+        }
       }
     };
     if (deferred) {
       deferred.done(f);
+      if (failfunc) {
+        deferred.fail(f);
+      }
     }
     else
       setTimeout(f, 13);
@@ -678,7 +688,16 @@ Mustache.registerHelper("show_expander", function() {
 
 Mustache.registerHelper("allow_help_edit", function() {
   var options = arguments[arguments.length - 1];
-  return options.fn(this); //always true for now
+  var instance = this && this.instance ? this.instance : options.contexts[0]._data.instance;
+  if (instance) {
+    var action = instance.isNew() ? "create" : "update";
+    if (Permission.is_allowed(action, "Help", null)) {
+      return options.fn(this);
+    } else {
+      return options.inverse(this);
+    }
+  }
+  return options.inverse(this);
 });
 
 Mustache.registerHelper("all", function(type, params, options) {
@@ -1034,8 +1053,11 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
   function finish(list) {
     return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
   }
+  function fail(error) {
+    return options.inverse($.extend([], options.contexts, options.contexts.concat([{error : error}])));
+  }
 
-  return defer_render('span', finish, loader.refresh_instances());
+  return defer_render('span', finish, loader.refresh_instances(), fail);
 });
 
 
@@ -1052,6 +1074,8 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
   person = Mustache.resolve(person);
   person = person.reify();
   refresh_queue.enqueue(person);
+  // Force monitoring of changes to `person.user_roles`
+  person.attr("user_roles");
   refresh_queue.trigger().then(function() {
     var user_roles = person.user_roles.reify()
       , user_roles_refresh_queue = new RefreshQueue()
@@ -1932,6 +1956,21 @@ Mustache.registerHelper("with_model_as", function(var_name, model_name, options)
   model_name = resolve_computed(Mustache.resolve(model_name));
   frame[var_name] = CMS.Models[model_name];
   return options.fn($.extend([], options.contexts, options.contexts.concat([frame])));
+});
+
+Mustache.registerHelper("private_program_owner", function(instance, modal_title, options) {
+  var state = get_binding_observe('__private_program_owner', options);
+  if (resolve_computed(modal_title).indexOf('New ') === 0) {
+    return GGRC.current_user.email;
+  }
+  else {
+    var loader = resolve_computed(instance).get_binding('authorizations');
+    return $.map(loader.list, function(binding) {
+      if (binding.instance.role.reify().attr('name') === 'ProgramOwner') {
+        return binding.instance.person.reify().attr('email');
+      }
+    }).join(', ');
+  }
 });
 
 })(this, jQuery, can);
