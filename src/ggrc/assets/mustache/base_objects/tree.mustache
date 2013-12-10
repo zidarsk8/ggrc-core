@@ -96,7 +96,10 @@
 
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
-        {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+        {{^if_equals instance.constructor.table_singular 'person'}}
+          {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+        {{/if_equals}}
+        
         {{#instance.url}}
         <div class="row-fluid">
           <div class="span6">
