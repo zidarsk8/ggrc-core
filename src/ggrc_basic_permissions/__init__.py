@@ -276,8 +276,10 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_role_implication(
     source_role, context, check_exists=False):
   if check_exists and db.session.query(RoleImplication)\
-      .filter(RoleImplication.context_id == context.id
-            and RoleImplication.source_context_id == None)\
+      .filter(
+          and_(
+            RoleImplication.context_id == context.id,
+            RoleImplication.source_context_id == None))\
       .count() > 0:
     return
   db.session.add(RoleImplication(

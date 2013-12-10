@@ -65,7 +65,7 @@ def upgrade():
 def downgrade():
   op.execute(
       roles_table.delete().where(
-        roles_table.c.name=='System Administrator' and \
+        roles_table.c.name=='System Administrator',
         roles_table.c.scope=='Admin'
         ))
   op.execute(contexts_table.delete().where(contexts_table.c.id==0))

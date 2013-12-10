@@ -14,7 +14,7 @@ down_revision = '40a621571ac7'
 import sqlalchemy as sa
 from alembic import op
 from datetime import datetime
-from sqlalchemy.sql import table, column, select, insert
+from sqlalchemy.sql import table, column, select, insert, and_
 import json
 
 contexts_table = table('contexts',
@@ -159,8 +159,10 @@ def upgrade():
           ))
     context = connection.execute(
         select([contexts_table.c.id]).where(
-          contexts_table.c.related_object_id == program.id\
-          and contexts_table.c.related_object_type == 'Program')).fetchone()
+          and_(
+            contexts_table.c.related_object_id == program.id,
+            contexts_table.c.related_object_type == 'Program')
+          )).fetchone()
     context_id = context.id
 
     #Add the role implications that makes the program public
@@ -174,9 +176,11 @@ def upgrade():
     #Add role assignments for owners and delete the object_owner relationships
     owners = connection.execute(
         select([object_owners_table.c.id, object_owners_table.c.person_id])\
-            .where(object_owners_table.c.ownable_id == program.id\
-                   and object_owners_table.c.ownable_type == 'Program'))\
-                 .fetchall()
+            .where(
+              and_(
+                object_owners_table.c.ownable_id == program.id,
+                object_owners_table.c.ownable_type == 'Program')
+              )).fetchall()
     for owner in owners:
       connection.execute(
         user_roles_table.insert().values(
@@ -194,28 +198,33 @@ def upgrade():
     #Move all relationships for the program into the program context
     op.execute(object_documents_table.update().values(context_id=context_id)\
         .where(
-          object_documents_table.c.documentable_id == program.id\
-          and object_documents_table.c.documentable_type == 'Program'))
+          and_(
+            object_documents_table.c.documentable_id == program.id,
+            object_documents_table.c.documentable_type == 'Program')))
 
     op.execute(object_people_table.update().values(context_id=context_id)\
         .where(
-          object_people_table.c.personable_id == program.id\
-          and object_people_table.c.personable_type == 'Program'))
+          and_(
+            object_people_table.c.personable_id == program.id,
+            object_people_table.c.personable_type == 'Program')))
 
     op.execute(object_objectives_table.update().values(context_id=context_id)\
         .where(
-          object_objectives_table.c.objectiveable_id == program.id\
-          and object_objectives_table.c.objectiveable_type == 'Program'))
+          and_(
+            object_objectives_table.c.objectiveable_id == program.id,
+            object_objectives_table.c.objectiveable_type == 'Program')))
 
     op.execute(relationships_table.update().values(context_id=context_id)\
         .where(
-          relationships_table.c.source_id == program.id\
-          and relationships_table.c.source_type == 'Program'))
+          and_(
+            relationships_table.c.source_id == program.id,
+            relationships_table.c.source_type == 'Program')))
 
     op.execute(relationships_table.update().values(context_id=context_id)\
         .where(
-          relationships_table.c.destination_id == program.id\
-          and relationships_table.c.destination_type == 'Program'))
+          and_(
+            relationships_table.c.destination_id == program.id,
+            relationships_table.c.destination_type == 'Program')))
 
     op.execute(program_controls_table.update().values(context_id=context_id)\
         .where(program_controls_table.c.program_id == program.id))
@@ -265,8 +274,10 @@ def downgrade():
             .where(programs_table.c.context_id == context_id)).fetchone()
     program_owners = connection.execute(
         select([user_roles_table.c.id, user_roles_table.c.person_id])\
-            .where(user_roles_table.c.context_id == context_id\
-                   and user_roles_table.c.role_id == program_owner_role.id))
+            .where(
+              and_(
+                user_roles_table.c.context_id == context_id,
+                user_roles_table.c.role_id == program_owner_role.id)))
     for program_owner in program_owners:
       connection.execute(
           object_owners_table.insert().values(
