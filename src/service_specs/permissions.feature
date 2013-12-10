@@ -583,5 +583,5 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlCategory  | name          | category1           |
       | ControlAssertion | name          | assertion1          |
       | Help             | title         | foo                 |
-      | Program          | start_date    | 2013-06-03T00:00:00 |
+      | Program          | state         | draft               |
 
