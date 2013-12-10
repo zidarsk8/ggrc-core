@@ -180,6 +180,13 @@
                 color:$white;
               }
             }
+            &.show-role {
+              padding: 0 10px;
+              font-size: 11px;
+              i {
+                margin: 7px 6px 0 0;
+              }
+            }
           }
         }
       }
