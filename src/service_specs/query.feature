@@ -38,11 +38,11 @@ Feature: Collection filtering via query parameters
     And "resource3" is not in query result
 
   Examples: Resources
-      | resource_type    | property_name | match_value1        | match_value2        | match_value3        | nomatch_value       |
-      | ControlCategory  | name          | category1           | category2           | category3           | none_match          |
-      | ControlAssertion | name          | assertion1          | assertion2          | assertion3          | 5                   |
-      | Help             | slug          | foo                 | bar                 | baz                 | never               |
-      | Program          | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
+      | resource_type    | property_name | match_value1 | match_value2 | match_value3 | nomatch_value       |
+      | ControlCategory  | name          | category1    | category2    | category3    | none_match          |
+      | ControlAssertion | name          | assertion1   | assertion2   | assertion3   | 5                   |
+      | Help             | slug          | foo          | bar          | baz          | never               |
+      | Program          | slug          | pgm1         | pgm2         | pgm3         | no_such_pgm         |
       #| Audit            | start_date    | 2013-06-03T00:00:00 | 2013-06-02T00:00:00 | 2013-06-01T00:00:00 | 2013-05-31T00:00:00 |
 
   Scenario: A single boolean query parameter supplied to a collection finds matching resources

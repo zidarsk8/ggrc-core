@@ -50,6 +50,13 @@
                         =current_user.email
                     %i.grcicon-carot-white
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+                    %li.show-role
+                      %i.grcicon-role-white
+                      %ul
+                        -for user_role in current_user.user_roles
+                          -if not user_role.context_id
+                            %li
+                              {{ user_role.role.name }} 
                     %li
                       %a{'href': "/dashboard"}
                         %i.grcicon-dashboard

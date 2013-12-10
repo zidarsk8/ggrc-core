@@ -4,7 +4,7 @@
 # Maintained By: silas@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Request
+from ggrc.models import Audit, Request
 from .base_row import *
 from collections import OrderedDict
 
@@ -23,8 +23,8 @@ class RequestRowConverter(BaseRowConverter):
     self.handle('objective_id', ObjectiveHandler)
     self.handle('request_type', RequestTypeColumnHandler, is_required=True)
     self.handle('status', StatusColumnHandler, valid_states=Request.VALID_STATES, default_value='Draft')
-    self.handle_date('requested_on')
-    self.handle_date('due_on')
+    self.handle_date('requested_on', is_required=True)
+    self.handle_date('due_on', is_required=True)
     self.handle_text_or_html('description')
     self.handle_text_or_html('test')
     self.handle_text_or_html('notes')
@@ -34,8 +34,10 @@ class RequestRowConverter(BaseRowConverter):
         person_must_exist=True)
 
   def save_object(self, db_session, **options):
-    if options.get('audit'):
-      self.obj.audit_id = options.get('audit').id
+    audit = options.get('audit')
+    if audit:
+      self.obj.audit = audit
+      self.obj.context = audit.context
       db_session.add(self.obj)
 
 class RequestsConverter(BaseConverter):
