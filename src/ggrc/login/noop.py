@@ -12,17 +12,20 @@ import flask_login
 import json
 from flask import url_for, redirect, request, session
 
+default_user_name = 'Example User'
+default_user_email = 'user@example.com'
+
 def get_user():
   if 'X-ggrc-user' in request.headers:
     json_user = json.loads(request.headers['X-ggrc-user'])
-    email = json_user.get('email', 'user@example.com')
-    name = json_user.get('name', 'Example User')
+    email = json_user.get('email', default_user_email)
+    name = json_user.get('name', default_user_name)
     permissions = json_user.get('permissions', None)
     header_override = permissions is not None
     session['permissions_header_asserted'] = True
   else:
-    email = 'user@example.com'
-    name = 'Example User'
+    email = default_user_email
+    name = default_user_name
     permissions = None
     header_override = False
   from ggrc.login.common import find_or_create_user_by_email
