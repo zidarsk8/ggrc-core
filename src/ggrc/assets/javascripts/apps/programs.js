@@ -299,6 +299,7 @@ function authorizations_list_loader() {
             insert_user_role({
                 person: mapping.instance
               , role: { permission_summary: 'Mapped' }
+              , result: mapping
             }, refresh_queue);
           });
           return refresh_queue.trigger().then(function() { return person_roles });

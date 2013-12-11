@@ -233,6 +233,9 @@ $(function() {
             , Document: {
                   mapping: "extended_related_documents"
                 }
+            , Person: {
+                  mapping: "extended_related_people"
+                }
             }
 
         , Program: {
@@ -290,9 +293,6 @@ $(function() {
                 , "extended_business_objects"
                 ]
             , Section : section_child_options
-            , Person: {
-                  mapping: "extended_related_people"
-                }
             }
 
         , Regulation: {

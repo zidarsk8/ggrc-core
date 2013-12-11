@@ -87,16 +87,8 @@
                       </li>
                     {{/roles}}
                     </ul>
-
-                    {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=this parent_instance=parent_instance}}}
                   </li>
                 </ul>
-              </div>
-              <div>
-                <a href="/people/{{id}}" class="info-action">
-                  View Profile Page
-                  <i class="grcicon-goto"></i>
-                </a>
               </div>
             </div>
             <div class="span6 info person-info">
@@ -106,6 +98,21 @@
                     <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
                   </a>
                 </div>
+              </div>
+            </div>
+          </div>
+          {{#roles}}
+            {{#if_equals role.permission_summary 'Mapped'}}
+              {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=user_role.result parent_instance=parent_instance}}}
+            {{/if_equals}}
+          {{/roles}}
+          <div class="row-fluid">
+            <div class="span6">
+              <div>
+                <a href="/people/{{id}}" class="info-action">
+                  View Profile Page
+                  <i class="grcicon-goto"></i>
+                </a>
               </div>
             </div>
           </div>
