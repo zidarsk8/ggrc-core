@@ -222,6 +222,7 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
 function authorizations_list_loader() {
   var person_roles = new can.Observe.List()
     , lists = []
+    , queues = []
     , el = $('#person_widget')
     ;
 
@@ -297,7 +298,7 @@ function authorizations_list_loader() {
       can.each(mappings, function(mapping) {
         insert_user_role(mapping.instance, refresh_queue);
       });
-      refresh_queue.trigger();
+      queues.push(refresh_queue.trigger());
       return mappings;
     }));
   }
@@ -313,7 +314,7 @@ function authorizations_list_loader() {
               , result: mapping
             }, refresh_queue);
           });
-          return refresh_queue.trigger()
+          return refresh_queue.trigger();
         };
 
     mappings.bind('add', function(ev, mappings) {
@@ -329,11 +330,19 @@ function authorizations_list_loader() {
       });
     });
 
-    insert_mappings(mappings);
+    queues.push(insert_mappings(mappings));
     return mappings;
   }));
 
-  return $.when.apply($, lists).then(function() { return person_roles });
+  // Ensure queued objects are fully loaded
+  var loaded = new can.Deferred();
+  $.when.apply($, lists).then(function() {
+    $.when.apply($, queues).then(function() {
+      loaded.resolve();
+    });
+  });
+
+  return loaded.then(function() { return person_roles });
 }
 
 function should_show_authorizations() {
