@@ -65,6 +65,7 @@ dashboard-js-files:
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
   - controllers/tree_filter_controller.js
+  - controllers/unmap_modal_controller.js
   - controls/control.js
   - controls/controls_controller.js
   - controllers/dashboard_controller.js
@@ -103,6 +104,7 @@ dashboard-js-files:
 dashboard-js-template-files:
   - add_widget_menu.mustache
   - base_objects/confirm_delete.mustache
+  - base_objects/confirm_unmap.mustache
   - base_objects/contacts.mustache
   - base_objects/extended_info.mustache
   - base_objects/info.mustache
@@ -148,6 +150,7 @@ dashboard-js-template-files:
   - modals/modal_header.mustache
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
+  - modals/unmap_cancel_buttons.mustache
   - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
@@ -215,6 +218,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - people/autocomplete_result.mustache
   - objectives/autocomplete_result.mustache
+  - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
   - responses/tree_footer.mustache
   - responses/modal_content.mustache
