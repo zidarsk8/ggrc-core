@@ -545,7 +545,7 @@ $(function() {
       return;
 
     // This overrides the merged Person/Authorizations widget
-    if (/programs\/\d+/.test(window.location) && model_name === 'Person') {
+    if (GGRC.page_instance() instanceof CMS.Models.Program && model_name === 'Person') {
       model_widget_descriptors[far_model.table_singular] = can.extend(descriptor, GGRC.extra_widget_descriptors[far_model.table_singular]);
     }
     else {
