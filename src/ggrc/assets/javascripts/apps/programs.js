@@ -220,7 +220,11 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
 function authorizations_list_loader() {
-  var person_roles = window.person_roles = new can.Observe.List();
+  var person_roles = window.person_roles = new can.Observe.List()
+    , el = $('#person_widget')
+    ;
+
+  el.trigger("updateCount", person_roles.length)
 
   function insert_user_role(user_role, refresh_queue) {
     var found = false
