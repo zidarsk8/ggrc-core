@@ -220,7 +220,8 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
 function authorizations_list_loader() {
-  var person_roles = window.person_roles = new can.Observe.List()
+  var person_roles = new can.Observe.List()
+    , lists = []
     , el = $('#person_widget')
     ;
 
@@ -283,7 +284,7 @@ function authorizations_list_loader() {
       var refresh_queue = new RefreshQueue();
       if (user_role.constructor == CMS.Models.UserRole)
         insert_user_role(user_role, refresh_queue);
-      refresh_queue.trigger()
+      refresh_queue.trigger();
     });
 
     CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
@@ -291,17 +292,18 @@ function authorizations_list_loader() {
         remove_user_role(user_role);
     });
 
-    GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
+    lists.push(GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
       var refresh_queue = new RefreshQueue();
       can.each(mappings, function(mapping) {
         insert_user_role(mapping.instance, refresh_queue);
       });
-      return refresh_queue.trigger().then(function() { return person_roles });
-    });
+      refresh_queue.trigger();
+      return mappings;
+    }));
   }
 
   // Insert mapped people with a custom user role "Mapped"
-  return GGRC.page_instance().get_list_loader('extended_related_people').pipe(function(mappings) {
+  lists.push(GGRC.page_instance().get_list_loader('extended_related_people').pipe(function(mappings) {
     var insert_mappings = function(mappings) {
           var refresh_queue = new RefreshQueue()
           can.each(mappings, function(mapping) {
@@ -311,7 +313,7 @@ function authorizations_list_loader() {
               , result: mapping
             }, refresh_queue);
           });
-          return refresh_queue.trigger().then(function() { return person_roles });
+          return refresh_queue.trigger()
         };
 
     mappings.bind('add', function(ev, mappings) {
@@ -327,8 +329,11 @@ function authorizations_list_loader() {
       });
     });
 
-    return insert_mappings(mappings);
-  });
+    insert_mappings(mappings);
+    return mappings;
+  }));
+
+  return $.when.apply($, lists).then(function() { return person_roles });
 }
 
 function should_show_authorizations() {
