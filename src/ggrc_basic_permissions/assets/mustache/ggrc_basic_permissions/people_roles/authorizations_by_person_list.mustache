@@ -6,7 +6,7 @@
 }}
 
 <ul class="tree-structure new-tree">
-  {{#each list}}
+  {{#list}}
     {{#person}}
     <li data-model="true" {{data 'person'}} class="tree-item person">
       <div class="item-main">
@@ -135,7 +135,7 @@
       </div>
     </li>
     {{/person}}
-  {{/each}}
+  {{/list}}
   {{#if allow_mapping}}
   {{#is_allowed_to_map parent_instance model.shortName}}
   <li class="tree-footer tree-item tree-item-add">
