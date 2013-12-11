@@ -95,3 +95,28 @@ class Person(Base, db.Model):
 
   def _display_name(self):
     return self.email
+
+  @property
+  def system_wide_role(self):
+    """For choosing the role string to show to the user; of all the roles in
+    the system-wide context, it shows the highest ranked one (if there are
+    multiple) or "No Access" if there are none.
+    """
+    ROLE_HIERARCHY = {
+        u'gGRC Admin': 0,
+        u'ProgramCreator': 1,
+        u'ObjectEditor': 2, 
+        u'Reader': 3
+    }
+    unique_roles = set([
+      user_role.role.name
+        for user_role in self.user_roles if not user_role.context_id
+      ])
+    if len(unique_roles) == 0:
+      return u"No Access"
+    else:
+      # -1 as default to make items not in this list appear on top
+      # and thus shown to the user
+      sorted_roles = sorted(unique_roles,
+          key=lambda x: ROLE_HIERARCHY.get(x, -1))
+      return sorted_roles[0]
