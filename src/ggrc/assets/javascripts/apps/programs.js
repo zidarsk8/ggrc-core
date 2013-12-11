@@ -256,7 +256,12 @@ function authorizations_list_loader() {
     can.each(person_roles, function(data, index) {
       if (user_role.person.id == data.person.id) {
         roles = data.attr('roles');
-        role_index = $.map(roles, function(role) { return role.role; }).indexOf(user_role.role.reify());
+        if (user_role.role.permission_summary === 'Mapped') {
+          role_index = $.map(roles, function(role) { return role.role.permission_summary; }).indexOf('Mapped');
+        }
+        else {
+          role_index = $.map(roles, function(role) { return role.role; }).indexOf(user_role.role.reify());
+        }
         if (role_index > -1) {
           roles.splice(role_index, 1);
           if (roles.length == 0)
@@ -314,7 +319,7 @@ function authorizations_list_loader() {
         remove_user_role({
             person: mapping.instance
           , role: { permission_summary: 'Mapped' }
-        }, refresh_queue);
+        });
       });
     });
 
@@ -344,6 +349,10 @@ $(function() {
               list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
             , list_loader: authorizations_list_loader
             , parent_instance: GGRC.page_instance()
+            , allow_reading: true
+            , allow_mapping: true
+            , allow_creating: true
+            , model: CMS.Models.Person
             }
         }
   };
