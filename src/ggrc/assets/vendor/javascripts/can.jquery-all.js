@@ -3810,7 +3810,11 @@
             if (last.nextSibling) {
                 last.parentNode.insertBefore(newFrag, last.nextSibling);
             } else {
-                last.parentNode.appendChild(newFrag);
+                if(last.parentNode) {
+                    last.parentNode.appendChild(newFrag);
+                } else {
+                    console.debug(last, "had no parent node. Ignoring.");
+                }
             }
         };
 

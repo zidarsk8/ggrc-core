@@ -183,6 +183,58 @@
       });
     },
 
+    'unmapform': function($target, $trigger, option) {
+      var form_target = $trigger.data('form-target')
+      , object_params = $trigger.attr('data-object-params')
+      , model = CMS.Models[$trigger.attr("data-object-singular")]
+      , instance;
+      if($trigger.attr('data-object-id') === "page") {
+        instance = GGRC.page_instance();
+      } else {
+        instance = model.findInCacheById($trigger.attr('data-object-id'));
+      }
+      if (object_params) {
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
+      } else {
+        object_params = {};
+      }
+
+      $target
+      .modal_form(option, $trigger)
+      .ggrc_controllers_unmap({
+          $trigger : $trigger
+        , new_object_form : false
+        , button_view : GGRC.mustache_path + "/modals/unmap_cancel_buttons.mustache"
+        , model : model
+        , instance : instance
+        , object_params : object_params
+        , modal_title : $trigger.attr("data-modal-title") || ("Delete " + $trigger.attr("data-object-singular"))
+        , content_view : $trigger.attr('data-content-view') || (GGRC.mustache_path + "/base_objects/confirm_unmap.mustache")
+      });
+
+      $target.on('modal:success', function(e, data) {
+        $trigger.children(".result").each(function(i, result_el) {
+          var $result_el = $(result_el)
+            , result = $result_el.data('result')
+            , mappings = result && result.get_mappings()
+            , i
+            ;
+
+          can.each(mappings, function(mapping) {
+            mapping.refresh().done(function() {
+              if (mapping instanceof CMS.Models.Control) {
+                mapping.removeAttr('directive');
+                mapping.save();
+              }
+              else {
+                mapping.destroy();
+              }
+            });
+          });
+        });
+      });
+    },
+
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
@@ -436,7 +488,7 @@
   };
 
   $(function() {
-    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-relationship-selector"], [data-toggle="modal-ajax-single-selector"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"]', function(e) {
+    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-relationship-selector"], [data-toggle="modal-ajax-single-selector"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"], [data-toggle="modal-ajax-unmapform"]', function(e) {
 
       var $this = $(this)
         , toggle_type = $(this).data('toggle')
@@ -489,6 +541,7 @@
         if (toggle_type == 'modal-ajax-relationship-selector') modal_type = 'relationshipsform';
         if (toggle_type == 'modal-ajax-single-selector') modal_type = 'listselect';
         if (toggle_type == 'modal-ajax-deleteform') modal_type = 'deleteform';
+        if (toggle_type == 'modal-ajax-unmapform') modal_type = 'unmapform';
         if (!modal_type) modal_type = 'modal';
       }
 
