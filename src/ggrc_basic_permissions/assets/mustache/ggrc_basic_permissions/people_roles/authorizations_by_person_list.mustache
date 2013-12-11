@@ -6,7 +6,7 @@
 }}
 
 <ul class="tree-structure new-tree">
-  {{#list}}
+  {{#each list}}
     {{#person}}
     <li data-model="true" {{data 'person'}} class="tree-item person">
       <div class="item-main">
@@ -135,5 +135,29 @@
       </div>
     </li>
     {{/person}}
-  {{/list}}
+  {{/each}}
+  {{#if allow_mapping}}
+  {{#is_allowed_to_map parent_instance model.shortName}}
+  <li class="tree-footer tree-item tree-item-add">
+    <div class="row-fluid">
+      <div class="span12">
+
+        <a
+          href="javascript://"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="multitype-modal-selector"
+          data-join-mapping="{{mapping}}"
+          data-join-option-type="{{model.shortName}}"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}"
+          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+          + {{model.title_singular}}
+        </a>
+
+      </div>
+    </div>
+  </li>
+  {{/is_allowed_to_map}}
+  {{/if}}
 </ul>
