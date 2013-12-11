@@ -64,13 +64,6 @@ def upgrade():
   permissions['read'].extend(additional_audit_objects)
   permissions['update'].extend(additional_audit_objects)
   permissions['delete'].extend(additional_audit_objects)
-  permissions['delete'].extend([
-    'Audit',
-    'Request',
-    'DocumentationResponse',
-    'InterviewResponse',
-    'PopulationSampleResponse',
-    ])
   update_role_permissions('ProgramAuditOwner', permissions)
 
 def downgrade():
