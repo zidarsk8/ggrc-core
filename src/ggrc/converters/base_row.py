@@ -11,8 +11,9 @@ from ggrc.models.all_models import (
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
     Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
-    )
+)
 from ggrc.models.exceptions import ValidationError
+
 
 def unpack_list(vals):
   result = []
@@ -255,9 +256,11 @@ class ColumnHandler(object):
       self.go_import(content)
 
   def go_import(self, content):
+    # validate first to trigger error in case field is required but None
+    # TODO: Unit tests of imports with and without required fields
+    self.validate(content)
     if content is not None:
       data = self.parse_item(content)
-      self.validate(data)
       if data is not None:
         self.value = data
         self.set_attr(data)
@@ -283,7 +286,7 @@ class RequestTypeColumnHandler(ColumnHandler):
 
 class StatusColumnHandler(ColumnHandler):
 
-   def parse_item(self, value):
+  def parse_item(self, value):
     # compare on fully-lower-cased version of valid states list
     valid_states = self.options.get('valid_states') or self.valid_states
     formatted_valid_states = [
@@ -301,7 +304,23 @@ class StatusColumnHandler(ColumnHandler):
             ", ".join(valid_states)
         ))
         return None
+    else:
+      default_value = self.options.get('default_value')
+      if default_value:
+        # default_value should be in valid_states list
+        self.add_warning("This field will be set to {}".format(
+            default_value))
+        return default_value
 
+  def go_import(self, content):
+    # override in case empty (None) items need to be set to a default
+    if self.options.get('default_value'):
+      data = self.parse_item(content)
+      self.validate(data)
+      self.value = data
+      self.set_attr(data)
+    else:  # treat as normal if there are no defaults
+      return super(StatusColumnHandler, self).go_import(content)
 
 class TextOrHtmlColumnHandler(ColumnHandler):
 
@@ -358,8 +377,8 @@ class ContactEmailHandler(ColumnHandler):
 class AssigneeHandler(ContactEmailHandler):
 
   def parse_item(self, value):
-    stripped_value = value.strip()
-    if len(stripped_value) == 0:
+    # in case Assignee field does not exist or stripped version is empty
+    if not value or len(value.strip()) == 0:
       # Audit should exist; was passed from view function
       audit = self.importer.options.get('audit')
       audit_owner = getattr(audit, 'contact', None)
@@ -478,7 +497,7 @@ class DateColumnHandler(ColumnHandler):
 
   def display(self):
     if self.has_errors():
-      return self.original
+      return self.original or u''
     else:
       return self.value or getattr(self.importer.obj, self.key, '') or ''
 

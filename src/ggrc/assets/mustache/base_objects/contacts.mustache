@@ -1,38 +1,62 @@
 {{#instance}}
 <div class="row-fluid">
-  {{^is_private_program}}
   <div {{^if stacked}}class="span6"{{/if}}>
-    {{#using contacts=instance.owners}}
+  {{#if is_private_program}}
+    <p>
+      <strong>Owner:</strong>
+      <br>
+      {{#with_mapping 'authorizations' instance}}
+        {{#each authorizations}}
+          {{#using role=instance.role}}
+            {{#if_equals role.name 'ProgramOwner'}}
+              {{#using person=instance.person}}
+                <p><span>{{firstnonempty person.name person.email ''}}</span></p>
+              {{/using}}
+            {{/if_equals}}
+          {{/using}}
+        {{/each}}
+      {{/with_mapping}}
+    </p>
+  {{else}}
+    {{#if owners.length}}
+      {{#using contacts=owners}}
       {{#contacts}}
         <p>
-          <strong>Owner:</strong>
+          <strong>Owner</strong>
+          <br>
           <span>{{firstnonempty name email}}</span>
         </p>
       {{/contacts}}
-      {{^contacts}}
-        <p>
-          <strong>Owner:</strong>
-          <span class="error">
-            Not Assigned
-          </span>
-        </p>
-      {{/contacts}}
-    {{/using}}
-  </div>
-  {{/is_private_program}}
-  <div {{^if stacked}}class="span6"{{/if}}>
-    <p>
-      <strong>Contact:</strong>
-      {{#using contact=contact}}
-      {{#if contact}}
-        <span>{{firstnonempty contact.name contact.email}}</span>
-      {{else}}
+      {{/using}}
+    {{else}}
+      <p>
+        <strong>Owner</strong>
+        <br>
         <span class="error">
           Not Assigned
         </span>
-      {{/if}}
-      {{/using}}
-    </p>
+      </p>
+    {{/if}}
+  {{/if}}
   </div>
+  {{#using contact=contact}}
+    <div {{^if stacked}}class="span6"{{/if}}>   
+    {{#if contact}}
+      <p>
+        <strong>Contact</strong>
+        <br>
+        <span>{{firstnonempty contact.name contact.email}}</span>
+      </p>
+    {{else}}
+      <p>
+        <strong>Contact</strong>
+        <br>
+        <span class="error">
+          Not Assigned
+        </span>
+      </p>
+    {{/if}}
+    </div>
+  {{/using}}
 </div>
 {{/instance}}

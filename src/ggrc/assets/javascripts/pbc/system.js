@@ -144,6 +144,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , object_sections : "CMS.Models.ObjectSection.stubs"
     , sections : "CMS.Models.Section.stubs"
     , response : "CMS.Models.Response.stub"
+    , network_zone : "CMS.Models.Option.stub"
     }
   , defaults : {
       title : ""

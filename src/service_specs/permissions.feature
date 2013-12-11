@@ -69,8 +69,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Process            |
       | Product            |
       | Project            |
-      | Program            |
-      | ProgramDirective   |
+      #| Program            |
+      #| ProgramDirective   |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -147,8 +147,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Process            |
       | Product            |
       | Project            |
-      | Program            |
-      | ProgramDirective   |
+      #| Program            |
+      #| ProgramDirective   |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -235,8 +235,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Process            |
       | Product            |
       | Project            |
-      | Program            |
-      | ProgramDirective   |
+      #| Program            |
+      #| ProgramDirective   |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -325,8 +325,8 @@ Feature: RBAC Permissions enforcement for REST API
       | Process            |
       | Product            |
       | Project            |
-      | Program            |
-      | ProgramDirective   |
+      #FIXME programs can have special behavior | Program            |
+      #| ProgramDirective   |
       | Risk               |
       | RiskyAttribute     |
       | RiskRiskyAttribute |
@@ -375,8 +375,8 @@ Feature: RBAC Permissions enforcement for REST API
           },
           "Program": {
             "contexts": [
-              {{context.context1.value['context']['id']}},
-              {{context.context2.value['context']['id']}}
+              {{context.context1.value['context']['id']}}
+              , {{context.context2.value['context']['id']}}
             ]
           }
         },
@@ -401,6 +401,7 @@ Feature: RBAC Permissions enforcement for REST API
     And "directive_in_2" is POSTed to its collection
     And a new "Program" named "program"
     And "program" link property "context" is "context1"
+    And "program" property "private" is literal "False"
     And "program" is POSTed to its collection
     And a new "ProgramDirective" named "program_directive_1"
     And "program_directive_1" link property "directive" is "directive_in_1"
@@ -412,6 +413,64 @@ Feature: RBAC Permissions enforcement for REST API
     And "program_directive_2" link property "context" is "context2"
     And "program_directive_2" link property "program" is "program"
     And "program_directive_2" is POSTed to its collection
+    Given the current user
+    """
+    { "email": "bobtester@testertester.com",
+      "name": "Bob Tester",
+      "permissions": {
+        "create": {
+          "Contract": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          },
+          "ProgramDirective": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          },
+          "Program": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          }
+        },
+        "read": {
+          "Contract": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          },
+          "ProgramDirective": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          },
+          "Program": {
+            "contexts": [
+              {{context.context1.value['context']['id']}}
+              , {{context.context2.value['context']['id']}}
+              , {{context.program.value['program']['context']['id']}}
+            ]
+          }
+        },
+        "update": {
+          "Contract": {
+            "contexts": [
+              {{context.context1.value['context']['id']}},
+              {{context.context2.value['context']['id']}}
+            ]
+          }
+        }
+      }
+    }
+    """
+
     When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
     Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
@@ -443,6 +502,7 @@ Feature: RBAC Permissions enforcement for REST API
           "Program": {
             "contexts": [
               {{context.context1.value['context']['id']}}
+              , {{context.program.value['program']['context']['id']}}
             ]
           }
         },
@@ -478,6 +538,7 @@ Feature: RBAC Permissions enforcement for REST API
           "Program": {
             "contexts": [
               {{context.context1.value['context']['id']}}
+              , {{context.program.value['program']['context']['id']}}
             ]
           }
         },
@@ -583,5 +644,5 @@ Feature: RBAC Permissions enforcement for REST API
       | ControlCategory  | name          | category1           |
       | ControlAssertion | name          | assertion1          |
       | Help             | title         | foo                 |
-      | Program          | start_date    | 2013-06-03T00:00:00 |
+      #| Program          | state         | draft               |
 

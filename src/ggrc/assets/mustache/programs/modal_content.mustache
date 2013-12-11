@@ -21,7 +21,13 @@
       {{/if_null}}
     </div>
     <div class="span6">
-      {{#private_program modal_title}}{{/private_program}}
+      <label>
+      Privacy
+        <i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>
+      </label>
+      <div class="checkbox-area">
+        <input tabindex="2" name="private" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
+      </div>
     </div>
   </div>
   <div class="row-fluid">
@@ -36,36 +42,28 @@
     </div>
     <div class="span6">
       {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#with_current_user_as 'current_user'}}
+        <label>
+          Owner
+          <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        </label>
         {{#if_helpers '\
           ^if' instance.context.id '\
           and ^if' instance.private '\
         '}}
-          <label>
-            Owner
-            <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
-          </label>
-          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text"
-              {{#new_object_form}}
-                 value="{{current_user.email}}"
-              {{/new_object_form}}
-              {{^new_object_form}}
-                 value="{{firstexist owner.email ''}}" 
-              {{/new_object_form}}
-          />
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email current_user.email ''}}" />
+        {{else}}
+          <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
+          <input tabindex="3" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{private_program_owner instance modal_title}}" />
         {{/if_helpers}}
+      {{/with_current_user_as}}
       {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text"
-              {{#new_object_form}}
-                 value="{{current_user.email}}"
-              {{/new_object_form}}
-              {{^new_object_form}}
-                 value="{{firstexist contact.email ''}}"
-              {{/new_object_form}} />
+      <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
     </div>
   </div>

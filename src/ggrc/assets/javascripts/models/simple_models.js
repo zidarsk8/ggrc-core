@@ -1028,6 +1028,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
     , contact : "CMS.Models.Person.stub"
+    , audit_firm : "CMS.Models.OrgGroup.stub"
   }
   , defaults : {
     status : "Draft"
@@ -1086,6 +1087,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
+    , requestor : "CMS.Models.Person.stub"
     , objective : "CMS.Models.Objective.stub"
     , requested_on : "date"
     , due_on : "date"
@@ -1094,6 +1096,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     status : "Draft"
     , requested_on : new Date()
     , due_on : null
+    , requestor : GGRC.current_user
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"

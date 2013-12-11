@@ -103,6 +103,7 @@ Feature: Private Program Audits and Role Implication
     And "request" link property "audit" is "audit"
     And "request" link property "objective" is "objective"
     And "request" link property "assignee" is "assignee"
+    And "request" link property "requestor" is "auditor"
     Then POST of "request" to its collection is allowed
     Then GET of "request" is allowed
     Then PUT of "request" is allowed
@@ -161,6 +162,7 @@ Feature: Private Program Audits and Role Implication
     And "request" link property "audit" is "audit"
     And "request" link property "objective" is "objective"
     And "request" link property "assignee" is "assignee"
+    And "request" link property "requestor" is "auditor"
     Then POST of "request" to its collection is allowed
     Then GET of "request" is allowed
     Then PUT of "request" is allowed
@@ -219,6 +221,7 @@ Feature: Private Program Audits and Role Implication
     And "request" link property "audit" is "audit"
     And "request" link property "objective" is "objective"
     And "request" link property "assignee" is "assignee"
+    And "request" link property "requestor" is "auditor"
     Then POST of "request" to its collection is forbidden
     Given the current user
       """
@@ -333,6 +336,7 @@ Feature: Private Program Audits and Role Implication
     And "request" link property "audit" is "audit"
     And "request" link property "objective" is "objective"
     And "request" link property "assignee" is "assignee"
+    And "request" link property "requestor" is "auditor"
     Then POST of "request" to its collection is allowed
     Then GET of "request" is allowed
     Then PUT of "request" is allowed
@@ -387,6 +391,7 @@ Feature: Private Program Audits and Role Implication
     And "request" link property "audit" is "audit"
     And "request" link property "objective" is "objective"
     And "request" link property "assignee" is "assignee"
+    And "request" link property "requestor" is "auditor"
     Then POST of "request" to its collection is allowed
     Given a new "DocumentationResponse" named "response"
     And link property "context" of "response" is link property "context" of "audit"

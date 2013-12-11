@@ -7,7 +7,7 @@
 
 {{! dashboard object listing}}
 <ul class="tree-structure new-tree">
-  {{#list}}
+  {{#each list}}
     <li class="tree-item {{object_type}}" data-model="true" {{data 'model'}}>
       <div class="item-main">
         <div class="openclose">
@@ -119,18 +119,22 @@
         </div>
       </div>
     </li>
-  {{/list}}
-  <li class="tree-footer tree-item tree-item-add">
+  {{/each}}
 
+  <li class="tree-footer tree-item tree-item-add">
     <a class="btn-add" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset">
       + Person
     </a>
 
-    {{#pager.next}}
+    {{#if has_next_page}}
     <a href="javascript://" class="pull-right view-more-paging">
       View More
       <i class="grcicon-down"></i>
     </a>
-    {{/pager.next}}
+    {{else}}
+    <span class="pull-right view-more-paging">
+      All results shown
+    </span>
+    {{/if}}
   </li>
 </ul>

@@ -47,6 +47,8 @@ can.Construct("ModelRefreshQueue", {
           this.model.findAll({ id__in: this.ids.join(",") }).then(function() {
             self.completed = true;
             self.deferred.resolve();
+          }, function() {
+            self.deferred.reject.apply(self.deferred, arguments);
           });
         else {
           this.completed = true;
@@ -201,6 +203,8 @@ can.Construct("RefreshQueue", {
           self.deferred.resolve(can.map(self.objects, function(obj) {
             return obj.reify();
           }));
+        }, function() {
+          self.deferred.reject.apply(self.deferred, arguments);
         });
       else
         return this.deferred.resolve(this.objects);
@@ -215,27 +219,30 @@ can.Construct("RefreshQueue", {
 if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
-function collated_user_roles_by_person(user_roles) {
-  var person_roles = new can.Observe.List([])
-    , refresh_queue = new RefreshQueue()
-    ;
+function authorizations_list_loader() {
+  var person_roles = new can.Observe.List();
 
-  function insert_user_role(user_role) {
-    var found = false;
+  function insert_user_role(user_role, refresh_queue) {
+    var found = false
+      , person = user_role.person.reify()
+      , role = user_role.role.reify()
+      , role_data = { user_role: user_role, role: role }
+      ;
+
     can.each(person_roles, function(data, index) {
-      if (user_role.person.id == data.person.id) {
-        person_roles.attr(index).attr('roles').push(user_role.role.reify());
-        refresh_queue.enqueue(user_role.role);
+      if (person.id == data.person.id) {
+        data.attr('roles').push(role_data);
+        refresh_queue.enqueue(role);
         found = true;
       }
     });
     if (!found) {
       person_roles.push({
-        person: user_role.person.reify(),
-        roles: [user_role.role.reify()]
+        person: person,
+        roles: [role_data]
       });
-      refresh_queue.enqueue(user_role.person);
-      refresh_queue.enqueue(user_role.role);
+      refresh_queue.enqueue(person);
+      refresh_queue.enqueue(role);
     }
   }
 
@@ -246,8 +253,8 @@ function collated_user_roles_by_person(user_roles) {
 
     can.each(person_roles, function(data, index) {
       if (user_role.person.id == data.person.id) {
-        roles = person_roles.attr(index).attr('roles');
-        role_index = roles.indexOf(user_role.role.reify());
+        roles = data.attr('roles');
+        role_index = $.map(roles, function(role) { return role.role; }).indexOf(user_role.role.reify());
         if (role_index > -1) {
           roles.splice(role_index, 1);
           if (roles.length == 0)
@@ -260,29 +267,25 @@ function collated_user_roles_by_person(user_roles) {
   }
 
   CMS.Models.UserRole.bind("created", function(ev, user_role) {
+    var refresh_queue = new RefreshQueue();
     if (user_role.constructor == CMS.Models.UserRole)
-      insert_user_role(user_role);
+      insert_user_role(user_role, refresh_queue);
+    refresh_queue.trigger()
   });
+
   CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
     if (user_role.constructor == CMS.Models.UserRole)
       remove_user_role(user_role);
   });
 
-  can.each(user_roles.reverse(), function(user_role) {
-    insert_user_role(user_role);
+  // Load all authorizations
+  return GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
+    var refresh_queue = new RefreshQueue();
+    can.each(mappings, function(mapping) {
+      insert_user_role(mapping.instance, refresh_queue);
+    });
+    return refresh_queue.trigger().then(function() { return person_roles });
   });
-
-  return refresh_queue.trigger().then(function() { return person_roles });
-}
-
-function authorizations_list_loader() {
-  var instance = GGRC.page_instance()
-    , context_id = instance.context && instance.context.id
-    ;
-
-  return CMS.Models.UserRole
-    .findAll({ context_id: context_id })
-    .then(collated_user_roles_by_person);
 }
 
 function should_show_authorizations() {
