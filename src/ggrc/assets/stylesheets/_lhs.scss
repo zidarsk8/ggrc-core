@@ -529,6 +529,12 @@
       display: inline-block;
     }
   }
+  .no-url {
+    display: inline-block;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-style: italic;
+  }
 }
 
 // fix for redundant lhn scroll
