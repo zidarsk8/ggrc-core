@@ -1242,7 +1242,11 @@
       //    early.
       //  Also return now if the descriptor is explicitly excluded from the 
       //    set of descriptors for this modal.
-      if (option_descriptors[option_model_name] || ~can.inArray(option_model_name, exclude_option_types))
+      if (option_descriptors[option_model_name]
+          || ~can.inArray(option_model_name, exclude_option_types)
+          //  For some recently-added join settings, there is no join model, so
+          //  short-circuit
+          || !descriptor.options.join_model_name)
         return;
 
       if (!option_set.default_option_descriptor)
