@@ -432,8 +432,8 @@ can.Control("GGRC.Controllers.Modals", {
       if (!instance.context)
         instance.attr('context', { id: null });
       // FIXME: This should not depend on presence of `<model>.attributes`
-      if (instance.isNew() && instance.constructor.attributes.owners &&
-          !instance.owners) {
+      if (instance.isNew() && instance.constructor.attributes.owners
+          && (!instance.owners || instance.owners.length == 0)) {
         // Do not add an owner to a private program. Ownership is managed
         // through role assignment for private programs.
         if (!(instance instanceof CMS.Models.Program) || !instance.private)
