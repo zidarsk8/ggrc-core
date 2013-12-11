@@ -34,7 +34,8 @@ def init_app(app):
   app.route('/logout')(login_module.logout)
 
   app.login_manager.user_loader(user_loader)
-  #app.before_request(login_module.user_load_or_create)
+  if hasattr(login_module, 'before_request'):
+    app.before_request(login_module.before_request)
   #app.context_processor(login_module.session_context)
 
 def get_current_user():
