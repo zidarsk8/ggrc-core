@@ -98,7 +98,9 @@ class Person(Base, db.Model):
 
   @property
   def system_wide_role(self):
-    """For choosing the role string to show to the user; of all the roles in the system-wide context, it shows the highest ranked one (if there are multiple) or u"No Access" if there are none.
+    """For choosing the role string to show to the user; of all the roles in
+    the system-wide context, it shows the highest ranked one (if there are
+    multiple) or "No Access" if there are none.
     """
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
@@ -106,8 +108,11 @@ class Person(Base, db.Model):
         u'ObjectEditor': 2, 
         u'Reader': 3
     }
-    unique_roles = set([user_role.role.name for user_role in self.user_roles if not user_role.context_id])
-    if unique_roles == set([]):
+    unique_roles = set([
+      user_role.role.name
+        for user_role in self.user_roles if not user_role.context_id
+      ])
+    if len(unique_roles) == 0:
       return u"No Access"
     else:
       # -1 as default to make items not in this list appear on top
