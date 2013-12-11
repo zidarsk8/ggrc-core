@@ -220,19 +220,19 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
 function authorizations_list_loader() {
-  var person_roles = new can.Observe.List();
+  var person_roles = window.person_roles = new can.Observe.List();
 
   function insert_user_role(user_role, refresh_queue) {
     var found = false
       , person = user_role.person.reify()
-      , role = user_role.role.reify()
+      , role = user_role.role.reify ? user_role.role.reify() : user_role.role
       , role_data = { user_role: user_role, role: role }
       ;
 
     can.each(person_roles, function(data, index) {
       if (person.id == data.person.id) {
         data.attr('roles').push(role_data);
-        refresh_queue.enqueue(role);
+        refresh_queue && role.reify && refresh_queue.enqueue(role);
         found = true;
       }
     });
@@ -241,8 +241,10 @@ function authorizations_list_loader() {
         person: person,
         roles: [role_data]
       });
-      refresh_queue.enqueue(person);
-      refresh_queue.enqueue(role);
+      if (refresh_queue) {
+        refresh_queue.enqueue(person);
+        role.reify && refresh_queue.enqueue(role);
+      }
     }
   }
 
@@ -266,25 +268,56 @@ function authorizations_list_loader() {
       person_roles.splice(person_index_to_remove, 1);
   }
 
-  CMS.Models.UserRole.bind("created", function(ev, user_role) {
-    var refresh_queue = new RefreshQueue();
-    if (user_role.constructor == CMS.Models.UserRole)
-      insert_user_role(user_role, refresh_queue);
-    refresh_queue.trigger()
-  });
-
-  CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
-    if (user_role.constructor == CMS.Models.UserRole)
-      remove_user_role(user_role);
-  });
-
-  // Load all authorizations
-  return GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
-    var refresh_queue = new RefreshQueue();
-    can.each(mappings, function(mapping) {
-      insert_user_role(mapping.instance, refresh_queue);
+  // Only grab authorizations if the user has access
+  if (should_show_authorizations()) {
+    CMS.Models.UserRole.bind("created", function(ev, user_role) {
+      var refresh_queue = new RefreshQueue();
+      if (user_role.constructor == CMS.Models.UserRole)
+        insert_user_role(user_role, refresh_queue);
+      refresh_queue.trigger()
     });
-    return refresh_queue.trigger().then(function() { return person_roles });
+
+    CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
+      if (user_role.constructor == CMS.Models.UserRole)
+        remove_user_role(user_role);
+    });
+
+    GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
+      var refresh_queue = new RefreshQueue();
+      can.each(mappings, function(mapping) {
+        insert_user_role(mapping.instance, refresh_queue);
+      });
+      return refresh_queue.trigger().then(function() { return person_roles });
+    });
+  }
+
+  // Insert mapped people with a custom user role "Mapped"
+  return GGRC.page_instance().get_list_loader('extended_related_people').pipe(function(mappings) {
+    var insert_mappings = function(mappings) {
+          var refresh_queue = new RefreshQueue()
+          can.each(mappings, function(mapping) {
+            insert_user_role({
+                person: mapping.instance
+              , role: { permission_summary: 'Mapped' }
+            }, refresh_queue);
+          });
+          return refresh_queue.trigger().then(function() { return person_roles });
+        };
+
+    mappings.bind('add', function(ev, mappings) {
+      insert_mappings(mappings);
+    });
+
+    mappings.bind('remove', function(ev, mappings) {
+      can.each(mappings, function(mapping) {
+        remove_user_role({
+            person: mapping.instance
+          , role: { permission_summary: 'Mapped' }
+        }, refresh_queue);
+      });
+    });
+
+    return insert_mappings(mappings);
   });
 }
 
@@ -300,33 +333,24 @@ function should_show_authorizations() {
 
 $(function() {
   program_widget_descriptors = {
-      authorizations: {
-          widget_id: "authorizations"
-        , widget_name: "Authorizations"
-        , widget_icon: "authorization"
-        , widget_guard: should_show_authorizations
+      person: {
+          widget_id: "person"
+        , widget_name: "People"
+        , widget_icon: "person"
         , extra_widget_actions_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache"
         , content_controller: GGRC.Controllers.ListView
         , content_controller_options: {
               list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
             , list_loader: authorizations_list_loader
+            , parent_instance: GGRC.page_instance()
             }
         }
   };
 
   if (/programs\/\d+/.test(window.location)) {
-    var widget_ids = [
-          'authorizations'
-        ]
-
     if (!GGRC.extra_widget_descriptors)
       GGRC.extra_widget_descriptors = {};
     $.extend(GGRC.extra_widget_descriptors, program_widget_descriptors);
-
-    if (!GGRC.extra_default_widgets)
-      GGRC.extra_default_widgets = [];
-    GGRC.extra_default_widgets.push.apply(
-        GGRC.extra_default_widgets, widget_ids);
   }
 
 });
