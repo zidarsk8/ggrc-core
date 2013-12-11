@@ -6,8 +6,8 @@
         {{#with_mapping 'folders' instance}}
           {{#if folders.0.instance.selfLink}}
           <a href="{{folders.0.instance.alternateLink}}" target="_blank">
-            /{{#using audit=instance.audit}}{{#with_mapping 'folders' audit}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{folders.0.instance.title}}
-          </a>
+            /{{#using reified_audit=instance.audit}}{{#with_mapping 'folders' reified_audit}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{folders.0.instance.title}}</a>
+          <span></span>
           {{else}}
             No evidence folder for this {{instance.constructor.title_singular}}.
             {{#using audit=instance.audit}}
