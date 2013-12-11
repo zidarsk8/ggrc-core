@@ -169,11 +169,24 @@ can.Control("GGRC.Controllers.Modals", {
   , autocomplete_select : function(el, event, ui) {
     var original_event;
     if(ui.item) {
-      var path = el.attr("name").split(".");
-      path.pop();
-      path = path.join(".");
+      var path = el.attr("name").split(".")
+        , instance = this.options.instance
+        , index = 0
+        ;
 
-      this.options.instance.attr(path, ui.item.stub());
+      path.pop();
+      if (/^\d+$/.test(path[path.length - 1])) {
+        index = parseInt(path.pop(), 10);
+        path = path.join(".");
+        if (!this.options.instance.attr(path)) {
+          this.options.instance.attr(path, []);
+        }
+        this.options.instance.attr(path).splice(index, 1, ui.item.stub());
+      }
+      else {
+        path = path.join(".");
+        this.options.instance.attr(path, ui.item.stub());
+      }
     } else {
       original_event = event;
 
@@ -419,8 +432,8 @@ can.Control("GGRC.Controllers.Modals", {
       if (!instance.context)
         instance.attr('context', { id: null });
       // FIXME: This should not depend on presence of `<model>.attributes`
-      if (instance.isNew() && instance.constructor.attributes.owners &&
-          !instance.owners) {
+      if (instance.isNew() && instance.constructor.attributes.owners
+          && (!instance.owners || instance.owners.length == 0)) {
         // Do not add an owner to a private program. Ownership is managed
         // through role assignment for private programs.
         if (!(instance instanceof CMS.Models.Program) || !instance.private)

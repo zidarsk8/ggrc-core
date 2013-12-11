@@ -305,7 +305,7 @@ class StatusColumnHandler(ColumnHandler):
         ))
         return None
     else:
-      default_value = self.options.get('default_value') or self.default_value
+      default_value = self.options.get('default_value')
       if default_value:
         # default_value should be in valid_states list
         self.add_warning("This field will be set to {}".format(

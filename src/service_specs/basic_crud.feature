@@ -43,7 +43,7 @@ Feature: Basic RESTful CRUD Support
       | Person             |
       | Product            |
       | Project            |
-      | Program            |
+      #| Program            |
       | ProgramDirective   |
       #| Relationship       |
       | Risk               |
