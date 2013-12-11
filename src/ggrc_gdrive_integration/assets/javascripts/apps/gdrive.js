@@ -109,7 +109,7 @@
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
   can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
-  GGRC.register_hook("Request.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
+  GGRC.register_hook("Request.tree_view_info", GGRC.mustache_path + "/requests/gdrive_info.mustache");
 
   $.extend(true, CMS.Models.DocumentationResponse.attributes, {
     "object_files" : "CMS.Models.ObjectFile.stubs"
