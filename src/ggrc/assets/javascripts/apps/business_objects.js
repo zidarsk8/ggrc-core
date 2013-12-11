@@ -230,12 +230,11 @@ $(function() {
             , System: {
                   mapping: "extended_related_systems"
                 }
-
-            , Person: {
-                  mapping: "extended_related_people"
-                }
             , Document: {
                   mapping: "extended_related_documents"
+                }
+            , Person: {
+                  mapping: "extended_related_people"
                 }
             }
 
@@ -544,7 +543,14 @@ $(function() {
 
     if (!list_loader)
       return;
-    model_widget_descriptors[far_model.table_singular] = descriptor;
+
+    // This overrides the merged Person/Authorizations widget
+    if (GGRC.page_instance() instanceof CMS.Models.Program && model_name === 'Person') {
+      model_widget_descriptors[far_model.table_singular] = can.extend(descriptor, GGRC.extra_widget_descriptors[far_model.table_singular]);
+    }
+    else {
+      model_widget_descriptors[far_model.table_singular] = descriptor;
+    }
     model_default_widgets.push(far_model.table_singular);
   });
 

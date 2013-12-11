@@ -90,12 +90,6 @@
                   </li>
                 </ul>
               </div>
-              <div>
-                <a href="/people/{{id}}" class="info-action">
-                  View Profile Page
-                  <i class="grcicon-goto"></i>
-                </a>
-              </div>
             </div>
             <div class="span6 info person-info">
               <div>
@@ -105,6 +99,34 @@
                   </a>
                 </div>
               </div>
+              {{#roles}}
+              {{#if_helpers '\
+                #if_equals' role.permission_summary 'Mapped' '\
+                #if' allow_mapping '\
+                #if' user_role.result.mappings '\
+                #is_allowed_all' 'delete' user_role.result.mappings}}
+                <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+                  {{#user_role.result}}<span class="result" {{data 'result'}}></span>{{/user_role.result}}
+                  <i class="grcicon-remove"></i>
+                  Unmap
+                </a>
+              {{/if_helpers}}
+              {{/roles}}
+            </div>
+          </div>
+          {{#roles}}
+            {{#if_equals role.permission_summary 'Mapped'}}
+              {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=user_role.result parent_instance=parent_instance}}}
+            {{/if_equals}}
+          {{/roles}}
+          <div class="row-fluid">
+            <div class="span6">
+              <div>
+                <a href="/people/{{id}}" class="info-action">
+                  View Profile Page
+                  <i class="grcicon-goto"></i>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -112,4 +134,28 @@
     </li>
     {{/person}}
   {{/list}}
+  {{#if allow_mapping}}
+  {{#is_allowed_to_map parent_instance model.shortName}}
+  <li class="tree-footer tree-item tree-item-add">
+    <div class="row-fluid">
+      <div class="span12">
+
+        <a
+          href="javascript://"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="multitype-modal-selector"
+          data-join-mapping="{{mapping}}"
+          data-join-option-type="{{model.shortName}}"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.constructor.shortName}}"
+          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}">
+          + {{model.title_singular}}
+        </a>
+
+      </div>
+    </div>
+  </li>
+  {{/is_allowed_to_map}}
+  {{/if}}
 </ul>
