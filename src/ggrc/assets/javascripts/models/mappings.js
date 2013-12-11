@@ -101,10 +101,10 @@
 
     // Governance
     , Control: {
-        _mixins: ["personable", "documentable"] //controllable
+        _mixins: ["personable"] //controllable
       , related_objects: Proxy(
           null, "controllable", "ObjectControl", "control", "object_controls") //control_objects
-      , related_and_able_objects : Multi(["objectives", "implemented_controls", "related_objects", "people", "documents"])
+      , related_and_able_objects : Multi(["objectives", "implemented_controls", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -153,7 +153,6 @@
         , "implementing_controls"
         , "joined_directives"
         , "people"
-        , "documents"
         // These don't exist client-side yet:
         // , "risks"
         // , "control_risks"
@@ -161,10 +160,10 @@
         ])
       }
     , Objective: {
-        _mixins: ["personable", "documentable"] //objectiveable
+        _mixins: ["personable"] //objectiveable
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
-      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people", "documents"])
+      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -184,14 +183,13 @@
         , "controls"
         , "sections"
         , "people"
-        , "documents"
         ])
       }
     , Section: {
-        _mixins: ["personable", "documentable"] //sectionable
+        _mixins: ["personable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
-      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people", "documents"])
+      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -211,7 +209,6 @@
         , "controls"
         , "objectives"
         , "people"
-        , "documents"
         ])
       }
 
@@ -268,7 +265,7 @@
     // Program
     , Program: {
         _mixins: [
-            "related_object", "personable", "documentable", "objectiveable"
+            "related_object", "personable", "objectiveable"
           , extended_related("data_assets")
           , extended_related("facilities")
           , extended_related("markets")
@@ -317,17 +314,6 @@
           , "controls"
           ])
 
-      , related_documents_via_sections: Cross("extended_related_sections", "documents")
-      , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
-      , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
-      , extended_related_documents:
-          Multi([
-              "documents"
-            , "related_documents_via_extended_controls"
-            , "related_documents_via_extended_objectives"
-            , "related_documents_via_sections"
-            ])
-
       , related_people_via_sections: Cross("extended_related_sections", "people")
       , related_people_via_extended_controls: Cross("extended_related_controls", "people")
       , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
@@ -367,14 +353,12 @@
         , "controls"
         , "directives"
         , "people"
-        , "documents"
-        // , "cycles"
         ])
       }
 
     , directive_object: {
         _mixins: [
-          "related_object", "personable", "documentable", "objectiveable"
+          "related_object", "personable", "objectiveable"
           , extended_related("data_assets")
           , extended_related("facilities")
           , extended_related("markets")
@@ -407,17 +391,6 @@
 
       , related_objects_via_sections: Cross("sections", "related_objects")
 
-      , related_documents_via_sections: Cross("sections", "documents")
-      , related_documents_via_extended_controls: Cross("extended_related_controls", "documents")
-      , related_documents_via_extended_objectives: Cross("extended_related_objectives", "documents")
-      , extended_related_documents:
-          Multi([
-              "documents"
-            , "related_documents_via_extended_controls"
-            , "related_documents_via_extended_objectives"
-            , "related_documents_via_sections"
-            ])
-
       , related_people_via_sections: Cross("sections", "people")
       , related_people_via_extended_controls: Cross("extended_related_controls", "people")
       , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
@@ -432,10 +405,8 @@
       , orphaned_objects: Multi([
           "sections"
         , "people"
-        , "documents"
         , "controls"
         , "programs"
-        , "documents"
         ])
       }
 
@@ -456,13 +427,12 @@
     // Business objects
     , business_object: {
         _mixins: [
-            "related_object", "personable", "documentable"
+            "related_object", "personable"
           , "controllable", "objectiveable", "sectionable"
           ]
       , orphaned_objects: Multi([
           "related_objects"
         , "people"
-        , "documents"
         , "controls"
         , "objectives"
         , "sections"
@@ -651,7 +621,7 @@
     }
 
     , response : {
-      _mixins : ["business_object"]
+      _mixins : ["business_object", "documentable"]
       , _request : Indirect("Request", "responses")
       , audit_via_request : Cross("_request", "_audit")
     }
