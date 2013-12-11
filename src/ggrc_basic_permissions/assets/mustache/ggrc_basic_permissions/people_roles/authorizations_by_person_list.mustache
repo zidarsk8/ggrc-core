@@ -100,19 +100,17 @@
                 </div>
               </div>
               {{#roles}}
-              {{#if_equals role.permission_summary 'Mapped'}}
-              {{#if allow_mapping}}
-              {{#if user_role.result.mappings}}
-              {{#is_allowed_all 'delete' user_role.result.mappings}}
+              {{#if_helpers '\
+                #if_equals' role.permission_summary 'Mapped' '\
+                #if' allow_mapping '\
+                #if' user_role.result.mappings '\
+                #is_allowed_all' 'delete' user_role.result.mappings}}
                 <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
                   {{#user_role.result}}<span class="result" {{data 'result'}}></span>{{/user_role.result}}
                   <i class="grcicon-remove"></i>
                   Unmap
                 </a>
-              {{/is_allowed_all}}
-              {{/if}}
-              {{/if}}
-              {{/if_equals}}
+              {{/if_helpers}}
               {{/roles}}
             </div>
           </div>
