@@ -147,8 +147,9 @@ Feature: Private Programs
       #FIXME add back when Auditor role is defined | Audit            |
       #| Categorization   |
       | Control          |
-      | ControlAssertion |
-      | ControlCategory  |
+      #FIXME Should these be creatable for ObjectEditor role?
+      #| ControlAssertion |
+      #| ControlCategory  |
       | ControlControl   |
       | ControlSection   |
       | DataAsset        |

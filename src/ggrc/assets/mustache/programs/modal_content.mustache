@@ -21,7 +21,13 @@
       {{/if_null}}
     </div>
     <div class="span6">
-      {{#private_program modal_title}}{{/private_program}}
+      <label>
+      Privacy
+        <i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>
+      </label>
+      <div class="checkbox-area">
+        <input tabindex="2" name="private" value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
+      </div>
     </div>
   </div>
   <div class="row-fluid">

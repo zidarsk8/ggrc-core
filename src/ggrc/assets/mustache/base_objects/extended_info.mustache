@@ -34,7 +34,13 @@
       {{/if_null}}
     </div>
   </div>
-  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+
+  {{^if_equals instance.constructor.table_singular 'person'}}
+    <div class="extended-info-contact">
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+    </div>
+  {{/if_equals}}
+
   <div class="row-fluid">
     <div class="span5">
       {{#visibility_delay 500}}

@@ -1,7 +1,6 @@
 {{#if allow_mapping_or_creating}}
 {{#if_equals parent_instance.constructor.shortName 'Program'}}
 {{#if allow_creating}}
-{{#is_private parent_instance}}
 {{#is_allowed 'create' model.shortName context=parent_instance.context.id}}
 <li class="tree-item tree-item-add tree-footer">
   <div class="row-fluid">
@@ -19,7 +18,6 @@
   </div>
 </li>
 {{/is_allowed}}
-{{/is_private}}
 {{/if}}
 {{/if_equals}}
 {{/if}}

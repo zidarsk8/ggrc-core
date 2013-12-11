@@ -51,7 +51,6 @@ class ControlRowConverter(BaseRowConverter):
       no_values=fraud_falses)
     self.handle_boolean('active', truthy_values = ['active'], no_values = [])
 
-    self.handle('documents', LinkDocumentsHandler)
     self.handle('categories', LinkControlCategoriesHandler)
     self.handle('assertions', LinkControlAssertionsHandler)
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
@@ -110,7 +109,6 @@ class ControlsConverter(BaseConverter):
     ('Map:Categories', 'categories'),
     ('Map:Assertions', 'assertions'),
     ('Frequency', 'verify_frequency'),
-    ('Link:References', 'documents'),
     ('Map:Person of Contact', 'contact'),
     ('Key Control', 'key_control'),
     ('Active', 'active'),

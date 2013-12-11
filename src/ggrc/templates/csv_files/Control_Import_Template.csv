@@ -53,11 +53,6 @@ Example:
 OCCURANCE
 UNDERSTANDABILITY","*Optional.  
 Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weakly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
-Enter a valid URL for References.  Use <option><return> to deliniate between multiple References.
-Example:
-
-www.reciprocitylabs.com
-reciprocitynow.com/about","*Optional.
 You can map a person to be the Person of Contact for the Control by entering an email address that already exists in your gGRC instance. Only 1 email address may be entered.
 
 Example:
@@ -86,4 +81,4 @@ Example:
 jeff@reciprocitylabs.com
 ","*Optional.
 Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope""",*Not yet implemented.  Ignore for now.
-Control Code,Title,Description,Kind/Nature,Type/Means,Start Date,Stop Date,URL,Reference URL,Notes,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,Link:References,Map:Person of Contact,Key Control,Active,Fraud Related,Map:Principal Assessor,Map:Secondary Assessor,Status,Version
+Control Code,Title,Description,Kind/Nature,Type/Means,Start Date,Stop Date,URL,Reference URL,Notes,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,Map:Person of Contact,Key Control,Active,Fraud Related,Map:Principal Assessor,Map:Secondary Assessor,Status,Version

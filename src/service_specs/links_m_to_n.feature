@@ -39,7 +39,7 @@ Feature: Many resources type pairs reference each other M x N relations. This
      #| Control   | documents            | Document  | FIXME no property??   |
      #| Control   | people               | Person    | ??                    |
       | Control   | sections             | Section   | controls              |
-      | Control   | implemented_controls | Control   | implementing_controls |
+      #| Control   | implemented_controls | Control   | implementing_controls |
       | Control   | risks                | Risk      | controls              |
       #| Directive | programs             | Program   | directives            |
       | Contract  | programs             | Program   | directives            |
