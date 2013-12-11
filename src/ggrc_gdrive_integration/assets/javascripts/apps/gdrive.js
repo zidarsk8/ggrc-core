@@ -59,7 +59,7 @@
       if(!authresult)
         return; //assume we had to do a non-immediate auth
 
-      if(o2result.email !== GGRC.current_user.email) {
+      if(o2result.email.toLowerCase().trim() !== GGRC.current_user.email.toLowerCase().trim()) {
         $(document.body).trigger(
           "ajax:flash"
           , { warning : [
