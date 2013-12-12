@@ -1028,6 +1028,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
     , contact : "CMS.Models.Person.stub"
+    , audit_firm : "CMS.Models.OrgGroup.stub"
   }
   , defaults : {
     status : "Draft"
@@ -1068,11 +1069,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , init : function() {
     this._super && this._super.apply(this, arguments);
-    $(function() {
-      if (GGRC.current_user) {
-        CMS.Models.Audit.defaults.contact = CMS.Models.Person.model(GGRC.current_user).stub();
-      }
-    });
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validatePresenceOf("title");

@@ -351,8 +351,8 @@ jQuery(function($) {
   };
   $('form.import .btn').unbind().click(disableButton);
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
+    var $btn = $('form.import .btn.disabled').first();
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
-      var $btn = $('form.import .btn.disabled').first();
       var result = $.parseJSON(data);
       if("location" in result){
         // Redirect
@@ -362,6 +362,9 @@ jQuery(function($) {
       setTimeout(function(){
         checkStatus(result, "Import", $btn);
       }, 500)
+    }
+    else{
+      $btn && $btn.removeClass('disabled');
     }
   });
 

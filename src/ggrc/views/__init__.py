@@ -5,7 +5,7 @@
 
 import json
 from collections import namedtuple
-from flask import request, flash, session, url_for, redirect
+from flask import request, flash, session, url_for, redirect, g
 from flask.views import View
 from ggrc.app import app
 from ggrc.rbac import permissions
@@ -24,7 +24,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 
 def get_permissions_json():
   permissions.permissions_for(permissions.get_user())
-  return json.dumps(session['permissions'])
+  return json.dumps(getattr(g, '_request_permissions', None))
 
 def get_config_json():
   return json.dumps(app.config.public_config)

@@ -79,14 +79,14 @@ def log_event(session, obj=None, current_user_id=None):
   if current_user_id is None:
     current_user_id = get_current_user_id()
   cache = get_cache()
-  for o in cache.dirty:
-    revision = Revision(o, current_user_id, 'modified', o.log_json())
+  for o, log_json in cache.dirty.items():
+    revision = Revision(o, current_user_id, 'modified', log_json)
     revisions.append(revision)
-  for o in cache.deleted:
-    revision = Revision(o, current_user_id, 'deleted', o.log_json())
+  for o, log_json in cache.deleted.items():
+    revision = Revision(o, current_user_id, 'deleted', log_json)
     revisions.append(revision)
-  for o in cache.new:
-    revision = Revision(o, current_user_id, 'created', o.log_json())
+  for o, log_json in cache.new.items():
+    revision = Revision(o, current_user_id, 'created', log_json)
     revisions.append(revision)
   if obj is None:
     resource_id = 0
@@ -309,6 +309,18 @@ class Resource(ModelView):
       :service: The instance of Resource handling the POST request.  
     """,
     )
+  model_put = signals.signal('Model PUT',
+      """
+      Indicates that a model object update was received via PUT and will be
+      updated in the database. The sender in the signal will be the model class
+      of the PUT resource. The following arguments will be sent along with the
+      signal:
+
+        :obj: The model instance updated from the PUT JSON.
+        :src: The original PUT JSON dictionary.
+        :service: The instance of Resource handling the PUT request.
+      """,
+      )
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -420,6 +432,7 @@ class Resource(ModelView):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Commit"):

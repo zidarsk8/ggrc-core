@@ -4,16 +4,16 @@
       <div class="tree-info">
         <strong>gDrive Evidence Folder: </strong>
         {{#with_mapping 'folders' instance}}
-          {{#if folders.length}}
+          {{#if folders.0.instance.selfLink}}
           <a href="{{folders.0.instance.alternateLink}}" target="_blank">
             /{{#using program=instance.program}}{{#with_mapping 'folders' program}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{folders.0.instance.title}}
           </a>
           {{else}}
             No evidence folder for this {{instance.constructor.title_singular}}.
             {{#using program=instance.program}}
-            {{#if_equals parent_instance.constructor.shortName 'Program'}}
+            {{#is_allowed 'create' 'ObjectFolder' context=instance.context}}
             <a href="javascript://" class="create-folder" {{#instance}}{{data 'model'}}{{/instance}}>Create one now</a>
-            {{/if_equals}}
+            {{/is_allowed}}
             {{/using}}
           {{/if}}
         {{else}}
