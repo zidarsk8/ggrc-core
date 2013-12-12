@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
-from flask import session, Blueprint
+from flask import Blueprint, session, g
 import sqlalchemy.orm
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy import and_, or_
@@ -54,54 +54,34 @@ class BasicUserPermissions(DefaultUserPermissions):
     return self.permissions
 
 class UserPermissions(DefaultUserPermissions):
+  @property
+  def _request_permissions(self):
+    return getattr(g, '_request_permissions', None)
+
+  @_request_permissions.setter
+  def _request_permissions(self, value):
+    setattr(g, '_request_permissions', value)
+
   def _permissions(self):
     self.check_permissions()
-    return session['permissions']
+    return self._request_permissions
 
   def check_permissions(self):
-    if 'permissions' not in session:
+    if not self._request_permissions:
       self.load_permissions()
-    elif session['permissions'] is None\
-        and 'permissions_header_asserted' not in session:
-      self.load_permissions()
-    elif session['permissions'] is not None\
-        and '__header_override' in session['permissions']:
-      pass
-    elif session['permissions'] is None\
-        or '__user' not in session['permissions']\
-        or session['permissions']['__user'] != \
-            self.get_email_for(get_current_user()):
-      self.load_permissions()
-    elif 'permissions__ts' in session and not get_current_user().is_anonymous():
-      self.load_permissions()
-      #if not session['permissions__ts']:
-        #self.load_permissions()
-      #else:
-        #current_most_recent_role_ts = db.session.query(UserRole.updated_at)\
-            #.filter(UserRole.person_id==get_current_user().id)\
-            #.order_by(UserRole.updated_at.desc())\
-            #.first()
-        #if current_most_recent_role_ts\
-            #and current_most_recent_role_ts[0] > session['permissions__ts']:
-          #self.load_permissions()
 
   def get_email_for(self, user):
     return user.email if hasattr(user, 'email') else 'ANONYMOUS'
 
   def load_permissions(self):
-    if hasattr(session, '_permissions_loaded'):
-      return
-    session._permissions_loaded = True
     user = get_current_user()
     email = self.get_email_for(user)
-    session['permissions'] = {}
-    session['permissions']['__user'] = email
+    self._request_permissions = {}
+    self._request_permissions['__user'] = email
     if user is None or user.is_anonymous():
-      session['permissions'] = {}
-      session['permissions__ts'] = None
+      self._request_permissions = {}
     else:
-      session['permissions'] = load_permissions_for(user)
-      session['permissions__ts'] = None
+      self._request_permissions = load_permissions_for(user)
 
 def collect_permissions(src_permissions, context_id, permissions):
   for action, resource_permissions in src_permissions.items():
