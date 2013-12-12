@@ -48,14 +48,27 @@
         </div>
         <div class="span3">
           &nbsp;
-          {{#selected_option_type}}
-          <div class="pull-right">
-            <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}" {{#if_equals related_model_singular "Objective"}}data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'{{/if_equals}}>
-              <i class="grcicon-add"></i>
-              {{ new_object_title }}
-            </a>
-          </div>
-          {{/selected_option_type}}
+          {{#if_equals new_object_title 'Section'}}
+            {{#if_helpers '\ #if_equals' selected_object.constructor.title_singular 'Contract' '\ or #if_equals' selected_object.constructor.title_singular 'Standard' '\ or #if_equals' selected_object.constructor.title_singular 'Policy' '\ or #if_equals' selected_object.constructor.title_singular 'Regulation'}}
+              {{#selected_option_type}}
+              <div class="pull-right">
+                <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}" {{#if_equals related_model_singular "Objective"}}data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'{{/if_equals}}>
+                  <i class="grcicon-add"></i>
+                  {{ new_object_title }}
+                </a>
+              </div>
+              {{/selected_option_type}}
+            {{/if_helpers}}
+          {{else}}
+            {{#selected_option_type}}
+            <div class="pull-right">
+              <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}" {{#if_equals related_model_singular "Objective"}}data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'{{/if_equals}}>
+                <i class="grcicon-add"></i>
+                {{ new_object_title }}
+              </a>
+            </div>
+            {{/selected_option_type}}
+          {{/if_equals}}
         </div>
       </div>
     </div>
