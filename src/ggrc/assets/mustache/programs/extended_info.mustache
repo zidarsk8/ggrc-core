@@ -30,12 +30,12 @@
         </a>
       {{/if_null}}
       {{#if_null url}}
-        No URL
+        <span class="no-url">No URL</span>
       {{/if_null}}
     </div>
   </div>
   <div class="extended-info-contact">
-    {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+    {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_program=true}}}
   </div>
   <div class="row-fluid">
     <div class="span5">

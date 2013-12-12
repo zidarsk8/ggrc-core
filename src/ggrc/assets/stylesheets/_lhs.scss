@@ -486,8 +486,8 @@
   }
   .extended-info-contact {
     p {
+      font-size:12px;
       span {
-        font-size:12px;
         line-height:16px;
       }
     }
@@ -528,6 +528,12 @@
     &.oneline {
       display: inline-block;
     }
+  }
+  .no-url {
+    display: inline-block;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-style: italic;
   }
 }
 

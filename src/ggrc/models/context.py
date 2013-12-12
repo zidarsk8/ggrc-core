@@ -17,17 +17,16 @@ class Context(Described, Base, db.Model):
 
   @property
   def related_object(self):
+    self._related_object = None
     if not hasattr(self, '_related_object'):
       if self.related_object_type:
         import ggrc.models
-        import ggrc.services.util
-        service = ggrc.services.util.service_for(str(self.related_object_type))
+        import ggrc.utils
+        service = ggrc.utils.service_for(str(self.related_object_type))
         model_class = service._model
-
-        self._related_object = db.session.query(model_class)\
-            .get(self.related_object_id)
-      else:
-        self._related_object = None
+        if self.related_object_id:
+          self._related_object = db.session.query(model_class)\
+              .get(self.related_object_id)
     return self._related_object
 
   @related_object.setter
