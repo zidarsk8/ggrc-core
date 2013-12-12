@@ -4,7 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from collections import namedtuple
-from flask import session
+from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
 from ggrc.models import get_model
@@ -104,12 +104,10 @@ class DefaultUserPermissions(UserPermissions):
             .get('contexts', [])
 
   def _permissions(self):
-    return session['permissions']
+    return getattr(g, '_request_permissions', {})
 
   def _is_allowed(self, permission):
     permissions = self._permissions()
-    if permissions is None:
-      return True
     if self._permission_match(permission, permissions):
       return True
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
@@ -122,7 +120,7 @@ class DefaultUserPermissions(UserPermissions):
     # Check for admin permission
     if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
       return True
-      
+
     conditions = self._permissions()\
         .setdefault(action, {})\
         .setdefault(instance._inflector.model_singular, {})\
@@ -172,11 +170,7 @@ class DefaultUserPermissions(UserPermissions):
   def _get_contexts_for(self, action, resource_type):
     # FIXME: (Security) When applicable, we should explicitly assert that no
     #   permissions are expected (e.g. that every user has ADMIN_PERMISSION).
-    if 'permissions' not in session:
-      return None
-    permissions = session['permissions']
-    if permissions is None:
-      return None
+    permissions = self._permissions()
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
       return None
 
