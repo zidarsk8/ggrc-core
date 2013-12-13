@@ -1,0 +1,83 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: andy@reciprocitylabs.com
+    Maintained By: andy@reciprocitylabs.com
+}}
+
+{{#person}}
+<a href="/people/{{id}}">
+  <span class="person-tooltip-trigger" data-placement="top">{{firstnonempty name email}}</span>
+</a>
+<div class="custom-popover-content">
+  <div class="preview-container person-preview">
+    <div class="row-fluid">
+      <div class="span8">
+        <div class="profile-info">
+          <ul>
+            <li><h4>{{firstnonempty name email}}</h4></li>
+            <li><strong>Email:</strong> {{email}}</li>
+            <li><strong>Company:</strong> {{company}}</li>
+          </ul>
+          <div class="profile-contact">
+            <ul>
+              <li>
+                <a rel="tooltip" data-original-title="Start a video call" href="#"><i class="grcicon-gvideo"></i></a>
+              </li>
+              <li>
+                <a rel="tooltip" data-original-title="Chat with this contact" href="#"><i class="grcicon-gchat"></i></a>
+              </li>
+              <li>
+                <a rel="tooltip" data-original-title="Email this contact" href="#"><i class="grcicon-gmail"></i></a>
+              </li>
+              <li>
+                <a rel="tooltip" data-original-title="Phone call" href="#"><i class="grcicon-gphone"></i></a>
+              </li>
+              <li class="circle-holder">
+                <a class="btn btn-mini square-trigger" href="#">Add to Circles <i class="grcicon-carot"></i></a>
+                <div class="square-popover">
+                  <ul>
+                    <li>
+                      <label>
+                        <input type="checkbox">
+                        Friends <span>126</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="checkbox">
+                        Family <span>40</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="checkbox">
+                        Acquaintances <span>12</span>
+                      </label>
+                    </li>
+                    <li>
+                      <label>
+                        <input type="checkbox">
+                        Following <span>4</span>
+                      </label>
+                    </li>
+                    <li class="create">
+                      <a href="#">Create new circle</a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <a class="info-action" href="/people/{{id}}">View profile <i class="grcicon-goto"></i></a>
+        </div>
+      </div>
+      <div class="span4">
+        <div class="profile-photo">
+          <img src="/static/images/people/predrag-kanazir.jpg" alt="Predrag Kanazir">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{/person}}
