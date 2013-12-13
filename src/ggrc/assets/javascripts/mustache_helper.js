@@ -1974,4 +1974,18 @@ Mustache.registerHelper("if_auditor_name", function(instance, options){
     return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("auditor_id", function(instance, options){
+
+  var loader = resolve_computed(instance).get_binding('authorizations')
+    , auditors = $.map(loader.list, function(binding) {
+        if (binding.instance.role.reify().attr('name') === 'Auditor') {
+          return binding.instance.person.reify().attr('id');
+        }
+      });
+  if (auditors.length > 0)
+    return auditors[0];
+  else
+    return "null";
+});
+
 })(this, jQuery, can);
