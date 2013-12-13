@@ -914,6 +914,23 @@ ul.new-tree {
   .tree-info {
     line-height: 18px;
   }
+  
+  .edit-auditor a {
+    font-size:11px;
+    font-weight:bold;
+    color:#111;
+    text-transform:uppercase;
+    @include opacity(0.4);
+    @include transition(opacity 0.2s);
+    &:hover {
+      @include opacity(1);
+      text-decoration:none;
+    }
+    [class^="grcicon-"] {
+      margin-top: 2px;
+    }
+  }
+
   .info-audit {
     @include reset-list();
     @include clearfix();

@@ -1960,4 +1960,18 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
+Mustache.registerHelper("if_auditor_name", function(instance, options){
+
+  var loader = resolve_computed(instance).get_binding('authorizations')
+    , auditors = $.map(loader.list, function(binding) {
+        if (binding.instance.role.reify().attr('name') === 'Auditor') {
+          return binding.instance.person.reify().attr('name');
+        }
+      });
+  if (auditors.length > 0)
+    return auditors.join(', ') + options.fn(options.contexts);
+  else
+    return options.inverse(options.contexts);
+});
+
 })(this, jQuery, can);
