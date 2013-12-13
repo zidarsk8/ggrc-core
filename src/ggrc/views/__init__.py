@@ -773,21 +773,21 @@ def import_directive_sections_template(directive_id):
   from flask import current_app
   from ggrc.models.all_models import Directive
   directive = Directive.query.filter_by(id=int(directive_id)).first()
-  directive_kind = directive.__class__.__name__
+  directive_type = directive.type
   DIRECTIVE_TYPES = ['Contract', 'Regulation', 'Standard', 'Policy']
-  if directive_kind not in DIRECTIVE_TYPES:
+  if directive_type not in DIRECTIVE_TYPES:
     return current_app.make_response((
         "No template for that type.", 404, []))
-  if directive_kind == "Contract":
+  if directive_type == "Contract":
     section_term = "Clause"
   else:
     section_term = "Section"
   output_filename = "{0}_{1}_Import_Template.csv".format(
-      directive_kind, section_term)
+      directive_type, section_term)
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(output_filename))]
   options = {
     'section_term': section_term,
-    'directive_kind': directive_kind,
+    'directive_type': directive_type,
     'directive_slug': directive.slug,
   }
   body = render_template("csv_files/Section_Import_Template.csv", **options)
