@@ -202,14 +202,21 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        <li>
+        {{#if_helpers '\
+          ^if' allow_mapping_or_creating '\
+          or ^is_allowed' 'update' instance '\
+          or #if' responses.length '\
+        ' _1_context=instance.context.id}}
           {{#using program=instance.program}}
-          <a href="{{program.viewLink}}#audit_widget" class="info-action">
-            View {{instance.constructor.title_singular}}
-            <i class="grcicon-goto"></i>
-          </a>
+            <li>
+              <a href="{{program.viewLink}}#audit_widget" class="info-action">
+                View {{instance.constructor.title_singular}}
+                <i class="grcicon-goto"></i>
+              </a>
+            </li>
           {{/using}}
-        </li>
+        {{/if_helpers}}
+        
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
           and #is_allowed' 'update' instance '\
