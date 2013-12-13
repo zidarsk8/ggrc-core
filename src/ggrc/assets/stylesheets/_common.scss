@@ -721,3 +721,21 @@ select.multiple-selector {
     }
   }
 }
+
+// Saved Message
+.saved {
+  position: relative;
+  input,
+  select,
+  textarea {
+    border: 1px solid $green;
+    margin-bottom: 3px;
+  }
+  .saved-message {
+    position: absolute;
+    right: 0;
+    font-size: 10px;
+    color: $green;
+    font-weight: bold;
+  }
+}
