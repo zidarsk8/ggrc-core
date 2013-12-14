@@ -3,7 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import csv
+import csv, _csv
 import chardet
 import os
 from ggrc.models import Directive, Section
@@ -28,8 +28,8 @@ def handle_csv_import(converter_class, filepath, **options):
       rows = [row for row in csv_reader(csv_file)]
     else:
       rows = [row for row in csv_reader(csv_file.read().splitlines(True))]
-  except UnicodeDecodeError: # Decode error occurs when a special character symbol is inserted in excel.
-    raise ImportException("Could not import: invalid character encountered, verify the file is correctly formatted.")
+  except (UnicodeDecodeError, _csv.Error): # Decode error occurs when a special character symbol is inserted in excel.
+    raise ImportException("Could not import: invalid character or spreadsheet encountered; verify the file is correctly formatted.")
   if not isinstance(csv_file, list):
     csv_file.close()
   converter = converter_class.from_rows(rows, **options)
