@@ -260,6 +260,19 @@
     color:$black;
     //font-weight:bold;
   }
+  &.person-tooltip {
+    .popover-inner,
+    .popover-content {
+      overflow: visible;
+    }
+    .popover-content {
+      margin: -10px 0;
+    }
+    .square-popover {
+      bottom: auto !important;
+      top: 0;
+    }
+  }
 }
 /* slowing down fade-in only.  Fade-out remains 0.15s */
 .tooltip.fade.in, .popover.fade.in {

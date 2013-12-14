@@ -773,26 +773,33 @@ $(window).load(function(){
     if (!target.data('popover')) {
       target.popover({
           html: true
-        , delay: { show: 500, hide: 500 }
+        , delay: { show: 400, hide: 200 }
         , trigger: 'manual'
         , content: function() {
             return $(this).closest('.person-holder').find('.custom-popover-content').html();
           }
       });
+      target.data('popover').tip().addClass('person-tooltip');
     }
 
-    last_popover = target.data('popover');
+    var popover = target.data('popover');
+
+    if (last_popover && last_popover !== popover) {
+      last_popover.hide();
+    }
 
     // If the popover is active, just refresh the timeout
-    if (last_popover.tip().is(':visible') && last_popover.timeout) {
-      clearTimeout(last_popover.timeout);
-      last_popover.hoverState = 'in';
+    if (popover.tip().is(':visible') && popover.timeout) {
+      clearTimeout(popover.timeout);
+      popover.hoverState = 'in';
     }
     // Otherwise show popover
     else {
-      clearTimeout(last_popover.timeout);
-      last_popover.enter(ev);
+      clearTimeout(popover.timeout);
+      popover.enter(ev);
     }
+
+    last_popover = popover;
   });
   $('body').on('mouseenter', '.popover', function(ev) {
     // Refresh the popover
@@ -802,14 +809,21 @@ $(window).load(function(){
       last_popover.hoverState = 'in';
     }
   });
-  $('body').on('mouseleave', '.person-holder, .popover', function(ev) {
+  $('body').on('mouseleave', '.person-holder, .person-tooltip-trigger, .popover, .popover .square-popover', function(ev) {
     var target = $(ev.currentTarget)
       , popover
       ;
 
+    if (target.is('.person-tooltip-trigger')) {
+      target = target.closest('.person-holder');
+    }
+    else if (target.is('.square-popover')) {
+      target = target.closest('.popover');
+    }
+
     // Hide the popover if we left for good
-    if (target.is('.person-holder') && (popover = target.find('.person-tooltip-trigger').data('popover'))) {
-      ev.target = ev.currentTarget = target[0];
+    if (target.is('.person-holder') && (target = target.find('.person-tooltip-trigger')) && (popover = target.data('popover'))) {
+      ev.currentTarget = target[0];
       popover.leave(ev);
     }
     // Check if this popover originated from the last person popover
