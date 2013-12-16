@@ -17,6 +17,9 @@ app.config.from_object(settings)
 if("public_config" not in app.config):
   app.config.public_config = {}
 
+for key in settings.exports:
+  app.config.public_config[key] = app.config[key]
+
 # Configure Flask-SQLAlchemy for app
 from . import db
 db.app = app
