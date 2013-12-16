@@ -1,6 +1,6 @@
 {{#instance}}
 <div class="row-fluid">
-  <div class="person-holder {{^if stacked}}span6{{/if}}">   
+  <div class="{{^if stacked}}span6{{/if}}">   
   {{#if is_program}}
     <p>
       <strong>Owner:</strong>
@@ -10,7 +10,7 @@
           {{#using role=instance.role}}
             {{#if_equals role.name 'ProgramOwner'}}
               {{#using contact=instance.person}}
-                <p>
+                <p class="person-holder">
                   {{{render '/static/mustache/people/popover.mustache' person=contact}}}
                 </p>
               {{/using}}
@@ -23,7 +23,7 @@
     {{#if owners.length}}
       {{#using contacts=owners}}
       {{#contacts}}
-        <p>
+        <p class="person-holder">
           <strong>Owner</strong>
           <br>
           {{{render '/static/mustache/people/popover.mustache' person=this}}}
