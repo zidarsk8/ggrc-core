@@ -1,6 +1,6 @@
 {{#instance}}
 <div class="row-fluid">
-  <div class="{{^if stacked}}span6{{/if}}">   
+  <div {{^if stacked}}class="span6"{{/if}}>   
   {{#if is_program}}
     <p>
       <strong>Owner:</strong>
@@ -42,9 +42,9 @@
   {{/if}}
   </div>
   {{#using person=contact}}
-    <div class="person-holder {{^if stacked}}span6{{/if}}">   
+    <div {{^if stacked}}class="span6"{{/if}}>  
     {{#if person}}
-      <p>
+      <p class="person-holder">
         <strong>Contact</strong>
         <br>
         {{{render '/static/mustache/people/popover.mustache' person=person}}}
