@@ -1960,4 +1960,114 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
+function google_api() {
+  var hash = "get_google_api_" + Date.now() + '_' + ~~(Math.random() * 1000)
+    , dfd = new can.Deferred()
+    ;
+
+  window[hash] = function() {
+    dfd.resolve(window.gapi);
+  };
+
+  if (!window.gapi) {
+    $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=" + hash + "'></script>");
+  }
+  else {
+    window[hash]();
+  }
+  
+  return dfd;
+};
+function google_load(api_name, api_version) {
+  var dfd = new can.Deferred();
+  window.gapi.client.load(api_name, api_version, function(result) {
+    if(!result){
+      dfd.resolve();
+    } else {
+      dfd.reject(result);
+    }
+  });
+  return dfd;
+}
+function google_auth(immediate) {
+  var dfd = new can.Deferred();
+  window.gapi.auth.authorize({
+    'client_id': GGRC.config.GAPI_CLIENT_ID
+    , 'scope': ['https://www.googleapis.com/auth/plus.login', 'https://www.googleapis.com/auth/plus.me', 'https://www.googleapis.com/auth/userinfo.email']
+    , 'immediate': immediate
+    , 'login_hint' : GGRC.current_user.email
+  }, function(result) {
+    if(result){
+      dfd.resolve(result);
+    } else {
+      dfd.reject();
+    }
+  });
+  return dfd;
+};
+function google_plus() {
+  // Load Google+ dependencies
+  if (!google_plus._gapi) {
+    var auth = google_plus._gapi = new can.Deferred();
+    google_api().done(function(gapi) {
+      $.when(google_load('oauth2', 'v2'), google_load('plus', 'v1')).done(function(oauth2, plus) {
+        // Retrieve authenticated user
+        function get_user() {    
+          gapi.client.oauth2.userinfo.get().execute(function(user) {
+            if(user.error) {
+              auth.reject(user.error);
+            } else {
+              auth.resolve(user);
+            }
+          });
+        };
+
+        // Attempt to authenticate user
+        google_auth(true)
+        .fail(function() {
+          google_auth(false)
+          .fail(function() {
+            auth.reject('auth failed');
+          })
+          .done(get_user);
+        })
+        .done(get_user);
+      });
+    });
+  }
+
+  return google_plus._gapi;
+};
+function google_plus_user(userId) {
+  if (!google_plus_user[userId]) {
+    var dfd = google_plus_user[userId] = new can.Deferred();
+    google_plus().done(function(gplus_user) {
+      gapi.client.plus.people.get({ userId: gplus_user.id })
+      .execute(function(user) {
+        dfd.resolve(user);
+      });
+    });
+  }
+  return google_plus_user[userId];
+};
+Mustache.registerHelper("google_plus", function(person, options) {
+  var state = get_binding_observe('__google_plus', options);
+  person = resolve_computed(person);
+
+  if (!state.attr('loading') && person.id === GGRC.current_user.id) {
+    state.attr('loading', true);
+    google_plus_user(person.id).done(function(gplus_user) {
+      if (gplus_user.image && gplus_user.image.url) {
+        gplus_user.image.url = gplus_user.image.url.replace(/\?sz=\d+$/, '?sz=90');
+      }
+      state.attr('gplus_user', gplus_user);
+    });
+  }
+
+  if (state.attr('gplus_user'))
+    return options.fn(state.attr('gplus_user'));
+  else
+    return options.inverse(options.contexts);
+});
+
 })(this, jQuery, can);
