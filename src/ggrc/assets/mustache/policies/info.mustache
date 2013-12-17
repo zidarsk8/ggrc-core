@@ -126,9 +126,9 @@
     <p>
       <small>
         <em>
-          Created by {{#if owners.length}}{{#using contacts=owners}}{{#contacts}}{{firstnonempty name email}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
+          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
           <br>
-          Modified by {{date updated_at}}
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
         </em>
       </small>
     </p>
