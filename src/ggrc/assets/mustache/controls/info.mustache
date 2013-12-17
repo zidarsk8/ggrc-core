@@ -167,8 +167,8 @@
         <p>
           <strong>Principal Assessor</strong>
           <br>
-          {{#using assessor=instance.principal_assessor}}
-          <span>{{firstnonempty assessor.email ''}}</span>
+            {{#using assessor=instance.principal_assessor}}
+            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
           {{/using}}
         </p>
       </div>
@@ -177,7 +177,7 @@
           <strong>Secondary Assessor</strong>
           <br>
           {{#using assessor=instance.secondary_assessor}}
-          <span>{{firstnonempty assessor.email ''}}</span>
+            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
           {{/using}}
         </p>
       </div>
