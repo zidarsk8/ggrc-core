@@ -81,4 +81,4 @@ Example:
 jeff@reciprocitylabs.com
 ","*Optional.
 Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope""",*Not yet implemented.  Ignore for now.
-Control Code,Title,Description,Kind/Nature,Type/Means,Start Date,Stop Date,URL,Reference URL,Notes,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,Map:Person of Contact,Key Control,Active,Fraud Related,Map:Principal Assessor,Map:Secondary Assessor,Status,Version
+Control Code,Title,Description,Kind/Nature,Type/Means,Start Date,Stop Date,URL,Reference URL,Notes,Map:Systems,Map:Processes,Map:Categories,Map:Assertions,Frequency,Map:Person of Contact,Key Control,Active,Fraud Related,Principal Assessor,Secondary Assessor,State,Version
