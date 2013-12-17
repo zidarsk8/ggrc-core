@@ -571,4 +571,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
       el.trigger("expand");
   }
 
+  , "input,select click" : function(el, ev) {
+    // Don't toggle accordion when clicking on input/select fields
+    ev.stopPropagation();
+  }
+
 });
