@@ -9,6 +9,7 @@
 {{#if_match parent_instance.constructor.shortName '^(Directive|Regulation|Policy|Standard|Contract)$'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
+{{#if_match parent_instance.constructor.shortName '^(Contract|Standard|Policy|Regulation)$'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -53,6 +54,7 @@
     </div>
   </div>
 </li>
+{{/if_match}}
 {{/is_allowed}}
 {{/if}}
 
@@ -60,6 +62,7 @@
 
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
+{{#if_match parent_instance.constructor.shortName '^(Contract|Standard|Policy|Regulation)$'}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -78,6 +81,7 @@
     </div>
   </div>
 </li>
+{{/if_match}}
 {{/is_allowed_to_map}}
 {{/if}}
 {{/if_match}}
