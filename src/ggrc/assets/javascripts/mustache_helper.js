@@ -1979,7 +1979,7 @@ Mustache.registerHelper("auditor_id", function(instance, options){
   var loader = resolve_computed(instance).get_binding('authorizations')
     , auditors = $.map(loader.list, function(binding) {
         if (binding.instance.role.reify().attr('name') === 'Auditor') {
-          return binding.instance.person.reify().attr('id');
+          return binding.instance.id;
         }
       });
   if (auditors.length > 0)

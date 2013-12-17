@@ -105,14 +105,18 @@
       return deferred;
     },
     init_data: function(){
-      if("auditor_id" in this.options){
+      if("userRole_id" in this.options){
 
         var self = this
-          , user = CMS.Models["Person"].findInCacheById(this.options.auditor_id);
+          , binding = CMS.Models["UserRole"].findInCacheById(this.options.userRole_id)
+          , instance = binding.person.reify()
+          , email = instance.attr('email')
+          ;
         // TODO: Figure out why input field clears the value
         setTimeout(function(){
-          $('input[name="auditor.email"]').val(user.email);
-          self.options.instance = user;
+          $('input[name="auditor.email"]').val(email);
+          self.options.binding = binding;
+          self.options.instance = instance;
         }, 100);
       }
       
@@ -129,31 +133,31 @@
     "a.btn[data-toggle='modal-submit'] click" : function(el, ev){
       var self = this
         , instance = this.options.instance
-        , role = this.role;
-      function remove_all(skip_id){
-        CMS.Models.UserRole.findAll(self.options.extra_join_query, function(joins){
-          can.each(joins, function(user_role){
-            var id = user_role.id;
-            // Skip the newly created role:
-            if(id === skip_id) return;
-            user_role.refresh().done(function(){
-              user_role.destroy();
-              self.element.trigger("modal:success").modal_form("hide");
-            });
-          });
+        , binding = this.options.binding || null
+        , role = this.role
+        , ajd
+        , join
+        ;
+      
+      function finish(){
+        self.element.trigger("modal:success").modal_form("hide");
+      }
+      function destroyBinding(){
+        if(binding === null)
+          return $.Deferred().resolve();
+        return binding.refresh().then(function(){
+          binding.destroy();
         });
-      };
+      }
+      
       if(instance == null){
-        remove_all(null)
+        ajd = destroyBinding().then(finish);
+        this.bindXHRToButton(ajd, el, "Saving, please wait...");
         return;
       }
-      join = this.get_new_join(
-              role.id, role.scope, role.constructor.shortName);
-      join.save().then(function() {
-        
-        remove_all(join.id);
-        self.element.trigger("saved", join);
-      });
+      join = this.get_new_join(role.id, role.scope, role.constructor.shortName);
+      ajd = join.save().then(destroyBinding).then(finish);
+      this.bindXHRToButton(ajd, el, "Saving, please wait...");
     },
     get_new_join: function(option_id, option_scope, option_type) {
       var join_params = {}
@@ -769,7 +773,7 @@
 
       e.preventDefault();
       e.stopPropagation();
-      options.auditor_id = data_set.params.auditor_id;
+      options.userRole_id = data_set.params.userRole_id;
       GGRC.Controllers.AuditRoleSelector.launch($this, options)
         .on("saved", function(ev, data) {
           $this.trigger("modal:" + ev.type, data);
