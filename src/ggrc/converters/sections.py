@@ -95,7 +95,7 @@ class SectionsConverter(BaseConverter):
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield [self.directive_kind(), self.directive().slug]
+    yield [self.directive().type, self.directive().slug]
     yield []
     yield []
     yield self.object_map.keys()

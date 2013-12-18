@@ -45,7 +45,7 @@
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
       </label>
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
@@ -63,7 +63,7 @@
     </div>
     <div class="span6">
       <label>
-        Direct URL
+        Objective URL
         <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
       </label>
       <input tabindex="5" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">

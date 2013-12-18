@@ -85,23 +85,21 @@
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
         {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-        {{#instance.url}}
+        
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">
               <strong>URL:</strong>
-              {{^if_null instance.url}}
+              {{#if instance.url}}
                 <a class="url" href="{{schemed_url instance.url}}" target="_blank">
                   {{instance.url}}
                 </a>
-              {{/if_null}}
-              {{#if_null instance.url}}
+              {{else}}
                 <i>No URL</i>
-              {{/if_null}}
+              {{/if}}
             </div>
           </div>
         </div>
-        {{/instance.url}}
       </div>
 
       {{#if draw_children}}

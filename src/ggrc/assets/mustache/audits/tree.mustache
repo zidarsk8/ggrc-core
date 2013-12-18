@@ -209,7 +209,7 @@
               </ul>
             </div>
           {{else}}
-            <select class="input-medium top-space" name="status">
+            <select class="input-medium top-space pull-right" name="status">
               {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
               <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
               {{/iterate}}
