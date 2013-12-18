@@ -1960,4 +1960,24 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
+// Determines whether the value matches one in the $.map'd list
+// {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+Mustache.registerHelper("if_in_map", function(list, path, value, options) {
+  list = resolve_computed(list);
+
+  if (!list.attr || list.attr('length')) {
+    path = path.split('.');
+    var map = $.map(list, function(obj) {
+      can.each(path, function(prop) {
+        obj = (obj && obj[prop]) || null;
+      })
+      return obj;
+    });
+
+    if (map.indexOf(value) > -1)
+      return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
+});
+
 })(this, jQuery, can);
