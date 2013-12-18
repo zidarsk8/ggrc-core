@@ -1799,7 +1799,7 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
 
 Mustache.registerHelper("default_audit_title", function(program, options) {
   program = resolve_computed(program) || {title : "program"};
-  return new Date().getFullYear() + " " + program.title + " Audit";
+  return new Date().getFullYear() + ": " + program.title + " - Audit";
 });
 
 Mustache.registerHelper("param_current_location", function() {
