@@ -28,10 +28,22 @@
               <div class="item-data">
                 <div class="tree-title-area">
                   {{#if roles.length}}
-                    <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
-                      {{roles.0.role.permission_summary}}
+                    <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                      {{#if_helpers '\
+                        #if_equals' roles.0.role.permission_summary 'Mapped' '\
+                        and ^if_equals' roles.length 1}}
+                        {{roles.1.role.permission_summary}}
+                      {{else}}
+                        {{roles.0.role.permission_summary}}
+                      {{/if_helpers}}
                       {{#roles.1}}
-                        + {{sum roles.length '-1'}}
+                        {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+                          {{^if_equals roles.length 2}}
+                            + {{sum roles.length '-2'}}
+                          {{/if_equals}}
+                        {{else}}
+                          + {{sum roles.length '-1'}}
+                        {{/if_in_map}}
                       {{/roles.1}}
                     </span>
                   {{else}}
@@ -82,9 +94,13 @@
                   <li>
                     <ul>
                     {{#roles}}
-                      <li class="role">
-                        {{role.permission_summary}}{{#if_equals role.permission_summary 'Auditor'}}: {{#with_mapping 'audit_via_context' user_role}}{{audit_via_context.0.instance.title}}{{/with_mapping}}{{/if_equal}}
-                      </li>
+                      {{#if_helpers '\
+                        ^if_equals' role.permission_summary 'Mapped' '\
+                        or #if_equals' roles.length 1}}
+                        <li class="role">
+                          {{role.permission_summary}}{{#if_equals role.permission_summary 'Auditor'}}: {{#with_mapping 'audit_via_context' user_role}}{{audit_via_context.0.instance.title}}{{/with_mapping}}{{/if_equal}}
+                        </li>
+                      {{/if_helpers}}
                     {{/roles}}
                     </ul>
                   </li>

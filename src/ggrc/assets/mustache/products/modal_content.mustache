@@ -45,7 +45,7 @@
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
         Contact
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
       </label>
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
@@ -58,7 +58,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Append simple text or html notes here."></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="5" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+        <textarea tabindex="4" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
       </div>
     </div>
     <div class="span6">
@@ -66,7 +66,7 @@
         Product URL
         <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
       </label>
-      <input tabindex="4" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
+      <input tabindex="5" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
       <label>
         Reference URL
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
