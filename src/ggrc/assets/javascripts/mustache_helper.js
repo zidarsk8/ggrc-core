@@ -1960,32 +1960,24 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
-Mustache.registerHelper("if_auditor_name", function(instance, options){
+Mustache.registerHelper("with_auditors", function(instance, options) {
 
   var loader = resolve_computed(instance).get_binding('authorizations')
     , auditors = $.map(loader.list, function(binding) {
         if (binding.instance.role.reify().attr('name') === 'Auditor') {
-          return binding.instance.person.reify().attr('name');
+          return {
+            person: binding.instance.person.reify()
+            , binding: binding.instance
+          }
         }
       });
-  if (auditors.length > 0)
-    return auditors.join(', ') + options.fn(options.contexts);
-  else
+  options.contexts.push({"auditors": auditors});
+  if(auditors.length > 0){
+    return options.fn(options.contexts);
+  }
+  else{
     return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("auditor_id", function(instance, options){
-
-  var loader = resolve_computed(instance).get_binding('authorizations')
-    , auditors = $.map(loader.list, function(binding) {
-        if (binding.instance.role.reify().attr('name') === 'Auditor') {
-          return binding.instance.id;
-        }
-      });
-  if (auditors.length > 0)
-    return auditors[0];
-  else
-    return "null";
+  }
 });
 
 })(this, jQuery, can);
