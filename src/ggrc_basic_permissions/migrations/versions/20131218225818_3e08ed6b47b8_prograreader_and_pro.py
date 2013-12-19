@@ -110,6 +110,139 @@ def upgrade():
                         "ObjectFolder"
                     ]
                 })
+  update_role_permissions('ProgramAuditOwner', {
+                    "read": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "UserRole",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "create": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "UserRole",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting",
+                        "Response",
+                    ],
+                    "view_object_page": [
+                        "__GGRC_ALL__"
+                    ],
+                    "update": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "delete": [
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ]
+                })
+  update_role_permissions('ProgramAuditEditor', {
+                    "read": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "create": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting",
+                        "Response",
+                    ],
+                    "view_object_page": [
+                        "__GGRC_ALL__"
+                    ],
+                    "update": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "delete": [
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ]
+                })
 
 def downgrade():
   update_role_permissions('ProgramReader', {
@@ -175,5 +308,136 @@ def downgrade():
                         "ProgramDirective",
                         "Relationship",
                         "ObjectFolder"
+                    ]
+                })
+  update_role_permissions('ProgramAuditOwner', {
+                    "read": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "UserRole",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "create": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "UserRole",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "view_object_page": [
+                        "__GGRC_ALL__"
+                    ],
+                    "update": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "delete": [
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ]
+                })
+  update_role_permissions('ProgramAuditEditor', {
+                    "read": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "create": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "ObjectFolder",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "view_object_page": [
+                        "__GGRC_ALL__"
+                    ],
+                    "update": [
+                        "Request",
+                        "DocumentationResponse",
+                        "InterviewResponse",
+                        "PopulationSampleResponse",
+                        "Audit",
+                        "Meeting",
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
+                    ],
+                    "delete": [
+                        "ObjectControl",
+                        "ObjectDocument",
+                        "ObjectObjective",
+                        "ObjectPerson",
+                        "ObjectSection",
+                        "Relationship",
+                        "Document",
+                        "Meeting"
                     ]
                 })
