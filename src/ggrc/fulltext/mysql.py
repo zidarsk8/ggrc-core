@@ -172,6 +172,23 @@ class MysqlIndexer(SqlIndexer):
           ).distinct()
         type_union_queries.append(model_type_query)
 
+      # Objects for which the user is an assessor
+      if hasattr(model, 'principal_assessor_id') or hasattr(model, 'secondary_assessor_id'):
+        assessor_queries = []
+        if hasattr(model, 'principal_assessor_id'):
+          assessor_queries.append(or_(model.principal_assessor_id == contact_id))
+        if hasattr(model, 'secondary_assessor_id'):
+          assessor_queries.append(or_(model.secondary_assessor_id == contact_id))
+
+        model_type_query = db.session.query(
+            model.id.label('id'),
+            literal(model.__name__).label('type'),
+            literal(None).label('context_id')
+          ).filter(
+              or_(*assessor_queries)
+          ).distinct()
+        type_union_queries.append(model_type_query)
+
     # Construct and JOIN to the UNIONed result set
     type_union_query = alias(union(*type_union_queries))
     query = query.join(

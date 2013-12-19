@@ -1671,6 +1671,14 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         });
       }
 
+      // Check for assessor roles
+      if (instance.attr('principal_assessor') && instance.principal_assessor.id === person.id) {
+        state.attr('roles').push('Principal Assessor');
+      }
+      if (instance.attr('secondary_assessor') && instance.secondary_assessor.id === person.id) {
+        state.attr('roles').push('Secondary Assessor');
+      }
+
       // Check for people
       if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
         state.attr('roles').push('Mapped');
