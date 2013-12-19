@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 import bleach
+from flask import current_app
 from ggrc import settings, db
 from sqlalchemy import event
 from sqlalchemy.ext.declarative import declared_attr
@@ -266,7 +267,8 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   def display_name(self):
     try:
       return self._display_name()
-    except Exception:
+    except Exception as e:
+      current_app.logger.error(e)
       return ""
 
   def _display_name(self):

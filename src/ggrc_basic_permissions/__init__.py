@@ -232,7 +232,6 @@ def handle_program_post(sender, obj=None, src=None, service=None):
       )
   context.related_object = obj
   db.session.add(context)
-  db.session.flush()
   obj.context = context
 
   # add a user_roles mapping assigning the user creating the program
@@ -243,6 +242,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
       role=program_owner_role,
       context=context,
       )
+  #pass along a temporary attribute for logging the events.
+  user_role._display_related_title = obj.title
   db.session.add(user_role)
   db.session.flush()
 
