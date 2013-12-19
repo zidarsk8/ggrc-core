@@ -248,14 +248,6 @@
               Edit {{model.title_singular}}
             </a>
           </li>
-          <li>
-            <div class="widget-action pull-right" rel="tooltip" title="Manage Authorized Auditors">
-              <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'>
-                <i class="grcicon-user-black"></i>
-                Auditors
-              </a>
-            </div>
-          </li>
           <!--
           <li>
             <a href="#"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
