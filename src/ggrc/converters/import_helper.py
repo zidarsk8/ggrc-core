@@ -56,7 +56,7 @@ def utf_8_encoder(csv_data):
   """
   for line in csv_data:
     try:
-      yield line.encode('utf-8')
+      yield line.decode('utf-8').encode('utf-8')
     except UnicodeDecodeError:
       encoding_guess = chardet.detect(line)['encoding']
       yield line.decode(encoding_guess).encode('utf-8')
