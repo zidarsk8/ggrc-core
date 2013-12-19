@@ -100,6 +100,7 @@
               </div>
             </div>
             <div class="span6 info person-info">
+              {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
               <div>
                 <div class="pull-right">
                   <a class="info-edit" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
@@ -107,6 +108,8 @@
                   </a>
                 </div>
               </div>
+              {{/is_allowed}}
+              {{#is_allowed 'update' instance}}
               <div>
                 <div class="pull-right">
                   <a class="info-edit" data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form" href="javascript://" rel="tooltip" title="Edit Person">
@@ -114,6 +117,7 @@
                   </a>
                 </div>
               </div>
+              {{/is_allowed}}
             </div>
           </div>
         </div>
