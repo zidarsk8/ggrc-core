@@ -233,6 +233,7 @@ can.Control("CMS.Controllers.TreeView", {
     });
     refresh_queue.trigger().then(function() {
       can.Observe.stopBatch();
+      temp_list = can.map(temp_list, function(o) { if (o.instance.selfLink) return o; })
       that.options.list.replace(temp_list);
       that.add_child_lists(that.options.attr("list")); //since the view is handling adding new controllers now, configure before rendering.
       GGRC.queue_event(function() {
@@ -350,9 +351,11 @@ can.Control("CMS.Controllers.TreeView", {
   , " newChild" : function(el, ev, data) {
     //  FIXME: This should be done with indices so the elements exactly
     //    mirror the order of `this.options.list`.
-    var prepped = this.prepare_child_options(data)
-    this.options.list.push(prepped);
-    this.add_child_lists([prepped]);
+    var prepped = this.prepare_child_options(data);
+    if (prepped.instance.selfLink) {
+      this.options.list.push(prepped);
+      this.add_child_lists([prepped]);
+    }
     ev.stopPropagation();
   }
 
