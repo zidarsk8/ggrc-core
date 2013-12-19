@@ -124,6 +124,7 @@
         ;
       
       function finish(){
+        CMS.Models[self.options.scope].cache[self.options.scope_id].refresh();
         self.element.trigger("modal:success").modal_form("hide");
       }
       function destroyBinding(){
@@ -686,6 +687,7 @@
       e.preventDefault();
       e.stopPropagation();
       options.userRole_id = data_set.params.userRole_id;
+      options.scope_id = data_set.params.scope_id;
       GGRC.Controllers.AuditRoleSelector.launch($this, options)
         .on("modal:success", function(ev, data) {
           $this.trigger("modal:" + ev.type, data);
