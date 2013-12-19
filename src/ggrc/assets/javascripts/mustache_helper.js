@@ -1799,7 +1799,7 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
 
 Mustache.registerHelper("default_audit_title", function(program, options) {
   program = resolve_computed(program) || {title : "program"};
-  return new Date().getFullYear() + " " + program.title + " Audit";
+  return new Date().getFullYear() + ": " + program.title + " - Audit";
 });
 
 Mustache.registerHelper("param_current_location", function() {
@@ -1958,6 +1958,26 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
       }
     }).join(', ');
   }
+});
+
+// Determines whether the value matches one in the $.map'd list
+// {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+Mustache.registerHelper("if_in_map", function(list, path, value, options) {
+  list = resolve_computed(list);
+
+  if (!list.attr || list.attr('length')) {
+    path = path.split('.');
+    var map = $.map(list, function(obj) {
+      can.each(path, function(prop) {
+        obj = (obj && obj[prop]) || null;
+      })
+      return obj;
+    });
+
+    if (map.indexOf(value) > -1)
+      return options.fn(options.contexts);
+  }
+  return options.inverse(options.contexts);
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
