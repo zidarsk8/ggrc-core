@@ -23,6 +23,9 @@ def program_creator():
 def object_editor():
   return _find_basic('ObjectEditor')
 
+def program_basic_reader():
+  return _find_basic('ProgramBasicReader')
+
 
 # Private Program Roles
 

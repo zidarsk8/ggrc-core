@@ -20,7 +20,13 @@ import json
 roles_table = table('roles',
     column('id', sa.Integer),
     column('name', sa.String),
-    column('permissions_json', sa.String)
+    column('permissions_json', sa.String),
+    column('description', sa.Text),
+    column('modified_by_id', sa.Integer),
+    column('created_at', sa.DateTime),
+    column('updated_at', sa.DateTime),
+    column('context_id', sa.Integer),
+    column('scope', sa.String),
     )
 
 def get_role_permissions(role):

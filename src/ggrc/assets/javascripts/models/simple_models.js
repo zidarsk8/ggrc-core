@@ -38,6 +38,9 @@ can.Model.Cacheable("CMS.Models.Program", {
     , controls : "CMS.Models.Control.stubs"
     , audits : "CMS.Models.Audit.stubs"
   }
+  , tree_view_options : {
+      "show_view" : GGRC.mustache_path + "/programs/tree.mustache"
+    }
   , links_to : {
     "Regulation" : "ProgramDirective"
     , "Policy" : "ProgramDirective"
