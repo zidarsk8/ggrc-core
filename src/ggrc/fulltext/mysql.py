@@ -90,6 +90,7 @@ class MysqlIndexer(SqlIndexer):
       Objects owned via ObjectOwner
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
+      Objects for which the user is the "primary_assessor" or "secondary_assessor"
       Audits for which the user is assigned a Request or Response
 
     This method only *limits* the result set -- Contexts and Roles will still
