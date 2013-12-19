@@ -15,8 +15,8 @@
           <div class="profile-info">
             <ul>
               <li><h4>{{firstnonempty name email}}</h4></li>
-              <li><strong>Email:</strong> {{email}}</li>
-              <li><strong>Company:</strong> {{company}}</li>
+              <li><strong>Email:</strong> <a href="mailto:{{email}}" target="_blank">{{email}}</a></li>
+              {{#company}}<li><strong>Company:</strong> {{company}}</li>{{/company}}
             </ul>
             <!--
             {{#google_plus person}}
