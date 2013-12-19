@@ -9,7 +9,7 @@ from os.path import abspath, dirname, join
 from mock import patch
 
 from ggrc import db
-from ggrc.models.all_models import Control, Policy, System
+from ggrc.models.all_models import Control, Directive, Policy, System
 from ggrc.converters.import_helper import handle_csv_import
 from ggrc.converters.common import ImportException
 from ggrc.converters.controls import ControlsConverter
@@ -346,11 +346,15 @@ class TestImport(TestCase):
     )
     db.session.add(pol1)
     db.session.commit()
-    options = {'directive_id': pol1.id, 'dry_run': False}
-    with self.assertRaises(ImportException) as cm:
+    options = {
+        'parent_type': Directive,
+        'parent_id': pol1.id,
+        'dry_run': False,
+    }
+    try:
       handle_csv_import(ControlsConverter, csv_filename, **options)
-    self.assertEqual(
-        "Could not import: invalid character encountered, verify the file is correctly formatted.",
-        cm.exception.message,
-        "Did not throw exception for non-utf8 character"
-    )
+      self.assertTrue(True)
+    except ImportException, e:
+      self.assertTrue(False, e.message)
+
+  #TODO: test for format-violating CSV (e.g. unmatched "s)
