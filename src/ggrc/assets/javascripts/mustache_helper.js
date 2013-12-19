@@ -1981,22 +1981,30 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
-  var loader = resolve_computed(instance).get_binding('authorizations')
-    , auditors = $.map(loader.list, function(binding) {
-        if (binding.instance.role.reify().attr('name') === 'Auditor') {
-          return {
-            person: binding.instance.person.reify()
-            , binding: binding.instance
+  var id = can.view.hook(function(el){
+    var loader = resolve_computed(instance).get_binding('authorizations')
+      , html
+      , auditors = $.map(loader.list, function(binding) {
+          if (binding.instance.role.reify().attr('name') === 'Auditor') {
+            return {
+              person: binding.instance.person.reify()
+              , binding: binding.instance
+            }
           }
-        }
-      });
-  options.contexts.push({"auditors": auditors});
-  if(auditors.length > 0){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+        });
+    options.contexts.push({"auditors": auditors});
+  
+    if(auditors.length > 0){
+      html = options.fn(options.contexts);
+    }
+    else{
+      html = options.inverse(options.contexts);
+    }
+    $(el).html(html)
+  });
+  return "<span" 
+    + id
+    + " data-replace='true'/>";
 });
 
 })(this, jQuery, can);
