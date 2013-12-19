@@ -9,7 +9,7 @@
 
   /* Auditor Assignment Modal
   */
-  can.Control("GGRC.Controllers.AuditRoleSelector", {
+  GGRC.Controllers.Modals("GGRC.Controllers.AuditRoleSelector", {
 
     _templates: [
       "base_modal_view"
@@ -17,20 +17,10 @@
 
     defaults: {
       base_modal_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/audit_modal.mustache",
-      
       option_model: null,
       option_query: {},
-      active_query: {},
       join_model: null,
-      join_query: {},
-      join_object: null,
-
       modal_title: null,
-      option_list_title: null,
-      active_list_title: null,
-      new_object_title: null,
-
-      instance: null
     },
 
     launch: function($trigger, options){
@@ -43,6 +33,7 @@
         ;
 
       options.scope = scope;
+      options.$target = $target;
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
       
@@ -69,18 +60,12 @@
 
     init_role: function(){
       var self = this
-        , params = {}
         ;
-
-      // If this is a private model, set the scope
-      if (self.options.scope) {
-        params.scope = self.options.scope;
-      }
       return this.options.option_model.findAll(
-        $.extend(params, this.option_query),
-        function(roles) {
+        this.option_query, function(roles) {
           can.each(roles, function(role){
-            self.role = role;
+            if(role.name === "Auditor")
+              self.role = role;
           });
         });
     },
@@ -101,26 +86,25 @@
 
       // Start listening for events
       this.on();
-
       return deferred;
     },
     init_data: function(){
       if("userRole_id" in this.options){
-
         var self = this
-          , binding = CMS.Models["UserRole"].findInCacheById(this.options.userRole_id)
+          , join_model = this.options.join_model
+          , binding = join_model.findInCacheById(this.options.userRole_id)
           , instance = binding.person.reify()
           , email = instance.attr('email')
           ;
         // TODO: Figure out why input field clears the value
         setTimeout(function(){
-          $('input[name="auditor.email"]').val(email);
+          self.options.$target.find('input').val(email);
           self.options.binding = binding;
           self.options.instance = instance;
         }, 100);
       }
-      
     },
+    set_value : function(){},
     "input[data-lookup] focus" : function(el, ev) {
       this.autocomplete(el);
     },
@@ -174,78 +158,6 @@
       $.extend(join_params, this.options.extra_join_fields);
       return new (this.options.join_model)(join_params);
     },
-    // TODO: Move autocomplete:
-    autocomplete : function(el) {
-      var ctl = this;
-      // Add autocomplete to the owner field
-      var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-        var $that = $(this)
-          , name = $that.attr("name") || ""
-          , prop = name.substr(name.lastIndexOf(".") + 1);
-
-        // Return if this field temporarily isn't storing data
-        if (!name) return false;
-
-        return $that.autocomplete({
-          // Ensure that the input.change event still occurs
-          change : function(event, ui) {
-            if(!$(event.target).parents(document.body).length)
-              console.log("FOO!");
-            $(event.target).trigger("change");
-          }
-
-          // Search for the people based on the term
-          , source : function(request, response) {
-            var query = request.term || ''
-              , that = this;
-
-            if (query.indexOf('@') > -1)
-              query = '"' + query + '"';
-
-            ctl.bindXHRToButton(GGRC.Models.Search
-            .search_for_types(
-                request.term || '',
-                [$that.data("lookup")],
-                {
-                // FIXME: Remove or figure out when this is necessary.
-                //{
-                //  __permission_type: 'create'
-                //  , __permission_model: 'Object' + $that.data("lookup")
-                })
-            .then(function(search_result) {
-              var objects = search_result.getResultsForType($that.data("lookup"))
-                , queue = new RefreshQueue()
-                ;
-
-              // Retrieve full people data
-              can.each(objects, function(object) {
-                queue.enqueue(object);
-              });
-              queue.trigger().then(function(objs) {
-                if(objs.length) {
-                  response(objs);
-                } else {
-                  that._suggest( [] );
-                  that._trigger( "open" );
-                }
-              });
-            }), $that, null, false);
-          }
-          , select : ctl.proxy("autocomplete_select", $that)
-          , close : function() {
-            //$that.val($that.attr("value"));
-          }
-        }).data('ui-autocomplete');
-      });
-      acs.each(function(i, ac) {
-        ac._renderMenu = function(ul, items) {
-          var model = CMS.Models[ac.element.data("lookup")] || GGRC.Models[ac.element.data("lookup")]
-          can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', items, function(frag) {
-            $(ul).html(frag);
-          });
-        };
-      });
-    }, 
     autocomplete_select : function(el, event, ui) {
       var original_event;
       if(ui.item) {
@@ -775,7 +687,7 @@
       e.stopPropagation();
       options.userRole_id = data_set.params.userRole_id;
       GGRC.Controllers.AuditRoleSelector.launch($this, options)
-        .on("saved", function(ev, data) {
+        .on("modal:success", function(ev, data) {
           $this.trigger("modal:" + ev.type, data);
         });
     });

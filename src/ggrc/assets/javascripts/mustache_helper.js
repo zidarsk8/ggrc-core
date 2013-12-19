@@ -1981,7 +1981,6 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
-
   var loader = resolve_computed(instance).get_binding('authorizations')
     , auditors = $.map(loader.list, function(binding) {
         if (binding.instance.role.reify().attr('name') === 'Auditor') {
