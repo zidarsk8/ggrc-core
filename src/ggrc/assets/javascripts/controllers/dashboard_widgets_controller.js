@@ -165,6 +165,5 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 
   , " updateCount" : function(el, ev, count) {
     this.options.widget_count.attr('count', ''+count);
-    this.element.trigger("widgets_updated");
   }
 });

@@ -388,63 +388,6 @@ can.Control("CMS.Controllers.InnerNav", {
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
 
-  , replace_widget_list : function(widget_elements, target) {
-      var widget_list = []
-        , that = this
-        ;
-
-      can.each(widget_elements, function(widget_element) {
-        var $widget = $(widget_element)
-          , widget = that.widget_by_selector("#" + $widget.attr("id"))
-          , $header = $widget.find(".header h2")
-          , icon = $header.find("i").attr("class")
-          , menuItem = $header.text().trim()
-          , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
-          , title = match[1]
-          , count = match[2] || undefined
-          ;
-
-        // If the metadata is unrendered, find it via options
-        if (!title) {
-          var widget_options = $widget.control("dashboard_widgets").options
-            , widget_name = widget_options.widget_name;
-          icon = icon || widget_options.widget_icon;
-          // Strips html
-          title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (''+widget_name)).text();
-        }
-        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
-
-        // Only create the observable once, this gets updated elsewhere
-        if (!widget) {
-          widget = new can.Observe({
-              selector: "#" + $widget.attr("id")
-            , count: count
-            , has_count: count != null
-          });
-        }
-
-        widget.attr({
-          internav_icon: icon
-        , internav_display: title
-        , spinner : that.options.spinners["#" + $widget.attr("id")]
-        });
-
-        widget_list.push(widget);
-      });
-      this.options.widget_list.replace(widget_list);
-
-      if (widget_list.length) {
-        $(this.options.widget_list[0].selector).siblings().hide();
-        var active_widget = this.options.contexts.attr('active_widget');
-        if (window.location.hash && (!active_widget || active_widget.selector !== window.location.hash) && (active_widget = this.widget_by_selector(window.location.hash))) {
-          this.set_active_widget(active_widget);
-        }
-        else {
-          this.show_active_widget(!this.options.contexts.attr('active_widget') ? this.options.widget_list[0].selector : undefined);
-        }
-      }
-    }
-
   , set_active_widget : function(widget) {
     if (typeof widget === 'string') {
       this.options.contexts.attr("active_widget", this.widget_by_selector(widget));
@@ -508,7 +451,60 @@ can.Control("CMS.Controllers.InnerNav", {
   }
 
   , update_widget_list : function(widget_elements) {
-      this.replace_widget_list(widget_elements, window.location.hash);
+      var widget_list = []
+        , that = this
+        ;
+
+      can.each(widget_elements, function(widget_element) {
+        var $widget = $(widget_element)
+          , widget = that.widget_by_selector("#" + $widget.attr("id"))
+          , $header = $widget.find(".header h2")
+          , icon = $header.find("i").attr("class")
+          , menuItem = $header.text().trim()
+          , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
+          , title = match[1]
+          , count = match[2] || undefined
+          ;
+
+        // If the metadata is unrendered, find it via options
+        if (!title) {
+          var widget_options = $widget.control("dashboard_widgets").options
+            , widget_name = widget_options.widget_name;
+          icon = icon || widget_options.widget_icon;
+          // Strips html
+          title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (''+widget_name)).text();
+        }
+        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
+
+        // Only create the observable once, this gets updated elsewhere
+        if (!widget) {
+          widget = new can.Observe({
+              selector: "#" + $widget.attr("id")
+            , count: count
+            , has_count: count != null
+          });
+        }
+
+        widget.attr({
+          internav_icon: icon
+        , internav_display: title
+        , spinner : that.options.spinners["#" + $widget.attr("id")]
+        });
+
+        widget_list.push(widget);
+      });
+      this.options.widget_list.replace(widget_list);
+
+      if (widget_list.length) {
+        $(this.options.widget_list[0].selector).siblings().hide();
+        var active_widget = this.options.contexts.attr('active_widget');
+        if (window.location.hash && (!active_widget || active_widget.selector !== window.location.hash) && (active_widget = this.widget_by_selector(window.location.hash))) {
+          this.set_active_widget(active_widget);
+        }
+        else {
+          this.show_active_widget(!this.options.contexts.attr('active_widget') ? this.options.widget_list[0].selector : undefined);
+        }
+      }
     }
 
   , update_widget_count : function($el, count) {
