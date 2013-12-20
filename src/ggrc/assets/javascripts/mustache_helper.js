@@ -1840,7 +1840,8 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
   to apply as well as whether it should be a truthy or falsy evaluation may also 
   be included with the statement in addition to the helper name.
 
-  Currently, if_helpers only supports all logic being 'and' or all logic being 'or'.
+  Currently, if_helpers only supports Disjunctive Normal Form. All "and" statements are grouped, 
+  groups are split by "or" statements.
 
   All hash arguments (some_val=37) must go in the last line and should be prefixed by the 
   zero-based index of the corresponding helper. This is necessary because all hash arguments 
@@ -1880,11 +1881,18 @@ Mustache.registerHelper("if_helpers", function() {
   var statements = []
     , statement
     , match
+    , disjunctions = []
     ;
   can.each(args, function(arg, i) {
     if (i < args.length - 1) {
       if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
-        statement && statements.push(statement);
+        if(statement) {
+          if(statement.logic === "or") {
+            disjunctions.push(statements);
+            statements = []
+          }
+          statements.push(statement);
+        }
         if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
@@ -1918,26 +1926,34 @@ Mustache.registerHelper("if_helpers", function() {
       }
     }
   });
-  statement && statements.push(statement);
+  if(statement) {
+    if(statement.logic === "or") {
+      disjunctions.push(statements);
+      statements = []
+    }
+    statements.push(statement);
+  }
+  disjunctions.push(statements);
 
-  if (statements.length) {
+  if (disjunctions.length) {
     // Evaluate statements
-    var result;
-    can.each(statements, function(statement) {
-      helper_result = null;
-      statement.helper.fn.apply(statement.helper, statement.args.concat([
-        can.extend({}, helper_options, { hash: statement.hash || helper_options.hash })
-      ]));
-      helper_result = helper_result === statement.fn_name;
-      if (result === undefined)
-        result = helper_result;
-      else if (statement.logic === 'and')
-        result = result && helper_result;
-      else if (statement.logic === 'or')
-        result = result || helper_result;
-      else
-        result = false;
-    });
+    var result = can.reduce(disjunctions, function(disjunctive_result, conjunctions) {
+      if(disjunctive_result)
+        return true;
+
+      var conjunctive_result = can.reduce(conjunctions, function(current_result, stmt) {
+        if(!current_result)
+          return false; //short circuit
+
+        helper_result = null;
+        stmt.helper.fn.apply(stmt.helper, stmt.args.concat([
+          can.extend({}, helper_options, { hash: stmt.hash || helper_options.hash })
+        ]));
+        helper_result = helper_result === stmt.fn_name;
+        return current_result && helper_result;
+      }, true);
+      return disjunctive_result || conjunctive_result;
+    }, false);
 
     // Execute based on the result
     if (result) {

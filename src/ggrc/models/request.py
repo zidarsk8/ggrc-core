@@ -26,7 +26,7 @@ class Request(Described, Base, db.Model):
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'),
-    nullable=False)
+    nullable=True)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True),
     'Request')
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
