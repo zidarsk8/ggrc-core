@@ -69,13 +69,15 @@
       {{/visibility_delay}}
     </div>
   </div>
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="code">
-        Code: {{slug}}
+  {{^if_equals instance.constructor.table_singular 'person'}}
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="code">
+          Code: {{slug}}
+        </div>
       </div>
     </div>
-  </div>
+  {{/if_equals}}
   <div class="links">
     <div class="row-fluid">
       <div class="span6">
