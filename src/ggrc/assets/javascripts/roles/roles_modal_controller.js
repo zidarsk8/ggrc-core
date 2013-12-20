@@ -191,7 +191,10 @@
           $trigger.trigger("routeparam", $trigger.data("route"));
           $trigger.trigger('modal:success', data);
         }
-      });
+      }).on('modal:success', function(){
+          var model_name = $trigger.attr("data-object-plural").toLowerCase();
+          window.location.reload();
+        });
     });
   });
 
