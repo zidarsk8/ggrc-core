@@ -18,7 +18,7 @@
                   {{instance.title}}
                 {{/instance.title}}
                 {{^instance.title}}
-                  {{{firstnonempty instance.description_inline ''}}}
+                  {{{firstnonempty instance.name instance.email instance.description_inline ''}}}
                 {{/instance.title}}
                 {{#infer_roles instance}}
                   <span class="role">
