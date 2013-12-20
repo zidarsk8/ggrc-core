@@ -373,7 +373,15 @@ can.Control("CMS.Controllers.InnerNav", {
       return this.element.sortable({
           placeholder: 'drop-placeholder'
         , items : "li"
+        , disabled : true
       })
+    }
+  , sortable_disable: function(){
+      this.element.sortable("cancel");
+      this.element.sortable("disable");
+    }
+  , sortable_enable: function(){
+      this.element.sortable("enable");
     }
 
   , " sortupdate": "apply_widget_list_sort"
@@ -393,7 +401,7 @@ can.Control("CMS.Controllers.InnerNav", {
       var widget_list = []
         , that = this
         ;
-
+      this.sortable_disable();
       can.each(widget_elements, function(widget_element) {
         var $widget = $(widget_element)
           , $header = $widget.find(".header h2")
@@ -424,6 +432,7 @@ can.Control("CMS.Controllers.InnerNav", {
           return (target || that.options.contexts.active_widget.selector) === widget.selector ? widget : undefined;
         })[0];
       this.options.contexts.attr("active_widget", active_widget ? active_widget : this.options.widget_list[0]);
+      this.sortable_enable();
     }
 
   , "{contexts} active_widget" : function(contexts, ev) {
@@ -455,6 +464,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , "{document.body} loaded" : function(body, ev) {
     var that = this;
+    this.sortable_disable();
     can.each(this.options.widget_list, function(widget) {
       var spinner;
       if($(widget.selector).has(ev.target).length) {
