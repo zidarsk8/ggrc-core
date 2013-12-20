@@ -222,7 +222,7 @@ class Stateful(object):
     if value is None:
       value = self.default_status()
     if value not in self.valid_statuses():
-      message = "Invalid state '{}'".format(value)
+      message = "Invalid state '{0}'".format(value)
       raise ValueError(message)
     return value
 
@@ -343,7 +343,7 @@ class WithContact(object):
     return db.relationship(
         'Person',
         uselist=False,
-        foreign_keys='{}.contact_id'.format(cls.__name__))
+        foreign_keys='{0}.contact_id'.format(cls.__name__))
 
   _publish_attrs = ['contact']
 
