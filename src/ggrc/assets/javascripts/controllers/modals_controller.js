@@ -501,14 +501,26 @@ can.Control("GGRC.Controllers.Modals", {
   , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
+      var self = this;
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
-        this.options.instance.refresh();
+        this.options.instance.refresh().then(function(){self.open_created.apply(self)});
+        
       }
     }
+  
+  , open_created : function(){
+    var instance = this.options.instance;
+    if(!(instance instanceof CMS.Models.Response)) return;
+    // Open newly created responses
+      var object_type = instance.selfLink.replace('/api/', '');
+      object_type = object_type.substring(0, object_type.indexOf('/')-1);
+      $('[data-object-id="'+instance.id+'"][data-object-type="'+object_type+'"]')
+        .find('.openclose').openclose('open');
+  }
 
   , destroy : function() {
     if(this.options.model && this.options.model.cache) {
