@@ -449,12 +449,22 @@ can.Control("GGRC.Controllers.Modals", {
 
         // If this was an Objective created directly from a Section, create a join
         var params = that.options.object_params;
-        if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.SectionObjective({
-            objective: obj
-            , section: CMS.Models.Section.findInCacheById(params.section.id)
-            , context: { id: null }
-          }).save().done(finish);
+        if (obj instanceof CMS.Models.Objective) {
+          if (params && params.section) {
+            new CMS.Models.SectionObjective({
+              objective: obj
+              , section: CMS.Models.Section.findInCacheById(params.section.id)
+              , context: { id: null }
+            }).save().done(finish);
+          } else if (params && params.objectiveable) {
+            new CMS.Models.ObjectObjective({
+              objective: obj
+              , objectiveable: CMS.Models[params.objectiveable.type].findInCacheById(params.objectiveable.id)
+              , context: { id: null }
+            }).save().done(finish);
+          } else {
+            finish();
+          }
         }
         else {
           finish();
