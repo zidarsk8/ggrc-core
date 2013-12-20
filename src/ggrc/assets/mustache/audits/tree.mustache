@@ -202,11 +202,7 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        {{#if_helpers '\
-          ^if' allow_mapping_or_creating '\
-          or ^is_allowed' 'update' instance '\
-          or #if' responses.length '\
-        ' _1_context=instance.context.id}}
+        {{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}
           {{#using program=instance.program}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
@@ -215,7 +211,7 @@
               </a>
             </li>
           {{/using}}
-        {{/if_helpers}}
+        {{/is_allowed}}
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
