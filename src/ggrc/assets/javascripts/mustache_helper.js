@@ -1984,4 +1984,23 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("with_auditors", function(instance, options) {
+  var loader = resolve_computed(instance).get_binding('authorizations')
+    , auditors = $.map(loader.list, function(binding) {
+        if (binding.instance.role.reify().attr('name') === 'Auditor') {
+          return {
+            person: binding.instance.person.reify()
+            , binding: binding.instance
+          }
+        }
+      });
+  options.contexts.push({"auditors": auditors});
+  if(auditors.length > 0){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+});
+
 })(this, jQuery, can);
