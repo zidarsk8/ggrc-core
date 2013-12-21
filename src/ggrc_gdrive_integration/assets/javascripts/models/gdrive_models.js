@@ -7,6 +7,8 @@
 
 (function(can) {
 
+var scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/apps.groups.settings'];
+
 /**
   create a search query that matches the expected format for GDrive API.
   It's a series of boolean constructors with operators for testing equality
@@ -87,12 +89,13 @@ var gdrive_findAll = function(extra_params, extra_path) {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   };
 };
 
 var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request_with_auth(params) {
-  return window.oauth_dfd.then(function() {
+  return window.gapi_authorize(params.scopes).then(function() {
     var dfd = new $.Deferred();
     var cb = params.callback;
     var check_auth = function(result) {
@@ -101,7 +104,7 @@ var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request
       if(result.error && result.error.code === 401) {
         doGAuth(); //changes oauth_dfd to a new deferred
         params.callback = cb;
-        window.oauth_dfd.then(can.proxy(gapi_request_with_auth, window, params))
+        window.gapi_authorize(params.scopes).then(can.proxy(gapi_request_with_auth, window, params))
         .then(
           function() {
             dfd.resolve.apply(dfd, arguments);
@@ -150,6 +153,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
           dfd.resolve();
         }
       }
+      , scopes : scopes
     }).done(function() {
       object.refresh();
     });
@@ -171,6 +175,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   }
 
@@ -188,6 +193,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
           dfd.resolve();
         }
       }
+      , scopes : scopes
     }).done(function() {
       object.refresh();
     });
@@ -203,6 +209,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   }
 
@@ -270,6 +277,7 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   }
   , findChildFolders : function(params) {
@@ -370,6 +378,7 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   }
 
@@ -385,6 +394,7 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
           dfd.resolve(result.id);
         }
       }
+      , scopes : scopes
     });
   }
 }, {});
@@ -409,6 +419,7 @@ CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
           dfd.resolve(result);
         }
       }
+      , scopes : scopes
     });
   }
 }, {});

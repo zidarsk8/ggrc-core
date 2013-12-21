@@ -16,13 +16,7 @@
               <div class='item-data'>
                 <div class='tree-title-area'>
                   {{#person}}
-                  {{#if email}}
-                  <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">
-                    {{firstnonempty name email}}
-                  </a>
-                  {{else}}
-                    {{firstnonempty name email}}
-                  {{/if}}
+                    {{{render '/static/mustache/people/popover.mustache' person=this}}}
                   {{/person}}
                 </div>
               </div>

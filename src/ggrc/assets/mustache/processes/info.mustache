@@ -25,43 +25,7 @@
       </div>
     </div>
     <div class="span6">
-      {{#if owners.length}}
-        {{#using contacts=owners}}
-        {{#contacts}}
-          <p>
-            <strong>Owner</strong>
-            <br>
-            <span>{{firstnonempty name email}}</span>
-          </p>
-        {{/contacts}}
-        {{/using}}
-      {{else}}
-        <p>
-          <strong>Owner</strong>
-          <br>
-          <span class="error">
-            Not Assigned
-          </span>
-        </p>
-      {{/if}}
-      
-      {{#using contact=contact}}
-      {{#if contact}}
-        <p>
-          <strong>Contact</strong>
-          <br>
-          <span>{{firstnonempty contact.name contact.email}}</span>
-        </p>
-      {{else}}
-        <p>
-          <strong>Contact</strong>
-          <br>
-          <span class="error">
-            Not Assigned
-          </span>
-        </p>
-      {{/if}}
-      {{/using}}
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance stacked=true}}}
     </div>
   </div>
   <div class="row-fluid">
@@ -162,9 +126,9 @@
     <p>
       <small>
         <em>
-          Created on {{date created_at}}
+          Created {{#if owners.length}}by {{#using contacts=owners}}{{#contacts}}{{{render '/static/mustache/people/popover.mustache' person=this}}}{{/contacts}}{{/using}}{{/if}} at {{date created_at}}
           <br>
-          Modified by {{#using person=modified_by}}{{firstnonempty person.name person.email}}{{/using}} on {{date updated_at}}
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
         </em>
       </small>
     </p>

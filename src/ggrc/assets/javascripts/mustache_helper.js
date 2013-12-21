@@ -558,6 +558,8 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
     context = this;
+  } else {
+    options.contexts.push(context);
   }
 
   if(typeof context === "function") {
@@ -567,8 +569,9 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(typeof template === "function") {
     template = template();
   }
+  options.hash && options.contexts.push(options.hash);
 
-  return can.view.render(template, context);
+  return can.view.render(template, options.contexts);
 });
 
 Mustache.registerHelper("render_hooks", function(hook, options) {
@@ -1959,6 +1962,7 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
     }).join(', ');
   }
 });
+
 
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}

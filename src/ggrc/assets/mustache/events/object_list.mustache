@@ -72,7 +72,7 @@
                     <span class="event-owner">
                       by
                       {{#modified_by}}
-                        {{email}}
+                        {{{render '/static/mustache/people/popover.mustache' person=modified_by}}}
                       {{/modified_by}}
                     </span>
                   </li>

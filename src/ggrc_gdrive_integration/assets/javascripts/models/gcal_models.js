@@ -6,7 +6,8 @@
  */
 
 (function(can, $) {
-  var gcal_findAll, gcalevent_findAll;
+  var gcal_findAll, gcalevent_findAll
+  , scopes = ['https://www.googleapis.com/auth/calendar'];
 
   can.Model.Cacheable("CMS.Models.GCal", {
 
@@ -33,8 +34,9 @@
 
     , getPrimary : function() {
       return GGRC.gapi_request_with_auth({
-        path : "/calendar/v3/calendars/primary",
-        callback : function(dfd, d) { dfd.resolve(d); }
+        path : "/calendar/v3/calendars/primary"
+        , callback : function(dfd, d) { dfd.resolve(d); }
+        , scopes : scopes
       });
     }
 

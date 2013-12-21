@@ -6,6 +6,19 @@
  */
 
 (function($, CMS, GGRC) {
+  var scopes = ['https://www.googleapis.com/auth/userinfo.email'];
+
+  window.gapi_authorize = function(newscopes) {
+    newscopes = newscopes || [];
+    newscopes = can.map(newscopes, function(ns) {
+      if(!~can.inArray(ns, scopes)) {
+        scopes.push(ns);
+        return ns;
+      }
+    });
+    //reauthorize if we're going to change scope
+    return newscopes.length ? window.oauth_dfd.then(can.proxy(window.doGAuth, window, false)) : window.oauth_dfd;
+  };
 
   $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=doGAuth'></script>");
 
@@ -28,7 +41,7 @@
     });
     window.gapi.auth.authorize({
       'client_id': GGRC.config.GAPI_CLIENT_ID
-      , 'scope': ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/apps.groups.settings']
+      , 'scope': scopes
       , 'immediate': !use_popup
       , 'login_hint' : GGRC.current_user.email
     }, function(authresult) {
@@ -151,5 +164,8 @@
   can.getObject("GGRC.Mappings.Meeting", window, true).events = new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent");
   GGRC.register_hook("Meeting.tree_view_info", GGRC.mustache_path + "/meetings/gcal_info.mustache");
 
+  // Enable these hooks when the deployment allows G+ APIs
+  // GGRC.register_hook("Person.popover_actions", GGRC.mustache_path + "/people/gplus_actions.mustache");
+  // GGRC.register_hook("Person.popover_info", GGRC.mustache_path + "/people/gplus_photo.mustache");
 
 })(this.can.$, this.CMS, this.GGRC);

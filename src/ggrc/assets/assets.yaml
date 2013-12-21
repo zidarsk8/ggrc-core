@@ -167,6 +167,7 @@ dashboard-js-template-files:
   - people/option_column.mustache
   - people/option_detail.mustache
   - people/page_header.mustache
+  - people/popover.mustache
   - people/tree.mustache
   - policies/info.mustache
   - policies/modal_content.mustache
