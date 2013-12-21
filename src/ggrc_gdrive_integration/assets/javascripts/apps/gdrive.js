@@ -164,7 +164,8 @@
   can.getObject("GGRC.Mappings.Meeting", window, true).events = new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent");
   GGRC.register_hook("Meeting.tree_view_info", GGRC.mustache_path + "/meetings/gcal_info.mustache");
 
-  GGRC.register_hook("Person.popover_actions", GGRC.mustache_path + "/people/gplus_actions.mustache");
-  GGRC.register_hook("Person.popover_info", GGRC.mustache_path + "/people/gplus_photo.mustache");
+  // Enable these hooks when the deployment allows G+ APIs
+  // GGRC.register_hook("Person.popover_actions", GGRC.mustache_path + "/people/gplus_actions.mustache");
+  // GGRC.register_hook("Person.popover_info", GGRC.mustache_path + "/people/gplus_photo.mustache");
 
 })(this.can.$, this.CMS, this.GGRC);
