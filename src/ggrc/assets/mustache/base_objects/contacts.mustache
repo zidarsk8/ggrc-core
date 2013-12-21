@@ -20,25 +20,25 @@
       {{/with_mapping}}
     </p>
   {{else}}
+    <p>
+      <strong>Owner:</strong>
+      <br>
     {{#if owners.length}}
       {{#using contacts=owners}}
       {{#contacts}}
         <p>
-          <strong>Owner</strong>
-          <br>
           {{{render '/static/mustache/people/popover.mustache' person=this}}}
         </p>
       {{/contacts}}
       {{/using}}
     {{else}}
       <p>
-        <strong>Owner</strong>
-        <br>
         <span class="error">
           Not Assigned
         </span>
       </p>
     {{/if}}
+    </p>
   {{/if}}
   </div>
   {{#using person=contact}}
