@@ -18,56 +18,15 @@
               <li><strong>Email:</strong> <a href="mailto:{{email}}" target="_blank">{{email}}</a></li>
               {{#company}}<li><strong>Company:</strong> {{company}}</li>{{/company}}
             </ul>
-            <!--
-            {{#google_plus person}}
-              <div class="profile-contact">
-                <ul>
-                  <li>
-                    <a rel="tooltip" data-original-title="Start a video call" href="#"><i class="grcicon-gvideo"></i></a>
-                  </li>
-                  <li>
-                    <a rel="tooltip" data-original-title="Chat with this contact" href="#"><i class="grcicon-gchat"></i></a>
-                  </li>
-                  <li>
-                    <a rel="tooltip" data-original-title="Email this contact" href="#"><i class="grcicon-gmail"></i></a>
-                  </li>
-                  <li>
-                    <a rel="tooltip" data-original-title="Phone call" href="#"><i class="grcicon-gphone"></i></a>
-                  </li>
-                  <li class="circle-holder">
-                    <a class="btn btn-mini square-trigger" href="#">Add to Circles <i class="grcicon-carot"></i></a>
-                    <div class="square-popover">
-                      <ul>
-                        {{#circles}}
-                        <li>
-                          <label>
-                            <input type="checkbox">
-                            {{displayName}} <span>{{people.totalItems}}</span>
-                          </label>
-                        </li>
-                        {{/circles}}
-                        <li class="create">
-                          <a href="#">Create new circle</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            {{/google_plus}}
-            -->
+            
+            {{{render_hooks 'Person.popover_actions' person=person}}}
+
             <a class="info-action" href="/people/{{id}}">View profile <i class="grcicon-goto"></i></a>
           </div>
         </div>
-        <div class="span4">
-          <!--
-          {{#google_plus person}}
-            <div class="profile-photo">
-              <img {{#image.url}}src="{{.}}"{{/image.url}} alt="{{displayName}}">
-            </div>
-          {{/google_plus}}
-          -->
-        </div>
+        
+        {{{render_hooks 'Person.popover_info' person=person}}}
+
       </div>
     </div>
   </div>
