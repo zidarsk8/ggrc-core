@@ -14,12 +14,7 @@
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{#instance.title}}
-                  {{instance.title}}
-                {{/instance.title}}
-                {{^instance.title}}
-                  {{{firstnonempty instance.name instance.email instance.description_inline ''}}}
-                {{/instance.title}}
+                {{firstnonempty instance.title instance.name instance.email ''}}
                 {{#infer_roles instance}}
                   <span class="role">
                     {{.}}
