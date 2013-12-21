@@ -1,0 +1,51 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
+    <div class="modal-header">
+      <div class="pull-right">
+        <a class="btn btn-mini" href="#" data-dismiss="modal">
+          <i class="grcicon-x-grey"></i>
+        </a>
+      </div>
+      <h2>
+        {{ modal_title }}
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="javascript://">
+        <div class="row-fluid">
+        <div class="span8">
+          <label>
+            Choose Auditor
+            <span class="required">*</span>
+          </label>
+          <input tabindex="3" class="input-block-level" name="auditor.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist auditor.email ''}}" />
+          <p><small><em><strong>NOTE:</strong> Auditor will be able to: add, edit and update PBC Requests and PBC Responses; to view Evidence and to view Audit Info.</em></small></p>
+        </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal-reset" href="#">Cancel</a>
+
+          </div>
+        </div>
+        <div class="span3">
+          &nbsp;
+        </div>
+        <div class="span6">
+          <div class="confirm-buttons">
+            <a tabindex="24" class="btn btn-primary preventdoubleclick" data-toggle="modal-submit" href="javascript://">Save</a>
+          </div>
+        </div>
+      </div>
+    </div>
+{{!</div>}}

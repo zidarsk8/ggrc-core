@@ -14,7 +14,12 @@
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
-                {{firstnonempty instance.title instance.name instance.email ''}}
+                {{#instance.title}}
+                  {{instance.title}}
+                {{/instance.title}}
+                {{^instance.title}}
+                  {{{firstnonempty instance.description_inline ''}}}
+                {{/instance.title}}
                 {{#infer_roles instance}}
                   <span class="role">
                     {{.}}
@@ -92,7 +97,7 @@
         {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
         {{^if_equals instance.constructor.table_singular 'person'}}
-          {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+          {{{render '/static/mustache/base_objects/contacts.mustache' is_program=true instance=instance}}}
         {{/if_equals}}
 
         {{#instance.url}}

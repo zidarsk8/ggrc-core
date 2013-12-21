@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: andy@reciprocitylabs.com
+    Maintained By: andy@reciprocitylabs.com
+}}
+
+{{#person}}
+<span class="person-holder">
+  <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">{{firstnonempty name email}}</span></a>
+  <div class="custom-popover-content">
+    <div class="preview-container person-preview">
+      <div class="row-fluid">
+        <div class="span8">
+          <div class="profile-info">
+            <ul>
+              <li><h4>{{firstnonempty name email}}</h4></li>
+              <li><strong>Email:</strong> <a href="mailto:{{email}}" target="_blank">{{email}}</a></li>
+              {{#company}}<li><strong>Company:</strong> {{company}}</li>{{/company}}
+            </ul>
+            
+            {{{render_hooks 'Person.popover_actions' person=person}}}
+
+            <a class="info-action" href="/people/{{id}}">View profile <i class="grcicon-goto"></i></a>
+          </div>
+        </div>
+        
+        {{{render_hooks 'Person.popover_info' person=person}}}
+
+      </div>
+    </div>
+  </div>
+</span>
+{{/person}}

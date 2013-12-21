@@ -981,6 +981,7 @@
 }
 .preview-container {
   &.person-preview {
+    overflow: visible;
     height: auto;
   }
 }

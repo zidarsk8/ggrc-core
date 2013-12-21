@@ -201,7 +201,7 @@
         setTimeout(can.proxy(window.location.reload, window.location), 10);
     },
 
-    ".option_column li click": function(el, ev) {
+    ".option_column li.tree-item click": function(el, ev) {
       var option = el.data('option')
         ;
 
@@ -212,7 +212,7 @@
       this.context.attr('selected_option', option);
     },
 
-    ".option_column li input[type='checkbox'] change": function(el, ev) {
+    ".option_column li.tree-item input[type='checkbox'] change": function(el, ev) {
       var self = this
         , option = el.closest('li').data('option')
         , join = this.find_join(option.id)
@@ -887,9 +887,9 @@
         can.view(this.options.option_items_view, context, function(frag) {
           if (self.element) {
             if (prepend)
-              self.element.find('.option_column ul').prepend(frag);
+              self.element.find('.option_column ul.new-tree').prepend(frag);
             else
-              self.element.find('.option_column ul').append(frag);
+              self.element.find('.option_column ul.new-tree').append(frag);
           }
           dfd.resolve();
         });
@@ -902,7 +902,7 @@
           , current_option_model = this.options.option_model
           , current_option_model_name = current_option_model.shortName
           , current_search_term = this.options.option_search_term
-          , $option_list = this.element.find('.option_column ul')
+          , $option_list = this.element.find('.option_column ul.new-tree')
           ;
 
         function refresh_up_to(objects, request_limit, render_limit) {
@@ -932,7 +932,7 @@
         }
 
         self.option_list.replace([]);
-        self.element.find('.option_column ul').empty();
+        self.element.find('.option_column ul.new-tree').empty();
 
         var join_model = GGRC.JoinDescriptor.join_model_name_for(
               this.options.object_model, current_option_model_name);
@@ -1000,10 +1000,10 @@
 
     , "{selected_object_type} change": "refresh_option_list"
 
-    , ".option_column li click": "on_select_option"
+    , ".option_column li.tree-item click": "on_select_option"
 
     , on_select_option: function(el) {
-        el.closest('.option_column').find('li').removeClass('selected');
+        el.closest('.option_column').find('li.tree-item').removeClass('selected');
         el.addClass('selected');
         this.context.attr('selected_option', el.data('option'));
       }
@@ -1063,7 +1063,7 @@
     , ".btn-add modal:success" : function(el, ev, data) {
         var self = this;
         // Scroll so the top element (the one just added) is in view
-        this.element.find(".option_column ul").parent().scrollTop(0);
+        this.element.find(".option_column ul.new-tree").parent().scrollTop(0);
         this.search_reset().then(function() {
           // Move the just-created object to the top
           self.move_option_to_top_and_select(data);
@@ -1073,7 +1073,7 @@
     , move_option_to_top_and_select: function(option) {
         var self = this
           , index = this.option_list.indexOf(option)
-          , option_column = this.element.find('.option_column ul').first()
+          , option_column = this.element.find('.option_column ul.new-tree').first()
           , option_row = option_column.find('li[data-id=' + option.id + ']')
           ;
         if (index > -1) {
@@ -1088,7 +1088,7 @@
         // Explicitly insert the option -- with paging, the object may not yet
         //   be in the list.
         this.insert_options([option], true).then(function() {
-          var option_column = self.element.find('.option_column ul').first()
+          var option_column = self.element.find('.option_column ul.new-tree').first()
             , option_row = option_column.find('li[data-id=' + option.id + ']')
             ;
           option_row.addClass('selected');

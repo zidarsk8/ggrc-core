@@ -19,7 +19,7 @@
   </p>}}
   <h4 class="oneline">
     <i class="grcicon-{{constructor.table_singular}}-color"></i>
-    {{ firstnonempty name email }}
+    {{{render '/static/mustache/people/popover.mustache' person=this}}}
     {{!<small>
       Google, inc
     </small>

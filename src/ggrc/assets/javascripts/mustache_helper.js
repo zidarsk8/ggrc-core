@@ -558,6 +558,8 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
     context = this;
+  } else {
+    options.contexts.push(context);
   }
 
   if(typeof context === "function") {
@@ -567,8 +569,9 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(typeof template === "function") {
     template = template();
   }
+  options.hash && options.contexts.push(options.hash);
 
-  return can.view.render(template, context);
+  return can.view.render(template, options.contexts);
 });
 
 Mustache.registerHelper("render_hooks", function(hook, options) {
@@ -1960,6 +1963,7 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
+
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
 Mustache.registerHelper("if_in_map", function(list, path, value, options) {
@@ -1978,6 +1982,25 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
       return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("with_auditors", function(instance, options) {
+  var loader = resolve_computed(instance).get_binding('authorizations')
+    , auditors = $.map(loader.list, function(binding) {
+        if (binding.instance.role.reify().attr('name') === 'Auditor') {
+          return {
+            person: binding.instance.person.reify()
+            , binding: binding.instance
+          }
+        }
+      });
+  options.contexts.push({"auditors": auditors});
+  if(auditors.length > 0){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
 });
 
 })(this, jQuery, can);
