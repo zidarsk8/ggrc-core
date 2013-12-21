@@ -252,6 +252,18 @@ def handle_program_post(sender, obj=None, src=None, service=None):
     add_public_program_role_implication(basic_roles.reader(), context)
     add_public_program_role_implication(basic_roles.object_editor(), context)
     add_public_program_role_implication(basic_roles.program_creator(), context)
+  #add_role_reader_implications(basic_roles.program_reader(), context)
+  #add_role_reader_implications(basic_roles.program_editor(), context)
+  #add_role_reader_implications(basic_roles.program_owner(), context)
+
+def add_role_reader_implications(source_role, context):
+  db.session.add(RoleImplication(
+    source_context=context,
+    source_role=source_role,
+    role=basic_roles.program_basic_reader(),
+    context=None,
+    modified_by=get_current_user(),
+    ))
 
 def add_public_program_role_implication(
     source_role, context, check_exists=False):

@@ -179,6 +179,7 @@ dashboard-js-template-files:
   - programs/info.mustache
   - programs/modal_content.mustache
   - programs/page_header.mustache
+  - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - risks/modal_content.mustache
