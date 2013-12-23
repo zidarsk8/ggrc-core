@@ -372,6 +372,7 @@ can.Control("CMS.Controllers.InnerNav", {
       return this.element.sortable({
           placeholder: 'drop-placeholder'
         , items : "li"
+        , disabled: true
       })
     }
 
@@ -448,6 +449,7 @@ can.Control("CMS.Controllers.InnerNav", {
         delete that.options.spinners[widget.selector];
       }
     });
+    this.element.sortable("enable");
   }
 
   , update_widget_list : function(widget_elements) {
