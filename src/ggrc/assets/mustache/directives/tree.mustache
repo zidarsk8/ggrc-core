@@ -31,7 +31,13 @@
           <div class="span1">
             <div class="counter">
               <i class="grcicon-section-black"></i>
-              {{instance.sections.length}}
+                {{#if expanded}}
+                {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+                  {{child_count}}        
+                {{/if_null}}
+                {{else}}
+                  {{instance.sections.length}}
+                {{/if expanded}}
             </div>
           </div>
         </div>
