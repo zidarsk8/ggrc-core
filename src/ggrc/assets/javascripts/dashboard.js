@@ -570,6 +570,19 @@ jQuery(function($) {
 });
 
 jQuery(function($) {
+  
+  $('body').on('click', '.pbc-filters button[type="reset"]', function(e){
+    var $this = $(this)
+    , filter_reset_target = '[data-object-type="request"]'
+    ;
+
+    $(filter_reset_target).each(function(i, elem) {
+      var $elem = $(elem)
+        ;
+      $elem.show();
+    });
+  });
+  
   $('body').on('click', 'button[data-toggle="filter-reset"]', function(e) {
     var $this = $(this)
       , filter_reset_target = '[data-toggle="filter-requests"]'
