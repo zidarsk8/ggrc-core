@@ -462,7 +462,7 @@ $(function() {
             return controller.options.instance.constructor.table_singular;
           }
         }, extra_page_options[model_name]));
-    } else if (/admin/.test(window.location)) {
+    } else if (/^\/admin\/?$/.test(window.location.pathname)) {
       $area.cms_controllers_dashboard({
           widget_descriptors: GGRC.admin_widget_descriptors
         , menu_tree_spec: GGRC.admin_menu_spec

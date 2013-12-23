@@ -73,13 +73,25 @@ can.Control("CMS.Controllers.Dashboard", {
           this.element.find('.widget-area'), {
               dashboard_controller: this
           });
+      if (!this.inner_nav_controller) {
+        //  If there is no inner-nav, then ensure widgets are shown
+        //  FIXME: This is a workaround because widgets and widget-areas are
+        //    hidden, assuming InnerNav controller will show() them
+        this.get_active_widget_containers()
+          .show()
+          .find('.widget').show()
+          .find('> section.content').show();
+      }
     }
 
   , init_inner_nav: function() {
-      this.inner_nav_controller = new CMS.Controllers.InnerNav(
-          this.element.find('.internav'), {
-              dashboard_controller: this
-          });
+      var $internav = this.element.find('.internav');
+      if ($internav.length > 0) {
+        this.inner_nav_controller = new CMS.Controllers.InnerNav(
+            this.element.find('.internav'), {
+                dashboard_controller: this
+            });
+      }
     }
 
   , init_add_widget: function() {
@@ -162,8 +174,10 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , update_inner_nav: function(el, ev, data) {
-      this.inner_nav_controller.update_widget_list(
-        this.get_active_widget_elements());
+      if (this.inner_nav_controller) {
+        this.inner_nav_controller.update_widget_list(
+          this.get_active_widget_elements());
+      }
     }
 
   , get_active_widget_containers: function() {

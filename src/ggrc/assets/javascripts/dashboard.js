@@ -953,7 +953,10 @@ jQuery(function($) {
     ;
     if( ! $this.hasClass("widget-active") ) {
       $this.addClass("widget-active");
-      $('.cms_controllers_inner_nav').control('inner_nav').show_active_widget('#' + $this.attr('id'));
+      var inner_nav = $('.cms_controllers_inner_nav').control('inner_nav');
+      if (inner_nav) {
+        inner_nav.show_active_widget('#' + $this.attr('id'));
+      }
     }
   });  
 
