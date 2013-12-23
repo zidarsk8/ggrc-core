@@ -168,9 +168,8 @@
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
       };
       var modal = GGRC.Controllers.RoleModal.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
-      $target.on('ajax:json', function(e, data, xhr) {
-        if (data.errors) {
-        } else if (form_target == 'refresh') {
+      $target.on('modal:success', function(e, data, xhr) {
+        if (form_target == 'refresh') {
           refresh_page();
         } else if (form_target == 'redirect') {
           window.location.assign(xhr.getResponseHeader('location'));
