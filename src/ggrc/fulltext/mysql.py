@@ -90,6 +90,7 @@ class MysqlIndexer(SqlIndexer):
       Objects owned via ObjectOwner
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
+      Objects for which the user is the "primary_assessor" or "secondary_assessor"
       Audits for which the user is assigned a Request or Response
 
     This method only *limits* the result set -- Contexts and Roles will still
@@ -169,6 +170,23 @@ class MysqlIndexer(SqlIndexer):
             literal(None).label('context_id')
           ).filter(
               model.contact_id == contact_id
+          ).distinct()
+        type_union_queries.append(model_type_query)
+
+      # Objects for which the user is an assessor
+      if hasattr(model, 'principal_assessor_id') or hasattr(model, 'secondary_assessor_id'):
+        assessor_queries = []
+        if hasattr(model, 'principal_assessor_id'):
+          assessor_queries.append(or_(model.principal_assessor_id == contact_id))
+        if hasattr(model, 'secondary_assessor_id'):
+          assessor_queries.append(or_(model.secondary_assessor_id == contact_id))
+
+        model_type_query = db.session.query(
+            model.id.label('id'),
+            literal(model.__name__).label('type'),
+            literal(None).label('context_id')
+          ).filter(
+              or_(*assessor_queries)
           ).distinct()
         type_union_queries.append(model_type_query)
 

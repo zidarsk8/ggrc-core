@@ -30,7 +30,7 @@
               <div class="span11">
                 <div class="item-data">
                   <div class="tree-title-area">
-                    {{name}}
+                    {{{render '/static/mustache/people/popover.mustache' person=this}}}
                     <span class="url-link">
                       {{email}}
                     </span>

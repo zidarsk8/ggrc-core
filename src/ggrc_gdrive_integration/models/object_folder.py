@@ -50,7 +50,7 @@ class ObjectFolder(Base, db.Model):
     return query.options()
 
   def _display_name(self):
-    return self.folderable.display_name + '<->' + self.folder.display_name
+    return self.folderable.display_name + '<-> gdrive folder ' + self.folder_id
 
 class Folderable(object):
   @classmethod

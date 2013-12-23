@@ -171,6 +171,27 @@
                   {{{firstnonempty firm.title 'None'}}}
                 {{/using}}
               </li>
+              {{#if_helpers '\
+                #if' allow_mapping_or_creating '\
+                and #is_allowed' 'update' instance '\
+              ' _1_context=instance.context.id}}
+              <li>
+                <strong>Auditor: </strong>
+                  {{#with_auditors instance}}
+                    {{join "person.name" auditors}}
+                    <span class="edit-auditor">
+                      <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}}, "userRole_id": {{auditors.0.binding.id}} }' data-base-modal="auditor">
+                        <i class="grcicon-edit"></i>
+                        Edit
+                      </a>
+                    </span>
+                  {{else}}
+                    <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}} }' data-base-modal="auditor">
+                    + Auditor
+                    </a>
+                  {{/with_auditors}}
+              </li>
+              {{/if_helpers}}
             </ul>
           </div>
         </div>
@@ -202,11 +223,7 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        {{#if_helpers '\
-          ^if' allow_mapping_or_creating '\
-          or ^is_allowed' 'update' instance '\
-          or #if' responses.length '\
-        ' _1_context=instance.context.id}}
+        {{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}
           {{#using program=instance.program}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
@@ -215,7 +232,7 @@
               </a>
             </li>
           {{/using}}
-        {{/if_helpers}}
+        {{/is_allowed}}
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
@@ -226,14 +243,6 @@
               <i class="grcicon-edit"></i>
               Edit {{model.title_singular}}
             </a>
-          </li>
-          <li>
-            <div class="widget-action pull-right" rel="tooltip" title="Manage Authorized Auditors">
-              <a href="javascript://" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal-wide" data-modal-scope="Audit" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'>
-                <i class="grcicon-user-black"></i>
-                Auditors
-              </a>
-            </div>
           </li>
           <!--
           <li>

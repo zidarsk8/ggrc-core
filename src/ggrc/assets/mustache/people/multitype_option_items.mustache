@@ -13,7 +13,7 @@
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{#if instance.name}}{{instance.name}}{{/if}}
+                {{{render '/static/mustache/people/popover.mustache' person=instance}}}
                 <span class="url-link">
                   {{#if instance.email}}{{instance.email}}{{/if}}
                 </span>

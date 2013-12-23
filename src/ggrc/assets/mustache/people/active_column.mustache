@@ -15,7 +15,7 @@
     <li class="{{#if _removed}}removed{{/if}}">
       <a class="jump-to-control" href="#">
         <span>
-          {{firstnonempty person.name person.email}}
+          {{{render '/static/mustache/people/popover.mustache' person=person}}}
           &nbsp;
         </span>
       </a>

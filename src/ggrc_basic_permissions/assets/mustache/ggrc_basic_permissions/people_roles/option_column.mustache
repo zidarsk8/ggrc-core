@@ -20,16 +20,18 @@
   </div>
 </div>
 <div class="selector-list">
-  <ul class="new-tree">
+  <ul class="new-tree tree-structure">
     {{#options}}
-    <li class="tree-item program" {{ data 'option' }} data-id="{{ id }}">
+    <li class="tree-item" {{ data 'option' }} data-id="{{ id }}">
       <div class="item-main">
         <div class="simple-link">
           <div class="row-fluid">
             <div class="span11">
-              <div class="item-data">
-                <div class="tree-title-area">
-                  {{name}}
+              <div class="openclose">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    {{name}}
+                  </div>
                 </div>
               </div>
             </div>
@@ -37,6 +39,12 @@
               <input type="checkbox" rel="tooltip" title="map">
             </div>
           </div>
+        </div>
+      </div>
+      <div class="tier-2-info item-content">
+        <div class="tier-2-info-content">
+          <p>{{{description}}}</p>
+          {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
         </div>
       </div>
     </li>

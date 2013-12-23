@@ -766,14 +766,72 @@ $(window).load(function(){
   });
   
   // Popover trigger for person tooltip in styleguide
-  if($('.person-tooltip-trigger').length > 0) {
-    $('.person-tooltip-trigger').popover({
-      html: true,
-      content: function() {
-        return $(this).closest('.person-holder').find('.custom-popover-content').html();
-      }
-    });
-  }
+  // The popover disappears if the show/hide isn't controlled manually
+  var last_popover;
+  $('body').on('mouseenter', '.person-tooltip-trigger', function(ev) {
+    var target = $(ev.currentTarget);
+    if (!target.data('popover')) {
+      target.popover({
+          html: true
+        , delay: { show: 400, hide: 200 }
+        , trigger: 'manual'
+        , content: function() {
+            return $(this).closest('.person-holder').find('.custom-popover-content').html();
+          }
+      });
+      target.data('popover').tip().addClass('person-tooltip');
+    }
+
+    var popover = target.data('popover');
+
+    if (last_popover && last_popover !== popover) {
+      last_popover.hide();
+    }
+
+    // If the popover is active, just refresh the timeout
+    if (popover.tip().is(':visible') && popover.timeout) {
+      clearTimeout(popover.timeout);
+      popover.hoverState = 'in';
+    }
+    // Otherwise show popover
+    else {
+      clearTimeout(popover.timeout);
+      popover.enter(ev);
+    }
+
+    last_popover = popover;
+  });
+  $('body').on('mouseenter', '.popover', function(ev) {
+    // Refresh the popover
+    if (last_popover && last_popover.tip().is(':visible')) {
+      ev.currentTarget = last_popover.$element[0];
+      clearTimeout(last_popover.timeout);
+      last_popover.hoverState = 'in';
+    }
+  });
+  $('body').on('mouseleave', '.person-holder, .person-tooltip-trigger, .popover, .popover .square-popover', function(ev) {
+    var target = $(ev.currentTarget)
+      , popover
+      ;
+
+    if (target.is('.person-tooltip-trigger')) {
+      target = target.closest('.person-holder');
+    }
+    else if (target.is('.square-popover')) {
+      target = target.closest('.popover');
+    }
+
+    // Hide the popover if we left for good
+    if (target.is('.person-holder') && (target = target.find('.person-tooltip-trigger')) && (popover = target.data('popover'))) {
+      ev.currentTarget = target[0];
+      popover.leave(ev);
+    }
+    // Check if this popover originated from the last person popover
+    else if (last_popover && target.is('.popover') && last_popover.tip()[0] === target[0]) {
+      ev.currentTarget = last_popover.$element[0];
+      last_popover.leave(ev);
+    }
+  });
   
   // Tab indexing form fields in modal
   $('body').on('focus', '.modal', function() {

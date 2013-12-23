@@ -18,7 +18,7 @@
     <img src="/static/images/sample/profile100.jpg" alt="">
   </p>}}
   <h4>
-    {{ name }}
+    {{{render '/static/mustache/people/popover.mustache' person=this}}}
     <br>
     {{ email }}
     <br>
