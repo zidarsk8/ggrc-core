@@ -558,6 +558,8 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(!options) {
     options = context;
     context = this;
+  } else {
+    options.contexts.push(context);
   }
 
   if(typeof context === "function") {
@@ -567,8 +569,9 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(typeof template === "function") {
     template = template();
   }
+  options.hash && options.contexts.push(options.hash);
 
-  return can.view.render(template, context);
+  return can.view.render(template, options.contexts);
 });
 
 Mustache.registerHelper("render_hooks", function(hook, options) {
@@ -1230,7 +1233,7 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
-var allowed_actions = ["create", "read", "update", "delete"];
+var allowed_actions = ["create", "read", "update", "delete", "view_object_page"];
 Mustache.registerHelper("is_allowed", function() {
   var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
@@ -1671,6 +1674,14 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         });
       }
 
+      // Check for assessor roles
+      if (instance.attr('principal_assessor') && instance.principal_assessor.id === person.id) {
+        state.attr('roles').push('Principal Assessor');
+      }
+      if (instance.attr('secondary_assessor') && instance.secondary_assessor.id === person.id) {
+        state.attr('roles').push('Secondary Assessor');
+      }
+
       // Check for people
       if (instance.people && ~can.inArray(person.id, $.map(instance.people, function(person) { return person.id; }))) {
         state.attr('roles').push('Mapped');
@@ -1960,6 +1971,7 @@ Mustache.registerHelper("private_program_owner", function(instance, modal_title,
   }
 });
 
+
 // Determines whether the value matches one in the $.map'd list
 // {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
 Mustache.registerHelper("if_in_map", function(list, path, value, options) {
@@ -1978,6 +1990,25 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
       return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("with_auditors", function(instance, options) {
+  var loader = resolve_computed(instance).get_binding('authorizations')
+    , auditors = $.map(loader.list, function(binding) {
+        if (binding.instance.role.reify().attr('name') === 'Auditor') {
+          return {
+            person: binding.instance.person.reify()
+            , binding: binding.instance
+          }
+        }
+      });
+  options.contexts.push({"auditors": auditors});
+  if(auditors.length > 0){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
 });
 
 })(this, jQuery, can);

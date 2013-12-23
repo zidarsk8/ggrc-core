@@ -360,7 +360,6 @@ can.Control("CMS.Controllers.InnerNav", {
 
       can.view(this.options.internav_view, this.options, function(frag) {
         that.element.append(frag);
-        that.update_scrollspy(window.location.hash);
       });
 
       if (!(this.options.contexts instanceof can.Observe))
@@ -373,15 +372,8 @@ can.Control("CMS.Controllers.InnerNav", {
       return this.element.sortable({
           placeholder: 'drop-placeholder'
         , items : "li"
-        , disabled : true
+        , disabled: true
       })
-    }
-  , sortable_disable: function(){
-      this.element.sortable("cancel");
-      this.element.sortable("disable");
-    }
-  , sortable_enable: function(){
-      this.element.sortable("enable");
     }
 
   , " sortupdate": "apply_widget_list_sort"
@@ -397,48 +389,28 @@ can.Control("CMS.Controllers.InnerNav", {
       this.element.trigger("inner_nav_sort_updated", [widget_ids]);
     }
 
-  , replace_widget_list : function(widget_elements, target) {
-      var widget_list = []
-        , that = this
-        ;
-      this.sortable_disable();
-      can.each(widget_elements, function(widget_element) {
-        var $widget = $(widget_element)
-          , $header = $widget.find(".header h2")
-          , icon = $header.find("i").attr("class")
-          , menuItem = $header.text().trim()
-          , match = menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/)
-          , title = match[1]
-          , count = match[2]
-          ;
-
-        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
-
-        widget_list.push({
-            selector: "#" + $widget.attr("id")
-          , internav_icon: icon
-          , internav_display: title
-          , count: count
-          , has_count: count != null
-          , spinner : that.options.spinners["#" + $widget.attr("id")]
-          });
-      });
-      this.options.widget_list.replace(widget_list);
-
-      // When replacing the list, the original widget object is no longer 
-      // identical to the one that it is getting replaced with, so find the 
-      // new widget with the same selector.
-      var active_widget = this.options.contexts.active_widget && can.map(this.options.widget_list, function(widget) { 
-          return (target || that.options.contexts.active_widget.selector) === widget.selector ? widget : undefined;
-        })[0];
-      this.options.contexts.attr("active_widget", active_widget ? active_widget : this.options.widget_list[0]);
-      this.sortable_enable();
+  , set_active_widget : function(widget) {
+    if (typeof widget === 'string') {
+      this.options.contexts.attr("active_widget", this.widget_by_selector(widget));
     }
+    else {
+      this.options.contexts.attr("active_widget", widget);
+    }
+  }
+
+  , show_active_widget : function(selector) {
+    var widget = $(selector || this.options.contexts.attr('active_widget').selector);
+    if (widget.length) {
+      this.options.dashboard_controller.show_widget_area();
+      widget.siblings(':visible').hide().end().show();
+      $('[href=' + (selector || this.options.contexts.attr('active_widget').selector) + ']')
+        .closest('li').addClass('active')
+        .siblings().removeClass('active');
+    }
+  }
 
   , "{contexts} active_widget" : function(contexts, ev) {
-    this.options.dashboard_controller.show_widget_area();
-    $(this.options.contexts.active_widget.selector).show().siblings().hide();
-    this.update_scrollspy(this.options.contexts.active_widget.selector);
+    this.show_active_widget();
   }
 
   , "a click" : function(el, ev) {
@@ -449,6 +421,12 @@ can.Control("CMS.Controllers.InnerNav", {
         return false;
       }
     });
+  }
+
+  , widget_by_selector : function(selector) {
+    return $.map(this.options.widget_list, function(widget) {
+      return widget.selector === selector ? widget : undefined;
+    })[0] || undefined;
   }
 
   , "{document.body} loading" : function(body, ev) {
@@ -464,7 +442,6 @@ can.Control("CMS.Controllers.InnerNav", {
 
   , "{document.body} loaded" : function(body, ev) {
     var that = this;
-    this.sortable_disable();
     can.each(this.options.widget_list, function(widget) {
       var spinner;
       if($(widget.selector).has(ev.target).length) {
@@ -472,58 +449,76 @@ can.Control("CMS.Controllers.InnerNav", {
         delete that.options.spinners[widget.selector];
       }
     });
+    this.element.sortable("enable");
   }
 
-  , update_scrollspy : function(target) {
-      var $area = $(".object-area")
-        , top = $area.scrollTop()
+  , update_widget_list : function(widget_elements) {
+      var widget_list = []
+        , that = this
         ;
 
-      // Some pages may not have scrollspy set up (e.g., dashboard)
-      if (!$area.data("scrollspy"))
-        return
+      can.each(widget_elements, function(widget_element) {
+        var $widget = $(widget_element)
+          , widget = that.widget_by_selector("#" + $widget.attr("id"))
+          , $header = $widget.find(".header h2")
+          , icon = $header.find("i").attr("class")
+          , menuItem = $header.text().trim()
+          , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
+          , title = match[1]
+          , count = match[2] || undefined
+          ;
 
-      // Activate the target if one is specified
-      if (target) {
-        $area
-          .scrollspy('refresh')
-          .scrollspy('activate', target);
+        // If the metadata is unrendered, find it via options
+        if (!title) {
+          var widget_options = $widget.control("dashboard_widgets").options
+            , widget_name = widget_options.widget_name;
+          icon = icon || widget_options.widget_icon;
+          // Strips html
+          title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (''+widget_name)).text();
+        }
+        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
+
+        // Only create the observable once, this gets updated elsewhere
+        if (!widget) {
+          widget = new can.Observe({
+              selector: "#" + $widget.attr("id")
+            , count: count
+            , has_count: count != null
+          });
+        }
+
+        widget.attr({
+          internav_icon: icon
+        , internav_display: title
+        , spinner : that.options.spinners["#" + $widget.attr("id")]
+        });
+
+        widget_list.push(widget);
+      });
+      this.options.widget_list.replace(widget_list);
+
+      if (widget_list.length) {
+        $(this.options.widget_list[0].selector).siblings().hide();
+        var active_widget = this.options.contexts.attr('active_widget');
+        if (window.location.hash && (!active_widget || active_widget.selector !== window.location.hash) && (active_widget = this.widget_by_selector(window.location.hash))) {
+          this.set_active_widget(active_widget);
+        }
+        else {
+          this.show_active_widget(!this.options.contexts.attr('active_widget') ? this.options.widget_list[0].selector : undefined);
+        }
       }
-      // Otherwise clear and recompute based on scrolling
-      else {
-        $area.data('scrollspy').activeTarget = null; 
-        $area
-          .scrollspy('refresh')
-          .scrollspy('process');
-      }
-    }
-
-  , update_widget_list : function(widget_elements) {
-      var that = this;
-
-      if (this._update_timeout)
-        return;
-
-      this._update_timeout = setTimeout(function() {
-        that.replace_widget_list(widget_elements, window.location.hash);
-        that.update_scrollspy(window.location.hash);
-        that._update_timeout = null;
-      }, 100);
     }
 
   , update_widget_count : function($el, count) {
       var widget_id = $el.closest('.widget').attr('id')
-        , i
+        , widget = this.widget_by_selector("#" + widget_id)
         ;
 
-      for (i=0; i<this.options.widget_list.length; i++) {
-        if (this.options.widget_list[i].selector === "#" + widget_id) {
-          this.options.widget_list[i].attr({
-              count: count
-            , has_count: true
-          });
-          return;
-        }
+      if (widget) {
+        widget.attr({
+            count: count
+          , has_count: true
+        });
       }
     }
 });

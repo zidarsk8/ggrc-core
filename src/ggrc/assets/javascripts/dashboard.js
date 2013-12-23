@@ -926,11 +926,12 @@ jQuery(function($) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
+    ,   control
     ;
 
     if( $targetWidget.hasClass("widget-active")
-      && $(".object-area").data('scrollspy')
-      && $(".object-area").data('scrollspy').activeTarget !== $widgetID
+      && (control = $('.cms_controllers_inner_nav').control('inner_nav'))
+      && control.options.contexts.attr('active_widget.selector') !== $widgetID
     ) {
       $targetWidget.removeClass("widget-active");
     }
@@ -943,7 +944,7 @@ jQuery(function($) {
     ;
     
     $targetWidget.addClass("widget-active");
-    $(".object-area").scrollspy('activate', $widgetID);
+    $('.cms_controllers_inner_nav').control('inner_nav').set_active_widget($widgetID);
   });    
 
   $('body').on('mouseenter', '.widget', function(e) {
@@ -952,7 +953,7 @@ jQuery(function($) {
     ;
     if( ! $this.hasClass("widget-active") ) {
       $this.addClass("widget-active");
-      $('.object-area').scrollspy('activate', '#' + $this.attr('id'));
+      $('.cms_controllers_inner_nav').control('inner_nav').show_active_widget('#' + $this.attr('id'));
     }
   });  
 

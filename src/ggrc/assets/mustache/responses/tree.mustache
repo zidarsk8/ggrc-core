@@ -1,3 +1,11 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
   <li class="tree-item programs responses-list" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
     <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
@@ -18,7 +26,7 @@
                   ^if' allow_mapping_or_creating '\
                   or ^is_allowed' 'update' instance '\
                 ' _1_context=instance.context.id}}
-                  <span class="black-font">{{firstnonempty contact.name contact.email ''}}</span>
+                  {{{render '/static/mustache/people/popover.mustache' person=contact}}}
                 {{else}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
                 {{/if_helpers}}
@@ -68,7 +76,7 @@
             {{/if}}
             {{#if request.assignee}}
               {{#using assignee=request.assignee}}
-              <div class="span6"><p><strong>requested by: </strong>{{firstnonempty assignee.name assignee.email}}</p></div>
+              <div class="span6"><p><strong>requested by: </strong>{{{render '/static/mustache/people/popover.mustache' person=assignee}}}</p></div>
               {{/using}}
             {{/if}}
             </div>
@@ -105,7 +113,7 @@
       {{#child_options.0}}
       <div class="inner-tree">
         <h6>Mapped Objects ({{child_options.0.list.length}})</h6>
-        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')) }}>
+        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
         </ul>
       </div>
       {{/child_options.0}}

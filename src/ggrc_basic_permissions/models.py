@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 import json
+from flask import current_app
 from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models.context import Context
@@ -93,6 +94,12 @@ class UserRole(Base, db.Model):
   def _display_name(self):
     if self.context and self.context.related_object:
       context_related = ' in ' + self.context.related_object.display_name
+    elif hasattr(self, '_display_related_title'):
+      context_related = ' in ' + self._display_related_title
+    elif self.context:
+      current_app.logger.warning(
+          'Unable to identify context.related for UserRole')
+      context_related = ''
     else:
       context_related = ''
     return '{0} <-> {1}{2}'.format(

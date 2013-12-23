@@ -3,6 +3,7 @@ dashboard-js-files:
   - models/gcal_models.js
   - apps/gdrive.js
   - controllers/gdrive_workflows_controller.js
+  - mustache_helpers.js
 
 dashboard-js-spec-files:
   - models/gdrive_models_spec.js
@@ -14,3 +15,5 @@ dashboard-js-template-files:
   - responses/gdrive_evidence_tree.mustache
   - meetings/gcal_info.mustache
   - requests/gdrive_info.mustache
+  - people/gplus_actions.mustache
+  - people/gplus_photo.mustache
