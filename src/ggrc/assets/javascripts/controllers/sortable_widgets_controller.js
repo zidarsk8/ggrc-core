@@ -81,11 +81,11 @@ can.Control("CMS.Controllers.SortableWidgets", {
           id.substr(0, id.indexOf("_widget")));
         $widget = $("#" + id);
       }
-      $widget.css("display", "none").appendTo(that.element);
+      $widget.hide().appendTo(that.element);
       //add this widget to the inner nav list
     });
     this.apply_widget_sort(this_sort);
-    this.element.find('section').css("display", "block").trigger('min_size');
+    this.element.find('section').show().trigger('min_size').hide();
     //if(firstchild) {
     //  firstchild.prevAll().detach().appendTo(this.element); //do the shuffle
     //}

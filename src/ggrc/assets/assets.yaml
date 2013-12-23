@@ -16,7 +16,6 @@ dashboard-js-files:
   - bootstrap-collapse.js
   - bootstrap-dropdown.js
   - bootstrap-modal.js
-  - bootstrap-scrollspy.js
   - bootstrap-tab.js
   - bootstrap-tooltip.js
   - bootstrap-popover.js
@@ -25,7 +24,6 @@ dashboard-js-files:
   - bootstrap/modal-form.js
   - can.jquery-all.js
   - bootstrap/modal-ajax.js
-  - bootstrap/scrollspy.js
   - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.4.0pre.js
