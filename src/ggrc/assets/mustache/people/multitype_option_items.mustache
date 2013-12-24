@@ -6,14 +6,14 @@
 }}
 
 {{#each options}}
-  <li class="tree-item business" {{#instance}}{{ data 'option' }}{{/instance}} data-id="{{ instance.id }}">
+  <li class="tree-item control" {{#instance}}{{ data 'option' }}{{/instance}} data-id="{{ instance.id }}">
     <div class="item-main">
       <div class="simple-link">
         <div class="row-fluid">
           <div class="span11">
             <div class="item-data">
               <div class="tree-title-area">
-                {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+                {{#if instance.name}}{{instance.name}}{{/if}}
                 <span class="url-link">
                   {{#if instance.email}}{{instance.email}}{{/if}}
                 </span>
