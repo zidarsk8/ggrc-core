@@ -144,7 +144,7 @@
             </ul>
           </div>
         </div>
-        <div class="span3">
+        <div class="span4">
           <div class="tree-info">
             <ul class="tree-info-list">
               <li>
@@ -171,11 +171,11 @@
                   {{{firstnonempty firm.title 'None'}}}
                 {{/using}}
               </li>
-              {{#if_helpers '\
+              <li>
+                {{#if_helpers '\
                 #if' allow_mapping_or_creating '\
                 and #is_allowed' 'update' instance '\
               ' _1_context=instance.context.id}}
-              <li>
                 <strong>Auditor: </strong>
                   {{#with_auditors instance}}
                     {{join "person.name" auditors}}
@@ -190,12 +190,17 @@
                     + Auditor
                     </a>
                   {{/with_auditors}}
+                {{else}}
+                <strong>Auditor: </strong>
+                {{#with_auditors instance}}
+                  {{join "person.name" auditors}}
+                {{/with_auditors}}
+                {{/if_helpers}}
               </li>
-              {{/if_helpers}}
             </ul>
           </div>
         </div>
-        <div class="span4" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
+        <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
           {{#if_helpers '\
             ^if' allow_mapping_or_creating '\
             or ^is_allowed' 'update' instance '\
@@ -205,6 +210,7 @@
               <ul class="tree-info-list">
                 <li>
                   <strong>Status: </strong>
+                  <br>
                   {{instance.status}}
                 </li>
               </ul>
