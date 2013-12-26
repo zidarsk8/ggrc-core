@@ -1026,3 +1026,17 @@ def init_all_object_views(app):
       if hasattr(extension_module, 'initialize_all_object_views'):
         extension_module.initialize_all_object_views(app)
 
+# Mockups HTML pages are listed here
+@app.route("/mockups")
+@login_required
+def mockup():
+  """The mockup guide page
+  """
+  return render_template("mockups/index.html")
+  
+@app.route("/mockups/assessments")
+@login_required
+def assessments():
+  """The assessments guide page
+  """
+  return render_template("mockups/assessments.html")
