@@ -414,6 +414,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         ;
 
       if ($ul.is(":visible")) {
+        el.removeClass("active");
         $ul.slideUp().removeClass("in");
       } else {
         // Use a cached max-height if one exists
@@ -428,7 +429,12 @@ can.Control("CMS.Controllers.LHN_Search", {
         $siblings.slideUp().removeClass("in");
         // Expand this list
         $ul.slideDown().addClass("in");
-
+        
+        // Remove active class from other lists
+        holder.find('a.active').removeClass('active');
+        // Add active class to this list
+        el.addClass("active");
+        
         // Compute the extra height to add to the expandable height, 
         // based on the size of the content that is sliding away.
         top = $content.offset().top;
