@@ -358,10 +358,10 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         //we removed the objective.  This is the easier case.
         obj_folder_to_destroy = req_folders_mapping[0].mappings[0].instance;
 
-        $.when(
-          CMS.Models.GDriveFile.findAll({id : req_folders[0].id})
+        return $.when(
+          CMS.Models.GDriveFile.findAll({parents : req_folders[0].id})
           , obj_folder_to_destroy.refresh().then(function(of) { of.destroy(); })
-        ).done(function(files) {
+        ).then(function(files) {
           //move each file from the old Request folder to the Audit folders
           var move_dfds = [];
           can.each(files, function(file) {
@@ -370,8 +370,14 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           });
           report_progress(
             "Moving files to the Audit folder"
-            , $.when.apply($, move_dfds).done(function() {
-              req_folders[0].destroy();
+            , $.when.apply($, move_dfds).then(function() {
+              CMS.Models.GDriveFile.findAll({parents : req_folders[0].id}).then(function(orphs) {
+                if(orphs.length < 1) {
+                  req_folders[0].destroy();
+                } else {
+                  console.warn("can't delete folder as files still exist:", orphs);
+                }
+              });
             })
           );
           report_progress(
@@ -382,8 +388,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
               , context : instance.context || { id : null }
             }).save()
           );
+        }).done(function() {
+          return that.update_owner_permission(model, ev, instance);
         });
-        that.update_owner_permission(model, ev, instance);
       }
     }).always(function() {
       delete instance._folders_mutex;
