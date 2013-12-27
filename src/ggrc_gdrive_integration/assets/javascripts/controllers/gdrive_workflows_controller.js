@@ -114,8 +114,23 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
   , create_program_folder : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
   , "{CMS.Models.Program} created" : function(model, ev, instance) {
+    var that = this
+      , refresh_queue = new RefreshQueue();
+    
     if((instance.context && instance.context.id) || instance.context_id) {
-      this.create_program_folder(model, ev, instance);
+      $.when(
+        this.create_program_folder(model, ev, instance)
+        , CMS.Models.UserRole.findAll({ role_name : "ProgramCreator" }).then(function(pcrs) {
+          can.each(pcrs, function(pcr) {
+            refresh_queue.enqueue(pcr.person.reify());
+          });
+          return refresh_queue.trigger();
+        })
+      ).then(function(folder, people) {
+        can.each(people, function(person) {
+          that.update_owner_permission(model, ev, instance, "writer", person);
+        });
+      });
     }
   }
 
