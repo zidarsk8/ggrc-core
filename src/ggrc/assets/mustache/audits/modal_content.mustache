@@ -42,7 +42,7 @@
       </label> 
       {{#if new_object_form}}
         {{#using program_reified=instance.program}}
-        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title program_reified}}" tabindex="2">
+        <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{default_audit_title title program_reified}}" tabindex="2">
         {{/using}}
       {{else}}
         <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2">

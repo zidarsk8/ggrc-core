@@ -1808,7 +1808,11 @@ Mustache.registerHelper("person_owned", function(owner_id, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("default_audit_title", function(program, options) {
+Mustache.registerHelper("default_audit_title", function(title, program, options) {
+  var computed_title = title();
+  if(typeof computed_title !== 'undefined'){
+    return computed_title;
+  }
   program = resolve_computed(program) || {title : "program"};
   return new Date().getFullYear() + ": " + program.title + " - Audit";
 });
