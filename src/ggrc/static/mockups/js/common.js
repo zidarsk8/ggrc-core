@@ -1,15 +1,21 @@
 $(document).ready(function(){
-
-  $('body').on('click', '.color-trigger', function() {
+  
+  $('[rel=tooltip]').tooltip();
+  
+  $('.lhs-holder').css('height', 100 + '%');
+  $('.inner-nav').css('height', 100 + '%');
+  $('.object-area').css('height', 100 + '%');
+  
+  $('body').on('click', '.info-expand a', function() {
     var $this = $(this),
-        $colorText = $this.closest('.content').find('h2');
+        $show_hide = $this.closest('.row-fluid').next('.hidden-fields-area');
     
-    if($this.hasClass("clicked")) {
-      $colorText.css('color', '#000');
-      $this.removeClass("clicked");
+    if($this.hasClass("active")) {
+      $show_hide.slideUp('fast');
+      $this.removeClass("active");
     } else {
-      $colorText.css('color', '#ff0000');
-      $this.addClass("clicked");
+      $show_hide.slideDown('fast');
+      $this.addClass("active");
     }
     
     return false;

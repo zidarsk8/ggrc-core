@@ -779,7 +779,7 @@ $(window).load(function(){
             return $(this).closest('.person-holder').find('.custom-popover-content').html();
           }
       });
-      target.data('popover').tip().addClass('person-tooltip');
+      target.data('popover').tip().addClass('person-tooltip').css("z-index", 2000);
     }
 
     var popover = target.data('popover');

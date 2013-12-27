@@ -36,7 +36,7 @@
               ' _1_context=instance.context.id}}
                 {{{render '/static/mustache/people/popover.mustache' person=assignee}}}
               {{else}}
-                <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
+                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
               {{/if_helpers}}
           </div>
         {{/using}}
@@ -50,13 +50,13 @@
               or #if' responses.length '\
             ' _1_context=instance.context.id}}
               <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
-              <select name="request_type" class="span9 short-field" disabled="true" readonly="true">
+              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
                 {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}
               </select>
             {{else}}
-              <select name="request_type" class="span9 short-field">
+              <select name="request_type" class="span8 short-field">
                 {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                 <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
                 {{/iterate}}

@@ -10,25 +10,25 @@
       <div class="span4">
         <ul class="filter-date-range">
           <li class="pull-right">
-            <span>requested on or after:</span>
+            <span class="requested-text">requested on or after:</span>
             <input class="input-small date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
           </li>
         </ul>
       </div>
       <div class="span2">
         <i class="grcicon-person-green pull-left"></i>
-        <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="">
+        <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="">
       </div>
       <div class="span2">
         <span class="pull-left request-type">type:</span>
-        <select name="request_type" class="span8 short-field">
+        <select name="request_type" class="span6 short-field">
           {{#iterate " " "Documentation" "Interview" "Population Sample"}}
           <option value="{{firstnonempty iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
           {{/iterate}}
         </select>
       </div>
       <div class="span2">
-        <select name="status" class="span9 short-field">
+        <select name="status" class="span10 short-field">
           <option value="" selected="true">Any</option>
           <option>Draft</option>
           <option>Requested</option>
@@ -38,7 +38,7 @@
           <option>Accepted</option>
         </select>
       </div>
-      <div class="span1">
+      <div class="span2">
         <button type="reset" data-toggle="filter-reset" class="btn">Reset</button>
       </div>
     </div>

@@ -23,7 +23,7 @@ window.process_gapi_query = function(params) {
   for(var i in params) {
     switch(i) {
       case 'parents' :
-        qstr.push("'" + params[i] + "' in " + i);
+        qstr.push("'" + (params[i].id ? params[i].id : params[i]) + "' in " + i);
         break;
       case 'mimeType' :
         qstr.push(i + " = '" + params[i] + "'");
