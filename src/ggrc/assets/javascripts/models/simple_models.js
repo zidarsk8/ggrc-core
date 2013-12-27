@@ -1116,7 +1116,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     this._super.apply(this, arguments);
     this.validatePresenceOf("due_on");
     this.validatePresenceOf("assignee");
-    this.validatePresenceOf("objective");
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
@@ -1124,12 +1123,6 @@ can.Model.Cacheable("CMS.Models.Request", {
         }
       });
     }
-  }
-  , init : function() {
-    this._super.apply(this, arguments);
-    this.validatePresenceOf("due_on");
-    this.validatePresenceOf("assignee");
-    this.validatePresenceOf("objective");
   }
 }, {
   init : function() {
