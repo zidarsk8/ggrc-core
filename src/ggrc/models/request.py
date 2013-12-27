@@ -31,7 +31,6 @@ class Request(Described, Base, db.Model):
     'Request')
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
   notes = deferred(db.Column(db.Text, nullable=True), 'Request')
-  auditor_contact = deferred(db.Column(db.String, nullable=True), 'Request')
 
   responses = db.relationship('Response', backref='request',
     cascade='all, delete-orphan')
@@ -49,13 +48,11 @@ class Request(Described, Base, db.Model):
     'responses',
     'test',
     'notes',
-    'auditor_contact',
   ]
   _sanitize_html = [
     'gdrive_upload_path',
     'test',
     'notes',
-    'auditor_contact',
   ]
 
   def _display_name(self):
