@@ -10,8 +10,7 @@ HOST = '0.0.0.0'
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:root@127.0.0.1/ggrcdev?charset=utf8'
 FULLTEXT_INDEXER = 'ggrc.fulltext.mysql.MysqlIndexer'
 LOGIN_MANAGER = 'ggrc.login.noop'
-SQLALCHEMY_ECHO = True
+#SQLALCHEMY_ECHO = True
 AUTOBUILD_ASSETS = True
 ENABLE_JASMINE = True
 #DEBUG_ASSETS = True
-
