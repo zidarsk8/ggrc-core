@@ -172,6 +172,7 @@ can.Control("GGRC.Controllers.Modals", {
       var path = el.attr("name").split(".")
         , instance = this.options.instance
         , index = 0
+        , that = this
         ;
 
       path.pop();
@@ -186,6 +187,15 @@ can.Control("GGRC.Controllers.Modals", {
       else {
         path = path.join(".");
         this.options.instance.attr(path, ui.item.stub());
+        // Make sure person name/email gets written to the input field
+        setTimeout(function(){
+          if(el.val() === ""){
+            var obj = that.options.instance.attr(path);
+            if(obj.type === "Person"){
+              el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
+            }
+          }
+        }, 150);
       }
     } else {
       original_event = event;
