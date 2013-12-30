@@ -1021,6 +1021,8 @@
         } else {
           join_instance.save()
             .done(function() {
+              $(document.body).trigger('ajax:flash', 
+                  { success: that.context.selected_option.constructor.shortName + " mapped successfully."});
               $(that.element).modal_form('hide');
             })
             .fail(function(xhr) {
