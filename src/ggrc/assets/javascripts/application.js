@@ -846,6 +846,17 @@ $(window).load(function(){
       setTimeout(addingTabindex,100)
     });
   });
+  
+  // Prevent link popup in code mode
+  $('body').on('click', 'a[data-wysihtml5-command=popupCreateLink]', function(e){
+    var $this = $(this);
+    if($this.hasClass('disabled')){
+      // The button is disabled, close the modal immediately
+      $('body').find('.bootstrap-wysihtml5-insert-link-modal').modal('hide');
+      $this.closest('.wysiwyg-area').find('textarea').focus()
+    }
+  });
+
   // Watermark trigger
   $('body').on('click', '.watermark-trigger', function() {
     var $this = $(this),
