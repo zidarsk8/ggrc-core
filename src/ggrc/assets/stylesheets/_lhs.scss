@@ -6,7 +6,6 @@
  */
 
 .area {
-  border-right:5px solid #444;
   &.governance {
     border-color:$governance;
     .header-content {
@@ -44,6 +43,13 @@
       border-color:$controls;
     }
   }
+  &.entities {
+    border-color:$entities;
+    .header-content {
+      border-color:$entities;
+    }
+  }
+
 }
 
 .lhs-holder {
