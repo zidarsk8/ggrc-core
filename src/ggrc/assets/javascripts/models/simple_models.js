@@ -1016,6 +1016,7 @@ can.Model.Cacheable("CMS.Models.Role", {
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
+  , category : "programs"
   , findOne : "GET /api/audits/{id}"
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
