@@ -45,16 +45,21 @@ def get_display_class_filter(obj):
     model = get_model(obj)
     obj = model._inflector.model_singular
 
-  if obj in ('Program'):
+  if obj in ('Program',):
     return 'program'
+  elif obj in ('Control',):
+    return 'control'
+  elif obj in ('Objective',):
+    return 'objective'
   elif obj in (
-      'Control', 'Directive', 'Contract', 'Policy', 'Regulation', 'Standard',
-      'Objective'):
+      'Directive', 'Contract', 'Policy', 'Regulation', 'Standard'):
     return 'governance'
   elif obj in (
       'OrgGroup', 'Project', 'Facility', 'Product', 'DataAsset', 'Market',
       'System', 'Process'):
     return 'business'
+  elif obj in ('OrgGroup', 'Person'):
+    return 'people'
   elif obj in ('Risk', 'RiskyAttribute'):
     return 'risk'
   else:
