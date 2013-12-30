@@ -902,7 +902,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
 can.Model.Cacheable("CMS.Models.Objective", {
   root_object : "objective"
   , root_collection : "objectives"
-  , category : "governance"
+  , category : "objectives"
   , title_singular : "Objective"
   , title_plural : "Objectives"
   , findAll : "GET /api/objectives"
