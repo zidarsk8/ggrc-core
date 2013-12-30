@@ -32,6 +32,18 @@
       border-color:$business;
     }
   }
+  &.objectives {
+    border-color:$objectives;
+    .header-content {
+      border-color:$objectives;
+    }
+  }
+  &.controls {
+    border-color:$controls;
+    .header-content {
+      border-color:$controls;
+    }
+  }
 }
 
 .lhs-holder {
@@ -176,6 +188,27 @@
       &.risk {
         a {
           color:$risk;
+        }
+      }
+    }
+    li {
+      &.objectives {
+        a {
+          color: $objectives;
+        }
+      }
+    }
+    li {
+      &.controls {
+        a {
+          color: $controls;
+        }
+      }
+    }
+    li {
+      &.entities {
+        a {
+          color: $entities;
         }
       }
     }
@@ -429,6 +462,48 @@
         a {
           color:#fff;
           background-color:$programs;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
+        }
+      }
+    }
+    &.objectives {
+      li.active,
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$objectives;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
+        }
+      }
+    }
+    &.controls {
+      li.active,
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$controls;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+
+        }
+      }
+    }
+    &.entities {
+      li.active,
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$entities;
           background-image: image-url("grcicons/icons.png");
           background-repeat: no-repeat;
           @include background-size(368px 416px);
