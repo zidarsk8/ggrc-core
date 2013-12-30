@@ -324,6 +324,63 @@
       }
     }
   }
+  &.controls {
+    .header {
+      h2 {
+        color: $controls;
+      }
+    }
+    &.widget-active {
+      .header {
+        background-color:$controls;
+        h2 {
+          color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
+        }
+      }
+    }
+  }
+  &.objectives {
+    .header {
+      h2 {
+        color: $objectives;
+      }
+    }
+    &.widget-active {
+      .header {
+        background-color:$objectives;
+        h2 {
+          color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
+        }
+      }
+    }
+  }
+  &.entities {
+    .header {
+      h2 {
+        color: $entities;
+      }
+    }
+    &.widget-active {
+      .header {
+        background-color:$entities;
+        h2 {
+          color: $white;
+          span.explanation {
+            color:$white;
+            @include opacity(0.7);
+          }
+        }
+      }
+    }
+  }
   .filter {
     padding:3px 2px;
     background: $filterBgnd;

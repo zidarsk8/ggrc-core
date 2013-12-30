@@ -360,6 +360,9 @@
 .grcicon-person-green {
   background-position:-30px -344px;
 }
+.grcicon-person-color {
+  background-position:-30px -368px;
+}
 .grcicon-pie-chart {
   background-position:-198px -344px;
 }
@@ -466,6 +469,15 @@
   &.risk {
     background-position: 0 -108px;
   }
+  &.objectives {
+    background-position: 0 -144px;
+  }
+  &.controls {
+    background-position: 0 -180px;
+  }
+  &.entities {
+    background-position: 0 -216px;
+  }
   &.dashboard {
     background-position: -2000px -2000px;
   }
@@ -540,7 +552,7 @@
 .grcicon-project-color { background-position:-222px -296px; }
 .grcicon-orggroup, .grcicon-org_group { background-position:-78px -248px;}
 .grcicon-orggroup-black, .grcicon-org_group-black { background-position:-78px -224px; }
-.grcicon-orggroup-color, .grcicon-org_group-color { background-position:-78px -224px; }/*{ background-position:-246px -296px; }*/
+.grcicon-orggroup-color, .grcicon-org_group-color { background-position:-246px -296px; }/*{ background-position:-246px -296px; }*/
 .grcicon-dataasset, .grcicon-data_asset { background-position:-174px -248px; }
 .grcicon-dataasset-black, .grcicon-data_asset-black { background-position:-174px -224px; }
 .grcicon-dataasset-color, .grcicon-data_asset-color { background-position:-54px -320px; }
