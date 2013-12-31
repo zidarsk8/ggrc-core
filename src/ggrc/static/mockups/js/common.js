@@ -101,5 +101,90 @@ $(document).ready(function(){
     return false;
     
   });
+  
+  $('.autogenerate').change(function(){
+    $('.autogenerate-result').toggleClass('active', $(this).val() == 'control');
+  });
+  
+  $('body').on('click', '.accordion-group a', function() {
+    var $this = $(this),
+        $subNav = $this.closest('.accordion-group').find('.sub-level'),
+        $subAction = $this.closest('.accordion-group').find('.sub-actions');
+    
+    if($this.hasClass("active")) {
+      $subNav.slideUp('fast');
+      $subAction.slideUp('fast');
+      $this.removeClass("active");
+    } else {
+      $subNav.slideDown('fast');
+      $subAction.slideDown('fast');
+      $this.addClass("active");
+    }
+    
+    return false;
+    
+  });
+  
+  
+  $('.internav li:gt(7)').hide();
+  $('.add-more-object').click(function() {
+    $('.internav li:gt(7)').slideDown('fast');
+    $(this).hide();
+  });
+  
+  $( ".date" ).datepicker();
+  
+  $(function() {
+    var people = [
+      "Vladan Mitevski vladan@reciprocitylabs.com",
+      "Predrag Kanazir predrag@reciprocitylabs.com",
+      "Dan Ring danring@reciprocitylabs.com",
+      "Silas Barta silas@reciprocitylabs.com"
+    ];
+    $( ".objective-selector input" ).autocomplete({
+      source: people
+    });
+  });
+  
+  $('body').on('click', 'ul.internav li a', function() {
+    var $this = $(this),
+        $innerNavItem = $this.closest('li'),
+        $allWidgets = $('.widget');
+    
+    $('ul.internav li.active').removeClass('active');
+    $allWidgets.removeClass('widget-active').hide();
+    
+    if($innerNavItem.hasClass("active")) {
+      $innerNavItem.removeClass("active");
+    } else {
+      $innerNavItem.addClass("active");
+    }
+    
+    if($('ul.internav li.active a').attr('href') == '#info_widget') {
+      $('#info_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#market_widget') {
+      $('#market_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#control_widget') {
+      $('#control_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#assessment_widget') {
+      $('#assessment_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#process_widget') {
+      $('#process_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#facility_widget') {
+      $('#facility_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#authorization_widget') {
+      $('#authorization_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#regulation_widget') {
+      $('#regulation_widget').addClass('widget-active').show();
+    }
+    
+  });
 
 });
