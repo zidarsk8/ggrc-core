@@ -47,7 +47,11 @@ function dateConverter(d) {
     conversion = "MM/DD/YYYY";
   }
   ret = moment(d.toString(), conversion);
-  if(typeof d === "string" && ret) {
+  if (typeof d === "string" && ret
+      //  Don't correct timezone for dates
+      && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
+      //  Don't correct timezone if `moment.js` has already done it
+      && !/[-+]\d\d:?\d\d/.test(d)) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
   return ret ? ret.toDate() : undefined;
