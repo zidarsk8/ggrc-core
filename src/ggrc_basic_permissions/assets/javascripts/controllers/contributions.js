@@ -277,12 +277,12 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='checkbox'] change": "change_option",
+    ".option_column li input[type='radio'] change": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
       this.context.bind("selected_object", this.proxy("refresh_join_list"));
-      this.option_list.bind("change", this.proxy("update_option_checkboxes"));
+      this.option_list.bind("change", this.proxy("update_option_radios"));
     },
 
     init_view: function() {
@@ -400,25 +400,25 @@
           $.extend({}, join_query),
           function(joins) {
             self.join_list.replace(joins);
-            self.update_option_checkboxes();
+            self.update_option_radios();
           });
       } else {
         return $.Deferred().resolve();
       }
     },
 
-    update_option_checkboxes: function() {
+    update_option_radios: function() {
       var self = this
         , $option_list = $(this.element).find('.option_column ul')
         ;
 
       $option_list
-        .find('li[data-id] input[type=checkbox]')
+        .find('li[data-id] input[type=radio]')
         .prop('checked', false);
 
       this.join_list.forEach(function(join, index, list) {
         $option_list
-          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=checkbox]')
+          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]')
           .prop('checked', true);
       });
     },
@@ -446,56 +446,62 @@
 
     change_option: function(el, ev) {
       var self = this
-        , option = el.closest('li').data('option')
-        , join = this.find_join(option.id)
+        , li = el.closest('li')
+        , original_option = li.data('option');
         ;
+      
+      $.map(li.parent().children(), function(el){
+        var el = $(el)
+        , option = el.closest('li').data('option')
+        , join = self.find_join(option.id)
+        ;
+        // FIXME: This is to trigger a page refresh only when data has changed
+        //   - currently only used for the Related widget (see the " hide" event)
+        //this._data_changed = true;
 
-      // FIXME: This is to trigger a page refresh only when data has changed
-      //   - currently only used for the Related widget (see the " hide" event)
-      //this._data_changed = true;
-
-      if (el.is(':checked')) {
-        // First, check if join instance already exists
-        if (join) {
-          // Ensure '_removed' attribute is false
-          join.attr('_removed', false);
-        } else {
-          // Otherwise, create it
-          join = this.get_new_join(
-              option.id, option.scope, option.constructor.shortName);
-          join.save().then(function() {
-            //join.refresh().then(function() {
-              self.join_list.push(join);
-              self.element.trigger("relationshipcreated", join);
-            //});
-          });
-        }
-      } else {
-        // Check if instance is still selected
-        if (join) {
-          // Ensure '_removed' attribute is false
-          if (join.isNew()) {
-            // It was created, then removed, so remove from list
-            join_index = this.join_list.indexOf(join);
-            if (join_index >= 0) {
-              this.join_list.splice(join_index, 1);
-            }
+        if (option.id == original_option.id) {
+          // First, check if join instance already exists
+          if (join) {
+            // Ensure '_removed' attribute is false
+            join.attr('_removed', false);
           } else {
-            // FIXME: The data should be updated in bulk, and only when "Save"
-            //   is clicked.  Right now, it updates continuously.
-            //join.attr('_removed', true);
-            join.refresh().done(function() {
-              join.destroy().then(function() {
-                join_index = self.join_list.indexOf(join);
-                if (join_index >= 0) {
-                  self.join_list.splice(join_index, 1);
-                }
-                self.element.trigger("relationshipdestroyed", join);
-              });
+            // Otherwise, create it
+            join = self.get_new_join(
+                option.id, option.scope, option.constructor.shortName);
+            join.save().then(function() {
+              //join.refresh().then(function() {
+                self.join_list.push(join);
+                self.element.trigger("relationshipcreated", join);
+              //});
             });
           }
+        } else {
+          // Check if instance is still selected
+          if (join) {
+            // Ensure '_removed' attribute is false
+            if (join.isNew()) {
+              // It was created, then removed, so remove from list
+              join_index = this.join_list.indexOf(join);
+              if (join_index >= 0) {
+                this.join_list.splice(join_index, 1);
+              }
+            } else {
+              // FIXME: The data should be updated in bulk, and only when "Save"
+              //   is clicked.  Right now, it updates continuously.
+              //join.attr('_removed', true);
+              join.refresh().done(function() {
+                join.destroy().then(function() {
+                  join_index = self.join_list.indexOf(join);
+                  if (join_index >= 0) {
+                    self.join_list.splice(join_index, 1);
+                  }
+                  self.element.trigger("relationshipdestroyed", join);
+                });
+              });
+            }
+          }
         }
-      }
+      });
     },
 
     // HELPERS
