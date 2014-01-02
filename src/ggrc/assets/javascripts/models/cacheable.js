@@ -113,7 +113,7 @@ can.Model("can.Model.Cacheable", {
           }
 
           setTimeout(function(){
-            var piece = sourceData.splice(0,Math.min(sourceData.length, 5));
+            var piece = sourceData.splice ? sourceData.splice(0,Math.min(sourceData.length, 5)) : [sourceData];
             obsList.push.apply(obsList, self.models(piece));
 
             if(sourceData.length) {
@@ -196,10 +196,15 @@ can.Model("can.Model.Cacheable", {
         .then(
           can.proxy(this, "resolve_deferred_bindings")
           , function(status) {
+            var dfd;
             if(status === 409) {
               //handle conflict.
+            } else {
+              dfd = new $.Deferred();
+              return dfd.reject.apply(dfd, arguments);
+            }
           }
-        });
+        );
       delete ret.hasFailCallback;
       return ret;
     };

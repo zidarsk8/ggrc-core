@@ -23,7 +23,7 @@ window.process_gapi_query = function(params) {
   for(var i in params) {
     switch(i) {
       case 'parents' :
-        qstr.push("'" + params[i] + "' in " + i);
+        qstr.push("'" + (params[i].id ? params[i].id : params[i]) + "' in " + i);
         break;
       case 'mimeType' :
         qstr.push(i + " = '" + params[i] + "'");
@@ -101,7 +101,7 @@ var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request
     var check_auth = function(result) {
       var args = can.makeArray(arguments);
       args.unshift(dfd);
-      if(result.error && result.error.code === 401) {
+      if(result && result.error && result.error.code === 401) {
         doGAuth(); //changes oauth_dfd to a new deferred
         params.callback = cb;
         window.gapi_authorize(params.scopes).then(can.proxy(gapi_request_with_auth, window, params))
@@ -244,6 +244,9 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   }
   , copyToParent : function(parent) {
     return this.constructor.copyToParent(this, parent);
+  }
+  , removeFromParent : function(parent) {
+    return this.constructor.removeFromParent(this, parent.id || parent);
   }
 });
 
