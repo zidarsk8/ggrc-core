@@ -32,7 +32,6 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
             .then(function(request){
               return request;
             })
-            .then(that.proxy("create_response"))
             .then(saveNextMapping)
           }
           saveNextMapping();
