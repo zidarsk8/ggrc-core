@@ -47,7 +47,11 @@ function dateConverter(d) {
     conversion = "MM/DD/YYYY";
   }
   ret = moment(d.toString(), conversion);
-  if(typeof d === "string" && ret) {
+  if (typeof d === "string" && ret
+      //  Don't correct timezone for dates
+      && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
+      //  Don't correct timezone if `moment.js` has already done it
+      && !/[-+]\d\d:?\d\d/.test(d)) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
   return ret ? ret.toDate() : undefined;
@@ -113,7 +117,7 @@ can.Model("can.Model.Cacheable", {
           }
 
           setTimeout(function(){
-            var piece = sourceData.splice(0,Math.min(sourceData.length, 5));
+            var piece = sourceData.splice ? sourceData.splice(0,Math.min(sourceData.length, 5)) : [sourceData];
             obsList.push.apply(obsList, self.models(piece));
 
             if(sourceData.length) {
@@ -196,10 +200,15 @@ can.Model("can.Model.Cacheable", {
         .then(
           $.proxy(this, "resolve_deferred_bindings")
           , function(status) {
+            var dfd;
             if(status === 409) {
               //handle conflict.
+            } else {
+              dfd = new $.Deferred();
+              return dfd.reject.apply(dfd, arguments);
+            }
           }
-        });
+        );
       delete ret.hasFailCallback;
       return ret;
     };

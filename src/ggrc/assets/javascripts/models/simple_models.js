@@ -902,7 +902,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
 can.Model.Cacheable("CMS.Models.Objective", {
   root_object : "objective"
   , root_collection : "objectives"
-  , category : "governance"
+  , category : "objectives"
   , title_singular : "Objective"
   , title_plural : "Objectives"
   , findAll : "GET /api/objectives"
@@ -1016,6 +1016,7 @@ can.Model.Cacheable("CMS.Models.Role", {
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
+  , category : "programs"
   , findOne : "GET /api/audits/{id}"
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
@@ -1116,7 +1117,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     this._super.apply(this, arguments);
     this.validatePresenceOf("due_on");
     this.validatePresenceOf("assignee");
-    this.validatePresenceOf("objective");
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
@@ -1124,12 +1124,6 @@ can.Model.Cacheable("CMS.Models.Request", {
         }
       });
     }
-  }
-  , init : function() {
-    this._super.apply(this, arguments);
-    this.validatePresenceOf("due_on");
-    this.validatePresenceOf("assignee");
-    this.validatePresenceOf("objective");
   }
 }, {
   init : function() {

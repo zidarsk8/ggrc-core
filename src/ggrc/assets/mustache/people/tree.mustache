@@ -60,9 +60,7 @@
             {{#if instance.email}}
             <div class="tree-info">
               Email:
-              <a href='mailto:{{instance.email}}' rel='tooltip' title='{{instance.email}}' target="_blank">
-                {{instance.email}}
-              </a>
+              {{{render '/static/mustache/people/popover.mustache' person=instance show_email=true}}}
             </div>
             {{else}}
               &nbsp;

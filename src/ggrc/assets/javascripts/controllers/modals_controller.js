@@ -388,7 +388,7 @@ can.Control("GGRC.Controllers.Modals", {
           }
         } else if(name[name.length - 1] === "time") {
           name.pop(); //time is a pseudoproperty of datetime objects
-          value = moment.utc(this.options.instance.attr(name.join("."))).startOf("day").add(parseInt(value, 10)).toDate();
+          value = moment(this.options.instance.attr(name.join("."))).startOf("day").add(parseInt(value, 10)).toDate();
         } else {
           value = new can.Observe({}).attr(name.slice(1).join("."), value);
         }

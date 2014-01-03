@@ -50,8 +50,6 @@
           instance = instance.instance;
         }
 
-        if(instance === null)
-          debugger;
         this.instance = instance;
         this.mappings = this._make_mappings(mappings);
         this.binding = binding;
@@ -218,8 +216,6 @@
   can.Construct("GGRC.ListLoaders.ListBinding", {
   }, {
       init: function(instance, loader) {
-        if(instance === null)
-          debugger;
         this.instance = instance;
         this.loader = loader;
 

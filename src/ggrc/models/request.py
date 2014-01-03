@@ -26,12 +26,11 @@ class Request(Described, Base, db.Model):
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'),
-    nullable=False)
+    nullable=True)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True),
     'Request')
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
   notes = deferred(db.Column(db.Text, nullable=True), 'Request')
-  auditor_contact = deferred(db.Column(db.String, nullable=True), 'Request')
 
   responses = db.relationship('Response', backref='request',
     cascade='all, delete-orphan')
@@ -49,13 +48,11 @@ class Request(Described, Base, db.Model):
     'responses',
     'test',
     'notes',
-    'auditor_contact',
   ]
   _sanitize_html = [
     'gdrive_upload_path',
     'test',
     'notes',
-    'auditor_contact',
   ]
 
   def _display_name(self):

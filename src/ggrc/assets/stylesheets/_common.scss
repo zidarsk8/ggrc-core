@@ -59,6 +59,15 @@ h1, h2, h3, h4, h5, h6 {
   &.risk {
     color:$risk;
   }
+  &.objectives {
+    color:$objectives;
+  }
+  &.controls {
+    color:$controls;
+  }
+  &.entities {
+    color:$entities;
+  }
 }
 
 span.error {

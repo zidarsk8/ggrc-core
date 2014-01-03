@@ -28,7 +28,6 @@ class RequestRowConverter(BaseRowConverter):
     self.handle_text_or_html('description')
     self.handle_text_or_html('test')
     self.handle_text_or_html('notes')
-    self.handle_raw_attr('auditor_contact')  # default to audit lead
     self.handle(
         'assignee', AssigneeHandler, is_required=True,
         person_must_exist=True)
@@ -54,7 +53,6 @@ class RequestsConverter(BaseConverter):
     ('Notes', 'notes'),
     ('Test', 'test'),
     ('Assignee', 'assignee'),
-    ('Audit Contact', 'auditor_contact'),
     ('Requested On', 'requested_on'),
     ('Due On', 'due_on'),
     ('Status', 'status'),

@@ -502,6 +502,12 @@
       font-size:$f-small;
       display: inline-block;
       margin-left: 6px;
+      &.autogenerate-result {
+        display: none;
+        &.active {
+          display: inline-block;
+        }
+      }
     }
     .large {
       font-size: 16px;

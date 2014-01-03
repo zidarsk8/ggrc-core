@@ -56,14 +56,17 @@
   <div class="row-fluid">
     {{#using objective=instance.objective}}
     <div class="span6">
+    {{#is_allowed 'update' 'Objective' context=null}}
       <label>
         Objective
-        <span class="required">*</span>
       </label>
       <i class="grcicon-objective-color pull-left icon-field"></i>
       <div class="objective-selector">
         <input tabindex="6" type="text" name="objective.title" data-lookup="Objective" class="span10" value="{{firstnonempty objective.title ''}}">
       </div>
+    {{else}}
+      &nbsp;
+    {{/is_allowed}}
     </div>
     {{/using}}
     {{#using assignee=instance.assignee}}
