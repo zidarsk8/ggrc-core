@@ -1453,7 +1453,8 @@ Mustache.registerHelper("local_time_range", function(value, start, end, options)
   var tokens = [];
   var sod;
   value = resolve_computed(value) || undefined;
-  sod = moment.utc(value).startOf("day");
+  //  Calculate "start of day" in UTC and offsets in local timezone
+  sod = moment(value).startOf("day").utc();
   start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
   end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
 
