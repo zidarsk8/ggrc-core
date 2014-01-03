@@ -109,7 +109,7 @@ can.Control("GGRC.Controllers.Modals", {
         // Ensure that the input.change event still occurs
         change : function(event, ui) {
           if(!$(event.target).parents(document.body).length)
-            console.log("FOO!");
+            console.warn("autocomplete menu change event is coming from detached nodes");
           $(event.target).trigger("change");
         }
 
@@ -161,6 +161,7 @@ can.Control("GGRC.Controllers.Modals", {
         var model = CMS.Models[ac.element.data("lookup")] || GGRC.Models[ac.element.data("lookup")]
         can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', items, function(frag) {
           $(ul).html(frag);
+          can.view.hookup(ul);
         });
       };
     });
@@ -355,7 +356,7 @@ can.Control("GGRC.Controllers.Modals", {
         instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
       });
       if(value.push) {
-        can.each(value, can.proxy(instance, "mark_for_addition", $elem.data("binding")));
+        can.each(value, $.proxy(instance, "mark_for_addition", $elem.data("binding")));
       } else {
         instance.mark_for_addition($elem.data("binding"), value);
       }

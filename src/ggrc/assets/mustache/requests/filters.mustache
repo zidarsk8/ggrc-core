@@ -9,19 +9,20 @@
     <div class="row-fluid">
       <div class="span4">
         <ul class="filter-date-range">
+          <li>FILTERS:</li>
           <li class="pull-right">
             <span>requested on or after:</span>
-            <input class="input-small date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
+            <input class="input-mini date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
           </li>
         </ul>
       </div>
-      <div class="span2">
+      <div class="span3">
         <i class="grcicon-person-green pull-left"></i>
         <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field" value="">
       </div>
-      <div class="span2">
+      <div class="span3">
         <span class="pull-left request-type">type:</span>
-        <select name="request_type" class="span8 short-field">
+        <select name="request_type" class="span9 short-field">
           {{#iterate " " "Documentation" "Interview" "Population Sample"}}
           <option value="{{firstnonempty iterator.toLowerCase}}" {{#iterator.toLowerCase}}{{#trim}}{{#if_equals this states.request_type}}selected="true"{{/trim}}{{/iterator.toLowerCase}}{{/if_equals}}>{{firstnonempty iterator "Any"}}</option>
           {{/iterate}}
@@ -37,9 +38,6 @@
           <option>Updated Response</option>
           <option>Accepted</option>
         </select>
-      </div>
-      <div class="span1">
-        <button type="reset" data-toggle="filter-reset" class="btn">Reset</button>
       </div>
     </div>
   </form>

@@ -104,7 +104,7 @@ var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request
       if(result.error && result.error.code === 401) {
         doGAuth(); //changes oauth_dfd to a new deferred
         params.callback = cb;
-        window.gapi_authorize(params.scopes).then(can.proxy(gapi_request_with_auth, window, params))
+        window.gapi_authorize(params.scopes).then($.proxy(gapi_request_with_auth, window, params))
         .then(
           function() {
             dfd.resolve.apply(dfd, arguments);
@@ -231,7 +231,7 @@ can.Model.Cacheable("CMS.Models.GDriveFile", {
   }
   , refresh : function(params) {
     return this.constructor.findOne({ id : this.id })
-    .then(can.proxy(this.constructor, "model"))
+    .then($.proxy(this.constructor, "model"))
     .done(function(d) {
       d.updated();
       //  Trigger complete refresh of object -- slow, but fixes live-binding
