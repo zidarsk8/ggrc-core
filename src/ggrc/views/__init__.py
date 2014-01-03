@@ -968,8 +968,6 @@ def all_object_views():
       object_view(models.Market),
       object_view(models.Project),
       object_view(models.DataAsset),
-      object_view(models.RiskyAttribute),
-      object_view(models.Risk),
       object_view(models.Person),
       ]
 
@@ -993,8 +991,6 @@ def all_tooltip_views():
       tooltip_view(models.Market),
       tooltip_view(models.Project),
       tooltip_view(models.DataAsset),
-      tooltip_view(models.RiskyAttribute),
-      tooltip_view(models.Risk),
       tooltip_view(models.Person),
       tooltip_view(models.Event),
       ]
