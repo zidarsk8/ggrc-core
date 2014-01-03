@@ -1481,8 +1481,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
   }
 
   var ret = defer_render('span', update, dfd);
-  ret = ret.substr(0, ret.indexOf(">") + 1) + options.inverse(options.contexts) + ret.substr(ret.indexOf(">") + 1);
-  return ret;
+  return ret + options.inverse(options.contexts);
 });
 
 Mustache.registerHelper("visibility_delay", function(delay, options) {
