@@ -5,7 +5,6 @@
 
 from collections import namedtuple
 from .common import BaseObjectView
-from .tooltip import TooltipView
 
 
 ObjectViewEntry = namedtuple(
@@ -17,7 +16,3 @@ def object_view(model_class, service_class=BaseObjectView):
       model_class._inflector.table_plural,
       model_class,
       service_class)
-
-
-def tooltip_view(model_class, service_class=TooltipView):
-  return object_view(model_class, service_class=service_class)
