@@ -1077,7 +1077,7 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
             })
         , roles_refresh_queue = new RefreshQueue()
         ;
-      roles_refresh_queue.enqueue(roles);
+      roles_refresh_queue.enqueue(roles.splice());
       roles_refresh_queue.trigger().then(function() {
         roles = can.map(can.makeArray(roles), function(role) {
           if (!scope || new RegExp(scope).test(role.scope)) {
