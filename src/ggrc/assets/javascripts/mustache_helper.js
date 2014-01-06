@@ -1959,4 +1959,9 @@ Mustache.registerHelper("with_auditors", function(instance, options) {
   }
 });
 
+// Turns DocumentationResponse to Response
+Mustache.registerHelper("type_to_readable", function(str, options){
+  return str().replace(/([A-Z])/g, ' $1').split(' ').pop();
+});
+
 })(this, jQuery, can);
