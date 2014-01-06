@@ -555,16 +555,16 @@ function defer_render(tag_prefix, func, deferred, failfunc) {
   function hookup(element, parent, view_id) {
     var f = function() {
       var g = deferred && deferred.state() === "rejected" ? failfunc : func;
-      var frag_or_html = g.apply(this, arguments)
-        , $element = $(element)
+      var $element = $(element)
         , term = element.nextSibling
+        , compute = can.compute(g, this)
         ;
 
       if(element.parentNode) {
-        can.view.live.html(element, can.compute(g, this), parent);
+        can.view.live.html(element, compute, parent);
 //        can.view.live.list(element, new can.Observe.List([arguments[0]]), g, this, element.parentNode);
       } else {
-        $element.after(frag_or_html);
+        $element.after(compute());
         if ($element.next().get(0)) {
           can.view.nodeLists.update($element.get(), $element.nextAll().get());
           $element.remove();
@@ -1460,18 +1460,10 @@ Mustache.registerHelper("mapping_count", function(instance) {
 
   if(!root) {
     root = new can.Observe();
-    options.context.attr("__mapping_count", root);
+    get_observe_context(options.contexts).attr("__mapping_count", root);
   }
 
-  function update(full_instance) {
-    if (full_instance.get_binding(mapping)) {
-      full_instance.get_list_loader(mapping).done(function(list) {
-        root.attr(mapping, list);
-      })
-    }
-    else 
-      root.attr(mapping).attr('loading', false);
-
+  function update() {
     return options.fn(''+root.attr(mapping).attr('length'));
   }
   if (!root[mapping]) {
@@ -1479,11 +1471,20 @@ Mustache.registerHelper("mapping_count", function(instance) {
     root.attr(mapping).attr('loading', true);
     refresh_queue.enqueue(instance);
     dfd = refresh_queue.trigger()
-      .then(function(instances) { return instances[0]; });
+      .then(function(instances) { return instances[0]; })
+      .done(function(refreshed_instance) {
+        if (refreshed_instance && refreshed_instance.get_binding(mapping)) {
+          refreshed_instance.get_list_loader(mapping).done(function(list) {
+            root.attr(mapping, list);
+          });
+        }
+        else
+          root.attr(mapping).attr('loading', false);
+    });
   }
 
   var ret = defer_render('span', update, dfd);
-  return ret + options.inverse(options.contexts);
+  return ret;
 });
 
 Mustache.registerHelper("visibility_delay", function(delay, options) {
@@ -1718,11 +1719,23 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
   }
 });
 
+function get_observe_context(scope) {
+  if(!scope) return null;
+  if(scope._context instanceof can.Observe) return scope._context;
+  return get_observe_context(scope._parent);
+}
+
+
 // Uses search to find the counts for a model type
 Mustache.registerHelper("global_count", function(model_type, options) {
   model_type = resolve_computed(model_type);
   var state = options.contexts.attr("__global_count")
     ;
+
+  if(!state) {
+    state = new can.Observe();
+    get_observe_context(options.contexts).attr("__global_count", state);
+  }
 
   if (!state.attr('status')) {
     state.attr('status', 'loading');

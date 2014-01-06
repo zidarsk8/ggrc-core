@@ -92,25 +92,25 @@
       {{#visibility_delay 500}}
       <div class="info">
         <i class="grcicon-control-color"></i>
-        {{#mapping_count instance 'extended_related_controls' 'related_controls' 'controls'}}
+        {{!#mapping_count instance 'extended_related_controls' 'related_controls' 'controls'}}
           {{.}}
-        {{else}}
+        {{!else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{!/mapping_count}}
         &nbsp;&nbsp;
         <i class="grcicon-process-color"></i>
-        {{#mapping_count instance 'extended_related_processes' 'related_processes' 'processes'}}
+        {{!#mapping_count instance 'extended_related_processes' 'related_processes' 'processes'}}
           {{.}}
-        {{else}}
+        {{!else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{!/mapping_count}}
         &nbsp;&nbsp;
         <i class="grcicon-system-color"></i>
-        {{#mapping_count instance 'extended_related_systems' 'related_systems' 'systems'}}
+        {{!#mapping_count instance 'extended_related_systems' 'related_systems' 'systems'}}
           {{.}}
-        {{else}}
+        {{!else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{!/mapping_count}}
       </div>
       {{/visibility_delay}}
     -->
