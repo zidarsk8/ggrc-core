@@ -98,12 +98,7 @@ def add_file_section(path, identifier, content)
 end
 
 add_file_section("/home/vagrant/.bashrc", "init_env", <<-END)
-export DEV_PREFIX=/vagrant-dev
-
-[ -n "$PS1" ] &&
-  echo "Initializing environment" &&
-  cd /vagrant &&
-  source /vagrant/bin/init_env
+[ -n "$PS1" ] && source /vagrant/bin/init_vagrant_env
 END
 
 # Update development virtualenv with requirements and dev-requirements
