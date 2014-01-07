@@ -556,8 +556,9 @@ function defer_render(tag_prefix, func, deferred, failfunc) {
     var f = function() {
       var g = deferred && deferred.state() === "rejected" ? failfunc : func;
       var $element = $(element)
+        , args = arguments
         , term = element.nextSibling
-        , compute = can.compute(g, this)
+        , compute = can.compute(function() { return g.apply(this, args); }, this)
         ;
 
       if(element.parentNode) {
