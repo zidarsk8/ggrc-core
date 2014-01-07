@@ -545,17 +545,21 @@ Mustache.registerHelper("render_hooks", function(hook, options) {
   }).join("\n");
 });
 
-function defer_render(tag_prefix, func, deferred, failfunc) {
+function defer_render(tag_prefix, funcs, deferred) {
   var hook
     , tag_name = tag_prefix.split(" ")[0]
     ;
 
   tag_name = tag_name || "span";
 
+  if(typeof funcs === "function") {
+    funcs = { done : funcs };
+  }
+
   function hookup(element, parent, view_id) {
-    var f = function() {
-      var g = deferred && deferred.state() === "rejected" ? failfunc : func;
-      var $element = $(element)
+    var $element = $(element)
+    , f = function() {
+      var g = deferred && deferred.state() === "rejected" ? funcs.fail : funcs.done
         , args = arguments
         , term = element.nextSibling
         , compute = can.compute(function() { return g.apply(this, args); }, this)
@@ -574,12 +578,18 @@ function defer_render(tag_prefix, func, deferred, failfunc) {
     };
     if (deferred) {
       deferred.done(f);
-      if (failfunc) {
+      if (funcs.fail) {
         deferred.fail(f);
       }
     }
     else
       setTimeout(f, 13);
+
+    if(funcs.progress) {
+      // You would think that we could just do $element.append(funcs.progress()) here
+      //  but for some reason we have to hookup our own fragment.
+      $element.append(can.view.hookup($("<div>").html(funcs.progress())).html());
+    }
   }
 
   hook = can.view.hook(hookup);
@@ -1011,7 +1021,7 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
     return options.inverse(options.contexts.add({error : error}));
   }
 
-  return defer_render('span', finish, loader.refresh_instances(), fail);
+  return defer_render('span', { done : finish, fail : fail }, loader.refresh_instances());
 });
 
 
@@ -1484,7 +1494,7 @@ Mustache.registerHelper("mapping_count", function(instance) {
     });
   }
 
-  var ret = defer_render('span', update, dfd);
+  var ret = defer_render('span', { done : update, progress : function() { return options.inverse(options.contexts); } }, dfd);
   return ret;
 });
 
@@ -1495,6 +1505,7 @@ Mustache.registerHelper("visibility_delay", function(delay, options) {
     setTimeout(function() {
       if ($(el.parentNode).is(':visible'))
         $(el).append(options.fn(options.contexts));
+        can.view.hookup($(el).children());
     }, delay);
     return el;
   };
