@@ -1146,7 +1146,7 @@
                                             <li class="tree-item tree-item-add tree-footer">
                                               <div class="row-fluid">
                                                 <div class="span12">
-                                                  <a href="#" class="section-create">
+                                                  <a href="#newFile" class="section-create" data-toggle="modal">
                                                     + File
                                                   </a>
                                                 </div>
@@ -1341,7 +1341,7 @@
                                             <li class="tree-item tree-item-add tree-footer">
                                               <div class="row-fluid">
                                                 <div class="span12">
-                                                  <a href="#" class="section-create">
+                                                  <a href="#newFile" class="section-create" data-toggle="modal">
                                                     + File
                                                   </a>
                                                 </div>
@@ -3611,6 +3611,87 @@
           </div>
         </div>
         
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a tabindex="24" class="btn btn-primary" id="createNewTask" href="javascript://">Save</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="newFile" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-grey"></i>
+      </a>
+      <h2>
+        <span>Add Supporting Files</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
+        <div class="row-fluid">
+          <div class="span12">
+            <label>
+              URL
+              <span class="required">*</span>
+            </label>
+            <input tabindex="1" id="document_link" class="input-block-level" placeholder="https://www.example.com/" name="link" type="text" value="" autofocus>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span9">
+            <label>
+              Title
+            </label>
+            <input tabindex="2" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="">
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="expand-link">
+              <a class="show-hidden-fields" href="javascript://">
+                <span class="out">
+                  <i class="grcicon-show"></i>
+                  Show 
+                </span>
+                <span class="in">
+                  <i class="grcicon-hide"></i>
+                  Hide
+                </span>
+                Advanced
+                <span class="hidden-fields out">
+                  Description
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="hidden-fields-area" style="display:none">
+          <div class="row-fluid">
+            <div class="span12">
+              <label>
+                Description
+              </label>
+              <div class="wysiwyg-area">
+                <textarea tabindex="3" id="link-description" class="span12 double wysihtml5" name="description" placeholder="Enter description"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
     <div class="modal-footer">
