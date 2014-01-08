@@ -150,7 +150,8 @@ def allowed_file(filename):
 ADMIN_KIND_TEMPLATES = {
   "processes": "Process_Import_Template.csv",
   "systems": "System_Import_Template.csv",
-  "admin": "People_Import_Template.csv",
+  "poeple": "People_Import_Template.csv",
+  "help": "Help_Import_Template.csv",
 }
 
 @app.route("/<admin_kind>/import_template", methods=['GET'])
@@ -209,20 +210,62 @@ def import_people_task(task):
           converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("directives/import_errors.haml",
           directive_id="People", exception_message=str(e))
+    
+@app.route("/tasks/import_help", methods=['POST'])
+@queued_task
+def import_help_task(task):
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.help import HelpConverter
+  from ggrc.converters.import_helper import handle_csv_import
+  from ggrc.models import Help
+  import ggrc.views
+
+  csv_file = task.parameters.get("csv_file")
+  dry_run = task.parameters.get("dry_run")
+  try:
+    options = {}
+    options['dry_run'] = dry_run
+    converter = handle_csv_import(HelpConverter, csv_file.splitlines(True), **options)
+    if dry_run:
+      options['converter'] = converter
+      options['results'] = converter.objects
+      options['heading_map'] = converter.object_map
+      return render_template("help/import_result.haml", **options)
+    else:
+      count = len(converter.objects)
+      return import_redirect("/admin/help_redirect/{}".format(count))
+
+  except ImportException as e:
+    if e.show_preview:
+      converter = e.converter
+      return render_template("help/import_result.haml", exception_message=e,
+          converter=converter, results=converter.objects, heading_map=converter.object_map)
+    return render_template("directives/import_errors.haml",
+          directive_id="Help", exception_message=str(e))
+
+@app.route("/admin/help_redirect/<count>", methods=["GET"])
+def help_redirect(count):
+  flash(u'Successfully imported {} help page{}'.format(count, 's' if count > 1 else ''), 'notice')
+  return redirect("/admin")
 
 @app.route("/admin/people_redirect/<count>", methods=["GET"])
 def people_redirect(count):
-  flash(u'Successfully imported {} person{}'.format(count, 's' if count > 1 else ''), 'notice')
+  flash(u'Successfully imported {} {}'.format(count, 'people' if count > 1 else 'person'), 'notice')
   return redirect("/admin")
 
-@app.route("/admin/import_people", methods=['GET', 'POST'])
-def import_people():
+@app.route("/admin/import/<import_type>", methods=['GET', 'POST'])
+def import_people(import_type):
+  import_task = {
+    "people": import_people_task,
+    "help": import_help_task
+  }
 
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
 
   if request.method != 'POST':
-    return render_template("people/import.haml", import_kind='People')
+    return render_template(import_type + "/import.haml",
+                           import_kind=import_type.capitalize())
 
   if 'cancel' in request.form:
     return import_redirect("/admin")
@@ -236,12 +279,12 @@ def import_people():
   else:
     file_msg = "Could not import: invalid csv file."
     return render_template("directives/import_errors.haml",
-        directive_id="People", exception_message=file_msg)
+        directive_id=import_type.capitalize(), exception_message=file_msg)
 
   parameters = {"dry_run": dry_run,
                 "csv_file": csv_file.read(),
                 "csv_filename": filename}
-  tq = create_task("import_people", import_people_task, parameters)
+  tq = create_task("import_"+import_type, import_task[import_type], parameters)
   return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
 
 @app.route("/standards/<directive_id>/import_controls", methods=['GET', 'POST'])
