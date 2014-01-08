@@ -699,12 +699,29 @@ def export_people_task(task):
   filename = "PEOPLE.csv"
   return handle_converter_csv_export(filename, people, PeopleConverter, **options)
 
-@app.route("/admin/export_people", methods=['GET'])
-def export_people():
+@app.route("/tasks/export_help", methods=['POST'])
+@queued_task
+def export_help_task(task):
+  from ggrc.converters.help import HelpConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Help
+  options = {}
+  options['export'] = True
+  people = Help.query.all()
+  filename = "HELP.csv"
+  return handle_converter_csv_export(filename, people, HelpConverter, **options)
+
+@app.route("/admin/export/<export_type>", methods=['GET'])
+def export(export_type):
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
+  
+  export_task = {
+    "people": export_people_task,
+    "help": export_help_task
+  }
 
-  tq = create_task("export_people", export_people_task)
+  tq = create_task("export_" + export_type, export_task[export_type])
   return import_dump({"id":tq.id, "status":tq.status})
 
 @app.route("/task/<id_task>", methods=['GET'])
