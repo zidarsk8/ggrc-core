@@ -24,10 +24,18 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
         .then(function(program) {
           return program.get_binding("extended_related_objectives").refresh_instances();
         }).then(function(objective_mappings) {
-          can.each(objective_mappings, function(objective_mapping) {
+          
+          function saveNextMapping(){
+            if(objective_mappings.length < 1) return;
+            var objective_mapping = objective_mappings.shift();
             that.create_request(instance, objective_mapping.instance)
-            .then(that.proxy("create_response"));
-          });
+            .then(function(request){
+              return request;
+            })
+            .then(that.proxy("create_response"))
+            .then(saveNextMapping)
+          }
+          saveNextMapping();
         });
       }
     }
