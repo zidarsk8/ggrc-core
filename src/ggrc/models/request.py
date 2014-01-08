@@ -4,9 +4,9 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Base, Described
+from .mixins import deferred, Base, Described, Slugged
 
-class Request(Described, Base, db.Model):
+class Request(Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
 
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
