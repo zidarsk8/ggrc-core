@@ -196,6 +196,16 @@ $(document).ready(function(){
     $('#addAssessment').fadeIn();
     
   });
+  
+  $('body').on('click', '.show-long', function() {
+    var $this = $(this),
+        $description = $this.closest('.show-description').find('.tree-description');
+    
+    $this.hide();
+    $description.removeClass('short');
+    
+    return false;
+
 
   // New Object under Assessment Created
   $('body').on('click', '#addObjectUnderAssessmentCreated', function() {
