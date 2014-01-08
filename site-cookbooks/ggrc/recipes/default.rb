@@ -48,6 +48,7 @@ execute "Prepare dev virtualenv" do
           "cd /vagrant; make setup_dev DEV_PREFIX=/vagrant-dev'"
   user "vagrant"
   group "vagrant"
+  environment ({'HOME' => '/home/vagrant'})
   action :run
 end
 
@@ -64,6 +65,7 @@ execute "Run Makefile for first time" do
           "cd /vagrant; make appengine DEV_PREFIX=/vagrant-dev'"
   user "vagrant"
   group "vagrant"
+  environment ({'HOME' => '/home/vagrant'})
   action :run
 end
 
