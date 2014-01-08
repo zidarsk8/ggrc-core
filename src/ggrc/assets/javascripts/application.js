@@ -46,6 +46,16 @@ GGRC.register_hook = function(path, hook) {
   h.push(hook);
 };
 
+GGRC.current_url_compute = can.compute(function() {
+  var path = window.location.pathname
+  , fragment = window.location.hash;
+  return window.encodeURIComponent(path + fragment);
+});
+
+$(window).on('hashchange', function() {
+  GGRC.current_url_compute(window.location);
+});
+
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
 function ModelError(message, data) {

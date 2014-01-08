@@ -1837,10 +1837,8 @@ Mustache.registerHelper("default_audit_title", function(title, program, options)
   return new Date().getFullYear() + ": " + program.title + " - Audit " + index;
 });
 
-Mustache.registerHelper("param_current_location", function() {
-  var path = window.location.pathname
-  , fragment = window.location.hash;
-  return window.encodeURIComponent(path + fragment);
+Mustache.registerHelper('param_current_location', function() {
+  return GGRC.current_url_compute();
 });
 
 Mustache.registerHelper("sum", function() {
