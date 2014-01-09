@@ -468,7 +468,10 @@ jQuery(document).ready(function($) {
         .sticky_popover($.extend({}, defaults, { 
           trigger: 'sticky-hover' 
           , placement : function() {
-            if(this.$element.closest(".widget-area:first-child").length)
+            var $el = this.$element
+              , space = $(document).width() - ($el.offset().left + $el.width());
+            // Display on right if there is enough space
+            if($el.closest(".widget-area:first-child").length && space > 420)
               return "right";
             else
               return "left";
