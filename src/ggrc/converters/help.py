@@ -41,7 +41,7 @@ class HelpConverter(BaseConverter):
   ])
 
   object_map = OrderedDict([
-    ('Slug', 'slug'),
+    ('Code', 'slug'),
     ('Title', 'title'),
     ('Content', 'content')
     #('Company', 'company')

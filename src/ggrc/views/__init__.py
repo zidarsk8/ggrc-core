@@ -150,7 +150,7 @@ def allowed_file(filename):
 ADMIN_KIND_TEMPLATES = {
   "processes": "Process_Import_Template.csv",
   "systems": "System_Import_Template.csv",
-  "poeple": "People_Import_Template.csv",
+  "people": "People_Import_Template.csv",
   "help": "Help_Import_Template.csv",
 }
 
