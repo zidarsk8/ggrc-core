@@ -478,7 +478,6 @@ $(function() {
         ;
       
       function notify(instance){
-        console.log(instance)
         $(document.body).trigger(
             "ajax:flash"
             , {"success" : "Unmap successful."}
