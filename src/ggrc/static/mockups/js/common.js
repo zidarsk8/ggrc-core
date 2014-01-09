@@ -212,5 +212,15 @@ $(document).ready(function(){
     $('#newlyCreatedTask').fadeIn();
     $('#taskCounter').html('1');
   });
+  
+  $('body').on('click', '.show-long', function() {
+    var $this = $(this),
+        $description = $this.closest('.show-description').find('.tree-description');
+    
+    $this.hide();
+    $description.removeClass('short');
+    
+    return false;
+  });
 
 });
