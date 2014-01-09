@@ -13,28 +13,20 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 }, {
 
   "{CMS.Models.Audit} created" : function(model, ev, instance) {
-    var refresh_queue
-    , that = this;
+    var that = this;
     
     if(instance instanceof CMS.Models.Audit) {
       if(instance.auto_generate) {
-        refresh_queue = new RefreshQueue();
 
         instance.program.reify().refresh()
         .then(function(program) {
           return program.get_binding("extended_related_objectives").refresh_instances();
         }).then(function(objective_mappings) {
-          
-          function saveNextMapping(){
-            if(objective_mappings.length < 1) return;
-            var objective_mapping = objective_mappings.shift();
-            that.create_request(instance, objective_mapping.instance)
-            .then(function(request){
-              return request;
-            })
-            .then(saveNextMapping)
-          }
-          saveNextMapping();
+          can.reduce(objective_mappings, function(deferred, objective_mapping){
+            return deferred.then(function(){ 
+              return that.create_request(instance, objective_mapping.instance)
+            });
+          }, $.when());
         });
       }
     }
