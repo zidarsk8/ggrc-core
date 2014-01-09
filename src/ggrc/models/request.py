@@ -4,6 +4,7 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
+from sqlalchemy.ext.declarative import declared_attr
 from .mixins import deferred, Base, Described, Slugged
 
 class Request(Slugged, Described, Base, db.Model):
@@ -12,8 +13,7 @@ class Request(Slugged, Described, Base, db.Model):
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request',
     u'Updated Response', u'Accepted')
-  requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'),
-    nullable=False)
+  requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
   requestor = db.relationship('Person', foreign_keys=[requestor_id])
   assignee_id = db.Column(db.Integer, db.ForeignKey('people.id'),
     nullable=False)
@@ -31,9 +31,13 @@ class Request(Slugged, Described, Base, db.Model):
     'Request')
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
   notes = deferred(db.Column(db.Text, nullable=True), 'Request')
-
   responses = db.relationship('Response', backref='request',
     cascade='all, delete-orphan')
+
+  # workaround for title being attached to slug
+  @declared_attr
+  def title(cls):
+    return deferred(db.Column(db.String, nullable=True), cls.__name__)
 
   _publish_attrs = [
     'assignee',
