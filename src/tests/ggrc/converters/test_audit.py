@@ -28,8 +28,20 @@ class TestRequest(TestCase):
     self.date2 = date(2013, 9, 26)
     self.date3 = date(2013, 9, 5)
     self.person3= Person(name="Requestor Person", email="requester@example.com")
-    db.session.add(self.person3)
+    self.objective1 = Objective(slug="OBJ-1", title="Objective 1")
+    self.person1 = Person(name="Assignee Person", email="assignee@example.com")
+    self.person2= Person(name="Audit Contact Person", email="contact@example.com")
+    self.prog1 = Program(slug="PROG-1", title="Program 1")
+    self.audit1 = Audit(slug="AUD-1", title="Audit 1", status="Planned", program=self.prog1, contact=self.person2)
+    self.request1 = Request(slug="REQ-1", title="Request 1", requestor=self.person3, assignee=self.person1, request_type=u'documentation', status='Draft', requested_on=self.date3, due_on=self.date2, audit=self.audit1)
+    objs = [self.objective1, self.person1, self.person2, self.prog1, self.audit1, self.request1]
+    [db.session.add(obj) for obj in objs]
     db.session.commit()
+    self.options = {
+        'program': self.prog1,
+        'audit': self.audit1,
+        'dry_run': False,
+    }
 
   def tearDown(self):
     self.patcher.stop()
@@ -37,25 +49,11 @@ class TestRequest(TestCase):
 
   def test_new_and_existing(self):
     csv_filename = join(CSV_DIR, "request_import.csv")
-    objective1 = Objective(slug="OBJ-1", title="Objective 1")
-    person1 = Person(name="Assignee Person", email="assignee@example.com")
-    person2= Person(name="Audit Contact Person", email="contact@example.com")
-    prog1 = Program(slug="PROG-1", title="Program 1")
-    audit1 = Audit(slug="AUD-1", title="Audit 1", status="Planned", program=prog1, contact=person2)
-    request1 = Request(slug="REQ-1", title="Request 1", requestor=self.person3, assignee=person1, request_type=u'documentation', status='Draft', requested_on=self.date3, due_on=self.date2, audit=audit1)
-    objs = [objective1, person1, person2, prog1, audit1, request1]
-    [db.session.add(obj) for obj in objs]
-    db.session.commit()
-    options = {
-        'program': prog1,
-        'audit': audit1,
-        'dry_run': False,
-    }
 
     expected_request_slugs = set(["REQ-1","REQ-2"])
     expected_due_dates = set([self.date1])
     expected_statuses = set(["Amended Request", "Requested"])
-    handle_csv_import(RequestsConverter, csv_filename, **options)
+    handle_csv_import(RequestsConverter, csv_filename, **self.options)
     db_program = Program.query.filter_by(slug="PROG-1").first()
     actual_requests = set(db_program.audits[0].requests)
     actual_request_slugs = set([x.slug for x in actual_requests])
@@ -66,3 +64,22 @@ class TestRequest(TestCase):
     self.assertEqual(expected_due_dates, actual_due_dates)
     self.assertEqual(expected_statuses, actual_statuses)
 
+  def test_no_objective(self):
+    csv_filename = join(CSV_DIR, "request_import_no_objective.csv")
+    # Make dry run since objective currently required at DB level
+    self.options['dry_run'] = True
+    expected_warning = 'You will need to connect an Objective later.'
+    converter = handle_csv_import(
+        RequestsConverter, csv_filename, **self.options)
+    actual_warning = converter.objects[0].warnings_for('objective_id')[0]
+    self.assertEqual(expected_warning, actual_warning)
+
+  def test_bad_objective(self):
+    csv_filename = join(CSV_DIR, "request_import_bad_objective.csv")
+    # Make dry run since objective currently required at DB level
+    self.options['dry_run'] = True
+    expected_error = "Objective code 'OBJ-BAD' does not exist."
+    converter = handle_csv_import(
+        RequestsConverter, csv_filename, **self.options)
+    actual_error = converter.objects[0].errors_for('objective_id')[0]
+    self.assertEqual(expected_error, actual_error)
