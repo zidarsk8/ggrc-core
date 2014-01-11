@@ -250,7 +250,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
     for(var i in data) {
-      if(data.hasOwnProperty(i) && data[i].provisional_id) {
+      if(data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
         attach_provisional_id(i);
       }
     }
