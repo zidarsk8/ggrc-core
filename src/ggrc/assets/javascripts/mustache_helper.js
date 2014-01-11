@@ -810,7 +810,7 @@ Mustache.registerHelper("iterate", function() {
 
   return can.map(args, function(arg) {
     var ctx = options.contexts;
-    return options.fn(ctx.add({iterator : arg}));
+    return options.fn(ctx.add({iterator : typeof arg === "string" ? new String(arg) : arg }));
   }).join("");
 });
 

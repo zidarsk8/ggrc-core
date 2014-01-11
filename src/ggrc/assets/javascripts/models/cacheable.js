@@ -762,9 +762,6 @@ can.Model("can.Model.Cacheable", {
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {
             d.updated();
-            //  Trigger complete refresh of object -- slow, but fixes live-binding
-            //  redraws in some cases
-            can.trigger(d, "change", "*");
             dfd.resolve(d);
           })
           .fail(function() {
