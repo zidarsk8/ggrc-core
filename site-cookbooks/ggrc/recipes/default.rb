@@ -12,7 +12,7 @@ src_dir = "#{base_dir}src/"
 
 include_recipe "apt"
 
-apt_packages = %w(unzip zip make python-virtualenv fabric python-mysqldb python-imaging git sqlite3)
+apt_packages = %w(unzip zip make python-dev python-virtualenv fabric python-mysqldb python-imaging git sqlite3)
 
 apt_packages.each do |package_name|
   package package_name do
@@ -82,7 +82,7 @@ def add_file_section(path, identifier, content)
   end_line = "# END #{identifier}"
 
   # Check for line with matching md5
-  if data.grep(/#{begin_line} #{digest}/).empty?
+  if (data.respond_to? :grep and data.grep(/#{begin_line} #{digest}/).empty?) or (data.lines.grep(/#{begin_line} #{digest}/).empty?)
     # Remove old additions
     data = data.gsub(/\s*#{begin_line}.*#{end_line}\s?[0-9a-f]*\s*/m, '')
 
