@@ -18,6 +18,9 @@ class ExtensionPackageEnv(object):
     self.extension_module = get_extension_module(extension_module_name)
     self.config = make_extension_config(self.extension_module)
     self.script_dir = ScriptDirectory.from_config(self.config)
+    # Override location of `versions` directory to be independent of `env.py`
+    self.script_dir.versions = os.path.join(
+        get_extension_migrations_dir(self.extension_module), 'versions')
 
   def run_env(self, fn, **kwargs):
     with EnvironmentContext(
@@ -39,23 +42,23 @@ def get_extension_migrations_dir(module):
 
 def get_base_migrations_dir():
   import ggrc
-  return os.path.join(
-      os.path.dirname(os.path.abspath(ggrc.__file__)),
-      'migrations',
-      )
+  return get_extension_migrations_dir(ggrc)
 
 def get_base_config_file():
   return os.path.join(get_base_migrations_dir(), 'alembic.ini')
 
 def make_extension_config(module):
   config = Config(get_base_config_file())
+  # If the extension module contains a `migrations/env.py`, then use that,
+  #   otherwise use `ggrc/migrations/env.py`
+  module_script_location = get_extension_migrations_dir(module)
+  if os.path.exists(os.path.join(module_script_location, 'env.py')):
+    script_location = module_script_location
+  else:
+    script_location = get_base_migrations_dir()
   config.set_main_option(
       'script_location',
-      get_extension_migrations_dir(module),
-      )
-  config.set_main_option(
-      'sqlalchemy.url',
-      settings.SQLALCHEMY_DATABASE_URI,
+      script_location
       )
   return config
 
@@ -63,18 +66,11 @@ def extension_version_table(module):
   module_name = module if type(module) is str else module.__name__
   return '{0}_alembic_version'.format(module_name)
 
-def extension_migrations_dir(extension_module):
-  module_dir = get_extension_dir(extension_module)
-  migrations_dir = os.path.join(module_dir, 'migrations')
-  if os.path.exists(migrations_dir):
-    return migrations_dir
-  return None
-
 def extension_migrations_list():
   ret = []
   for extension_module in get_extension_modules():
-    migrations_dir = extension_migrations_dir(extension_module)
-    if migrations_dir:
+    migrations_dir = get_extension_migrations_dir(extension_module)
+    if os.path.exists(migrations_dir):
       ret.append(migrations_dir)
   return ret
 
