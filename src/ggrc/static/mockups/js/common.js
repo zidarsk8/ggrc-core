@@ -145,6 +145,7 @@ $(document).ready(function(){
     $( ".objective-selector input" ).autocomplete({
       source: people
     });
+    
   });
   
   $('body').on('click', 'ul.internav li a', function() {
@@ -230,10 +231,10 @@ var dataView;
 var grid;
 var data = [];
 var columns = [
-  {id: "title", name: "Title", field: "title", width: 300, minWidth: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true},
-  {id: "assignee", name: "Assignee", width: 300, minWidth: 120, cssClass: "cell-assignee", editor: Slick.Editors.Text, sortable: true},
-  {id: "start", name: "Start Date", field: "start", width: 120, minWidth: 60, editor: Slick.Editors.Date, sortable: true},
-  {id: "finish", name: "Finish Date", field: "finish", width: 120, minWidth: 60, editor: Slick.Editors.Date, sortable: true}
+  {id: "title", name: "Title", field: "title", width: 250, minWidth: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true},
+  {id: "assignee", name: "Assignee", field: "assignee", width: 250, minWidth: 120, cssClass: "cell-assignee", editor: Slick.Editors.Auto, sortable: true},
+  {id: "status", name: "Status", width: 140, minWidth: 80, cssClass: "cell-status", editor: Slick.Editors.Select, sortable: true},
+  {id: "finish", name: "Due on", field: "finish", width: 140, minWidth: 80, editor: Slick.Editors.Date, sortable: true}
 ];
 
 var options = {
@@ -241,8 +242,9 @@ var options = {
   enableAddRow: true,
   enableCellNavigation: true,
   asyncEditorLoading: true,
-  forceFitColumns: false,
-  topPanelHeight: 25
+  forceFitColumns: true,
+  topPanelHeight: 25,
+  rowHeight: 32,
 };
 
 var sortcol = "title";
@@ -284,26 +286,17 @@ function toggleFilterRow() {
   grid.setTopPanelVisibility(!grid.getOptions().showTopPanel);
 }
 
-
-$(".grid-header .ui-icon")
-        .addClass("ui-state-default ui-corner-all")
-        .mouseover(function (e) {
-          $(e.target).addClass("ui-state-hover")
-        })
-        .mouseout(function (e) {
-          $(e.target).removeClass("ui-state-hover")
-        });
-
 $(function () {
   // prepare the data
-  for (var i = 0; i < 50000; i++) {
+  for (var i = 0; i < 50; i++) {
     var d = (data[i] = {});
 
     d["id"] = "id_" + i;
     d["num"] = i;
-    d["title"] = "Task " + i;
-    d["start"] = "01/01/2009";
-    d["finish"] = "01/05/2009";
+    d["title"] = "Collect documentation " + i;
+    d["assignee"] = "Cassius Clay";
+    d["status"] = "Assigned";
+    d["finish"] = "Due on: 01/05/13";
   }
 
 
