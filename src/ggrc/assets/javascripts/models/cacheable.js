@@ -198,7 +198,7 @@ can.Model("can.Model.Cacheable", {
       var ret = _update
         .call(this, id, this.process_args(params))
         .then(
-          can.proxy(this, "resolve_deferred_bindings")
+          $.proxy(this, "resolve_deferred_bindings")
           , function(status) {
             var dfd;
             if(status === 409) {
@@ -217,7 +217,7 @@ can.Model("can.Model.Cacheable", {
     this.create = function(params) {
       var ret = _create
         .call(this, this.process_args(params))
-        .then(can.proxy(this, "resolve_deferred_bindings"));
+        .then($.proxy(this, "resolve_deferred_bindings"));
       delete ret.hasFailCallback;
       return ret;
     };
@@ -407,7 +407,7 @@ can.Model("can.Model.Cacheable", {
     params = this.object_from_resource(params);
     if (!params)
       return params;
-    var fn = (typeof params.each === "function") ? can.proxy(params.each,"call") : can.each;
+    var fn = (typeof params.each === "function") ? $.proxy(params.each,"call") : can.each;
     m = this.findInCacheById(params[this.id])
         || (params.provisional_id && can.getObject("provisional_cache", can.Model.Cacheable, true)[params.provisional_id]);
     if(m) {
@@ -610,6 +610,7 @@ can.Model("can.Model.Cacheable", {
     , id_key = this.constructor.id;
     if (this[id_key])
       cache[this[id_key]] = this;
+    this.attr("class", this.constructor);
   }
   , computed_errors : function() {
       var that = this
@@ -758,7 +759,7 @@ can.Model("can.Model.Cacheable", {
             , type : "get"
             , dataType : "json"
           })
-          .then(can.proxy(that.constructor, "model"))
+          .then($.proxy(that.constructor, "model"))
           .done(function(d) {
             d.updated();
             //  Trigger complete refresh of object -- slow, but fixes live-binding

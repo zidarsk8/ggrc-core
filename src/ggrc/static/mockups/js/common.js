@@ -214,6 +214,13 @@ $(document).ready(function(){
     $('#taskCounter').html('1');
   });
   
+  // Create New File
+  $('body').on('click', '#createNewFile', function() {
+    $('#newFile').modal('hide');
+    $('#newlyCreatedFile').fadeIn();
+    $('#fileCounter').html('3');
+  });
+  
   $('body').on('click', '.show-long', function() {
     var $this = $(this),
         $description = $this.closest('.show-description').find('.tree-description');

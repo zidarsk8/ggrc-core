@@ -17,7 +17,7 @@
       }
     });
     //reauthorize if we're going to change scope
-    return newscopes.length ? window.oauth_dfd.then(can.proxy(window.doGAuth, window, false)) : window.oauth_dfd;
+    return newscopes.length ? window.oauth_dfd.then($.proxy(window.doGAuth, window, false)) : window.oauth_dfd;
   };
 
   $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=doGAuth'></script>");

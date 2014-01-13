@@ -507,7 +507,7 @@ $(function() {
               , draw_children: false
               , parent_instance: object
               , model: model_name
-              , list_loader: can.proxy(list_loader, "refresh_list")
+              , list_loader: $.proxy(list_loader, "refresh_list")
             }
         }
       ;

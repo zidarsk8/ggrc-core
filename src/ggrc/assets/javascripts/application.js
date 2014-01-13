@@ -250,7 +250,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
     jqXHR.setRequestHeader("If-Unmodified-Since", (etags[originalOptions.url] || [])[1]);
     options.data = options.type.toUpperCase() === "DELETE" ? "" : JSON.stringify(data);
     for(var i in data) {
-      if(data.hasOwnProperty(i) && data[i].provisional_id) {
+      if(data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
         attach_provisional_id(i);
       }
     }
@@ -913,7 +913,8 @@ jQuery(function($){
     
     this.each(function() {
       var $that = $(this)
-      , editor = $that.data("wysihtml5").editor;
+      , editor = $that.data("wysihtml5").editor
+      , $textarea = $(editor.textarea.element);
 
       if($that.data("cms_events_bound"))
         return;
@@ -930,8 +931,9 @@ jQuery(function($){
       }).bind("resizestop", function(ev) {
         ev.stopPropagation();
         $that.css({"display" : "block", "height" : $that.height() + 20}); //10px offset between reported height and styled height.
+        $textarea.css('width', $textarea.width()+20);
         editor.composer.style();// re-copy new size of textarea to composer
-        $that.css("display", "none");
+        editor.fire('change_view', editor.currentView.name)
       });
       var $sandbox = $wysiarea.find(".wysihtml5-sandbox");
 
