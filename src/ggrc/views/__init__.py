@@ -1100,3 +1100,10 @@ def assessments():
   """The assessments guide page
   """
   return render_template("mockups/assessments.html")
+  
+@app.route("/mockups/assessments_grid")
+@login_required
+def assessments_grid():
+  """The assessments grid guide page
+  """
+  return render_template("mockups/assessments-grid.html")
