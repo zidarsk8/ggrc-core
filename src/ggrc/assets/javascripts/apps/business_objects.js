@@ -489,10 +489,14 @@ $(function() {
           , widget_name: function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
-                if (/dashboard/.test(window.location))
+                if (/dashboard/.test(window.location)) {
+                  if (far_model.title_plural === 'Sections') {
+                    return "My Sections / Clauses";
+                  }
                   return "My " + far_model.title_plural;
-                else
+                } else {
                   return far_model.title_plural;
+                }
               } else if (far_model.title_plural === "Audits") {
                 return "Mapped Audits <small>BETA</small>";
               } else {
