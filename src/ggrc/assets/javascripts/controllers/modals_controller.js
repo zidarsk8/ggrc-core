@@ -159,7 +159,8 @@ can.Control("GGRC.Controllers.Modals", {
     acs.each(function(i, ac) {
       ac._renderMenu = function(ul, items) {
         var model_class = ac.element.data("lookup")
-        , model = CMS.Models[model_class] || GGRC.Models[model_class]
+          , model = CMS.Models[model_class] || GGRC.Models[model_class]
+          ;
         can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', {model_class: model_class, items: items}, function(frag) {
           $(ul).html(frag);
         });
