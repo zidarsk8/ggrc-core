@@ -9,16 +9,79 @@
   $.extend(true, window, {
     "Slick": {
       "Editors": {
+        "Auto": AutoCompleteEditor,
         "Text": TextEditor,
         "Integer": IntegerEditor,
         "Date": DateEditor,
         "YesNoSelect": YesNoSelectEditor,
         "Checkbox": CheckboxEditor,
         "PercentComplete": PercentCompleteEditor,
-        "LongText": LongTextEditor
+        "LongText": LongTextEditor,
+        "Select": SelectEditor
       }
     }
   });
+  
+  var availableTags = [
+    "Vladan Mitevski vladan@reciprocitylabs.com",
+    "Predrag Kanazir predrag@reciprocitylabs.com",
+    "Dan Ring danring@reciprocitylabs.com",
+    "Silas Barta silas@reciprocitylabs.com"
+  ];
+
+  function AutoCompleteEditor(args) {
+   var $input;
+   var defaultValue;
+   var scope = this;
+   var calendarOpen = false;
+  
+   this.init = function () {
+     $input = $("<INPUT id='tags' class='editor-text' />");
+     $input.appendTo(args.container);
+     $input.focus().select();
+     $input.autocomplete({
+      delay: 0,
+      minLength: 0,
+      source: availableTags
+     });
+   };
+  
+   this.destroy = function () {
+     $input.autocomplete("destroy");
+   };
+  
+   this.focus = function () {
+     $input.focus();
+   };
+  
+   this.loadValue = function (item) {
+     defaultValue = item[args.column.field];
+     $input.val(defaultValue);
+     $input[0].defaultValue = defaultValue;
+     $input.select();
+   };
+  
+   this.serializeValue = function () {
+     return $input.val();
+   };
+  
+   this.applyValue = function (item, state) {
+     item[args.column.field] = state;
+   };
+  
+   this.isValueChanged = function () {
+     return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+   };
+  
+   this.validate = function () {
+     return {
+       valid: true,
+       msg: null
+     };
+   };
+  
+   this.init();
+  }
 
   function TextEditor(args) {
     var $input;
@@ -26,7 +89,7 @@
     var scope = this;
 
     this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />")
+      $input = $("<INPUT type=text class='editor-text input-block-level' />")
           .appendTo(args.container)
           .bind("keydown.nav", function (e) {
             if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
@@ -95,7 +158,7 @@
     var scope = this;
 
     this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
+      $input = $("<INPUT type=text class='editor-text input-block-level' />");
 
       $input.bind("keydown.nav", function (e) {
         if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
@@ -158,13 +221,13 @@
     var calendarOpen = false;
 
     this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
+      $input = $("<input type=text class='editor-text input-block-level' />");
       $input.appendTo(args.container);
       $input.focus().select();
       $input.datepicker({
         showOn: "button",
         buttonImageOnly: true,
-        buttonImage: "../images/calendar.gif",
+        buttonImage: "/static/images/bgnds/grid/calendar.gif",
         beforeShow: function () {
           calendarOpen = true
         },
@@ -509,4 +572,51 @@
 
     this.init();
   }
+  
+  function SelectEditor(args) {
+    var $select;
+    var defaultValue;
+    var scope = this;
+
+    this.init = function () {
+      $select = $("<SELECT tabIndex='0' class='editor-select'><OPTION value='assigned'>Assigned</OPTION><OPTION value='accepted'>Accepted</OPTION><OPTION value='completed'>Completed</OPTION></SELECT>");
+      $select.appendTo(args.container);
+      $select.focus();
+    };
+
+    this.destroy = function () {
+      $select.remove();
+    };
+
+    this.focus = function () {
+      $select.focus();
+    };
+
+    this.loadValue = function (item) {
+      $select.val((defaultValue = item[args.column.field]) ? "assigned" : "accepted");
+      $select.select();
+    };
+
+    this.serializeValue = function () {
+      return ($select.val() == "assigned");
+    };
+
+    this.applyValue = function (item, status) {
+      item[args.column.field] = status;
+    };
+
+    this.isValueChanged = function () {
+      return ($select.val() != defaultValue);
+    };
+
+    this.validate = function () {
+      return {
+        valid: true,
+        msg: null
+      };
+    };
+
+    this.init();
+  }
+  
 })(jQuery);
