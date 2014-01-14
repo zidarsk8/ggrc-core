@@ -4,4 +4,3 @@
 # Maintained By: dan@reciprocitylabs.com
 
 EXTENSIONS = ['ggrc_risk_assessments']
-exports = []
