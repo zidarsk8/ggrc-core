@@ -1086,14 +1086,14 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap";
 });
 
-Mustache.registerHelper("if_result_has_direct_mappings", function(
+Mustache.registerHelper("result_direct_mappings", function(
     bindings, parent_instance, options) {
-  //  Render the `true` / `fn` block if the `result` contains a direct mapping
-  //  to `parent_instance`.  Otherwise render the `false` / `inverse` block.
   bindings = Mustache.resolve(bindings);
   bindings = resolve_computed(bindings);
   parent_instance = Mustache.resolve(parent_instance);
   var has_direct_mappings = false
+    , has_external_mappings = false
+    , mappings_type = ""
     , i
     ;
 
@@ -1102,13 +1102,15 @@ Mustache.registerHelper("if_result_has_direct_mappings", function(
       if (bindings[i].instance && parent_instance
           && bindings[i].instance.reify() === parent_instance.reify())
         has_direct_mappings = true;
+      else {
+        has_external_mappings = true;
+      }
     }
   }
-
-  if (has_direct_mappings)
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
+  mappings_type = has_direct_mappings ? 
+      (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
+  options.contexts[options.contexts.length-1].mappings_type = mappings_type 
+  return options.fn(options.contexts);
 });
 
 Mustache.registerHelper("if_result_has_extended_mappings", function(
