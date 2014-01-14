@@ -238,7 +238,7 @@ var dataView;
 var grid;
 var data = [];
 var columns = [
-  {id: "title", name: "Title", field: "title", width: 330, minWidth: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true, filter: text},
+  {id: "title", name: "Title", field: "title", width: 330, minWidth: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true},
   {id: "assignee", name: "Assignee", field: "assignee", width: 170, minWidth: 100, cssClass: "cell-assignee", editor: Slick.Editors.Auto, sortable: true},
   {id: "status", name: "Status", field: "status", width: 140, minWidth: 80, cssClass: "cell-status", options: "Assigned,Accepted,Completed", editor: Slick.Editors.Select, sortable: true},
   {id: "due-on", name: "Due on", field: "due-on", width: 140, minWidth: 80, cssClass: "cell-due-on", editor: Slick.Editors.Date, sortable: true}
