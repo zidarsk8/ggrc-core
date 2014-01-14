@@ -714,14 +714,12 @@ def import_processes():
 
   return render_template("systems/import.haml", import_kind='Processes')
 
-@app.route("/processes/export", methods=['GET'])
-def export_processes():
+@app.route("/tasks/export_process", methods=['POST'])
+@queued_task
+def export_process_task(task):
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
   from ggrc.models.all_models import Process
-
-  if not permissions.is_allowed_read("/admin", 1):
-    raise Forbidden()
 
   options = {}
   options['export'] = True
@@ -729,6 +727,19 @@ def export_processes():
   procs = Process.query.all()
   filename = "PROCESSES.csv"
   return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
+
+@app.route("/tasks/export_system", methods=['POST'])
+@queued_task
+def export_system_task(task):
+  from ggrc.converters.systems import SystemsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import System
+
+  options = {}
+  options['export'] = True
+  systems = System.query.filter_by(is_biz_process=False).all()
+  filename = "SYSTEMS.csv"
+  return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
 @app.route("/tasks/export_people", methods=['POST'])
 @queued_task
@@ -761,7 +772,9 @@ def export(export_type):
   
   export_task = {
     "people": export_people_task,
-    "help": export_help_task
+    "help": export_help_task,
+    "process": export_process_task,
+    "system": export_system_task,
   }
 
   tq = create_task("export_" + export_type, export_task[export_type])
@@ -770,21 +783,6 @@ def export(export_type):
 @app.route("/task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
-
-@app.route("/systems/export", methods=['GET'])
-def export_systems():
-  from ggrc.converters.systems import SystemsConverter
-  from ggrc.converters.import_helper import handle_converter_csv_export
-  from ggrc.models.all_models import System
-
-  if not permissions.is_allowed_read("/admin", 1):
-    raise Forbidden()
-
-  options = {}
-  options['export'] = True
-  systems = System.query.filter_by(is_biz_process=False).all()
-  filename = "SYSTEMS.csv"
-  return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
 @app.route("/standards/<directive_id>/export_sections", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
