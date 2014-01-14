@@ -7,14 +7,14 @@
 
 
 {{!tree node mustache}}
-<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.constructor.table_singular}}">
+<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" data-model="true" {{data 'model'}}>
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
         <div class="span10">
           <div class="item-data">
             <div class="tree-title-area">
-              <i class="grcicon-{{instance.constructor.table_singular}}-color"></i>
+              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
               {{instance.title}}
               <span class="small gray">{{instance.status}}</span>
               {{#infer_roles instance}}
@@ -26,7 +26,7 @@
           </div>
         </div>
         {{#with_page_object_as 'page_object'}}
-        {{#if_equals page_object.constructor.shortName 'Person'}}
+        {{#if_instance_of page_object 'Person'}}
         <div class="span1">
           <div class="counter">
             {{^instance.contact}}
@@ -53,7 +53,7 @@
             {{/instance.contact}}
           </div>
         </div>
-        {{/if_equals}}
+        {{/if_instance_of}}
         {{/with_page_object_as}}
       </div>
     </a>
@@ -69,7 +69,7 @@
         <div class="span6">
         {{#if instance.viewLink}}
           <a href="{{instance.viewLink}}" class="info-action">
-            View {{instance.constructor.title_singular}}
+            View {{instance.class.title_singular}}
             <i class="grcicon-goto"></i>
           </a>
         {{/if}}
@@ -238,7 +238,7 @@
           {{#using program=instance.program}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
-                View {{instance.constructor.title_singular}}
+                View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
               </a>
             </li>
@@ -250,7 +250,7 @@
           and #is_allowed' 'update' instance '\
         ' _1_context=instance.context.id}}
           <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.constructor.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
               <i class="grcicon-edit"></i>
               Edit {{model.title_singular}}
             </a>
@@ -279,7 +279,7 @@
     </div>
 
     {{#if draw_children}}
-      {{^if_null 'z'}} {{! this line is just chopping the context stack down to one element}}
+      {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
@@ -296,7 +296,7 @@
           </div>
         {{else}}
           {{#with_page_object_as 'page_object'}}
-          {{#if_match page_object.constructor.shortName 'Audit|Program|Person'}}
+          {{#if_instance_of page_object 'Audit|Program|Person'}}
             <div class="inner-tree">
               <h6>
                 PBC Requests ({{child_options.0.list.length}})
@@ -322,10 +322,10 @@
                 <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
               {{/child_options.4}}
             </div>
-          {{/if_match}}
+          {{/if_instance_of}}
           {{/with_page_object_as}}
         {{/is_profile}}
-      {{/if_null}}
+      {{/prune_context}}
     {{/if}}
 
   </div>

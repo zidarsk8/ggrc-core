@@ -52,7 +52,7 @@
     }
     , refresh : function(params) {
       return this.constructor.findOne({ id : this.id })
-      .then(can.proxy(this.constructor, "model"))
+      .then($.proxy(this.constructor, "model"))
       .done(function(d) {
         d.updated();
         //  Trigger complete refresh of object -- slow, but fixes live-binding
@@ -154,7 +154,7 @@
 
     refresh : function(params) {
       return this.constructor.findOne({ calendar : this.calendar, id : this.id })
-      .then(can.proxy(this.constructor, "model"))
+      .then($.proxy(this.constructor, "model"))
       .done(function(d) {
         d.updated();
         //  Trigger complete refresh of object -- slow, but fixes live-binding

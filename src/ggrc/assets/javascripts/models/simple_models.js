@@ -1136,9 +1136,11 @@ can.Model.Cacheable("CMS.Models.Request", {
     setAssigneeFromAudit.call(this);
 
     this.bind("audit", setAssigneeFromAudit);
-  }
-  , response_model_class : function() {
-    return can.capitalize(this.request_type.replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); })) + "Response";
+    this.attr("response_model_class", can.compute(function() {
+      return can.capitalize(this.attr("request_type")
+          .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
+        + "Response";
+    }, this));
   }
 });
 

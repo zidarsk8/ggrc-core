@@ -343,7 +343,7 @@ class ContactEmailHandler(ColumnHandler):
       value = self.find_contact(value, is_required=is_required)
     elif value and not re.match(Person.EMAIL_RE_STRING, value):
       message = "{} is not a valid email. \
-                Plerse use following format: user@example.com".format(value)
+                Please use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
     return value
 
@@ -684,11 +684,19 @@ class ObjectiveHandler(ColumnHandler):
 
   def parse_item(self, value):
     # if this slug exists, return the objective_id, otherwise throw error
-    objective = Objective.query.filter_by(slug=value.upper()).first()
-    if not objective:
-      self.add_error("Objective code {} does not exist.".format(value))
+    if value:
+      objective = Objective.query.filter_by(slug=value.upper()).first()
+      if not objective:
+        self.add_error("Objective code '{}' does not exist.".format(value))
+      else:
+        return objective.id
     else:
-      return objective.id
+      # warn or throw error based on options
+      if self.options.get('is_required'):
+        self.add_error("Objective code is required.")
+      elif self.options.get('is_needed_later'):
+        self.add_warning("You will need to connect an Objective later.")
+      return ''
 
   def export(self):
     objective_id = getattr(self.importer.obj, 'objective_id', '')

@@ -597,6 +597,10 @@
         text-decoration: underline;
       }
     }
+    .url {
+      display: inline-block;
+      @include oneline();
+    }
   }
   .risk-content {
     h3 {
