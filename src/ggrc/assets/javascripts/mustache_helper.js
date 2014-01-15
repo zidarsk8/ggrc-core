@@ -29,7 +29,7 @@ function get_template_path(url) {
 //   short-circuit the request.
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
-      template = GGRC.Templates[template_path];
+      template = template_path && GGRC.Templates[template_path];
 
   if (template) {
     return {
