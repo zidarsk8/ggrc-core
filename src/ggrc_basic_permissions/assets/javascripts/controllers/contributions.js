@@ -459,9 +459,6 @@
         , option = el.closest('li').data('option')
         , join = self.find_join(option.id)
         ;
-        // FIXME: This is to trigger a page refresh only when data has changed
-        //   - currently only used for the Related widget (see the " hide" event)
-        //this._data_changed = true;
 
         if (option.id == original_option.id) {
           // First, check if join instance already exists
@@ -473,10 +470,9 @@
             join = self.get_new_join(
                 option.id, option.scope, option.constructor.shortName);
             join.save().then(function() {
-              //join.refresh().then(function() {
                 self.join_list.push(join);
+                self.refresh_object_list();
                 self.element.trigger("relationshipcreated", join);
-              //});
             });
           }
         } else {
@@ -499,6 +495,7 @@
                   if (join_index >= 0) {
                     self.join_list.splice(join_index, 1);
                   }
+                  self.refresh_object_list();
                   self.element.trigger("relationshipdestroyed", join);
                 });
               });
