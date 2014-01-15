@@ -736,21 +736,6 @@ Mustache.registerHelper("all", function(type, params, options) {
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
-Mustache.registerHelper("handle_context", function() {
-  var context_href = this.attr('context.href')
-    , context_id = this.attr('context.id')
-    ;
-
-  return [
-    "<input type='hidden' name='context.href'" +
-      (context_href ? ("value='" + context_href + "'") : "") +
-      " null-if-empty='null-if-empty' />",
-    "<input type='hidden' name='context.id'" +
-      (context_id ? ("value='" + context_id + "'") : "") +
-      " null-if-empty='null-if-empty' numeric='numeric' />"
-    ].join("\n");
-});
-
 can.each(["page_object", "current_user"], function(fname) {
   Mustache.registerHelper("with_" + fname + "_as", function(name, options) {
     if(!options) {
