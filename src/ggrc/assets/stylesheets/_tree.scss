@@ -409,6 +409,44 @@ ul.new-tree {
         }
       }
     }
+    &.request-list {
+      &.request-redesign {
+        .item-data {
+          padding-left: 5px;
+          .type {
+            float: left;
+            width: 40px;
+          }
+        }
+        a {
+          &.danger {
+            color: $red;
+          }
+        }
+        .accepted {
+          text-transform: uppercase;
+          color: $green;
+        }
+        .controls {
+          color: $controls;
+        }
+        .control-wrap {
+          @include clearfix();
+          padding-right: 5px;
+        }
+        .date {
+          color: $gray;
+          float: left;
+          width: 30%;
+        }
+        .request-control {
+          float: left;
+          width: 66%;
+          margin-left: 4%;
+          text-align: right;
+        }
+      }
+    }
   }
   &.rq-colors {
     li.tree-item {
