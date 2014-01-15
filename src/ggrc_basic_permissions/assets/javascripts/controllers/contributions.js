@@ -379,8 +379,9 @@
       return this.options.option_model.findAll(
         $.extend(params, this.option_query),
         function(options) {
+          options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
           options.unshift({name: "No access", id: 0});
-          self.option_list.replace(options)
+          self.option_list.replace(options);
         });
     },
 
