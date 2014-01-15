@@ -413,11 +413,10 @@
         , $option_list = $(this.element).find('.option_column ul')
         ;
 
-      $option_list
-        .find('li[data-id] input[type=radio]')
-        .prop('checked', false);
       if(this.join_list.length === 0){
-        $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+        setTimeout(function(){
+          $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+        }, 0);
         return;
       }
       this.join_list.forEach(function(join, index, list) {
