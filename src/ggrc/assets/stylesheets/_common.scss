@@ -187,8 +187,7 @@ blockquote {
   font-weight: bold;
   @include box-shadow(none);
   .request-control & {
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding: 3px 6px;
     line-height: 15px;
   }
   i {
