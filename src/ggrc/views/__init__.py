@@ -570,21 +570,27 @@ def import_sections(directive_id):
       "directives/import.haml", directive_id=directive_id, import_kind=import_kind, return_to=return_to)
 
 @app.route("/task/import_system", methods=["POST"])
+@app.route("/task/import_process", methods=["POST"])
 @queued_task
 def import_system_task(task):
   from ggrc.converters.common import ImportException
   from ggrc.converters.systems import SystemsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
+  kind_lookup = {"systems": "System(s)", "processes": "Process(es)"}
   csv_file = task.parameters.get("csv_file")
+  object_kind = task.parameters.get("object_kind")
   dry_run = task.parameters.get("dry_run")
+  options = {"dry_run": dry_run}
+  if object_kind == "processes":
+    options["is_biz_process"] = '1'
   try:
-    converter = handle_csv_import(SystemsConverter, csv_file.splitlines(True), dry_run=dry_run)
+    converter = handle_csv_import(SystemsConverter, csv_file.splitlines(True), **options)
     if dry_run:
       return render_template("systems/import_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} system{}'.format(count, 's' if count > 1 else ''), 'notice')
+      flash(u'Successfully imported {} {}'.format(count, kind_lookup[object_kind]), 'notice')
       return import_redirect("/admin")
 
   except ImportException as e:
@@ -593,13 +599,18 @@ def import_system_task(task):
       return render_template("systems/import_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("directives/import_errors.haml", exception_message=e)
 
-@app.route("/systems/import", methods=['GET', 'POST'])
-def import_systems():
+@app.route("/<object_kind>/import", methods=['GET', 'POST'])
+def import_systems_processes(object_kind):
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-
+  kind_lookup = {"systems": "Systems", "processes": "Processes"}
+  if object_kind in kind_lookup:
+    import_kind = kind_lookup[object_kind]
+  else:
+    return current_app.make_response((
+        "Invalid import type.", 404, []))
   if request.method != 'POST':
-    return render_template("systems/import.haml", import_kind='Systems')
+    return render_template("systems/import.haml", import_kind=import_kind)
 
   if 'cancel' in request.form:
     return import_redirect('/admin')
@@ -611,7 +622,7 @@ def import_systems():
   else:
     file_msg = "Could not import: invalid csv file."
     return render_template("directives/import_errors.haml", exception_message=file_msg)
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename}
+  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "object_kind": object_kind}
   tq = create_task("import_system", import_system_task, parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
@@ -682,52 +693,6 @@ def import_redirect(location):
   return app.make_response((
     '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
       json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
-
-@app.route("/task/import_process", methods=['POST'])
-@queued_task
-def import_process_task(task):
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.systems import SystemsConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  import ggrc.views
-
-  csv_file = task.parameters.get("csv_file")
-  dry_run = task.parameters.get("dry_run")
-  try:
-    converter = handle_csv_import(SystemsConverter, csv_file.splitlines(True), dry_run=dry_run, is_biz_process='1')
-    if dry_run:
-      return render_template("systems/import_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
-    else:
-      count = len(converter.objects)
-      flash(u'Successfully imported {} process{}'.format(count, 'es' if count > 1 else ''), 'notice')
-      return import_redirect("/admin")
-  except ImportException as e:
-    if e.show_preview:
-      converter = e.converter
-      return render_template("systems/import_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
-    return render_template("directives/import_errors.haml", exception_message=e)
-
-@app.route("/processes/import", methods=['GET', 'POST'])
-def import_processes():
-  if not permissions.is_allowed_read("/admin", 1):
-    raise Forbidden()
-
-  if request.method != 'POST':
-    return render_template("systems/import.haml", import_kind='Processes')
-  if 'cancel' in request.form:
-    return import_redirect('/admin')
-
-  dry_run = not ('confirm' in request.form)
-  csv_file = request.files['file']
-  if csv_file and allowed_file(csv_file.filename):
-    from werkzeug import secure_filename
-    filename = secure_filename(csv_file.filename)
-  else:
-    file_msg = "Could not import: invalid csv file."
-    return render_template("directives/import_errors.haml", exception_message=file_msg)
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename}
-  tq = create_task("import_process", import_process_task, parameters)
-  return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/tasks/export_process", methods=['POST'])
 @queued_task
