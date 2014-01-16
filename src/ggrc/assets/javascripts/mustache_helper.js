@@ -513,7 +513,9 @@ Mustache.registerHelper("render", function(template, context, options) {
     }
   }
 
-  return can.view.render(template, context instanceof can.view.Scope ? context : new can.view.Scope(context));
+  var ret = can.view.render(template, context instanceof can.view.Scope ? context : new can.view.Scope(context));
+  can.view.hookup(ret);
+  return ret;
 });
 
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
@@ -1975,5 +1977,15 @@ Mustache.registerHelper("prune_context", function(options) {
 Mustache.registerHelper("type_to_readable", function(str, options){
   return str().replace(/([A-Z])/g, ' $1').split(' ').pop();
 });
+
+Mustache.registerHelper("mixed_content_check", function(url, options) {
+  url = Mustache.getHelper("schemed_url", options.contexts).fn(url);
+  if(window.location.protocol === "https:" && !/^https:/.test(url)) {
+    return options.inverse(options.contexts);
+  } else {
+    return options.fn(options.contexts);
+  }
+});
+
 
 })(this, jQuery, can);
