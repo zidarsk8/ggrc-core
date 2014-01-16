@@ -27,14 +27,13 @@
                 {{#if objective}}
                   {{objective.title}}
                 {{else}}
-                  Missing Objective
-                {{/objective}}
+                  {{#is_allowed "update" "Objective" context=null}}
+                    Missing Objective
+                  {{else}}
+                    NEW
+                  {{/is_allowed}}
+                {{/if}}
               {{/using}}
-              {{#if_helpers '\
-                #if_null' instance.objective '\
-                and ^is_allowed' "update" "Objective" context=null}}
-                  NEW
-              {{/if_helpers}}
             </div>
           </div>
         </div>
