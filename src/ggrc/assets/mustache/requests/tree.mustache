@@ -11,12 +11,24 @@
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
-        <div class="span3">
+        <div class="span2">
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-request-color"></i>
+              {{instance.description}}
+            </div>
+          </div>
+        </div>
+        <div class="span2">
+          <div class="item-data">
+            <div class="tree-title-area">
+              <i class="grcicon-objective-color"></i>
               {{#using objective=instance.objective}}
-                {{objective.title}}
+                {{#if objective}}
+                  {{objective.title}}
+                {{else}}
+                  Missing Objective
+                {{/objective}}
               {{/using}}
               {{#if_helpers '\
                 #if_null' instance.objective '\
@@ -41,8 +53,8 @@
           </div>
         {{/using}}
         </div>
-        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <span class="pull-left request-type black-font">type:</span>
+        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+          <span class="pull-left request-type black-font"></span>
           {{#with_mapping 'responses' instance}}
             {{#if_helpers '\
               ^if' allow_mapping_or_creating '\
