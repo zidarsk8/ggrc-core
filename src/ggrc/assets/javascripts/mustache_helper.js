@@ -1726,7 +1726,7 @@ Mustache.registerHelper("default_audit_title", function(title, program, options)
   
   // Count the current number of audits with default_title
   $.map(CMS.Models['Audit'].cache, function(audit){
-    if(audit.title.indexOf(default_title) === 0){
+    if(audit.title && audit.title.indexOf(default_title) === 0){
       index += 1;
     }
   });
