@@ -53,9 +53,9 @@ $(APPENGINE_ENV_DIR) :
 	mkdir -p `dirname $(APPENGINE_ENV_DIR)`
 	virtualenv "$(APPENGINE_ENV_DIR)"
 	source "$(APPENGINE_ENV_DIR)/bin/activate"; \
-		pip --version | grep -E "1\.4|1\.1" \
-			&& pip install -U pip==1.4.1 \
-			|| pip install -U pip==1.4.1 --no-use-wheel;
+		pip --version | grep -E "1.5" \
+			&& pip install -U pip==1.4.1 --no-use-wheel \
+			|| pip install -U pip==1.4.1;
 
 appengine_virtualenv : $(APPENGINE_ENV_DIR)
 
@@ -95,9 +95,9 @@ dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
 dev_virtualenv_packages : dev_virtualenv src/dev-requirements.txt src/requirements.txt
 	source "$(PREFIX)/bin/init_env"; \
-		pip --version | grep -E "1\.4|1\.1" \
-			&& pip install -U pip==1.4.1 \
-			|| pip install -U pip==1.4.1 --no-use-wheel; \
+		pip --version | grep -E "1.5" \
+			&& pip install -U pip==1.4.1 --no-use-wheel \
+			|| pip install -U pip==1.4.1; \
 		pip install --no-deps -r src/requirements.txt; \
 		pip install -r src/dev-requirements.txt
 
