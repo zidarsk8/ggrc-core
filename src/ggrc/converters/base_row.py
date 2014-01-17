@@ -180,11 +180,7 @@ class BaseRowConverter(object):
     self.handle(key, OptionColumnHandler, **options)
 
   def find_by_slug(self, slug):
-    if self.importer.options.get('is_biz_process'):
-      target_class = Process
-    else:
-      target_class = self.model_class
-    return target_class.query.filter_by(slug=slug).first()
+    return self.model_class.query.filter_by(slug=slug).first()
 
   def set_attr(self, name, value):
     try:
