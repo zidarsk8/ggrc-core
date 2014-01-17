@@ -29,7 +29,7 @@ function get_template_path(url) {
 //   short-circuit the request.
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
-      template = GGRC.Templates[template_path];
+      template = template_path && GGRC.Templates[template_path];
 
   if (template) {
     return {
@@ -1094,7 +1094,7 @@ Mustache.registerHelper("result_direct_mappings", function(
   }
   mappings_type = has_direct_mappings ? 
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
-  options.contexts[options.contexts.length-1].mappings_type = mappings_type 
+  options.context.mappings_type = mappings_type 
   return options.fn(options.contexts);
 });
 
@@ -1726,7 +1726,7 @@ Mustache.registerHelper("default_audit_title", function(title, program, options)
   
   // Count the current number of audits with default_title
   $.map(CMS.Models['Audit'].cache, function(audit){
-    if(audit.title.indexOf(default_title) === 0){
+    if(audit.title && audit.title.indexOf(default_title) === 0){
       index += 1;
     }
   });
