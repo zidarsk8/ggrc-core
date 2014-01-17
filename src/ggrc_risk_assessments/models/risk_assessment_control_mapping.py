@@ -45,3 +45,7 @@ class RiskAssessmentControlMapping(Base, db.Model):
     'threat',
     'control',
     ]
+
+  def _display_name(self):
+    return self.risk_assessment_mapping.display_name + \
+        '<->' + self.control.display_name
