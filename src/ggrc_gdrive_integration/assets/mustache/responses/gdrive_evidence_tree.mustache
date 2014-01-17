@@ -67,7 +67,8 @@
             <div class="tree-info">
               GDrive Path: 
               <a class="reference" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
-                <sticky-data class="popover-data-title">
+
+                {{#scriptwrap attr_class="popover-data-title"}}
                   <div class='row-fluid'>
                     <div class='span12'>
                       <h3>
@@ -76,7 +77,7 @@
                       </h3>
                     </div>
                   </div>
-                </sticky-data>
+                {{/scriptwrap}}
                 /{{#using request=parent_instance.request}}{{#with_mapping 'folders' request}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{#with_mapping 'files' instance}}{{files.0.instance.title}}{{/with_mapping}}
               </a>
               <span class='option'>

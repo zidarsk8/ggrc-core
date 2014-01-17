@@ -1987,5 +1987,50 @@ Mustache.registerHelper("mixed_content_check", function(url, options) {
   }
 });
 
+/**
+  scriptwrap - create live-bound content contained within a <script> tag as CDATA
+  to prevent, e.g. iframes being rendered in hidden fields, or temporary storage 
+  of markup being found by $().
+
+  Usage
+  -----
+  To render a section of markup in a script tag:
+  {{#scriptwrap}}<section content>{{/scriptwrap}}
+
+  To render the output of another helper in a script tag:
+  {{scriptwrap "name_of_other_helper" helper_arg helper_arg... hashkey=hashval}}
+
+  Hash keys starting with "attr_" will be treated as attributes to place on the script tag itself.
+  e.g. {{#scriptwrap attr_class="data-popover-content" attr_aria_
+*/
+Mustache.registerHelper("scriptwrap", function(helper) {
+  var extra_attrs = ""
+  , args = can.makeArray(arguments).slice(1, arguments.length)
+  , options = args[args.length - 1] || helper
+  , ret = "<script type='text/html'" + can.view.hook(function(el, parent, view_id) {
+    var c = can.compute(function() {
+      var $d = $("<div>").html(
+        helper === options
+        ? options.fn(options.contexts)  //not calling a separate helper case
+        : Mustache.getHelper(helper, options.contexts).fn.apply(options.context, args));
+      can.view.hookup($d);
+      return "<script type='text/html'" + extra_attrs + ">" + $d.html() + "</script>";
+    });
+
+    can.view.live.html(el, c, parent);
+  });
+
+  if(options.hash) {
+    can.each(Object.keys(options.hash), function(key) {
+      if(/^attr_/.test(key)) {
+        extra_attrs += " " + key.substr(5).replace("_", "-") + "='" + resolve_computed(options.hash[key]) + "'";
+        delete options.hash[key];
+      }
+    });
+  }
+
+  ret += "></script>";
+  return new Mustache.safeString(ret);
+});
 
 })(this, jQuery, can);

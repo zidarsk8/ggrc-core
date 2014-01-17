@@ -42,11 +42,7 @@
         <br>
         <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url url}}" target="_blank">
           {{url}}
-          <sticky-data class="popover-data-content">
-            <div>
-              {{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=url}}}
-            </div>
-          </sticky-data>
+          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=url}}}
         </a>
       </p>
       <p>
@@ -54,11 +50,7 @@
         <br>
         <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url reference_url}}" target="_blank">
           {{reference_url}}
-          <sticky-data class="popover-data-content">
-            <div>
-              {{{render '/static/mustache/pbc/iframe_tooltip.mustache' url=reference_url}}}
-            </div>
-          </sticky-data>
+          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=reference_url}}}
         </a>
       </p>
     </div>
