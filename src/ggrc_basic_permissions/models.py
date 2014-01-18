@@ -10,6 +10,7 @@ from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.mixins import Base, Described
 from sqlalchemy.orm import backref
+from .contributed_roles import DECLARED_ROLE, get_declared_role
 
 class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
@@ -31,7 +32,11 @@ class Role(Base, Described, db.Model):
 
   @simple_property
   def permissions(self):
-    permissions = json.loads(self.permissions_json) or {}
+    if self.permissions_json == DECLARED_ROLE:
+      declared_role = get_declared_role(self.name)
+      permissions = declared_role.permissions
+    else:
+      permissions = json.loads(self.permissions_json) or {}
     # make sure not to omit actions
     for action in ['create', 'read', 'update', 'delete']:
       if action not in permissions:

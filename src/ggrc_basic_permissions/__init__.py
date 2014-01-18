@@ -431,3 +431,6 @@ def initialize_all_object_views(app):
       role_view_entry.model_class,
       decorators=(login_required,),
       )
+
+from .contributed_roles import BasicRoleDeclarations
+ROLE_DECLARATIONS = BasicRoleDeclarations()
