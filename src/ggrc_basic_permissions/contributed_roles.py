@@ -47,6 +47,19 @@ def lookup_contributions(rolename):
       contributions.update(ext_contributions.contributions_for(rolename))
   return contributions;
 
+def lookup_role_implications(rolename, implications={}):
+  if rolename in implications:
+    return implications[rolename]
+  extension_modules = get_extension_modules()
+  role_implications = []
+  for extension_module in extension_modules:
+    ext_implications = getattr(
+        extension_module, "ROLE_IMPLICATIONS", None)
+    if ext_implications:
+      role_implications.extend(ext_implications.implications_for(rolename))
+  implications[rolename] = role_implications
+  return role_implications
+
 class RoleDeclarations(object):
   """
   A RoleDeclarations object provides the names of roles declared by this
@@ -73,6 +86,14 @@ class RoleContributions(object):
       return method(self)
     return {}
 
+class RoleImplications(object):
+  def implications_for(self, rolename):
+    """
+    Return a list of rolenames implied for the given rolename, or an empty
+    list.
+    """
+    return []
+
 class BasicRoleDeclarations(RoleDeclarations):
   def roles(self):
     return {
@@ -90,3 +111,23 @@ class BasicRoleDeclarations(RoleDeclarations):
         'ProgramAuditReader': ProgramAuditReader,
         'Auditor': Auditor,
         }
+
+class BasicRoleImplications(RoleImplications):
+  implications = {
+      # Program -> Audit implications
+      'ProgramOwner': ['ProgramAuditOwner',],
+      'ProgramEditor': ['ProgramAuditEditor',],
+      'ProgramReader': ['ProgramAuditReader',],
+
+      # Audit -> Program implications
+      'Auditor': [
+        'AuditorProgramReader', 'AuditorReader',],
+
+      # None -> Program (public) implications
+      'ProgramCreator': ['ObjectEditor', 'PublicProgramEditor',],
+      'ObjectEditor': ['PublicProgramEditor',],
+      'Reader': ['ProgramReader',],
+      }
+
+  def implications_for(self, rolename):
+    return self.implications.get(rolename, list())

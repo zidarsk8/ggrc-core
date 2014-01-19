@@ -169,3 +169,36 @@ class RoleImplication(Base, db.Model):
       role=self.role.display_name,
       context=context_display_name,
     )
+
+class ContextImplication(Base, db.Model):
+  __tablename__ = 'context_implications'
+
+  context_id = db.Column(
+      db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
+  source_context_id = db.Column(
+      db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
+
+  context = db.relationship(
+      'Context',
+      uselist=False,
+      foreign_keys=[context_id],
+      )
+  source_context = db.relationship(
+      'Context',
+      uselist=False,
+      foreign_keys=[source_context_id],
+      )
+
+  def _display_name(self):
+    if self.source_context:
+      source_context_display_name = self.source_context.display_name
+    else:
+      source_context_display_name = 'Default Context'
+    if self.context:
+      context_display_name = self.context.display_name
+    else:
+      context_display_name = 'Default Context'
+    return '{source_context} -> {context}'.format(
+        source_context=source_context_display_name,
+        context=context_display_name,
+        )
