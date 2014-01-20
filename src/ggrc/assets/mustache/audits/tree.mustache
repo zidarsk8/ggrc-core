@@ -196,10 +196,19 @@
                   {{/with_auditors}}
                   {{/with_mapping}}
                 {{else}}
+                <!-- TODO: Figure out how to fetch authorizations for user with no access roles
                 <strong>Auditor: </strong>
-                {{#with_auditors instance}}
-                  {{join "person.name" auditors}}
-                {{/with_auditors}}
+                {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+                  {{#with_mapping 'authorizations' instance}}
+                  {{#with_auditors instance}}
+                    {{#using auditor=auditors.0.person}}
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
+                    {{/using}}
+                  {{else}}
+                    None
+                  {{/with_auditors}}
+                  {{/with_mapping}}
+                -->
                 {{/if_helpers}}
               </li>
             </ul>

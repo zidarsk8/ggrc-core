@@ -539,7 +539,6 @@ can.Control("GGRC.Controllers.Modals", {
           person : instance.auditor
         }).save());
       }).then(finish);
-      //TODO: Update Auditor field once the changes are completed.
     }
     else{
       finish();
