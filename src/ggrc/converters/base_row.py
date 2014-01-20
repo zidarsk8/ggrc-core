@@ -687,12 +687,9 @@ class ObjectiveHandler(ColumnHandler):
       else:
         return objective.id
     else:
-      # warn or throw error based on options
-      if self.options.get('is_required'):
-        self.add_error("Objective code is required.")
-      elif self.options.get('is_needed_later'):
+      if self.options.get('is_needed_later'):
         self.add_warning("You will need to connect an Objective later.")
-      return ''
+      return None
 
   def export(self):
     objective_id = getattr(self.importer.obj, 'objective_id', '')
