@@ -75,6 +75,12 @@
       return deferred;
     },
     set_value : function(){},
+    "input[data-lookup] change" : function(el, ev) {
+      // Clear the user
+      if(el.val() == ""){
+        this.options.instance.auditor = null;
+      }
+    },
     "a.btn[data-toggle='modal-submit'] click" : function(el, ev){
       var self = this
         , instance = this.options.instance
