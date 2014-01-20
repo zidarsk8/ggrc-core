@@ -66,8 +66,6 @@ class TestRequest(TestCase):
 
   def test_no_objective(self):
     csv_filename = join(CSV_DIR, "request_import_no_objective.csv")
-    # Make dry run since objective currently required at DB level
-    self.options['dry_run'] = True
     expected_warning = 'You will need to connect an Objective later.'
     converter = handle_csv_import(
         RequestsConverter, csv_filename, **self.options)
