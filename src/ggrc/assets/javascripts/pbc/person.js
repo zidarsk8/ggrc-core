@@ -66,9 +66,9 @@ can.Model.Cacheable("CMS.Models.Person", {
     }
   , init : function() {
     this._super.apply(this, arguments);
-    //H/T to Sebastian Porto for the email validation regex
+    //Validation regex from: http://stackoverflow.com/a/46181/11236
     this.validatePresenceOf("email");
-    this.validateFormatOf("email", /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
+    this.validateFormatOf("email", /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
   }
 }, {
   display_name : function() {
