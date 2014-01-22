@@ -591,17 +591,23 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   // FIXME I can't figure out from the UserRole what context it applies to.  Assuming that we are on
   //  the program page and adding ProgramReader/ProgramEditor/ProgramOwner.
   , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
+    var cache, that = this;
     if(instance instanceof CMS.Models.UserRole
-       && GGRC.page_instance() instanceof CMS.Models.Program
-       && /^Program/.test(instance.role.reify().name)
+       && /^Program|^Auditor/.test(instance.role.reify().name)
     ) {
-      this.update_owner_permission(
-        model
-        , ev
-        , GGRC.page_instance()
-        , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
-        , instance.person
-      );
+      cache = /^Program/.test(instance.role.reify().name) ? CMS.Models.Program.cache : CMS.Models.Audit.cache;
+
+      can.each(Object.keys(cache), function(key) {
+        if(cache[key].context && cache[key].context.id === instance.context.id) {
+          that.update_owner_permission(
+            model
+            , ev
+            , cache[key]
+            , /^ProgramReader$|^Auditor/.test(instance.role.reify().name) ? "reader" : "writer"
+            , instance.person
+          );
+        }
+      });
     }
   }
 
