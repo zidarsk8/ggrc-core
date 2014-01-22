@@ -61,7 +61,16 @@ can.Model.Cacheable("CMS.Models.Program", {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
-}, {});
+}, {
+  set_owner_to_current_user_if_unset : function() {
+    // Do not add an owner to a private program. Ownership is managed
+    // through role assignment for private programs.
+    if (!this.private)
+    {
+      this._super();
+    }
+  }
+});
 
 can.Model.Cacheable("CMS.Models.Cycle", {
 }, {
