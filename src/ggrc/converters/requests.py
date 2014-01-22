@@ -6,7 +6,7 @@
 
 from .base import *
 from ggrc import db
-from ggrc.models import Audit, Request
+from ggrc.models import Audit, Program, Request
 from .base_row import *
 from collections import OrderedDict
 
@@ -36,9 +36,9 @@ class RequestRowConverter(BaseRowConverter):
         person_must_exist=True)
 
   def save_object(self, db_session, **options):
-    audit_obj = options.get('audit')
-    if audit_obj:
-      audit = db_session.merge(audit_obj)
+    audit_id = options.get('audit_id')
+    if audit_id:
+      audit = Audit.query.get(audit_id)
       self.obj.audit = audit
       self.obj.context = audit.context
       db_session.add(self.obj)
@@ -78,7 +78,7 @@ class RequestsConverter(BaseConverter):
     self.validate_code(attrs)
 
   def program(self):
-    program = db.session.merge(self.options['program'])
+    program = Program.query.get(self.options['program_id'])
     return program
 
   def do_export_metadata(self):

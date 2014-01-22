@@ -37,9 +37,11 @@ class TestRequest(TestCase):
     objs = [self.objective1, self.person1, self.person2, self.prog1, self.audit1, self.request1]
     [db.session.add(obj) for obj in objs]
     db.session.commit()
+    self.db_program = Program.query.filter_by(slug="PROG-1").first()
+    self.db_audit = Audit.query.filter_by(slug="AUD-1").first()
     self.options = {
-        'program': self.prog1,
-        'audit': self.audit1,
+        'program_id': self.db_program.id,
+        'audit_id': self.db_audit.id,
         'dry_run': False,
     }
 
@@ -54,8 +56,7 @@ class TestRequest(TestCase):
     expected_due_dates = set([self.date1])
     expected_statuses = set(["Amended Request", "Requested"])
     handle_csv_import(RequestsConverter, csv_filename, **self.options)
-    db_program = Program.query.filter_by(slug="PROG-1").first()
-    actual_requests = set(db_program.audits[0].requests)
+    actual_requests = set(self.db_program.audits[0].requests)
     actual_request_slugs = set([x.slug for x in actual_requests])
     actual_due_dates = set([x.due_on for x in actual_requests])
     actual_statuses = set([x.status for x in actual_requests])

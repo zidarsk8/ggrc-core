@@ -453,11 +453,13 @@ def import_request_task(task):
   from ggrc.converters.requests import RequestsConverter
   from ggrc.converters.import_helper import handle_csv_import
 
-  csv_file = task.parameters.get("csv_file")
   dry_run = task.parameters.get("dry_run")
-  audit = task.parameters.get("audit")
-  program = task.parameters.get("program")
-  options = {"dry_run": dry_run, "audit": audit, "program": program}
+  csv_file = task.parameters.get("csv_file")
+  options = {
+      "dry_run": dry_run,
+      "audit_id": task.parameters.get("audit_id"),
+      "program_id": task.parameters.get("program_id"),
+  }
   try:
     converter = handle_csv_import(RequestsConverter, csv_file.splitlines(True), **options)
     if dry_run:
@@ -499,7 +501,7 @@ def import_requests(audit_id):
   else:
     file_msg = "Could not import: invalid csv file."
     return render_template("programs/import_request_errors.haml", exception_message=file_msg)
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "audit": audit, "program": program, "return_to": return_to}
+  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "audit_id": audit_id, "program_id": program.id, "return_to": return_to}
   tq = create_task("import_request", import_request_task, parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
