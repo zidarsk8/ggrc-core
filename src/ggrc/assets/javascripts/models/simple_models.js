@@ -1087,7 +1087,50 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("title");
   }
 }, {
-
+  save : function() {
+    return this._super.apply(this, arguments).then(function(instance) {
+      var no_change = false
+        , auditor_role
+        ;
+      
+      if(typeof instance.auditor !== 'undefined'){
+        // Find the Auditor user role
+        return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
+          if(roles.length === 0) {
+            console.warn("No Auditor role");
+            return new $.Deferred().reject();
+          }
+          auditor_role = roles[0];
+          
+          return CMS.Models.UserRole.findAll({
+            context_id__in: instance.context.id,
+            role_id__in: auditor_role.id
+          });
+        }).then(function(auditor_roles){
+          return $.when(
+            can.map(auditor_roles, function(role){
+              if(typeof instance.auditor !== "undefined" &&
+                  instance.auditor != null &&
+                  role.person.id === instance.auditor.id) {
+                // Auditor hasn't changed
+                no_change = true;
+                return $.when();
+              }
+              return role.refresh().then(function(role){role.destroy();});
+          }));
+        }).then(function(){
+          if(!instance.auditor || no_change){
+            return $.when();
+          }
+          return $.when(new CMS.Models.UserRole({
+            context : instance.context,
+            role : auditor_role,
+            person : instance.auditor
+          }).save());
+        });
+      }
+    });
+  }
 });
 
 can.Model.Cacheable("CMS.Models.Request", {

@@ -464,12 +464,7 @@ can.Control("GGRC.Controllers.Modals", {
             , section: CMS.Models.Section.findInCacheById(params.section.id)
             , context: { id: null }
           }).save().done(finish);
-        }
-        // Map auditor to audit:
-        else if (obj instanceof CMS.Models.Audit){
-          that.saveAuditor(finish);
-        }
-        else {
+        } else {
           finish();
         }
       }).fail(function(xhr, status) {
@@ -489,53 +484,6 @@ can.Control("GGRC.Controllers.Modals", {
           }, 0);
         }
       });
-    }
-  }
-  , 'saveAuditor' : function(finish){
-    var removed = $("input[name='auditor.email']").val().length === 0
-      , instance = this.options.instance
-      , no_change = false
-      , auditor_role
-      ;
-    
-    if(typeof instance.auditor !== "undefined" || removed){
-      // Find the Auditor user role
-      CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-        if(roles.length === 0) {
-          console.warn("No Auditor role");
-          return new $.Deferred().reject();
-        }
-        auditor_role = roles[0]
-        
-        return CMS.Models.UserRole.findAll({
-          context_id__in: instance.context.id, 
-          role_id__in: auditor_role.id
-        });
-      }).then(function(auditor_roles){
-        return $.when(
-          can.map(auditor_roles, function(role){
-            if(typeof instance.auditor !== "undefined" &&
-                instance.auditor != null && 
-                role.person.id === instance.auditor.id) {
-              // Auditor hasn't changed
-              no_change = true;
-              return $.when();
-            }
-            return role.refresh().then(function(role){role.destroy()});
-        }));
-      }).then(function(){
-        if(!instance.auditor || no_change){
-          return $.when();
-        }
-        return $.when(new CMS.Models.UserRole({
-          context : instance.context,
-          role : auditor_role,
-          person : instance.auditor
-        }).save());
-      }).then(finish);
-    }
-    else{
-      finish();
     }
   }
   , " ajax:flash" : function(el, ev, mesg) {
