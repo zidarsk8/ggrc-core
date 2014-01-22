@@ -7,7 +7,7 @@ from datetime import datetime
 import re
 from .common import *
 from ggrc.models.all_models import (
-    ControlCategory, ControlAssertion,
+    Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
     Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
@@ -381,7 +381,7 @@ class AssigneeHandler(ContactEmailHandler):
         self.add_warning("Blank field; assignee will remain as {}".format(current_request_assignee.display_name))
         return current_request_assignee
       # Otherwise, default to owner of audit (received via view function)
-      audit = self.importer.options.get('audit')
+      audit = Audit.query.get(self.importer.options.get('audit_id'))
       audit_owner = getattr(audit, 'contact', None)
       if audit_owner:
         # Owner should exist, and if so, return that Person
@@ -687,12 +687,9 @@ class ObjectiveHandler(ColumnHandler):
       else:
         return objective.id
     else:
-      # warn or throw error based on options
-      if self.options.get('is_required'):
-        self.add_error("Objective code is required.")
-      elif self.options.get('is_needed_later'):
+      if self.options.get('is_needed_later'):
         self.add_warning("You will need to connect an Objective later.")
-      return ''
+      return None
 
   def export(self):
     objective_id = getattr(self.importer.obj, 'objective_id', '')
