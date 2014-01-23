@@ -85,55 +85,23 @@ from ggrc_basic_permissions.contributed_roles import RoleContributions
 class GDriveRoleContributions(RoleContributions):
   contributions = {
       'Auditor': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
-        },
-      'AuditorProgramReader': {
-        'read': ['ObjectFolder'],
-        },
-      'AuditorReader': {
-        'read': ['ObjectFolder', 'ObjectFile'],
-        },
-      'ObjectEditor': {
-        'read': ['ObjectFolder', 'ObjectFile'],
-        'create': ['ObjectFile']
+        'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
       'ProgramAuditEditor': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
+        'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'create': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'update': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'delete': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
       'ProgramAuditOwner': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
+        'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'create': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'update': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+        'delete': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
       'ProgramAuditReader': {
-        'read': ['ObjectFolder'],
+        'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
-      'ProgramBasicReader': {
-        },
-      'ProgramCreator': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
-        'delete': ['ObjectFolder'],
-        },
-      'ProgramEditor': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
-        'delete': ['ObjectFolder'],
-        },
-      'ProgramOwner': {
-        'read': ['ObjectFolder'],
-        'create': ['ObjectFolder'],
-        'delete': ['ObjectFolder'],
-        },
-      'ProgramReader': {
-        'read': ['ObjectFolder'],
-        },
-      'Reader': {
-        'read': ['ObjectFolder', 'ObjectFile']
-        },
-      'gGRC_Admin': {
-        }
       }
 
 ROLE_CONTRIBUTIONS = GDriveRoleContributions()
