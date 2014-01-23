@@ -871,7 +871,7 @@ def export_requests(audit_id):
   options = {}
   audit = Audit.query.get(audit_id)
   program = audit.program
-  options['program'] = program
+  options['program_id'] = program.id
   filename = "{}-requests.csv".format(program.slug)
   if 'ids' in request.args:
     ids = request.args['ids'].split(",")
