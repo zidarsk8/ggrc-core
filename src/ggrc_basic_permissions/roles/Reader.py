@@ -48,8 +48,6 @@ permissions = {
         "Person",
         "Program",
         "Role",
-        "ObjectFolder",
-        "ObjectFile"
     ],
     "create": [],
     "view_object_page": [

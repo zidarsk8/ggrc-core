@@ -10,7 +10,6 @@ permissions = {
         "InterviewResponse",
         "PopulationSampleResponse",
         "Audit",
-        "ObjectFolder",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",

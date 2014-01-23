@@ -5,11 +5,9 @@ description = """
 permissions = {
     "read": [
         "Program",
-        "ObjectFolder"
     ],
     "create": [
         "Program",
-        "ObjectFolder"
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -33,6 +31,5 @@ permissions = {
             },
             "condition": "contains"
         },
-        "ObjectFolder"
     ]
 }

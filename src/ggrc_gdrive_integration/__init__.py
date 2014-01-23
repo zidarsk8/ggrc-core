@@ -79,3 +79,61 @@ all_collections = [
   service('object_files', models.ObjectFile),
   service('object_events', models.ObjectEvent)
 ]
+
+from ggrc_basic_permissions.contributed_roles import RoleContributions
+
+class GDriveRoleContributions(RoleContributions):
+  contributions = {
+      'Auditor': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        },
+      'AuditorProgramReader': {
+        'read': ['ObjectFolder'],
+        },
+      'AuditorReader': {
+        'read': ['ObjectFolder', 'ObjectFile'],
+        },
+      'ObjectEditor': {
+        'read': ['ObjectFolder', 'ObjectFile'],
+        'create': ['ObjectFile']
+        },
+      'ProgramAuditEditor': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        },
+      'ProgramAuditOwner': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        },
+      'ProgramAuditReader': {
+        'read': ['ObjectFolder'],
+        },
+      'ProgramBasicReader': {
+        },
+      'ProgramCreator': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        'delete': ['ObjectFolder'],
+        },
+      'ProgramEditor': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        'delete': ['ObjectFolder'],
+        },
+      'ProgramOwner': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        'delete': ['ObjectFolder'],
+        },
+      'ProgramReader': {
+        'read': ['ObjectFolder'],
+        },
+      'Reader': {
+        'read': ['ObjectFolder', 'ObjectFile']
+        },
+      'gGRC_Admin': {
+        }
+      }
+
+ROLE_CONTRIBUTIONS = GDriveRoleContributions()

@@ -40,7 +40,6 @@ permissions = {
             "type": "PopulationSampleResponse",
             "condition": "in"
         },
-        "ObjectFolder",
         "Meeting",
         "ObjectControl",
         "ObjectDocument",
@@ -53,7 +52,6 @@ permissions = {
     ],
     "create": [
         "Request",
-        "ObjectFolder"
     ],
     "view_object_page": [
         "__GGRC_ALL__"

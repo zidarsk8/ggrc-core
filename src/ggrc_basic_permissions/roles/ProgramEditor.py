@@ -15,7 +15,6 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Relationship",
-        "ObjectFolder",
         "UserRole"
     ],
     "create": [
@@ -26,7 +25,6 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Relationship",
-        "ObjectFolder"
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -49,6 +47,5 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Relationship",
-        "ObjectFolder"
     ]
 }

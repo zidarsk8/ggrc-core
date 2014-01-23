@@ -14,7 +14,6 @@ permissions = {
         "ProgramControl",
         "ProgramDirective",
         "Relationship",
-        "ObjectFolder"
     ],
     "create": [],
     "update": [],

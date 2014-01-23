@@ -47,8 +47,6 @@ permissions = {
         "Person",
         "Program",
         "Role",
-        "ObjectFolder",
-        "ObjectFile"
     ],
     "create": [
         "Categorization",
@@ -90,7 +88,6 @@ permissions = {
         "SystemControl",
         "SystemSystem",
         "Person",
-        "ObjectFile"
     ],
     "view_object_page": [
         "__GGRC_ALL__"
