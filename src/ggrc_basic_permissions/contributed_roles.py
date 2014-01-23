@@ -13,13 +13,21 @@ from .roles import (
 
 DECLARED_ROLE = "CODE DECLARED ROLE"
 
+def contribute_role_permissions(permissions, additional_permissions):
+  for action, resource_permissions in additional_permissions.items():
+    permissions.setdefault(action, list())
+    for resource_permission in resource_permissions:
+      permissions[action].append(resource_permission)
+  return permissions
+
 def get_declared_role(rolename, resolved_roles={}):
   if rolename in resolved_roles:
     return resolved_roles[rolename]
   declarations = lookup_declarations()
   if rolename in declarations:
     role_definition = declarations[rolename]
-    role_definition.permissions.update(lookup_contributions(rolename))
+    role_contributions = lookup_contributions(rolename)
+    contribute_role_permissions(role_definition.permissions, role_contributions)
     resolved_roles[rolename] = role_definition
     return role_definition
   return None
@@ -44,7 +52,8 @@ def lookup_contributions(rolename):
   for extension_module in extension_modules:
     ext_contributions = getattr(extension_module, "ROLE_CONTRIBUTIONS", None)
     if ext_contributions:
-      contributions.update(ext_contributions.contributions_for(rolename))
+      ext_role_contributions = ext_contributions.contributions_for(rolename)
+      contribute_role_permissions(contributions, ext_role_contributions)
   return contributions;
 
 def lookup_role_implications(rolename, implications={}):
@@ -53,8 +62,7 @@ def lookup_role_implications(rolename, implications={}):
   extension_modules = get_extension_modules()
   role_implications = []
   for extension_module in extension_modules:
-    ext_implications = getattr(
-        extension_module, "ROLE_IMPLICATIONS", None)
+    ext_implications = getattr(extension_module, "ROLE_IMPLICATIONS", None)
     if ext_implications:
       role_implications.extend(ext_implications.implications_for(rolename))
   implications[rolename] = role_implications
@@ -81,7 +89,10 @@ class RoleContributions(object):
     look up a method in self for the role name, return value of method is the
     contribution.
     """
-    method = getattr(self.__class__, rolename)
+    contributions = getattr(self.__class__, 'contributions', {})
+    if rolename in contributions:
+      return contributions[rolename]
+    method = getattr(self.__class__, rolename, None)
     if method:
       return method(self)
     return {}
