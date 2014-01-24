@@ -284,7 +284,7 @@
       $target.on('modal:success', function(e, data, xhr) {
         if (form_target == 'refresh') {
           refresh_page();
-        } else if (form_target == 'redirect' && data.type != 'Audit' && data.type != 'Program') {
+        } else if (form_target == 'redirect' && data.type != 'Audit') {
           if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
             window.location.assign(xhr.getResponseHeader('location'));
           }
