@@ -73,4 +73,4 @@ def upgrade():
       ))
 
 def downgrade():
-  op.drop_table('role_implications')
+  op.drop_table('context_implications')

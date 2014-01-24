@@ -8,7 +8,7 @@ from .roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
     ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramOwner,
-    ProgramReader, Reader, gGRC_ADMIN,
+    ProgramReader, Reader, gGRC_Admin,
     )
 
 DECLARED_ROLE = "CODE DECLARED ROLE"

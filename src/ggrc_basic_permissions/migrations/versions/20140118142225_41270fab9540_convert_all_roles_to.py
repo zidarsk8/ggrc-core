@@ -47,14 +47,14 @@ def downgrade():
       Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
       ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
       ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramOwner,
-      ProgramReader, Reader, gGRC_ADMIN,
+      ProgramReader, Reader, gGRC_Admin,
       )
 
   roles = [
       Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
       ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
       ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramOwner,
-      ProgramReader, Reader, gGRC_ADMIN,
+      ProgramReader, Reader, gGRC_Admin,
       ]
 
   for role in roles:
