@@ -22,12 +22,16 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
         .then(function(program) {
           return program.get_binding("extended_related_objectives").refresh_instances();
         }).then(function(objective_mappings) {
-          can.reduce(objective_mappings, function(deferred, objective_mapping){
-            return deferred.then(function(){ 
+          return can.reduce(objective_mappings, function(deferred, objective_mapping){
+            return deferred.then(function(){
               return that.create_request(instance, objective_mapping.instance)
             });
           }, $.when());
+        }).then(function(){
+          instance.saveDeferreds.objectives.resolve(instance);
         });
+      } else {
+        instance.saveDeferreds.objectives.resolve(instance);
       }
     }
   }

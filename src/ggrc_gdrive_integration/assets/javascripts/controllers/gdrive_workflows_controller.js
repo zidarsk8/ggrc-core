@@ -8,6 +8,7 @@
 var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
   var that = this
   , dfd
+  , folder
   , owner = cls === CMS.Models.Request ? "assignee" : "contact";
 
   if(instance instanceof cls) {
@@ -25,10 +26,12 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
 
       report_progress("Creating Drive folder for " + title_generator(instance), xhr);
       return xhr;
-    }).then(function(folder) {
+    }).then(function(created_folder) {
       var refresh_queue;
+      
+      folder = created_folder;
 
-      report_progress(
+      return report_progress(
         'Linking folder "' + folder.title + '" to ' + instance.constructor.title_singular
         , new CMS.Models.ObjectFolder({
           folder : folder
@@ -36,7 +39,7 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
           , context : instance.context || { id : null }
         }).save()
       );
-
+    }).then(function(){
       if(instance[owner] && instance[owner].id !== GGRC.current_user.id) {
         refresh_queue = new RefreshQueue().enqueue(instance[owner].reify());
         refresh_queue.trigger().done(function() {
@@ -49,7 +52,10 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
             }).save()
           );
         });
+        return refresh_queue;
       }
+      return $.when();
+    }).then(function(){
       return folder;
     });
   }
@@ -134,8 +140,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       .then(this.proxy("create_folder_if_nonexistent"))
       .then($.proxy(instance.program.reify(), "refresh"))
       .then(function() {
-        that.create_audit_folder(model, ev, instance);
+        return that.create_audit_folder(model, ev, instance);
         delete that._audit_create_in_progress;
+      })
+      .then(function(){
+        instance.saveDeferreds.auditFolder.resolve(instance);
       });
     }
   }
@@ -143,28 +152,33 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   // if we had to wait for an Audit to get its own folder link on creation, we can now do the delayed creation
   //  of folder links for the audit's requests, which were created first in the PBC workflow
   , "{CMS.Models.ObjectFolder} created" : function(model, ev, instance) {
-    var i, that = this, folderable;
+    var i, that = this, folderable, create_deferreds = [];
     if(instance instanceof CMS.Models.ObjectFolder && (folderable = instance.folderable.reify()) instanceof CMS.Models.Audit) {
       folderable.refresh().then(function() {
-        folderable.get_binding("folders").refresh_instances().then(function() {
+        return folderable.get_binding("folders").refresh_instances().then(function() {
           for(i = that.request_create_queue.length; i--;) {
             if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
               if(that.request_create_queue[i].objective) {
-                that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]);
+                create_deferreds.push(that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]));
               } else {
+                var dfd = new CMS.Models.ObjectFolder({
+                  folder_id : instance.folder_id
+                  , folderable : that.request_create_queue[i]
+                  , context : that.request_create_queue[i].context || { id : null }
+                }).save();
+                create_deferreds.push(dfd);
                 report_progress(
                   'Linking new Request to Audit folder'
-                  , new CMS.Models.ObjectFolder({
-                    folder_id : instance.folder_id
-                    , folderable : that.request_create_queue[i]
-                    , context : that.request_create_queue[i].context || { id : null }
-                  }).save()
+                  , dfd
                 );
               }
               that.request_create_queue.splice(i, 1);
             }
           }
+          return $.when.apply($, create_deferreds);
         });
+      }).then(function(){
+        folderable.saveDeferreds.linkFolders.resolve(instance);
       });
     }
   }

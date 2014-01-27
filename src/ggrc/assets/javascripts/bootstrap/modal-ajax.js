@@ -284,9 +284,12 @@
       $target.on('modal:success', function(e, data, xhr) {
         if (form_target == 'refresh') {
           refresh_page();
-        } else if (form_target == 'redirect' && data.type != 'Audit') {
+        } else if (form_target == 'redirect') {
           if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
             window.location.assign(xhr.getResponseHeader('location'));
+          }
+          else if(data.type === "Audit"){
+            window.location.assign('/programs/' + data.program.id + '#audit_widget');
           }
           else {
             window.location.assign(data.selfLink.replace('/api', ''));
