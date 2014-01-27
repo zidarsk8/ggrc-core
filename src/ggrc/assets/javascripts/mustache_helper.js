@@ -514,7 +514,7 @@ Mustache.registerHelper("render", function(template, context, options) {
   }
 
   var ret = can.view.render(template, context instanceof can.view.Scope ? context : new can.view.Scope(context));
-  can.view.hookup(ret);
+  //can.view.hookup(ret);
   return ret;
 });
 
