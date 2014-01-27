@@ -18,7 +18,8 @@ permissions = {
         "ObjectSection",
         "Relationship",
         "Document",
-        "Meeting"
+        "Meeting",
+        "UserRole",
     ],
     "create": [],
     "view_object_page": [
