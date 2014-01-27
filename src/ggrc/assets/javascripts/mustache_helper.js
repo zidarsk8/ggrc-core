@@ -1926,22 +1926,33 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
-  var loader = resolve_computed(instance).get_binding('authorizations')
-    , auditors = $.map(loader.list, function(binding) {
-        if (binding.instance.role.reify().attr('name') === 'Auditor') {
-          return {
-            person: binding.instance.person.reify()
-            , binding: binding.instance
+
+  var auditor_hook, _el
+  , id = can.view.hook(auditor_hook = function auditor_hook(el){
+    var loader = resolve_computed(instance).get_binding('authorizations')
+      , html
+      , auditors = $.map(loader.list, function(binding) {
+          if (binding.instance.role.reify().attr('name') === 'Auditor') {
+            return {
+              person: binding.instance.person.reify()
+              , binding: binding.instance
+            }
           }
-        }
-      });
-  options.contexts = options.contexts.add({"auditors": auditors});
-  if(auditors.length > 0){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+        });
+    _el = el;
+    if(auditors.length > 0){
+      html = options.fn(options.contexts.add({"auditors": auditors}));
+    }
+    else{
+      html = options.inverse(options.contexts);
+    }
+    $(el).html(html);
+    can.view.hookup(el);
+  });
+  resolve_computed(instance).get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
+  return "<span" 
+    + id
+    + " data-replace='true'/>";
 });
 
 Mustache.registerHelper("if_instance_of", function(inst, cls, options) {
