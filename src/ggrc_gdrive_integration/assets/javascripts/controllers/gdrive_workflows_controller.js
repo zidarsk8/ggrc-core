@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2013-2014 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: brad@reciprocitylabs.com
+ */
 (function(can, $) {
 var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
   var that = this
@@ -114,26 +120,10 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   request_create_queue : []
 
   , create_program_folder : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
-  , "{CMS.Models.Program} created" : function(model, ev, instance) {
-    var that = this
-      , refresh_queue = new RefreshQueue();
-    
-    if((instance.context && instance.context.id) || instance.context_id) {
-      $.when(
-        this.create_program_folder(model, ev, instance)
-        , CMS.Models.UserRole.findAll({ role_name : "ProgramCreator" }).then(function(pcrs) {
-          can.each(pcrs, function(pcr) {
-            refresh_queue.enqueue(pcr.person.reify());
-          });
-          return refresh_queue.trigger();
-        })
-      ).then(function(folder, people) {
-        can.each(people, function(person) {
-          that.update_owner_permission(model, ev, instance, "writer", person);
-        });
-      });
-    }
-  }
+  /*
+    NB: We don't do folder creation on Program creation now.  Only when the first Audit is created does the Program folder
+    get created as well.
+  */
 
   , create_audit_folder : partial_proxy(create_folder, CMS.Models.Audit, function(inst) { return inst.title; }, "program")
   , "{CMS.Models.Audit} created" : function(model, ev, instance) {
@@ -467,7 +457,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       //no ObjectFolder or cannot access folder from GAPI
       el.trigger(
         "ajax:flash"
-        , { 
+        , {
           warning : 'Can\'t upload: No GDrive folder found for PBC Request '
                   + request.objective ? ('"' + request.objective.reify().title + '"') : " with no title"
         });
@@ -601,17 +591,23 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   // FIXME I can't figure out from the UserRole what context it applies to.  Assuming that we are on
   //  the program page and adding ProgramReader/ProgramEditor/ProgramOwner.
   , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
+    var cache, that = this;
     if(instance instanceof CMS.Models.UserRole
-       && GGRC.page_instance() instanceof CMS.Models.Program
-       && /^Program/.test(instance.role.reify().name)
+       && /^Program|^Auditor/.test(instance.role.reify().name)
     ) {
-      this.update_owner_permission(
-        model
-        , ev
-        , GGRC.page_instance()
-        , instance.role.reify().name === "ProgramReader" ? "reader" : "writer"
-        , instance.person
-      );
+      cache = /^Program/.test(instance.role.reify().name) ? CMS.Models.Program.cache : CMS.Models.Audit.cache;
+
+      can.each(Object.keys(cache), function(key) {
+        if(cache[key].context && cache[key].context.id === instance.context.id) {
+          that.update_owner_permission(
+            model
+            , ev
+            , cache[key]
+            , /^ProgramReader$|^Auditor/.test(instance.role.reify().name) ? "reader" : "writer"
+            , instance.person
+          );
+        }
+      });
     }
   }
 

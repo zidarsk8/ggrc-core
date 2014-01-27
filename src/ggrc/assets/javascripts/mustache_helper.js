@@ -879,7 +879,7 @@ Mustache.registerHelper("schemed_url", function(url) {
   if (url) {
     url = url.isComputed? url(): url;
     if (url && !url.match(/^[a-zA-Z]+:/)) {
-        return 'http://' + url;
+        return (window.location.protocol === "https:" ? 'https://' : 'http://') + url;
     }
   }
   return url;
@@ -1985,6 +1985,19 @@ Mustache.registerHelper("prune_context", function(options) {
 // Turns DocumentationResponse to Response
 Mustache.registerHelper("type_to_readable", function(str, options){
   return str().replace(/([A-Z])/g, ' $1').split(' ').pop();
+});
+
+Mustache.registerHelper("is_page_instance", function(instance, options){
+  var instance = resolve_computed(instance)
+    , page_instance = GGRC.page_instance()
+    ;
+  
+  if(instance.type === page_instance.type && instance.id === page_instance.id){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
 });
 
 })(this, jQuery, can);
