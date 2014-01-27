@@ -409,6 +409,16 @@ ul.new-tree {
         }
       }
     }
+    &.responses-list {
+      .response-control {
+        text-align: right;
+        padding-right: 5px;
+        .rejected {
+          text-transform: uppercase;
+          color: $red;
+        }
+      }
+    }
     &.request-list {
       &.request-redesign {
         .item-data {
