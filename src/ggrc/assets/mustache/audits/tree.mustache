@@ -183,16 +183,17 @@
                     {{#using auditor=auditors.0.person}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                     {{/using}}
-                    <span class="edit-auditor">
+                    <!--<span class="edit-auditor">
                       <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit" data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}}, "userRole_id": {{auditors.0.binding.id}} }' data-base-modal="auditor">
                         <i class="grcicon-edit"></i>
                         Edit
                       </a>
-                    </span>
+                    </span>-->
                   {{else}}
-                    <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit"  data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}} }' data-base-modal="auditor">
+                    No auditor assigned
+                    <!--<a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit"  data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}} }' data-base-modal="auditor">
                     + Auditor
-                    </a>
+                    </a>-->
                   {{/with_auditors}}
                   {{/with_mapping}}
                 {{else}}
