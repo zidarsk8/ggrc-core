@@ -602,7 +602,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
         });
-        can.view(self.options.actions_view, context, function(frag, xhr) {
+        can.view($list.data("actions") || self.options.actions_view, context, function(frag, xhr) {
           $list.find(self.options.actions_content_selector).html(frag);
         });
       });
@@ -810,10 +810,17 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
   , get_tooltip_view: function(el) {
       var tooltip_view = $(el)
             .closest('[data-tooltip-view]').attr('data-tooltip-view');
-      if (tooltip_view && tooltip_view.length > 0)
-        return GGRC.mustache_path + tooltip_view;
-      else
+      if (tooltip_view && tooltip_view.length > 0) {
+        if (tooltip_view === "null") {
+          return null;
+        }
+        else {
+          return GGRC.mustache_path + tooltip_view;
+        }
+      }
+      else {
         return this.options.tooltip_view;
+      }
     }
 
   , on_fade_in_timeout: function(el, instance) {
@@ -821,16 +828,18 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         , tooltip_view = this.get_tooltip_view(el)
         ;
 
-      this.fade_in_timeout = null;
-      can.view(tooltip_view, new can.Observe({ instance: instance }), function(frag) {
-        self.options.$extended
-          .html(frag)
-          .addClass('in')
-          .removeClass('hide')
-          .css({ top: el.offset().top, left: self.options.$lhs.width() })
-          .data('model', instance);
-        self.ensure_tooltip_visibility();
-      });
+      if (tooltip_view) {
+        this.fade_in_timeout = null;
+        can.view(tooltip_view, new can.Observe({ instance: instance }), function(frag) {
+          self.options.$extended
+            .html(frag)
+            .addClass('in')
+            .removeClass('hide')
+            .css({ top: el.offset().top, left: self.options.$lhs.width() })
+            .data('model', instance);
+          self.ensure_tooltip_visibility();
+        });
+      }
     }
 
   , on_tooltip_mouseenter: function() {
