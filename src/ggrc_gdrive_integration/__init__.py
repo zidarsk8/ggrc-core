@@ -74,7 +74,7 @@ import ggrc_gdrive_integration.views
 
 from ggrc.services.registry import service
 
-all_collections = [
+contributed_collections = [
   service('object_folders', models.ObjectFolder),
   service('object_files', models.ObjectFile),
   service('object_events', models.ObjectEvent)
