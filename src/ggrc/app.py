@@ -50,7 +50,7 @@ ggrc.services.init_all_services(app)
 
 # Initialize views
 import ggrc.views
-ggrc.views.init_all_object_views(app)
+ggrc.views.init_all_views(app)
 
 # Initialize extension blueprints
 for extension in settings.EXTENSIONS:

@@ -17,7 +17,6 @@ from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
-from ggrc.views import object_view
 from . import basic_roles
 from .contributed_roles import lookup_role_implications
 from .models import Role, RoleImplication, UserRole, ContextImplication
@@ -222,12 +221,6 @@ def load_permissions_for(user):
       .append(personal_context.id)
   return permissions
 
-def all_collections():
-  """The list of all collections provided by this extension."""
-  return [
-      service('roles', Role),
-      service('user_roles', UserRole),
-      ]
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
@@ -403,14 +396,21 @@ from ggrc.app import app
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for,}
 
-def initialize_all_object_views(app):
-  role_view_entry = object_view(Role)
-  role_view_entry.service_class.add_to(
-      app,
-      '/{0}'.format(role_view_entry.url),
-      role_view_entry.model_class,
-      decorators=(login_required,),
-      )
+
+def contributed_services():
+  """The list of all collections provided by this extension."""
+  return [
+      service('roles', Role),
+      service('user_roles', UserRole),
+      ]
+
+
+def contributed_object_views():
+  from ggrc.views.registry import object_view
+  return [
+      object_view(Role)
+      ]
+
 
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()
