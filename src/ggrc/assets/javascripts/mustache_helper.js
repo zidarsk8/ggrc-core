@@ -1465,6 +1465,11 @@ Mustache.registerHelper("mapping_count", function(instance) {
   function update() {
     return options.fn(''+root.attr(mapping).attr('length'));
   }
+
+  if (!mapping) {
+    return "";
+  }
+
   if (!root[mapping]) {
     root.attr(mapping, new can.Observe.List());
     root.attr(mapping).attr('loading', true);
