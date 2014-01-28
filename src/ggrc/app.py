@@ -14,7 +14,7 @@ from werkzeug import secure_filename
 
 app = Flask('ggrc', instance_relative_config=True)
 app.config.from_object(settings)
-if("public_config" not in app.config):
+if "public_config" not in app.config:
   app.config.public_config = {}
 
 for key in settings.exports:
@@ -53,9 +53,8 @@ import ggrc.views
 ggrc.views.init_all_views(app)
 
 # Initialize extension blueprints
-for extension in settings.EXTENSIONS:
-  __import__(extension)
-  extension_module = sys.modules[extension]
+from ggrc.extensions import get_extension_modules
+for extension_module in get_extension_modules():
   if hasattr(extension_module, 'blueprint'):
     app.register_blueprint(extension_module.blueprint)
 

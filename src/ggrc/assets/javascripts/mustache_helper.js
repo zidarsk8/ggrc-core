@@ -2048,6 +2048,17 @@ Mustache.registerHelper("scriptwrap", function(helper) {
   return new Mustache.safeString(ret);
 });
 
+Mustache.registerHelper("ggrc_config_value", function(key, default_, options) {
+  key = resolve_computed(key);
+  if (!options) {
+    options = default_;
+    default_ = null;
+  }
+  default_ = resolve_computed(default_);
+  default_ = default_ || "";
+  return can.getObject(key, [GGRC.config]) || default_;
+});
+
 Mustache.registerHelper("is_page_instance", function(instance, options){
   var instance = resolve_computed(instance)
     , page_instance = GGRC.page_instance()

@@ -7,6 +7,7 @@ import json
 from collections import namedtuple
 from flask import request, flash, session, url_for, redirect, g
 from flask.views import View
+from ggrc.extensions import get_extension_modules
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
@@ -26,7 +27,12 @@ def get_permissions_json():
   return json.dumps(getattr(g, '_request_permissions', None))
 
 def get_config_json():
-  return json.dumps(app.config.public_config)
+  public_config = dict(app.config.public_config)
+  for extension_module in get_extension_modules():
+    if hasattr(extension_module, 'get_public_config'):
+      public_config.update(
+          extension_module.get_public_config(get_current_user()))
+  return json.dumps(public_config)
 
 def get_current_user_json():
   current_user = get_current_user()
@@ -1008,8 +1014,6 @@ def contributed_object_views():
 
 
 def all_object_views():
-  from ggrc.extensions import get_extension_modules
-
   views = contributed_object_views()
 
   for extension_module in get_extension_modules():
@@ -1048,8 +1052,6 @@ def contributed_tooltip_views():
 
 
 def all_tooltip_views():
-  from ggrc.extensions import get_extension_modules
-
   views = contributed_tooltip_views()
 
   for extension_module in get_extension_modules():
@@ -1069,7 +1071,6 @@ def init_extra_views(app):
 def init_all_views(app):
   import sys
   from ggrc import settings
-  from ggrc.extensions import get_extension_modules
 
   for entry in all_object_views():
     entry.service_class.add_to(
@@ -1086,7 +1087,6 @@ def init_all_views(app):
       entry.model_class,
       decorators=(login_required,)
       )
-
 
   init_extra_views(app)
   for extension_module in get_extension_modules():
