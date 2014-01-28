@@ -32,3 +32,13 @@ def contributed_services():
       service('threats', models.Threat),
       service('vulnerabilities', models.Vulnerability),
       ]
+
+
+def contributed_object_views():
+  from . import models
+
+  return [
+      object_view(models.Template),
+      object_view(models.Threat),
+      object_view(models.Vulnerability),
+      ]
