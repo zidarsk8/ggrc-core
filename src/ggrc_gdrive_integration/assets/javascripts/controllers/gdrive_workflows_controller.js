@@ -222,19 +222,19 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       } else {
         dfd = person.refresh();
       }
-      dfd.then(function() {
-        $.when(
+      return dfd.then(function() {
+        return $.when(
           CMS.Models.GDriveFilePermission.findUserPermissionId(person)
           , instance.get_binding("folders").refresh_instances()
           , GGRC.config.GAPI_ADMIN_GROUP 
             ? CMS.Models.GDriveFilePermission.findUserPermissionId(GGRC.config.GAPI_ADMIN_GROUP)
             : undefined
         ).then(function(user_permission_id, list, admin_permission_id) {
-          can.each(list, function(binding) {
+          return $.when(can.map(list, function(binding) {
             if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
-              return;  //short circuit any operation if the user isn't allowed to add permissions
+              return $.when();  //short circuit any operation if the user isn't allowed to add permissions
 
-            binding.instance.findPermissions().then(function(permissions) {
+            return binding.instance.findPermissions().then(function(permissions) {
               var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
               var matching = can.map(permissions, function(permission) {
                 if(admin_permission_id
@@ -258,7 +258,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 }
               });
               if(matching.length < 1) {
-                report_progress(
+                return report_progress(
                   "Creating Drive folder " + (role.name || role) + " permission for " + person.email + ' on folder "' + binding.instance.title + '"'
                   , new CMS.Models.GDriveFolderPermission({
                     folder : binding.instance
@@ -268,7 +268,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 );
               }
               if(!owners_matched) {
-                report_progress(
+                return report_progress(
                   'Creating admin group permission on folder "' + binding.instance.title + '"'
                   , new CMS.Models.GDriveFolderPermission({
                     folder : binding.instance
@@ -279,7 +279,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                 );
               }
             });
-          });
+          }));
         });
       });
     }
@@ -376,7 +376,20 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
 
   , "{CMS.Models.Program} updated" : "update_owner_permission"
-  , "{CMS.Models.Audit} updated" : "update_owner_permission"
+  , "{CMS.Models.Audit} updated" : "update_audit_owner_permission"
+  , update_audit_owner_permission : function(model, ev, instance){
+    
+    if(!(instance instanceof CMS.Models.Audit)) {
+      return;
+    }
+    
+    var dfd = this.update_owner_permission.apply(this, arguments);
+    if(typeof(instance.saveDeferreds) !== 'undefined'){
+      dfd.then(function(){
+        instance.saveDeferreds.auditPermissions.resolve(instance);
+      });
+    }
+  }
   , "{CMS.Models.Request} updated" : function(model, ev, instance) {
     var that = this;
     if(!(instance instanceof CMS.Models.Request) || instance._folders_mutex) {

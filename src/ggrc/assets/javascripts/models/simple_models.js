@@ -1091,9 +1091,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
     
     var that = this, isNew = that.isNew();
     this.saveDeferreds = {
-        objectives: $.Deferred(),
-        auditFolder: $.Deferred(),
-        linkFolders: $.Deferred(),
+        objectives: $.Deferred()
+        , auditFolder: $.Deferred()
+        , linkFolders: $.Deferred()
+        , auditPermissions: $.Deferred()
     }
     
     return this._super.apply(this, arguments).then(function(instance) {
