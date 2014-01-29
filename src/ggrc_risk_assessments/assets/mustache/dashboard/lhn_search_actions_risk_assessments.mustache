@@ -1,6 +1,6 @@
 {{#is_allowed 'create' model.shortName context='any'}}
 <li class="add-new" data-ui-autocomplete-item="">
-<a href="https://ggrc-risk-dev.googleplex.com/riskForm" target="_blank">
+<a href="{{ggrc_config "RISK_ASSESSMENT_URL"}}/riskForm" target="_blank">
     + Create New
 </a>
 </li>
