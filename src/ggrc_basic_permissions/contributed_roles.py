@@ -7,8 +7,8 @@ from ggrc.extensions import get_extension_modules
 from .roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
-    ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramOwner,
-    ProgramReader, Reader, gGRC_Admin,
+    ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramMappingEditor,
+    ProgramOwner, ProgramReader, Reader, gGRC_Admin,
     )
 
 DECLARED_ROLE = "CODE DECLARED ROLE"
@@ -113,6 +113,7 @@ class BasicRoleDeclarations(RoleDeclarations):
         'ProgramCreator': ProgramCreator,
         'ObjectEditor': ObjectEditor,
         'ProgramBasicReader': ProgramBasicReader,
+        'ProgramMappingEditor': ProgramMappingEditor,
         'ProgramOwner': ProgramOwner,
         'ProgramEditor': ProgramEditor,
         'ProgramReader': ProgramReader,
@@ -135,8 +136,8 @@ class BasicRoleImplications(RoleImplications):
         'AuditorProgramReader', 'AuditorReader',],
 
       # None -> Program (public) implications
-      'ProgramCreator': ['ObjectEditor'], #, 'PublicProgramEditor',],
-      'ObjectEditor': [], #'PublicProgramEditor',],
+      'ProgramCreator': ['ObjectEditor', 'ProgramMappingEditor',],
+      'ObjectEditor': ['ProgramMappingEditor',],
       'Reader': ['ProgramReader',],
       }
 
