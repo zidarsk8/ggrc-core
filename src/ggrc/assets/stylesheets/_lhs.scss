@@ -248,6 +248,8 @@
         background:#eee;
         span.lhs-item {
           display:block;
+          width: auto !important;
+          margin-right: 60px;
           @include oneline();
         }
         &.active {
@@ -262,6 +264,15 @@
         }
         .lhs-private {
           margin-right: 17px;
+          position: absolute;
+          top: 0px;
+          right: 20px;
+        }
+        .lhs-people {
+          margin-right: 17px;
+          position: absolute;
+          top: 0px;
+          right: 0px;
         }
       }
       &.view-more {
