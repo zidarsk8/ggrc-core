@@ -29,6 +29,18 @@ blueprint = Blueprint(
     static_url_path='/static/ggrc_basic_permissions',
     )
 
+
+def get_public_config(current_user):
+  """Expose additional permissions-dependent config to client.
+    Specifically here, expose GGRC_BOOTSTRAP_ADMIN values to ADMIN users.
+  """
+  public_config = {}
+  if permissions.is_admin():
+    if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
+      public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
+  return public_config
+
+
 class CompletePermissionsProvider(object):
   def __init__(self, settings):
     pass
