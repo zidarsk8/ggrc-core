@@ -1206,7 +1206,7 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
-var allowed_actions = ["create", "read", "update", "delete", "view_object_page"];
+var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
 Mustache.registerHelper("is_allowed", function() {
   var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
@@ -1832,7 +1832,7 @@ Mustache.registerHelper("if_helpers", function() {
         if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
-            , helper: Mustache.getHelper(match[4], options.context)
+            , helper: Mustache.getHelper(match[4], options.contexts)
             , args: []
             , logic: match[2] === 'or' ? 'or' : 'and'
           };

@@ -1133,3 +1133,11 @@ def assessments_grid():
   """The assessments grid guide page
   """
   return render_template("mockups/assessments-grid.html")
+
+@app.route("/permissions")
+@login_required
+def user_permissions():
+  '''Permissions object for the currently
+     logged in user
+  '''
+  return get_permissions_json()
