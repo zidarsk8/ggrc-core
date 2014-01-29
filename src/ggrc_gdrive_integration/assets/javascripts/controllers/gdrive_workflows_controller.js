@@ -174,15 +174,17 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   //  we can do the request folder immediately.
   , create_request_folder : partial_proxy(
     create_folder, CMS.Models.Request, function(inst) { return inst.objective.reify().title; }, "audit")
-  , "{CMS.Models.Request} created" : function(model, ev, instance) {
+  , "{CMS.Models.Request} created" : "link_request_to_new_folder_or_audit_folder"
+
+  , link_request_to_new_folder_or_audit_folder : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Request) {
       if(this._audit_create_in_progress || instance.audit.reify().object_folders.length < 1) {
         this.request_create_queue.push(instance);
       } else {
         if(instance.objective) {
-          this.create_request_folder(model, ev, instance);
+          return this.create_request_folder(model, ev, instance);
         } else {
-          report_progress(
+          return report_progress(
             'Linking new Request to Audit folder'
             , new CMS.Models.ObjectFolder({
               folder_id : instance.audit.reify().object_folders[0].reify().folder_id
@@ -363,7 +365,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
   , "{CMS.Models.Program} updated" : "update_owner_permission"
   , "{CMS.Models.Audit} updated" : "update_owner_permission"
-  , "{CMS.Models.Request} updated" : function(model, ev, instance) {
+  , "{CMS.Models.Request} updated" : "update_request_folder"
+
+  , update_request_folder : function(model, ev, instance) {
     var that = this;
     if(!(instance instanceof CMS.Models.Request) || instance._folders_mutex) {
       return;
@@ -371,7 +375,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
     instance._folders_mutex = true;
 
-    $.when(
+    return $.when(
       instance.get_binding("folders").refresh_instances()
       , instance.audit.reify().get_binding("folders").refresh_instances()
     ).then(function(req_folders_mapping, audit_folders_mapping) {

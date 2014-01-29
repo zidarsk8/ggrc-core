@@ -1093,42 +1093,45 @@ can.Model.Cacheable("CMS.Models.Audit", {
         , auditor_role
         ;
       
-      if(typeof instance.auditor !== 'undefined'){
-        // Find the Auditor user role
-        return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-          if(roles.length === 0) {
-            console.warn("No Auditor role");
-            return new $.Deferred().reject();
-          }
-          auditor_role = roles[0];
-          
-          return CMS.Models.UserRole.findAll({
-            context_id__in: instance.context.id,
-            role_id__in: auditor_role.id
-          });
-        }).then(function(auditor_roles){
-          return $.when(
-            can.map(auditor_roles, function(role){
-              if(typeof instance.auditor !== "undefined" &&
-                  instance.auditor != null &&
-                  role.person.id === instance.auditor.id) {
-                // Auditor hasn't changed
-                no_change = true;
-                return $.when();
-              }
-              return role.refresh().then(function(role){role.destroy();});
-          }));
-        }).then(function(){
-          if(!instance.auditor || no_change){
-            return $.when();
-          }
-          return $.when(new CMS.Models.UserRole({
-            context : instance.context,
-            role : auditor_role,
-            person : instance.auditor
-          }).save());
-        });
+      if(typeof instance.auditor === 'undefined'){
+        return instance;
       }
+      // Find the Auditor user role
+      return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
+        if(roles.length === 0) {
+          console.warn("No Auditor role");
+          return new $.Deferred().reject();
+        }
+        auditor_role = roles[0];
+        
+        return CMS.Models.UserRole.findAll({
+          context_id__in: instance.context.id,
+          role_id__in: auditor_role.id
+        });
+      }).then(function(auditor_roles){
+        return $.when(
+          can.map(auditor_roles, function(role){
+            if(typeof instance.auditor !== "undefined" &&
+                instance.auditor != null &&
+                role.person.id === instance.auditor.id) {
+              // Auditor hasn't changed
+              no_change = true;
+              return $.when();
+            }
+            return role.refresh().then(function(role){role.destroy();});
+        }));
+      }).then(function(){
+        if(!instance.auditor || no_change){
+          return $.when();
+        }
+        return $.when(new CMS.Models.UserRole({
+          context : instance.context,
+          role : auditor_role,
+          person : instance.auditor
+        }).save());
+      }).then(function(){
+        return instance;
+      });
     });
   }
 });

@@ -8,6 +8,8 @@ from collections import namedtuple
 from flask import request, flash, session, url_for, redirect, g
 from flask.views import View
 from ggrc.extensions import get_extension_modules
+from urlparse import urlparse, urlunparse
+import urllib
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
@@ -471,8 +473,18 @@ def import_request_task(task):
       return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
-      return_to = task.parameters.get("return_to")
+      urlparts = urlparse(task.parameters.get("return_to"))
+      #flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return_to = urlunparse(
+        (urlparts.scheme, 
+          urlparts.netloc, 
+          u"/audits/post_import_request_hook",
+          u'',
+          u'return_to=' + urllib.quote_plus(task.parameters.get("return_to")) \
+          + u'&ids=' + json.dumps([object.obj.id for object in converter.objects])
+          + u'&audit_id=' + unicode(int(options['audit_id'])),
+          '')
+        )
       return import_redirect(return_to)
 
   except ImportException as e:
@@ -481,6 +493,11 @@ def import_request_task(task):
       return render_template("programs/import_request_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("programs/import_request_errors.haml",
           exception_message=e)
+
+@app.route("/audits/post_import_request_hook", methods=['GET'])
+def post_import_requests():
+  return import_redirect(request.args.get("return_to"))
+
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
