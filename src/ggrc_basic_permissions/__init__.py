@@ -197,17 +197,28 @@ def load_permissions_for(user):
     context_implications_by_source.setdefault(
         context_implication.source_context_id, set())\
             .add(context_implication.context_id)
+
+  # Gather all roles required by context implications
+  all_implied_roles = {}
   for source_context, implied_contexts \
       in context_implications_by_source.items():
-    implied_rolenames = []
     for rolename in source_contexts_to_rolenames.get(source_context, []):
-      implied_rolenames.extend(lookup_role_implications(rolename))
-    if implied_rolenames:
-      implied_roles = db.session.query(Role)\
-          .filter(Role.name.in_(implied_rolenames))\
-          .options(sqlalchemy.orm.undefer_group('Role_complete'))\
-          .all()
-      for implied_role in implied_roles:
+      for implied_rolename in lookup_role_implications(rolename):
+        all_implied_roles.setdefault(implied_rolename, None)
+  # If some roles are required, query for them in bulk
+  if all_implied_roles:
+    implied_roles = db.session.query(Role)\
+        .filter(Role.name.in_(all_implied_roles.keys()))\
+        .options(sqlalchemy.orm.undefer_group('Role_complete'))\
+        .all()
+    for implied_role in implied_roles:
+      all_implied_roles[implied_role.name] = implied_role
+  # Now aggregate permissions resulting from these roles
+  for source_context, implied_contexts \
+      in context_implications_by_source.items():
+    for rolename in source_contexts_to_rolenames.get(source_context, []):
+      for implied_rolename in lookup_role_implications(rolename):
+        implied_role = all_implied_roles[implied_rolename]
         for implied_context in implied_contexts:
           collect_permissions(
               implied_role.permissions, implied_context, permissions)
