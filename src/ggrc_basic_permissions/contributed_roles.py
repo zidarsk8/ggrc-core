@@ -135,8 +135,8 @@ class BasicRoleImplications(RoleImplications):
         'AuditorProgramReader', 'AuditorReader',],
 
       # None -> Program (public) implications
-      'ProgramCreator': ['ObjectEditor', 'PublicProgramEditor',],
-      'ObjectEditor': ['PublicProgramEditor',],
+      'ProgramCreator': ['ObjectEditor'], #, 'PublicProgramEditor',],
+      'ObjectEditor': [], #'PublicProgramEditor',],
       'Reader': ['ProgramReader',],
       }
 
