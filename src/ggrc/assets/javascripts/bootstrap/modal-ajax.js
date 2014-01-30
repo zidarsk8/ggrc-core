@@ -289,8 +289,7 @@
             window.location.assign(xhr.getResponseHeader('location'));
           }
           else if(data.type === "Audit"){
-            window.location.assign('/programs/' + data.program.id + '#audit_widget');
-          }
+            window.location.assign(data.program.reify().viewLink + "#audit_widget");          }
           else {
             window.location.assign(data.selfLink.replace('/api', ''));
           }
