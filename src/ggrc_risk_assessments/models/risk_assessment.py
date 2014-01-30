@@ -34,6 +34,14 @@ class RiskAssessment(Base, db.Model):
       'Template',
       foreign_keys='RiskAssessment.template_id')
 
+  _fulltext_attrs = [
+    'name',
+    'description',
+    'note',
+    'category',
+    'subcategory',
+    ]
+
   _publish_attrs = [
     'name',
     'description',

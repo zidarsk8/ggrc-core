@@ -10,9 +10,6 @@ blueprint = Blueprint(
   static_url_path='/static/ggrc_gdrive_integration',
 )
 
-for key in settings.exports:
-  app.config.public_config[key] = app.config[key]
-
 import ggrc_gdrive_integration.models
 
 from ggrc import db
@@ -74,7 +71,7 @@ import ggrc_gdrive_integration.views
 
 from ggrc.services.registry import service
 
-all_collections = [
+contributed_services = [
   service('object_folders', models.ObjectFolder),
   service('object_files', models.ObjectFile),
   service('object_events', models.ObjectEvent)

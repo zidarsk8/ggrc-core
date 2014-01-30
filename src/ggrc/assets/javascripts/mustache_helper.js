@@ -1044,6 +1044,18 @@ Mustache.registerHelper("person_roles", function(person, scope, options) {
             return role;
           }
         });
+
+        //  "Superuser" roles are determined from config
+        //  FIXME: Abstraction violation
+        if ((!scope || new RegExp(scope).test("System"))
+            && GGRC.config.BOOTSTRAP_ADMIN_USERS
+            && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
+          roles.unshift({
+            permission_summary: "Superuser",
+            name: "Superuser"
+          });
+        }
+
         roles_deferred.resolve(roles);
       });
     });
@@ -1194,7 +1206,7 @@ Mustache.registerHelper("date", function(date) {
  *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
-var allowed_actions = ["create", "read", "update", "delete", "view_object_page"];
+var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
 Mustache.registerHelper("is_allowed", function() {
   var args = Array.prototype.slice.call(arguments, 0)
     , actions = []
@@ -1465,6 +1477,11 @@ Mustache.registerHelper("mapping_count", function(instance) {
   function update() {
     return options.fn(''+root.attr(mapping).attr('length'));
   }
+
+  if (!mapping) {
+    return "";
+  }
+
   if (!root[mapping]) {
     root.attr(mapping, new can.Observe.List());
     root.attr(mapping).attr('loading', true);
@@ -1815,7 +1832,7 @@ Mustache.registerHelper("if_helpers", function() {
         if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
               fn_name: match[3] === '^' ? 'inverse' : 'fn'
-            , helper: Mustache.getHelper(match[4], options.context)
+            , helper: Mustache.getHelper(match[4], options.contexts)
             , args: []
             , logic: match[2] === 'or' ? 'or' : 'and'
           };
@@ -2041,6 +2058,17 @@ Mustache.registerHelper("scriptwrap", function(helper) {
 
   ret += "></script>";
   return new Mustache.safeString(ret);
+});
+
+Mustache.registerHelper("ggrc_config_value", function(key, default_, options) {
+  key = resolve_computed(key);
+  if (!options) {
+    options = default_;
+    default_ = null;
+  }
+  default_ = resolve_computed(default_);
+  default_ = default_ || "";
+  return can.getObject(key, [GGRC.config]) || default_;
 });
 
 Mustache.registerHelper("is_page_instance", function(instance, options){

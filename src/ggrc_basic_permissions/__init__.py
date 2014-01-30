@@ -17,7 +17,6 @@ from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
-from ggrc.views import object_view
 from . import basic_roles
 from .contributed_roles import lookup_role_implications
 from .models import Role, RoleImplication, UserRole, ContextImplication
@@ -29,6 +28,18 @@ blueprint = Blueprint(
     static_folder='static',
     static_url_path='/static/ggrc_basic_permissions',
     )
+
+
+def get_public_config(current_user):
+  """Expose additional permissions-dependent config to client.
+    Specifically here, expose GGRC_BOOTSTRAP_ADMIN values to ADMIN users.
+  """
+  public_config = {}
+  if permissions.is_admin():
+    if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
+      public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
+  return public_config
+
 
 class CompletePermissionsProvider(object):
   def __init__(self, settings):
@@ -186,17 +197,28 @@ def load_permissions_for(user):
     context_implications_by_source.setdefault(
         context_implication.source_context_id, set())\
             .add(context_implication.context_id)
+
+  # Gather all roles required by context implications
+  all_implied_roles = {}
   for source_context, implied_contexts \
       in context_implications_by_source.items():
-    implied_rolenames = []
     for rolename in source_contexts_to_rolenames.get(source_context, []):
-      implied_rolenames.extend(lookup_role_implications(rolename))
-    if implied_rolenames:
-      implied_roles = db.session.query(Role)\
-          .filter(Role.name.in_(implied_rolenames))\
-          .options(sqlalchemy.orm.undefer_group('Role_complete'))\
-          .all()
-      for implied_role in implied_roles:
+      for implied_rolename in lookup_role_implications(rolename):
+        all_implied_roles.setdefault(implied_rolename, None)
+  # If some roles are required, query for them in bulk
+  if all_implied_roles:
+    implied_roles = db.session.query(Role)\
+        .filter(Role.name.in_(all_implied_roles.keys()))\
+        .options(sqlalchemy.orm.undefer_group('Role_complete'))\
+        .all()
+    for implied_role in implied_roles:
+      all_implied_roles[implied_role.name] = implied_role
+  # Now aggregate permissions resulting from these roles
+  for source_context, implied_contexts \
+      in context_implications_by_source.items():
+    for rolename in source_contexts_to_rolenames.get(source_context, []):
+      for implied_rolename in lookup_role_implications(rolename):
+        implied_role = all_implied_roles[implied_rolename]
         for implied_context in implied_contexts:
           collect_permissions(
               implied_role.permissions, implied_context, permissions)
@@ -222,12 +244,6 @@ def load_permissions_for(user):
       .append(personal_context.id)
   return permissions
 
-def all_collections():
-  """The list of all collections provided by this extension."""
-  return [
-      service('roles', Role),
-      service('user_roles', UserRole),
-      ]
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
@@ -403,14 +419,21 @@ from ggrc.app import app
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for,}
 
-def initialize_all_object_views(app):
-  role_view_entry = object_view(Role)
-  role_view_entry.service_class.add_to(
-      app,
-      '/{0}'.format(role_view_entry.url),
-      role_view_entry.model_class,
-      decorators=(login_required,),
-      )
+
+def contributed_services():
+  """The list of all collections provided by this extension."""
+  return [
+      service('roles', Role),
+      service('user_roles', UserRole),
+      ]
+
+
+def contributed_object_views():
+  from ggrc.views.registry import object_view
+  return [
+      object_view(Role)
+      ]
+
 
 from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()

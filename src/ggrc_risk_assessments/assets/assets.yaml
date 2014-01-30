@@ -1,5 +1,8 @@
 dashboard-js-files:
   - models/risk_assessment.js
+  - models/template.js
+  - models/threat.js
+  - models/vulnerability.js
   - apps/risk_assessments.js
   - mustache_helpers.js
 
@@ -9,3 +12,6 @@ dashboard-js-template-files:
   - dashboard/lhn_risk_assessments.mustache
   - dashboard/lhn_search_result_risk_assessments.mustache
   - dashboard/lhn_search_actions_risk_assessments.mustache
+  - templates/modal_content.mustache
+  - threats/modal_content.mustache
+  - vulnerabilities/modal_content.mustache

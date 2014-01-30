@@ -7,6 +7,9 @@ import json
 from collections import namedtuple
 from flask import request, flash, session, url_for, redirect, g
 from flask.views import View
+from ggrc.extensions import get_extension_modules
+from urlparse import urlparse, urlunparse
+import urllib
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
@@ -14,8 +17,7 @@ from ggrc.utils import as_json
 from ggrc.builder.json import publish
 from werkzeug.exceptions import Forbidden
 from . import filters
-from .common import BaseObjectView, RedirectedPolymorphView
-from .tooltip import TooltipView
+from .registry import object_view, tooltip_view
 from ggrc.models.task import Task, queued_task, create_task, make_task_response
 
 """ggrc.views
@@ -27,7 +29,12 @@ def get_permissions_json():
   return json.dumps(getattr(g, '_request_permissions', None))
 
 def get_config_json():
-  return json.dumps(app.config.public_config)
+  public_config = dict(app.config.public_config)
+  for extension_module in get_extension_modules():
+    if hasattr(extension_module, 'get_public_config'):
+      public_config.update(
+          extension_module.get_public_config(get_current_user()))
+  return json.dumps(public_config)
 
 def get_current_user_json():
   current_user = get_current_user()
@@ -466,8 +473,18 @@ def import_request_task(task):
       return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
-      return_to = task.parameters.get("return_to")
+      urlparts = urlparse(task.parameters.get("return_to"))
+      #flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return_to = urlunparse(
+        (urlparts.scheme, 
+          urlparts.netloc, 
+          u"/audits/post_import_request_hook",
+          u'',
+          u'return_to=' + urllib.quote_plus(task.parameters.get("return_to")) \
+          + u'&ids=' + json.dumps([object.obj.id for object in converter.objects])
+          + u'&audit_id=' + unicode(int(options['audit_id'])),
+          '')
+        )
       return import_redirect(return_to)
 
   except ImportException as e:
@@ -476,6 +493,11 @@ def import_request_task(task):
       return render_template("programs/import_request_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("programs/import_request_errors.haml",
           exception_message=e)
+
+@app.route("/audits/post_import_request_hook", methods=['GET'])
+def post_import_requests():
+  return import_redirect(request.args.get("return_to"))
+
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
@@ -981,19 +1003,10 @@ def import_controls_template(object_type, object_id):
   body = render_template("csv_files/" + template_name, **options)
   return current_app.make_response((body, 200, headers))
 
-ViewEntry = namedtuple('ViewEntry', 'url model_class service_class')
-
-def object_view(model_class, base_service_class=BaseObjectView):
-  return ViewEntry(
-      model_class._inflector.table_plural,
-      model_class,
-      base_service_class)
-
-def tooltip_view(model_class, base_service_class=TooltipView):
-  return object_view(model_class, base_service_class=base_service_class)
-
-def all_object_views():
+def contributed_object_views():
   from ggrc import models
+  from .common import RedirectedPolymorphView
+
   return [
       object_view(models.Task),
       object_view(models.Program),
@@ -1016,7 +1029,21 @@ def all_object_views():
       object_view(models.Person),
       ]
 
-def all_tooltip_views():
+
+def all_object_views():
+  views = contributed_object_views()
+
+  for extension_module in get_extension_modules():
+    contributions = getattr(extension_module, "contributed_object_views", None)
+    if contributions:
+      if callable(contributions):
+        contributions = contributions()
+      views.extend(contributions)
+
+  return views
+
+
+def contributed_tooltip_views():
   from ggrc import models
   return [
       tooltip_view(models.Audit),
@@ -1040,7 +1067,25 @@ def all_tooltip_views():
       tooltip_view(models.Event),
       ]
 
-def init_all_object_views(app):
+
+def all_tooltip_views():
+  views = contributed_tooltip_views()
+
+  for extension_module in get_extension_modules():
+    contributions = getattr(extension_module, "contributed_tooltip_views", None)
+    if contributions:
+      if callable(contributions):
+        contributions = contributions()
+      views.extend(contributions)
+
+  return views
+
+
+def init_extra_views(app):
+  pass
+
+
+def init_all_views(app):
   import sys
   from ggrc import settings
 
@@ -1060,12 +1105,12 @@ def init_all_object_views(app):
       decorators=(login_required,)
       )
 
-  if hasattr(settings, 'EXTENSIONS'):
-    for extension in settings.EXTENSIONS:
-      __import__(extension)
-      extension_module = sys.modules[extension]
-      if hasattr(extension_module, 'initialize_all_object_views'):
-        extension_module.initialize_all_object_views(app)
+  init_extra_views(app)
+  for extension_module in get_extension_modules():
+    ext_extra_views = getattr(extension_module, "init_extra_views", None)
+    if ext_extra_views:
+      ext_extra_views(app)
+
 
 # Mockups HTML pages are listed here
 @app.route("/mockups")
@@ -1088,3 +1133,11 @@ def assessments_grid():
   """The assessments grid guide page
   """
   return render_template("mockups/assessments-grid.html")
+
+@app.route("/permissions")
+@login_required
+def user_permissions():
+  '''Permissions object for the currently
+     logged in user
+  '''
+  return get_permissions_json()

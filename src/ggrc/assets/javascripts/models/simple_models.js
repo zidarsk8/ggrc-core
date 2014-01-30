@@ -1087,7 +1087,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("title");
   }
 }, {
-  save : function(){
+  save : function() {
     
     var that = this, isNew = that.isNew();
     this.saveDeferreds = {
@@ -1113,6 +1113,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     var no_change = false
       , auditor_role
       ;
+
+    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
     
     if(typeof instance.auditor === 'undefined'){
       return instance;
