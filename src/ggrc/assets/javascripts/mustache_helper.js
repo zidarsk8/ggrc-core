@@ -2088,4 +2088,15 @@ Mustache.registerHelper("remove_space", function(str, options){
   return str().replace(' ', '');
 });
 
+Mustache.registerHelper("if_contains", function(str, search, options){
+  if(typeof str === 'function') str = str();
+  
+  if(str.indexOf(search) > -1){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+})
+
 })(this, jQuery, can);

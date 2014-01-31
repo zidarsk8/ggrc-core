@@ -11,7 +11,7 @@
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
 	          <div class="type">
-	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="Documentation"></i>
+	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
 	            <div class="state-type dropdown">
 	              {{#if_equals 'Draft' instance.status}}
 	              <span class="dropdown-toggle" data-toggle="dropdown" role="button">
@@ -71,6 +71,38 @@
           </div>
         {{/using}}
         </div>
+        
+        <div class="span4">
+          <div class="control-wrap">
+            <div class="date">
+              {{#if instance.due_on}}
+              <span>{{localize_date instance.due_on}}</span>
+              {{/if}}
+            </div>
+            
+            <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+              {{#if_equals instance.status "Draft"}}
+                <button data-name="status" data-value="Requested" class="btn btn-warning">Request</button>
+              {{/if_equals}}
+              {{#if_equals instance.status "Requested"}}
+                <button data-name="status" data-value="Responded" class="btn btn-primary">Respond</button>
+              {{/if_contains}}
+              {{#if_contains instance.status "Amended Request"}}
+                <button data-name="status" data-value="Updated Response" class="btn btn-primary">Respond</button>
+              {{/if_contains}}
+              {{#if_contains instance.status "Respon"}}
+                <button data-name="status" data-value="Accepted" class="btn btn-add">Accept</button>
+                <button data-name="status" data-value="Amended Request" class="btn btn-warning">Amend</button>
+              {{/if_contains}}
+              
+              {{#if_equals instance.status "Accepted"}}
+                <small class="accepted"><em>Accepted</em></small>
+              {{/if_equals}}
+              
+            </div>
+          </div>
+        </div>
+        <!-- 
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="row-fluid">
             <div class="span5">
@@ -87,16 +119,10 @@
                 </select>
               {{/if_helpers}}
             </div>
-            <div class="span6">
-              <div class="black-font">
-                &nbsp;&nbsp;
-                {{#if instance.due_on}}
-                  <strong>due on: </strong>{{localize_date instance.due_on}}
-                {{/if}}
-              </div>
             </div>
           </div>
         </div>
+         -->
       </div>
     </a>
   </div>

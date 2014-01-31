@@ -43,12 +43,22 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   
   , ".dropdown-menu > li click" : function(el, ev){
     ev.stopPropagation();
-    console.log(el.data('name'), el.data('value'))
     var that = this;
-      this.set_value({ name: el.data('name'), value: el.data('value') });
-      setTimeout(function() {
-        that.options.instance.save();
-      }, 100);
+    this.set_value({ name: el.data('name'), value: el.data('value') });
+    setTimeout(function() {
+      that.options.instance.save();
+      $(el).closest('.open').removeClass('open');
+    }, 100);
+  }
+  , "button click" : function(el, ev){
+    if(!el.data('name') || !el.data('value')){
+      return;
+    }
+    var that = this;
+    this.set_value({ name: el.data('name'), value: el.data('value') });
+    setTimeout(function() {
+      that.options.instance.save();
+    }, 100);
   }
 
 });
