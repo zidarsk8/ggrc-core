@@ -17,3 +17,4 @@ dashboard-js-template-files:
   - requests/gdrive_info.mustache
   - people/gplus_actions.mustache
   - people/gplus_photo.mustache
+  - gdrive/auth_button.mustache
