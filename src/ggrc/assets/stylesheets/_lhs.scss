@@ -5,53 +5,6 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 
-.area {
-  &.governance {
-    border-color:$governance;
-    .header-content {
-      border-color:$governance;
-    }
-  }
-  &.risk {
-    border-color:$risk;
-    .header-content {
-      border-color:$risk;
-    }
-  }
-  &.program {
-    border-color:$programs;
-    .header-content {
-      border-color:$programs;
-    }
-    
-  }
-  &.business {
-    border-color:$business;
-    .header-content {
-      border-color:$business;
-    }
-  }
-  &.objectives {
-    border-color:$objectives;
-    .header-content {
-      border-color:$objectives;
-    }
-  }
-  &.controls {
-    border-color:$controls;
-    .header-content {
-      border-color:$controls;
-    }
-  }
-  &.entities {
-    border-color:$entities;
-    .header-content {
-      border-color:$entities;
-    }
-  }
-
-}
-
 .lhs-holder {
   @include gradient-horizontal(#fff,#e1e1e1);
   //overflow-x:hidden;

@@ -827,7 +827,7 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 55;
+  internavHeight = lhsHeight - 50;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
