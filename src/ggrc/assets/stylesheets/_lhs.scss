@@ -6,7 +6,7 @@
  */
 
 .lhs-holder {
-  @include gradient-horizontal(#fff,#e1e1e1);
+  background: $treeListBgnd;
   //overflow-x:hidden;
 }
 
