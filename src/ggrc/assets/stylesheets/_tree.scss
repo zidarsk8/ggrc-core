@@ -573,7 +573,9 @@ ul.new-tree {
           }
         }
       }
-      &.rq-responded-request {
+      &.rq-responded-request,
+      &.rq-responded,
+      &.rq-updated-response {
         .item-main {
           &:hover {
             .row-fluid {
@@ -605,7 +607,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-amended-request {
+      &.rq-amended-request,
+      &.rq-amended {
         .item-main {
           &:hover {
             .row-fluid {

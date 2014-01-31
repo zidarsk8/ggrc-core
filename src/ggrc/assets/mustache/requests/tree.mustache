@@ -4,10 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="tree-item programs request-list request-redesign rq-{{to_class instance.status}} {{#if_helpers '\
-      #if_null' instance.assignee '\
-      or #if_null' instance.objective '\
-         and #is_allowed' 'update' 'Objective' context=null}}rq-warning{{/if_helpers}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item programs request-list request-redesign rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
