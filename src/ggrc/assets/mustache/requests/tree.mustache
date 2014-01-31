@@ -4,19 +4,41 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="tree-item programs request-list rq-{{to_class instance.status}} {{#if_helpers '\
+<li class="tree-item programs request-list request-redesign rq-{{to_class instance.status}} {{#if_helpers '\
       #if_null' instance.assignee '\
       or #if_null' instance.objective '\
          and #is_allowed' 'update' 'Objective' context=null}}rq-warning{{/if_helpers}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
-        <div class="span2">
+        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-request-color"></i>
-              {{instance.description}}
-            </div>
+	          <div class="type">
+	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="Documentation"></i>
+	            <div class="state-type dropdown">
+	              {{#if_equals 'Draft' instance.status}}
+	              <span class="dropdown-toggle" data-toggle="dropdown" role="button">
+	                <i class="grcicon-carot"></i>
+	              </span>
+	              
+	              <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
+	                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+	                <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
+	                  <span>
+	                    <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
+	                    {{iterator}} 
+	                  </span>
+	                </li>
+	                {{/iterate}}
+	              </ul>
+	              {{else}}
+	              <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
+	              {{/if_equals}}
+	            </div>
+	          </div>
+	          <div class="tree-title-area">
+	            <span>{{instance.description}}</span>
+	          </div>
           </div>
         </div>
         <div class="span2">
@@ -51,29 +73,6 @@
               {{/if_helpers}}
           </div>
         {{/using}}
-        </div>
-        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <span class="pull-left request-type black-font"></span>
-          {{#with_mapping 'responses' instance}}
-            {{#if_helpers '\
-              ^if' allow_mapping_or_creating '\
-              or ^is_allowed' 'update' instance '\
-              or #if' responses.length '\
-            ' _1_context=instance.context.id}}
-              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
-              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
-                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
-            {{else}}
-              <select name="request_type" class="span8 short-field">
-                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
-            {{/if_helpers}}
-          {{/with_mapping}}
         </div>
         <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="row-fluid">

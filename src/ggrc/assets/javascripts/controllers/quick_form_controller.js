@@ -40,5 +40,15 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     this._super && this._super.apply(this, arguments);
     ev.stopPropagation();
   }
+  
+  , ".dropdown-menu > li click" : function(el, ev){
+    ev.stopPropagation();
+    console.log(el.data('name'), el.data('value'))
+    var that = this;
+      this.set_value({ name: el.data('name'), value: el.data('value') });
+      setTimeout(function() {
+        that.options.instance.save();
+      }, 100);
+  }
 
 });

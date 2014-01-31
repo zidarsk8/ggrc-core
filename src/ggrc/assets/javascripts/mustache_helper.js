@@ -2084,4 +2084,8 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
   }
 });
 
+Mustache.registerHelper("remove_space", function(str, options){
+  return str().replace(' ', '');
+});
+
 })(this, jQuery, can);
