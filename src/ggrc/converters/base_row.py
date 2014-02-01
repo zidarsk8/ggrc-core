@@ -414,9 +414,14 @@ class SlugColumnHandler(ColumnHandler):
       else:
         self.base_importer.add_slug_to_slugs(self.value)
       self.validate(content)
+      return content
     else:
-      self.add_warning('Code will be generated on completion of import')
-    return content
+      if self.options.get('is_required'):
+        # execute usual validation behavior
+        self.validate(content)
+      else:
+        self.add_warning('Code will be generated on completion of import')
+      return None
 
 class OptionColumnHandler(ColumnHandler):
 
