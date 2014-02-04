@@ -94,37 +94,10 @@ var gdrive_findAll = function(extra_params, extra_path) {
   };
 };
 
-var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request_with_auth(params) {
-  return window.gapi_authorize(params.scopes).then(function() {
-    var dfd = new $.Deferred();
-    var cb = params.callback;
-    var check_auth = function(result) {
-      var args = can.makeArray(arguments);
-      args.unshift(dfd);
-      if(result && result.error && result.error.code === 401) {
-        doGAuth(); //changes oauth_dfd to a new deferred
-        params.callback = cb;
-        window.gapi_authorize(params.scopes).then($.proxy(gapi_request_with_auth, window, params))
-        .then(
-          function() {
-            dfd.resolve.apply(dfd, arguments);
-          }, function() {
-            dfd.reject.apply(dfd, arguments);
-          });
-      } else {
-        cb.apply(window, args);
-      }
-    };
-    params.callback = check_auth;
-    if(typeof params.path === "function") {
-      params.path = params.path();
-    }
-    gapi.client.request(params);
-    return dfd.promise();
-  });
-}
-
-
+var gapi_request_with_auth;
+$(function() {
+  gapi_request_with_auth = GGRC.gapi_request_with_auth;
+});
 /**
   GDrive files not including folders.  Folders are also files in GDrive,
   with a particular MIME type, but we distinguish between them here as
