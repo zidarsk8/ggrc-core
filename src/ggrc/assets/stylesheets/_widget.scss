@@ -190,23 +190,6 @@
         @include box-shadow(none);
         background: transparent;
       }
-      &.widget-showhide {
-        @include transition(background 0.3s ease);
-        a {
-          width: 30px;
-          height: 30px;
-          padding: 0;
-          @include opacity(0.2);
-          @include transition(opacity 0.3s ease);
-          &:hover {
-            @include opacity(1);
-          }
-        }
-        &:hover {
-          @include box-shadow(none);
-          background: transparent;
-        }
-      }
     }
     h2 {
       font-weight:normal;
