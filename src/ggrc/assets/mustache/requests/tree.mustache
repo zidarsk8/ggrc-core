@@ -87,18 +87,16 @@
               {{#if_equals instance.status "Requested"}}
                 <button data-name="status" data-value="Responded" class="btn btn-primary">Respond</button>
               {{/if_contains}}
-              {{#if_contains instance.status "Amended Request"}}
+              {{#if_equals instance.status "Amended Request"}}
                 <button data-name="status" data-value="Updated Response" class="btn btn-primary">Respond</button>
-              {{/if_contains}}
+              {{/if_equals}}
               {{#if_contains instance.status "Respon"}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add">Accept</button>
                 <button data-name="status" data-value="Amended Request" class="btn btn-warning">Amend</button>
               {{/if_contains}}
-              
               {{#if_equals instance.status "Accepted"}}
                 <small class="accepted"><em>Accepted</em></small>
               {{/if_equals}}
-              
             </div>
           </div>
         </div>
@@ -165,7 +163,7 @@
       {{#each child_options}}
           <div class="inner-tree">
             <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}}{{/prune_context}} ({{child_count}})</h6>
-            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            <ul class="tree-structure new-tree rq-colors rq-colors-inner" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
             </ul>
           </div>
       {{/each}}
