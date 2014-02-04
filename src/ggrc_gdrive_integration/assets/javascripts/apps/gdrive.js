@@ -19,13 +19,6 @@
   GGRC.gapi_request_with_auth = $.proxy(GGRC.Controllers.GAPI, "gapi_request_with_auth");
   $(function() {
     $(document.body).ggrc_controllers_gapi({ scopes : scopes });
-    GGRC.config = GGRC.config || {};
-    CMS.Models.GCal.getPrimary().done(function(d) {
-      GGRC.config.USER_PRIMARY_CALENDAR = d;
-      if(!GGRC.config.DEFAULT_CALENDAR) {
-        GGRC.config.DEFAULT_CALENDAR = d;
-      }
-    });
   });
 
   // set up a temporary global auth function so the GAPI onload can find it

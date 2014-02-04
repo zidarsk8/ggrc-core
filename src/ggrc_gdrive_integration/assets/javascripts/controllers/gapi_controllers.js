@@ -63,7 +63,7 @@
       });
 
       if(use_popup) {
-        if(!$(".ggrc_controllers_gapi.modal").length) {
+        if(!$(".ggrc_controllers_gapi_modal").length) {
           $("<div class='modal hide'>").modal_form().appendTo(document.body).ggrc_controllers_gapi_modal({
             scopes : scopes
             , modal_title : "Please log in to Google API"
@@ -127,7 +127,7 @@
               ].join(' ')
             });
         }
-        oauth_dfd.resolve(authresult, o2result);
+        window.oauth_dfd.resolve(authresult, o2result);
       });
     }
     , gapi_request_with_auth : function(params) {
@@ -139,7 +139,7 @@
           var args = can.makeArray(arguments);
           args.unshift(dfd);
           if(result && result.error && result.error.code === 401) {
-            that.doGAuth(scopes); //changes oauth_dfd to a new deferred
+            //that.doGAuth(scopes); //changes oauth_dfd to a new deferred
             params.callback = cb;
             that.authorize(params.scopes).then($.proxy(gapi_request_with_auth, that, params))
             .then(
@@ -164,6 +164,7 @@
   }, {
 
     init : function() {
+      var that = this;
       this._super.apply(this, arguments);
       if(!this.constructor.canonical_instance) {
         this.constructor.canonical_instance = this;
@@ -172,21 +173,40 @@
         this.constructor.doGAuth(this.options.scopes);
       }
 
-      this.doGAuthWithScopes = $.proxy(this.constructor, "doGAuth", this.options.scopes);
+      this.doGAuthWithScopes = can.debounce(500, $.proxy(this.constructor, "doGAuth", this.options.scopes, false));
     }
 
     , authorize : function(newscopes) {
-      var that = this;
+      var dfd, f, old_dfd
+      , that = this
+      , found = false;
+      
       can.each(newscopes, function(ns) {
         if(!~can.inArray(ns, that.options.scopes)) {
           that.options.scopes.push(ns);
+          found = true;
         }
       });
-      return window.oauth_dfd;
+      if(!found || window.oauth_dfd.state() === "pending") {
+        return window.oauth_dfd;
+      } else {
+        old_dfd = window.oauth_dfd;
+        dfd = new $.Deferred();
+        setTimeout(f = function() {
+          if(window.oauth_dfd === old_dfd) {
+            setTimeout(f, 500);
+          } else {
+            window.oauth_dfd.done(function() {
+              dfd.resolve.apply(dfd, arguments);
+            });
+          }
+        }, 500);
+        return dfd;
+      }
     }
 
     , "{scopes} change" : function(scopes, ev) {
-      can.debounce(500, this.doGAuthWithScopes); //debounce in case we push several scopes in sequence
+      this.doGAuthWithScopes(); //debounce in case we push several scopes in sequence
     }
   });
 

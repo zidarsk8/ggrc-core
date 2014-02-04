@@ -627,7 +627,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         var subwin;
 
         function poll() {
-          if(subwin.closed) {
+          if(!subwin) {
+            return; //popup blocker didn't allow a reference to the open window.
+          } else if(subwin.closed) {
             cev.refresh().then(function() {
               instance.attr({
                 title : cev.summary
