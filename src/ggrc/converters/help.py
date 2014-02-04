@@ -27,7 +27,7 @@ class HelpRowConverter(BaseRowConverter):
       return self.obj
 
   def reify(self):
-    self.handle_text_or_html('slug', is_required=True)
+    self.handle('slug', SlugColumnHandler, is_required=True)
     self.handle_text_or_html('title')
     self.handle_text_or_html('content')
 
