@@ -13,8 +13,7 @@
 
 [class^="grcicon-"],
 [class^="icon-"],
-.showhide,
-.widget-showhide {
+.showhide {
   display: inline-block;
   width: 20px;
   height: 16px;
@@ -433,19 +432,6 @@
   }
 }
 
-.widget-showhide {
-  a {
-    background-position: -241px -241px;
-    background-image: image-url("grcicons/icons.png");
-    background-repeat: no-repeat;
-    @include background-size(368px 416px);
-    &.active {
-     background-position: -241px -217px;
-    }
-  }
-}
-
-
 // diferentiation of objects by icons
 .grcobject {
   display: inline-block;
@@ -750,16 +736,6 @@ i.short {
       .grcicon-request-color { background-position:-54px -392px; }
       .grcicon-response-color { background-position:-102px -392px; }
       .grcicon-assessment-color { background-position:-174px -392px; }
-      .widget-showhide {
-        a {
-          background-position: -265px -241px;
-          &.active {
-           background-position: -265px -217px;
-          }
-        }
-      }
-      
-      
     }
   }
 }

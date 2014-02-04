@@ -503,7 +503,7 @@ jQuery(document).ready(function($) {
   });
 
   // Contract/Expand widget
-  $('body').on('click', '.widget .header .showhide, .widget .header .widget-showhide a', function(e) {
+  $('body').on('click', '.widget .header .showhide,', function(e) {
 
     if($(this).is(".widget-showhide"))
       e.preventDefault();
