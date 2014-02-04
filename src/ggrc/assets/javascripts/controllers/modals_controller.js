@@ -427,8 +427,8 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "[data-before], [data-after] change" : function(el, ev) {
     var start_date = el.datepicker('getDate');
-    this.element.find("[name=" + el.data("before") + "]").datepicker().datepicker("option", "minDate", start_date);
-    this.element.find("[name=" + el.data("after") + "]").datepicker().datepicker("option", "maxDate", start_date);
+    this.element.find("[name=" + el.data("before") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "minDate", start_date);
+    this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
