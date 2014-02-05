@@ -597,9 +597,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
     var cache, that = this;
     if(instance instanceof CMS.Models.UserRole
+       && instance.context // Only proceed if not the common context
        && /^Program|^Auditor/.test(instance.role.reify().name)
     ) {
       cache = /^Program/.test(instance.role.reify().name) ? CMS.Models.Program.cache : CMS.Models.Audit.cache;
+
+      if (!cache)
+        return;
 
       can.each(Object.keys(cache), function(key) {
         if(cache[key].context && cache[key].context.id === instance.context.id) {

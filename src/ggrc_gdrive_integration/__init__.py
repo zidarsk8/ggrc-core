@@ -99,6 +99,12 @@ class GDriveRoleContributions(RoleContributions):
       'ProgramAuditReader': {
         'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
         },
+      'ProgramOwner': {
+        'read': ['ObjectFolder'],
+        'create': ['ObjectFolder'],
+        'update': ['ObjectFolder'],
+        'delete': ['ObjectFolder'],
+        },
       }
 
 ROLE_CONTRIBUTIONS = GDriveRoleContributions()

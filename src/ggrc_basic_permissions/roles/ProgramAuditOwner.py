@@ -47,6 +47,7 @@ permissions = {
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
+        "UserRole",
         "Audit",
         "Meeting",
         "ObjectControl",
@@ -59,6 +60,7 @@ permissions = {
         "Meeting"
     ],
     "delete": [
+        "UserRole",
         "ObjectControl",
         "ObjectDocument",
         "ObjectObjective",
