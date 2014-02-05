@@ -49,7 +49,7 @@
         data-object-params='{{#if_instance_of parent_instance "Section"}}{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }{{/if_instance_of}}'>
         + Object
       </a>
-      {{#if_equals parent_instance.constructor.shortName "Section"}}
+      {{#if_instance_of parent_instance "Section"}}
       <span class="section-expander">
         &nbsp;
         &nbsp;
