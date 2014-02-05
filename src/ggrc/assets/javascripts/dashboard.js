@@ -318,7 +318,7 @@ jQuery(function($) {
         $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
-          var jsonResult = $.parseJSON($(task.result.content).html());
+          var jsonResult = $.parseJSON($(task.result.content).text());
           if("location" in jsonResult){
             window.location.assign(jsonResult.location);
             return;
