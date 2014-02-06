@@ -412,16 +412,16 @@ class SlugColumnHandler(ColumnHandler):
       if self.value in self.base_importer.get_slugs():
         self.add_error('Slug Code is duplicated in CSV')
       else:
+        self.validate(content)
         self.base_importer.add_slug_to_slugs(self.value)
-      self.validate(content)
-      return content
+      self.value = content
+      self.set_attr(content)
     else:
       if self.options.get('is_required'):
         # execute usual validation behavior
         self.validate(content)
       else:
         self.add_warning('Code will be generated on completion of import')
-      return None
 
 class OptionColumnHandler(ColumnHandler):
 
