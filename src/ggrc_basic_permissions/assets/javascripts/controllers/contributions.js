@@ -287,7 +287,7 @@
         $.extend(params, this.option_query),
         function(options) {
           options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
-          options.unshift({name: "No access", id: 0});
+          options.unshift({name: "No access", id: 0, description: "This role allows a user access to the MyWork dashboard and applications Help files.", scope: "System"});
           self.option_list.replace(options);
         });
     },
