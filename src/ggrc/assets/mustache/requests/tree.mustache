@@ -41,15 +41,17 @@
         <div class="span2">
           <div class="item-data">
             <div class="tree-title-area">
-              <i class="grcicon-objective-color"></i>
               {{#using objective=instance.objective}}
                 {{#if objective}}
+                  <i class="grcicon-objective-color"></i>
                   {{objective.title}}
                 {{else}}
                   {{#is_allowed "update" "Objective" context=null}}
-                    Missing Objective
+                  <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+			              <i class="grcicon-objective-danger"></i>
+			              Map Objective
+			            </a>
                   {{else}}
-                    NEW
                   {{/is_allowed}}
                 {{/if}}
               {{/using}}
@@ -57,18 +59,13 @@
           </div>
         </div>
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+	        {{#if_can_edit_request instance}}
           <i class="grcicon-person-green pull-left"></i>
-        {{#using assignee=instance.assignee}}
+          {{#using assignee=instance.assignee}}
           <div class="objective-selector">
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-              {{else}}
-                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
-              {{/if_helpers}}
+            <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
           </div>
+          {{/if_can_edit_request}}
         {{/using}}
         </div>
         
@@ -79,20 +76,35 @@
               <span>{{localize_date instance.due_on}}</span>
               {{/if}}
             </div>
-            
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
               {{#if_equals instance.status "Draft"}}
+                {{#if_auditor instance}}
                 <button data-name="status" data-value="Requested" class="btn btn-warning">Request</button>
+                {{else}}
+                <small class="gray"><em>In progress...</em></small>
+                {{/if_auditor}}
               {{/if_equals}}
               {{#if_equals instance.status "Requested"}}
+                {{#if_can_edit_request instance}}
                 <button data-name="status" data-value="Responded" class="btn btn-primary">Respond</button>
+                {{else}}
+                <small class="gray"><em>In progress...</em></small>
+                {{/if_can_edit_request}}
               {{/if_contains}}
               {{#if_equals instance.status "Amended Request"}}
+                {{#if_can_edit_request instance}}
                 <button data-name="status" data-value="Updated Response" class="btn btn-primary">Respond</button>
+                {{else}}
+                <small class="gray"><em>In progress...</em></small>
+                {{/if_can_edit_request}}
               {{/if_equals}}
               {{#if_contains instance.status "Respon"}}
+                {{#if_auditor instance}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add">Accept</button>
                 <button data-name="status" data-value="Amended Request" class="btn btn-warning">Amend</button>
+                {{else}}
+                <small class="gray"><em>In progress...</em></small>
+                {{/if_auditor}}
               {{/if_contains}}
               {{#if_equals instance.status "Accepted"}}
                 <small class="accepted"><em>Accepted</em></small>
@@ -100,27 +112,6 @@
             </div>
           </div>
         </div>
-        <!-- 
-        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <div class="row-fluid">
-            <div class="span5">
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                <span class="black-font">{{instance.status}}</span>
-              {{else}}
-                <select name="status" class="span12 short-field">
-                  {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-                  <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                  {{/iterate}}
-                </select>
-              {{/if_helpers}}
-            </div>
-            </div>
-          </div>
-        </div>
-         -->
       </div>
     </a>
   </div>

@@ -19,6 +19,7 @@
           </div>
           
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+            {{^if_auditor instance.request}}
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
@@ -32,6 +33,7 @@
                 {{/if_helpers}}
               {{/using}}
             </div>
+            {{/if_auditor}}
           </div>
           
           <div class="span1">
@@ -55,43 +57,33 @@
           </div>
           
           <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                <span class="black-font">{{instance.status}}</span>
-              {{else}}
               <div class="response-control">
                 {{#if_equals instance.status "Assigned"}}
+                  {{#if_can_edit_request instance.request}}
                   <button class="btn btn-primary" data-name="status" data-value="Submitted">Submit</button>
+                  {{else}}
+                  <small class="gray"><em>In progress...</em></small>
+                  {{/if_can_edit_request}}
                 {{/if_equals}}
                 {{#if_equals instance.status "Submitted"}}
+                  {{#if_auditor instance.request}}
                   <button class="btn btn-add" data-name="status" data-value="Accepted">Accept</button>
                   <button class="btn btn-danger" data-name="status" data-value="Rejected">Reject</button>
+                  {{else}}
+                  <small class="gray"><em>In progress...</em></small>
+                  {{/if_auditor}}
                 {{/if_equals}}
                 {{#if_equals instance.status "Accepted"}}
                   <small class="accepted"><em>Accepted</em></small>
                 {{/if_equals}}
                 {{#if_equals instance.status "Rejected"}}
+                  {{#if_can_edit_request instance.request}}
                   <button class="btn btn-primary" data-name="status" data-value="Submitted">Re-Submit</button>
+                  {{else}}
+                  <small class="rejected"><em>Rejected</em></small>
+                  {{/if_can_edit_request}}
                 {{/if_equals}}
               </div>
-              {{/if_helpers}}
-          </div>
-          
-          <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                <span class="black-font">{{instance.status}}</span>
-              {{else}}
-                <select name="status" class="span10 short-field">
-                  {{#iterate 'Assigned' 'Submitted' 'Accepted' 'Rejected'}}
-                  <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                  {{/iterate}}
-                </select>
-              {{/if_helpers}}
           </div>
         </div>
       </a>
