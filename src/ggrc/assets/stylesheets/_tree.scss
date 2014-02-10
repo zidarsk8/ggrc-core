@@ -513,7 +513,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqDraft,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -545,7 +545,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqStarted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -577,7 +577,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqRespond,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -609,7 +609,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqAmmend,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -641,7 +641,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqUpdate,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -673,7 +673,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqAccepted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -705,7 +705,7 @@ ul.new-tree {
         .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+              background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
               @include background-size(30px 6px);
               .row-fluid {
                 background-image: none;
@@ -740,7 +740,7 @@ ul.new-tree {
           .item-main {
             &:hover {
               .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+                background:darken($rqAssigned,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
                 @include background-size(30px 6px !important);
                 .row-fluid {
                   background-image: none;
@@ -763,7 +763,7 @@ ul.new-tree {
           .item-main {
             &:hover {
               .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+                background:darken($rqSubmitted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
                 @include background-size(30px 6px !important);
                 .row-fluid {
                   background-image: none;
@@ -786,7 +786,7 @@ ul.new-tree {
           .item-main {
             &:hover {
               .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+                background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
                 @include background-size(30px 6px !important);
                 .row-fluid {
                   background-image: none;
@@ -806,7 +806,7 @@ ul.new-tree {
           .item-main {
             &:hover {
               .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+                background:darken($rqAccepted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
                 @include background-size(30px 6px !important);
                 .row-fluid {
                   background-image: none;
