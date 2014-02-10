@@ -184,14 +184,20 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         if(instance.objective) {
           return this.create_request_folder(model, ev, instance);
         } else {
-          return report_progress(
-            'Linking new Request to Audit folder'
-            , new CMS.Models.ObjectFolder({
-              folder_id : instance.audit.reify().object_folders[0].reify().folder_id
-              , folderable : instance
-              , context : instance.context || { id : null }
-            }).save()
-          );
+
+          if(Permission.is_allowed("create", "ObjectFolder", instance.context.id || null)) {
+
+            return report_progress(
+              'Linking new Request to Audit folder'
+              , new CMS.Models.ObjectFolder({
+                folder_id : instance.audit.reify().object_folders[0].reify().folder_id
+                , folderable : instance
+                , context : instance.context || { id : null }
+              }).save()
+            );
+          } else {
+            return $.when();
+          }
         }
       }
     }
@@ -337,6 +343,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       "Moving files to the Audit folder"
       , $.when.apply($, move_dfds).done(function() {
         can.each(req_folders, function(rf) {
+          if(!rf.selfLink || rf.userPermission.role !== "writer" && rf.userPermission.role !== "owner")
+            return;  //short circuit any operation if the user isn't allowed to add permissions
+
           report_progress(
             'Checking whether folder "' + rf.title + '" is empty'
             , CMS.Models.GDriveFile.findAll({parents : rf.id}).then(function(orphs) {
@@ -384,7 +393,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return; //can't do anything if the audit has no folder
       //reduce the binding lists to instances only -- makes for easier comparison
       var req_folders =  can.map(req_folders_mapping, function(rf) { return rf.instance; });
-      var audit_folders = can.map(audit_folders_mapping, function(af) { return af.instance; });
+      //Check whether or not the current user has permissions to modify the audit folder.
+      var audit_folders = can.map(audit_folders_mapping, function(af) {
+        if(!af.instance.selfLink || af.instance.userPermission.role !== "writer" && af.instance.userPermission.role !== "owner")
+          return;  //short circuit any operation if the user isn't allowed to edit
+        return af.instance;
+      });
+
+      if(audit_folders.length < 1) {
+        return;  // no audit folder to work on, or none that the user can edit.
+      }
 
       // check the array of request_folers against the array of audit_folders to see if there is a match.
       af_index = can.reduce(req_folders, function(res, folder) {
