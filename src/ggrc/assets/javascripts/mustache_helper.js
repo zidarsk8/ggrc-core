@@ -1944,20 +1944,26 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
+function findAuditors(instance){
+  var loader = resolve_computed(instance).get_binding('authorizations');
+  
+  return $.map(loader.list, function(binding) {
+    var role = binding.instance.role.reify();
+    if (binding.instance.role.reify().attr('name') === 'Auditor') {
+      return {
+        person: binding.instance.person.reify()
+        , binding: binding.instance
+      }
+    }
+  });
+}
+
 Mustache.registerHelper("with_auditors", function(instance, options) {
 
   var auditor_hook, _el
   , id = can.view.hook(auditor_hook = function auditor_hook(el){
-    var loader = resolve_computed(instance).get_binding('authorizations')
-      , html
-      , auditors = $.map(loader.list, function(binding) {
-          if (binding.instance.role.reify().attr('name') === 'Auditor') {
-            return {
-              person: binding.instance.person.reify()
-              , binding: binding.instance
-            }
-          }
-        });
+    var html
+      , auditors = findAuditors(instance);
     _el = el;
     if(auditors.length > 0){
       html = options.fn(options.contexts.add({"auditors": auditors}));
@@ -2077,6 +2083,54 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
     ;
   
   if(instance.type === page_instance.type && instance.id === page_instance.id){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+});
+
+Mustache.registerHelper("remove_space", function(str, options){
+  return str().replace(' ', '');
+});
+
+Mustache.registerHelper("if_contains", function(str, search, options){
+  if(typeof str === 'function') str = str();
+  
+  if(str.indexOf(search) > -1){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+});
+
+Mustache.registerHelper("if_auditor", function(instance, options){
+  var admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , instance = instance().reify()
+    , audit = instance.audit.reify()
+    , auditors = findAuditors(audit)
+    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id;
+  if(admin || auditor){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+});
+
+Mustache.registerHelper("if_can_edit_request", function(instance, options){
+  var admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , update = Permission.is_allowed("update", instance)
+    , map = Permission.is_allowed("mapping", instance)
+    , create = Permission.is_allowed("creating", instance)
+    , assignee = instance().reify().assignee.id === GGRC.current_user.id;
+    ;
+  //  instead of
+  //    ^if' allow_mapping_or_creating '\
+  //    or ^is_allowed' 'update' instance '\
+  //    ' _1_context=instance.context.id
+  if(admin || update || map || create || assignee){
     return options.fn(options.contexts);
   }
   else{

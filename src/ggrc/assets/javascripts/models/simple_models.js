@@ -1085,6 +1085,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validatePresenceOf("title");
+    // Preload auditor role:
+    CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
   save : function() {

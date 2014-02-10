@@ -172,10 +172,6 @@
                 {{/using}}
               </li>
               <li>
-                {{#if_helpers '\
-                #if' allow_mapping_or_creating '\
-                and #is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
                 <strong>Auditor: </strong>
                   {{! `with_auditors` requires `authorizations` mapping, so preload it }}
                   {{#with_mapping 'authorizations' instance}}
@@ -183,34 +179,10 @@
                     {{#using auditor=auditors.0.person}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                     {{/using}}
-                    <!--<span class="edit-auditor">
-                      <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit" data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}}, "userRole_id": {{auditors.0.binding.id}} }' data-base-modal="auditor">
-                        <i class="grcicon-edit"></i>
-                        Edit
-                      </a>
-                    </span>-->
                   {{else}}
                     No auditor assigned
-                    <!--<a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit"  data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}} }' data-base-modal="auditor">
-                    + Auditor
-                    </a>-->
                   {{/with_auditors}}
                   {{/with_mapping}}
-                {{else}}
-                <!-- TODO: Figure out how to fetch authorizations for user with no access roles
-                <strong>Auditor: </strong>
-                {{! `with_auditors` requires `authorizations` mapping, so preload it }}
-                  {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance}}
-                    {{#using auditor=auditors.0.person}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
-                    {{/using}}
-                  {{else}}
-                    None
-                  {{/with_auditors}}
-                  {{/with_mapping}}
-                -->
-                {{/if_helpers}}
               </li>
             </ul>
           </div>
