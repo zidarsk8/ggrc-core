@@ -8,7 +8,9 @@ from .base import *
 from ggrc import db
 from ggrc.models import Audit, Program, Request
 from .base_row import *
+
 from collections import OrderedDict
+from datetime import datetime
 
 class RequestRowConverter(BaseRowConverter):
   model_class = Request
@@ -26,7 +28,7 @@ class RequestRowConverter(BaseRowConverter):
     self.handle('objective_id', ObjectiveHandler, is_needed_later=True)
     self.handle('request_type', RequestTypeColumnHandler, is_required=True)
     self.handle('status', StatusColumnHandler, valid_states=Request.VALID_STATES, default_value='Draft')
-    self.handle_date('requested_on', is_required=True)
+    self.handle_date('requested_on', default_value=datetime.today())
     self.handle_date('due_on', is_required=True)
     self.handle_text_or_html('description')
     self.handle_text_or_html('test')
