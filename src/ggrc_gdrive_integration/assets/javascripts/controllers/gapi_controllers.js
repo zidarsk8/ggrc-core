@@ -36,6 +36,7 @@
       if(window.oauth_dfd.state() === "pending") {
         window.oauth_dfd.reject("User canceled operation");
       }
+      this.element.remove();
     }
 
   });
@@ -159,7 +160,7 @@
           if(result && result.error && result.error.code === 401) {
             //that.doGAuth(scopes); //changes oauth_dfd to a new deferred
             params.callback = cb;
-            that.authorize(params.scopes).then($.proxy(that.gapi_request_with_auth, that, params))
+            that.authorize(params.scopes, true).then($.proxy(that.gapi_request_with_auth, that, params))
             .then(
               function() {
                 dfd.resolve.apply(dfd, arguments);
@@ -194,7 +195,7 @@
       this.doGAuthWithScopes = can.debounce(500, $.proxy(this.constructor, "doGAuth", this.options.scopes, false));
     }
 
-    , authorize : function(newscopes) {
+    , authorize : function(newscopes, force) {
       var dfd, f, old_dfd
       , that = this
       , found = false;
@@ -206,9 +207,11 @@
         }
       });
       
-      if(found
-         ? window.oauth_dfd.state() !== "pending"
-         : window.oauth_dfd.state() === "rejected"
+      if(force ||
+          (found
+            ? window.oauth_dfd.state() !== "pending"
+            : window.oauth_dfd.state() === "rejected"
+          )
       ) {
         old_dfd = window.oauth_dfd;
         dfd = new $.Deferred();
