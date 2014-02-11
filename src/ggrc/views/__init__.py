@@ -453,54 +453,13 @@ def import_controls_to_program(program_id):
 
   return render_template("programs/import_controls.haml", program_id=program_id, import_kind='Controls', return_to=return_to, parent_type="Program")
 
-@app.route("/task/import_request", methods=['POST'])
-@queued_task
-def import_request_task(task):
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.requests import RequestsConverter
-  from ggrc.converters.import_helper import handle_csv_import
-
-  dry_run = task.parameters.get("dry_run")
-  csv_file = task.parameters.get("csv_file")
-  options = {
-      "dry_run": dry_run,
-      "audit_id": task.parameters.get("audit_id"),
-      "program_id": task.parameters.get("program_id"),
-  }
-  try:
-    converter = handle_csv_import(RequestsConverter, csv_file.splitlines(True), **options)
-    if dry_run:
-      return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
-    else:
-      count = len(converter.objects)
-      urlparts = urlparse(task.parameters.get("return_to"))
-      #flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
-      return_to = urlunparse(
-        (urlparts.scheme, 
-          urlparts.netloc, 
-          u"/audits/post_import_request_hook",
-          u'',
-          u'return_to=' + urllib.quote_plus(task.parameters.get("return_to")) \
-          + u'&ids=' + json.dumps([object.obj.id for object in converter.objects])
-          + u'&audit_id=' + unicode(int(options['audit_id'])),
-          '')
-        )
-      return import_redirect(return_to)
-
-  except ImportException as e:
-    if e.show_preview:
-      converter = e.converter
-      return render_template("programs/import_request_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
-    return render_template("programs/import_request_errors.haml",
-          exception_message=e)
-
-@app.route("/audits/post_import_request_hook", methods=['GET'])
-def post_import_requests():
-  return import_redirect(request.args.get("return_to"))
-
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
 def import_requests(audit_id):
+  from werkzeug import secure_filename
+  from ggrc.converters.common import ImportException
+  from ggrc.converters.requests import RequestsConverter
+  from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Audit, Program
   from ggrc.utils import view_url_for
 
@@ -509,23 +468,42 @@ def import_requests(audit_id):
   program_url = view_url_for(program)
   return_to = unicode(request.args.get('return_to', program_url))
 
-  if request.method != 'POST':
-    return render_template("programs/import_request.haml", import_kind='Requests', return_to=return_to)
+  if request.method == 'POST':
 
-  if 'cancel' in request.form:
-    return import_redirect(return_to)
-  dry_run = not ('confirm' in request.form)
-  csv_file = request.files['file']
-  if csv_file and allowed_file(csv_file.filename):
-    from werkzeug import secure_filename
-    filename = secure_filename(csv_file.filename)
+    if 'cancel' in request.form:
+      return import_redirect(return_to)
+    dry_run = not ('confirm' in request.form)
+    csv_file = request.files['file']
+    try:
+      if csv_file and allowed_file(csv_file.filename):
+        filename = secure_filename(csv_file.filename)
+        converter = handle_csv_import(RequestsConverter, csv_file,
+          program_id=program.id, audit_id=audit.id, dry_run=dry_run)
 
-  else:
-    file_msg = "Could not import: invalid csv file."
-    return render_template("programs/import_request_errors.haml", exception_message=file_msg)
-  parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "audit_id": audit_id, "program_id": program.id, "return_to": return_to}
-  tq = create_task("import_request", import_request_task, parameters)
-  return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
+        if dry_run:
+          return render_template("programs/import_request_result.haml",
+              converter=converter,
+              results=converter.objects, heading_map=converter.object_map)
+        else:
+          count = len(converter.objects)
+          flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+          return import_redirect(return_to)
+      else:
+        file_msg = "Could not import: invalid csv file."
+        return render_template("programs/import_request_errors.haml",
+              exception_message=file_msg)
+
+    except ImportException as e:
+      if e.show_preview:
+        converter = e.converter
+        return render_template("programs/import_request_result.haml", exception_message=e,
+            converter=converter, results=converter.objects,
+            heading_map=converter.object_map)
+      return render_template("programs/import_request_errors.haml",
+            exception_message=e)
+
+  return render_template("programs/import_request.haml", import_kind='Requests', return_to=return_to)
+
 
 @app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])
 def import_requests_template(audit_id):

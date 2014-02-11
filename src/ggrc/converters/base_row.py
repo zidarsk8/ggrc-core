@@ -493,7 +493,11 @@ class DateColumnHandler(ColumnHandler):
           date_result = datetime.strptime(value, "%Y-%m-%d")
         elif value:
           raise ValueError("Error parsing the date string")
-
+      default_value = self.options.get('default_value')
+      if default_value and value == '':
+        self.add_warning("This field will be set to the date {}".format(
+            default_value.strftime("%m/%d/%Y")))
+        date_result = default_value
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
       else:
