@@ -36,7 +36,7 @@
       if(window.oauth_dfd.state() === "pending") {
         window.oauth_dfd.reject("User canceled operation");
       }
-      this.element.remove();
+      this.element && this.element.remove();
     }
 
   });
