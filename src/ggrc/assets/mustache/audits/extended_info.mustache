@@ -63,7 +63,9 @@
     <div class="span5">
       <div class="info">
         <strong>Audit Firm: </strong>
-        {{{firstnonempty instance.audit_firm 'None'}}}
+        {{#using firm=instance.audit_firm}}
+          {{{firstnonempty firm.title 'None'}}}
+        {{/using}}
         <br>
         <strong>Audit Lead: </strong>
         {{#if instance.contact}}
