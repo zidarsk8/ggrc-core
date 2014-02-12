@@ -49,8 +49,8 @@
     , drivedfd : null
     , gapidfd : new $.Deferred()
   
-    , authorize : function(newscopes) {
-      return this.canonical_instance.authorize(newscopes);
+    , authorize : function(newscopes, force) {
+      return this.canonical_instance.authorize(newscopes, force);
     }
 
     , doGAuth : function(scopes, use_popup) {
