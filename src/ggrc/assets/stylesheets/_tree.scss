@@ -952,7 +952,6 @@ ul.new-tree {
 }
 
 .inner-tree {
-  margin-bottom:20px;
   ul.new-tree {
     @include reset-list();
     li.tree-item {
@@ -1007,7 +1006,7 @@ ul.new-tree {
   &.content-open {
     @include box-shadow(inset 0 4px 3px -3px #bbb);
     background:#fff;
-    padding-bottom:2px;
+    padding-bottom:20px;
   }
 }
 .tier-2-info-content {
@@ -1194,6 +1193,7 @@ ul.new-tree {
 }
 
 .inner-tree {
+  padding-top: 20px;
   h6 {
     @include border-radius(4px 4px 0 0);
     border:1px solid #ccc;
@@ -1201,7 +1201,6 @@ ul.new-tree {
     background:#ddd;
     color:#666;
     padding-left:20px;
-    margin-top:20px;
     margin-left:20px;
     margin-right:20px;
     line-height:24px;
