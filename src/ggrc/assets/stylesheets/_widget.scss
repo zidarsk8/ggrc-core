@@ -762,6 +762,10 @@
       min-height: 23px;
       margin-top: 4px;
     }
+    select {
+      line-height: 14px;
+      padding: 2px 4px 0 4px;
+    }
     .filter-date-range {
       @include clearfix();
       padding-left: 20px;
