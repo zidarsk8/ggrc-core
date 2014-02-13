@@ -17,8 +17,8 @@
   function preload_content() {
     var template =
       [ '<div class="modal-header">'
-      , '  <a class="btn btn-mini pull-right" href="#" data-dismiss="modal">'
-      , '    <i class="grcicon-x-grey"></i>'
+      , '  <a class="btn btn-danger btn-mini pull-right" href="#" data-dismiss="modal">'
+      , '    <i class="grcicon-x-white"></i>'
       , '  </a>'
       , '  <h2>Loading...</h2>'
       , '</div>'
@@ -359,8 +359,8 @@
       _scrollY = window.scrollY;
       _top = _scrollY 
         + (offsetParent.height() 
-          - modal.height()) / 2 
-        + header_height / 2
+          - modal.height()) / 5 
+        + header_height / 5
 
         window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height()) 
     } else {
