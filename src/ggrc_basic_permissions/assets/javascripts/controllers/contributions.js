@@ -318,20 +318,22 @@
 
     update_option_radios: function() {
       var self = this
+        , role_found = false
         , $option_list = $(this.element).find('.option_column ul')
         ;
 
-      if(this.join_list.length === 0){
-        setTimeout(function(){
-          $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
-        }, 0);
-        return;
-      }
       this.join_list.forEach(function(join, index, list) {
-        $option_list
-          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]')
-          .prop('checked', true);
+        var $option = $option_list
+          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]');
+        if($option.length == 1){
+          $option.prop('checked', true);
+          role_found = true;
+        }
       });
+      if(!role_found){
+        $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+      }
+      
     },
 
     /*" hide": function(el, ev) {
