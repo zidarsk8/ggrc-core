@@ -690,7 +690,7 @@ class ObjectiveHandler(ColumnHandler):
   def parse_item(self, value):
     # if this slug exists, return the objective_id, otherwise throw error
     if value:
-      objective = Objective.query.filter_by(slug=value.upper()).first()
+      objective = Objective.query.filter_by(slug=value).first()
       if not objective:
         self.add_error("Objective code '{}' does not exist.".format(value))
       else:
@@ -724,7 +724,7 @@ class LinkControlsHandler(LinksHandler):
   model_class = Control
 
   def parse_item(self, data):
-    return {'slug' : data.upper()}
+    return {'slug' : data}
 
   def create_item(self, data):
     self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
@@ -863,7 +863,7 @@ class LinkSystemsHandler(LinksHandler):
   model_class = System
 
   def parse_item(self, value):
-    return { 'slug' : value.upper(), 'title' : value }
+    return { 'slug' : value, 'title' : value }
 
   def find_existing_item(self, data):
     system = SystemOrProcess.query.filter_by(slug=data.get('slug')).first()
@@ -897,7 +897,7 @@ class LinkRelationshipsHandler(LinksHandler):
       else:
         self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
-      return {'slug' : value.upper()}
+      return {'slug' : value}
 
   def get_existing_items(self):
     where_params= {}
@@ -954,7 +954,7 @@ class LinkObjectHandler(LinksHandler):
       else:
         self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
-      return {'slug' : value.upper()}
+      return {'slug' : value}
 
   def create_item(self, data):
     model_class = self.options.get('model_class') or self.model_class

@@ -11,7 +11,7 @@ from copy import *
 DEBUG_IMPORT = True
 
 def prepare_slug(slug):
-  return re.sub(r'\r|\n'," ", slug.strip()).upper()
+  return re.sub(r'\r|\n'," ", slug.strip())
 
 class ImportException(Exception):
   def __init__(self, message, show_preview=False, converter=None):
