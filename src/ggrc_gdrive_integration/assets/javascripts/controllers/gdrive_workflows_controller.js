@@ -586,7 +586,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         if(that._audit_create_in_progress || object.audit.reify().get_mapping("folders").length < 1) {
           that.request_create_queue.push(object);
         } else {
-          that.create_request_folder(object.constructor, {}, object);
+          that.link_request_to_new_folder_or_audit_folder(object.constructor, {}, object);
         }
       } else {
         folder_dfd = that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
