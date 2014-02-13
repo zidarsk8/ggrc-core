@@ -697,7 +697,7 @@ class ObjectiveHandler(ColumnHandler):
         return objective.id
     else:
       if self.options.get('is_needed_later'):
-        self.add_warning("You will need to connect an Objective later.")
+        self.add_warning("An Objective will need to be mapped later")
       return None
 
   def export(self):

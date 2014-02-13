@@ -950,7 +950,7 @@ def export_systems_from_program(program_id):
 def import_controls_template(object_type, object_id):
   from flask import current_app
   from ggrc.models.all_models import Directive, Program
-  DIRECTIVE_TYPES = ["regulations", "contracts", "policies"]
+  DIRECTIVE_TYPES = ["regulations", "contracts", "policies", "standards"]
   OTHER_TYPES = ["programs"]
   if object_type in DIRECTIVE_TYPES + OTHER_TYPES:
     if object_type in DIRECTIVE_TYPES:
