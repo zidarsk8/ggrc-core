@@ -2138,4 +2138,8 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
   }
 });
 
+Mustache.registerHelper("strip_html_tags", function(str){
+  return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
+});
+
 })(this, jQuery, can);
