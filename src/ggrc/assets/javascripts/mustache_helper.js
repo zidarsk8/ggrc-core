@@ -2096,17 +2096,29 @@ Mustache.registerHelper("remove_space", function(str, options){
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
-  var admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , instance = instance().reify()
+  var auditor_hook, _el, _instance = instance
+    , id = can.view.hook(auditor_hook = function auditor_hook(el){
+    var admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , instance = resolve_computed(_instance).reify()
     , audit = instance.audit.reify()
     , auditors = findAuditors(audit)
-    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id;
-  if(admin || auditor){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+    , html, _el = el;
+    if(admin || auditor){
+      html = options.fn(options.contexts);
+    }
+    else{
+      html = options.inverse(options.contexts);
+    }
+    $(el).html(html);
+    if(typeof el !== "undefined")
+      can.view.hookup(el);
+  });
+  
+  resolve_computed(instance).audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
+  return "<span" 
+    + id
+    + " data-replace='true'/>";
 });
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
