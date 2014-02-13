@@ -1362,8 +1362,9 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     return options.inverse(options.contexts || this);
 });
 
-function resolve_computed(maybe_computed) {
-  return (typeof maybe_computed === "function" && maybe_computed.isComputed) ? resolve_computed(maybe_computed()) : maybe_computed;
+function resolve_computed(maybe_computed, always_resolve) {
+  return (typeof maybe_computed === "function" 
+    && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
 }
 
 Mustache.registerHelper("attach_spinner", function(spin_opts, styles) {
@@ -2008,7 +2009,7 @@ Mustache.registerHelper("prune_context", function(options) {
 
 // Turns DocumentationResponse to Response
 Mustache.registerHelper("type_to_readable", function(str, options){
-  return str().replace(/([A-Z])/g, ' $1').split(' ').pop();
+  return resolve_computed(str, true).replace(/([A-Z])/g, ' $1').split(' ').pop();
 });
 
 Mustache.registerHelper("mixed_content_check", function(url, options) {
@@ -2091,18 +2092,7 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
 });
 
 Mustache.registerHelper("remove_space", function(str, options){
-  return str().replace(' ', '');
-});
-
-Mustache.registerHelper("if_contains", function(str, search, options){
-  if(typeof str === 'function') str = str();
-  
-  if(str.indexOf(search) > -1){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+  return resolve_computed(str, true).replace(' ', '');
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
