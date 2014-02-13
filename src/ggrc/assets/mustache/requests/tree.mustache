@@ -59,14 +59,20 @@
           </div>
         </div>
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+	        <i class="grcicon-person-green pull-left"></i>
 	        {{#if_can_edit_request instance}}
-          <i class="grcicon-person-green pull-left"></i>
-          {{#using assignee=instance.assignee}}
-          <div class="objective-selector">
-            <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
-          </div>
+            {{#using assignee=instance.assignee}}
+              <div class="objective-selector">
+                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
+              </div>
+            {{/using}}
+          {{else}}
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{firstnonempty assignee.name assignee.email ''}}
+              </div>
+            </div>
           {{/if_can_edit_request}}
-        {{/using}}
         </div>
         
         <div class="span4">
