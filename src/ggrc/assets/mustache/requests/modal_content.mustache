@@ -25,7 +25,7 @@
       {{#with_mapping 'responses' instance}}
       <select name="request_type" class="input-block-level" tabindex="2" {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
         {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-        <option value="{{iterator.toLowerCase}}" {{#if_equals iterator.toLowerCase instance.request_type}} selected="true"{{/if_equals}}>{{iterator}}</option>
+        <option value="{{iterator.toLowerCase}}" {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
       </select>
       {{/with_mapping}}
@@ -68,18 +68,33 @@
     {{/is_allowed}}
     </div>
     {{/using}}
-    {{#using assignee=instance.assignee}}
     <div class="span6">
       <label>
         Assignee
         <span class="required">*</span>
       </label>
       <i class="grcicon-person-green pull-left icon-field"></i>
-      <div class="objective-selector">
-        <input tabindex="7" type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
-      </div>
+      {{#is_allowed 'update' 'Objective' context=null}}
+        {{#using assignee=instance.assignee}}
+        <div class="objective-selector">
+          <input tabindex="7" type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
+        </div>
+        {{/using}}
+      {{else}}
+        {{#if new_object_form}}
+          {{#using audit=instance.audit}}
+          {{#using assignee=audit.contact}}
+            {{firstnonempty assignee.email '&nbsp;'}}
+            <input type="hidden" name="assignee.email" value="{{assignee.email}}">
+          {{/using}}
+          {{/using}}
+        {{else}}
+          {{#using assignee=instance.assignee}}
+            {{firstnonempty assignee.email '&nbsp;'}}
+          {{/using}}
+        {{/if}}
+      {{/is_allowed}}
     </div>
-    {{/using}}
   </div>
   <div class="row-fluid">
     <div class="span12">
