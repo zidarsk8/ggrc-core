@@ -85,29 +85,29 @@
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
               {{#if_equals instance.status "Draft"}}
                 {{#if_auditor instance}}
-                <button data-name="status" data-value="Requested" class="btn btn-warning">Request</button>
+                <button data-name="status" data-value="Requested" class="btn btn-warning {{instance._disabled}}">Request</button>
                 {{else}}
                 <small class="gray"><em>{{instance.status}}</em></small>
                 {{/if_auditor}}
               {{/if_equals}}
               {{#if_equals instance.status "Requested"}}
                 {{#if_can_edit_request instance}}
-                <button data-name="status" data-value="Responded" class="btn btn-primary">Respond</button>
+                <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}}">Respond</button>
                 {{else}}
                 <small class="gray"><em>{{instance.status}}</em></small>
                 {{/if_can_edit_request}}
               {{/if_equals}}
               {{#if_equals instance.status "Amended Request"}}
                 {{#if_can_edit_request instance}}
-                <button data-name="status" data-value="Updated Response" class="btn btn-primary">Respond</button>
+                <button data-name="status" data-value="Updated Response" class="btn btn-primary {{instance._disabled}}">Respond</button>
                 {{else}}
                 <small class="gray"><em>Amended</em></small>
                 {{/if_can_edit_request}}
               {{/if_equals}}
               {{#if_match instance.status "Respon"}}
                 {{#if_auditor instance}}
-                <button data-name="status" data-value="Accepted" class="btn btn-add">Accept</button>
-                <button data-name="status" data-value="Amended Request" class="btn btn-warning">Amend</button>
+                <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
+                <button data-name="status" data-value="Amended Request" class="btn btn-warning {{instance._disabled}}">Amend</button>
                 {{else}}
                 <small class="gray"><em>Responded</em></small>
                 {{/if_auditor}}
@@ -116,7 +116,7 @@
                 <small class="accepted"><em>Accepted</em></small>
               {{/if_equals}}
               {{#instance._undo.0}}
-                <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo">Undo</a>
+                <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
               {{/instance._undo.0}}
             </div>
           </div>

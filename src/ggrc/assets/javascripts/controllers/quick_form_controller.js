@@ -51,11 +51,10 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     }, 100);
   }
   , "button,a.undo click" : function(el, ev){
-    if(!el.data('name') || !el.data('value')){
+    ev.stopPropagation();
+    if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
       return;
     }
-    ev.stopPropagation();
-
     var that = this
       , name = el.data('name')
       , old_value = this.options.instance.attr(name);
@@ -68,8 +67,13 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     else{
       that.options.instance.attr('_undo').shift();
     }
-    that.set_value({ name: el.data('name'), value: el.data('value') });
-    that.options.instance.save();
+    that.options.instance.attr('_disabled', 'disabled');
+    that.options.instance.refresh().then(function(instance){ 
+      that.set_value({ name: el.data('name'), value: el.data('value') });
+      return instance.save();
+    }).then(function(){
+      that.options.instance.attr('_disabled', '');
+    });
   }
 
 });
