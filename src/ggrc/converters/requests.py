@@ -67,13 +67,18 @@ class RequestsConverter(BaseConverter):
 
   row_converter = RequestRowConverter
 
+  # code is optional for this object; do the same as in super class
+  # but with slug in optional_headers
+  def read_headers(self, import_map, row, required_headers=[], optional_headers=[]):
+    return super(RequestsConverter, self).read_headers(import_map, row, required_headers, ['slug'] + optional_headers)
+
   # Overwrite validate functions since they assume a program rather than a directive
 
   def validate_code(self, attrs):
-    if not attrs.get('slug'):
-      self.errors.append('Missing Program Code heading')
-    elif attrs['slug'] != self.program().slug:
-      self.errors.append('Program Code must be {}'.format(self.program().slug))
+    true_program_slug = self.program().slug
+    given_program_slug = attrs.get('slug')
+    if given_program_slug and given_program_slug != true_program_slug:
+      self.warnings.append('You have provided {0} as the program code, but this will be imported to program with code {1}.'.format(given_program_slug, true_program_slug))
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Requests")
