@@ -13,7 +13,10 @@
 	          <div class="type">
 	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
 	            <div class="state-type dropdown">
-	              {{#if_equals 'Draft' instance.status}}
+	              {{#if_helpers '\
+			            #if_equals' 'Draft' instance.status '\
+			            and ^if' instance.responses.length '\
+			            ' _1_context=instance.context.id }}
 	              <span class="dropdown-toggle" data-toggle="dropdown" role="button">
 	                <i class="grcicon-carot"></i>
 	              </span>
@@ -29,8 +32,9 @@
 	                {{/iterate}}
 	              </ul>
 	              {{else}}
+	              
 	              <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
-	              {{/if_equals}}
+	              {{/if_helpers}}
 	            </div>
 	          </div>
 	          <div class="tree-title-area">
