@@ -9,9 +9,24 @@
 // widgets styles
 .widget {
   @include border-radius();
-  &.widget-active {
-    .content {
-      @include opacity(1);
+  @include box-shadow(0 0 5px lighten($gray,10%));
+  .header {
+    .widget-action {
+      i {
+        @include opacity(0.5);
+        @include transition(opacity 0.3s ease);
+      }
+      a {
+        display: block;
+        width: 20px;
+        height: 16px;
+        padding: 7px 5px;
+        &:hover {
+          i {
+            @include opacity(1);
+          }
+        }
+      }
     }
   }
   width:96%;
@@ -155,37 +170,18 @@
     }
   }
   .header {
-    background:$white;
+    background-color: $defaultWidget;
     border-bottom:1px solid darken($lightGray, 10%);
     @include transition(background-color 0.2s);
     color:$text;
     height: 30px;
     padding-left: 16px;
     &:hover {
-      background-image: image-url("grcicons/icons.png");
-      background-repeat: no-repeat;
-      @include background-size(368px 416px);
-      background-position: -270px -169px;
       cursor: move;
     }
     .widget-action {
       height: 30px;
       width: 30px;
-      i {
-        @include opacity(0.2);
-        @include transition(opacity 0.3s ease);
-      }
-      a {
-        display: block;
-        width: 20px;
-        height: 16px;
-        padding: 7px 5px;
-        &:hover {
-          i {
-            @include opacity(1);
-          }
-        }
-      }
       &.widget-action-help {
         @include box-shadow(none);
         background: transparent;
@@ -194,7 +190,7 @@
     h2 {
       font-weight:normal;
       line-height: 28px;
-      color: $widgetTitle;
+      color: $white;
       margin-bottom:0;
       @include oneline();
       span {
@@ -210,7 +206,8 @@
         margin-right: 7px;
       }
       span.explanation {
-        color:#999;
+        color:$white;
+        @include opacity(0.7);
         font-style:italic;
         margin-left:10px;
       }
@@ -233,135 +230,37 @@
   }
   &.governance {
     .header {
-      h2 {
-        color: $governance;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$governance;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$governance;
     }
   }
   &.programs {
     .header {
-      h2 {
-        color: $programs;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$programs;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$programs;
     }
   }
   &.risk {
     .header {
-      h2 {
-        color: $risk;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$risk;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$risk;
     }
   }
   &.business {
     .header {
-      h2 {
-        color: $business;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$business;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$business;
     }
   }
   &.controls {
     .header {
-      h2 {
-        color: $controls;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$controls;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$controls;
     }
   }
   &.objectives {
     .header {
-      h2 {
-        color: $objectives;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$objectives;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$objectives;
     }
   }
   &.entities {
     .header {
-      h2 {
-        color: $entities;
-      }
-    }
-    &.widget-active {
-      .header {
-        background-color:$entities;
-        h2 {
-          color: $white;
-          span.explanation {
-            color:$white;
-            @include opacity(0.7);
-          }
-        }
-      }
+      background-color:$entities;
     }
   }
   .filter {
@@ -420,7 +319,6 @@
   .content {
     border-top: none;
     background:$white;
-    @include opacity(0.7);
   }
   .footer {
     color:$text;
@@ -496,25 +394,6 @@
         position: static;
         margin-bottom: 10px;
         text-align: right;
-      }
-    }
-  }
-  &.widget-active {
-    @include box-shadow(0 0 12px $gray);
-    .header {
-      background:#444;
-      h2 {
-        color:$white;
-      }
-      .widget-action {
-        i {
-          @include opacity(0.5);
-        }
-        &.widget-showhide {
-          a {
-            @include opacity(0.5);
-          }
-        }
       }
     }
   }
