@@ -26,7 +26,7 @@
           {{#pack list=instance.controls}}
             {{#prune_context}}
               <div class="span1 section-item-count">
-                <div class="counter">
+                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
                   <i class="grcicon-control-black"></i>
                     {{#if list.length}} 
                       <span>{{list.length}}</span>
@@ -40,7 +40,7 @@
           {{#pack list=instance.objectives}}
             {{#prune_context}}
               <div class="span1 section-item-count">
-                <div class="counter">
+                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
                   <i class="grcicon-objective-black"></i>
                     {{#if list.length}} 
                       <span>{{list.length}}</span>
@@ -54,7 +54,7 @@
           {{#with_mapping 'related_objects' instance}}
             {{#prune_context}}
               <div class="span1 section-item-count">
-                <div class="counter">
+                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                   <i class="grcicon-object-black"></i>
                     {{#if related_objects.length}} 
                       <span>{{related_objects.length}}</span>
