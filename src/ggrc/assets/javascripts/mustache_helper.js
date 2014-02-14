@@ -2114,8 +2114,7 @@ Mustache.registerHelper("if_auditor", function(instance, options){
     if(typeof el !== "undefined")
       can.view.hookup(el);
   });
-  
-  resolve_computed(instance).audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
+  resolve_computed(instance).reify().audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
   return "<span" 
     + id
     + " data-replace='true'/>";
