@@ -2100,11 +2100,12 @@ Mustache.registerHelper("if_auditor", function(instance, options){
     , id = can.view.hook(auditor_hook = function auditor_hook(el){
     var admin = Permission.is_allowed("__GGRC_ADMIN__")
     , instance = resolve_computed(_instance).reify()
+    , finished = instance.status === "Accepted"
     , audit = instance.audit.reify()
     , auditors = findAuditors(audit)
     , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
     , html, _el = el;
-    if(admin || auditor){
+    if(admin || (!finished && auditor)){
       html = options.fn(options.contexts);
     }
     else{
@@ -2122,16 +2123,26 @@ Mustache.registerHelper("if_auditor", function(instance, options){
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
   var admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , instance = resolve_computed(instance).reify()
+    , accepted = instance.status === "Accepted"
     , update = Permission.is_allowed("update", instance)
     , map = Permission.is_allowed("mapping", instance)
     , create = Permission.is_allowed("creating", instance)
-    , assignee = instance().reify().assignee.id === GGRC.current_user.id;
+    , assignee = instance.assignee.id === GGRC.current_user.id
+    , audit = instance.audit.reify()
+    , auditors = findAuditors(audit)
+    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+    , auditor_states = ["Draft", "Responded", "Amended Response"]
+    , can_auditor_edit = auditor && $.inArray(instance.status, auditor_states) != -1
+    , can_assignee_edit = assignee && instance.status === "Draft"
     ;
+    
   //  instead of
   //    ^if' allow_mapping_or_creating '\
   //    or ^is_allowed' 'update' instance '\
   //    ' _1_context=instance.context.id
-  if(admin || update || map || create || assignee){
+  if(admin || can_auditor_edit || can_assignee_edit || 
+      (!accepted && (update || map || create))){
     return options.fn(options.contexts);
   }
   else{
