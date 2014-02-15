@@ -2096,15 +2096,27 @@ Mustache.registerHelper("remove_space", function(str, options){
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
-  var admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , instance = instance().reify()
-    , audit = instance.audit.reify()
-    , auditors = findAuditors(audit)
-    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id;
-  if(admin || auditor){
+  var instance, audit, auditors
+    , admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , include_admin = !options.hash || options.hash.include_admin !== false;
+
+  instance = resolve_computed(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if(!instance) 
+    return "";
+
+  audit = instance.attr("audit");
+
+  if(!audit)
+    return "";  //take no action until audit is available
+
+  audit = audit.reify();
+  auditors = findAuditors(audit);
+
+  if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id)) {
     return options.fn(options.contexts);
-  }
-  else{
+  } else {
     return options.inverse(options.contexts);
   }
 });
