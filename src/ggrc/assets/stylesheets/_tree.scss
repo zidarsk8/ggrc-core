@@ -398,6 +398,9 @@ ul.new-tree {
           @include opacity(1);
           text-decoration:none;
         }
+        &.controls {
+          @include opacity(1);
+        }
       }
       .request-read-only {
         .small {
@@ -1067,6 +1070,7 @@ ul.new-tree {
   }
   .population-upload {
     @include reset-list();
+    margin-top: 20px;
     li {
       margin-bottom: 20px;
       label {

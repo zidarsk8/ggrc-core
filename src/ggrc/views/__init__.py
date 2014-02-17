@@ -481,9 +481,7 @@ def import_requests(audit_id):
           program_id=program.id, audit_id=audit.id, dry_run=dry_run)
 
         if dry_run:
-          return render_template("programs/import_request_result.haml",
-              converter=converter,
-              results=converter.objects, heading_map=converter.object_map)
+          return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map, program_code=program.slug)
         else:
           count = len(converter.objects)
           flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')

@@ -23,7 +23,7 @@
           {{#using request=instance.request}}
           {{#using request_assignee=request.assignee}}
             <input tabindex="3" type="text" name="contact.email" class="span11" data-lookup="Person" value="{{firstnonempty contact.email request_assignee.email current_user.email ''}}">
-            <input type="hidden" name="contact.id" value="{{firstnonempty request_assignee.id current_user.id ''}}">
+            <input type="hidden" name="contact.id" value="{{firstnonempty contact.id request_assignee.id current_user.id ''}}">
           {{/using}}
           {{/using}}
         {{else}}

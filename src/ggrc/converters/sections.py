@@ -16,7 +16,7 @@ class SectionRowConverter(BaseRowConverter):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
         and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Slug code is already used.')
+          self.importer.errors.append('Section code is already used.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
@@ -69,10 +69,10 @@ class SectionsConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.directive().type))
+      self.errors.append('Missing {} Code heading'.format(self.directive_kind()))
     elif attrs['slug'] != self.directive().slug:
       self.errors.append('{0} Code must be {1}'.format(
-          self.directive(),
+          self.directive_kind(),
           self.directive().slug
       ))
 
