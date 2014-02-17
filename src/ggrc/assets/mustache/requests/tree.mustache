@@ -63,7 +63,8 @@
 	        {{#if_can_edit_request instance}}
             {{#using assignee=instance.assignee}}
               <div class="objective-selector">
-                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
+                <!--<input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">-->
+                <input type="text" name="assignee.name" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
               </div>
             {{/using}}
           {{else}}
