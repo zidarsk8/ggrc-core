@@ -84,7 +84,7 @@
           <div class="control-wrap">
             <div class="date">
               {{#if instance.due_on}}
-              <span>{{localize_date instance.due_on}}</span>
+              <span rel="tooltip" data-placement="top" data-original-title="Due On"><span>{{localize_date instance.due_on}}</span></span>
               {{/if}}
             </div>
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
