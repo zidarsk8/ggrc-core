@@ -145,6 +145,11 @@ blockquote {
   overflow: visible;
 }
 
+.undo {
+  font-size: 12px;
+  padding-left: 7px;
+}
+
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
   z-index: 2000 !important;
