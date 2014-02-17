@@ -290,8 +290,6 @@ can.Control("GGRC.Controllers.Modals", {
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
 
-    this.options.$content.find("input:first").focus();
-
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
     });
