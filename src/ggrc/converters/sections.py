@@ -16,7 +16,7 @@ class SectionRowConverter(BaseRowConverter):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
         and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Slug code is already used.')
+          self.importer.errors.append('Section code is already used.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
