@@ -398,6 +398,9 @@ ul.new-tree {
           @include opacity(1);
           text-decoration:none;
         }
+        &.controls {
+          @include opacity(1);
+        }
       }
       .request-read-only {
         .small {
