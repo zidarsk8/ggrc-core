@@ -1067,6 +1067,7 @@ ul.new-tree {
   }
   .population-upload {
     @include reset-list();
+    margin-top: 20px;
     li {
       margin-bottom: 20px;
       label {
