@@ -25,7 +25,9 @@
                 {{#if_can_edit_request instance.request}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
                 {{else}}
+                <span class="read-only">
                   {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                </span>
                 {{/if_can_edit_request}}
               {{/using}}
             </div>
