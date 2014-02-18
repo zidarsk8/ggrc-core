@@ -27,7 +27,9 @@
                   ^if' allow_mapping_or_creating '\
                   or ^is_allowed' 'update' instance '\
                 ' _1_context=instance.context.id}}
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                  <span class="read-only">
+                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                  </span>
                 {{else}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
                 {{/if_helpers}}
