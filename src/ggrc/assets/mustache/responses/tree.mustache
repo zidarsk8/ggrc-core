@@ -19,21 +19,16 @@
           </div>
           
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-            {{^if_auditor instance.request}}
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
-                {{#if_helpers '\
-                  ^if' allow_mapping_or_creating '\
-                  or ^is_allowed' 'update' instance '\
-                ' _1_context=instance.context.id}}
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                {{else}}
+                {{#if_can_edit_request instance.request}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
-                {{/if_helpers}}
+                {{else}}
+                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                {{/if_can_edit_request}}
               {{/using}}
             </div>
-            {{/if_auditor}}
           </div>
           
           <div class="span1">

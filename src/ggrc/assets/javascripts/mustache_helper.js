@@ -1596,7 +1596,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         // If this is and audit the owner could be an auditor
         if (instance instanceof CMS.Models.Audit) {
           instance.reify().get_mapping('authorizations').bind("change", function() { 
-            if(~can.inArray(person.id, $.map(findAuditors(instance), function(p) { console.log('person', p); return p.person.id; }))){
+            if(~can.inArray(person.id, $.map(findAuditors(instance), function(p) { return p.person.id; }))){
               state.attr('roles').push('Auditor');
             }
             else{
