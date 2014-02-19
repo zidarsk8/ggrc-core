@@ -50,15 +50,30 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       $(el).closest('.open').removeClass('open');
     }, 100);
   }
-  , "button click" : function(el, ev){
-    if(!el.data('name') || !el.data('value')){
+  , "button,a.undo click" : function(el, ev){
+    ev.stopPropagation();
+    if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
       return;
     }
-    var that = this;
-    this.set_value({ name: el.data('name'), value: el.data('value') });
-    setTimeout(function() {
-      that.options.instance.save();
-    }, 100);
+    var that = this
+      , name = el.data('name')
+      , old_value = this.options.instance.attr(name);
+
+    // Check if the undo button was clicked:
+    this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);
+    if(!el.data('undo')){
+      that.options.instance.attr('_undo').unshift(old_value);
+    }
+    else{
+      that.options.instance.attr('_undo').shift();
+    }
+    that.options.instance.attr('_disabled', 'disabled');
+    that.options.instance.refresh().then(function(instance){ 
+      that.set_value({ name: el.data('name'), value: el.data('value') });
+      return instance.save();
+    }).then(function(){
+      that.options.instance.attr('_disabled', '');
+    });
   }
 
 });

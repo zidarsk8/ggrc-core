@@ -145,6 +145,24 @@ blockquote {
   overflow: visible;
 }
 
+.undo {
+  font-size: 12px;
+  padding-left: 7px;
+}
+
+.read-only {
+  text-decoration: none;
+  color: $darkText;
+  display: inline-block;
+  a {
+    text-decoration: none;
+    color: $darkText;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
   z-index: 2000 !important;

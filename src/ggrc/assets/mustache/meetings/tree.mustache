@@ -83,7 +83,7 @@
               {{#if people.length}}
                 <ul>
                   {{#people}}
-                    <li>{{instance.name}}</li>
+                    <li>{{{renderLive '/static/mustache/people/popover.mustache' person=instance}}}</li>
                   {{/people}}
                 </ul>
               {{/if}}

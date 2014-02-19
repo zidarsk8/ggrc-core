@@ -1596,7 +1596,20 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
 
       // Check for ownership
       if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
-        state.attr('roles').push('Owner');
+        // If this is and audit the owner could be an auditor
+        if (instance instanceof CMS.Models.Audit) {
+          instance.reify().get_mapping('authorizations').bind("change", function() { 
+            if(~can.inArray(person.id, $.map(findAuditors(instance), function(p) { return p.person.id; }))){
+              state.attr('roles').push('Auditor');
+            }
+            else{
+              state.attr('roles').push('Owner');
+            }
+          });
+        }
+        else{
+          state.attr('roles').push('Owner');
+        }
       }
 
       // Check for authorizations
@@ -2099,36 +2112,71 @@ Mustache.registerHelper("remove_space", function(str, options){
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
-  var admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , instance = instance().reify()
+  var auditor_hook, _el, _instance = instance
+    , id = can.view.hook(auditor_hook = function auditor_hook(el){
+    var admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , instance = resolve_computed(_instance).reify()
+    , finished = instance.status === "Accepted"
     , audit = instance.audit.reify()
     , auditors = findAuditors(audit)
-    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id;
-  if(admin || auditor){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+    , html, _el = el;
+    if(admin || (!finished && auditor)){
+      html = options.fn(options.contexts);
+    }
+    else{
+      html = options.inverse(options.contexts);
+    }
+    $(el).html(html);
+    if(typeof el !== "undefined")
+      can.view.hookup(el);
+  });
+  resolve_computed(instance).reify().audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
+  return "<span" 
+    + id
+    + " data-replace='true'/>";
 });
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
-  var admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , update = Permission.is_allowed("update", instance)
-    , map = Permission.is_allowed("mapping", instance)
-    , create = Permission.is_allowed("creating", instance)
-    , assignee = instance().reify().assignee.id === GGRC.current_user.id;
-    ;
-  //  instead of
-  //    ^if' allow_mapping_or_creating '\
-  //    or ^is_allowed' 'update' instance '\
-  //    ' _1_context=instance.context.id
-  if(admin || update || map || create || assignee){
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+  
+  var auditor_hook, _el, _instance = instance
+    , id = can.view.hook(auditor_hook = function auditor_hook(el){
+      var admin = Permission.is_allowed("__GGRC_ADMIN__")
+      , instance = resolve_computed(_instance).reify()
+      , accepted = instance.status === "Accepted"
+      , update = Permission.is_allowed("update", instance)
+      , map = Permission.is_allowed("mapping", instance)
+      , create = Permission.is_allowed("creating", instance)
+      , assignee = instance.assignee.id === GGRC.current_user.id
+      , audit = instance.audit.reify()
+      , auditors = findAuditors(audit)
+      , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+      , auditor_states = ["Draft", "Responded", "Amended Response"]
+      , can_auditor_edit = auditor && $.inArray(instance.status, auditor_states) != -1
+      , can_assignee_edit = assignee && instance.status === "Draft"
+      , html, _el = el;
+      ;
+      //    instead of
+      //    ^if' allow_mapping_or_creating '\
+      //    or ^is_allowed' 'update' instance '\
+      //    ' _1_context=instance.context.id
+      if(admin || can_auditor_edit || can_assignee_edit || 
+          (!accepted && (update || map || create))){
+        html = options.fn(options.contexts);
+      }
+      else{
+        html = options.inverse(options.contexts);
+      }
+      
+      $(el).html(html);
+      if(typeof el !== "undefined")
+        can.view.hookup(el);
+  });
+  
+  resolve_computed(instance).reify().audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
+  return "<span" 
+    + id
+    + " data-replace='true'/>";
 });
 
 Mustache.registerHelper("strip_html_tags", function(str){
