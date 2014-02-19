@@ -2109,29 +2109,30 @@ Mustache.registerHelper("remove_space", function(str, options){
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
-  var auditor_hook, _el, _instance = instance
-    , id = can.view.hook(auditor_hook = function auditor_hook(el){
-    var admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , instance = resolve_computed(_instance).reify()
-    , finished = instance.status === "Accepted"
-    , audit = instance.audit.reify()
-    , auditors = findAuditors(audit)
-    , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
-    , html, _el = el;
-    if(admin || (!finished && auditor)){
-      html = options.fn(options.contexts);
-    }
-    else{
-      html = options.inverse(options.contexts);
-    }
-    $(el).html(html);
-    if(typeof el !== "undefined")
-      can.view.hookup(el);
-  });
-  resolve_computed(instance).reify().audit.reify().get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
-  return "<span" 
-    + id
-    + " data-replace='true'/>";
+  var instance, audit, auditors, finished
+    , admin = Permission.is_allowed("__GGRC_ADMIN__")
+    , include_admin = !options.hash || options.hash.include_admin !== false;
+
+  instance = resolve_computed(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if(!instance) 
+    return "";
+
+  finished = instance.status === "Accepted"
+  audit = instance.attr("audit");
+  
+  if(!audit)
+    return "";  //take no action until audit is available
+
+  audit = audit.reify();
+  auditors = findAuditors(audit);
+
+  if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id) && !finished) {
+    return options.fn(options.contexts);
+  } else {
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
