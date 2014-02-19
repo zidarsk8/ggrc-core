@@ -363,7 +363,20 @@ can.Control("GGRC.Controllers.Modals", {
     if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
-    if($elem.is("[data-binding]")) {
+    if($elem.is("[data-binding]") && $elem.is("[type=checkbox]")){
+      can.map($elem, function(el){
+        if(el.value != value.id) 
+          return;
+        if($(el).is(":checked")){
+          instance.mark_for_addition($elem.data("binding"), value);
+        }
+        else{
+          instance.mark_for_deletion($elem.data("binding"), value);
+        }
+      });
+      return;
+    }
+    else if($elem.is("[data-binding]")) {
       can.each(can.makeArray($elem[0].options), function(opt) {
         instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
       });
@@ -408,6 +421,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
     value = value && value.serialize ? value.serialize() : value;
+    console.log($elem.is('[data-list]'));
     if ($elem.is('[data-list]')) {
       var list_path = name.slice(0, name.length-1).join(".")
         , cur = instance.attr(list_path)
@@ -419,6 +433,8 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
+      console.log(name[0])
+      if(name[0] !== "people")
       instance.attr(name[0], value);
     }
   }

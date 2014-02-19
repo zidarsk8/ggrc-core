@@ -31,11 +31,15 @@
             <label>
             <input tabindex="5" 
                    name="people" 
-                   data-binding="people" 
+                   data-binding="people"
                    model="Person"
                    type="checkbox" 
                    value="{{id}}" 
-                   {{#in_array this attendees}}checked{{/in_array}} /> 
+                   {{#if new_object_form}}
+                   checked
+                   {{else}}
+                   {{#in_array this attendees}}checked{{/in_array}}
+                   {{/if}} /> 
               {{firstnonempty name email ''}}</label>
             {{/reified_people}}
           {{/using}}
