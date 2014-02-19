@@ -41,7 +41,7 @@
               <i class="grcicon-remove"></i>
               Unmap
             </a>
-            {{/with_mapping}}{{/using}}
+            {{else}}{{/with_mapping}}{{/using}}
           {{/is_allowed_all}}
           {{/if}}
           </div>
@@ -65,7 +65,9 @@
         <div class="row-fluid">
           <div class="span12">
             <div class="tree-info">
-              GDrive Path: 
+              <strong>GDrive Path: </strong>
+            {{#with_mapping 'files' instance}}
+              {{#if files.0.instance.selfLink}}
               <a class="reference" data-popover-trigger="sticky-hover" data-sticky-popover="true" data-content="{{renderLive '/static/mustache/pbc/iframe_tooltip.mustache' url=instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
 
                 {{#scriptwrap attr_class="popover-data-title"}}
@@ -78,10 +80,20 @@
                     </div>
                   </div>
                 {{/scriptwrap}}
-                /{{#using request=parent_instance.request}}{{#with_mapping 'folders' request}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{#with_mapping 'files' instance}}{{files.0.instance.title}}{{/with_mapping}}
+
+              /{{#using request=parent_instance.request}}{{#with_mapping 'folders' request}}{{folders.0.instance.title}}{{/with_mapping}}{{/using}}/{{files.0.instance.title}}
+            </a>
+            {{else}}
+              No GDrive file found for this evidence.
+            {{/if}}
+          {{else}}
+            {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
+            The GDrive file for this evidence could not be accessed.
+            {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="file"}}}
+          {{/with_mapping}}
+
+
               </a>
-              <span class='option'>
-              </span>
             </div>
           </div>
         </div>
@@ -98,8 +110,8 @@
                   {{localize_date modifiedDate}}
                   {{/with}}
                 {{/defer}}
+              {{else}}
               {{/with_mapping}}
-              </span>
             </div>
           </div>
         </div>
@@ -108,7 +120,7 @@
         {{#is_allowed 'update' instance}}
         <div class="row-fluid">
           <div class="span12">
-            <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Document" data-object-plural="documents" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" }, "modal_title" : "Edit Evidence" }'>
+            <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Document" data-object-plural="documents" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" }, "modal_title" : "Edit Evidence" }'>
             <i class="grcicon-edit"></i>
             Edit Evidence
           </a>

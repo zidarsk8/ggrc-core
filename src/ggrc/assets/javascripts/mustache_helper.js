@@ -2183,4 +2183,22 @@ Mustache.registerHelper("strip_html_tags", function(str){
   return resolve_computed(str).replace(/<(?:.|\n)*?>/gm, '');
 });
 
+Mustache.registerHelper("switch", function(value, options) {
+  var frame = new can.Observe({});
+  value = resolve_computed(value);
+  frame.attr(value || "default", true);
+  frame.attr("default", true);
+  return options.fn(options.contexts.add(frame), { 
+    helpers : { 
+      case : function(val, options) {
+        val = resolve_computed(val);
+        if(options.context[val]) {
+          options.context.attr ? options.context.attr("default", false) : (options.context.default = false);
+          return options.fn(options.contexts);
+        }
+      }
+    }
+  });
+});
+
 })(this, jQuery, can);
