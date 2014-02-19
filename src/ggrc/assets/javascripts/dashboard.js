@@ -335,6 +335,10 @@ jQuery(function($) {
         }
         $("#results-container").html(task.result.content);
         $('form.import .btn').unbind().unbind().click(disableButton);
+        if(msg === "Upload and Review"){
+          // Don't display "Upload and Review successful." message
+          return;
+        }
         $('body').trigger(
           'ajax:flash', 
             { "success" : msg + " successful."}
