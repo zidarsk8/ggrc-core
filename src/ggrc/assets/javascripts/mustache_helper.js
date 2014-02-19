@@ -1416,10 +1416,13 @@ Mustache.registerHelper("instance_ids", function(list, options) {
   //  `assets/mustache/controls/tree_footer.mustache`
   var ids;
   list = resolve_computed(Mustache.resolve(list));
-  if (list)
+  if (list) {
+    list.attr("length");
     ids = can.map(list, function(result) { return result.attr("instance.id"); });
-  else
+  }
+  else {
     ids = [];
+  }
   return ids.join(",");
 });
 
