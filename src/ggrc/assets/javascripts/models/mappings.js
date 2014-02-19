@@ -104,7 +104,6 @@
         _mixins: ["personable"] //controllable
       , related_objects: Proxy(
           null, "controllable", "ObjectControl", "control", "object_controls") //control_objects
-      , related_and_able_objects : Multi(["objectives", "implemented_controls", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -113,6 +112,15 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+      , related_business_objects: Multi([
+          "related_data_assets", "related_facilities", "related_markets",
+          "related_org_groups", "related_processes", "related_products",
+          "related_projects", "related_systems"
+          ])
+      , related_and_able_objects: Multi([
+          "objectives", "implemented_controls", "related_business_objects",
+          "people", "joined_directives", "programs"
+          ])
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
       , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
