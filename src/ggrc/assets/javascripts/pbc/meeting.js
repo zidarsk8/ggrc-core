@@ -48,8 +48,7 @@ can.Model.Cacheable("CMS.Models.Meeting", {
         that.bind("change", function(){
           if(typeof that.response !== "undefined" && !that._preloaded_people){
             that._preloaded_people = true;
-            
-            console.log(that.get_binding('people').list.length, "People")
+
             can.map(that.response.reify().people, function(person){
               that.mark_for_addition("people", person);
             })

@@ -421,7 +421,6 @@ can.Control("GGRC.Controllers.Modals", {
     }
 
     value = value && value.serialize ? value.serialize() : value;
-    console.log($elem.is('[data-list]'));
     if ($elem.is('[data-list]')) {
       var list_path = name.slice(0, name.length-1).join(".")
         , cur = instance.attr(list_path)
@@ -433,9 +432,8 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
-      console.log(name[0])
       if(name[0] !== "people")
-      instance.attr(name[0], value);
+        instance.attr(name[0], value);
     }
   }
 
