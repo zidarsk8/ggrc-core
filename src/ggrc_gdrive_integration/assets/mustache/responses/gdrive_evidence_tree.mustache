@@ -89,7 +89,9 @@
           {{else}}
             {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
             The GDrive file for this evidence could not be accessed.
-            {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="file"}}}
+            {{#using request=parent_instance.request}}
+              {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="file" instance=request error=error}}}
+            {{/using}}
           {{/with_mapping}}
 
 

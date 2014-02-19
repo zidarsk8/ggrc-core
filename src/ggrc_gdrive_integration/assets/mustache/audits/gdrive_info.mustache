@@ -19,7 +19,9 @@
         {{else}}
           {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
           The GDrive folder for this {{instance.class.title_singular}} could not be accessed.
-          {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder"}}}
+          {{#pack audit=instance}}
+            {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder" instance=this}}}
+          {{/pack}}
         {{/with_mapping}}
       </div>
     </div>

@@ -23,3 +23,8 @@
     </span>
   </div>
   </div>
+  {{#if_auditor instance}}
+  <div>
+    Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.
+  </div>
+  {{/if}}

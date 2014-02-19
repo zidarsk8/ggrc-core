@@ -563,7 +563,7 @@ function defer_render(tag_prefix, funcs, deferred) {
       var g = deferred && deferred.state() === "rejected" ? funcs.fail : funcs.done
         , args = arguments
         , term = element.nextSibling
-        , compute = can.compute(function() { return g.apply(this, args); }, this)
+        , compute = can.compute(function() { return g.apply(this, args) || ""; }, this)
         ;
 
       if(element.parentNode) {
