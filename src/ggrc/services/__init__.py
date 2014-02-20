@@ -82,6 +82,33 @@ def all_collections():
       ret.extend(entries)
   return ret
 
+# initialization of GGRC Caching Layer objects
+#
+def init_ggrc_cache(app):
+  from ggrc.cache import CacheManager, Config, Factory, get_cache_manager
+
+  # REVIST: read properties from settings for app like SQLAlchemy and other modules
+  defaultproperties={'CACHEMECHANISM':'local'}
+
+  # Create instance of cache manager class for applying policies and operations on cache
+  cache_manager = get_cache_manager()
+
+  # Setup config including policies
+  config = Config();
+  config.setProperties(defaultproperties)
+  config.initialize()
+
+  # Setup factory class to allow cache manager to create the cache mechanism objects.
+  # REVIST: Rename as BaseFactory instead of Factory
+  factory = Factory();
+
+  # Initialize the caching layer
+  cache_manager.set_config(config)
+  cache_manager.set_factory(factory)
+  cache_manager.initialize()
+  print "Cache Manager initalized"
+
+
 def init_all_services(app):
   """Register all gGRC REST services with the Flask application ``app``."""
   from ggrc.login import login_required
@@ -105,3 +132,8 @@ def init_all_services(app):
   from .description import ServiceDescription
   app.add_url_rule(
     '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
+
+
+  # Initialize Caching layer
+  init_ggrc_cache(app)
+
