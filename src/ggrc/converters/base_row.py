@@ -503,7 +503,7 @@ class DateColumnHandler(ColumnHandler):
       else:
         return ''
     except ValueError as e:
-      self.warnings.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
+      self.errors.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
 
   def display(self):
     if self.has_errors():
