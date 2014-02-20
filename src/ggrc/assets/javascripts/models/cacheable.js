@@ -662,7 +662,9 @@ can.Model("can.Model.Cacheable", {
       });
 
       // Generate the summary
-      result.push('This may also delete');
+      if(objects.length || mappings.length){
+        result.push('This may also delete');
+      }
       if (objects.length) {
         can.each(objects, function(instance) {
           var title = instance.constructor.title_singular;
