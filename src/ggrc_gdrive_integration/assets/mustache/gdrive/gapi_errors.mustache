@@ -3,6 +3,7 @@
     {{#case 403}}You were not permitted to access Drive.{{/case}}
     {{#case 401}}You are not logged in to Drive.{{/case}}
     {{#case 500}}Google Drive encountered an internal error.{{/case}}
+    {{#case 400}}Google API didn't understand the request from GGRC{{/case}}
     {{#default}}No error code was returned or the error was not recognized{{/default}}
   {{/switch}}
   <div class="info info-expand">
@@ -25,6 +26,15 @@
   </div>
   {{#if_auditor instance}}
   <div>
-    Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.
+  {{#switch error.code}}
+    {{#case 404}}Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.{{/case}}
+    {{#case 403}}Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.{{/case}}
+    {{#case 401}}Try reloading this page. If you see a popup for Google API, make sure to click the Authorize buttons{{/case}}
+    {{#case 500}}Try again later to see if the problem resolves.{{/case}}
+    {{#case 400}}Please ontact {{ggrc_config_value 'GAPI_ADMIN_GROUP'}} and report this problem.{{/case}}
+    {{#default}}Try again later to see if the problem resolves.{{/default}}
+
+  {{/switch}}
+    
   </div>
   {{/if}}
