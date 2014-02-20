@@ -506,9 +506,6 @@ class Resource(ModelView):
     with benchmark("Query for collection"):
       objs = self.get_collection()
 
-    with benchmark("Query for collection2"):
-      objs = objs.all()
-
     with benchmark("serialize into JSON"):
       collection = self.collection_for_json(objs)
 
