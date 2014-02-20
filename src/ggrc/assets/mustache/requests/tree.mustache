@@ -4,7 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="tree-item programs request-list request-redesign rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
@@ -165,7 +165,7 @@
       {{#each child_options}}
           <div class="inner-tree">
             <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}}{{/prune_context}} ({{child_count}})</h6>
-            <ul class="tree-structure new-tree rq-colors rq-colors-inner" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            <ul class="tree-structure new-tree responses-list colored-items" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
             </ul>
           </div>
       {{/each}}
