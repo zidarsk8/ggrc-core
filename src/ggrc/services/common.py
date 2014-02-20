@@ -32,6 +32,10 @@ from wsgiref.handlers import format_date_time
 from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 
+from ggrc.cache import CacheManager, get_cache_manager
+from copy import deepcopy
+
+
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
 """
@@ -323,6 +327,7 @@ class Resource(ModelView):
       )
 
   def dispatch_request(self, *args, **kwargs):
+   with benchmark("dispatch_request"):
     method = request.method
 
     if method in ('POST', 'PUT', 'DELETE')\
@@ -475,10 +480,43 @@ class Resource(ModelView):
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
+    # Check if collection is available in cache to return
+    cache_response = None
+
+    # Check in supported list of models
+    model_plural = self.model._inflector.table_plural
+    collection_name = '{0}_collection'.format(model_plural)
+
+    stubs_in_args = '__stubs_only' in request.args
+    if stubs_in_args:
+      category = 'stubs'
+    else:
+      category = 'collection'
+    cache_manager = get_cache_manager()
+    cache_supported=cache_manager.is_caching_supported(category, model_plural)
+    if cache_supported:
+      cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
+      if cache_response is not None:
+        return cache_response
+      else:
+        print "CACHE: Unable to find " + model_plural + " object in caching layer, checking Data-ORM layer" + " in " + category + " category"
+    else:
+      print "CACHE: Get Collection from cache is not supported for "  + model_plural + " in " + category + " category"
+
     with benchmark("Query for collection"):
       objs = self.get_collection()
-    with benchmark("Serialize collection"):
+
+    with benchmark("Query for collection2"):
+      objs = objs.all()
+
+    with benchmark("serialize into JSON"):
       collection = self.collection_for_json(objs)
+
+    # Write collection to cache, if caching is supported for the model
+    if cache_supported:
+      cache_response = self.write_collection_to_cache(collection, category, model_plural, collection_name, model_plural)
+    else:
+      print "CACHE: Write Collection to cache is not supported for "  + model_plural + " in " + category + " category"
 
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(collection):
@@ -486,6 +524,89 @@ class Resource(ModelView):
         '', 304, [('Etag', self.etag(collection))]))
     return self.json_success_response(
       collection, self.collection_last_modified())
+
+  # REVISIT: remove print statements and use python logger 
+  #
+  def get_collection_from_cache(self, category, resource, x_category, x_resource):
+    print "CACHE: Get collection from cache for " + resource + " in " + category + " category"
+    cache_manager = get_cache_manager()
+    if cache_manager is None:
+      print "CACHE: CacheManager is not initialized"
+      return None
+
+    # Check in local cache for 'eager_query' related requests and args with with 'id_in' 
+    # Do additional parsing of arguments such as '_' for etag, replacing comma with '%2C'
+    # for JSON response
+    cacheobjids = request.args.get('id__in', False)
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      print "CACHE: GET request for resource collection and eager query"
+      cacheobjidstr = cacheobjids.replace(',', '%2C')
+      etag = request.args.get('_', False)
+      ids = [long(i) for i in cacheobjids.split(',')]
+      filter={'ids':ids, 'attrs':None}
+      # REVISIT: Apply cacheManager policies to verify if caching is supported 
+      # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
+      #print "CACHE: request cacheManager to get collection, " + \
+            #" category: " + category + " resource: " + resource + \
+            #" filter: " +  str(filter)
+      data = cache_manager.get_collection(category, resource, filter)
+      if data is not None or len(data) > 0: 
+        converted_data = {x_category: {x_resource: []}}
+        for cachetype, cachedata in data.items():
+          for id, attrs in cachedata.items():
+            converted_data[x_category][x_resource].append(attrs)
+        selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
+        converted_data[x_category]['selfLink'] = selfLink
+        controls_data = converted_data[x_category][x_resource]
+        if len(controls_data) > 0:
+          #print "CACHE: Successfully converted data: ", converted_data
+          print "CACHE: Successfully converted data to return as JSON response"
+          return self.json_success_response(converted_data, datetime.datetime.now())
+        else:
+          print "CACHE: Unable to find data for model: " + \
+                 resource + " in cache"
+          return None
+      else:
+        print "CACHE: Model: " + resource + "not found in cache"
+        return None
+    else:
+      print "CACHE: Caching is only supported for collection for model: " + resource 
+      return None
+
+  # REVISIT: remove print statements and use python logger 
+  #
+  def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
+    print "CACHE: Write collection to cache for " + resource + " in " + category + " category"
+    cache_manager = get_cache_manager()
+    if cache_manager is None:
+      print "CACHE: CacheManager is not initialized"
+      return None
+    cacheobjids = request.args.get('id__in', False)
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      print "CACHE: GET request for resource collection and eager query"
+      if collection.has_key(x_category):
+        resource_collection= collection.get(x_category).get(x_resource)
+        cacheData={}
+        for aresource in resource_collection:
+          id = aresource['id']
+          cacheData[id] = deepcopy(aresource)
+
+        #print "CACHE: request cacheManager to add collection, " + \
+        #" category: " + category + " resource: " + resource 
+        #print "CACHE: data written to cache: ", cacheData
+        write_result = cache_manager.add_collection(category, resource, cacheData)
+        if write_result is None:
+           print "CACHE: Failed to write collection"
+           return None
+        else:
+           print "CACHE: Successfully written data in cache for resource: " + resource
+           #print "CACHE: result from cacheManager addCollection : ", write_result
+           return write_result
+      else:
+         print "CACHE: Unable to find data in source collection for model: " + resource
+	 return None
+    else:
+      print "CACHE: Caching is only supported for collection for model: " + resource 
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
@@ -700,6 +821,8 @@ class Resource(ModelView):
         ]
     if id:
       headers.append(('Location', self.url_for(id=id)))
+    with benchmark("serialize to json"):
+      self.as_json(response_object)
     return current_app.make_response(
       (self.as_json(response_object), status, headers))
 
