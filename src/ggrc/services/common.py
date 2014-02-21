@@ -811,8 +811,6 @@ class Resource(ModelView):
         ]
     if id:
       headers.append(('Location', self.url_for(id=id)))
-    with benchmark("serialize to json"):
-      self.as_json(response_object)
     return current_app.make_response(
       (self.as_json(response_object), status, headers))
 
