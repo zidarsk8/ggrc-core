@@ -14,8 +14,6 @@
 
 """
 from collections import OrderedDict
-from sqlalchemy.orm.session import Session
-from sqlalchemy import event
 from cache import all_cache_entries
 
 class CacheManager:
@@ -62,18 +60,10 @@ class CacheManager:
     #
     self.dto_manager= self.get_config().get_dto_manager()
 
-    # 5. Setup Event listeners for SQL Alchemy Session flush, commit, rollback events
-    #    before flush and after flush will invoke update/delete collection in cache
-    #
     self.new = {}
     self.dirty = {}
     self.deleted = {}
-    event.listen(Session, 'before_flush', self.update_cache_before_flush)
-    event.listen(Session, 'after_flush', self.update_cache_after_flush)
-    event.listen(Session, 'after_commit', self.clear_cache)
-    event.listen(Session, 'after_rollback', self.clear_cache)
 
-	
   def set_factory(self, factory):
     self.factory = factory
 	
@@ -105,7 +95,6 @@ class CacheManager:
     #
     objs = OrderedDict()
     cache_dict = self.get_cache()
-    #print "CACHE: dictionary: ", cache_dict
     for key, obj in cache_dict.items():
       # returned_obj is returned None if one of configured policies for the cache fails or ERRORs
       returned_obj = obj.get(category, resource, filter)
@@ -123,7 +112,6 @@ class CacheManager:
 
     # 2. Apply policyManager rules - TBD
     #
-    #print "CACHE: data to add to collection %s" %(dto)
     if not self.is_caching_supported(category, resource, dto, 'add_collection'): 
       return None
 
@@ -203,62 +191,7 @@ class CacheManager:
     cache_dict.clear()
     return True
 
-  def update_cache_before_flush(self, session, flush_context, objects):
-    """
-    Before the flush happens, we can still access to-be-deleted objects, so
-    record JSON for log here
-    """
-    for o in session.new:
-      if hasattr(o, 'log_json'):
-        self.new[o] = o.log_json()
-    for o in session.deleted:
-      if hasattr(o, 'log_json'):
-        self.deleted[o] = o.log_json()
-    dirty = set(o for o in session.dirty if session.is_modified(o))
-    for o in dirty - set(self.new) - set(self.deleted):
-      if hasattr(o, 'log_json'):
-        self.dirty[o] = o.log_json()
-
-    """
-    REVISIT: Update local or mem cache state that the object is marked for delete or update ONLY   
-    The session.new entries are ignored
-    """
-
-  def update_cache_after_flush(self, session, flush_context):
-    """
-    After the flush, we know which objects were actually deleted, not just
-    modified (deletes due to cascades are not known pre-flush), so fix up
-    cache.
-    """
-    #import ipdb
-
-    #ipdb.set_trace()
-
-    for o in self.dirty.keys():
-      # SQLAlchemy magic to determine whether object was actually deleted due
-      #   to `cascade="all,delete-orphan"`
-      # If an object was actually deleted, move it into `deleted`
-      if flush_context.is_deleted(o._sa_instance_state):
-        self.deleted[o] = self.dirty[o]
-        del self.dirty[o]
-
-    """
-    Update local or mem cache 
-    The session.new entries are ignored
-    """
-    if len(self.dirty) > 0: 
-      for o, json_obj in self.dirty.items():
-        cls = o.__class__.__name__
-        if self.supported_classes.has_key(cls):
-          print "CACHE: Updating object instance of model: " + cls + " resource type: " + self.supported_classes[cls] 
-
-    if len(self.deleted) > 0: 
-      for o, json_obj in self.deleted.items():
-        cls = o.__class__.__name__
-        if self.supported_classes.has_key(cls):
-          print "CACHE: Deleting object instance of model: " + cls + " resource type: " + self.supported_classes[cls] 
-
-  def clear_cache(self, session):
+  def clear_cache(self):
     self.new = {}
     self.dirty = {}
     self.deleted = {}

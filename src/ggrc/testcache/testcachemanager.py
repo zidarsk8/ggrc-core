@@ -27,12 +27,12 @@ class TestCacheManager(unittest.TestCase):
 
     for i in range(50):
       data = {i: {'name':'control'+str(i), 'type': 'type'+str(i)}}
-      self.cache_manager.add_collection('object', 'controls', data)
+      self.cache_manager.add_collection('collection', 'controls', data)
 
   def runTest(self):
     print "\nTest Case #1: Getting data from cache"
     filter1={'ids':[1,5,10], 'attrs':['name']}
-    data = self.cache_manager.get_collection('object', 'controls', filter1)
+    data = self.cache_manager.get_collection('collection', 'controls', filter1)
     if data is not None and len(data) > 0:
      print("==> data returned form getCollection <===")
      for key, value in data.items():
@@ -42,7 +42,7 @@ class TestCacheManager(unittest.TestCase):
 
     filter2={'ids':[1,5,10], 'attrs':None}
     print "\nTest Case #2: Getting data from cache with empty attributes"
-    data = self.cache_manager.get_collection('object', 'controls', filter2)
+    data = self.cache_manager.get_collection('collection', 'controls', filter2)
     if data is not None and len(data) > 0:
      print("==> data returned form getCollection <===")
      converted_data = {'controls_collection': {'controls': []}}

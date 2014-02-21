@@ -6,6 +6,7 @@
 from collections import namedtuple
 from .common import *
 from .registry import service
+from ggrc.cache import CacheManager, Config, Factory, get_cache_manager
 
 """All gGRC REST services."""
 
@@ -84,29 +85,91 @@ def all_collections():
 
 # initialization of GGRC Caching Layer objects
 #
-def init_ggrc_cache(app):
-  from ggrc.cache import CacheManager, Config, Factory, get_cache_manager
+def update_cache_before_flush(session, flush_context, objects):
+  cache_manager = get_cache_manager()
+  """
+  Before the flush happens, we can still access to-be-deleted objects, so
+  record JSON for log here
+  """
+  for o in session.new:
+    if hasattr(o, 'log_json'):
+      cache_manager.new[o] = o.log_json()
+  for o in session.deleted:
+    if hasattr(o, 'log_json'):
+      cache_manager.deleted[o] = o.log_json()
+  dirty = set(o for o in session.dirty if session.is_modified(o))
+  for o in dirty - set(cache_manager.new) - set(cache_manager.deleted):
+    if hasattr(o, 'log_json'):
+      cache_manager.dirty[o] = o.log_json()
 
+  """
+  REVISIT: Update local or mem cache state that the object is marked for delete or update ONLY   
+  The session.new entries are ignored
+  """
+
+def update_cache_after_flush(session, flush_context):
+  cache_manager = get_cache_manager()
+  """
+  After the flush, we know which objects were actually deleted, not just
+  modified (deletes due to cascades are not known pre-flush), so fix up
+  cache.
+  """
+  for o in cache_manager.dirty.keys():
+    # SQLAlchemy magic to determine whether object was actually deleted due
+    #   to `cascade="all,delete-orphan"`
+     # If an object was actually deleted, move it into `deleted`
+    if flush_context.is_deleted(o._sa_instance_state):
+      cache_manager.deleted[o] = cache_manager.dirty[o]
+      del cache_manager.dirty[o]
+
+  """
+  Update local or mem cache 
+  """
+  if len(cache_manager.new) > 0: 
+    for o, json_obj in cache_manager.dirty.items():
+      cls = o.__class__.__name__
+      if cache_manager.supported_classes.has_key(cls):
+        current_app.logger.info("CACHE: Remove mapping links for new object instance of model: " + cls + \
+          " resource type: " + cache_manager.supported_classes[cls])
+
+  if len(cache_manager.dirty) > 0: 
+    for o, json_obj in cache_manager.dirty.items():
+      cls = o.__class__.__name__
+      if cache_manager.supported_classes.has_key(cls):
+        current_app.logger.info("CACHE: Updating object instance of model: " + cls + \
+          " resource type: " + cache_manager.supported_classes[cls])
+
+  if len(cache_manager.deleted) > 0: 
+    for o, json_obj in cache_manager.deleted.items():
+      cls = o.__class__.__name__
+      if cache_manager.supported_classes.has_key(cls):
+        current_app.logger.info("CACHE: Deleting object instance of model: " + cls + \
+          " resource type: " + cache_manager.supported_classes[cls]) 
+
+def clear_cache(session):
+  cache_manager = get_cache_manager()
+  cache_manager.clear_cache()
+
+def init_ggrc_cache(app):
   # REVIST: read properties from settings for app like SQLAlchemy and other modules
   defaultproperties={'CACHEMECHANISM':'local'}
-
   # Create instance of cache manager class for applying policies and operations on cache
   cache_manager = get_cache_manager()
-
   # Setup config including policies
   config = Config();
   config.setProperties(defaultproperties)
   config.initialize()
-
   # Setup factory class to allow cache manager to create the cache mechanism objects.
   # REVIST: Rename as BaseFactory instead of Factory
   factory = Factory();
-
   # Initialize the caching layer
   cache_manager.set_config(config)
   cache_manager.set_factory(factory)
+  event.listen(Session, 'before_flush',update_cache_before_flush)
+  event.listen(Session, 'after_flush', update_cache_after_flush)
+  event.listen(Session, 'after_commit', clear_cache)
+  event.listen(Session, 'after_rollback', clear_cache)
   cache_manager.initialize()
-  print "Cache Manager initalized"
 
 
 def init_all_services(app):

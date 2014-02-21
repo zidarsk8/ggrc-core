@@ -56,13 +56,11 @@ class LocalCache(Cache):
     cache_key = self.get_key(category, resource)
 
     if cache_key is None:
-      print "CACHE: cannot find entries for key %s:%s in cache" %(category, resource)
       return  None
 
     entries = self.cache_entries.get(cache_key)
     ids, attrs = self.parse_filter(filter)
     if ids is None and attrs is None:
-      print "CACHE: Unable to find any information in cache"
       return None
     else:
       if ids is None:
@@ -75,7 +73,6 @@ class LocalCache(Cache):
   def add(self, category, resource, data): 
     cache_key = self.get_key(category, resource)
     if cache_key is None:
-      print "CACHE: cannot find entries for key %s:%s in cache" %(category, resource)
       return None
     entries = self.cache_entries.get(cache_key)
 
@@ -95,7 +92,6 @@ class LocalCache(Cache):
   def remove(self, category, resource, data): 
     cache_key = self.get_key(category, resource)
     if cache_key is None:
-      print "CACHE: cannot find entries for key %s:%s in cache " %(category, resource)
       return None
     entries = self.cache_entries.get(cache_key) 	
 

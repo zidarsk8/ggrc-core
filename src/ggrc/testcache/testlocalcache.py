@@ -8,13 +8,13 @@ class TestLocalCache(unittest.TestCase):
     self.local_cache = LocalCache()
     for i in range(50):
       data = {i: {'name':'control'+str(i), 'type': 'type'+str(i)}}
-      self.local_cache.add('object', 'controls', data)
+      self.local_cache.add('collection', 'controls', data)
       #print "==> contents of cache <=== ", self.localCache
 
   def runTest(self):
     print "\nTest Case #1 - Get from local cache"
     filter={'ids':[1,5,10], 'attrs':['name']}
-    data = self.local_cache.get('object', 'controls', filter)
+    data = self.local_cache.get('collection', 'controls', filter)
     if data is not None:
       for key, value in data.items():
         print("key : %d, value : %s" %(key, value))

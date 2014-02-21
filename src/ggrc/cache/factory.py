@@ -8,7 +8,6 @@
 # Maintained By: chandramouliv@google.com
 #
 
-#
 from .localcache import LocalCache
 class Factory:
   def __init__(self): 
@@ -16,11 +15,8 @@ class Factory:
 
   def create(self, name, arguments=None):
     if "local" in name :
-      print "CACHE: Local cache" 
       return LocalCache();
     elif  "remote" in name : 
-      print "CACHE: Mem cache"
       return MemCache();
     else: 
-      print "CACHE: Cache %s is not supported with arguments: %s" %(name, arguments)
       return None
