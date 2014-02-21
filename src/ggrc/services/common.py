@@ -511,7 +511,7 @@ class Resource(ModelView):
     with benchmark("Query for collection"):
       objs = self.get_collection()
 
-    with benchmark("serialize into JSON"):
+    with benchmark("Serialize collection"):
       collection = self.collection_for_json(objs)
 
     # Write collection to cache, if caching is supported for the model
