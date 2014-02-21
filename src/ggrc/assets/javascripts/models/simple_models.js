@@ -1142,7 +1142,19 @@ can.Model.Cacheable("CMS.Models.Audit", {
         return instance;
       });
     });
-  }
+  }, findAuditors : function(){
+    var loader = this.get_binding('authorizations');
+    
+    return $.map(loader.list, function(binding) {
+      var role = binding.instance.role.reify();
+      if (role.attr('name') === 'Auditor') {
+        return {
+          person: binding.instance.person.reify()
+          , binding: binding.instance
+        }
+      }
+    });
+  } 
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
