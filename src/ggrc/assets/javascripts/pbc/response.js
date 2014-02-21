@@ -171,6 +171,12 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
 }, {
   save : function() {
     if(this.isNew()) {
+      var audit = this.request.reify().audit.reify()
+        , auditors = audit.findAuditors();
+      
+      if(auditors.length > 0){
+        this.mark_for_addition("people", auditors[0].person);
+      }
       this.mark_for_addition("people", this.contact);
     }
     return this._super.apply(this, arguments);

@@ -1599,7 +1599,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         // If this is and audit the owner could be an auditor
         if (instance instanceof CMS.Models.Audit) {
           instance.reify().get_mapping('authorizations').bind("change", function() { 
-            if(~can.inArray(person.id, $.map(findAuditors(instance), function(p) { return p.person.id; }))){
+            if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
               state.attr('roles').push('Auditor');
             }
             else{
@@ -1961,40 +1961,21 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
-function findAuditors(instance){
-  var loader = resolve_computed(instance).get_binding('authorizations');
-  
-  return $.map(loader.list, function(binding) {
-    var role = binding.instance.role.reify();
-    if (binding.instance.role.reify().attr('name') === 'Auditor') {
-      return {
-        person: binding.instance.person.reify()
-        , binding: binding.instance
-      }
-    }
-  });
-}
-
 Mustache.registerHelper("with_auditors", function(instance, options) {
+  var auditors;
+  
+  instance = resolve_computed(instance);
 
-  var auditor_hook, _el
-  , id = can.view.hook(auditor_hook = function auditor_hook(el){
-    var html
-      , auditors = findAuditors(instance);
-    _el = el;
-    if(auditors.length > 0){
-      html = options.fn(options.contexts.add({"auditors": auditors}));
-    }
-    else{
-      html = options.inverse(options.contexts);
-    }
-    $(el).html(html);
-    can.view.hookup(el);
-  });
-  resolve_computed(instance).get_mapping('authorizations').bind("change", function() { auditor_hook(_el); });
-  return "<span" 
-    + id
-    + " data-replace='true'/>";
+  if(!instance) 
+    return "";
+  
+  auditors = resolve_computed(instance).findAuditors();
+  if(auditors.length > 0){
+    return options.fn(options.contexts.add({"auditors": auditors}));
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
 });
 
 Mustache.registerHelper("if_instance_of", function(inst, cls, options) {
@@ -2128,7 +2109,7 @@ Mustache.registerHelper("if_auditor", function(instance, options){
     return "";  //take no action until audit is available
 
   audit = audit.reify();
-  auditors = findAuditors(audit);
+  auditors = audit.findAuditors();
 
   if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id)) {
     return options.fn(options.contexts);
@@ -2154,7 +2135,7 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
       return "";  //take no action until audit is available
 
     audit = audit.reify();
-    auditors = findAuditors(audit);
+    auditors = audit.findAuditors();
     
     var accepted = instance.status === "Accepted"
       , update = Permission.is_allowed("update", instance)
