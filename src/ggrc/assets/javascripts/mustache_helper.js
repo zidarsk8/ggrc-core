@@ -2103,12 +2103,12 @@ Mustache.registerHelper("if_auditor", function(instance, options){
   if(!instance) 
     return "";
 
-  audit = instance.attr("audit");
+  audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
   
   if(!audit)
     return "";  //take no action until audit is available
 
-  audit = audit.reify();
+  audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
   auditors = audit.findAuditors();
 
   if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id)) {
