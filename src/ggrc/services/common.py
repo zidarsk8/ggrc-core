@@ -163,7 +163,8 @@ class ModelView(View):
         if j_contexts is not None:
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
-    query = query.order_by(self.modified_attr.desc())
+    if '__sort' not in request.args:
+      query = query.order_by(self.modified_attr.desc())
     order_properties = []
     if '__sort' in request.args:
       sort_attrs = request.args['__sort'].split(",")
