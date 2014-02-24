@@ -61,5 +61,7 @@ permissions = {
         "Request",
         "Response"
     ],
-    "delete": []
+    "delete": [
+        "Request",
+    ],
 }
