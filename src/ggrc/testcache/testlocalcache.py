@@ -1,15 +1,21 @@
 import unittest
 
 from cache import LocalCache
+import logging
+import sys
 
 class TestLocalCache(unittest.TestCase):
   localCache = None
+  #log_level=logging.DEBUG
+  log_level=logging.INFO
   def setUp(self):
+    logging.basicConfig(level=self.log_level)
     self.local_cache = LocalCache()
     for i in range(50):
       data = {i: {'name':'control'+str(i), 'type': 'type'+str(i)}}
-      self.local_cache.add('collection', 'controls', data)
-      #print "==> contents of cache <=== ", self.localCache
+      entries = self.local_cache.add('collection', 'controls', data)
+      if entries is not None:
+        logging.debug("==> contents of cache <=== " + str(entries))
 
   def runTest(self):
     print "\nTest Case #1 - Get from local cache"
@@ -17,7 +23,7 @@ class TestLocalCache(unittest.TestCase):
     data = self.local_cache.get('collection', 'controls', filter)
     if data is not None:
       for key, value in data.items():
-        print("key : %d, value : %s" %(key, value))
+        logging.info("key : %d, value : %s" %(key, value))
     else:
-      print("ERROR: No data found returned")
+      logging.info("ERROR: No data found returned")
 

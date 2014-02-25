@@ -2,14 +2,19 @@ import unittest
 
 from cache import CacheManager, Config, Factory
 import json
+import logging
+import sys
 
 class TestCacheManager(unittest.TestCase):
   cache_manager = None
   config = None
   factory = None
+  #log_level=logging.DEBUG
+  log_level=logging.INFO
   defaultproperties={'CACHEMECHANISM':'local'}
 
   def setUp(self):
+    logging.basicConfig(level=self.log_level)
     self.cache_manager= CacheManager()
 
     # setup config
@@ -30,32 +35,35 @@ class TestCacheManager(unittest.TestCase):
       self.cache_manager.add_collection('collection', 'controls', data)
 
   def runTest(self):
-    print "\nTest Case #1: Getting data from cache"
+    logging.info("\nTest Case #1: Getting data from cache")
     filter1={'ids':[1,5,10], 'attrs':['name']}
     data = self.cache_manager.get_collection('collection', 'controls', filter1)
     if data is not None and len(data) > 0:
-     print("==> data returned form getCollection <===")
+     logging.info("==> data returned form getCollection <===")
      for key, value in data.items():
-      print "key :%s, data:%s" %(key, value)
+      logging.info("key :%s, data:%s" %(key, value))
     else:
-      print "FAILED: No entries in cache"
+      logging.info("FAILED: No entries in cache")
 
     filter2={'ids':[1,5,10], 'attrs':None}
-    print "\nTest Case #2: Getting data from cache with empty attributes"
+    logging.info("\nTest Case #2: Getting data from cache with empty attributes")
     data = self.cache_manager.get_collection('collection', 'controls', filter2)
     if data is not None and len(data) > 0:
-     print("==> data returned form getCollection <===")
+     logging.info("==> data returned form getCollection <===")
      converted_data = {'controls_collection': {'controls': []}}
      for cachetype, cachedata in data.items():
-       print "cachetype:%s, cachedata:%s" %(cachetype, cachedata)
+       logging.info("cachetype:%s, cachedata:%s" %(cachetype, cachedata))
        for id, attrs in cachedata.items():
          converted_data['controls_collection']['controls'].append(attrs)
          json_data = json.dumps(converted_data)
-         print "JSON data: ", json_data
+         logging.info("JSON data: "+ json_data)
     else:
-      print "FAILED: No entries in cache"
+      logging.info("FAILED: No entries in cache")
 
     self.cache_manager.clean()
-    print "\nTest Case #3: Clean cache and try to get data from cache"
+    logging.info("\nTest Case #3: Clean cache and try to get data from cache")
     data = self.cache_manager.get_collection('object', 'controls', filter2)
-    print "==> cache must be empty: ", data
+    if data is None:
+      logging.info("==> cache must be empty: ")
+    else:
+      logging.info("FAILED: cache is not empty after cleanup")
