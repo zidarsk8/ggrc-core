@@ -21,6 +21,7 @@ exports = []
 # Deployment-specific variables
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
+COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
 VERSION = "s23"
 
 # Initialize from environment if present
