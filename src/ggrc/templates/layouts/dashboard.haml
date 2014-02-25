@@ -133,8 +133,7 @@
           %p
             -#FIXME: Copyright footer
             -#=CMS_CONFIG['COMPANY']
-            Confidential.
-            Copyright &copy;
+            =config.get('COPYRIGHT')
             -#=Time.now.year
             =config.get('COMPANY')
             Version
