@@ -1397,7 +1397,14 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     //    the output is not identical to input (hence, not using them now.)
     //.replace(/'/g, "\\'")
     //.replace(/"/g, '&#34;').replace(/'/g, "&#39;")
-    .replace(/\n/g, "\\n").replace(/\r/g, "\\r");
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\u2028/g, "\\u2028") // Line separator
+    .replace(/\u2029/g, "\\u2029") // Paragraph separator
+    .replace(/\t/g, "\\t")
+    .replace(/\b/g, "\\b")
+    .replace(/\f/g, "\\f")
+    .replace(/\v/g, "\\v");
 });
 
 can.each({
