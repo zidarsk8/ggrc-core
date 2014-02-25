@@ -484,8 +484,19 @@ def import_requests(audit_id):
           return render_template("programs/import_request_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map, program_code=program.slug)
         else:
           count = len(converter.objects)
-          flash(u'Successfully imported {} request{}'.format(count, 's' if count > 1 else ''), 'notice')
+          urlparts = urlparse(request.args.get("return_to"))
+          return_to = urlunparse(
+            (urlparts.scheme, 
+              urlparts.netloc, 
+              u"/audits/post_import_request_hook",
+              u'',
+              u'return_to=' + urllib.quote_plus(request.args.get("return_to")) \
+              + u'&ids=' + json.dumps([object.obj.id for object in converter.objects])
+              + u'&audit_id=' + unicode(int(audit_id)),
+              '')
+          )
           return import_redirect(return_to)
+
       else:
         file_msg = "Could not import: invalid csv file."
         return render_template("programs/import_request_errors.haml",
@@ -502,6 +513,9 @@ def import_requests(audit_id):
 
   return render_template("programs/import_request.haml", import_kind='Requests', return_to=return_to)
 
+@app.route("/audits/post_import_request_hook", methods=['GET'])
+def post_import_requests():
+  return import_redirect(request.args.get("return_to"))
 
 @app.route("/audits/<audit_id>/import_pbc_template", methods=['GET'])
 def import_requests_template(audit_id):
