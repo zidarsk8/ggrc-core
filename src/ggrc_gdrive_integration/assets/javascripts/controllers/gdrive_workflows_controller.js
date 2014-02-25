@@ -18,13 +18,22 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
                           // GDriveFolder.create will translate that into 'root'
     }
     return dfd.then(function(parent_folders) {
-      var xhr = new CMS.Models.GDriveFolder({
-        title : title_generator(instance)
-        , parents : parent_folders[0].instance
-      }).save();
+      parent_folders = can.map(parent_folders, function(pf) {
+        return pf.instance.userPermission.role === "writer" || pf.instance.userPermission.role === "owner" ? pf : undefined;
+      });
 
-      report_progress("Creating Drive folder for " + title_generator(instance), xhr);
-      return xhr;
+      if(parent_folders.length < 1) {
+        return new $.Deferred().reject("no write permissions on parent");
+      } else {
+
+        var xhr = new CMS.Models.GDriveFolder({
+          title : title_generator(instance)
+          , parents : parent_folders[0].instance
+        }).save();
+
+        report_progress("Creating Drive folder for " + title_generator(instance), xhr);
+        return xhr;
+      }
     }).then(function(folder) {
       var refresh_queue;
 
@@ -51,6 +60,9 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
         });
       }
       return folder;
+    }, function() {
+      //rejected case from previous
+      return $.when();
     });
   }
   else {
@@ -573,10 +585,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       , "Audit" : "program"
       , "Request" : "audit"
     };
-    if(parent_prop[object.constructor.shortName]) {
+    // maybe we also need to create a parent folder if we don't already have a folder for this object.
+    if(parent_prop[object.constructor.shortName] && !object.get_mapping("folders").length) {
       dfd = this.create_folder_if_nonexistent(object[parent_prop[object.constructor.shortName]].reify());
-    } else {
+    } else if(!object.get_mapping("folders").length) {
       dfd.resolve();
+    } else {
+      return $.when(object.get_mapping("folders")[0].instance);
     }
     return dfd.then(function foldercheck() {
       var folder_dfd;
