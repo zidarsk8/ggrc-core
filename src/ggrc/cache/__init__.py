@@ -10,6 +10,7 @@
 
 
 from .localcache import LocalCache
+from .memcache import MemCache
 from .cachemanager import CacheManager
 from .config import Config
 from .factory import Factory

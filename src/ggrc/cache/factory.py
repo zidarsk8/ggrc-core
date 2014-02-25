@@ -9,6 +9,7 @@
 #
 
 from .localcache import LocalCache
+from .memcache import MemCache 
 class Factory:
   def __init__(self): 
     pass
@@ -16,7 +17,7 @@ class Factory:
   def create(self, name, arguments=None):
     if "local" in name :
       return LocalCache();
-    elif  "remote" in name : 
+    elif  "memcache" in name : 
       return MemCache();
     else: 
       return None

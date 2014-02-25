@@ -12,6 +12,7 @@ from collections import namedtuple
 CacheEntry = namedtuple('CacheEntry', 'model_plural class_name cache_type')
 
 def resource(model_plural, class_name, cache_type='local'):
+#def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
 
 def all_cache_entries():
@@ -82,14 +83,14 @@ def all_cache_entries():
   ]
 
   return ret
+
 class Cache:
   name = None
   config = None
+  supported_resources = {}
+
   def __init__(self, configparam):
     pass
-
-  def is_caching_supported(self, category, resource):
-    return None
 
   def get_name(self):
     return None
@@ -119,10 +120,7 @@ class Cache:
   #
   def get_key(self, category, resource):
     cache_key = category + ":" + resource
-    if self.cache_entries.has_key(cache_key):
-      return cache_key
-    else:
-      return None
+    return cache_key
 
   # parse the filter for incoming request and extracts the 'ids' and 'attrs'
   # This is used for GET collection 
@@ -146,8 +144,7 @@ class Cache:
     return ids, attrs
 
   def is_caching_supported(self, category, resource):
-     cache_key = self.get_key(category, resource)
-     if cache_key is None: 
-       return None
-     else:
-       return self.supported_resources.has_key(cache_key)
+    if category is not 'collection':
+      return False
+
+    return self.supported_resources.has_key(resource)

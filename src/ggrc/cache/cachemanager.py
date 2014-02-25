@@ -172,8 +172,7 @@ class CacheManager:
     for key, cache in self.get_cache().items():
       if cache.is_caching_supported(category, resource): 
          return True
-      else:
-         return False 
+    return False 
 
   def parse_dto(self, data):
     # Apply DTO manager

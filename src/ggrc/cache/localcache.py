@@ -19,7 +19,6 @@ from cache import all_cache_entries
 """
 class LocalCache(Cache):
   cache_entries=OrderedDict()
-  supported_resources={}
 
   def __init__(self, configparam=None):
     self.config = configparam
@@ -34,13 +33,6 @@ class LocalCache(Cache):
     for key in self.supported_resources.keys():
      self.cache_entries['collection:'+key] =  {}
 
-  def is_caching_supported(self, category, resource):
-    cache_key = self.get_key(category, resource)
-    if cache_key is None: 
-      return None
-    else:
-      return self.cache_entries.has_key(cache_key)
-
   def get_name(self):
      return self.name
 
@@ -53,12 +45,17 @@ class LocalCache(Cache):
   # Get data from all cache for the specified filter
   #
   def get(self, category, resource, filter): 
-    cache_key = self.get_key(category, resource)
+    if not self.is_caching_supported(category, resource):
+      return None
 
+    cache_key = self.get_key(category, resource)
     if cache_key is None:
       return  None
 
     entries = self.cache_entries.get(cache_key)
+    if entries is None:
+       return None
+
     ids, attrs = self.parse_filter(filter)
     if ids is None and attrs is None:
       return None
@@ -71,10 +68,16 @@ class LocalCache(Cache):
   # Add data to cache for the specified data
   #
   def add(self, category, resource, data): 
+    if not self.is_caching_supported(category, resource):
+      return None
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
+    if self.cache_entries is None:
+      return None
     entries = self.cache_entries.get(cache_key)
+    if entries is None:
+      return None
 
     # REVISIT: Should we perform deep copy of data
     for key in data.keys(): 
@@ -90,8 +93,12 @@ class LocalCache(Cache):
   # Remove data from cache for the specified data
   #
   def remove(self, category, resource, data): 
+    if not self.is_caching_supported(category, resource):
+      return None
     cache_key = self.get_key(category, resource)
     if cache_key is None:
+      return None
+    if self.cache_entries is None:
       return None
     entries = self.cache_entries.get(cache_key) 	
 
@@ -108,8 +115,8 @@ class LocalCache(Cache):
 
     for key in keys:
       if not cacheitems.has_key(key):
-        # if a key is not in cache, stop processing and continue as before going to Data-ORM layer
-        # REVISIT: Currently we have all or None default policy
+        #  ALL or None Policy: if a key is not in cache, stop processing and continue as before going to Data-ORM layer
+        #
         return None
       attrvalues = cacheitems.get(key)
       targetattrs=None
