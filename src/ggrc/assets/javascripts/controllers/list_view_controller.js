@@ -95,6 +95,10 @@ can.Control("GGRC.Controllers.ListView", {
       var pager = that.context.attr("pager");
       return pager && pager.has_next && pager.has_next();
     }));
+    this.context.attr("has_prev_page", can.compute(function() {
+      var pager = that.context.attr("pager");
+      return pager && pager.has_prev && pager.has_prev();
+    }));
     this.context.attr(this.options);
 
     if(this.options.header_view) {
@@ -211,7 +215,7 @@ can.Control("GGRC.Controllers.ListView", {
 
     this.context.attr(this.options);
     can.view(this.options.list_view, this.context, function(frag) {
-      that.element.find('.spinner, .tree-structure').remove();
+      that.element.find('.spinner, .tree-structure').hide();
       that.element
         .append(frag)
         .trigger("loaded");
@@ -237,12 +241,19 @@ can.Control("GGRC.Controllers.ListView", {
   }
   , "{list} change": "update_count"
   , ".view-more-paging click" : function(el, ev) {
-      var that = this;
-      var collection_name = that.options.model.root_collection+"_collection";
-      if (that.options.pager.has_next()) {
-        that.options.pager.next().done(function(data) {
+      var that = this
+        , collection_name = that.options.model.root_collection+"_collection"
+        , is_next = el.data('next')
+        , can_load = is_next ? that.options.pager.has_next() : that.options.pager.has_prev()
+        , load = is_next ? that.options.pager.next : that.options.pager.prev;
+      that.options.list.replace([]);
+      that.element.find('.spinner').show();
+      that.element.find('.sticky-clone').remove();
+      if (can_load) {
+        load().done(function(data) {
+          that.element.find('.spinner').hide();
           if (data[collection_name] && data[collection_name].length > 0) {
-            that.options.list.push.apply(that.options.list, data[collection_name]);
+            that.options.list.replace(data[collection_name]);
           }
           that.options.pager = data.paging;
           that.context.attr("pager", data.paging);
