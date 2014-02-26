@@ -11,6 +11,7 @@
 from google.appengine.api import memcache
 from cache import Cache
 from cache import all_cache_entries
+from collections import OrderedDict
 
 """
     Memcache implements the remote AppEngine Memcache mechanism
@@ -42,7 +43,7 @@ class MemCache(Cache):
     # Construct the Attributes for the given filter, resource and category
     # Invoke Google AppEngine mem cache API
     #
-    data = {}
+    data = OrderedDict()
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return  None
@@ -58,10 +59,10 @@ class MemCache(Cache):
         if attrs is None:
           data[id] = attrvalues
         else: 
-          attr_dict = {}
+          attr_dict = OrderedDict()
           for attr in attrs:
-            if data.has_key(attr): 
-              attr_dict[attr] = data.get(attr)
+            if attrvalues.has_key(attr): 
+              attr_dict[attr] = attrvalues.get(attr)
           data[id] = attr_dict
     return data
 
@@ -73,11 +74,11 @@ class MemCache(Cache):
     if cache_key is None:
       return None
     for key in data.keys(): 
-      id = cache_key + ":" +  str(key)
+      id = cache_key + ":" + str(key)
       cache_data = memcache.get(id) 
       if cache_data is None:
-        memcache.add(id, data)
-        entries[id] = data
+        memcache.add(id, data.get(key))
+        entries[key] = data
     return entries
 
   def update(self, category, resource, data): 

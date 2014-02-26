@@ -11,8 +11,8 @@
 from collections import namedtuple
 CacheEntry = namedtuple('CacheEntry', 'model_plural class_name cache_type')
 
-def resource(model_plural, class_name, cache_type='local'):
-#def resource(model_plural, class_name, cache_type='memcache'):
+#def resource(model_plural, class_name, cache_type='local'):
+def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
 
 def all_cache_entries():

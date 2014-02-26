@@ -153,8 +153,8 @@ def clear_cache(session):
 def init_ggrc_cache(app):
   # REVIST: read properties from settings for app similar to SQLAlchemy and other modules
   #defaultproperties={'CACHEMECHANISM':'local,memcache'}
-  #defaultproperties={'CACHEMECHANISM':'memcache'}
-  defaultproperties={'CACHEMECHANISM':'local'}
+  defaultproperties={'CACHEMECHANISM':'memcache'}
+  #defaultproperties={'CACHEMECHANISM':'local'}
   # Create instance of cache manager class for applying policies and operations on cache
   cache_manager = get_cache_manager()
   # Setup config including policies
