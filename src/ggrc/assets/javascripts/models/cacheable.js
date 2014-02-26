@@ -74,7 +74,11 @@ function makeDateSerializer(type, key) {
     if(typeof d !== "number") {
       d = d.getTime();
     }
-    var retstr = moment((d / 1000).toString(), "X").utc().format(conversion);
+    var retstr = moment((d / 1000).toString(), "X");
+    if(type !== "date") {
+      retstr = retstr.utc();
+    }
+    retstr = retstr.format(conversion);
     var retval;
     if(key) {
       retval = {};
