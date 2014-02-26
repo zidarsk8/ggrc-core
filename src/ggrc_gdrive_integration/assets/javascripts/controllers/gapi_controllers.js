@@ -122,7 +122,7 @@
         var o2d = new $.Deferred();
         gapi.client.oauth2.userinfo.get().execute(function(user) {
           if(user.error) {
-            $(document.body.trigger("ajax:flash", { error : user.error }));
+            $(document.body).trigger("ajax:flash", { error : user.error });
             o2d.reject(user.error);
           } else {
             o2d.resolve(user);
