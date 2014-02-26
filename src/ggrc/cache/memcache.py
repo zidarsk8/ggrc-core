@@ -12,6 +12,7 @@ from google.appengine.api import memcache
 from cache import Cache
 from cache import all_cache_entries
 from collections import OrderedDict
+from copy import deepcopy
 
 """
     Memcache implements the remote AppEngine Memcache mechanism
@@ -62,7 +63,7 @@ class MemCache(Cache):
           attr_dict = OrderedDict()
           for attr in attrs:
             if attrvalues.has_key(attr): 
-              attr_dict[attr] = attrvalues.get(attr)
+              attr_dict[attr] = deepcopy(attrvalues.get(attr))
           data[id] = attr_dict
     return data
 
@@ -77,7 +78,7 @@ class MemCache(Cache):
       id = cache_key + ":" + str(key)
       cache_data = memcache.get(id) 
       if cache_data is None:
-        memcache.add(id, data.get(key))
+        memcache.add(id, deepcopy(data.get(key)))
         entries[key] = data
     return entries
 
