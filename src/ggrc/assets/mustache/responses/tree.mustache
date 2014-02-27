@@ -188,7 +188,7 @@
                 <div class="row-fluid">
                   {{#using population_worksheet=instance.population_worksheet}}
                   <div class="span9">
-                    <input type="text" name="population_worksheet.name" data-lookup="PopulationWorksheet" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
+                    <input type="text" name="population_worksheet.name" data-lookup="PopulationWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
                   </div>
                   {{/using}}
                   <!--
@@ -214,7 +214,7 @@
                 <div class="row-fluid">
                   {{#using sample_worksheet=instance.sample_worksheet}}
                   <div class="span9">
-                    <input type="text" name="sample_worksheet.name" data-lookup="SampleWorksheet" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
+                    <input type="text" name="sample_worksheet.name" data-lookup="SampleWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
                   </div>
                   {{/using}}
                   <!--
@@ -240,7 +240,7 @@
                 <div class="row-fluid">
                   {{#using sample_evidence=instance.sample_evidence}}
                   <div class="span9">
-                    <input type="text" name="sample_evidence.name" data-lookup="SampleEvidence" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
+                    <input type="text" name="sample_evidence.name" data-lookup="SampleEvidence" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
                   </div>
                   {{/using}}
                   <!--
