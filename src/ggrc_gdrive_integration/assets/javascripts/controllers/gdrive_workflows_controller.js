@@ -8,32 +8,33 @@
 var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
   var that = this
   , dfd
+  , has_parent = true
   , owner = cls === CMS.Models.Request ? "assignee" : "contact";
 
   if(instance instanceof cls) {
     if(parent_attr) {
       dfd = instance[parent_attr].reify().get_binding("folders").refresh_instances();
     } else {
+      has_parent = false;
       dfd = $.when([{}]); //make parent_folder instance be undefined; 
                           // GDriveFolder.create will translate that into 'root'
     }
     return dfd.then(function(parent_folders) {
       parent_folders = can.map(parent_folders, function(pf) {
-        return pf.instance.userPermission.role === "writer" || pf.instance.userPermission.role === "owner" ? pf : undefined;
+        return pf.instance && pf.instance.userPermission &&
+          (pf.instance.userPermission.role === "writer" || 
+           pf.instance.userPermission.role === "owner") ? pf : undefined;
       });
-
-      if(parent_folders.length < 1) {
+      if(has_parent && parent_folders.length < 1){
         return new $.Deferred().reject("no write permissions on parent");
-      } else {
-
-        var xhr = new CMS.Models.GDriveFolder({
-          title : title_generator(instance)
-          , parents : parent_folders[0].instance
-        }).save();
-
-        report_progress("Creating Drive folder for " + title_generator(instance), xhr);
-        return xhr;
       }
+      var xhr = new CMS.Models.GDriveFolder({
+        title : title_generator(instance)
+        , parents : parent_folders.length > 0 ? parent_folders[0].instance : undefined
+      }).save();
+
+      report_progress("Creating Drive folder for " + title_generator(instance), xhr);
+      return xhr;
     }).then(function(folder) {
       var refresh_queue;
 
@@ -237,10 +238,10 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             : undefined
         ).then(function(user_permission_id, list, admin_permission_id) {
           can.each(list, function(binding) {
-            if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
-              return;  //short circuit any operation if the user isn't allowed to add permissions
-
             binding.instance.findPermissions().then(function(permissions) {
+              if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
+                return;  //short circuit any operation if the user isn't allowed to add permissions
+              
               var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
               var matching = can.map(permissions, function(permission) {
                 if(admin_permission_id
