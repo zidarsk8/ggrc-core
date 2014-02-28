@@ -1095,6 +1095,11 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
 }, {
   save : function() {
+
+    // Make sure the context is always set to the parent program
+    if(!this.context.id){
+      this.context = this.program.reify().context;
+    }
     return this._super.apply(this, arguments).then(function(instance) {
       var no_change = false
         , auditor_role
