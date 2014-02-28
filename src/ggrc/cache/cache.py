@@ -144,7 +144,7 @@ class Cache:
     return ids, attrs
 
   def is_caching_supported(self, category, resource):
-    if category is not 'collection':
+    if category is 'collection' or category is 'stubs':
+      return self.supported_resources.has_key(resource)
+    else:
       return False
-
-    return self.supported_resources.has_key(resource)

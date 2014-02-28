@@ -209,6 +209,24 @@ class ModelView(View):
     except sqlalchemy.orm.exc.NoResultFound:
       return None
 
+  def get_object_from_cache(self, id, category, resource, x_category, x_resource):
+    current_app.logger.info("CACHE: Get specific resource: " + resource + " id: " + str(id) + " in " + category + " category")
+    cache_manager = get_cache_manager()
+    if cache_manager is None:
+      current_app.logger.error("CACHE: CacheManager is not initialized")
+      return None
+
+    # Check in local cache for the object in question from the arguments
+    #
+    ids=[id]
+    filter={'ids':ids, 'attrs':None}
+
+    # REVISIT: Apply cacheManager policies to verify if caching is supported 
+    # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
+    data = cache_manager.get_collection(category, resource, filter)
+
+    return data
+
   def not_found_message(self):
     return '{0} not found.'.format(self.model._inflector.title_singular)
 
@@ -539,10 +557,10 @@ class Resource(ModelView):
     # Do additional parsing of arguments such as '_' for etag, replacing comma with '%2C'
     # for JSON response
     cacheobjids = request.args.get('id__in', False)
+    etag = request.args.get('_', False)
     if cacheobjids and hasattr(self.model, 'eager_query'):
       current_app.logger.info("CACHE: GET request for resource collection and eager query")
       cacheobjidstr = cacheobjids.replace(',', '%2C')
-      etag = request.args.get('_', False)
       ids = [long(i) for i in cacheobjids.split(',')]
       filter={'ids':ids, 'attrs':None}
       # REVISIT: Apply cacheManager policies to verify if caching is supported 
@@ -567,8 +585,30 @@ class Resource(ModelView):
         current_app.logger.info("CACHE: Model: " + resource + "not found in cache")
         return None
     else:
-      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
-      return None
+      if category is 'stubs':
+        ids = [0]
+        filter={'ids':ids, 'attrs':None}
+        # REVISIT: Apply cacheManager policies to verify if caching is supported 
+        # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
+        data = cache_manager.get_collection(category, resource, filter)
+        if data is not None or len(data) > 0: 
+          converted_data = {x_category: {x_resource: []}}
+          for cachetype, cachedata in data.items():
+            for id, attrs in cachedata.items():
+              converted_data[x_category][x_resource]=attrs
+          selfLink = "/api/" + x_resource + "?__stubs_only=true" + "&_="+ etag 
+          converted_data[x_category]['selfLink'] = selfLink
+        controls_data = converted_data[x_category][x_resource]
+        if len(controls_data) > 0:
+          current_app.logger.info("CACHE: Successfully converted stub data to return as JSON response")
+          return self.json_success_response(converted_data, datetime.datetime.now())
+        else:
+          current_app.logger.info("CACHE: Unable to find stub data for model: " + \
+            resource + " in cache")
+          return None
+      else:
+        current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+        return None
 
   def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
     current_app.logger.info("CACHE: Write collection to cache for " + resource + " in " + category + " category")
@@ -576,7 +616,11 @@ class Resource(ModelView):
     if cache_manager is None:
       current_app.logger.info("CACHE: CacheManager is not initialized")
       return None
-    cacheobjids = request.args.get('id__in', False)
+    
+    cacheobjids=None
+    if category is 'collection':
+      cacheobjids = request.args.get('id__in', False)
+
     if cacheobjids and hasattr(self.model, 'eager_query'):
       current_app.logger.info("CACHE: GET request for resource collection and eager query")
       if collection.has_key(x_category):
@@ -596,7 +640,24 @@ class Resource(ModelView):
          current_app.logger.info("CACHE: Unable to find data in source collection for model: " + resource)
 	 return None
     else:
-      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+      if category is 'stubs':
+        current_app.logger.info("CACHE: GET request for stubs")
+        if collection.has_key(x_category):
+          resource_stubs = collection.get(x_category).get(x_resource)
+          cacheData={}
+          cacheData[0] = deepcopy(resource_stubs)
+          write_result = cache_manager.add_collection(category, resource, cacheData)
+          if write_result is None:
+             current_app.logger.info("CACHE: Unable to write stub to cache")
+             return None
+          else:
+             current_app.logger.info("CACHE: Successfully written data in cache for stub: " + resource)
+             return write_result
+        else:
+           current_app.logger.info("CACHE: Unable to find data in stubs for model: " + resource)
+	   return None
+      else:
+        current_app.logger.info("CACHE: Caching is only supported for stubs and collection for model: " + resource)
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
