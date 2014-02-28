@@ -651,53 +651,61 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       });
     }
   }
-
+  , "a.show-meeting click" : function(el, ev){
+    var instance = el.closest("[data-model], :data(model)").data("model")
+      , cev = el.closest("[data-model], :data(cev)").data("cev")
+      , subwin;
+    function poll() {
+      if(!subwin) {
+        return; //popup blocker didn't allow a reference to the open window.
+      } else if(subwin.closed) {
+        cev.refresh().then(function() {
+          instance.attr({
+            title : cev.summary
+            , start_at : cev.start
+            , end_at : cev.end
+          });
+          can.each(instance.get_mapping("people"), function(person_binding) {
+            instance.mark_for_deletion("people", person_binding.instance);
+          });
+          can.each(cev.attendees, function(attendee) {
+            instance.mark_for_addition("people", attendee);
+          });
+          instance.save();
+        });
+      } else {
+        setTimeout(poll, 5000);
+      }
+    }
+    subwin = window.open(cev.htmlLink, cev.summary);
+    setTimeout(poll, 5000);
+  }
+  , create_meeting : function(instance){
+    
+    new CMS.Models.GCalEvent({
+      calendar : GGRC.config.DEFAULT_CALENDAR
+      , summary : instance.title
+      , start : instance.start_at
+      , end : instance.end_at
+      , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
+    }).save().then(function(cev) {
+      
+      new CMS.Models.ObjectEvent({
+        eventable : instance
+        , calendar : GGRC.config.DEFAULT_CALENDAR
+        , event : cev
+        , context : instance.context || { id : null }
+      }).save();
+    });
+  }
   , "{CMS.Models.Meeting} created" : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Meeting) {
-      new CMS.Models.GCalEvent({
-        calendar : GGRC.config.DEFAULT_CALENDAR
-        , summary : instance.title
-        , start : instance.start_at
-        , end : instance.end_at
-        , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
-      }).save().then(function(cev) {
-        var subwin;
-
-        function poll() {
-          if(!subwin) {
-            return; //popup blocker didn't allow a reference to the open window.
-          } else if(subwin.closed) {
-            cev.refresh().then(function() {
-              instance.attr({
-                title : cev.summary
-                , start_at : cev.start
-                , end_at : cev.end
-              });
-              can.each(instance.get_mapping("people"), function(person_binding) {
-                instance.mark_for_deletion("people", person_binding.instance);
-              });
-              can.each(cev.attendees, function(attendee) {
-                instance.mark_for_addition("people", attendee);
-              });
-              instance.save();
-            });
-          } else {
-            setTimeout(poll, 5000);
-          }
-        }
-
-        new CMS.Models.ObjectEvent({
-          eventable : instance
-          , calendar : GGRC.config.DEFAULT_CALENDAR
-          , event : cev
-          , context : instance.context || { id : null }
-        }).save();
-
-        subwin = window.open(cev.htmlLink, cev.summary);
-        setTimeout(poll, 5000);
-
-      });
+      this.create_meeting(instance);
     }
+  }
+  , "a.create-meeting click" : function(el, ev){
+    var instance = el.closest("[data-model], :data(model)").data("model");
+    this.create_meeting(instance);
   }
 });
 
