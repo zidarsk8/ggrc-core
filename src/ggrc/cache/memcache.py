@@ -65,6 +65,9 @@ class MemCache(Cache):
             if attrvalues.has_key(attr): 
               attr_dict[attr] = deepcopy(attrvalues.get(attr))
           data[id] = attr_dict
+      else:
+        # All or None policy is enforced, if one of the objects is not available in cache, then we return empty
+        return None
     return data
 
   def add(self, category, resource, data): 
