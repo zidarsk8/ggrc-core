@@ -183,7 +183,7 @@ def load_permissions_for(user):
         or_(
           ContextImplication.source_context_id == None,
           ContextImplication.source_context_id.in_(keys),
-          ))#.all()
+          )).all()
   elif keys:
     all_context_implications = all_context_implications.filter(
           ContextImplication.source_context_id.in_(keys)).all()
@@ -195,33 +195,40 @@ def load_permissions_for(user):
   context_implications_by_source = {}
   for context_implication in all_context_implications:
     context_implications_by_source.setdefault(
-        context_implication.source_context_id, set())\
-            .add(context_implication.context_id)
+        context_implication.source_context, set())\
+            .add(context_implication.context)
 
   # Gather all roles required by context implications
-  all_implied_roles = {}
+  implied_context_to_implied_roles = {}
+  all_implied_roles_set = set()
   for source_context, implied_contexts \
       in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        all_implied_roles.setdefault(implied_rolename, None)
+    source_context_id = source_context.id if source_context else None
+    for rolename in source_contexts_to_rolenames.get(source_context_id, []):
+      for implied_context in implied_contexts:
+        implied_context_id = implied_context.id if implied_context else None
+        implied_role_names_list = implied_context_to_implied_roles.setdefault(
+            implied_context_id, list())
+        implied_role_names = lookup_role_implications(
+            rolename, source_context, implied_context)
+        all_implied_roles_set.update(implied_role_names)
+        implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
-  if all_implied_roles:
+  all_implied_roles_by_name = {}
+  if implied_context_to_implied_roles:
     implied_roles = db.session.query(Role)\
-        .filter(Role.name.in_(all_implied_roles.keys()))\
+        .filter(Role.name.in_(all_implied_roles_set))\
         .options(sqlalchemy.orm.undefer_group('Role_complete'))\
         .all()
     for implied_role in implied_roles:
-      all_implied_roles[implied_role.name] = implied_role
+      all_implied_roles_by_name[implied_role.name] = implied_role
   # Now aggregate permissions resulting from these roles
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        implied_role = all_implied_roles[implied_rolename]
-        for implied_context in implied_contexts:
-          collect_permissions(
-              implied_role.permissions, implied_context, permissions)
+  for implied_context_id, implied_rolenames \
+      in implied_context_to_implied_roles.items():
+    for implied_rolename in implied_rolenames:
+      implied_role = all_implied_roles_by_name[implied_rolename]
+      collect_permissions(
+          implied_role.permissions, implied_context_id, permissions)
 
   #grab personal context
   personal_context = db.session.query(Context).filter(
@@ -353,6 +360,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       description='',
       modified_by=get_current_user(),
       )
+  context.related_object = obj
   db.session.add(context)
   db.session.flush()
 

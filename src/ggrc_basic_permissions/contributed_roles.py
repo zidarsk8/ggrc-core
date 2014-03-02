@@ -4,6 +4,7 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc.extensions import get_extension_modules
+from ggrc.models import Program, Audit
 from .roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
@@ -56,16 +57,14 @@ def lookup_contributions(rolename):
       contribute_role_permissions(contributions, ext_role_contributions)
   return contributions;
 
-def lookup_role_implications(rolename, implications={}):
-  if rolename in implications:
-    return implications[rolename]
+def lookup_role_implications(rolename, src_context, context):
   extension_modules = get_extension_modules()
   role_implications = []
   for extension_module in extension_modules:
     ext_implications = getattr(extension_module, "ROLE_IMPLICATIONS", None)
     if ext_implications:
-      role_implications.extend(ext_implications.implications_for(rolename))
-  implications[rolename] = role_implications
+      role_implications.extend(
+          ext_implications.implications_for(rolename, src_context, context))
   return role_implications
 
 class RoleDeclarations(object):
@@ -98,7 +97,7 @@ class RoleContributions(object):
     return {}
 
 class RoleImplications(object):
-  def implications_for(self, rolename):
+  def implications_for(self, rolename, context, src_context):
     """
     Return a list of rolenames implied for the given rolename, or an empty
     list.
@@ -125,21 +124,36 @@ class BasicRoleDeclarations(RoleDeclarations):
         }
 
 class BasicRoleImplications(RoleImplications):
+  # (Source Context Type, Context Type)
+  #   -> Source Role -> Implied Role for Context
   implications = {
-      # Program -> Audit implications
-      'ProgramOwner': ['ProgramAuditOwner',],
-      'ProgramEditor': ['ProgramAuditEditor',],
-      'ProgramReader': ['ProgramAuditReader',],
-
-      # Audit -> Program implications
-      'Auditor': [
-        'AuditorProgramReader', 'AuditorReader',],
-
-      # None -> Program (public) implications
-      'ProgramCreator': ['ObjectEditor', 'ProgramMappingEditor',],
-      'ObjectEditor': ['ProgramMappingEditor',],
-      'Reader': ['ProgramReader',],
+      ('Program', 'Audit'): {
+        'ProgramOwner': ['ProgramAuditOwner'],
+        'ProgramEditor': ['ProgramAuditEditor'],
+        'ProgramReader': ['ProgramAuditReader'],
+        },
+      ('Audit', 'Program'): {
+        'Auditor': ['AuditorProgramReader'],
+        },
+      ('Audit', None): {
+        'Auditor': ['AuditorReader'],
+        },
+      (None, None): {
+        'ProgramCreator': ['ObjectEditor'],
+        },
+      (None, 'Program'): {
+        'ProgramCreator': ['ProgramMappingEditor'],
+        'ObjectEditor': ['ProgramMappingEditor'],
+        'Reader': ['ProgramReader'],
+        },
       }
 
-  def implications_for(self, rolename):
-    return self.implications.get(rolename, list())
+  def implications_for(self, rolename, src_context, context):
+    '''Given a role assignment in context return the implied role assignments
+    in src_context.
+    '''
+    context_type = context.related_object_type if context else None
+    src_context_type = src_context.related_object_type if src_context else None
+    result = self.implications.get((src_context_type, context_type), {})\
+        .get(rolename, list())
+    return result
