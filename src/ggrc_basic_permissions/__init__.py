@@ -352,6 +352,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   #Create an audit context
   context = Context(
       context=obj.context,
