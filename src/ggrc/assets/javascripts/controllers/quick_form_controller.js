@@ -27,9 +27,15 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
 
   , autocomplete_select : function(el, event, ui) {
     var that = this;
+    var prop = el.attr("name").split(".").slice(0, -1).join(".");
     if(this._super.apply(this, arguments) !== false) {
       setTimeout(function() {
-        that.options.instance.save();
+        that.options.instance.save().then(function() {
+          var obj = that.options.instance.attr(prop);
+          if(obj.attr) {
+            obj.attr("saved", true);
+          }
+        });
       }, 100);
     } else {
       return false;

@@ -2189,4 +2189,59 @@ Mustache.registerHelper("switch", function(value, options) {
   });
 });
 
+
+Mustache.registerHelper("fadein", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  resolve_computed(prop);
+  return function(el) {
+    var $el = $(el);
+    $el.css("display", "none");
+    if(!prop || resolve_computed(prop)) {
+      setTimeout(function() {
+        $el.fadeIn({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(true);
+          }
+        });
+      }, delay);
+    }
+  };
+});
+
+Mustache.registerHelper("fadeout", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  if(resolve_computed(prop)) {
+    return function(el) {
+      var $el = $(el);
+      setTimeout(function() {
+        $el.fadeOut({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(null);
+          }
+        });
+      }, delay);
+    };
+  }
+});
+
 })(this, jQuery, can);
