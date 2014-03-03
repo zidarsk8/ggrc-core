@@ -442,9 +442,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         if(visible_model_names.indexOf(model_name) > -1) {
           self.options.visible_lists[model_name].unshift(instance);
           self.options.results_lists[model_name].unshift(instance);
-          // Refresh the counts whenever the lists change
-          self.refresh_counts();
         }
+        // Refresh the counts whenever the lists change
+        self.refresh_counts();
       });
     }
 
