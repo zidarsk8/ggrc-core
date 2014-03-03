@@ -1085,7 +1085,7 @@
     , move_option_to_top_and_select: function(option) {
 
         // If element is null, the modal was closed and we don't need to do anything
-        if(this.element === null){
+        if(!this.element){
           return;
         }
       
