@@ -1103,19 +1103,19 @@ def init_all_views(app):
 
 
 # Mockups HTML pages are listed here
-@app.route("/mockups")
+@app.route("/mockups/v1.0/program.html")
 @login_required
 def mockup():
-  """The mockup guide page
+  """The mockup program guide page
   """
-  return render_template("mockups/index.html")
+  return render_template("mockups/v1.0/program.html")
   
-@app.route("/mockups/assessments")
+@app.route("/mockups/v1.0/assessments.html")
 @login_required
 def assessments():
   """The assessments guide page
   """
-  return render_template("mockups/assessments.html")
+  return render_template("mockups/v1.0/assessments.html")
   
 @app.route("/mockups/assessments_grid")
 @login_required

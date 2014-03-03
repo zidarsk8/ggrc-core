@@ -107,7 +107,7 @@ $(document).ready(function(){
     $('.autogenerate-result').toggleClass('active', $(this).val() == 'control');
   });
   
-  $('body').on('click', '.accordion-group a', function() {
+  $('body').on('click', '.accordion-group > a', function() {
     var $this = $(this),
         $subNav = $this.closest('.accordion-group').find('.sub-level'),
         $subAction = $this.closest('.accordion-group').find('.sub-actions');
@@ -142,8 +142,22 @@ $(document).ready(function(){
       "Dan Ring danring@reciprocitylabs.com",
       "Silas Barta silas@reciprocitylabs.com"
     ];
+    var program = [
+      "Google Fiber",
+      "LEED",
+      "ISO 27001 Program",
+      "CFR 21 Part 11",
+      "HIPAA",
+      "HR Program",
+      "SOX Compliance Program",
+      "Contract Compliance",
+      "PCI Compliance Program",
+    ]
     $( ".objective-selector input" ).autocomplete({
       source: people
+    });
+    $( ".objective-selector input[name='program.title']" ).autocomplete({
+      source: program
     });
     
   });
