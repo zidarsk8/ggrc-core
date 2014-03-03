@@ -15,9 +15,7 @@ class Factory:
     pass
 
   def create(self, name, arguments=None):
-    if "local" in name :
-      return LocalCache();
-    elif  "memcache" in name : 
+    if  "memcache" in name : 
       return MemCache();
     else: 
       return None
