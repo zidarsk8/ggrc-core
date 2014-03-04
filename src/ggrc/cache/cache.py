@@ -10,10 +10,13 @@
 
 from collections import namedtuple
 CacheEntry = namedtuple('CacheEntry', 'model_plural class_name cache_type')
+MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source dest cache_type')
 
-#def resource(model_plural, class_name, cache_type='local'):
 def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
+
+def mapping(model_plural, class_name, source, dest, cache_type='memcache'):
+  return MappingEntry(model_plural, class_name, source, dest, cache_type)
 
 def all_cache_entries():
   ret = [
@@ -80,6 +83,31 @@ def all_cache_entries():
    resource('risk_assessment_control_mappings', 'RiskAssessmentControlMapping'),
    resource('threats', 'Threat'),
    resource('vulnerabilities', 'Vulnerability'),
+  ]
+
+  return ret
+
+def all_mapping_entries():
+  #mapping('risk_assessment_mappings', 'RiskAssessmentMapping'),
+  #mapping('risk_assessment_control_mappings', 'RiskAssessmentControlMapping'),
+  ret = [
+   mapping('control_controls', 'ControlControl', 'control_id', 'implemented_control_id'),
+   mapping('control_sections', 'ControlSection', 'control_id', 'section_id'),
+   mapping('directive_controls', 'DirectiveControl', 'directives_id', 'control_id'),
+   mapping('object_controls', 'ObjectControl', 'control_id', 'controllable_id'),
+   mapping('object_documents', 'ObjectDocument', 'document_id', 'documentable_id'),
+   mapping('object_objectives', 'ObjectObjective', 'objective_id', 'objectiveable_id'),
+   mapping('object_owners', 'ObjectOwner', 'person_id', 'ownable_id'),
+   mapping('object_people', 'ObjectPerson', 'person_id', 'personable_id'),
+   mapping('object_sections', 'ObjectSection', 'section_id', 'sectionable_id'),
+   mapping('objective_controls', 'ObjectiveControl', 'objective_id', 'control_id'),
+   mapping('program_controls', 'ProgramControl', 'program_id', 'controls_id'),
+   mapping('program_directives', 'ProgramDirective', 'program_id', 'directive_id'),
+   mapping('section_objectives', 'SectionObjective', 'section_id', 'objective_id'),
+   mapping('user_roles', 'UserRole', 'role_id', 'person_id'),
+   mapping('object_folders', 'ObjectFolder', 'folder_id', 'folderable_id'),
+   mapping('object_files', 'ObjectFile', 'file_id', 'fileable_id'),
+   mapping('object_events', 'ObjectEvent', 'event_id', 'eventable_id'),
   ]
 
   return ret

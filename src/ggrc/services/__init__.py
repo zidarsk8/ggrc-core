@@ -126,11 +126,14 @@ def update_cache_after_flush(session, flush_context):
   Update local or mem cache 
   """
   if len(cache_manager.new) > 0: 
-    for o, json_obj in cache_manager.dirty.items():
+    for o, json_obj in cache_manager.new.items():
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
-        current_app.logger.info("CACHE: Remove mapping links for new object instance of model: " + cls + \
+        current_app.logger.info("CACHE: Adding new object instance of model: " + cls + \
           " resource type: " + cache_manager.supported_classes[cls])
+        if cache_manager.supported_mappings.has_key(cls):
+          current_app.logger.info("CACHE: Removing source and dest links for mapping: " + cls + \
+            " resource type: " + str(cache_manager.supported_mappings[cls]))
 
   if len(cache_manager.dirty) > 0: 
     for o, json_obj in cache_manager.dirty.items():

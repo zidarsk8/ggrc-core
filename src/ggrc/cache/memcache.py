@@ -23,11 +23,13 @@ class MemCache(Cache):
   def __init__(self, configparam=None):
     self.config = configparam
     self.name = 'memcache'
+    self.client = None
 
     # Setup Memcache
     for cache_entry in all_cache_entries():
       if cache_entry.cache_type is self.name:
         self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
+        self.memcache_client = memcache.Client()
  
   def get_name(self):
    return self.name
@@ -55,7 +57,7 @@ class MemCache(Cache):
       if ids is None:
         return None
     for id in ids:
-      attrvalues= memcache.get(cache_key + ":" + str(id))
+      attrvalues= self.memcache_client.gets(cache_key + ":" + str(id))
       if attrvalues is not None:
         if attrs is None:
           data[id] = attrvalues
@@ -79,9 +81,11 @@ class MemCache(Cache):
       return None
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
-      cache_data = memcache.get(id) 
+      cache_data = self.memcache_client.gets(id) 
       if cache_data is None:
-        memcache.add(id, deepcopy(data.get(key)))
+        # Log the event for add failures
+        if self.memcache_client.add(id, data.get(key)) is False:
+          return  None
         entries[key] = data
     return entries
 
@@ -89,7 +93,22 @@ class MemCache(Cache):
     return None
 
   def remove(self, category, resource, data): 
-    return None
+    if not self.is_caching_supported(category, resource):
+      return None
+    entries = {}
+    cache_key = self.get_key(category, resource)
+    if cache_key is None:
+      return None
+    for key in data.keys(): 
+      id = cache_key + ":" + str(key)
+      cache_data = self.memcache_client.gets(id) 
+      if cache_data is not None:
+        retvalue = self.memcache_client.delete(id)
+        # Log the event of delete failures
+        if retvalue is not 2:
+          return None
+        entries[key] = data
+    return entries
 
   def clean(self): 
     pass

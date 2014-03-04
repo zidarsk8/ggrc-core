@@ -14,13 +14,14 @@
 
 """
 from collections import OrderedDict
-from cache import all_cache_entries
+from cache import all_cache_entries, all_mapping_entries
 
 class CacheManager:
   cache = OrderedDict()
   polices = OrderedDict()
   config = OrderedDict()
   supported_classes={}
+  supported_mappings={}
   factory = None
   policy_manager = None
   dto_manager = None
@@ -44,6 +45,9 @@ class CacheManager:
     #
     for cache_entry in all_cache_entries():
       self.supported_classes[cache_entry.class_name] = cache_entry.model_plural
+
+    for mapping_entry in all_mapping_entries():
+      self.supported_mappings[mapping_entry.class_name] = mapping_entry
 
     # 2. Build cache dictionary indexed by cache mechanism such as 'local', 'memcache' 
     #
