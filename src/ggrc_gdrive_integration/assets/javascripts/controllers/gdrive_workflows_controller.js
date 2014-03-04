@@ -130,6 +130,7 @@ function report_progress(str, xhr) {
 var permissions_by_type = {
   "Program" : {
     "owners" : "writer"
+    , "contact" : "writer"
   }
   , "Audit" : {
     "owners" : "writer"
@@ -247,7 +248,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           if(typeof people === "function") {
             people = people.call(instance);
           }
-          var dfd = can.reduce(people.push ? people : [people], function(dfd, person) {
+          var dfd = can.reduce((!people || people.push) ? people : [people], function(dfd, person) {
 
             if(person) {
               if(person.person) {
@@ -411,8 +412,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     );
   }
 
-  , "{CMS.Models.Program} updated" : "update_permissions"
-  , "{CMS.Models.Audit} updated" : "update_permissions"
+  , "{CMS.Models.Program} updated" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.Program) {
+      this.update_permissions(model, ev, instance);
+    }
+  }
+  , "{CMS.Models.Audit} updated" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.Audit) {
+      this.update_permissions(model, ev, instance);
+    }
+  }
   , "{CMS.Models.Request} updated" : "update_request_folder"
 
   , update_request_folder : function(model, ev, instance) {

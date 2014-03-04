@@ -171,7 +171,11 @@ can.Model("can.Model.Cacheable", {
     }
 
     // Prevent event "bleeding" from other members of the Cacheable tree.
-    this.__bindEvents = {};
+    // This fix causes breakages in places where we're expecting model class
+    //  events not to be isolated (like in the LHN controller).
+    //  I've submitted a fix to CanJS for this but it remains to be seen
+    //  whether it gets in and when.  --BM 3/4/14
+    //this.__bindEvents = {};
 
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
