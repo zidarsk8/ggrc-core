@@ -314,7 +314,7 @@ can.Control("CMS.Controllers.LHN", {
       }
 
       window.resize_areas();
-
+      $(window).trigger('resize');
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
       })
@@ -343,6 +343,7 @@ can.Control("CMS.Controllers.LHN", {
     
     $search.width(resize - 100);
     window.resize_areas();
+    $(window).trigger('resize');
 
   }
   , ".bar-v mousedown" : function(el, ev) {
