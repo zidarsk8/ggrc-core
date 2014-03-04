@@ -127,6 +127,21 @@ function report_progress(str, xhr) {
   return xhr;
 }
 
+var permissions_by_type = {
+  "Program" : {
+    "owners" : "writer"
+  }
+  , "Audit" : {
+    "owners" : "writer"
+    , "contact" : "writer"
+    , "findAuditors" : "reader"
+  }
+  , "Request" : {
+    "owners" : "writer"
+    , "assignee" : "writer"
+  }
+};
+
 can.Control("GGRC.Controllers.GDriveWorkflow", {
 
 }, {
@@ -216,80 +231,91 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     }
   }
 
-  , update_owner_permission : function(model, ev, instance, role, person) {
+  , update_permissions : function(model, ev, instance) {
     var dfd
-    , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
+    , that = this
+    , permission_ids = {};
+
+    if(!(instance instanceof model))
+      return;
 
     // TODO check whether person is the logged-in user, and use OAuth2 identifier if so?
-    role = role || "writer";
-    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
-      person = (person || instance[owner]).reify();
-      if(person.selfLink) {
-        dfd = $.when(person);
-      } else {
-        dfd = person.refresh();
-      }
-      dfd.then(function() {
-        $.when(
-          CMS.Models.GDriveFilePermission.findUserPermissionId(person)
-          , instance.get_binding("folders").refresh_instances()
-          , GGRC.config.GAPI_ADMIN_GROUP 
-            ? CMS.Models.GDriveFilePermission.findUserPermissionId(GGRC.config.GAPI_ADMIN_GROUP)
-            : undefined
-        ).then(function(user_permission_id, list, admin_permission_id) {
-          can.each(list, function(binding) {
-            binding.instance.findPermissions().then(function(permissions) {
-              if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
-                return;  //short circuit any operation if the user isn't allowed to add permissions
-              
-              var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
-              var matching = can.map(permissions, function(permission) {
-                if(admin_permission_id
-                   && permission.type === "group"
-                   && (permission.id === admin_permission_id)
-                       || (permission.emailAddress && permission.emailAddress.toLowerCase() === GGRC.config.GAPI_ADMIN_GROUP.toLowerCase())
-                ) {
-                  owners_matched = true;
-                }
-                /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
-                   Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
-                   while "Permission IDs" will match on internal account permissions (where email address is
-                   usually not provided).  Check both.
-                */
-                if(permission.type === "user"
-                  && (permission.id === user_permission_id
-                      || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.email.toLowerCase()))
-                  && (permission.role === "owner" || permission.role === "writer" || permission.role === role)
-                ) {
-                  return permission;
-                }
+    instance.get_binding("folders").refresh_instances().then(function(list) {
+      can.each(list, function(binding) {
+        can.each(permissions_by_type[instance.constructor.model_singular], function(role, key) {
+          var people = instance[key];
+          if(typeof people === "function") {
+            people = people.call(instance);
+          }
+          var dfd = can.reduce(people.push ? people : [people], function(dfd, person) {
+
+            if(person) {
+              if(person.person) {
+                person = person.person;
+              }
+              person = person.reify();
+              return dfd.then(function() { return person.selfLink ? person : person.refresh();
+              }).then(function() {
+                return permission_ids[person.email] || CMS.Models.GDriveFilePermission.findUserPermissionId(person);
+              }).then(function(user_permission_id) {
+                permission_ids[person.email] = user_permission_id;
+                return that.update_permission_for(binding.instance, person, user_permission_id, role);
               });
-              if(matching.length < 1) {
-                report_progress(
-                  "Creating Drive folder " + (role.name || role) + " permission for " + person.email + ' on folder "' + binding.instance.title + '"'
-                  , new CMS.Models.GDriveFolderPermission({
-                    folder : binding.instance
-                    , person : person
-                    , role : role
-                  }).save()
-                );
-              }
-              if(!owners_matched) {
-                report_progress(
-                  'Creating admin group permission on folder "' + binding.instance.title + '"'
-                  , new CMS.Models.GDriveFolderPermission({
-                    folder : binding.instance
-                    , email : GGRC.config.GAPI_ADMIN_GROUP
-                    , role : "writer"
-                    , permission_type : "group"
-                  }).save()
-                );
-              }
-            });
-          });
+            } else {
+              return dfd;
+            }
+          }, $.when());
         });
+        if(GGRC.config.GAPI_ADMIN_GROUP) {
+          $.when(
+            permission_ids[GGRC.config.GAPI_ADMIN_GROUP]
+            || CMS.Models.GDriveFilePermission.findUserPermissionId(GGRC.config.GAPI_ADMIN_GROUP)
+            , dfd
+          ).then(function(admin_permission_id) {
+            permission_ids[GGRC.config.GAPI_ADMIN_GROUP] = admin_permission_id;
+            that.update_permission_for(binding.instance, GGRC.config.GAPI_ADMIN_GROUP, admin_permission_id, "writer");
+          });
+        }
       });
+    });
+  }
+
+  , update_permission_for : function(item, person, permissionId, role) {
+    if(item.userPermission.role !== "writer" && item.userPermission.role !== "owner")
+      return;  //short circuit any operation if the user isn't allowed to add permissions
+
+    if(person.email) {
+      person = person.email;
     }
+
+    return item.findPermissions().then(function(permissions) {
+
+      var matching = can.map(permissions, function(permission) {
+        /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
+           Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
+           while "Permission IDs" will match on internal account permissions (where email address is
+           usually not provided).  Check both.
+        */
+        if((permission.id === permissionId
+              || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.toLowerCase()))
+          && (permission.role === "owner" || permission.role === "writer" || permission.role === role)
+        ) {
+          return permission;
+        }
+      });
+
+      if(matching.length < 1) {
+        return report_progress(
+          'Creating ' + role + ' permission on folder "' + item.title + '" for ' + person
+          , new CMS.Models.GDriveFolderPermission({
+            folder : item
+            , email : person
+            , role : role
+            , permission_type : person === GGRC.config.GAPI_ADMIN_GROUP ? "group" : "user"
+          }).save()
+        );
+      }
+    });
   }
 
   // extracted out of {Request updated} for readability.
@@ -385,8 +411,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     );
   }
 
-  , "{CMS.Models.Program} updated" : "update_owner_permission"
-  , "{CMS.Models.Audit} updated" : "update_owner_permission"
+  , "{CMS.Models.Program} updated" : "update_permissions"
+  , "{CMS.Models.Audit} updated" : "update_permissions"
   , "{CMS.Models.Request} updated" : "update_request_folder"
 
   , update_request_folder : function(model, ev, instance) {
@@ -452,7 +478,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             console.warn("a prerequisite failed", arguments[0]);
           }
         ).done(function() {
-          that.update_owner_permission(model, ev, instance);
+          that.update_permissions(model, ev, instance);
         });
       } else if(req_folders.length < 1) {
         return;
@@ -475,7 +501,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         ).then(
           that.proxy("move_files_to_audit_folder", instance, audit_folders, req_folders)
         ).done(function() {
-          return that.update_owner_permission(model, ev, instance);
+          return that.update_permissions(model, ev, instance);
         });
       }
     }).always(function() {
@@ -641,12 +667,10 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
       can.each(Object.keys(cache), function(key) {
         if(cache[key].context && cache[key].context.id === instance.context.id) {
-          that.update_owner_permission(
+          that.update_permissions(
             model
             , ev
             , cache[key]
-            , /^ProgramReader$|^Auditor/.test(instance.role.reify().name) ? "reader" : "writer"
-            , instance.person
           );
         }
       });

@@ -170,6 +170,9 @@ can.Model("can.Model.Cacheable", {
       this.findPage = this.makeFindPage(this.findAll);
     }
 
+    // Prevent event "bleeding" from other members of the Cacheable tree.
+    this.__bindEvents = {};
+
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
       this.findAll = can.Model.Cacheable.findAll;
