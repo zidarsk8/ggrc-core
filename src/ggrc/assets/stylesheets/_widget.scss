@@ -425,6 +425,14 @@
     h3 {
       font-weight:normal;
       padding-bottom:6px;
+      i {
+        cursor: pointer;
+        @include opacity(0.2);
+        margin-top: 5px;
+        &:hover {
+          @include opacity(0.7);
+        }
+      }
     }
     a.info-edit {
       font-size:11px;
@@ -910,5 +918,17 @@
   &.person-preview {
     overflow: visible;
     height: auto;
+  }
+}
+
+// Mockups Assessment Page V1.0
+.info-utility-link {
+  margin: 10px 0 15px 0;
+}
+.workflow-list {
+  @include reset-list();
+  margin: 10px 0 0 20px;
+  li {
+    margin-bottom: 4px;
   }
 }
