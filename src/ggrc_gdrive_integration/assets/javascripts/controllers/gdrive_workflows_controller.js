@@ -293,7 +293,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
 
   // extracted out of {Request updated} for readability.
-  , move_files_to_new_folder : function(audit_folders, new_folder, audit_files) {
+  , move_files_to_new_folder : function(audit_folders, new_folder, audit_files, request_responses) {
     var tldfds = [];
     can.each(audit_files, function(file) {
       //if the file is still referenced in more than one request without an objective,
@@ -303,33 +303,40 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           "document.link" : file.alternateLink
         }).then(function(obds) {
           //filter out any object-documents that aren't Responses.
+          var connected_request_responses = [], other_responses = [];
           var responses = can.map(obds, function(obd) {
-            if(obd.documentable.reify() instanceof CMS.Models.Response)
+            var dable = obd.documentable.reify();
+            if(dable instanceof CMS.Models.Response) {
+              if(~can.inArray(dable, request_responses)) {
+                connected_request_responses.push(dable);
+              } else {
+                other_responses.push(dable);
+              }
               return obd.documentable.reify();
+            }
           });
-          
-          file.addToParent(new_folder);
-          return new RefreshQueue().enqueue(responses).trigger().then(function(reified_responses) {
-            var dfds = [];
 
-            if(obds.length < 2
-              || can.map(reified_responses, function(resp) {
-                  if(resp.request.reify() !== instance
-                     && !resp.request.reify().objective) {
+          if(connected_request_responses.length > 0) {
+            file.addToParent(new_folder);
+            return new RefreshQueue().enqueue(other_responses).trigger().then(function(reified_responses) {
+              var dfds = [];
+
+              if(can.map(reified_responses, function(resp) {
+                  if(!resp.request.reify().objective) {
                     return resp;
                   }
-                })
-              .length < 1
-            ) {
-              //If no other request is still using the Audit folder version,
-              // remove from the audit folder.
-              can.each(audit_folders, function(af) {
-                dfds.push(file.removeFromParent(af));
-              });
-            }
+                }).length < 1
+              ) {
+                //If no other request is still using the Audit folder version,
+                // remove from the audit folder.
+                can.each(audit_folders, function(af) {
+                  dfds.push(file.removeFromParent(af));
+                });
+              }
 
-            return $.when.apply($, dfds);
-          });
+              return $.when.apply($, dfds);
+            });
+          }
         })
       );
     });
@@ -445,7 +452,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             })
           )
           , CMS.Models.GDriveFile.findAll({parentfolderid : audit_folders[0].id})
-          , obj_folder_to_destroy.refresh().then(function(of) { of.destroy(); })
+          , instance.responses.reify()
+          , obj_folder_to_destroy.refresh().then(function(of) { return of.destroy(); })
         ).then(
           that.proxy("move_files_to_new_folder", audit_folders)
           , function() {
