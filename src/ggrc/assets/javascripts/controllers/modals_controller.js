@@ -492,8 +492,10 @@ can.Control("GGRC.Controllers.Modals", {
         instance.set_owner_to_current_user_if_unset();
       }
 
+      this.disable_hide = true;
       ajd = instance.save().done(function(obj) {
         function finish() {
+          delete that.disable_hide;
           that.element.trigger("modal:success", obj).modal_form("hide");
         };
 
@@ -510,6 +512,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }).fail(function(xhr, status) {
         el.trigger("ajax:flash", { error : xhr.responseText });
+        delete that.disable_hide;
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");
     }
@@ -549,6 +552,12 @@ can.Control("GGRC.Controllers.Modals", {
   , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
+      if(this.disable_hide) {
+        ev.stopImmediatePropagation();
+        ev.stopPropagation();
+        ev.preventDefault();
+        return false;
+      }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
