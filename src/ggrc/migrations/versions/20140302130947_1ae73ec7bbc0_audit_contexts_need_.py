@@ -29,6 +29,11 @@ audits_table = table('audits',
     column('context_id', sa.Integer),
     )
 
+programs_table = table('programs',
+    column('id', sa.Integer),
+    column('context_id', sa.Integer),
+    )
+
 def upgrade():
   op.execute(
     contexts_table.update()\
@@ -39,6 +44,16 @@ def upgrade():
         .where(
             contexts_table.c.id == audits_table.c.context_id,
             ))
+  op.execute(
+    contexts_table.update()\
+        .values(
+            related_object_id=programs_table.c.id,
+            related_object_type='Program',
+            )\
+        .where(
+            contexts_table.c.id == programs_table.c.context_id,
+            ))
+
 
 def downgrade():
   pass
