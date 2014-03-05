@@ -148,6 +148,12 @@ blockquote {
 .gray {
   color: $gray;
 }
+.divider {
+  width: 100%;
+  height: 1px;
+  background: $footerBorder;
+  margin: 14px 0;
+}
 
 .undo {
   font-size: 12px;
@@ -165,14 +171,6 @@ blockquote {
       text-decoration: none;
     }
   }
-}
-
-// Mockups Assessment Page V1.0
-.dotted-divider {
-  border-bottom: 1px solid $footerBorder;
-  width: 100%;
-  height: 1px;
-  margin-bottom: 20px;
 }
 
 .tooltip {
