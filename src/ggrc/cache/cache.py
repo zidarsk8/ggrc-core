@@ -10,13 +10,13 @@
 
 from collections import namedtuple
 CacheEntry = namedtuple('CacheEntry', 'model_plural class_name cache_type')
-MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source dest cache_type')
+MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type source_name dest_type dest_name polymorph, cache_type')
 
 def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
 
-def mapping(model_plural, class_name, source, dest, cache_type='memcache'):
-  return MappingEntry(model_plural, class_name, source, dest, cache_type)
+def mapping(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph=False, cache_type='memcache'):
+  return MappingEntry(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph, cache_type)
 
 def all_cache_entries():
   ret = [
@@ -91,23 +91,23 @@ def all_mapping_entries():
   #mapping('risk_assessment_mappings', 'RiskAssessmentMapping'),
   #mapping('risk_assessment_control_mappings', 'RiskAssessmentControlMapping'),
   ret = [
-   mapping('control_controls', 'ControlControl', 'control_id', 'implemented_control_id'),
-   mapping('control_sections', 'ControlSection', 'control_id', 'section_id'),
-   mapping('directive_controls', 'DirectiveControl', 'directives_id', 'control_id'),
-   mapping('object_controls', 'ObjectControl', 'control_id', 'controllable_id'),
-   mapping('object_documents', 'ObjectDocument', 'document_id', 'documentable_id'),
-   mapping('object_objectives', 'ObjectObjective', 'objective_id', 'objectiveable_id'),
-   mapping('object_owners', 'ObjectOwner', 'person_id', 'ownable_id'),
-   mapping('object_people', 'ObjectPerson', 'person_id', 'personable_id'),
-   mapping('object_sections', 'ObjectSection', 'section_id', 'sectionable_id'),
-   mapping('objective_controls', 'ObjectiveControl', 'objective_id', 'control_id'),
-   mapping('program_controls', 'ProgramControl', 'program_id', 'controls_id'),
-   mapping('program_directives', 'ProgramDirective', 'program_id', 'directive_id'),
-   mapping('section_objectives', 'SectionObjective', 'section_id', 'objective_id'),
-   mapping('user_roles', 'UserRole', 'role_id', 'person_id'),
-   mapping('object_folders', 'ObjectFolder', 'folder_id', 'folderable_id'),
-   mapping('object_files', 'ObjectFile', 'file_id', 'fileable_id'),
-   mapping('object_events', 'ObjectEvent', 'event_id', 'eventable_id'),
+   mapping('control_controls', 'ControlControl', 'controls', 'control_id', 'controls', 'implemented_control_id'),
+   mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
+   mapping('directive_controls', 'DirectiveControl', 'directives', 'directives_id', 'controls', 'control_id'),
+   mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', True),
+   mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable', 'documentable_id', True),
+   mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', True),
+   mapping('object_owners', 'ObjectOwner', 'people', 'person_id', 'ownable_type', 'ownable_id', True),
+   mapping('object_people', 'ObjectPerson', 'people', 'person_id', 'personable_type', 'personable_id', True),
+   mapping('object_sections', 'ObjectSection', 'sections', 'section_id', 'sectionable_type', 'sectionable_id', True),
+   mapping('objective_controls', 'ObjectiveControl', 'objectives', 'objective_id', 'controls', 'control_id'),
+   mapping('program_controls', 'ProgramControl', 'programs', 'program_id', 'controls', 'controls_id'),
+   mapping('program_directives', 'ProgramDirective', 'programs', 'program_id', 'directives', 'directive_id'),
+   mapping('section_objectives', 'SectionObjective', 'sections', 'section_id', 'objectives', 'objective_id'),
+   mapping('user_roles', 'UserRole', 'people', 'person_id', 'roles', 'role_id'),
+   mapping('object_events', 'ObjectEvent', None, 'event_id', 'eventable_type', 'eventable_id', True),
+   mapping('object_folders', 'ObjectFolder', None, 'folder_id', 'folderable_type', 'folderable_id', True),
+   mapping('object_files', 'ObjectFile', None, 'fileable_type', 'fileable_id', True),
   ]
 
   return ret
@@ -139,6 +139,18 @@ class Cache:
     return None
 
   def remove(self, category, resource, data): 
+    return None
+
+  def get_multi(self, filter): 
+    return None
+
+  def add_multi(self, data): 
+    return None
+
+  def update_multi(self, data): 
+    return None
+
+  def remove_multi(self, category, resource, data): 
     return None
 
   def clean(self):

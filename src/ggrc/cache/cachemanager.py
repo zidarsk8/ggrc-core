@@ -28,6 +28,9 @@ class CacheManager:
   new = None
   dirty = None
   deleted = None
+  marked_for_add={}
+  marked_for_update={}
+  marked_for_delete={}
 
   def __init__(self):
     pass	
@@ -177,6 +180,25 @@ class CacheManager:
       if cache.is_caching_supported(category, resource): 
          return True
     return False 
+   
+  def bulk_add_to_cache(self, data):
+    for key, cache in self.get_cache().items():
+	return cache.add_multi(data)
+
+  def bulk_cache_get(self, data):
+    # REVISIT: only one cache mechanism is supported
+    for key, cache in self.get_cache().items():
+	return cache.get_multi(data)
+
+  def bulk_cache_update(self, data):
+    # REVISIT: only one cache mechanism is supported
+    for key, cache in self.get_cache().items():
+	return cache.update_multi(data)
+
+  def bulk_cache_delete(self, data):
+    # REVISIT: only one cache mechanism is supported
+    for key, cache in self.get_cache().items():
+	return cache.remove_multi(data)
 
   def parse_dto(self, data):
     # Apply DTO manager

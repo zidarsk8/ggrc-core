@@ -111,6 +111,72 @@ def log_event(session, obj=None, current_user_id=None):
     event.revisions = revisions
     session.add(event)
 
+def mark_cache_operation(operation, status, key, timestamp):
+  pass
+
+def add_cache_object(category, resource, id, attrs):
+  write_result=None
+  current_app.logger.info("CACHE: Adding object with id: " + str(id) + " to cache for " + resource + " in " + category + " category")
+  cache_manager = get_cache_manager()
+  if cache_manager is None or id is None:
+    current_app.logger.info("CACHE: CacheManager is not initialized")
+    return None
+  if category is not 'collection':
+    current_app.logger.info("CACHE: Support deletion for category: collection")
+    return None
+  cacheData={}
+  cacheData[id] = deepcopy(attrs)
+  current_app.logger.info("CACHE: data: " + str(cacheData))
+  #write_result = cache_manager.add_collection(category, resource, cacheData)
+  if write_result is None:
+    current_app.logger.info("CACHE: Unable to write object to cache")
+    return None
+  else:
+    current_app.logger.info("CACHE: Successfully added new entry in cache for resource: " + resource)
+    return write_result
+
+def update_cache_object(category, resource, id, attrs):
+  update_result=None
+  current_app.logger.info("CACHE: Updating object with id: " + str(id) + " to cache for " + resource + " in " + category + " category")
+  cache_manager = get_cache_manager()
+  if cache_manager is None or id is None:
+    current_app.logger.info("CACHE: CacheManager is not initialized")
+    return None
+  if category is not 'collection':
+    current_app.logger.info("CACHE: Support deletion for category: collection")
+    return None
+  cacheData={}
+  cacheData[id] = deepcopy(attrs)
+  current_app.logger.info("CACHE: data: " + str(cacheData))
+  #update_result = cache_manager.update_collection(category, resource, cacheData)
+  if update_result is None:
+    current_app.logger.info("CACHE: Unable to update cache")
+    return None
+  else:
+    current_app.logger.info("CACHE: Successfully updated entry in cache for resource: " + resource)
+    return update_result
+
+def delete_cache_object(category, resource, id):
+  delete_result=None
+  current_app.logger.info("CACHE: delete object with id: " + str(id) + " from cache for " + resource + " in " + category + " category")
+  cache_manager = get_cache_manager()
+  if cache_manager is None or id is None:
+    current_app.logger.info("CACHE: CacheManager is not initialized")
+    return None
+  if category is not 'collection':
+    current_app.logger.info("CACHE: Support deletion for category: collection")
+    return None
+  cacheData={}
+  cacheData[id] = 'Mark for Deletion'
+  current_app.logger.info("CACHE: data: " + str(cacheData))
+  #delete_result = cache_manager.delete_collection(category, resource, cacheData)
+  if delete_result is None:
+    current_app.logger.info("CACHE: Unable to delete collection from cache")
+    return None
+  else:
+    current_app.logger.info("CACHE: Successfully deleted entry from cache for resource: " + resource)
+    return write_result
+
 class ModelView(View):
   DEFAULT_PAGE_SIZE = 20
   MAX_PAGE_SIZE = 100
@@ -658,6 +724,7 @@ class Resource(ModelView):
 	   return None
       else:
         current_app.logger.info("CACHE: Caching is only supported for stubs and collection for model: " + resource)
+	return None
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
