@@ -57,14 +57,14 @@ def lookup_contributions(rolename):
       contribute_role_permissions(contributions, ext_role_contributions)
   return contributions;
 
-def lookup_role_implications(rolename, src_context, context):
+def lookup_role_implications(rolename, context_implication):
   extension_modules = get_extension_modules()
   role_implications = []
   for extension_module in extension_modules:
     ext_implications = getattr(extension_module, "ROLE_IMPLICATIONS", None)
     if ext_implications:
       role_implications.extend(
-          ext_implications.implications_for(rolename, src_context, context))
+          ext_implications.implications_for(rolename, context_implication))
   return role_implications
 
 class RoleDeclarations(object):
@@ -97,7 +97,7 @@ class RoleContributions(object):
     return {}
 
 class RoleImplications(object):
-  def implications_for(self, rolename, context, src_context):
+  def implications_for(self, rolename, context_implication):
     """
     Return a list of rolenames implied for the given rolename, or an empty
     list.
@@ -148,12 +148,12 @@ class BasicRoleImplications(RoleImplications):
         },
       }
 
-  def implications_for(self, rolename, src_context, context):
+  def implications_for(self, rolename, context_implication):
     '''Given a role assignment in context return the implied role assignments
     in src_context.
     '''
-    context_type = context.related_object_type if context else None
-    src_context_type = src_context.related_object_type if src_context else None
-    result = self.implications.get((src_context_type, context_type), {})\
+    src_context_scope = context_implication.source_context_scope
+    context_scope = context_implication.context_scope
+    result = self.implications.get((src_context_scope, context_scope), {})\
         .get(rolename, list())
     return result

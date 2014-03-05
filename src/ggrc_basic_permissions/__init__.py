@@ -192,27 +192,19 @@ def load_permissions_for(user):
           ContextImplication.source_context_id == None).all()
   else:
     all_context_implications = []
-  context_implications_by_source = {}
-  for context_implication in all_context_implications:
-    context_implications_by_source.setdefault(
-        context_implication.source_context, set())\
-            .add(context_implication.context)
 
   # Gather all roles required by context implications
   implied_context_to_implied_roles = {}
   all_implied_roles_set = set()
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    source_context_id = source_context.id if source_context else None
-    for rolename in source_contexts_to_rolenames.get(source_context_id, []):
-      for implied_context in implied_contexts:
-        implied_context_id = implied_context.id if implied_context else None
-        implied_role_names_list = implied_context_to_implied_roles.setdefault(
-            implied_context_id, list())
-        implied_role_names = lookup_role_implications(
-            rolename, source_context, implied_context)
-        all_implied_roles_set.update(implied_role_names)
-        implied_role_names_list.extend(implied_role_names)
+  for context_implication in all_context_implications:
+    for rolename in source_contexts_to_rolenames.get(
+        context_implication.source_context_id, []):
+      implied_role_names_list = implied_context_to_implied_roles.setdefault(
+          context_implication.context_id, list())
+      implied_role_names = lookup_role_implications(
+          rolename, context_implication)
+      all_implied_roles_set.update(implied_role_names)
+      implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
   all_implied_roles_by_name = {}
   if implied_context_to_implied_roles:
@@ -254,6 +246,7 @@ def load_permissions_for(user):
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   # get the personal context for this logged in user
   personal_context = service.personal_context()
 
@@ -307,6 +300,8 @@ def add_public_program_context_implication(context, check_exists=False):
   db.session.add(ContextImplication(
     source_context=None,
     context=context,
+    source_context_scope=None,
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
 
@@ -369,6 +364,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=obj.context,
     context=context,
+    source_context_scope='Program',
+    context_scope='Audit',
     modified_by=get_current_user(),
     ))
 
@@ -376,6 +373,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=context,
     context=obj.context,
+    source_context_scope='Audit',
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
   
@@ -383,6 +382,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
       source_context=context,
       context=None,
+      source_context_scope='Audit',
+      context_scope=None,
       modified_by=get_current_user(),
       ))
   db.session.flush()
