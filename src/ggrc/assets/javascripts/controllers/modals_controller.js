@@ -177,9 +177,8 @@ can.Control("GGRC.Controllers.Modals", {
         , instance = this.options.instance
         , index = 0
         , that = this
-        ;
+        , prop = path.pop();
 
-      path.pop();
       if (/^\d+$/.test(path[path.length - 1])) {
         index = parseInt(path.pop(), 10);
         path = path.join(".");
@@ -198,6 +197,8 @@ can.Control("GGRC.Controllers.Modals", {
             if(obj.type === "Person"){
               el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
             }
+            instance._transient || instance.attr("_transient", new can.Observe({}));
+            instance.attr("_transient." + path, ui.item[prop]);
           }
         }, 150);
       }
@@ -422,8 +423,10 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
 
         if($elem.is("[data-lookup]")) {
+          name.pop(); //set the owner to null, not the email
+          instance._transient || instance.attr("_transient", new can.Observe({}));
+          instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
-            name.pop(); //set the owner to null, not the email
             value = null;
           } else {
             // Setting a "lookup field is handled in the autocomplete() method"
@@ -573,6 +576,9 @@ can.Control("GGRC.Controllers.Modals", {
       delete this.options.model.cache[undefined];
     }
     this._super && this._super.apply(this, arguments);
+    if(this.options.instance._transient) {
+      this.options.instance.removeAttr("_transient");
+    }
   }
 });
 
