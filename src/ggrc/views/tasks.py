@@ -1,6 +1,6 @@
 import json
 
-from flask import render_template
+from flask import flash, render_template
 
 from ggrc.app import app
 from ggrc.converters.common import ImportException
@@ -111,12 +111,48 @@ def import_help_task(task):
     return render_template("directives/import_errors.haml",
           directive_id="Help", exception_message=str(e))
 
+@app.route("/task/import_objective_directive", methods=['POST'])
+@queued_task
+def import_objective_directive_task(task):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.models import Directive
+  from ggrc.utils import view_url_for
+
+  csv_file = task.parameters.get("csv_file")
+  dry_run = task.parameters.get("dry_run")
+  directive_id = task.parameters.get("parent_id")
+  directive = Directive.query.get(directive_id)
+  directive_url = view_url_for(directive)
+  return_to = task.parameters.get("return_to") or directive_url
+  
+  try:
+    converter = handle_csv_import(ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
+    if dry_run:
+      options = {
+          'converter': converter,
+          'results': converter.objects,
+          'heading_map': converter.object_map,
+      }
+      return render_template("directives/import_objectives_result.haml", **options)
+    else:
+      count = len(converter.objects)
+      flash(u'Successfully imported {} objective{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return import_redirect(return_to)
+  except ImportException as e:
+    if e.show_preview:
+      converter = e.converter
+      return render_template("directives/import_objectives_result.haml",
+          exception_message=e, converter=converter, results=converter.objects,
+          directive_id=directive_id, heading_map=converter.object_map)
+    return render_template("directives/import_errors.haml",
+        directive_id=directive_id, exception_message=str(e))
+
+  return render_template("directives/import.haml", directive_id=directive_id, import_kind='Objectives', return_to=return_to, parent_type=(directive.kind or directive.meta_kind))
+
 @app.route('/task/import_control_directive', methods=['POST'])
 @queued_task
 def import_control_directive_task(task):
-  from ggrc.converters.common import ImportException
   from ggrc.converters.controls import ControlsConverter
-  from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive
   from ggrc.utils import view_url_for
 
