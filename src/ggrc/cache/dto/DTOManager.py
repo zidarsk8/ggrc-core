@@ -18,20 +18,20 @@
 from collection import OrderedList
 
 class DTOManager
-	config = None
-	dtoList = OrderedList()
+  config = None
+  dtoList = OrderedList()
 
-	def __init__(self):
-		pass
+  def __init__(self):
+    pass
 
-	def setConfig(self, config):
-		self.config = config
-	
-	def getDTOs(self):
-		return None
+  def setConfig(self, config):
+    self.config = config
 
-	def setDTOs(self, dto)
-		return False
+  def getDTOs(self):
+    return None
 
-	def removeDTO(self, dto): 
-		return False
+  def setDTOs(self, dto)
+    return None
+
+  def removeDTO(self, dto): 
+   return None

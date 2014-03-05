@@ -8,8 +8,7 @@
 # Maintained By: dan@reciprocitylabs.com
 #
 
-Class RbacPolicy(Policy):
-
-	def apply(**policyargs):
-		pass
+class RbacPolicy(Policy):
+  def apply(**policyargs):
+    pass
 

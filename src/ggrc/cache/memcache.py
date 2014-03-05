@@ -134,16 +134,16 @@ class MemCache(Cache):
     return entries
 
   def add_multi(self, data): 
-	return self.memcache_client_add_multi(data)
+	return self.memcache_client.add_multi(data)
 
   def get_multi(self, data): 
-	return self.memcache_client_gets_multi(data)
+	return self.memcache_client.gets_multi(data, '', None, True)
 
   def update_multi(self, data): 
-	return self.memcache_client_cas_multi(data)
+	return self.memcache_client.cas_multi(data)
 
   def remove_multi(self, data): 
-	return self.memcache_client_cas_multi(data)
+	return self.memcache_client.delete_multi(data)
 
   def clean(self): 
     pass

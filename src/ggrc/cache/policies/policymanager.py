@@ -18,20 +18,19 @@
 from collection import OrderedList
 
 class PolicyManager:
-	config = None
-	policyDict = OrderedList()
+  config = None
+  policyDict = OrderedList()
+  def __init__(self):
+    pass
 
-	def __init__(self):
-		pass
+  def setConfig(self, config):
+    self.config = config
 
-	def setConfig(self, config):
-		self.config = config
-	
-	def getPolicyConfigs(self, policyargs):
-		return None
+  def getPolicyConfigs(self, policyargs):
+    return None
 
-	def setPolicyConfigs(self, policyargs, policyconfigs): 
-		return False
+  def setPolicyConfigs(self, policyargs, policyconfigs): 
+    return None
 
-	def removePolicyConfigs(self, policyargs, policyconfigs): 
-		return None
+  def removePolicyConfigs(self, policyargs, policyconfigs): 
+    return None

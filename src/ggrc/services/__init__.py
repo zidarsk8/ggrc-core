@@ -83,34 +83,29 @@ def all_collections():
       ret.extend(entries)
   return ret
 
-# initialization of GGRC Caching Layer objects
-#
 def update_cache_before_flush(session, flush_context, objects):
-  current_app.logger.info("Entering update_cache_before_flush")
+  current_app.logger.info("CACHE: Entering updating cache before flush")
   cache_manager = get_cache_manager()
+
   """
-  Before the flush happens, we can still access to-be-deleted objects, so
-  record JSON for log here
+  Before the flush happens, populate intermediate data structures (dict)
+  and actual marking for add, delete and updates are done in session event listenerafter_flush 
   """
   for o in session.new:
     if hasattr(o, 'log_json'):
-      cache_manager.new[o] = 'marked for add'
+      cache_manager.new[o] = o.log_json()
   for o in session.deleted:
     if hasattr(o, 'log_json'):
-      cache_manager.deleted[o] = 'marked for delete'
+      cache_manager.deleted[o] = o.log_json()
   dirty = set(o for o in session.dirty if session.is_modified(o))
   for o in dirty - set(cache_manager.new) - set(cache_manager.deleted):
     if hasattr(o, 'log_json'):
-      cache_manager.dirty[o] = 'marked for update'
-
-  """
-  REVISIT: Update local or mem cache state that the object is marked for delete or update ONLY   
-  The session.new entries are ignored
-  """
+      cache_manager.dirty[o] = o.log_json()
 
 def update_cache_after_flush(session, flush_context):
-  current_app.logger.info("Entering update_cache_after_flush")
+  current_app.logger.info("CACHE: Entering updating cache after flush")
   cache_manager = get_cache_manager()
+
   """
   After the flush, we know which objects were actually deleted, not just
   modified (deletes due to cascades are not known pre-flush), so fix up
@@ -125,7 +120,7 @@ def update_cache_after_flush(session, flush_context):
       del cache_manager.dirty[o]
 
   """
-  Update local or mem cache 
+  Mark add, update and delete entries and commits to cache (memcache) will be done in session commit event listener
   """
   if len(cache_manager.new) > 0: 
     items_to_add = cache_manager.new.items()
@@ -134,15 +129,35 @@ def update_cache_after_flush(session, flush_context):
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
         model_plural = cache_manager.supported_classes[cls]
-        # REVISIT Handle the cache expiry of mapping creation, mark source and destination for deletion
-        # 
-        current_app.logger.info("CACHE: Adding new object instance of model: " + cls + \
+        current_app.logger.info("CACHE: Marking cache addition for object instance of model: " + cls + \
           " resource type: " + cache_manager.supported_classes[cls])
+        # Marking object to be added to cache
+        #
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_add[key]=json_obj
 
-    # REVISIT: before_flush and after_flush reentrancy issues?
-    #
+        # Marking stub to be added to cache
+        # REVISIT: 
+        # Build stub json object to populate in cache
+        #stubs = 'stubs:' + model_plural + ':' + str(json_obj['id'])
+        #cache_manager.marked_for_delete[stubs]=stubs_json
+
+        # Marking mapping links to be deleted from cache
+        #
+        if cache_manager.supported_mappings.has_key(cls):
+          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                   cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname] 
+          destid = json_obj[dstname] 
+          if polymorph is True:
+            dsttype = json_obj[dsttype]
+          from_key = 'collection:' + srctype + ':' + str(srcid)
+          to_key   = 'collection:' + dsttype + ':' + str(dstid)
+          current_app.logger.info("CACHE: removing links from cache, source: " + \
+            from_key + " destination: " + to_key)
+          cache_manager.marked_for_delete[from_key]={}
+          cache_manager.marked_for_delete[to_key]={}
+
     for o, json_obj in items_to_add:
       del cache_manager.new[o]
       
@@ -153,13 +168,13 @@ def update_cache_after_flush(session, flush_context):
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
         model_plural = cache_manager.supported_classes[cls]
-        current_app.logger.info("CACHE: Updating object instance of model: " + cls + \
+        current_app.logger.info("CACHE: Marking cache updates for object instance of model: " + cls + \
             " resource type: " + cache_manager.supported_classes[cls])
+        # Marking object to updated in cache
+        #
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_update[key]=json_obj
 
-    # REVISIT: before_flush and after_flush reentrancy issues?
-    #
     for o, json_obj in items_to_update:
       del cache_manager.dirty[o]
 
@@ -168,63 +183,119 @@ def update_cache_after_flush(session, flush_context):
     for o, json_obj in items_to_delete:
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
-        model_plural = cache_manager.supported_classes[cls]
-        current_app.logger.info("CACHE: Deleting object instance of model: " + cls + \
+        current_app.logger.info("CACHE: Marking cache deletes for object instance of model: " + cls + \
           " resource type: " + cache_manager.supported_classes[cls]) 
-        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-        stubs = 'stubs:' + model_plural + ':' + str(json_obj['id'])
-        # json_obj is passed for cache_manager but it may not be used for delete operation in cache
+        model_plural = cache_manager.supported_classes[cls]
+        # Marking object to deleted from cache
         #
+        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_delete[key]=json_obj
+
+        # Marking stubs to deleted from cache
+        #
+        stubs = 'stubs:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_delete[stubs]=json_obj
 
-    # REVISIT: before_flush and after_flush reentrancy issues?
-    #
+        # Marking mapping links to be deleted from cache
+        #
+        if cache_manager.supported_mappings.has_key(cls):
+          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                   cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname] 
+          destid = json_obj[dstname] 
+          if polymorph is True:
+            dsttype = json_obj[dsttype]
+          from_key = 'collection:' + srctype + ':' + str(srcid)
+          to_key   = 'collection:' + dsttype + ':' + str(dstid)
+          current_app.logger.info("CACHE: removing mappings from cache, source: " + \
+            from_key + " destination: " + to_key)
+          cache_manager.marked_for_delete[from_key]={}
+          cache_manager.marked_for_delete[to_key]={}
+
     for o, json_obj in items_to_delete:
       del cache_manager.deleted[o]
 
 def clear_cache(session):
   current_app.logger.info("Entering clear_cache")
   cache_manager = get_cache_manager()
+
+  """
+  Clean up any cache items related to a session
+  """
   cache_manager.clear_cache()
 
-def sync_cache(session):
-  current_app.logger.info("Entering sync_cache")
+def update_cache_before_commit(session):
+  current_app.logger.info("CACHE: Entering updating cache before commiting to database")
+
+  """
+  The session event listener before_commit results in updating flag in memcache for marking for add/delete/update
+  On any failures, it throws exception to prevent commits to DB
+  """
+
+  # REVISIT: 
+  # For all items marked for add/update/delete, add flag in memcache to indicate that it is in progress
+  # Also set the expiration time parameter in memcache multi_<op> to 30 seconds for ensuring cache entries are not expired
+  # prior to session event listener after_commit 
+  # 
+
+def update_cache_after_commit(session):
+  current_app.logger.info("CACHE: Entering updating cache after commiting to database")
   cache_manager = get_cache_manager()
-  current_app.logger.info("CACHE: sync cache");
-  current_app.logger.info("CACHE: objects marked for add in cache");
-  for key, data in cache_manager.marked_for_add.items():
-    current_app.logger.info("CACHE: key: " + key + " : data: " + str(data))
-  current_app.logger.info("CACHE: objects marked for update in cache");
-  for key, data in cache_manager.marked_for_update.items():
-    current_app.logger.info("CACHE: key: " + key + " data: " + str(data))
-  current_app.logger.info("CACHE: objects marked for delete in cache");
-  for key, data in cache_manager.marked_for_delete.items():
-    current_app.logger.info("CACHE: key: " + key + " data: " + str(data))
+
+  """
+  The session event listener after_commit results in actually updating the cache entries
+  Also marks the flag for the objects modified as completed, this is to indicate to gets() to go ahead and read from cache
+  """
+  if len(cache_manager.marked_for_add) > 0:
+    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_add))
+    result = cache_manager.bulk_add(cache_manager.marked_for_add)
+    current_app.logger.info("CACHE: add result: " + str(result))
+
+  if len(cache_manager.marked_for_update) > 0:
+    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_update))
+    update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
+    current_app.logger.info("CACHE: update result: " + str(result))
+
+  if len(cache_manager.marked_for_delete) > 0:
+    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_delete))
+    result = cache_manager.bulk_delete(cache_manager.marked_for_delete)
+    current_app.logger.info("CACHE: delete result: " + str(result))
   
+  # REVISIT: 
+  # For all items marked for add/update/delete, add flag in memcache to indicate that it is in complete
+  # commits are done in sequential order and it is not reentrant
+  # 
   cache_manager.clear_cache()
+
 
 def init_ggrc_cache(app):
-  # REVIST: read properties from settings for app similar to SQLAlchemy and other modules
-  #defaultproperties={'CACHEMECHANISM':'local,memcache'}
-  defaultproperties={'CACHEMECHANISM':'memcache'}
-  #defaultproperties={'CACHEMECHANISM':'local'}
+
   # Create instance of cache manager class for applying policies and operations on cache
+  #
   cache_manager = get_cache_manager()
-  # Setup config including policies
+
+  # Setup config, policy, DTO manager
+  #
+  defaultproperties={'CACHEMECHANISM':'memcache'}
   config = Config();
   config.setProperties(defaultproperties)
   config.initialize()
+
   # Setup factory class to allow cache manager to create the cache mechanism objects.
-  # REVIST: Rename as BaseFactory instead of Factory
+  # REVISIT: Rename Factory as BaseFactory 
+  #
   factory = Factory();
-  # Initialize the caching layer
   cache_manager.set_config(config)
   cache_manager.set_factory(factory)
+
+  # Setup session event listeners
+  #
   event.listen(Session, 'before_flush',update_cache_before_flush)
   event.listen(Session, 'after_flush', update_cache_after_flush)
-  event.listen(Session, 'after_commit', sync_cache)
+  event.listen(Session, 'before_commit', update_cache_before_commit)
+  event.listen(Session, 'after_commit', update_cache_after_commit)
   event.listen(Session, 'after_rollback', clear_cache)
+
   cache_manager.initialize()
 
 
@@ -251,7 +322,6 @@ def init_all_services(app):
   from .description import ServiceDescription
   app.add_url_rule(
     '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
-
 
   # Initialize Caching layer
   init_ggrc_cache(app)

@@ -18,16 +18,15 @@ from cache import all_cache_entries, all_mapping_entries
 
 class CacheManager:
   cache = OrderedDict()
-  polices = OrderedDict()
   config = OrderedDict()
   supported_classes={}
   supported_mappings={}
   factory = None
   policy_manager = None
   dto_manager = None
-  new = None
-  dirty = None
-  deleted = None
+  new = {}
+  dirty = {}
+  deleted = {}
   marked_for_add={}
   marked_for_update={}
   marked_for_delete={}
@@ -67,9 +66,15 @@ class CacheManager:
     #
     self.dto_manager= self.get_config().get_dto_manager()
 
+    # 5. Initialize dictionaries for caching updates
+    #
+    self.dto_manager= self.get_config().get_dto_manager()
     self.new = {}
     self.dirty = {}
     self.deleted = {}
+    self.marked_for_add={}
+    self.marked_for_update={}
+    self.marked_for_delete={}
 
   def set_factory(self, factory):
     self.factory = factory
@@ -181,22 +186,23 @@ class CacheManager:
          return True
     return False 
    
-  def bulk_add_to_cache(self, data):
-    for key, cache in self.get_cache().items():
-	return cache.add_multi(data)
-
-  def bulk_cache_get(self, data):
-    # REVISIT: only one cache mechanism is supported
+  def bulk_get(self, data):
+    # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
 	return cache.get_multi(data)
 
-  def bulk_cache_update(self, data):
-    # REVISIT: only one cache mechanism is supported
+  def bulk_add(self, data):
+    # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    for key, cache in self.get_cache().items():
+	return cache.add_multi(data)
+
+  def bulk_update(self, data):
+    # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
 	return cache.update_multi(data)
 
-  def bulk_cache_delete(self, data):
-    # REVISIT: only one cache mechanism is supported
+  def bulk_delete(self, data):
+    # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
 	return cache.remove_multi(data)
 
@@ -220,3 +226,6 @@ class CacheManager:
     self.new = {}
     self.dirty = {}
     self.deleted = {}
+    self.marked_for_add={}
+    self.marked_for_update={}
+    self.marked_for_delete={}

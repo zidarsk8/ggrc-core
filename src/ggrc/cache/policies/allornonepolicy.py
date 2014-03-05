@@ -8,8 +8,7 @@
 # Maintained By: dan@reciprocitylabs.com
 #
 
-Class AllOrNonePolicy(Policy):
-
-	def apply(**policyargs):
-		pass
+class AllOrNonePolicy(Policy):
+  def apply(**policyargs):
+    pass
 
