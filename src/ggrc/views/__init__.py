@@ -15,6 +15,7 @@ from ggrc.rbac import permissions
 from ggrc.login import get_current_user
 from ggrc.utils import as_json
 from ggrc.builder.json import publish
+from ggrc.views.convertors import *  # necessary for routing
 from werkzeug.exceptions import Forbidden
 from . import filters
 from .registry import object_view, tooltip_view
@@ -185,70 +186,6 @@ def system_program_import_template(program_id):
     return current_app.make_response((body, 200, headers))
   return current_app.make_response((
       "No such program.", 404, []))
-
-@app.route("/tasks/import_people", methods=['POST'])
-@queued_task
-def import_people_task(task):
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.people import PeopleConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Person
-  import ggrc.views
-
-  csv_file = task.parameters.get("csv_file")
-  dry_run = task.parameters.get("dry_run")
-  try:
-    options = {}
-    options['dry_run'] = dry_run
-    converter = handle_csv_import(PeopleConverter, csv_file.splitlines(True), **options)
-    if dry_run:
-      options['converter'] = converter
-      options['results'] = converter.objects
-      options['heading_map'] = converter.object_map
-      return render_template("people/import_result.haml", **options)
-    else:
-      count = len(converter.objects)
-      return import_redirect("/admin/people_redirect/{}".format(count))
-
-  except ImportException as e:
-    if e.show_preview:
-      converter = e.converter
-      return render_template("people/import_result.haml", exception_message=e,
-          converter=converter, results=converter.objects, heading_map=converter.object_map)
-    return render_template("directives/import_errors.haml",
-          directive_id="People", exception_message=str(e))
-    
-@app.route("/tasks/import_help", methods=['POST'])
-@queued_task
-def import_help_task(task):
-  from ggrc.converters.common import ImportException
-  from ggrc.converters.help import HelpConverter
-  from ggrc.converters.import_helper import handle_csv_import
-  from ggrc.models import Help
-  import ggrc.views
-
-  csv_file = task.parameters.get("csv_file")
-  dry_run = task.parameters.get("dry_run")
-  try:
-    options = {}
-    options['dry_run'] = dry_run
-    converter = handle_csv_import(HelpConverter, csv_file.splitlines(True), **options)
-    if dry_run:
-      options['converter'] = converter
-      options['results'] = converter.objects
-      options['heading_map'] = converter.object_map
-      return render_template("help/import_result.haml", **options)
-    else:
-      count = len(converter.objects)
-      return import_redirect("/admin/help_redirect/{}".format(count))
-
-  except ImportException as e:
-    if e.show_preview:
-      converter = e.converter
-      return render_template("help/import_result.haml", exception_message=e,
-          converter=converter, results=converter.objects, heading_map=converter.object_map)
-    return render_template("directives/import_errors.haml",
-          directive_id="Help", exception_message=str(e))
 
 @app.route("/admin/help_redirect/<count>", methods=["GET"])
 def help_redirect(count):
@@ -745,13 +682,6 @@ def import_dump(data):
   return app.make_response((
     '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
       json.dumps(data)), 200, [('Content-Type', 'text/html')]))
-
-def import_redirect(location):
-  # The textarea here is a custom response for 'remoteipart' to
-  # proxy a JSON response through an iframe.
-  return app.make_response((
-    '<textarea data-type="application/json" response-code="200">{0}</textarea>'.format(
-      json.dumps({ 'location': location })), 200, [('Content-Type', 'text/html')]))
 
 @app.route("/tasks/export_process", methods=['POST'])
 @queued_task
