@@ -22,7 +22,7 @@
             Program
           </label>
           <select class="input-block-level" name="program.id" tabindex="1" autofocus>
-            {{#all 'Program' '{ "context_id__null" : false }'}}
+            {{#all 'Program' '{ "context_id__null" : false, "require_permission": "update" }'}}
             <option value="{{id}}">{{title}}</option>
             {{/all}}
           </select>

@@ -100,7 +100,8 @@ can.Control("GGRC.Controllers.Modals", {
     var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
       var $that = $(this)
         , name = $that.attr("name") || ""
-        , prop = name.substr(name.lastIndexOf(".") + 1);
+        , prop = name.substr(name.lastIndexOf(".") + 1)
+        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
 
       // Return if this field temporarily isn't storing data
       if (!name) return false;
@@ -124,7 +125,7 @@ can.Control("GGRC.Controllers.Modals", {
           ctl.bindXHRToButton(GGRC.Models.Search
           .search_for_types(
               request.term || '',
-              [$that.data("lookup")],
+              searchtypes,
               {
               // FIXME: Remove or figure out when this is necessary.
               //{
@@ -132,7 +133,7 @@ can.Control("GGRC.Controllers.Modals", {
               //  , __permission_model: 'Object' + $that.data("lookup")
               })
           .then(function(search_result) {
-            var objects = search_result.getResultsForType($that.data("lookup"))
+            var objects = search_result.getResultsForType(searchtypes.join(","))
               , queue = new RefreshQueue()
               ;
 
@@ -220,6 +221,34 @@ can.Control("GGRC.Controllers.Modals", {
       return false;
     }
   }
+
+  , immediate_find_or_create : function(el, ev, data) {
+    var that = this
+    , prop = el.data("drop")
+    , model = CMS.Models[el.data("lookup")]
+    , params = { context : that.options.instance.context && that.options.instance.context.serialize ? that.options.instance.context.serialize() : that.options.instance.context };
+
+    setTimeout(function() {
+      params[prop] = el.val();
+      el.prop("disabled", true);
+      model.findAll(params).then(function(list) {
+        if(list.length) {
+          that.autocomplete_select(el, ev, { item : list[0] });
+        } else {
+          new model(params).save().then(function(d) {
+            that.autocomplete_select(el, ev, { item : d });
+          });
+        }
+      })
+      .always(function() {
+        el.prop("disabled", false);
+      });
+    }, 100);
+  }
+  , "input[data-lookup][data-drop] paste" : "immediate_find_or_create"
+  , "input[data-lookup][data-drop] drop" : "immediate_find_or_create"
+
+
 
   , fetch_templates : function(dfd) {
     var that = this;
@@ -463,8 +492,10 @@ can.Control("GGRC.Controllers.Modals", {
         instance.set_owner_to_current_user_if_unset();
       }
 
+      this.disable_hide = true;
       ajd = instance.save().done(function(obj) {
         function finish() {
+          delete that.disable_hide;
           that.element.trigger("modal:success", obj).modal_form("hide");
         };
 
@@ -481,6 +512,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }).fail(function(xhr, status) {
         el.trigger("ajax:flash", { error : xhr.responseText });
+        delete that.disable_hide;
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");
     }
@@ -520,6 +552,12 @@ can.Control("GGRC.Controllers.Modals", {
   , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
+      if(this.disable_hide) {
+        ev.stopImmediatePropagation();
+        ev.stopPropagation();
+        ev.preventDefault();
+        return false;
+      }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]

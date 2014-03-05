@@ -23,11 +23,14 @@
 <li class="spinner">
 </li>
 {{/list}}
-{{^is_allowed 'read' model.shortName context='any'}}
+{{#if_helpers '\
+   ^is_allowed' 'read' model.shortName _0_context='any' '\
+   and ^is_allowed' 'create' model.shortName _1_context='any' '\
+   and ^is_allowed' 'read' 'Program' _2_context='any'}}
 <li class="no-access">
   You do not have access to read this information.
 </li>
-{{/is_allowed}}
+{{/if_helpers}}
 {{#list.is_loading}}
 <li class="spinner">
   <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>

@@ -685,6 +685,7 @@ Mustache.registerHelper("all", function(type, params, options) {
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
+  , require_permission = ""
   , items_dfd, hook;
 
   if(!options) {
@@ -693,12 +694,21 @@ Mustache.registerHelper("all", function(type, params, options) {
   } else {
     params = JSON.parse(resolve_computed(params));
   }
+  if("require_permission" in params){
+    require_permission = params.require_permission;
+    delete params.require_permission;
+  }
 
   function hookup(element, parent, view_id) {
     items_dfd.done(function(items){
       var val
       , $parent = $(element.parentNode)
       , $el = $(element);
+      items = can.map(items, function(item){
+        if(require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)){
+          return item;
+        }
+      });
       can.each(items, function(item) {
         $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
       });
@@ -2187,6 +2197,61 @@ Mustache.registerHelper("switch", function(value, options) {
       }
     }
   });
+});
+
+
+Mustache.registerHelper("fadein", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  resolve_computed(prop);
+  return function(el) {
+    var $el = $(el);
+    $el.css("display", "none");
+    if(!prop || resolve_computed(prop)) {
+      setTimeout(function() {
+        $el.fadeIn({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(true);
+          }
+        });
+      }, delay);
+    }
+  };
+});
+
+Mustache.registerHelper("fadeout", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  if(resolve_computed(prop)) {
+    return function(el) {
+      var $el = $(el);
+      setTimeout(function() {
+        $el.fadeOut({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(null);
+          }
+        });
+      }, delay);
+    };
+  }
 });
 
 })(this, jQuery, can);
