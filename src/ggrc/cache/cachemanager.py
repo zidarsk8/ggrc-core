@@ -29,7 +29,7 @@ class CacheManager:
   deleted = {}
   marked_for_add={}
   marked_for_update={}
-  marked_for_delete={}
+  marked_for_delete=[]
 
   def __init__(self):
     pass	
@@ -74,7 +74,7 @@ class CacheManager:
     self.deleted = {}
     self.marked_for_add={}
     self.marked_for_update={}
-    self.marked_for_delete={}
+    self.marked_for_delete=[]
 
   def set_factory(self, factory):
     self.factory = factory
@@ -228,4 +228,4 @@ class CacheManager:
     self.deleted = {}
     self.marked_for_add={}
     self.marked_for_update={}
-    self.marked_for_delete={}
+    self.marked_for_delete=[]

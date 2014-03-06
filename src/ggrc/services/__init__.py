@@ -136,11 +136,11 @@ def update_cache_after_flush(session, flush_context):
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_add[key]=json_obj
 
-        # Marking stub to be added to cache
+        # Marking stubs to be added to cache
         # REVISIT: 
-        # Build stub json object to populate in cache
-        #stubs = 'stubs:' + model_plural + ':' + str(json_obj['id'])
-        #cache_manager.marked_for_delete[stubs]=stubs_json
+        # Build the json for stubs from the json_obj
+        # stubs_key = 'stubs:' + model_plural + ':' + str(json_obj['id'])
+        # cache_manager.marked_for_add[stubs_key]=json_stubs
 
         # Marking mapping links to be deleted from cache
         #
@@ -148,15 +148,25 @@ def update_cache_after_flush(session, flush_context):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
                    cache_manager.supported_mappings[cls]
           srcid  = json_obj[srcname] 
-          destid = json_obj[dstname] 
+          dstid = json_obj[dstname] 
+          model_plural = None
           if polymorph is True:
             dsttype = json_obj[dsttype]
-          from_key = 'collection:' + srctype + ':' + str(srcid)
-          to_key   = 'collection:' + dsttype + ':' + str(dstid)
-          current_app.logger.info("CACHE: removing links from cache, source: " + \
-            from_key + " destination: " + to_key)
-          cache_manager.marked_for_delete[from_key]={}
-          cache_manager.marked_for_delete[to_key]={}
+            model_plural = cache_manager.supported_classes[dsttype]
+          else:
+            model_plural = dsttype
+          if srctype is not None:
+            from_key = 'collection:' + srctype + ':' + str(srcid)
+            current_app.logger.info("CACHE: removing links from cache, source: " + from_key)
+            cache_manager.marked_for_delete.append(from_key)
+          if model_plural is not None:
+            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+            current_app.logger.info("CACHE: removing links from cache, destination: " + to_key)
+            cache_manager.marked_for_delete.append(to_key)
+          else:
+            # This error should not happen, it indicates that class is not in the supproted_classes map
+            # Log error
+            current_app.logger.error("CACHE: destination class : " + dsttype + " is not supported for caching") 
 
     for o, json_obj in items_to_add:
       del cache_manager.new[o]
@@ -188,13 +198,13 @@ def update_cache_after_flush(session, flush_context):
         model_plural = cache_manager.supported_classes[cls]
         # Marking object to deleted from cache
         #
-        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-        cache_manager.marked_for_delete[key]=json_obj
+        object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+        cache_manager.marked_for_delete.append(object_key)
 
         # Marking stubs to deleted from cache
         #
-        stubs = 'stubs:' + model_plural + ':' + str(json_obj['id'])
-        cache_manager.marked_for_delete[stubs]=json_obj
+        stubs_key = 'stubs:' + model_plural + ':' + str(json_obj['id'])
+        cache_manager.marked_for_delete.append(stubs_key)
 
         # Marking mapping links to be deleted from cache
         #
@@ -202,15 +212,25 @@ def update_cache_after_flush(session, flush_context):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
                    cache_manager.supported_mappings[cls]
           srcid  = json_obj[srcname] 
-          destid = json_obj[dstname] 
+          dstid = json_obj[dstname] 
+          model_plural = None
           if polymorph is True:
             dsttype = json_obj[dsttype]
-          from_key = 'collection:' + srctype + ':' + str(srcid)
-          to_key   = 'collection:' + dsttype + ':' + str(dstid)
-          current_app.logger.info("CACHE: removing mappings from cache, source: " + \
-            from_key + " destination: " + to_key)
-          cache_manager.marked_for_delete[from_key]={}
-          cache_manager.marked_for_delete[to_key]={}
+            model_plural = cache_manager.supported_classes[dsttype]
+          else:
+            model_plural = dsttype
+          if srctype is not None:
+            from_key = 'collection:' + srctype + ':' + str(srcid)
+            current_app.logger.info("CACHE: removing links from cache, source: " + from_key)
+            cache_manager.marked_for_delete.append(from_key)
+          if model_plural is not None:
+            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+            current_app.logger.info("CACHE: removing links from cache, destination: " + to_key)
+            cache_manager.marked_for_delete.append(to_key)
+          else:
+            # This error should not happen, it indicates that class is not in the supproted_classes map
+            # Log error
+            current_app.logger.error("CACHE: destination class : " + dsttype + " is not supported for caching") 
 
     for o, json_obj in items_to_delete:
       del cache_manager.deleted[o]
@@ -248,18 +268,37 @@ def update_cache_after_commit(session):
   """
   if len(cache_manager.marked_for_add) > 0:
     current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_add))
-    result = cache_manager.bulk_add(cache_manager.marked_for_add)
-    current_app.logger.info("CACHE: add result: " + str(result))
+    add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
+    # REVISIT: result is empty on success, non-empty on failure, add those items to the marked_for_update list
+    # update status in memcache flag with timestamp
+    #
+    if len(add_result) > 0: 
+      current_app.logger.error("CACHE: Failed to add entries to cache: " + str(add_result))
+    else:
+      current_app.logger.info("CACHE: Successfully added entries to cache") 
 
   if len(cache_manager.marked_for_update) > 0:
-    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_update))
+    current_app.logger.info("CACHE: items to be updated in cache: " + str(cache_manager.marked_for_update))
     update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
-    current_app.logger.info("CACHE: update result: " + str(result))
+    # REVISIT: result is empty on success, non-empty on failure returns list of keys
+    # Not sure of the network errors, need to check memcache code 
+    # update status in memcache with timestamp
+    #
+    if len(update_result) > 0: 
+      current_app.logger.error("CACHE: Failed to update entries in cache: " + str(update_result))
+    else:
+      current_app.logger.info("CACHE: Successfully updated entries in cache") 
 
   if len(cache_manager.marked_for_delete) > 0:
-    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_delete))
-    result = cache_manager.bulk_delete(cache_manager.marked_for_delete)
-    current_app.logger.info("CACHE: delete result: " + str(result))
+    current_app.logger.info("CACHE: items to be deleted from cache: " + str(cache_manager.marked_for_delete))
+    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete)
+    # REVISIT: result is True on success, False on any other failure including network errors
+    # update status in memcache flag with timestamp
+    #
+    if delete_result is True:
+      current_app.logger.info("CACHE: Successfully deleted entries from cache") 
+    else:
+      current_app.logger.error("CACHE: Failed to delete entries from cache: " + str(delete_result))
   
   # REVISIT: 
   # For all items marked for add/update/delete, add flag in memcache to indicate that it is in complete

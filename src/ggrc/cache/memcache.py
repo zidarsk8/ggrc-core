@@ -19,7 +19,6 @@ from copy import deepcopy
 
 """
 class MemCache(Cache):
-
   def __init__(self, configparam=None):
     self.config = configparam
     self.name = 'memcache'
@@ -44,8 +43,6 @@ class MemCache(Cache):
     if not self.is_caching_supported(category, resource):
       return None
     # REVISIT: use memcache.Client.gets_multi() instead of gets()
-    # Construct the Attributes for the given filter, resource and category
-    # Invoke Google AppEngine mem cache API
     #
     data = OrderedDict()
     cache_key = self.get_key(category, resource)
@@ -70,6 +67,7 @@ class MemCache(Cache):
           data[id] = attr_dict
       else:
         # All or None policy is enforced, if one of the objects is not available in cache, then we return empty
+        # REVISIT: cannot distinguish network failures vs id not found in memcache, both scenarios return empty list
         return None
     return data
 
@@ -87,9 +85,20 @@ class MemCache(Cache):
       cache_data = self.memcache_client.gets(id) 
       if cache_data is None:
         if self.memcache_client.add(id, data.get(key)) is False:
-          # REVISIT: throw exceptions on errors to log critical events
-          return  None
-        entries[key] = data
+          # We stop processing any further
+          # REVISIT: Should we throw exceptions and/or log critical events
+          return None
+        else:
+          entries[key] = data
+      else:
+        # This could occur on import scenarios
+        #
+        if self.memcache_client.update(id, data.get(key)) is False:
+          # We stop processing any further
+          # REVISIT: Should we throw exceptions and/or log critical events
+          return None
+        else:
+          entries[key] = data
     return entries
 
   def update(self, category, resource, data): 
@@ -103,12 +112,11 @@ class MemCache(Cache):
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
-      cache_data = self.memcache_client.gets(id) 
-      if cache_data is None:
-        # Log the event for add failures
-        if self.memcache_client.cas(id, data.get(key)) is False:
-          # REVISIT: throw exceptions on errors to log critical events
-          return  None
+      if self.memcache_client.cas(id, data.get(key)) is False:
+        # RPC Error or value is not id is not found in cache.
+        # Cannot proceed further with update (All or None) policy
+        return None
+      else:
         entries[key] = data
     return entries
 
@@ -123,27 +131,36 @@ class MemCache(Cache):
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
-      cache_data = self.memcache_client.gets(id) 
-      if cache_data is not None:
-        retvalue = self.memcache_client.delete(id)
-        # Log the event of delete failures
-        if retvalue is not 2:
-          # REVISIT: throw exceptions on errors to log critical events
-          return None
+      retvalue = self.memcache_client.delete(id)
+      # Log the event of delete failures
+      if retvalue is 0:
+        # retvalue of 0 indicates Network failure, Cannot proceed further with delete (All or None) policy
+        return None
+      elif retvalue is 2:
+        # retvalue of 2 indicates Success
         entries[key] = data
+      elif retvalue is 1:
+        # retvalue of 1 indicates id is not present in memcache (could be expired), proceed with next entry
+        continue
+      else:
+        # Any other return value, Cannot proceed further with delete (All or None) policy
+        #
+        return None
     return entries
 
   def add_multi(self, data): 
-	return self.memcache_client.add_multi(data)
+    # REVISIT: import scenarios, add will return non-empty list, we should invoke update_multi for those items
+    #
+    return self.memcache_client.add_multi(data)
 
   def get_multi(self, data): 
-	return self.memcache_client.gets_multi(data, '', None, True)
+    return self.memcache_client.gets_multi(data, '', None, True)
 
   def update_multi(self, data): 
-	return self.memcache_client.cas_multi(data)
+    return self.memcache_client.cas_multi(data)
 
   def remove_multi(self, data): 
-	return self.memcache_client.delete_multi(data)
+    return self.memcache_client.delete_multi(data)
 
   def clean(self): 
     pass
