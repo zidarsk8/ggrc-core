@@ -129,3 +129,157 @@
 #objectItemUnderAssessmentCountObjectNav {
   font-weight:normal;
 }
+
+// Mockups Assessment Page V1.0
+#newWorkflowLabel,
+#workflowEdit,
+#workflowSet,
+#workflowTasks,
+#workflowReviews,
+#workflowFrequency,
+#newWorkflowTitle,
+#accordionContentReview,
+#accordionContentTasks,
+#addedObject,
+#addSingleObject,
+#objectStep3,
+#objectAdd,
+#newRule,
+#objectStep2 {
+  display: none;
+}
+
+.mockup-tree { 
+  .tree-item {
+    .tree-title-area {
+      [class^="grcicon-"] {
+        display: inline-block;
+      }
+    }
+  }
+  .tree-item-add {
+    .add-single-object {
+      select,
+      input {
+        margin-bottom: 5px;
+        margin-top: 4px;
+      }
+      a {
+        i {
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  .object-check {
+    padding-right: 20px;
+    text-align: right;
+    &.all-check {
+      label {
+        line-height: 32px;
+        margin-bottom: 0;
+      }
+    }
+  }
+  .object-add {
+    padding-right: 20px;
+    text-align: right;
+    .btn-small {
+      padding-top: 3px;
+      padding-bottom: 3px;
+    }
+  }
+}
+
+ul.new-tree {
+  &.mockup-tree {
+    li.tree-item {
+      font-size: 13px;
+      line-height: 30px;
+      &.selected {
+        background: $lightGray;
+      }
+      &.object-filter {
+        background: #b7b7b7;
+        span {
+          color: $black;
+        }
+      }
+    }
+    .short-field {
+      min-height: 23px;
+      margin-bottom: 0;
+      margin-top: 4px;
+    }
+    .control-wrap {
+      padding-right: 20px;
+      .request-control {
+        text-align: right;
+      }
+    }
+    .assessment-review {
+      padding: 10px 20px 0 20px;
+      input[type="checkbox"] {
+        margin-top: 0;
+      }
+      .review-icon {
+        margin-top: 10px;
+        margin-left: -4px;
+      }
+    }
+  }
+}
+
+.choose-object-wrap {
+  background: $lightGray;
+  padding: 8px 0;
+  .choose-object-content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  label {
+    line-height: 28px;
+    margin-bottom: 0;
+    margin-right: 6px;
+    display: inline-block;
+  }
+  select,
+  input {
+    margin-bottom: 0;
+  }
+  .objective-selector {
+    display: inline-block;
+  }
+  .first-row {
+    margin-bottom: 10px;
+  }
+  .indent-row {
+    padding-left: 53px;
+    margin-bottom: 10px;
+    select {
+      margin-right: 4px;
+    }
+  }
+  button {
+    border: none;
+    background: none;
+    padding: 0;
+    i {
+      margin-top: 1px;
+    }
+    &:focus,
+    &:active {
+      outline: 0;
+    }
+  }
+  .choose-object-footer {
+    border-top: 1px solid $footerBorder;
+    padding: 6px 20px 0 20px;
+    .confirm-buttons {
+      text-align: right;
+    }
+  }
+  .add-rule {
+    margin-top: 6px;
+  }
+}
