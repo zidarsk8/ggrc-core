@@ -624,11 +624,7 @@ can.Model("can.Model.Cacheable", {
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
   }
-  , computed_errors : function() {
-      var that = this
-        , compute = can.compute(function() { return that.errors(); });
-      return compute;
-    }
+  , computed_errors : can.compute(function() { return this.errors(); })
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);

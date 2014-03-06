@@ -158,10 +158,11 @@
           Audit Firm
         </label>
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
-        <div class="objective-selector">
+        <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
           {{#using firm=instance.audit_firm}}
           <input tabindex="11" type="text" name="audit_firm.email" data-lookup="OrgGroup" class="span8" value="{{firstnonempty firm.title ''}}">
           {{/using}}
+          {{#instance.computed_errors.audit_firm}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.audit_firm}}
         </div>
       </div>
     </div>

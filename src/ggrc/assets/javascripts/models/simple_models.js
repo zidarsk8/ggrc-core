@@ -1090,6 +1090,14 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validatePresenceOf("title");
+    this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
+      var audit_firm = this.attr("audit_firm");
+      var audit_firm_text = this.attr("_transient.audit_firm");
+      if(!audit_firm && audit_firm_text
+        || (audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
+        return "No valid org group selected for firm";
+      }
+    });
     // Preload auditor role:
     CMS.Models.Role.findAll({name__in: "Auditor"});
   }
