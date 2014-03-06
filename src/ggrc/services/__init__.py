@@ -289,6 +289,8 @@ def update_cache_after_commit(session):
     else:
       current_app.logger.info("CACHE: Successfully updated entries in cache") 
 
+  # REVISIT: check for duplicates in marked_for_delete
+  #
   if len(cache_manager.marked_for_delete) > 0:
     current_app.logger.info("CACHE: items to be deleted from cache: " + str(cache_manager.marked_for_delete))
     delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete)
