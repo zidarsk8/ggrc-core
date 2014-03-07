@@ -198,6 +198,11 @@ can.Control("GGRC.Controllers.Modals", {
               el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
             }
             instance._transient || instance.attr("_transient", new can.Observe({}));
+            can.reduce(path.split("."), function(current, next) {
+              current = current + "." + next;
+              instance.attr(current) || instance.attr(current, new can.Observe({}));
+              return current;
+            }, "_transient");
             instance.attr("_transient." + path, ui.item[prop]);
           }
         }, 150);
@@ -425,6 +430,11 @@ can.Control("GGRC.Controllers.Modals", {
         if($elem.is("[data-lookup]")) {
           name.pop(); //set the owner to null, not the email
           instance._transient || instance.attr("_transient", new can.Observe({}));
+          can.reduce(name.slice(0, -1), function(current, next) {
+            current = current + "." + next;
+            instance.attr(current) || instance.attr(current, new can.Observe({}));
+            return current;
+          }, "_transient");
           instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
             value = null;
