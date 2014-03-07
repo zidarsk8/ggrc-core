@@ -111,72 +111,6 @@ def log_event(session, obj=None, current_user_id=None):
     event.revisions = revisions
     session.add(event)
 
-def mark_cache_operation(operation, status, key, timestamp):
-  pass
-
-def add_cache_object(category, resource, id, attrs):
-  write_result=None
-  current_app.logger.info("CACHE: Adding object with id: " + str(id) + " to cache for " + resource + " in " + category + " category")
-  cache_manager = get_cache_manager()
-  if cache_manager is None or id is None:
-    current_app.logger.info("CACHE: CacheManager is not initialized")
-    return None
-  if category is not 'collection':
-    current_app.logger.info("CACHE: Support deletion for category: collection")
-    return None
-  cacheData={}
-  cacheData[id] = deepcopy(attrs)
-  current_app.logger.info("CACHE: data: " + str(cacheData))
-  #write_result = cache_manager.add_collection(category, resource, cacheData)
-  if write_result is None:
-    current_app.logger.info("CACHE: Unable to write object to cache")
-    return None
-  else:
-    current_app.logger.info("CACHE: Successfully added new entry in cache for resource: " + resource)
-    return write_result
-
-def update_cache_object(category, resource, id, attrs):
-  update_result=None
-  current_app.logger.info("CACHE: Updating object with id: " + str(id) + " to cache for " + resource + " in " + category + " category")
-  cache_manager = get_cache_manager()
-  if cache_manager is None or id is None:
-    current_app.logger.info("CACHE: CacheManager is not initialized")
-    return None
-  if category is not 'collection':
-    current_app.logger.info("CACHE: Support deletion for category: collection")
-    return None
-  cacheData={}
-  cacheData[id] = deepcopy(attrs)
-  current_app.logger.info("CACHE: data: " + str(cacheData))
-  #update_result = cache_manager.update_collection(category, resource, cacheData)
-  if update_result is None:
-    current_app.logger.info("CACHE: Unable to update cache")
-    return None
-  else:
-    current_app.logger.info("CACHE: Successfully updated entry in cache for resource: " + resource)
-    return update_result
-
-def delete_cache_object(category, resource, id):
-  delete_result=None
-  current_app.logger.info("CACHE: delete object with id: " + str(id) + " from cache for " + resource + " in " + category + " category")
-  cache_manager = get_cache_manager()
-  if cache_manager is None or id is None:
-    current_app.logger.info("CACHE: CacheManager is not initialized")
-    return None
-  if category is not 'collection':
-    current_app.logger.info("CACHE: Support deletion for category: collection")
-    return None
-  cacheData={}
-  cacheData[id] = 'Mark for Deletion'
-  current_app.logger.info("CACHE: data: " + str(cacheData))
-  #delete_result = cache_manager.delete_collection(category, resource, cacheData)
-  if delete_result is None:
-    current_app.logger.info("CACHE: Unable to delete collection from cache")
-    return None
-  else:
-    current_app.logger.info("CACHE: Successfully deleted entry from cache for resource: " + resource)
-    return write_result
-
 class ModelView(View):
   DEFAULT_PAGE_SIZE = 20
   MAX_PAGE_SIZE = 100
@@ -274,24 +208,6 @@ class ModelView(View):
           .filter(self.model.id == id).one()
     except sqlalchemy.orm.exc.NoResultFound:
       return None
-
-  def get_object_from_cache(self, id, category, resource, x_category, x_resource):
-    current_app.logger.info("CACHE: Get specific resource: " + resource + " id: " + str(id) + " in " + category + " category")
-    cache_manager = get_cache_manager()
-    if cache_manager is None:
-      current_app.logger.error("CACHE: CacheManager is not initialized")
-      return None
-
-    # Check in local cache for the object in question from the arguments
-    #
-    ids=[id]
-    filter={'ids':ids, 'attrs':None}
-
-    # REVISIT: Apply cacheManager policies to verify if caching is supported 
-    # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
-    data = cache_manager.get_collection(category, resource, filter)
-
-    return data
 
   def not_found_message(self):
     return '{0} not found.'.format(self.model._inflector.title_singular)
@@ -461,6 +377,7 @@ class Resource(ModelView):
       raise Forbidden()
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
+
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
       return current_app.make_response((
@@ -598,6 +515,11 @@ class Resource(ModelView):
     with benchmark("Serialize collection"):
       collection = self.collection_for_json(objs)
 
+    if 'If-None-Match' in self.request.headers and \
+        self.request.headers['If-None-Match'] == self.etag(collection):
+      return current_app.make_response((
+        '', 304, [('Etag', self.etag(collection))]))
+
     # Write collection to cache, if caching is supported for the model
     if cache_supported:
       cache_response = self.write_collection_to_cache(collection, category, model_plural, collection_name, model_plural)
@@ -605,10 +527,6 @@ class Resource(ModelView):
       current_app.logger.info("CACHE: Write Collection to cache is not supported for "  +\
         model_plural + " in " + category + " category")
 
-    if 'If-None-Match' in self.request.headers and \
-        self.request.headers['If-None-Match'] == self.etag(collection):
-      return current_app.make_response((
-        '', 304, [('Etag', self.etag(collection))]))
     return self.json_success_response(
       collection, self.collection_last_modified())
 
@@ -619,9 +537,8 @@ class Resource(ModelView):
       current_app.logger.error("CACHE: CacheManager is not initialized")
       return None
 
-    # Check in local cache for 'eager_query' related requests and args with with 'id_in' 
-    # Do additional parsing of arguments such as '_' for etag, replacing comma with '%2C'
-    # for JSON response
+    # Check in cache for 'eager_query' related requests and args with with 'id_in' 
+    #
     cacheobjids = request.args.get('id__in', False)
     etag = request.args.get('_', False)
     if cacheobjids and hasattr(self.model, 'eager_query'):

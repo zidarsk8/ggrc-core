@@ -93,7 +93,7 @@ class MemCache(Cache):
       else:
         # This could occur on import scenarios
         #
-        if self.memcache_client.update(id, data.get(key)) is False:
+        if self.memcache_client.cas(id, data.get(key)) is False:
           # We stop processing any further
           # REVISIT: Should we throw exceptions and/or log critical events
           return None
