@@ -183,7 +183,7 @@ def load_permissions_for(user):
         or_(
           ContextImplication.source_context_id == None,
           ContextImplication.source_context_id.in_(keys),
-          ))#.all()
+          )).all()
   elif keys:
     all_context_implications = all_context_implications.filter(
           ContextImplication.source_context_id.in_(keys)).all()
@@ -192,36 +192,35 @@ def load_permissions_for(user):
           ContextImplication.source_context_id == None).all()
   else:
     all_context_implications = []
-  context_implications_by_source = {}
-  for context_implication in all_context_implications:
-    context_implications_by_source.setdefault(
-        context_implication.source_context_id, set())\
-            .add(context_implication.context_id)
 
   # Gather all roles required by context implications
-  all_implied_roles = {}
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        all_implied_roles.setdefault(implied_rolename, None)
+  implied_context_to_implied_roles = {}
+  all_implied_roles_set = set()
+  for context_implication in all_context_implications:
+    for rolename in source_contexts_to_rolenames.get(
+        context_implication.source_context_id, []):
+      implied_role_names_list = implied_context_to_implied_roles.setdefault(
+          context_implication.context_id, list())
+      implied_role_names = lookup_role_implications(
+          rolename, context_implication)
+      all_implied_roles_set.update(implied_role_names)
+      implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
-  if all_implied_roles:
+  all_implied_roles_by_name = {}
+  if implied_context_to_implied_roles:
     implied_roles = db.session.query(Role)\
-        .filter(Role.name.in_(all_implied_roles.keys()))\
+        .filter(Role.name.in_(all_implied_roles_set))\
         .options(sqlalchemy.orm.undefer_group('Role_complete'))\
         .all()
     for implied_role in implied_roles:
-      all_implied_roles[implied_role.name] = implied_role
+      all_implied_roles_by_name[implied_role.name] = implied_role
   # Now aggregate permissions resulting from these roles
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        implied_role = all_implied_roles[implied_rolename]
-        for implied_context in implied_contexts:
-          collect_permissions(
-              implied_role.permissions, implied_context, permissions)
+  for implied_context_id, implied_rolenames \
+      in implied_context_to_implied_roles.items():
+    for implied_rolename in implied_rolenames:
+      implied_role = all_implied_roles_by_name[implied_rolename]
+      collect_permissions(
+          implied_role.permissions, implied_context_id, permissions)
 
   #grab personal context
   personal_context = db.session.query(Context).filter(
@@ -247,6 +246,7 @@ def load_permissions_for(user):
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   # get the personal context for this logged in user
   personal_context = service.personal_context()
 
@@ -300,6 +300,8 @@ def add_public_program_context_implication(context, check_exists=False):
   db.session.add(ContextImplication(
     source_context=None,
     context=context,
+    source_context_scope=None,
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
 
@@ -345,6 +347,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   #Create an audit context
   context = Context(
       context=obj.context,
@@ -353,6 +356,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       description='',
       modified_by=get_current_user(),
       )
+  context.related_object = obj
   db.session.add(context)
   db.session.flush()
 
@@ -360,6 +364,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=obj.context,
     context=context,
+    source_context_scope='Program',
+    context_scope='Audit',
     modified_by=get_current_user(),
     ))
 
@@ -367,6 +373,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=context,
     context=obj.context,
+    source_context_scope='Audit',
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
   
@@ -374,6 +382,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
       source_context=context,
       context=None,
+      source_context_scope='Audit',
+      context_scope=None,
       modified_by=get_current_user(),
       ))
   db.session.flush()
