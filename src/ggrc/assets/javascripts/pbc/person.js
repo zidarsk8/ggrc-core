@@ -40,10 +40,22 @@ can.Model.Cacheable("CMS.Models.Person", {
       , object_people : "CMS.Models.ObjectPerson.stubs"
       , language : "CMS.Models.Option.stub"
       , user_roles : "CMS.Models.UserRole.stubs"
+      , name : "trimmed"
+      , email : "trimmed"
     }
     , defaults : {
       name : ""
       , email : ""
+    }
+    , convert : {
+      "trimmed" : function(val) {
+        return (val && val.trim) ? val.trim() : val;
+      }
+    }
+    , serialize : {
+      "trimmed" : function(val) {
+        return (val && val.trim) ? val.trim() : val;
+      }
     }
     , findInCacheByEmail : function(email) {
       var result = null, that = this;
