@@ -4,7 +4,6 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc.extensions import get_extension_modules
-from ggrc.models import Program, Audit
 from .roles import (
     Auditor, AuditorProgramReader, AuditorReader, ObjectEditor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
