@@ -145,7 +145,24 @@
 #objectStep3,
 #objectAdd,
 #newRule,
-#objectStep2 {
+#objectStep2,
+#newEntry,
+#entryText,
+#finishObject,
+#taskDone,
+#finishTask,
+#startTask,
+#taskDone2,
+#finishTask2,
+#startTask2,
+#taskDone3,
+#finishTask3,
+#startTask3,
+#reviewNoteDone,
+#reviewNoteDone2,
+#peerReview,
+#partyReview,
+#objectMessage {
   display: none;
 }
 
@@ -189,6 +206,10 @@
       padding-bottom: 3px;
     }
   }
+  .task-done {
+    font-size: 13px;
+    color: $green;
+  }
 }
 
 ul.new-tree {
@@ -204,6 +225,11 @@ ul.new-tree {
         span {
           color: $black;
         }
+      }
+    }
+    .inner-tree {
+      select {
+        height: 23px;
       }
     }
     .short-field {
@@ -225,6 +251,20 @@ ul.new-tree {
       .review-icon {
         margin-top: 10px;
         margin-left: -4px;
+      }
+    }
+    .tree-info-list {
+      i {
+        margin-top: 0;
+      }
+    }
+  }
+  &.tasks-list {
+    li.tree-item {
+      &.completed {
+        .row-fluid {
+          background: $rqAccepted;
+        }
       }
     }
   }
@@ -281,5 +321,117 @@ ul.new-tree {
   }
   .add-rule {
     margin-top: 6px;
+  }
+}
+.inner-row {
+  padding-left: 20px;
+  padding-top: 6px;
+}
+.entry-list {
+  @include reset-list();
+  li {
+    border-bottom: 1px solid $footerBorder;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    .entry-author {
+      color: $gray;
+      font-size: 11px;
+      font-style: italic;
+      display: block;
+    }
+    &.add-entry {
+      border-bottom: none;
+      margin-top: 12px;
+      textarea {
+        margin-bottom: 4px;
+      }
+      .entry-attachment {
+        display: inline-block;
+        margin-bottom: 10px;
+        [class^="grcicon-"] {
+          margin-top: 1px;
+        }
+      }
+    }
+  }
+}
+.attachment-list {
+  @include reset-list();
+  padding: 4px 0 0 0;
+  li {
+    margin-left: -4px;
+    color: $gray;
+    border-bottom: none;
+    padding-bottom: 4px;
+    a {
+      color: $gray;
+      span {
+        text-decoration: underline;
+      }
+      &:hover {
+        text-decoration: none;
+        span {
+          text-decoration: none;
+        }
+      }
+      i {
+        @include opacity(0.5);
+      }
+    }
+    [class^="grcicon-"] {
+      margin-top: 3px;
+    }
+  }
+}
+
+.review-wrap {
+  .review-note {
+    padding-top: 10px;
+    p {
+      line-height: 16px;
+      color: $black;
+    }
+  }
+  .inner-tree {
+    padding-bottom: 20px;
+    padding-top: 0;
+    h6 {
+      margin-left: 0;
+      margin-right: 0;
+      line-height: 30px;
+      .review-note-action {
+        padding-right: 20px;
+        text-transform: none;
+        .btn {
+          padding-top: 3px;
+          padding-bottom: 3px;
+          line-height: 16px;
+          font-size: 13px;
+          margin-top: -1px;
+        }
+        span {
+          font-size: 11px;
+          font-weight: normal;
+        }
+      }
+    }
+    ul.new-tree {
+      li.tree-item {
+        margin-left: 0;
+        margin-right: 0;
+        .item-data {
+          color: $black;
+          .entry-author {
+            color: $gray;
+            font-size: 11px;
+            font-style: italic;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+  .tree-description {
+    padding-bottom: 16px;
   }
 }

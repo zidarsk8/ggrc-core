@@ -1119,10 +1119,17 @@ def assessments():
   
 @app.route("/mockups/v1.0/assessment-start.html")
 @login_required
-def assessments():
+def assessments_start():
   """The assessment start guide page
   """
   return render_template("mockups/v1.0/assessment-start.html")
+  
+@app.route("/mockups/v1.0/object.html")
+@login_required
+def assessments_object():
+  """The assessment object guide page
+  """
+  return render_template("mockups/v1.0/object.html")
   
 @app.route("/mockups/assessments_grid")
 @login_required

@@ -369,6 +369,88 @@ $(document).ready(function(){
     $('#objectStep1').hide();
     $('#objectStep2').show();
   });
+  
+  $('body').on('click', '#addEntryTrigger', function() {
+    $('#entryText').show();
+    $(this).hide();
+  });
+  
+  $('body').on('click', '#addEntryButton', function() {
+    $('#newEntry').show();
+    $('#addEntryTrigger').show();
+    $('#entryText').hide();
+  });
+  
+  $('body').on('click', '#startObject', function() {
+    $('#finishObject').show();
+    $(this).hide();
+    $('#taskStatus').hide();
+    $('#taskStatus2').hide();
+    $('#taskStatus3').hide();
+    $('#startTask').show();
+    $('#startTask2').show();
+    $('#startTask3').show();
+  });
+  
+  $('body').on('click', '#startTask', function() {
+    $(this).hide();
+    $('#finishTask').show();
+  });
+  $('body').on('click', '#startTask2', function() {
+    $(this).hide();
+    $('#finishTask2').show();
+  });
+  $('body').on('click', '#startTask3', function() {
+    $(this).hide();
+    $('#finishTask3').show();
+  });
+  
+  $('body').on('click', '#finishTask', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone').show();
+  });
+  
+  $('body').on('click', '#finishTask2', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone2').show();
+  });
+  
+  $('body').on('click', '#finishTask3', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone3').show();
+  });
+  
+  $('body').on('click', '#peerReviewActive', function() {
+    $(this).hide();
+    $('#peerReview').show();
+  });
+  
+  $('body').on('click', '#partyReviewActive', function() {
+    $(this).hide();
+    $('#partyReview').show();
+  });
+  
+  $('body').on('click', '#peerReviewComplete', function() {
+    $(this).hide();
+    $('#reviewNoteDone').show();
+    $('#addNote').hide();
+  });
+  
+  $('body').on('click', '#partyReviewComplete', function() {
+    $(this).hide();
+    $('#reviewNoteDone2').show();
+    $('#addNote2').hide();
+    $('#finishObject').removeClass('disabled');
+  });
+  
+  $('body').on('click', '#finishObject', function() {
+    $(this).closest('.tree-item').removeClass('rq-amended-request').addClass('rq-accepted');
+    $(this).hide();
+    $('#objectMessage').show();
+  });
 
 });
 

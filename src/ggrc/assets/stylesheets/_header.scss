@@ -292,6 +292,22 @@
         margin-top:11px;
       }
     }
+    span.status {
+      font-size: 13px;
+      color: $gray;
+      font-style: italic;
+      display: inline-block;
+      line-height: 36px;
+      vertical-align: middle;
+    }
+  }
+  .object-location {
+    text-align: right;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: bold;
   }
   .btn-group {
     margin-top: 27px;
