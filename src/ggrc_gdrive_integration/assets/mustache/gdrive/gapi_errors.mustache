@@ -27,11 +27,23 @@
   {{#if_auditor instance}}
   <div>
   {{#switch error.code}}
-    {{#case 404}}Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.{{/case}}
-    {{#case 403}}Contact {{#using assignee=instance.contact}}{{assignee.email}}{{/using}} to request access.{{/case}}
+    {{#case 404}}
+      {{#if_instance_of instance 'Request'}}
+        Contact your Audit Lead ({{#using audit=instance.audit}}{{#using assignee=audit.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}{{/using}}) to request access.
+      {{else}}
+        Contact your Audit Lead ({{#using assignee=instance.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}) to request access.
+      {{/if_instance_of}}
+    {{/case}}
+    {{#case 403}}
+      {{#if_instance_of instance 'Request'}}
+        Contact your Audit Lead ({{#using audit=instance.audit}}{{#using assignee=audit.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}{{/using}}) to request access.
+      {{else}}
+        Contact your Audit Lead ({{#using assignee=instance.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}) to request access.
+      {{/if_instance_of}}      
+    {{/case}}
     {{#case 401}}Try reloading this page. If you see a popup for Google API, make sure to click the Authorize buttons{{/case}}
     {{#case 500}}Try again later to see if the problem resolves.{{/case}}
-    {{#case 400}}Please ontact {{ggrc_config_value 'GAPI_ADMIN_GROUP'}} and report this problem.{{/case}}
+    {{#case 400}}Please contact your GGRC admins (<a href="mailto:{{ggrc_config_value 'GAPI_ADMIN_GROUP'}}">{{ggrc_config_value 'GAPI_ADMIN_GROUP'}}</a>) and report this problem.{{/case}}
     {{#default}}Try again later to see if the problem resolves.{{/default}}
 
   {{/switch}}
