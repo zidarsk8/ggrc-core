@@ -130,17 +130,17 @@ def update_cache_after_flush(session, flush_context):
       if cache_manager.supported_classes.has_key(cls):
         model_plural = cache_manager.supported_classes[cls]
         current_app.logger.info("CACHE: Marking cache addition for object instance of model: " + cls + \
-          " resource type: " + cache_manager.supported_classes[cls])
+          " resource type: " + model_plural)
+
         # Marking object to be added to cache
         #
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_add[key]=json_obj
 
-        # Marking stubs to be added to cache
-        # REVISIT: 
-        # Build the json for stubs from the json_obj
-        # stubs_key = 'stubs:' + model_plural + ':' + str(json_obj['id'])
-        # cache_manager.marked_for_add[stubs_key]=json_stubs
+        # Marking stubs to be expired from cache instead of appending to end of the list
+        #
+        stubs_key = 'stubs:' + model_plural + ':0' 
+        cache_manager.marked_for_delete.append(stubs_key)
 
         # Marking mapping links to be deleted from cache
         #
@@ -164,7 +164,7 @@ def update_cache_after_flush(session, flush_context):
             current_app.logger.info("CACHE: removing links from cache, destination: " + to_key)
             cache_manager.marked_for_delete.append(to_key)
           else:
-            # This error should not happen, it indicates that class is not in the supproted_classes map
+            # This error should not happen, it indicates that class is not in the supported_classes map
             # Log error
             current_app.logger.error("CACHE: destination class : " + dsttype + " is not supported for caching") 
 
@@ -201,9 +201,9 @@ def update_cache_after_flush(session, flush_context):
         object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_delete.append(object_key)
 
-        # Marking stubs to deleted from cache
+        # Marking stubs to be expired from cache instead of deleting it from the list
         #
-        stubs_key = 'stubs:' + model_plural + ':' + str(json_obj['id'])
+        stubs_key = 'stubs:' + model_plural + ':0'
         cache_manager.marked_for_delete.append(stubs_key)
 
         # Marking mapping links to be deleted from cache
