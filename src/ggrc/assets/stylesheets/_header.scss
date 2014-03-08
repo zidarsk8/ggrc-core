@@ -301,13 +301,20 @@
       vertical-align: middle;
     }
   }
-  .object-location {
-    text-align: right;
-    display: inline-block;
+  .object-header-notification {
     text-transform: uppercase;
     font-size: 14px;
     line-height: 18px;
     font-weight: bold;
+    margin: 18px 20px 0 103px;
+    &.object-approved {
+      margin: 18px 20px 0 223px;
+      color: $green;
+    }
+    .grcicon-attribute-color {
+      margin-top: 2px;
+      margin-left: -2px;
+    }
   }
   .btn-group {
     margin-top: 27px;

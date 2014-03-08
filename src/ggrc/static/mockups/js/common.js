@@ -219,6 +219,7 @@ $(document).ready(function(){
     $('#assessmentCountWidget').html('(2)');
     $('#mainAssessmentsCountNew').html('2');
     $('#addAssessment').fadeIn();
+    $('#mainAssessmentNew').fadeIn();
     
   });
 
@@ -368,6 +369,7 @@ $(document).ready(function(){
   $('body').on('click', '#objectReview', function() {
     $('#objectStep1').hide();
     $('#objectStep2').show();
+    $('#objectAdd').show();
   });
   
   $('body').on('click', '#addEntryTrigger', function() {
@@ -379,17 +381,12 @@ $(document).ready(function(){
     $('#newEntry').show();
     $('#addEntryTrigger').show();
     $('#entryText').hide();
+    $('#entriesCount').html('2');
   });
   
   $('body').on('click', '#startObject', function() {
     $('#finishObject').show();
     $(this).hide();
-    $('#taskStatus').hide();
-    $('#taskStatus2').hide();
-    $('#taskStatus3').hide();
-    $('#startTask').show();
-    $('#startTask2').show();
-    $('#startTask3').show();
   });
   
   $('body').on('click', '#startTask', function() {
@@ -450,6 +447,17 @@ $(document).ready(function(){
     $(this).closest('.tree-item').removeClass('rq-amended-request').addClass('rq-accepted');
     $(this).hide();
     $('#objectMessage').show();
+  });
+  
+  $('body').on('click', '#filterTrigger', function() {
+    $('#objectStep2').hide();
+    $('#objectStep1').show();
+  });
+  
+  $('body').on('click', '#filterTriggerFooter', function() {
+    $('#objectStep2').hide();
+    $('#objectStep3').hide();
+    $('#objectStep1').show();
   });
 
 });

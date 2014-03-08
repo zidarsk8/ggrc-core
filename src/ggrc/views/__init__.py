@@ -1130,6 +1130,20 @@ def assessments_object():
   """The assessment object guide page
   """
   return render_template("mockups/v1.0/object.html")
+
+@app.route("/mockups/v1.0/object-final.html")
+@login_required
+def assessments_object_final():
+  """The assessment object final guide page
+  """
+  return render_template("mockups/v1.0/object-final.html")  
+
+@app.route("/mockups/v1.0/my-work.html")
+@login_required
+def assessments_my_work():
+  """The assessment my work guide page
+  """
+  return render_template("mockups/v1.0/my-work.html")    
   
 @app.route("/mockups/assessments_grid")
 @login_required
