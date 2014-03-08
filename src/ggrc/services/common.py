@@ -546,13 +546,19 @@ class Resource(ModelView):
       cacheobjidstr = cacheobjids.replace(',', '%2C')
       ids = [long(i) for i in cacheobjids.split(',')]
       filter={'ids':ids, 'attrs':None}
-      # REVISIT: Apply cacheManager policies to verify if caching is supported 
+      # Apply cacheManager policies to verify if caching is supported 
       # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
       data = cache_manager.get_collection(category, resource, filter)
       if data is not None or len(data) > 0: 
         converted_data = {x_category: {x_resource: []}}
         for cachetype, cachedata in data.items():
           for id, attrs in cachedata.items():
+            context_id = self.get_context_id_from_json(attrs) 
+            if context_id is not None:
+              current_app.logger.info("CACHE: Verifying read permissions, Context ID: " + str(context_id) + " Object ID: " + str(id))
+              if not permissions.is_allowed_read(self.model.__name__, context_id):
+                current_app.logger.error("CACHE: Forbidden permissions")
+                raise Forbidden()
             converted_data[x_category][x_resource].append(attrs)
         selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
         converted_data[x_category]['selfLink'] = selfLink
@@ -571,8 +577,8 @@ class Resource(ModelView):
       if category is 'stubs':
         ids = [0]
         filter={'ids':ids, 'attrs':None}
-        # REVISIT: Apply cacheManager policies to verify if caching is supported 
-        # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
+        # REVISIT: No RBAC policies are applied for reading stubs, as context_id is not available at the resource level
+        #
         data = cache_manager.get_collection(category, resource, filter)
         if data is not None or len(data) > 0: 
           converted_data = {x_category: {x_resource: []}}
@@ -583,7 +589,7 @@ class Resource(ModelView):
           converted_data[x_category]['selfLink'] = selfLink
         controls_data = converted_data[x_category][x_resource]
         if len(controls_data) > 0:
-          current_app.logger.info("CACHE: Successfully converted stub data to return as JSON response")
+          current_app.logger.info("CACHE: Successfully converted stub data to return as JSON response") 
           return self.json_success_response(converted_data, datetime.datetime.now())
         else:
           current_app.logger.info("CACHE: Unable to find stub data for model: " + \
