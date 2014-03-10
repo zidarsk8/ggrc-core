@@ -252,7 +252,7 @@ blockquote {
   }
   &.pending-ajax {
     cursor: default;
-    background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
+    background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
     @include box-shadow(none);
     border: 1px solid $ajaxBtnDisabled;
     color: $ajaxGray;
