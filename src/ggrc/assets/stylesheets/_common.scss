@@ -180,6 +180,16 @@ blockquote {
   }
 }
 
+.objective-selector {
+  .search-icon {
+    background-image: image-url("magnifying-glass.png");
+    background-repeat: no-repeat;
+    @include background-size(21px 16px);
+    background-position: right center;
+    padding-right: 28px;
+  }
+}
+
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
   z-index: 2000 !important;
