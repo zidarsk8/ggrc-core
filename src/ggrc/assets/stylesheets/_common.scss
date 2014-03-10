@@ -91,6 +91,13 @@ blockquote {
     margin-bottom:6px;
   }
 }
+.widget-status {
+  text-align: right;
+  display: block;
+  padding-right: 20px;
+  font-style: italic;
+  color: $black;
+}
 
 .inline {
   display:inline;
@@ -143,6 +150,16 @@ blockquote {
 .tab-position {
   position: relative;
   overflow: visible;
+}
+
+.gray {
+  color: $gray;
+}
+.divider {
+  width: 100%;
+  height: 1px;
+  background: $footerBorder;
+  margin: 14px 0;
 }
 
 .undo {
@@ -217,6 +234,9 @@ blockquote {
   }
   &:hover {
     @include box-shadow(inset 0 0 2px rgba(0,0,0,0.3));
+  }
+  &.btn-footer {
+    margin-top: 4px;
   }
   &.btn-add {
     color:$white;

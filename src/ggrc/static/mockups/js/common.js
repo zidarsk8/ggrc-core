@@ -107,7 +107,7 @@ $(document).ready(function(){
     $('.autogenerate-result').toggleClass('active', $(this).val() == 'control');
   });
   
-  $('body').on('click', '.accordion-group a', function() {
+  $('body').on('click', '.accordion-group > a', function() {
     var $this = $(this),
         $subNav = $this.closest('.accordion-group').find('.sub-level'),
         $subAction = $this.closest('.accordion-group').find('.sub-actions');
@@ -142,9 +142,30 @@ $(document).ready(function(){
       "Dan Ring danring@reciprocitylabs.com",
       "Silas Barta silas@reciprocitylabs.com"
     ];
+    var program = [
+      "Google Fiber",
+      "LEED",
+      "ISO 27001 Program",
+      "CFR 21 Part 11",
+      "HIPAA",
+      "HR Program",
+      "SOX Compliance Program",
+      "Contract Compliance",
+      "PCI Compliance Program",
+    ]
+    var object = [
+      "Stability and Perpetuability"
+    ]
     $( ".objective-selector input" ).autocomplete({
       source: people
     });
+    $( ".objective-selector input[name='program.title']" ).autocomplete({
+      source: program
+    });
+    $( ".objective-selector input[name='object.title']" ).autocomplete({
+      source: object
+    });
+    
     
   });
   
@@ -185,7 +206,10 @@ $(document).ready(function(){
     }
     if($('ul.internav li.active a').attr('href') == '#regulation_widget') {
       $('#regulation_widget').addClass('widget-active').show();
-    } 
+    }
+    if($('ul.internav li.active a').attr('href') == '#objects_widget') {
+      $('#objects_widget').addClass('widget-active').show();
+    }
   });
 
   // New Assessment Created
@@ -195,6 +219,7 @@ $(document).ready(function(){
     $('#assessmentCountWidget').html('(2)');
     $('#mainAssessmentsCountNew').html('2');
     $('#addAssessment').fadeIn();
+    $('#mainAssessmentNew').fadeIn();
     
   });
 
@@ -229,6 +254,210 @@ $(document).ready(function(){
     $description.removeClass('short');
     
     return false;
+  });
+  
+  $('.workflow-accordion').on('show', function (e) {
+    $(e.target).prev('.accordion-heading').find('.accordion-toggle').addClass('active');
+  });
+
+  $('.workflow-accordion').on('hide', function (e) {
+    $(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
+  });
+  
+  $('#assessmentWorkflowChoose').on('change', function(){
+    if($(this).val() == 'newWorkflow') {
+      $('#regularWorkflowLabel').hide();
+      $('#newWorkflowLabel').show();
+      $('#newWorkflowTitle').show();
+      $('.workflow-accordion .accordion-group .accordion-body').each(function(){
+        $(this).addClass('in');
+      });
+      $('#accordionContentReview').show();
+      $('#accordionContentTasks').show();
+      $('#showTasksCount').html('3');
+      $('#showReviewCount').html('2');
+    } else if ($(this).val() == 'existingWorkflow') {
+      $('.workflow-accordion .accordion-group .accordion-body').each(function(){
+        $(this).addClass('in');
+      });
+      $('#accordionContentReview').show();
+      $('#accordionContentTasks').show();
+      $('#showTasksCount').html('3');
+      $('#showReviewCount').html('2');
+    } else {
+      $('#regularWorkflowLabel').show();
+      $('#newWorkflowLabel').hide();
+      $('#newWorkflowTitle').hide();
+      
+      $('.workflow-accordion .accordion-group .accordion-body').each(function(){
+        $(this).removeClass('in');
+      });
+      $('#accordionContentReview').hide();
+      $('#accordionContentTasks').hide();
+      $('#showTasksCount').html('0');
+      $('#showReviewCount').html('0');
+    }
+  });
+  
+  $('body').on('click', '#addWorkflow', function() {
+    $('#setupWorkflow').modal('hide');
+    $('#workflowNotSet').hide();
+    $('#workflowSet').show();
+    $('#workflowTasksCount').html('3');
+    $('#workflowReviewCount').html('2');
+    $('#workflowTasks').show();
+    $('#workflowReviews').show();
+    $('#workflowFrequency').show();
+    $('#workflowSetup').hide();
+    $('#workflowEdit').show();
+    $('#noWorkflow').hide();
+  });
+  
+  $('body').on('mouseover', '.section-add', function() {
+    var $this = $(this)
+    ,   $sectionExpand = $this.closest('.section-expandable').find('.section-expander');
+    
+    $this.hide();
+    $sectionExpand.show();
+  });
+  
+  $('body').on('click', '#addSingleObjectTrigger', function() {
+    $('#addSingleObject').show();
+    $('#objectFooterUtility').hide();
+  });
+  
+  $('body').on('click', '#addSingleControl', function() {
+    $('#addSingleObject').hide();
+    $('#addedObject').show();
+    $('#objectsCounter').html('(5)');
+    $('#objectsMainCounter').html('5');
+    $('#objectFooterUtility').show();
+    $('.section-expander').hide();
+    $('.section-add').show();
+    $('#noObjects').html('5 Objects selected').css('font-style','normal').css('color','#000');
+    $('#startAssessment').removeClass('disabled');
+  });
+  
+  $('body').on('click', '#cancelSingleControl', function() {
+    $('#objectFooterUtility').show();
+    $('#addSingleObject').hide();
+    $('.section-expander').hide();
+    $('.section-add').show();
+  });
+  
+  $("#objectAll").click(function () {
+    $(".object-check-single").prop('checked', $(this).prop('checked'));
+    if($('#objectAll').attr('checked', true)) {
+      $('#objectAdd').show();
+    } else {
+      $('#objectAdd').hide();
+    }
+  });
+  
+  $('body').on('click', '#objectAdd a', function() {
+    $('#objectStep2').hide();
+    $('#objectAdd').hide();
+    $('#objectStep3').show();
+    $('#objectsCounter').html('(4)');
+    $('#objectsMainCounter').html('4');
+  });
+  
+  $('body').on('click', '#addRule', function() {
+    $('#newRule').show();
+  });
+  
+  $('body').on('click', '#objectReview', function() {
+    $('#objectStep1').hide();
+    $('#objectStep2').show();
+    $('#objectAdd').show();
+  });
+  
+  $('body').on('click', '#addEntryTrigger', function() {
+    $('#entryText').show();
+    $(this).hide();
+  });
+  
+  $('body').on('click', '#addEntryButton', function() {
+    $('#newEntry').show();
+    $('#addEntryTrigger').show();
+    $('#entryText').hide();
+    $('#entriesCount').html('2');
+  });
+  
+  $('body').on('click', '#startObject', function() {
+    $('#finishObject').show();
+    $(this).hide();
+  });
+  
+  $('body').on('click', '#startTask', function() {
+    $(this).hide();
+    $('#finishTask').show();
+  });
+  $('body').on('click', '#startTask2', function() {
+    $(this).hide();
+    $('#finishTask2').show();
+  });
+  $('body').on('click', '#startTask3', function() {
+    $(this).hide();
+    $('#finishTask3').show();
+  });
+  
+  $('body').on('click', '#finishTask', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone').show();
+  });
+  
+  $('body').on('click', '#finishTask2', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone2').show();
+  });
+  
+  $('body').on('click', '#finishTask3', function() {
+    $(this).closest('.tree-item').addClass('completed');
+    $(this).hide();
+    $('#taskDone3').show();
+  });
+  
+  $('body').on('click', '#peerReviewActive', function() {
+    $(this).hide();
+    $('#peerReview').show();
+  });
+  
+  $('body').on('click', '#partyReviewActive', function() {
+    $(this).hide();
+    $('#partyReview').show();
+  });
+  
+  $('body').on('click', '#peerReviewComplete', function() {
+    $(this).hide();
+    $('#reviewNoteDone').show();
+    $('#addNote').hide();
+  });
+  
+  $('body').on('click', '#partyReviewComplete', function() {
+    $(this).hide();
+    $('#reviewNoteDone2').show();
+    $('#addNote2').hide();
+    $('#finishObject').removeClass('disabled');
+  });
+  
+  $('body').on('click', '#finishObject', function() {
+    $(this).closest('.tree-item').removeClass('rq-amended-request').addClass('rq-accepted');
+    $(this).hide();
+    $('#objectMessage').show();
+  });
+  
+  $('body').on('click', '#filterTrigger', function() {
+    $('#objectStep2').hide();
+    $('#objectStep1').show();
+  });
+  
+  $('body').on('click', '#filterTriggerFooter', function() {
+    $('#objectStep2').hide();
+    $('#objectStep3').hide();
+    $('#objectStep1').show();
   });
 
 });
