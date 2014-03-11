@@ -419,36 +419,16 @@ can.Model("can.Model.Cacheable", {
     params = this.object_from_resource(params);
     if (!params)
       return params;
-    var fn = (typeof params.each === "function") ? $.proxy(params.each,"call") : can.each;
     m = this.findInCacheById(params[this.id])
         || (params.provisional_id && can.getObject("provisional_cache", can.Model.Cacheable, true)[params.provisional_id]);
     if(m) {
-      if(m.provisional_id) {
+      if(m.provisional_id && params.id) {
         delete can.Model.Cacheable.provisional_cache[m.provisional_id];
         m.removeAttr("provisional_id");
+        m.constructor.cache[params.id] = m;
+        m.attr("id", params.id);
       }
-
-      if (m === params) {
-        //return m;
-      } else if (!params.selfLink) {
-        //return m;
-      } else {
-      if (!m.selfLink) {
-        //we are fleshing out a stub, which is much like creating an object new.
-        //But we don't want to trigger every change event on the new object's props.
-        m._init = 1;
-        // Stub attributes should be removed to not conflict with real model
-        // attributes; however, this should be well-tested first
-        //m.removeAttr('type');
-        //m.removeAttr('href');
-      }
-      fn(params, function(val, key) {
-        if (key === 'context' && val == null && m[key] && m[key].id == null)
-          return;
-        m.attr(key, val);// && val.serialize ? val.serialize() : val);
-      });
-      delete m._init;
-      }
+      m.attr(params);
     } else {
       m = this._super(params);
     }
@@ -740,18 +720,13 @@ can.Model("can.Model.Cacheable", {
     this._pending_refresh.fn();
     return this._pending_refresh.dfd;
   }
-  , attr : function() {
-    if(arguments.length < 1) {
-      return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
-    } else if(arguments[0] instanceof can.Observe) {
-      if(arguments[0] === this)
-        return this;
-      else
-        return this._super(arguments[0].serialize());
-    } else {
-      return this._super.apply(this, arguments);
-    }
-  }
+  // , attr : function() {
+  //   if(arguments.length < 1) {
+  //     return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
+  //   } else {
+  //     return this._super.apply(this, arguments);
+  //   }
+  // }
   , serialize : function() {
     var that = this, serial = {};
     if(arguments.length) {
