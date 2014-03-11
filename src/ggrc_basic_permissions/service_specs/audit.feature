@@ -341,7 +341,8 @@ Feature: Private Program Audits and Role Implication
     Then GET of "request" is allowed
     Then PUT of "request" is allowed
     Then GET of "request" is allowed
-    Then DELETE of "request" is forbidden
+    # Request deletion by Auditor is now allowed
+    #Then DELETE of "request" is forbidden
     Given a new "DocumentationResponse" named "response"
     And link property "context" of "response" is link property "context" of "audit"
     And "response" link property "request" is "request"
