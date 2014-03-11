@@ -265,6 +265,17 @@ $(document).ready(function(){
   });
   
   $('#assessmentWorkflowChoose').on('change', function(){
+    var id = $(this).val()
+      , workflow = null;
+    new Workflow.List({}).each(function(v){
+      if(v.id == id){
+        workflow = v;
+      }
+    });
+    $("workflow-app").trigger("workflow_selected", workflow);
+    $('#accordionContentReview').show();
+    $('#accordionContentTasks').show();
+    return;
     if($(this).val() == 'newWorkflow') {
       $('#regularWorkflowLabel').hide();
       $('#newWorkflowLabel').show();

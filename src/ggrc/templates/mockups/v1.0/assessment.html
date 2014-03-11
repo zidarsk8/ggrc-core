@@ -14,72 +14,285 @@
 </head>
 <body>
 
-  <header class="header main">
-    <div class="header-bar">
-      <div class="container-fluid">
+{% raw %}
+<script id='assessments' type='text/mustache'>
+<assessments-app>
+<li class="programs accordion-group">
+<a class="programs" href="#">
+  <i class="grcicon-assessment-color"></i>
+  Assessments
+  <small>(<span class="item-count">{{assessments.length}}</span>)</small>
+</a>
+
+<ul class="sub-level">
+  {{#each assessments}}
+  <li class="programs" data-model="true">
+    <a href="/mockups/v1.0/assessment.html" class="show-extended" can-click="select">
+      <div class="row-fluid">
+        <div class="span8 lhs-main-title">
+          <span class="lhs-item">
+            {{title}}
+          </span>
+        </div>
+        <div class="span1 lhs-private"></div>
+        <div class="span1 lhs-people"></div>
+      </div>
+    </a>
+  </li>
+  {{/each assessments}}
+</ul>
+<ul class="sub-actions">
+  <li class="add-new">
+    <a data-modal-class="modal-wide" href="#newAssessmentStandAlone" data-toggle="modal">
+      + Create New
+    </a>
+  </li>
+</ul>
+</li>
+</assessments-app>
+</script>
+<script id='workflow' type='text/mustache'>
+<workflow-app>
+<div id="setupWorkflow" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="setupWorkflowLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Setup Assessment Workflow</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
         <div class="row-fluid">
-          <div class="span12">
-            <div class="logo pull-left">
-              <a href="/mockups/v1.0/my-work.html">Company GRC</a>
+          <div class="span6">
+            <label>
+              Assessment Title
+            </label>
+            <strong>{{assessment.title}}</strong>
+          </div>
+          <div class="span6">
+            <label>
+              Program
+            </label>
+            <i class="grcicon-program-color pull-left icon-field"></i>
+            <strong>{{assessment.program_title}}</strong>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="row-fluid">
+          <div class="span6">
+            <label id="regularWorkflowLabel">
+              Choose Assessment Workflow
+            </label>
+            <label id="newWorkflowLabel">
+              Clone existing workflow
+            </label>
+            <select class="span12" id="assessmentWorkflowChoose">
+              <option>- Choose -</option>
+              {{#each workflows}}
+              <option value="{{id}}" {{#if_equals workflow_id id}}selected="selected"{{/if}}>{{title}}</option>
+              {{/each workflows}}
+              <option>&nbsp;</option>
+              <option value="newWorkflow">+ Create New Assessment Workflow</option>
+            </select>
+            <p class="note">
+              <strong>Note:</strong> Tasks and Review cycles you setup will be applied to all selected objects 
+              within assessment. However, you'll be able to adjust them on object level.
+            </p>
+          </div>
+          <div class="span6" id="newWorkflowTitle">
+            <label>
+              New Workflow Title
+              <span class="required">*</span>
+            </label>
+            <input class="input-block-level" placeholder="" name="workflow-title" type="text" value="Internal Audit - Control Setup">
+          </div>
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span1">&nbsp;</div>
+          <div class="span11">
+            
+            <div class="accordion workflow-accordion" id="workflow-accordion">
+              {{#if workflow}}       
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseTasks">
+                    <i class="grcicon-toggle-arrow"></i> Show tasks (<span id="showTasksCount">{{workflow.tasks.length}}</span>)
+                  </a>
+                </div>
+                <div id="collapseTasks" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div class="row-fluid">
+                      <div class="span11">
+                      
+                        <div id="accordionContentTasks">
+                          {{#each workflow.tasks}}
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <input type="text" class="input-block-level" value="{{.}}">
+                            </div>
+                            <div class="span1">
+                              <button type="submit"><i class="grcicon-deleted"></i></button>
+                            </div>
+                          </div>
+                          {{/each}}
+                        </div>
+                        
+                        <div class="more-button">
+                          <a href="#" id="addTask" class="btn btn-success">Add Task</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseReview">
+                    <i class="grcicon-toggle-arrow"></i> Show review cycles (<span id="showReviewCount">{{workflow.reviews.length}}</span>)
+                  </a>
+                </div>
+                <div id="collapseReview" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div id="accordionContentReview">
+                      <div class="row-fluid">
+                        <div class="span11">
+                          {{#each workflow.reviews}}
+                          <div class="row-fluid">
+                            <div class="span7">
+                              <input type="text" class="input-block-level" value="{{title}}">
+                            </div>
+                            <div class="span4">
+                              <i class="grcicon-person-green pull-left icon-field"></i>
+                              <div class="objective-selector">
+                                <input type="text" name="assessment_lead.email" class="span10" value="{{reviewer}}" placeholder="Choose Reviewer">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <button type="submit"><i class="grcicon-deleted"></i></button>
+                            </div>
+                          </div>
+                          {{/each workflow.reviews}}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="more-button">
+                      <a href="#" id="addReview" class="btn btn-success">Add review</a>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseFrequency">
+                    <i class="grcicon-toggle-arrow"></i> Show reassessment frequency
+                  </a>
+                </div>
+                <div id="collapseFrequency" class="accordion-body collapse">
+                  <div class="accordion-inner">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <select class="input-block-level">
+                          <option>One time</option>
+                          <option>Monthly</option>
+                          <option>Every 3 months</option>
+                          <option>Every 6 months</option>
+                          <option selected="selected">Annually</option>
+                          <option>Biannually</option>
+                          <option>Ongoing</option>
+                        </select>
+                      </div>
+                      <div class="span8">
+                        <span class="workflow-repeat">Repeat every:</span>
+                        <select class="input-mini">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                          <option>7</option>
+                          <option>8</option>
+                          <option>9</option>
+                          <option>10</option>
+                          <option>11</option>
+                          <option>12</option>
+                          <option>13</option>
+                          <option>14</option>
+                          <option>15</option>
+                          <option>16</option>
+                          <option>17</option>
+                          <option>18</option>
+                          <option>19</option>
+                          <option>20</option>
+                          <option>21</option>
+                          <option>22</option>
+                          <option>23</option>
+                          <option>24</option>
+                          <option selected="selected">25</option>
+                          <option>26</option>
+                          <option>27</option>
+                          <option>28</option>
+                          <option>29</option>
+                          <option>30</option>
+                          <option>31</option>
+                        </select>
+                        <select class="input-medium">
+                          <option>January</option>
+                          <option>Febraury</option>
+                          <option>March</option>
+                          <option selected="selected">April</option>
+                          <option>May</option>
+                          <option>June</option>
+                          <option>July</option>
+                          <option>August</option>
+                          <option>September</option>
+                          <option>October</option>
+                          <option>November</option>
+                          <option>December</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                            {{/if}}
             </div>
-            <ul class="menu">
-              <li class="black-link">
-                <a id="page-help" href="javascript://" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="help">
-                  <i class="grcicon-help"></i>
-                  <span>Help</span>
-                </a>
-              </li>
-              <li class="user dropdown dropdown-black black-link">
-                <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
-                  <i class="grcicon-user"></i>
-                  <span>user@example.com</span>
-                  <i class="grcicon-carot-white"></i>
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  <li class="show-role">
-                    <i class="grcicon-role-white"></i>
-                    Role: gGRC Admin
-                  </li>
-                  <li>
-                    <a href="/mockups/v1.0/my-work.html">
-                      <i class="grcicon-dashboard"></i>
-                      My Work (gGRC Admin)
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/admin">
-                      <i class="grcicon-admin"></i>
-                      Admin Dashboard
-                    </a>
-                  </li>
-                  <li>
-                    <a class="clear-display-settings" href="#" tabindex="-1">
-                      <i class="grcicon-desktop"></i>
-                      Reset Layout to Default
-                    </a>
-                  </li>
-                  <li>
-                    <a class="set-display-settings-default" href="#" tabindex="-1">
-                      <i class="grcicon-desktop"></i>
-                      Set Layout as Default
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" tabindex="-1">
-                      <i class="grcicon-logout"></i>
-                      Logout
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
+          </div>
+        </div>
+        
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a id="addWorkflow" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
           </div>
         </div>
       </div>
     </div>
-  </header>
-  
-  <div class="area program">
+  </div>
+</workflow-app>
+</script>
+<script id='assessment' type='text/mustache'>
+<assessment-app>
+<div class="area program">
     <div class="header-content">
       <div class="row-fluid">
         <div id="page-header" class="span9">
@@ -87,7 +300,7 @@
             <div class="grcobject programs" rel="tooltip" data-placement="bottom" title="Assessment">
               <i class="grcicon-assessment-white"></i>
             </div>
-            2014 Google Fiber Assessment
+            {{assessment.title}}
             <span class="private"></span>
           </h1>
         </div>
@@ -122,6 +335,7 @@
           </div>
         </div>
         
+          
         <div class="object-area" style="margin-left: 200px;">
           <div id="show_columns" class="column-set">
             <div id="middle_column" class="widget-area ui-sortable">
@@ -152,7 +366,7 @@
                   <section class="info">
                     <div class="row-fluid">
                       <div class="span6">
-                        <h3>2014 Google Fiber Assessment</h3>
+                        <h3>{{assessment.title}}</h3>
                       </div>
                       <div class="span6">&nbsp;</div>
                     </div>
@@ -168,7 +382,7 @@
                           <div>   
                             <p>
                               <strong>Status:</strong><br>
-                              Pending
+                              {{assessment.status}}
                             </p>
                           </div>
                         </div>
@@ -179,7 +393,7 @@
                       <div class="span12">
                         <div class="rtf-block">
                           <strong>Related Program:</strong>
-                          <i class="grcicon-program-color"></i> <strong>Google Fiber</strong>
+                          <i class="grcicon-program-color"></i> <strong>{{assessment.program_title}}</strong>
                         </div>
                       </div>
                     </div>
@@ -188,15 +402,16 @@
                       <div class="span12">
                         <p>
                           <strong>Assessment Lead:</strong>
-                          Cassius Clay
+                          {{assessment.lead_email}}
                         </p>
                         <p>
                           <strong>Requested on:</strong>
-                          05/01/14
+                          {{#if assessment.start_date}}{{assessment.start_date}}{{else}}<em>not defined</em>{{/if}}
                         </p>
                         <p>
                           <strong>Due on:</strong>
-                          <em>not defined</em>
+                          {{#if assessment.end_date}}{{assessment.end_date}}{{else}}<em>not defined</em>{{/if}}
+
                         </p>
                         <p>
                           <strong>gGRC Folder:</strong>
@@ -654,7 +869,78 @@
       </div>
     </section>
   </div>
-  
+</assessment-app>
+</script>
+{% endraw %}
+
+
+
+
+  <header class="header main">
+    <div class="header-bar">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="logo pull-left">
+              <a href="/mockups/v1.0/my-work.html">Company GRC</a>
+            </div>
+            <ul class="menu">
+              <li class="black-link">
+                <a id="page-help" href="javascript://" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="help">
+                  <i class="grcicon-help"></i>
+                  <span>Help</span>
+                </a>
+              </li>
+              <li class="user dropdown dropdown-black black-link">
+                <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button">
+                  <i class="grcicon-user"></i>
+                  <span>user@example.com</span>
+                  <i class="grcicon-carot-white"></i>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                  <li class="show-role">
+                    <i class="grcicon-role-white"></i>
+                    Role: gGRC Admin
+                  </li>
+                  <li>
+                    <a href="/mockups/v1.0/my-work.html">
+                      <i class="grcicon-dashboard"></i>
+                      My Work (gGRC Admin)
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/admin">
+                      <i class="grcicon-admin"></i>
+                      Admin Dashboard
+                    </a>
+                  </li>
+                  <li>
+                    <a class="clear-display-settings" href="#" tabindex="-1">
+                      <i class="grcicon-desktop"></i>
+                      Reset Layout to Default
+                    </a>
+                  </li>
+                  <li>
+                    <a class="set-display-settings-default" href="#" tabindex="-1">
+                      <i class="grcicon-desktop"></i>
+                      Set Layout as Default
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" tabindex="-1">
+                      <i class="grcicon-logout"></i>
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div id="assessment-app"></div>
   <section class="footer" style="z-index: 1000; position: fixed; right:0; bottom: 0; width: 100%;">
     <div class="row-fluid">
       <div class="span12">
@@ -936,41 +1222,8 @@
                     </li>
                   </ul>
                 </div>
-                
               </li>
-              <li class="programs accordion-group">
-                <a class="programs" href="#">
-                  <i class="grcicon-assessment-color"></i>
-                  Assessments
-                  <small>(<span class="item-count" id="mainAssessmentsCountNew">1</span>)</small>
-                </a>
-                
-                <div class="content">
-                  <ul class="sub-level">
-                    <li class="programs" data-model="true">
-                      <a href="/mockups/v1.0/assessment.html" class="show-extended">
-                        <div class="row-fluid">
-                          <div class="span8 lhs-main-title">
-                            <span class="lhs-item">
-                              2014: Google Fiber Assessment
-                            </span>
-                          </div>
-                          <div class="span1 lhs-private"></div>
-                          <div class="span1 lhs-people"></div>
-                        </div>
-                      </a>
-                    </li>
-                  </ul>
-                  <ul class="sub-actions">
-                    <li class="add-new">
-                      <a data-modal-class="modal-wide" href="#newAssessmentStandAlone" data-toggle="modal">
-                        + Create New
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                
-              </li>
+              <div class="content" id="assessments-lhn"></div>
             </ul>
           </div>
           
@@ -2789,275 +3042,7 @@
       <a class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
     </div>
   </div>
-  
-  <div id="setupWorkflow" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="setupWorkflowLabel" aria-hidden="true">
-    <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
-        <i class="grcicon-x-white"></i>
-      </a>
-      <h2>
-        <span>Setup Assessment Workflow</span>
-      </h2>
-    </div>
-    <div class="modal-body">
-      <form action="#">
-        <div class="row-fluid">
-          <div class="span6">
-            <label>
-              Assessment Title
-            </label>
-            <strong>2014: Google Fiber Assessment</strong>
-          </div>
-          <div class="span6">
-            <label>
-              Program
-            </label>
-            <i class="grcicon-program-color pull-left icon-field"></i>
-            <strong>Google Fiber</strong>
-          </div>
-        </div>
-        
-        <div class="divider"></div>
-        
-        <div class="row-fluid">
-          <div class="span6">
-            <label id="regularWorkflowLabel">
-              Choose Assessment Workflow
-            </label>
-            <label id="newWorkflowLabel">
-              Clone existing workflow
-            </label>
-            <select class="span12" id="assessmentWorkflowChoose">
-              <option>- Choose -</option>
-              <option>General Walkthrough</option>
-              <option>General Testing</option>
-              <option value="existingWorkflow">FIBER - Control Testing</option>
-              <option>FED - Contract Validation</option>
-              <option>&nbsp;</option>
-              <option value="newWorkflow">+ Create New Assessment Workflow</option>
-            </select>
-            <p class="note">
-              <strong>Note:</strong> Tasks and Review cycles you setup will be applied to all selected objects 
-              within assessment. However, you'll be able to adjust them on object level.
-            </p>
-          </div>
-          <div class="span6" id="newWorkflowTitle">
-            <label>
-              New Workflow Title
-              <span class="required">*</span>
-            </label>
-            <input class="input-block-level" placeholder="" name="workflow-title" type="text" value="Internal Audit - Control Setup">
-          </div>
-        </div>
-        
-        <div class="row-fluid">
-          <div class="span1">&nbsp;</div>
-          <div class="span11">
-            <div class="accordion workflow-accordion" id="workflow-accordion">
-              
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseTasks">
-                    <i class="grcicon-toggle-arrow"></i> Show tasks (<span id="showTasksCount">0</span>)
-                  </a>
-                </div>
-                <div id="collapseTasks" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div class="row-fluid">
-                      <div class="span11">
-                      
-                        <div id="accordionContentTasks">
-                          <div class="row-fluid">
-                            <div class="span11">
-                              <input type="text" class="input-block-level" value="Proof reading">
-                            </div>
-                            <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
-                            </div>
-                          </div>
-                          
-                          <div class="row-fluid">
-                            <div class="span11">
-                              <input type="text" class="input-block-level" value="Validate mappings">
-                            </div>
-                            <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
-                            </div>
-                          </div>
-                          
-                          <div class="row-fluid">
-                            <div class="span11">
-                              <input type="text" class="input-block-level" value="Validate supporting documents">
-                            </div>
-                            <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div class="more-button">
-                          <a href="#" class="btn btn-success">Add Task</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseReview">
-                    <i class="grcicon-toggle-arrow"></i> Show review cycles (<span id="showReviewCount">0</span>)
-                  </a>
-                </div>
-                <div id="collapseReview" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div id="accordionContentReview">
-                      <div class="row-fluid">
-                        <div class="span11">
-                        
-                          <div class="row-fluid">
-                            <div class="span7">
-                              <input type="text" class="input-block-level" value="Peer review">
-                            </div>
-                            <div class="span4">
-                              <i class="grcicon-person-green pull-left icon-field"></i>
-                              <div class="objective-selector">
-                                <input type="text" name="assessment_lead.email" class="span10" value="Jonathan Myers" placeholder="Choose Reviewer">
-                              </div>
-                            </div>
-                            <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
-                            </div>
-                          </div>
-                          
-                          <div class="row-fluid">
-                            <div class="span7">
-                              <input type="text" class="input-block-level" value="3rd party review">
-                            </div>
-                            <div class="span4">
-                              <i class="grcicon-person-green pull-left icon-field"></i>
-                              <div class="objective-selector">
-                                <input type="text" name="assessment_lead.email" class="span10" value="Cindy Rella" placeholder="Choose Reviewer">
-                              </div>
-                            </div>
-                            <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
-                            </div>
-                          </div>
-                          
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="more-button">
-                      <a href="#" class="btn btn-success">Add review</a>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-              
-              <div class="accordion-group">
-                <div class="accordion-heading">
-                  <a class="accordion-toggle" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseFrequency">
-                    <i class="grcicon-toggle-arrow"></i> Show reassessment frequency
-                  </a>
-                </div>
-                <div id="collapseFrequency" class="accordion-body collapse">
-                  <div class="accordion-inner">
-                    <div class="row-fluid">
-                      <div class="span4">
-                        <select class="input-block-level">
-                          <option>One time</option>
-                          <option>Monthly</option>
-                          <option>Every 3 months</option>
-                          <option>Every 6 months</option>
-                          <option selected="selected">Annually</option>
-                          <option>Biannually</option>
-                          <option>Ongoing</option>
-                        </select>
-                      </div>
-                      <div class="span8">
-                        <span class="workflow-repeat">Repeat every:</span>
-                        <select class="input-mini">
-                          <option>1</option>
-                          <option>2</option>
-                          <option>3</option>
-                          <option>4</option>
-                          <option>5</option>
-                          <option>6</option>
-                          <option>7</option>
-                          <option>8</option>
-                          <option>9</option>
-                          <option>10</option>
-                          <option>11</option>
-                          <option>12</option>
-                          <option>13</option>
-                          <option>14</option>
-                          <option>15</option>
-                          <option>16</option>
-                          <option>17</option>
-                          <option>18</option>
-                          <option>19</option>
-                          <option>20</option>
-                          <option>21</option>
-                          <option>22</option>
-                          <option>23</option>
-                          <option>24</option>
-                          <option selected="selected">25</option>
-                          <option>26</option>
-                          <option>27</option>
-                          <option>28</option>
-                          <option>29</option>
-                          <option>30</option>
-                          <option>31</option>
-                        </select>
-                        <select class="input-medium">
-                          <option>January</option>
-                          <option>Febraury</option>
-                          <option>March</option>
-                          <option selected="selected">April</option>
-                          <option>May</option>
-                          <option>June</option>
-                          <option>July</option>
-                          <option>August</option>
-                          <option>September</option>
-                          <option>October</option>
-                          <option>November</option>
-                          <option>December</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-            </div>
-          </div>
-        </div>
-        
-      </form>
-    </div>
-    <div class="modal-footer">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="deny-buttons">
-            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
-          </div>
-        </div>
-        <div class="span6">
-          &nbsp;
-        </div>
-        <div class="span3">
-          <div class="confirm-buttons">
-            <a id="addWorkflow" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+  <div id="workflow-app"></div>
   <div id="newAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">
     <div class="modal-header">
       <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
@@ -3085,7 +3070,7 @@
             </label>
             <i class="grcicon-program-color pull-left icon-field"></i>
             <div class="objective-selector">
-              <input tabindex="2" type="text" name="program.title" class="span11" value="" placeholder="Find Program">
+              <input tabindex="2" type="text" name="program_title" class="span11" value="" placeholder="Find Program">
             </div>
           </div>
         </div>
@@ -3099,7 +3084,7 @@
             </label>
             <i class="grcicon-person-green pull-left icon-field"></i>
             <div class="objective-selector">
-              <input tabindex="3" type="text" name="assessment_lead.email" class="span11" value="Cassius Clay">
+              <input tabindex="3" type="text" name="lead_email" class="span11" value="Cassius Clay">
             </div>
           </div>
         </div>
@@ -3111,14 +3096,14 @@
               <span class="required">*</span>
               <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
             </label>
-            <input tabindex="4" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="">
+            <input tabindex="4" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="start_date" placeholder="MM/DD/YYYY" type="text" value="">
           </div>
           <div class="span3">
             <label>
               Due on
               <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
             </label>
-            <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="">
+            <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="">
           </div>
         </div>
         
@@ -3195,7 +3180,11 @@
   <script type="text/javascript" src="/static/mockups/js/tooltip.js"></script>
   <script type="text/javascript" src="/static/mockups/js/modal.js"></script>
   <script type="text/javascript" src="/static/mockups/js/bootstrap-collapse.js"></script>
-	<script type="text/javascript" src="/static/mockups/js/common.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/can.jquery.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/can.object.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/can-localstorage.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/assessments.js"></script>
+  <script type="text/javascript" src="/static/mockups/js/common.js"></script>
 
 </body>
 </html>
