@@ -54,7 +54,7 @@
       <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
         {{#using contact=instance.contact}}
-        <input tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector" value="{{firstnonempty contact.email ''}}">
+        <input tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
         {{/using}}
       </div>
     </div>
@@ -147,10 +147,10 @@
           {{#with_mapping 'authorizations' instance}}
           {{#with_auditors instance}}
             {{#using auditor=auditors.0.person}}
-            <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8" value="{{auditor.email}}">
+            <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8 search-icon" placeholder="Enter text to search for Auditor" value="{{auditor.email}}">
             {{/using}}
           {{else}}
-            <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8" value="">
+            <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8 search-icon" placeholder="Enter text to search for Auditor" value="">
           {{/with_auditors instance}}
           {{/with_mapping 'authorizations' instance}}
         </div>
@@ -160,7 +160,7 @@
         <i class="grcicon-orggroup-color pull-left icon-field"></i>
         <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
           {{#using firm=instance.audit_firm}}
-          <input tabindex="11" type="text" name="audit_firm.email" data-lookup="OrgGroup" class="span8" value="{{firstnonempty firm.title ''}}">
+          <input tabindex="11" type="text" name="audit_firm.email" data-lookup="OrgGroup" class="span8 search-icon" placeholder="Enter text to search for Audit Firm" value="{{firstnonempty firm.title ''}}">
           {{/using}}
           {{#instance.computed_errors.audit_firm}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.audit_firm}}
         </div>
