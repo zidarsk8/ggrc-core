@@ -72,7 +72,8 @@ if settings.ENABLE_JASMINE:
 
   jasmine.sources(
       Asset("dashboard-js"),
-      Asset("dashboard-js-spec-helpers"))
+      Asset("dashboard-js-spec-helpers"),
+      Asset("dashboard-js-templates"))
 
   jasmine.specs(
       Asset("dashboard-js-specs"))
