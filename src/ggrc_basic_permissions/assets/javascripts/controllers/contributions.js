@@ -286,8 +286,20 @@
       return this.options.option_model.findAll(
         $.extend(params, this.option_query),
         function(options) {
+          var scope = params.scope || "System";
           options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
-          options.unshift({name: "No access", id: 0, description: "A person with the No Access role will not be able to see this Private Program.", scope: "System"});
+          if (params.scope == "Private Program") {
+            description = "A person with the No Access role will not be able to see this Private Program.";
+          }
+          else {
+            description = "This role allows a user access to the MyWork dashboard and applications Help files.";
+          }
+          options.unshift({
+            name: "No access",
+            id: 0,
+            description: description,
+            scope: params.scope || "System"
+          });
           self.option_list.replace(options);
         });
     },
