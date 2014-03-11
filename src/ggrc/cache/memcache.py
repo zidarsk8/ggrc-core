@@ -42,7 +42,7 @@ class MemCache(Cache):
   def get(self, category, resource, filter): 
     if not self.is_caching_supported(category, resource):
       return None
-    # REVISIT: use memcache.Client.gets_multi() instead of gets()
+    # REVISIT: use memcache.Client.get_multi() instead of gets()
     #
     data = OrderedDict()
     cache_key = self.get_key(category, resource)
@@ -108,7 +108,7 @@ class MemCache(Cache):
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # REVISIT: use memcache.Client.cas_multi(), gets_multi() instead of cas(), gets()
+    # REVISIT: use memcache.Client.cas_multi(), get_multi() instead of cas(), gets()
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
@@ -127,7 +127,7 @@ class MemCache(Cache):
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # REVISIT: use memcache.Client.delete_multi(), gets_multi() instead of delete(), gets()
+    # REVISIT: use memcache.Client.delete_multi(), get_multi() instead of delete(), gets()
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
@@ -154,7 +154,7 @@ class MemCache(Cache):
     return self.memcache_client.add_multi(data)
 
   def get_multi(self, data): 
-    return self.memcache_client.gets_multi(data, '', None, True)
+    return self.memcache_client.get_multi(data, '', None, True)
 
   def update_multi(self, data): 
     return self.memcache_client.cas_multi(data)

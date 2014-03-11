@@ -244,19 +244,28 @@ def clear_cache(session):
   """
   cache_manager.clear_cache()
 
+def build_status_cache(data, key, timestamp, status):
+    data[key] = {'timestamp': timestamp, 'status': status}
+
 def update_cache_before_commit(session):
   current_app.logger.info("CACHE: Entering updating cache before commiting to database")
+  cache_manager = get_cache_manager()
 
   """
   The session event listener before_commit results in updating flag in memcache for marking for add/delete/update
   On any failures, it throws exception to prevent commits to DB
   """
-
-  # REVISIT: 
-  # For all items marked for add/update/delete, add flag in memcache to indicate that it is in progress
-  # Also set the expiration time parameter in memcache multi_<op> to 30 seconds for ensuring cache entries are not expired
-  # prior to session event listener after_commit 
-  # 
+  status_entries ={}
+  for key in cache_manager.marked_for_add.keys():
+       build_status_cache(status_entries, 'CreateOp:' + key, datetime.datetime.now(), 'InProgress')
+  for key in cache_manager.marked_for_update.keys():
+       build_status_cache(status_entries, 'UpdateOp:' + key, datetime.datetime.now(), 'InProgress')
+  for key in cache_manager.marked_for_delete:
+       build_status_cache(status_entries, 'DeleteOp:' + key, datetime.datetime.now(), 'InProgress')
+  if len(status_entries) > 0:
+    ret = cache_manager.bulk_add(status_entries)
+    if len(ret) > 0:
+     current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ')
 
 def update_cache_after_commit(session):
   current_app.logger.info("CACHE: Entering updating cache after commiting to database")
@@ -269,8 +278,7 @@ def update_cache_after_commit(session):
   if len(cache_manager.marked_for_add) > 0:
     current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_add))
     add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
-    # REVISIT: result is empty on success, non-empty on failure, add those items to the marked_for_update list
-    # update status in memcache flag with timestamp
+    # result is empty on success, non-empty on failure
     #
     if len(add_result) > 0: 
       current_app.logger.error("CACHE: Failed to add entries to cache: " + str(add_result))
@@ -280,7 +288,7 @@ def update_cache_after_commit(session):
   if len(cache_manager.marked_for_update) > 0:
     current_app.logger.info("CACHE: items to be updated in cache: " + str(cache_manager.marked_for_update))
     update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
-    # REVISIT: result is empty on success, non-empty on failure returns list of keys
+    # result is empty on success, non-empty on failure returns list of keys
     # Not sure of the network errors, need to check memcache code 
     # update status in memcache with timestamp
     #
@@ -302,10 +310,17 @@ def update_cache_after_commit(session):
     else:
       current_app.logger.error("CACHE: Failed to delete entries from cache: " + str(delete_result))
   
-  # REVISIT: 
-  # For all items marked for add/update/delete, add flag in memcache to indicate that it is in complete
-  # commits are done in sequential order and it is not reentrant
-  # 
+  status_entries =[]
+  for key in cache_manager.marked_for_add.keys():
+     status_entries.append('CreateOp:' + key)
+  for key in cache_manager.marked_for_update.keys():
+     status_entries.append('UpdateOp:' + key)
+  for key in cache_manager.marked_for_delete:
+     status_entries.append('DeleteOp:' + key)
+  if len(status_entries) > 0:
+    if cache_manager.bulk_delete(status_entries) is not True:
+      current_app.logger.error('CACHE: Unable to delete status for entries in memcache')
+
   cache_manager.clear_cache()
 
 

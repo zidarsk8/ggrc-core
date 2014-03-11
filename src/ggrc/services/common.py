@@ -497,14 +497,20 @@ class Resource(ModelView):
       category = 'collection'
     cache_manager = get_cache_manager()
     cache_supported=cache_manager.is_caching_supported(category, model_plural)
+    cache_in_porgress = False
     if cache_supported:
-      cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
-      if cache_response is not None:
-        return cache_response
+      cache_in_progress=self.is_caching_in_progress(category, model_plural, True) 
+      if cache_in_progress is False:
+        cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
+        if cache_response is not None:
+          return cache_response
+        else:
+          current_app.logger.info("CACHE: Unable to find " + model_plural + \
+            " object in caching layer, checking Data-ORM layer" + \
+            " in " + category + " category")
       else:
-        current_app.logger.info("CACHE: Unable to find " + model_plural + \
-          " object in caching layer, checking Data-ORM layer" + \
-          " in " + category + " category")
+         current_app.logger.info("CACHE: Caching operation is in progress for " + \
+          model_plural + " in " + category + " category")
     else:
       current_app.logger.info("CACHE: Get Collection from cache is not supported for "  + \
         model_plural + " in " + category + " category")
@@ -521,6 +527,8 @@ class Resource(ModelView):
         '', 304, [('Etag', self.etag(collection))]))
 
     # Write collection to cache, if caching is supported for the model
+    # REVISIT: If caching is in progress, go ahead with updating to cache
+    #
     if cache_supported:
       cache_response = self.write_collection_to_cache(collection, category, model_plural, collection_name, model_plural)
     else:
@@ -529,6 +537,51 @@ class Resource(ModelView):
 
     return self.json_success_response(
       collection, self.collection_last_modified())
+
+  def is_caching_in_progress(self, category, resource, delete_on_expiry): 
+    current_app.logger.info("CACHE: checking status of cache for " + resource + " in " + category + " category")
+    cache_manager = get_cache_manager()
+    if cache_manager is None:
+      current_app.logger.error("CACHE: CacheManager is not initialized")
+      return False
+
+    # Check in cache for collection and stubs to determine if cache needs to be invalidated
+    #
+    status_keys=[]
+    cacheobjids = request.args.get('id__in', False)
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      for id in cacheobjids: 
+           status_keys.append('CreateOp:' + category + ':' + resource + ':' + str(id))
+           status_keys.append('UpdateOp:' + category + ':' + resource + ':' + str(id))
+           status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
+    else:
+      if category is 'stubs':
+        status_keys.append('CreateOp:' + category + ':' + resource + ':0')  
+        status_keys.append('UpdateOp:' + category + ':' + resource + ':0')
+        status_keys.append('DeleteOp:' + category + ':' + resource + ':0')
+      else:
+        return False
+
+    return_status = False
+    delete_candidates=[]
+    expiration_time=300
+    current_app.logger.info("CACHE: deleting entries from cache: " + str(delete_candidates))
+    result = cache_manager.bulk_get(status_keys)
+    if len(result) > 0:
+      for key, value in result:
+        timestamp = value['timestamp']
+        status = value['status']
+        now = datetime.datetime.now()
+        if status == 'InProgress':
+          return_status = True
+        if (now-timestamp).total_seconds() > expiration_time:
+          delete_candidates.append(key)
+      if delete_on_expiry is True and len(delete_candidates):
+        current_app.logger.info("CACHE: deleting entries from cache: " + str(delete_candidates))
+        result = cache_manager.bulk_delete(delete_candidates) 
+        if result is not True:
+          current_app.logger.error("CACHE: Unable to delete entries from memcache")
+    return return_status
 
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
     current_app.logger.info("CACHE: Get collection from cache for " + resource + " in " + category + " category")

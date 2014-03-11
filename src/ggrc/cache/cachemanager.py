@@ -183,28 +183,33 @@ class CacheManager:
     #
     for key, cache in self.get_cache().items():
       if cache.is_caching_supported(category, resource): 
-         return True
+        return True
     return False 
    
   def bulk_get(self, data):
     # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
-	return cache.get_multi(data)
+      return cache.get_multi(data)
 
   def bulk_add(self, data):
     # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
-	return cache.add_multi(data)
+      return cache.add_multi(data)
 
   def bulk_update(self, data):
     # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    get_result = {}
     for key, cache in self.get_cache().items():
-	return cache.update_multi(data)
+      get_result = cache.get_multi(data.keys())
+      for key, updates in data.items():
+        for update_key, update_value in updates.items(): 
+          get_result[key][update_key] = update_value
+    return cache.update_multi(get_result)
 
   def bulk_delete(self, data):
     # REVISIT: only one cache mechanism is supported and returns the first matched ones
     for key, cache in self.get_cache().items():
-	return cache.remove_multi(data)
+      return cache.remove_multi(data)
 
   def parse_dto(self, data):
     # Apply DTO manager
