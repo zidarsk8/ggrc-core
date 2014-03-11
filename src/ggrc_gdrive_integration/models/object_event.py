@@ -50,7 +50,7 @@ class ObjectEvent(Base, db.Model):
     return query.options()
 
   def _display_name(self):
-    return self.eventable.display_name + '<->' + self.event.display_name
+    return self.eventable.display_name + '<-> gdrive event' + self.event_id
 
 class Eventable(object):
   @classmethod
