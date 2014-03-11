@@ -154,7 +154,7 @@
         return function(id) {
           var def = new can.Deferred()
           , key = [this._shortName, id].join(":")
-          , item = this.model(window.localStorage.getItem( key ));
+          , item = this.model(JSON.parse(window.localStorage.getItem( key )));
 
           if(item) {
             window.localStorage.removeItem(key);

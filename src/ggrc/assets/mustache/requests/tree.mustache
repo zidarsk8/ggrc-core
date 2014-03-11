@@ -44,24 +44,26 @@
         </div>
         <div class="span2">
           <div class="item-data">
-            <div class="tree-title-area">
-              {{#using objective=instance.objective}}
-                {{#if objective}}
+            {{#using objective=instance.objective}}
+              {{#if objective}}
+                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
                   <i class="grcicon-objective-color"></i>
                   {{objective.title}}
-                {{else}}
+                </div>
+              {{else}}
                 
                 {{#if_helpers "\
                   ^if_equals" instance.status "Accepted" "\
 			            and ^if_auditor" instance _1_include_admin=false}}
-                  <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-			              <i class="grcicon-objective-danger"></i>
-			              Map Objective
-			            </a>
-                  {{/if_auditor}}
-                {{/if}}
-              {{/using}}
-            </div>
+			            <div class="tree-title-area">
+                    <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+  			              <i class="grcicon-objective-danger"></i>
+  			              Map Objective
+  			            </a>
+                  </div>
+                {{/if_auditor}}
+              {{/if}}
+            {{/using}}
           </div>
         </div>
         <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>

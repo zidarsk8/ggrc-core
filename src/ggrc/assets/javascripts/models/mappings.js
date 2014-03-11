@@ -415,6 +415,8 @@
         , "people"
         , "controls"
         , "programs"
+        , "objectives"
+        , "related_objects"
         ])
       }
 

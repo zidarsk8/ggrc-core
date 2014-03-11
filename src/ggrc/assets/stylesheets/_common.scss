@@ -91,6 +91,13 @@ blockquote {
     margin-bottom:6px;
   }
 }
+.widget-status {
+  text-align: right;
+  display: block;
+  padding-right: 20px;
+  font-style: italic;
+  color: $black;
+}
 
 .inline {
   display:inline;
@@ -145,6 +152,16 @@ blockquote {
   overflow: visible;
 }
 
+.gray {
+  color: $gray;
+}
+.divider {
+  width: 100%;
+  height: 1px;
+  background: $footerBorder;
+  margin: 14px 0;
+}
+
 .undo {
   font-size: 12px;
   padding-left: 7px;
@@ -160,6 +177,16 @@ blockquote {
     &:hover {
       text-decoration: none;
     }
+  }
+}
+
+.objective-selector {
+  .search-icon {
+    background-image: image-url("magnifying-glass.png");
+    background-repeat: no-repeat;
+    @include background-size(21px 16px);
+    background-position: right center;
+    padding-right: 28px;
   }
 }
 
@@ -218,6 +245,9 @@ blockquote {
   &:hover {
     @include box-shadow(inset 0 0 2px rgba(0,0,0,0.3));
   }
+  &.btn-footer {
+    margin-top: 4px;
+  }
   &.btn-add {
     color:$white;
     background: $addBtn;
@@ -252,7 +282,7 @@ blockquote {
   }
   &.pending-ajax {
     cursor: default;
-    background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
+    background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
     @include box-shadow(none);
     border: 1px solid $ajaxBtnDisabled;
     color: $ajaxGray;

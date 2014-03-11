@@ -171,12 +171,21 @@ class RoleImplication(Base, db.Model):
     )
 
 class ContextImplication(Base, db.Model):
+  '''A roles implication between two contexts. An implication may be scoped
+  with additional scoping properties on the target and source contexts. The
+  meaning of the scoping properties is determined by the module that
+  contributed the implication. For example, an implication may be scoped based
+  on the related objects of the contexts such as from a Program context to
+  an Audit context.
+  '''
   __tablename__ = 'context_implications'
 
   context_id = db.Column(
       db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
   source_context_id = db.Column(
       db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
+  context_scope = db.Column(db.String, nullable=True)
+  source_context_scope = db.Column(db.String, nullable=True)
 
   context = db.relationship(
       'Context',

@@ -292,6 +292,29 @@
         margin-top:11px;
       }
     }
+    span.status {
+      font-size: 13px;
+      color: $gray;
+      font-style: italic;
+      display: inline-block;
+      line-height: 36px;
+      vertical-align: middle;
+    }
+  }
+  .object-header-notification {
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: bold;
+    margin: 18px 20px 0 103px;
+    &.object-approved {
+      margin: 18px 20px 0 223px;
+      color: $green;
+    }
+    .grcicon-attribute-color {
+      margin-top: 2px;
+      margin-left: -2px;
+    }
   }
   .btn-group {
     margin-top: 27px;

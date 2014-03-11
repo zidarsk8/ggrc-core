@@ -260,7 +260,7 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
     if(typeof params !== "string") {
       params = params.id;
     }
-    return this.findAll({ parent : params.id });
+    return this.findAll({ parents : params });
   }
   , addChildFolder : function(parent, params) {
     return this.create($.extend({ parent : parent }, params));

@@ -188,9 +188,6 @@
       if(!this.constructor.canonical_instance) {
         this.constructor.canonical_instance = this;
       }
-      if(this.options.scopes.length) {
-        this.constructor.doGAuth(this.options.scopes);
-      }
 
       this.doGAuthWithScopes = can.debounce(500, $.proxy(this.constructor, "doGAuth", this.options.scopes, false));
     }
