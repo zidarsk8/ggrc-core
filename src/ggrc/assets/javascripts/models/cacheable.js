@@ -445,59 +445,16 @@ can.Model("can.Model.Cacheable", {
       fn(params, function(val, key) {
         if (key === 'context' && val == null && m[key] && m[key].id == null)
           return;
-        val = that.get_attr(key, val);
-        if (val == null)
-          m.removeAttr(key)
-        else
-          m.attr(key, val);// && val.serialize ? val.serialize() : val);
+        m.attr(key, val);// && val.serialize ? val.serialize() : val);
       });
       delete m._init;
       }
     } else {
-      fn(params, function(val, key) {
-        val = that.get_attr(key, val);
-        if (val == null) {
-          if (params.removeAttr)
-            params.removeAttr(key);
-          else
-            delete params[key];
-        } else {
-          if (params.attr) {
-            params.attr(key, val);
-          } else {
-            params[key] = val;
-          }
-        }
-      });
       m = this._super(params);
     }
     return m;
   }
 
-  , get_attr: function(key, val) {
-      // Special case to avoid constant replacement of `null` contexts
-      var i = 0, j = 0, k, changed = false;
-      converter = this.constructor.attributes && this.constructor.attributes[name];
-      if (converter) {
-        function_name = converter.substr(fun_name.lastIndexOf(".") + 1);
-        converted_value = can.getObject(converter)(val);
-        if (function_name === "stub"
-            || function_name == "models"
-            || function_name == "get_instances") {
-          return can.map(converted_value, function(item) {
-            return item.stub();
-          });
-        } else if (function_name === "stub"
-                   || function_name == "model"
-                   || function_name == "get_instance") {
-          return converted_value.stub();
-        } else {
-          return converted_value;
-        }
-      } else {
-        return val;
-      }
-    }
   , convert : {
     "date" : dateConverter
     , "datetime" : dateConverter
