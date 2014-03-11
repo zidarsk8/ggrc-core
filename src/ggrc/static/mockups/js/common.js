@@ -159,7 +159,7 @@ $(document).ready(function(){
     $( ".objective-selector input" ).autocomplete({
       source: people
     });
-    $( ".objective-selector input[name='program.title']" ).autocomplete({
+    $( ".objective-selector input[name='program_title'],input[name='program.title']" ).autocomplete({
       source: program
     });
     $( ".objective-selector input[name='object.title']" ).autocomplete({

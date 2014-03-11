@@ -133,17 +133,17 @@
                           {{#each workflow.tasks}}
                           <div class="row-fluid">
                             <div class="span11">
-                              <input type="text" class="input-block-level" value="{{.}}">
+                              <input type="text" class="input-block-level update" data-model="tasks" data-index="{{@index}}" value="{{.}}">
                             </div>
                             <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
+                              <button type="submit" class="delete" data-type="tasks" data-index="{{@index}}"><i class="grcicon-deleted"></i></button>
                             </div>
                           </div>
                           {{/each}}
                         </div>
                         
                         <div class="more-button">
-                          <a href="#" id="addTask" class="btn btn-success">Add Task</a>
+                          <a href="#" data-type="tasks" class="btn btn-success add">Add Task</a>
                         </div>
                       </div>
                     </div>
@@ -164,16 +164,16 @@
                           {{#each workflow.reviews}}
                           <div class="row-fluid">
                             <div class="span7">
-                              <input type="text" class="input-block-level" value="{{title}}">
+                              <input type="text" class="input-block-level update" data-type="title" data-model="reviews" data-index="{{@index}}" value="{{title}}">
                             </div>
                             <div class="span4">
                               <i class="grcicon-person-green pull-left icon-field"></i>
                               <div class="objective-selector">
-                                <input type="text" name="assessment_lead.email" class="span10" value="{{reviewer}}" placeholder="Choose Reviewer">
+                                <input type="text" name="assessment_lead.email" class="span10 update" data-type="reviewer" data-index="{{@index}}" data-model="reviews"  value="{{reviewer}}" placeholder="Choose Reviewer">
                               </div>
                             </div>
                             <div class="span1">
-                              <button type="submit"><i class="grcicon-deleted"></i></button>
+                              <button type="submit" class="delete" data-type="reviews" data-index="{{@index}}"><i class="grcicon-deleted"></i></button>
                             </div>
                           </div>
                           {{/each workflow.reviews}}
@@ -182,7 +182,7 @@
                     </div>
                     
                     <div class="more-button">
-                      <a href="#" id="addReview" class="btn btn-success">Add review</a>
+                      <a href="#" data-type="reviews" class="btn btn-success add">Add review</a>
                     </div>
                     
                   </div>
@@ -282,7 +282,7 @@
         </div>
         <div class="span3">
           <div class="confirm-buttons">
-            <a id="addWorkflow" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
+            <a id="addWorkflowNow" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
           </div>
         </div>
       </div>
@@ -415,7 +415,7 @@
                         </p>
                         <p>
                           <strong>gGRC Folder:</strong>
-                          <a href="#">/gGRC Programs/Google Fiber/2014 - Google Fiber Assessment/</a>
+                          <a href="#">/{{assessment.program_title}}/{{assessment.title}}/</a>
                         </p>
                       </div>
                     </div>
@@ -436,43 +436,48 @@
                         <div class="workflow-wrap">
                           <h3>
                             Assessment Workflow <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
-                            <span id="workflowNotSet"><em>Not yet selected</em></span>
+                            {{^workflow}}<span id="workflowNotSet"><em>Not yet selected</em></span>{{/workflow}}
                           </h3>
-                          <p class="workflow-subtitle" id="workflowSet">FIBER - Control Testing</p>
+                          {{#workflow}}
+                          <p class="workflow-subtitle">{{workflow.title}}</p>
                           <ul class="workflow-list">
                             <li>
-                              <strong>* Tasks</strong> (<span class="count" id="workflowTasksCount">0</span>)
-                              <ul id="workflowTasks">
-                                <li>Proof reading</li>
-                                <li>Validate mappings</li>
-                                <li>Validate supporting documents</li>
+                              <strong>* Tasks</strong> (<span class="count">{{workflow.tasks.length}}</span>)
+                              <ul>
+                                {{#each workflow.tasks}}
+                                <li>{{.}}</li>
+                                {{/each}}
                               </ul>
                             </li>
                             <li>
-                              <strong>* Reviews</strong> (<span class="count" id="workflowReviewCount">0</span>)
-                              <ul id="workflowReviews">
-                                <li>Peer review (<a href="#">Jonathan Myers</a>)</li>
-                                <li>3rd party review (<a href="#">Cindy Rella</a>)</li>
-                              </ul>
+                              <strong>* Reviews</strong> (<span class="count">{{workflow.reviews.length}}</span>)
+                              <ul>
+                                {{#each workflow.reviews}}
+                                <li>{{title}} (<a href="#">{{reviewer}}</a>)</li>
+                                {{/each}} 
+                             </ul>
                             </li>
                             <li>
                               <strong>* Reassessment frequency</strong>
-                              <ul id="workflowFrequency">
+                              <ul>
                                 <li>Annually, every April 25th</li>
                               </ul>
                             </li>
                           </ul>
-                          
+                          {{/workflow}}
                           <div class="info-utility-link">
+                            {{^workflow}}
                             <a href="#setupWorkflow" class="setup-link" id="workflowSetup" data-toggle="modal">
                               <i class="grcicon-setup"></i>
                               Setup Assessment Workflow
                             </a>
-                          
-                            <a href="#" class="info-edit" id="workflowEdit">
+                            {{/workflow}}
+                            {{#workflow}}
+                            <a href="#" class="info-edit" id="workflowSetup" data-toggle="modal">
                               <i class="grcicon-edit"></i>
                               <span>Edit Assessment Workflow</span>
                             </a>
+                            {{/workflow}}
                           </div>
                           
                         </div>
@@ -3040,6 +3045,23 @@
       </p>
       <a id="addWorkflow" class="btn btn-primary btn-large" href="/mockups/v1.0/assessment-start.html">Proceed</a>
       <a class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
+    </div>
+  </div>
+  <div id="workflowConfirm" style="z-index:9999;" class="modal hide fade ui-draggable" tabindex="-1" role="dialog" aria-labelledby="assessmentStartLabel" aria-hidden="false">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Warning</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <p>
+        Changes made to current workflow will not be saved. Do you wish to continue?
+      </p>
+      <a id="cancelChangeWorkflow" class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
+      <a id="confirmChangeWorkflow" class="btn btn-primary btn-large" href="/mockups/v1.0/assessment-start.html">Continue</a>
     </div>
   </div>
   <div id="workflow-app"></div>

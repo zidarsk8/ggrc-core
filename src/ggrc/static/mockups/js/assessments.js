@@ -117,7 +117,6 @@ can.Component.extend({
       $("workflow-app").trigger("selected", assessment);
     },
     equals : function(v){
-      console.log(v)
       return false;
     }
   },
@@ -133,6 +132,7 @@ can.Component.extend({
   scope: {
     assessments : new Assessment.List({}),
     assessment: new Assessment.List({})[0],
+    workflow: null
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -140,13 +140,17 @@ can.Component.extend({
     },
     ' selected' : function(el, ev, assessment){
       this.scope.attr('assessment', assessment);
-    }
+    },
+    ' workflow_selected' : function(el, ev, workflow){
+      this.scope.attr('workflow', workflow);
+    },
   }
 });
 
 can.Component.extend({
   tag: 'workflow-app',
   name: 'workflow-app',
+  edited: false,
   scope: {
     assessments : new Assessment.List({}),
     assessment: new Assessment.List({})[0],
@@ -163,15 +167,55 @@ can.Component.extend({
       this.scope.attr('workflow_id', 'workflow' in assessment ? assessment.workflow : 0)
     },
     ' workflow_selected' : function(el, ev, workflow){
+      var show_modal = this.edited;
+      this.edited = false;
+      if(show_modal && !workflow.confirmed){
+        $('#workflowConfirm').modal('show');
+        return;
+      }
+      this.scope.attr('workflow_id', workflow.id);
       this.scope.attr('workflow', workflow);
     },
-    '#addTask click' : function(){
-      this.scope.attr('workflow').tasks.push('');
+    ' select_previous' : function(){
+      this.edited = true;
+      $("#assessmentWorkflowChoose > option[value='"+this.scope.workflow_id+"']").attr('selected', 'selected');
     },
-    '#addReview click' : function(){
-      var review = this.scope.attr('workflow');
-      review.reviews.push({title: "", reviewer: ""});
-      review.save();
+    'input change' : function(el){
+      this.edited = true;
+    },
+    '.add click' : function(el){
+      var type = el.data('type')
+        , workflow = this.scope.attr('workflow');
+      workflow[type].push(type == "tasks" ? "" : {title: "", reviewer: ""});
+      this.edited = true;
+      //workflow.save();
+    },
+    '.delete click' : function(el, ev){
+      ev.preventDefault();
+      var type = el.data('type')
+        , index = el.data('index')
+        , workflow = this.scope.attr('workflow');
+      
+      workflow[type].splice(index, 1);
+      this.edited = true;
+      //workflow.save()
+    },
+    "a#addWorkflowNow click" : function(el, ev){
+      $("assessment-app").trigger("workflow_selected", this.scope.workflow);
+      $("#setupWorkflow").modal('hide');
+    },
+    '.update change' : function(el, ev){
+      var model = el.data('model')
+        , type = el.data('type')
+        , index = el.data('index')
+        , workflow = this.scope.attr('workflow');
+      console.log(model, index, type,workflow);
+      if(model === "tasks"){
+        workflow[model][index] = el.val();
+      }
+      else{
+        workflow[model][index].attr(type, el.val());
+      }
     }
   },
   helpers: {
@@ -209,7 +253,6 @@ can.Component.extend({
     }
   }
 });
-
 $("#addAssessmentCreated").on('click', function(ev){
   var attrs = {}, $modal =  $("#newAssessmentStandAlone");
   
@@ -221,6 +264,21 @@ $("#addAssessmentCreated").on('click', function(ev){
   $modal.modal('hide')
   
   new Assessment(attrs).save();
+});
+$("#confirmChangeWorkflow").on('click', function(ev){
+  ev.preventDefault();
+  var id = $("#assessmentWorkflowChoose").val();
+  new Workflow.List({}).each(function(v){
+    if(v.id == id){
+      workflow = v;
+    }
+  });
+  workflow.confirmed = true;
+  $("workflow-app").trigger("workflow_selected", workflow);
+  $('#workflowConfirm').modal('hide');
+});
+$("#cancelChangeWorkflow").on('click', function(ev){
+  $("workflow-app").trigger("select_previous", workflow);
 });
 $("#assessments-lhn").html(can.view("assessments", {}))
 $("#assessment-app").html(can.view("assessment", {}))
