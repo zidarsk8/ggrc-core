@@ -1299,12 +1299,24 @@ Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
   can.each(instances, function(instance) {
     var resource_type
       , context_id
+      , base_mappings = []
       ;
 
-    resource_type = instance.constructor.shortName;
-    context_id = instance.context ? instance.context.id : null;
+    if(instance instanceof GGRC.ListLoaders.MappingResult) {
+      instance.walk_instances(function(inst, mapping) {
+        if(can.reduce(mapping.mappings, function(a, b) { return a || (b.instance === true); }, false)) {
+          base_mappings.push(inst);
+        }
+      });
+    } else {
+      base_mappings.push(instance);
+    }
 
-    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    can.each(base_mappings, function(instance) {
+      resource_type = instance.constructor.shortName;
+      context_id = instance.context ? instance.context.id : null;
+      passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    });
   });
 
   if (passed)
