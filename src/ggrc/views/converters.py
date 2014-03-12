@@ -464,6 +464,8 @@ def import_requests(audit_id):
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Audit, Program
   from ggrc.utils import view_url_for
+  from urlparse import urlparse, urlunparse
+  import urllib
 
   audit = Audit.query.get(audit_id)
   program = audit.program

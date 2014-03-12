@@ -8,8 +8,6 @@ from collections import namedtuple
 from flask import request, session, url_for, redirect, g
 from flask.views import View
 from ggrc.extensions import get_extension_modules
-from urlparse import urlparse, urlunparse
-import urllib
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
