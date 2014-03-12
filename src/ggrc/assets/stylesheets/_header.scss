@@ -307,13 +307,16 @@
     line-height: 18px;
     font-weight: bold;
     margin: 18px 20px 0 103px;
+    i {
+      margin-top: 1px;
+      &.grcicon-attribute-color {
+        margin-top: 3px;
+        margin-left: -4px;
+      }
+    }
     &.object-approved {
       margin: 18px 20px 0 223px;
       color: $green;
-    }
-    .grcicon-attribute-color {
-      margin-top: 2px;
-      margin-left: -2px;
     }
   }
   .btn-group {
