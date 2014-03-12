@@ -132,7 +132,7 @@ can.Component.extend({
   scope: {
     assessments : new Assessment.List({}),
     assessment: new Assessment.List({})[0],
-    workflow: null,
+    workflow: new Assessment.List({})[0].workflow,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -143,6 +143,7 @@ can.Component.extend({
     },
     ' workflow_selected' : function(el, ev, workflow){
       this.scope.attr('workflow', workflow);
+      this.scope.assessment.attr('workflow', workflow).save();
     },
   }
 });
