@@ -363,6 +363,7 @@ class Resource(ModelView):
 
   # Default JSON request handlers
   def get(self, id):
+    current_app.logger.info("CACHE: GET resource: " + self.model._inflector.table_plural + " id: " + str(id))
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -527,7 +528,7 @@ class Resource(ModelView):
         '', 304, [('Etag', self.etag(collection))]))
 
     # Write collection to cache, if caching is supported for the model
-    # REVISIT: If caching is in progress, go ahead with updating to cache
+    # TODO(ggrcdev): checks for cache in progress is not done prior to rewriting contents from DB into cache
     #
     if cache_supported:
       cache_response = self.write_collection_to_cache(collection, category, model_plural, collection_name, model_plural)
@@ -539,6 +540,20 @@ class Resource(ModelView):
       collection, self.collection_last_modified())
 
   def is_caching_in_progress(self, category, resource, delete_on_expiry): 
+    """Check the current state of cache and in progress
+
+    Calls the cachemanager to do a bulk GET of status of any operation in cache for the resource 
+    The status entries for create, update and delete operation is maintained in memcache
+    
+    Args:
+       category: collection, stub, etc.
+       resource: regulations, programs, controls, etc.
+       delete_on_expiry: An flag indicating that we need to delete status entries if expiry time is reached
+
+    Returns:
+      True if any resource is question has operation in progress
+      False otherwise
+    """
     current_app.logger.info("CACHE: checking status of cache for " + resource + " in " + category + " category")
     cache_manager = get_cache_manager()
     if cache_manager is None:
@@ -576,6 +591,7 @@ class Resource(ModelView):
           return_status = True
         if (now-timestamp).total_seconds() > expiration_time:
           delete_candidates.append(key)
+      #TODO(ggrcdev): Use set Cache expiration time during creation to avoid deleting here 
       if delete_on_expiry is True and len(delete_candidates):
         current_app.logger.info("CACHE: deleting entries from cache: " + str(delete_candidates))
         result = cache_manager.bulk_delete(delete_candidates) 
@@ -584,6 +600,24 @@ class Resource(ModelView):
     return return_status
 
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
+    """Get collection (objects or stubs) from cache
+
+    Parse the request arguments and handles stubs and eager query related collection requests
+    Invokes cache manager interface to get collection from cache (e.g. memcache) 
+    The stubs entry key is stubs.<resource>.0 and value is JSON object (dictionary of attr names, values)
+    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
+    
+    Args:
+       category: collection, stub, etc.
+       resource: regulations, programs, controls, etc.
+       x_category: Output category for the JSON response (resource_collection)
+       x_resource: Output resource for JSON response (resource)
+
+    Returns:
+      None if any one of the entries is not found in cache, caching is not supported for the resource, 
+           request is neither a stub or a collection
+      JSON response on successfully retreiving entries from cache
+    """
     current_app.logger.info("CACHE: Get collection from cache for " + resource + " in " + category + " category")
     cache_manager = get_cache_manager()
     if cache_manager is None:
@@ -630,7 +664,7 @@ class Resource(ModelView):
       if category is 'stubs':
         ids = [0]
         filter={'ids':ids, 'attrs':None}
-        # REVISIT: No RBAC policies are applied for reading stubs, as context_id is not available at the resource level
+        # TODO(ggrcdev): No RBAC policies are applied for reading stubs, as context_id is not available at the resource level
         #
         data = cache_manager.get_collection(category, resource, filter)
         if data is not None or len(data) > 0: 
@@ -653,6 +687,25 @@ class Resource(ModelView):
         return None
 
   def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
+    """Write collection (objects or stubs) to cache
+
+    Parse the request arguments and handles stubs and eager query related collection requests
+    Invokes cache manager interface to write collection into cache (e.g. memcache) 
+    The stubs entry key is stubs.<resource>.0 and value is JSON object (dictionary of attr names, values)
+    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
+    
+    Args:
+       collection: JSON object returned from SQLAlchemy data-ORM layer
+       category: collection, stub, etc.
+       resource: regulations, programs, controls, etc.
+       x_category: Output category for the JSON response (resource_collection)
+       x_resource: Output resource for JSON response (resource)
+
+    Returns:
+      None Errors in writing to cache, caching is not supported for the resource, 
+           request is neither a stub or a collection
+      JSON response on successfully retreiving entries from cache
+    """
     current_app.logger.info("CACHE: Write collection to cache for " + resource + " in " + category + " category")
     cache_manager = get_cache_manager()
     if cache_manager is None:

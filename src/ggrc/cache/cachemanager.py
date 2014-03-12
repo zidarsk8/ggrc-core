@@ -10,13 +10,29 @@
 
 
 """
-    CacheManager provides encapsulation to the caching mechanism as well as working with Data transfer objects(DTO)
+    CacheManager provides encapsulation to the caching mechanism 
 
 """
 from collections import OrderedDict
 from cache import all_cache_entries, all_mapping_entries
 
 class CacheManager:
+  """ Cache manager provides encapsulation to caching mechanims such as Memcache
+
+  Attributes:
+    cache: Ordered dictionary of all cache objects derived from base class (Cache)
+    config: Ordered dictionary of config objects
+    supported_classes: Model plural table name for a supported resource type
+    supported_mappings: Mapping entry tuples for a supported resource type
+    factory: Factory class to create cache object
+    policy_manager: Future use to apply All or None and other policies
+    dto_manager: Future use to allow transformation of Data transfer object (DTO) into formats such as JSON
+    new, dirty, deleted: temporary dictionaries used in session event listeners before and after flush 
+    marked_for_<op>: dictionaries used in session event listeners after flush, before and after commit
+
+  Returns:
+    None 
+  """
   cache = OrderedDict()
   config = OrderedDict()
   supported_classes={}
@@ -34,9 +50,10 @@ class CacheManager:
   def __init__(self):
     pass	
 	
-  # Initialize Cache Manager and configure cache mechanism and its related policies
-  #
   def initialize(self):
+    """
+      Initialize Cache Manager, configure cache mechanism and its related policies and DTO mechanisms
+    """
     if self.get_factory() is None:
       return
 
@@ -98,6 +115,17 @@ class CacheManager:
     return self.cache
 
   def get_collection(self, category, resource, filter): 
+    """ get collection from cache 
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      filter: dictionary containing ids and optional attrs
+
+    Returns:
+      DTO formatted string, e.g. JSON string representation
+    """
+
     # 1. Apply policyManager rules to check if caching is allowed
     #
     if not self.is_caching_supported(category, resource, filter, 'get_collection'): 
@@ -118,6 +146,16 @@ class CacheManager:
     return self.format_dto(objs)
 
   def add_collection(self, category, resource, data): 
+    """ add collection in cache 
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and attrs to update
+    Returns:
+     DTO formatted string, e.g. JSON string representation
+    """
+
     # 1. Parse the data into DTO
     #
     dto = self.parse_dto(data)
@@ -139,6 +177,16 @@ class CacheManager:
     return self.format_dto(objs)
 
   def update_collection(category, resource, data): 
+    """ update collection in cache 
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and attrs to update
+    Returns:
+     DTO formatted string, e.g. JSON string representation
+    """
+
     # 1. Parse the data into DTO
     dto = self.parse_dto(data)
 
@@ -159,6 +207,16 @@ class CacheManager:
     return self.format_dto(objs)
 
   def delete_collection(self, category, resource, data): 
+    """ delete collection from cache 
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids of the resource to delete
+    Returns:
+      DTO formatted string, e.g. JSON string representation
+    """
+
     # 1. Parse the data into DTO
     dto = self.parse_dto(data)
 
@@ -179,7 +237,20 @@ class CacheManager:
     return self.formatDTO(objs)
 
   def is_caching_supported(self, category, resource, data=None, operation=None):
-    # REVISIT: Leverage PolicyManager for apply all configured policies for specified parameters
+    """ Check if caching is supported
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: additional data such as context information, Default is None
+      operation: operation performed such as get, update, delete or add
+
+    Returns:
+      True if caching is supported for the category and resource. 
+      False otherwise
+    """
+
+    # TODO(ggrcdev): Leverage PolicyManager for apply all configured policies for specified parameters
     #
     for key, cache in self.get_cache().items():
       if cache.is_caching_supported(category, resource): 
@@ -187,17 +258,40 @@ class CacheManager:
     return False 
    
   def bulk_get(self, data):
-    # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    """ Perform Bulk Get operations in cache for specified data
+
+    Args:
+      data: keys for bulk get
+    Returns:
+     Result of cache get_multi
+    """
+
+    # TODO(ggrcdev): only memcache is supported and the first matched ones is used
     for key, cache in self.get_cache().items():
       return cache.get_multi(data)
 
   def bulk_add(self, data):
-    # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    """ Perform Bulk Add operations in cache for specified data
+
+    Args:
+      data: keys for bulk add
+    Returns:
+     Result of cache add_multi
+    """
+
+    # TODO(ggrcdev): only memcache is supported and the first matched ones is used
     for key, cache in self.get_cache().items():
       return cache.add_multi(data)
 
   def bulk_update(self, data):
-    # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    """ Perform Bulk update operations in cache for specified data
+
+    Args:
+      data: keys for bulk update
+    Returns:
+     Result of cache update_multi
+    """
+    # TODO(ggrcdev): only memcache is supported and the first matched ones is used
     get_result = {}
     for key, cache in self.get_cache().items():
       get_result = cache.get_multi(data.keys())
@@ -207,19 +301,32 @@ class CacheManager:
     return cache.update_multi(get_result)
 
   def bulk_delete(self, data):
-    # REVISIT: only one cache mechanism is supported and returns the first matched ones
+    """ Perform Bulk Delete operations in cache for specified data
+
+    Args:
+      data: keys for bulk delete
+    Returns:
+     Result of cache remove_multi
+    """
+    # TODO(ggrcdev): only memcache is supported and the first matched ones is used
     for key, cache in self.get_cache().items():
       return cache.remove_multi(data)
 
   def parse_dto(self, data):
+    """ parse JSON representation into DTO object using DTO manager
+    """
     # Apply DTO manager
     return data
 
-  def format_dto(self, data):
+  def format_dto(self, data): 
+    """ Format DTO object into a representation such as JSON using DTO manager
+    """
     # Apply DTO manager
     return data
 
   def clean(self):
+    """ Cleanup cache manager resources
+    """
     cache_dict= self.get_cache()
     if len(cache_dict) > 0:
       for name, cache_object in cache_dict.items():
@@ -228,6 +335,8 @@ class CacheManager:
     return True
 
   def clear_cache(self):
+    """ Clear temporary dictionaries used for cache operations
+    """
     self.new = {}
     self.dirty = {}
     self.deleted = {}

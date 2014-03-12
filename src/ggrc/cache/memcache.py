@@ -40,9 +40,22 @@ class MemCache(Cache):
    return self.config
 
   def get(self, category, resource, filter): 
+    """ get items from mem cache for specified filter
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      filter: dictionary containing ids and optional attrs
+
+    Returns:
+      All or None policy is applied by default
+      None on any errors 
+      Mapping of DTO formatted string, e.g. JSON string representation
+    """
+
     if not self.is_caching_supported(category, resource):
       return None
-    # REVISIT: use memcache.Client.get_multi() instead of gets()
+    # TODO(ggrcdev): use memcache.Client.get_multi() instead of gets()
     #
     data = OrderedDict()
     cache_key = self.get_key(category, resource)
@@ -67,26 +80,36 @@ class MemCache(Cache):
           data[id] = attr_dict
       else:
         # All or None policy is enforced, if one of the objects is not available in cache, then we return empty
-        # REVISIT: cannot distinguish network failures vs id not found in memcache, both scenarios return empty list
+        # TODO(ggrcdev): cannot distinguish network failures vs id not found in memcache, both scenarios return empty list
         return None
     return data
 
   def add(self, category, resource, data): 
+    """ add data to mem cache 
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and attrs
+
+    Returns:
+      None on any errors
+      Mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
     entries = {}
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # REVISIT: use memcache.Client.add_multi() instead of add()
-    #
+    # TODO(ggrcdev): use memcache.Client.add_multi() instead of add()
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
       cache_data = self.memcache_client.gets(id) 
       if cache_data is None:
         if self.memcache_client.add(id, data.get(key)) is False:
           # We stop processing any further
-          # REVISIT: Should we throw exceptions and/or log critical events
+          # TODO(ggrcdev): Should we throw exceptions and/or log critical events
           return None
         else:
           entries[key] = data
@@ -95,20 +118,31 @@ class MemCache(Cache):
         #
         if self.memcache_client.cas(id, data.get(key)) is False:
           # We stop processing any further
-          # REVISIT: Should we throw exceptions and/or log critical events
+          # TODO(ggrcdev): Should we throw exceptions and/or log critical events
           return None
         else:
           entries[key] = data
     return entries
 
   def update(self, category, resource, data): 
+    """ Update items from mem cache for specified data
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      filter: dictionary containing ids and attrs
+
+    Returns:
+      None on any errors 
+      Mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
     entries = {}
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # REVISIT: use memcache.Client.cas_multi(), get_multi() instead of cas(), gets()
+    # TODO(ggrcdev): use memcache.Client.cas_multi(), get_multi() instead of cas(), gets()
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
@@ -121,13 +155,24 @@ class MemCache(Cache):
     return entries
 
   def remove(self, category, resource, data): 
+    """ delete items from mem cache for specified data
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: List of keys
+
+    Returns:
+      None on any errors 
+      mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
     entries = {}
     cache_key = self.get_key(category, resource)
     if cache_key is None:
       return None
-    # REVISIT: use memcache.Client.delete_multi(), get_multi() instead of delete(), gets()
+    # TODO(ggrcdev): use memcache.Client.delete_multi(), get_multi() instead of delete(), gets()
     #
     for key in data.keys(): 
       id = cache_key + ":" + str(key)
@@ -149,17 +194,60 @@ class MemCache(Cache):
     return entries
 
   def add_multi(self, data): 
-    # REVISIT: import scenarios, add will return non-empty list, we should invoke update_multi for those items
+    """ Add multiple entries to memcache
+    There are limits to size of data in memcache
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and dictionary of attrs
+
+    Returns:
+      memcache client API add_multi
+    """
+    # TODO(ggrcdev): import scenarios, add will return non-empty list, we should invoke update_multi for those items
     #
     return self.memcache_client.add_multi(data)
 
   def get_multi(self, data): 
+    """ Get multiple entries from memcache
+    There are limits to size of data in memcache
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids 
+
+    Returns:
+      memcache client API get_multi
+    """
     return self.memcache_client.get_multi(data, '', None, True)
 
   def update_multi(self, data): 
+    """ update multiple entries to memcache
+    There are limits to size of data in memcache
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and dictionary of attrs
+
+    Returns:
+      memcache client API cas_multi (compare and set) 
+    """
     return self.memcache_client.cas_multi(data)
 
   def remove_multi(self, data): 
+    """ delete multiple entries to memcache
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data:  list of keys
+
+    Returns:
+      memcache client API delete_multi
+    """
     return self.memcache_client.delete_multi(data)
 
   def clean(self): 

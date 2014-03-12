@@ -106,10 +106,15 @@ def update_cache_after_flush(session, flush_context):
   current_app.logger.info("CACHE: Entering updating cache after flush")
   cache_manager = get_cache_manager()
 
-  """
+  """ update cache during session event after_flush
   After the flush, we know which objects were actually deleted, not just
   modified (deletes due to cascades are not known pre-flush), so fix up
   cache.
+  Args:
+    session: SQLAlchemy Session object
+    flush_context: context of flush including states
+  Returns:
+    None 
   """
   for o in cache_manager.dirty.keys():
     # SQLAlchemy magic to determine whether object was actually deleted due
@@ -129,21 +134,15 @@ def update_cache_after_flush(session, flush_context):
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
         model_plural = cache_manager.supported_classes[cls]
-        current_app.logger.info("CACHE: Marking cache addition for object instance of model: " + cls + \
-          " resource type: " + model_plural)
-
         # Marking object to be added to cache
-        #
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         cache_manager.marked_for_add[key]=json_obj
 
         # Marking stubs to be expired from cache instead of appending to end of the list
-        #
         stubs_key = 'stubs:' + model_plural + ':0' 
         cache_manager.marked_for_delete.append(stubs_key)
 
         # Marking mapping links to be deleted from cache
-        #
         if cache_manager.supported_mappings.has_key(cls):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
                    cache_manager.supported_mappings[cls]
@@ -157,11 +156,9 @@ def update_cache_after_flush(session, flush_context):
             model_plural = dsttype
           if srctype is not None:
             from_key = 'collection:' + srctype + ':' + str(srcid)
-            current_app.logger.info("CACHE: removing links from cache, source: " + from_key)
             cache_manager.marked_for_delete.append(from_key)
           if model_plural is not None:
             to_key   = 'collection:' + model_plural + ':' + str(dstid)
-            current_app.logger.info("CACHE: removing links from cache, destination: " + to_key)
             cache_manager.marked_for_delete.append(to_key)
           else:
             # This error should not happen, it indicates that class is not in the supported_classes map
@@ -193,8 +190,6 @@ def update_cache_after_flush(session, flush_context):
     for o, json_obj in items_to_delete:
       cls = o.__class__.__name__
       if cache_manager.supported_classes.has_key(cls):
-        current_app.logger.info("CACHE: Marking cache deletes for object instance of model: " + cls + \
-          " resource type: " + cache_manager.supported_classes[cls]) 
         model_plural = cache_manager.supported_classes[cls]
         # Marking object to deleted from cache
         #
@@ -221,11 +216,9 @@ def update_cache_after_flush(session, flush_context):
             model_plural = dsttype
           if srctype is not None:
             from_key = 'collection:' + srctype + ':' + str(srcid)
-            current_app.logger.info("CACHE: removing links from cache, source: " + from_key)
             cache_manager.marked_for_delete.append(from_key)
           if model_plural is not None:
             to_key   = 'collection:' + model_plural + ':' + str(dstid)
-            current_app.logger.info("CACHE: removing links from cache, destination: " + to_key)
             cache_manager.marked_for_delete.append(to_key)
           else:
             # This error should not happen, it indicates that class is not in the supproted_classes map
@@ -236,25 +229,37 @@ def update_cache_after_flush(session, flush_context):
       del cache_manager.deleted[o]
 
 def clear_cache(session):
+  """
+  Clean up any cache items related to a session
+  Args:
+    session: SQLAlchemy session object
+  Returns:
+    None 
+  """
   current_app.logger.info("Entering clear_cache")
   cache_manager = get_cache_manager()
 
-  """
-  Clean up any cache items related to a session
-  """
   cache_manager.clear_cache()
 
 def build_status_cache(data, key, timestamp, status):
-    data[key] = {'timestamp': timestamp, 'status': status}
+  """
+  build the status cache dictionary
+  Args:
+    data: dictionary to update
+    key: key to dictionary
+    timestamp: update timestamp entry 
+    status: Update status entry, e.g.InProgress
+  Returns:
+    None 
+  """
+  data[key] = {'timestamp': timestamp, 'status': status}
 
 def update_cache_before_commit(session):
-  current_app.logger.info("CACHE: Entering updating cache before commiting to database")
-  cache_manager = get_cache_manager()
-
   """
   The session event listener before_commit results in updating flag in memcache for marking for add/delete/update
-  On any failures, it throws exception to prevent commits to DB
+  On any failures, it logs errors and does not throw exception
   """
+  cache_manager = get_cache_manager()
   status_entries ={}
   for key in cache_manager.marked_for_add.keys():
        build_status_cache(status_entries, 'CreateOp:' + key, datetime.datetime.now(), 'InProgress')
@@ -268,15 +273,20 @@ def update_cache_before_commit(session):
      current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ')
 
 def update_cache_after_commit(session):
-  current_app.logger.info("CACHE: Entering updating cache after commiting to database")
-  cache_manager = get_cache_manager()
-
   """
   The session event listener after_commit results in actually updating the cache entries
   Also marks the flag for the objects modified as completed, this is to indicate to gets() to go ahead and read from cache
+  Logs error if there are errors in updating entries in cache 
+
+  Args:
+    app: Flask Application context
+
+  Returns:
+    None 
   """
+  cache_manager = get_cache_manager()
+
   if len(cache_manager.marked_for_add) > 0:
-    current_app.logger.info("CACHE: items to be added to cache: " + str(cache_manager.marked_for_add))
     add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
     # result is empty on success, non-empty on failure
     #
@@ -286,25 +296,18 @@ def update_cache_after_commit(session):
       current_app.logger.info("CACHE: Successfully added entries to cache") 
 
   if len(cache_manager.marked_for_update) > 0:
-    current_app.logger.info("CACHE: items to be updated in cache: " + str(cache_manager.marked_for_update))
     update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
-    # result is empty on success, non-empty on failure returns list of keys
-    # Not sure of the network errors, need to check memcache code 
-    # update status in memcache with timestamp
-    #
+    # result is empty on success, non-empty on failure returns list of keys including network failures
     if len(update_result) > 0: 
       current_app.logger.error("CACHE: Failed to update entries in cache: " + str(update_result))
     else:
       current_app.logger.info("CACHE: Successfully updated entries in cache") 
 
-  # REVISIT: check for duplicates in marked_for_delete
+  # TODO(ggrcdev): check for duplicates in marked_for_delete
   #
   if len(cache_manager.marked_for_delete) > 0:
-    current_app.logger.info("CACHE: items to be deleted from cache: " + str(cache_manager.marked_for_delete))
     delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete)
-    # REVISIT: result is True on success, False on any other failure including network errors
-    # update status in memcache flag with timestamp
-    #
+    # TODOC(ggrcdev): handling failure including network errors, currently we log errors
     if delete_result is True:
       current_app.logger.info("CACHE: Successfully deleted entries from cache") 
     else:
@@ -325,7 +328,13 @@ def update_cache_after_commit(session):
 
 
 def init_ggrc_cache(app):
+  """Write collection (objects or stubs) to cache
+  Args:
+    app: Flask Application context
 
+  Returns:
+    None 
+  """
   # Create instance of cache manager class for applying policies and operations on cache
   #
   cache_manager = get_cache_manager()
@@ -338,7 +347,7 @@ def init_ggrc_cache(app):
   config.initialize()
 
   # Setup factory class to allow cache manager to create the cache mechanism objects.
-  # REVISIT: Rename Factory as BaseFactory 
+  # TODO(ggrcdev): Rename Factory as BaseFactory 
   #
   factory = Factory();
   cache_manager.set_config(config)

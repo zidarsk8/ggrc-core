@@ -18,6 +18,12 @@ from cache import all_cache_entries
 
 """
 class LocalCache(Cache):
+  """ LocalCache inherits from cache and it provides caching mechanims that is local to a particular gGRC instance
+      
+      Attributes:
+        cache_entries: Ordered dictionary containing resource id as key and value as JSON object (dictionary)
+  """
+
   cache_entries=OrderedDict()
 
   def __init__(self, configparam=None):
@@ -42,9 +48,19 @@ class LocalCache(Cache):
   def get_config(self):
      return self.config
 
-  # Get data from all cache for the specified filter
-  #
   def get(self, category, resource, filter): 
+    """ Get data from local cache for the specified filter
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      filter: dictionary containing ids and optional attrs
+
+    Returns:
+      All or None policy is applied by default
+      None on any errors 
+      Mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
 
@@ -65,9 +81,18 @@ class LocalCache(Cache):
       else:
         return self.get_data(ids, entries, attrs)
 
-  # Add data to cache for the specified data
-  #
   def add(self, category, resource, data): 
+    """ Add data to local cache for the specified data
+
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: dictionary containing ids and attrs
+
+    Returns:
+      None on any errors
+      Mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
     cache_key = self.get_key(category, resource)
@@ -79,20 +104,29 @@ class LocalCache(Cache):
     if entries is None:
       return None
 
-    # REVISIT: Should we perform deep copy of data
+    # TODO(ggrcdev): Should we perform deep copy of data
     for key in data.keys(): 
       entries[key] = data.get(key)
 
     return entries
 
-  # Update data from cache for the specified data
-  #
   def update(self, category, resource, data): 
+    """ Update data in local cache for the specified data
+    TODO(ggrcdev): updates is not available for local cache
+    """
     return None
 
-  # Remove data from cache for the specified data
-  #
   def remove(self, category, resource, data): 
+    """ Remove data from local cache for the specified data
+    Args:
+      category: collection or stub
+      resource: regulation, controls, etc.
+      data: List of keys
+
+    Returns:
+      None on any errors 
+      mapping of DTO formatted string, e.g. JSON string representation
+    """
     if not self.is_caching_supported(category, resource):
       return None
     cache_key = self.get_key(category, resource)
@@ -107,10 +141,18 @@ class LocalCache(Cache):
 
     return entries
 
-  # Get data from cache for the given set of keys and attributes in cache
-  # REVISIT: all or none default policy is implemeted here, it should be in cachemanager
-  #
   def get_data(self, keys, cacheitems, attrs):
+    """ Get data from cache for the given set of keys and attributes in cache
+        TODO(ggrcdev): all or none default policy is implemeted here, it should be in cachemanager
+    Args:
+      keys: set of keys to search from local cache
+      cacheitems: cache entries
+      attrs:  set of attributes to search from local cache
+
+    Returns:
+      None on any errors 
+      mapping of DTO formatted string, e.g. JSON string representation
+    """ 
     data=OrderedDict()
 
     for key in keys:
@@ -139,13 +181,13 @@ class LocalCache(Cache):
 
     return data 
 
-  # Cleanup
-  #
   def clean(self):
+    """ Cleanup
+    """
     self.cache_entries.clear()
 
-  # Print content of cache
-  #
   def __repr__(self):
+    """ Print content of cache
+    """
     return str(self.cache_entries.keys()) + str(self.cache_entries.values())
 
