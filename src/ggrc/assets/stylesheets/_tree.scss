@@ -156,6 +156,12 @@ ul.new-tree {
       float: left;
       width: 30%;
     }
+    input {
+      &.date {
+        float: none;
+        width: 40%;
+      }
+    }
     .request-control {
       float: left;
       width: 66%;
