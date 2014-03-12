@@ -272,6 +272,9 @@ $(document).ready(function(){
         workflow = v;
       }
     });
+    if(id == "new"){
+      workflow = new Workflow({_new: true, title: "", tasks: [], reviews: []});
+    }
     $("workflow-app").trigger("workflow_selected", workflow);
     $('#accordionContentReview').show();
     $('#accordionContentTasks').show();

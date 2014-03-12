@@ -132,7 +132,7 @@ can.Component.extend({
   scope: {
     assessments : new Assessment.List({}),
     assessment: new Assessment.List({})[0],
-    workflow: null
+    workflow: null,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -156,7 +156,7 @@ can.Component.extend({
     assessment: new Assessment.List({})[0],
     workflows : new Workflow.List({}),
     workflow : null,
-    workflow_id : 'workflow' in assessment ? assessment.workflow : 0
+    workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -173,7 +173,7 @@ can.Component.extend({
         $('#workflowConfirm').modal('show');
         return;
       }
-      this.scope.attr('workflow_id', workflow.id);
+      this.scope.attr('workflow_id', typeof workflow !== "undefined" ? workflow.id : 0);
       this.scope.attr('workflow', workflow);
     },
     ' select_previous' : function(){
@@ -202,6 +202,11 @@ can.Component.extend({
     },
     "a#addWorkflowNow click" : function(el, ev){
       $("assessment-app").trigger("workflow_selected", this.scope.workflow);
+      if(this.scope.workflow.attr('_new')){
+        this.scope.workflow.attr('_new', false);
+        this.scope.workflow.save();
+        
+      }
       $("#setupWorkflow").modal('hide');
     },
     '.update change' : function(el, ev){
@@ -209,9 +214,12 @@ can.Component.extend({
         , type = el.data('type')
         , index = el.data('index')
         , workflow = this.scope.attr('workflow');
-      console.log(model, index, type,workflow);
       if(model === "tasks"){
         workflow[model][index] = el.val();
+      }
+      else if(model === "title"){
+        
+        workflow.attr(model, el.val());
       }
       else{
         workflow[model][index].attr(type, el.val());
@@ -273,6 +281,9 @@ $("#confirmChangeWorkflow").on('click', function(ev){
       workflow = v;
     }
   });
+  if(id == "new"){
+    workflow = new Workflow({_new: true, title: "", tasks: [], reviews: []});
+  }
   workflow.confirmed = true;
   $("workflow-app").trigger("workflow_selected", workflow);
   $('#workflowConfirm').modal('hide');

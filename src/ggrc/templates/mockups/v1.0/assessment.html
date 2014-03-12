@@ -96,20 +96,22 @@
               <option value="{{id}}" {{#if_equals workflow_id id}}selected="selected"{{/if}}>{{title}}</option>
               {{/each workflows}}
               <option>&nbsp;</option>
-              <option value="newWorkflow">+ Create New Assessment Workflow</option>
+              <option value="new">+ Create New Assessment Workflow</option>
             </select>
             <p class="note">
               <strong>Note:</strong> Tasks and Review cycles you setup will be applied to all selected objects 
               within assessment. However, you'll be able to adjust them on object level.
             </p>
           </div>
-          <div class="span6" id="newWorkflowTitle">
+          {{#if workflow._new}}
+          <div class="span6">
             <label>
               New Workflow Title
               <span class="required">*</span>
             </label>
-            <input class="input-block-level" placeholder="" name="workflow-title" type="text" value="Internal Audit - Control Setup">
+            <input class="input-block-level update" data-model="title" placeholder="" name="title" type="text" value="">
           </div>
+          {{/if}}
         </div>
         
         <div class="row-fluid">
@@ -423,9 +425,9 @@
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="info-utility-link">
-                          <a href="#" class="info-edit" title="Edit">
+                          <a href="#setupWorkflow" class="info-edit" title="Edit"  id="workflowSetup" data-toggle="modal">
                             <i class="grcicon-edit"></i>
-                            <span>Edit Assessment Info</span>
+                            Edit Assessment Info
                           </a>
                         </div>
                       </div>
@@ -473,9 +475,9 @@
                             </a>
                             {{/workflow}}
                             {{#workflow}}
-                            <a href="#" class="info-edit" id="workflowSetup" data-toggle="modal">
+                            <a href="#setupWorkflow" class="info-edit" id="workflowSetup" data-toggle="modal">
                               <i class="grcicon-edit"></i>
-                              <span>Edit Assessment Workflow</span>
+                              Edit Assessment Workflow
                             </a>
                             {{/workflow}}
                           </div>
