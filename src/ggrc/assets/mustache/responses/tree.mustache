@@ -23,7 +23,7 @@
             <div class="objective-selector">
               {{#using contact=instance.contact}}
                 {{#if_can_edit_request instance.request}}
-                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty contact.name contact.email ''}}">
+                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
                 {{else}}
                 <span class="read-only">
                   {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
@@ -183,22 +183,14 @@
         <ul class="population-upload">
           <li>
             <div class="row-fluid">
-              <div class="span8">
-                <label>Population worksheet</label>
+              <div class="span8 evidence">
+                <label class="auto-save">Population worksheet {{#instance.population_worksheet.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.population_worksheet.saved}}>Saved</span>{{/instance.population_worksheet.saved}}</label>
                 <div class="row-fluid">
-                  {{#using population_worksheet=instance.population_worksheet}}
+                {{#using population_worksheet=instance.population_worksheet}}
                   <div class="span9">
-                    <input type="text" name="population_worksheet.name" data-lookup="PopulationWorksheet" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
+                    <input type="text" name="population_worksheet.name" data-lookup="PopulationWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty population_worksheet.name population_worksheet.link ''}}">
                   </div>
-                  {{/using}}
-                  <!--
-                    <div class="span1">
-                      <span class="choose">OR</span>
-                    </div>
-                    <div class="span2">
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" class="btn btn-add" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" } }'><i class="grcicon-upload"></i> Upload</a>
-                    </div>
-                  -->
+                {{/using}}
                 </div>
               </div>
               <div class="span4">
@@ -209,22 +201,14 @@
           </li>
           <li>
             <div class="row-fluid">
-              <div class="span8">
-                <label>Sample worksheet</label>
+              <div class="span8 evidence">
+                <label class="auto-save">Sample worksheet {{#instance.sample_worksheet.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.sample_worksheet.saved}}>Saved</span>{{/instance.sample_worksheet.saved}}</label>
                 <div class="row-fluid">
-                  {{#using sample_worksheet=instance.sample_worksheet}}
+                {{#using sample_worksheet=instance.sample_worksheet}}
                   <div class="span9">
-                    <input type="text" name="sample_worksheet.name" data-lookup="SampleWorksheet" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
+                    <input type="text" name="sample_worksheet.name" data-lookup="SampleWorksheet" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_worksheet.name sample_worksheet.link ''}}">
                   </div>
-                  {{/using}}
-                  <!--
-                    <div class="span1">
-                      <span class="choose">OR</span>
-                    </div>
-                    <div class="span2">
-                      <a href="#" class="btn btn-add"><i class="grcicon-upload"></i> Upload</a>
-                    </div>
-                  -->
+                {{/using}}
                 </div>
               </div>
               <div class="span4">
@@ -235,22 +219,14 @@
           </li>
           <li>
             <div class="row-fluid">
-              <div class="span8">
-                <label>Sample evidence</label>
+              <div class="span8 evidence">
+                <label class="auto-save">Sample evidence {{#instance.sample_evidence.saved}}<span class="success" {{fadein}} {{fadeout 3000 instance.sample_evidence.saved}}>Saved</span>{{/instance.sample_evidence.saved}}</label>
                 <div class="row-fluid">
-                  {{#using sample_evidence=instance.sample_evidence}}
+                {{#using sample_evidence=instance.sample_evidence}}
                   <div class="span9">
-                    <input type="text" name="sample_evidence.name" data-lookup="SampleEvidence" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
+                    <input type="text" name="sample_evidence.name" data-lookup="SampleEvidence" data-drop="link" class="input-block-level" placeholder="Enter URL" value="{{firstnonempty sample_evidence.name sample_evidence.link ''}}">
                   </div>
-                  {{/using}}
-                  <!--
-                    <div class="span1">
-                      <span class="choose">OR</span>
-                    </div>
-                    <div class="span2">
-                      <span class="btn btn-add"><i class="grcicon-upload"></i> Upload</span>
-                    </div>
-                  -->
+                {{/using}}
                 </div>
               </div>
               <div class="span4">&nbsp;</div>

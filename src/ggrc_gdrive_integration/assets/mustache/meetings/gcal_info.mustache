@@ -4,11 +4,13 @@
         <strong>gCal Event Link: </strong>
         {{#with_mapping 'events' instance}}
           {{#if events.length}}
-          <a href="{{events.0.instance.htmlLink}}" target="_blank">
+          <a href="javascript://" class="show-meeting" {{#instance}}{{data 'model'}}{{/instance}} {{#events.0.instance}}{{data 'cev'}}{{/events.0.instance}}>
             {{events.0.instance.summary}}
           </a>
           {{else}}
-            No event found in gCal
+            <a href="javascript://" class="create-meeting" {{#instance}}{{data 'model'}}{{/instance}}>
+              Create Google Calendar meeting
+            </a>
           {{/if}}
         {{/with_mapping}}
       </div>

@@ -170,6 +170,13 @@ can.Model("can.Model.Cacheable", {
       this.findPage = this.makeFindPage(this.findAll);
     }
 
+    // Prevent event "bleeding" from other members of the Cacheable tree.
+    // This fix causes breakages in places where we're expecting model class
+    //  events not to be isolated (like in the LHN controller).
+    //  I've submitted a fix to CanJS for this but it remains to be seen
+    //  whether it gets in and when.  --BM 3/4/14
+    //this.__bindEvents = {};
+
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
       this.findAll = can.Model.Cacheable.findAll;
@@ -617,11 +624,7 @@ can.Model("can.Model.Cacheable", {
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
   }
-  , computed_errors : function() {
-      var that = this
-        , compute = can.compute(function() { return that.errors(); });
-      return compute;
-    }
+  , computed_errors : can.compute(function() { return this.errors(); })
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);

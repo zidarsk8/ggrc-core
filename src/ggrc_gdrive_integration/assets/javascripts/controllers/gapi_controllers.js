@@ -122,7 +122,7 @@
         var o2d = new $.Deferred();
         gapi.client.oauth2.userinfo.get().execute(function(user) {
           if(user.error) {
-            $(document.body.trigger("ajax:flash", { error : user.error }));
+            $(document.body).trigger("ajax:flash", { error : user.error });
             o2d.reject(user.error);
           } else {
             o2d.resolve(user);
@@ -187,9 +187,6 @@
       this._super.apply(this, arguments);
       if(!this.constructor.canonical_instance) {
         this.constructor.canonical_instance = this;
-      }
-      if(this.options.scopes.length) {
-        this.constructor.doGAuth(this.options.scopes);
       }
 
       this.doGAuthWithScopes = can.debounce(500, $.proxy(this.constructor, "doGAuth", this.options.scopes, false));

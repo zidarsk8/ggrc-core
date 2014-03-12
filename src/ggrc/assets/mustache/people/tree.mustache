@@ -15,11 +15,6 @@
               <div class='tree-title-area'>
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{{render '/static/mustache/people/popover.mustache' person=instance}}}
-                {{#infer_roles instance}}
-                  <span class="role">
-                    {{.}}
-                  </span>
-                {{/infer_roles}}
               </div>
             </div>
           </div>

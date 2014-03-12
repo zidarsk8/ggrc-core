@@ -417,19 +417,22 @@ $(document).ready(function(){
   });
   
   $('body').on('click', '#finishTask', function() {
-    $(this).closest('.tree-item').addClass('completed');
+    $(this).closest('.tree-item').removeClass('rq-draft');
+    $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone').show();
   });
   
   $('body').on('click', '#finishTask2', function() {
-    $(this).closest('.tree-item').addClass('completed');
+    $(this).closest('.tree-item').removeClass('rq-draft');
+    $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone2').show();
   });
   
   $('body').on('click', '#finishTask3', function() {
-    $(this).closest('.tree-item').addClass('completed');
+    $(this).closest('.tree-item').removeClass('rq-draft');
+    $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone3').show();
   });

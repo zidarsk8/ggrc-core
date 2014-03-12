@@ -685,6 +685,7 @@ Mustache.registerHelper("all", function(type, params, options) {
   , $dummy_content = $(options.fn({}).trim()).first()
   , tag_name = $dummy_content.prop("tagName")
   , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
+  , require_permission = ""
   , items_dfd, hook;
 
   if(!options) {
@@ -693,12 +694,21 @@ Mustache.registerHelper("all", function(type, params, options) {
   } else {
     params = JSON.parse(resolve_computed(params));
   }
+  if("require_permission" in params){
+    require_permission = params.require_permission;
+    delete params.require_permission;
+  }
 
   function hookup(element, parent, view_id) {
     items_dfd.done(function(items){
       var val
       , $parent = $(element.parentNode)
       , $el = $(element);
+      items = can.map(items, function(item){
+        if(require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)){
+          return item;
+        }
+      });
       can.each(items, function(item) {
         $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
       });
@@ -1289,12 +1299,24 @@ Mustache.registerHelper("is_allowed_all", function(action, instances, options) {
   can.each(instances, function(instance) {
     var resource_type
       , context_id
+      , base_mappings = []
       ;
 
-    resource_type = instance.constructor.shortName;
-    context_id = instance.context ? instance.context.id : null;
+    if(instance instanceof GGRC.ListLoaders.MappingResult) {
+      instance.walk_instances(function(inst, mapping) {
+        if(can.reduce(mapping.mappings, function(a, b) { return a || (b.instance === true); }, false)) {
+          base_mappings.push(inst);
+        }
+      });
+    } else {
+      base_mappings.push(instance);
+    }
 
-    passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    can.each(base_mappings, function(instance) {
+      resource_type = instance.constructor.shortName;
+      context_id = instance.context ? instance.context.id : null;
+      passed = passed && Permission.is_allowed(action, resource_type, context_id);
+    });
   });
 
   if (passed)
@@ -1333,6 +1355,8 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
   //  source = GGRC.page_instance();
   //}
 
+  context_id = source.context ? source.context.id : null;
+
   if (target_type === 'Cacheable') {
     //  FIXME: This will *not* work for customizable roles -- this *only* works
     //    for the limited default roles as of 2013-10-07, and assumes that:
@@ -1341,13 +1365,15 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     //    2.  If a user has permission for creating `Relationship` objects in
     //        the `null` context, they have permission for creating all mapping
     //        objects in `null` context.
-    can_map = Permission.is_allowed('create', 'Relationship', null);
+    //  UPDATE 2013-03-05: Passing source context solved the issue where user
+    //    with reader sys-wide role and program owner role was unable to map 
+    //    objects.
+    can_map = Permission.is_allowed('create', 'Relationship', context_id);
   }
   else {
     resource_type = GGRC.JoinDescriptor.join_model_name_for(
       source.constructor.shortName, target_type);
 
-    context_id = source.context ? source.context.id : null;
     if (!(source instanceof CMS.Models.Program)
         && target instanceof CMS.Models.Program)
       context_id = target.context ? target.context.id : null;
@@ -2187,6 +2213,61 @@ Mustache.registerHelper("switch", function(value, options) {
       }
     }
   });
+});
+
+
+Mustache.registerHelper("fadein", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  resolve_computed(prop);
+  return function(el) {
+    var $el = $(el);
+    $el.css("display", "none");
+    if(!prop || resolve_computed(prop)) {
+      setTimeout(function() {
+        $el.fadeIn({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(true);
+          }
+        });
+      }, delay);
+    }
+  };
+});
+
+Mustache.registerHelper("fadeout", function(delay, prop, options) {
+  switch(arguments.length) {
+    case 1:
+    options = delay;
+    delay = 500;
+    break;
+    case 2:
+    options = prop;
+    prop = null;
+    break;
+  }
+  if(resolve_computed(prop)) {
+    return function(el) {
+      var $el = $(el);
+      setTimeout(function() {
+        $el.fadeOut({
+          duration : (options.hash && options.hash.duration) || 500
+          , complete : function() {
+            typeof prop === "function" && prop(null);
+          }
+        });
+      }, delay);
+    };
+  }
 });
 
 })(this, jQuery, can);

@@ -63,7 +63,7 @@
       </label>
       <i class="grcicon-objective-color pull-left icon-field"></i>
       <div class="objective-selector">
-        <input tabindex="6" type="text" name="objective.title" data-lookup="Objective" class="span10" value="{{firstnonempty objective.title ''}}">
+        <input tabindex="6" type="text" name="objective.title" data-lookup="Objective" class="span10 search-icon" value="{{firstnonempty objective.title ''}}" placeholder="Enter text to search for Objective">
       </div>
     {{/if_auditor}}
     </div>
@@ -90,7 +90,7 @@
       {{else}}
         {{#using assignee=instance.assignee}}
         <div class="objective-selector">
-          <input tabindex="7" type="text" name="assignee.email" class="span10" data-lookup="Person" value="{{firstnonempty assignee.email ''}}">
+          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
         </div>
         {{/using}}
       {{/if_auditor}}
