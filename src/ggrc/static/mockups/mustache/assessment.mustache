@@ -1,0 +1,584 @@
+<assessment-app>
+<div class="area program">
+    <div class="header-content">
+      <div class="row-fluid">
+        <div id="page-header" class="span9">
+          <h1 class="programs">
+            <div class="grcobject programs" rel="tooltip" data-placement="bottom" title="Assessment">
+              <i class="grcicon-assessment-white"></i>
+            </div>
+            {{assessment.title}}
+            <span class="private"></span>
+          </h1>
+        </div>
+      </div>
+    </div>
+    
+    <section class="content">
+      <div class="clearfix">
+        
+        <div class="inner-nav">
+          <div class="object-nav">
+            <ul class="nav internav program cms_controllers_inner_nav ui-sortable">
+              <li class="active">
+                <a href="#info_widget">
+                  <div class="oneline">
+                    <i class="grcicon-info"></i>
+                    Assessment Info
+                  </div>
+                </a>
+                <div class="drag"></div>
+              </li>
+              <li>
+                <a href="#objects_widget">
+                  <div class="oneline">
+                    <i class="grcicon-object-color"></i>
+                    Objects (<span id="objectsMainCounter">0</span>)
+                  </div>
+                </a>
+                <div class="drag"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+          
+        <div class="object-area" style="margin-left: 200px;">
+          <div id="show_columns" class="column-set">
+            <div id="middle_column" class="widget-area ui-sortable">
+
+              <!-- Widget: Assessment Info -->
+              <section class="widget programs widget-active" id="info_widget">
+                <header class="header">
+                  <div class="row-fluid">
+                    <div class="span9">
+                      <h2>
+                        <i class="grcicon-info"></i>
+                        Assessment Info
+                        <span class="object_count">
+                          </span>
+                        <span class="explanation"></span>
+                      </h2>
+                    </div>
+                    <div class="span3">
+                      <div class="widget-action pull-right widget-action-help">
+                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                          <i class="grcicon-help-black"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </header>
+                <section class="content">
+                  <section class="info">
+                    <div class="row-fluid">
+                      <div class="span6">
+                        <h3>{{assessment.title}}</h3>
+                      </div>
+                      <div class="span6">&nbsp;</div>
+                    </div>
+                    
+                    <div class="row-fluid">
+                      <div class="span6">
+                        <div class="rtf-block">
+                          <p>Initial control setup confirmation.</p>
+                        </div>
+                      </div>
+                      <div class="span6">
+                        <div class="row-fluid">
+                          <div>   
+                            <p>
+                              <strong>Status:</strong><br>
+                              {{assessment.status}}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <div class="rtf-block">
+                          <strong>Related Program:</strong>
+                          <i class="grcicon-program-color"></i> <strong>{{assessment.program_title}}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <p>
+                          <strong>Assessment Lead:</strong>
+                          {{assessment.lead_email}}
+                        </p>
+                        <p>
+                          <strong>Requested on:</strong>
+                          {{#if assessment.start_date}}{{assessment.start_date}}{{else}}<em>not defined</em>{{/if}}
+                        </p>
+                        <p>
+                          <strong>Due on:</strong>
+                          {{#if assessment.end_date}}{{assessment.end_date}}{{else}}<em>not defined</em>{{/if}}
+
+                        </p>
+                        <p>
+                          <strong>gGRC Folder:</strong>
+                          <a href="#">/{{assessment.program_title}}/{{assessment.title}}/</a>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <div class="info-utility-link">
+                          <a href="#setupWorkflow" class="info-edit" title="Edit"  id="workflowSetup" data-toggle="modal">
+                            <i class="grcicon-edit"></i>
+                            Edit Assessment Info
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="row-fluid">
+                      <div class="span12">
+                        <div class="workflow-wrap">
+                          <h3>
+                            Assessment Workflow <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+                            {{^workflow}}<span id="workflowNotSet"><em>Not yet selected</em></span>{{/workflow}}
+                          </h3>
+                          {{#workflow}}
+                          <p class="workflow-subtitle">{{workflow.title}}</p>
+                          <ul class="workflow-list">
+                            <li>
+                              <strong>* Tasks</strong> (<span class="count">{{workflow.tasks.length}}</span>)
+                              <ul>
+                                {{#each workflow.tasks}}
+                                <li>{{.}}</li>
+                                {{/each}}
+                              </ul>
+                            </li>
+                            <li>
+                              <strong>* Reviews</strong> (<span class="count">{{workflow.reviews.length}}</span>)
+                              <ul>
+                                {{#each workflow.reviews}}
+                                <li>{{title}} (<a href="#">{{reviewer}}</a>)</li>
+                                {{/each}} 
+                             </ul>
+                            </li>
+                            <li>
+                              <strong>* Reassessment frequency</strong>
+                              <ul>
+                                <li>Annually, every April 25th</li>
+                              </ul>
+                            </li>
+                          </ul>
+                          {{/workflow}}
+                          <div class="info-utility-link">
+                            {{^workflow}}
+                            <a href="#setupWorkflow" class="setup-link" id="workflowSetup" data-toggle="modal">
+                              <i class="grcicon-setup"></i>
+                              Setup Assessment Workflow
+                            </a>
+                            {{/workflow}}
+                            {{#workflow}}
+                            <a href="#setupWorkflow" class="info-edit" id="workflowSetup" data-toggle="modal">
+                              <i class="grcicon-edit"></i>
+                              Edit Assessment Workflow
+                            </a>
+                            {{/workflow}}
+                          </div>
+                          
+                        </div>
+                        
+                      </div>
+                    </div>
+                    
+                    <div class="info-widget-footer">
+                      <div class="right-button">
+                        <span class="gray small"><em><span id="noObjects">No selected objects</span><span id="noWorkflow">, no selected workflow</span></em></span> <a href="#assessmentStart" id="startAssessment" class="btn btn-small btn-primary disabled" data-toggle="modal">Start Assessment</a>
+                      </div>
+                    </div>
+                  </section>
+                </section>
+              </section>
+
+              <!-- Widget: Objects -->
+              <section class="widget objectives" id="objects_widget" style="display:none;">
+                <header class="header">
+                  <div class="row-fluid">
+                    <div class="span9">
+                      <h2>
+                        <i class="grcicon-object-color"></i>
+                        Objects under Assessment
+                        <span class="object_count" id="objectsCounter">(0)</span>
+                        <span class="explanation"></span>
+                      </h2>
+                    </div>
+                    <div class="span3">
+                      <div class="widget-action pull-right widget-action-help">
+                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                          <i class="grcicon-help-black"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </header>
+                <section class="content">
+                  <div class="object-step" id="objectStep1">
+                    <div class="choose-object-wrap">
+                      <div class="choose-object-content">
+                        <div class="row-fluid">
+                          <div class="span12">
+                            <div class="first-row">
+                              <label>
+                                <strong>Add all</strong>
+                              </label>
+                              <select class="input-medium">
+                                <option>Regulations</option>
+                                <option>Contracts</option>
+                                <option>Policies</option>
+                                <option>Standards</option>
+                                <option>Objectives</option>
+                                <option selected="selected">Controls</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row-fluid">
+                          <div class="span12">
+                            <div class="indent-row">
+                              <label>
+                                <strong>Relevant to:</strong>
+                              </label>
+                              <select class="input-small">
+                                <option selected="selected">Program</option>
+                                <option>Process</option>
+                                <option>System</option>
+                                <option>Market</option>
+                              </select>
+                              <div class="objective-selector">
+                                <input type="text" name="program.title" class="input-large" value="Google Fiber" placeholder="">
+                              </div>
+                              <button type="submit"><i class="grcicon-deleted"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row-fluid">
+                          <div class="span12">
+                            <div class="indent-row">
+                              <div id="newRule">
+                                <label>
+                                  <strong>AND &nbsp; Relevant to:</strong>
+                                </label>
+                                <select class="input-small">
+                                  <option>Program</option>
+                                  <option>Process</option>
+                                  <option>System</option>
+                                  <option selected="selected">Market</option>
+                                </select>
+                                <div class="objective-selector">
+                                  <input type="text" name="program.title" class="input-large" value="Kansas City" placeholder="">
+                                </div>
+                                <button type="submit"><i class="grcicon-deleted"></i></button>
+                              </div>
+                              <div class="add-rule">
+                                <a href="#" id="addRule">+ Add Rule</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="choose-object-footer">
+                        <div class="row-fluid">
+                          <div class="span3">
+                            <div class="deny-buttons">
+                              <a class="btn" href="#">Reset</a>
+                            </div>
+                          </div>
+                          <div class="span3">
+                            &nbsp;
+                          </div>
+                          <div class="span6">
+                            <div class="confirm-buttons">
+                              <span><strong>4 controls found</strong></span>
+                              <a class="btn btn-primary" href="#" id="objectReview">Review</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="object-step" id="objectStep2">
+                    <ul class="tree-structure new-tree mockup-tree">
+                      <li class="tree-item governance object-filter">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span9">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <span><strong>4 controls found</strong></span> &nbsp; <a href="#" id="filterTrigger"><strong>Show Filter</strong></a>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span3">
+                              <div class="object-check all-check">
+                                <label>
+                                  select all
+                                  <input type="checkbox" checked="checked" id="objectAll">
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance selected">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Secure Backups
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="object-check">
+                                <input type="checkbox" checked="checked" class="object-check-single">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance selected">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Data Storage
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="object-check">
+                                <input type="checkbox" checked="checked" class="object-check-single">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance selected">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Password Security
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="object-check">
+                                <input type="checkbox" checked="checked" class="object-check-single">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance selected">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Access Control
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="object-check">
+                                <input type="checkbox" checked="checked" class="object-check-single">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="object-step" id="objectStep3">
+                    <ul class="tree-structure new-tree mockup-tree">
+                      <li class="tree-item governance">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span10">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Secure Backups
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span10">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Data Storage
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span10">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Password Security
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span10">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Access Control
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="tree-item governance" id="addedObject">
+                        <div class="item-main">
+                          <div class="row-fluid">
+                            <div class="span10">
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  <i class="grcicon-control-color"></i>
+                                  Stability and Perpetuability
+                                </div>
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <div class="counter">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <ul class="tree-structure new-tree mockup-tree">
+                    <li class="tree-footer tree-item tree-item-add">
+                      <div class="row-fluid">
+                        <div class="span10 section-expandable">
+                          <div id="objectFooterUtility">
+                            <a href="javascript://" class="section-add">
+                              Add object under assessment
+                            </a>
+                            <span class="section-expander">
+                              <a href="#" id="addSingleObjectTrigger">
+                                Add single object
+                              </a>
+                              &nbsp;
+                              &nbsp;
+                              <a href="#" class="section-import" id="filterTriggerFooter">
+                                Add multiple objects by filtering
+                              </a>
+                            </span>
+                          </div>
+                          <div class="add-single-object" id="addSingleObject">
+                            <div class="row-fluid">
+                              <div class="span2">
+                                <select class="input-block-level">
+                                  <option>Regulation</option>
+                                  <option>Contract</option>
+                                  <option>Policy</option>
+                                  <option>Standard</option>
+                                  <option>Objective</option>
+                                  <option selected="selected">Control</option>
+                                </select>
+                              </div>
+                              <div class="span4">
+                                <div class="objective-selector">
+                                  <input type="text" name="object.title" class="input-block-level" value="Stability and Perpetuability">
+                                </div>
+                              </div>
+                              <div class="span2">
+                                <a href="#" class="btn btn-primary btn-footer" id="addSingleControl">Add</a>
+                                <a href="#" id="cancelSingleControl"><i class="grcicon-x-grey"></i></a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="span2">
+                          <div id="objectAdd" class="object-add">
+                            <a href="#" class="btn btn-primary btn-small">Add selected</a>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </section>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</assessment-app>

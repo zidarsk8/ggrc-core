@@ -1,0 +1,239 @@
+<workflow-app>
+<div id="setupWorkflow" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="setupWorkflowLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Setup Assessment Workflow</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
+        <div class="row-fluid">
+          <div class="span6">
+            <label>
+              Assessment Title
+            </label>
+            <strong>{{assessment.title}}</strong>
+          </div>
+          <div class="span6">
+            <label>
+              Program
+            </label>
+            <i class="grcicon-program-color pull-left icon-field"></i>
+            <strong>{{assessment.program_title}}</strong>
+          </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="row-fluid">
+          <div class="span6">
+            <label id="regularWorkflowLabel">
+              Choose Assessment Workflow
+            </label>
+            <label id="newWorkflowLabel">
+              Clone existing workflow
+            </label>
+            <select class="span12" id="assessmentWorkflowChoose">
+              <option>- Choose -</option>
+              {{#each workflows}}
+              <option value="{{id}}" {{#if_equals workflow_id id}}selected="selected"{{/if}}>{{title}}</option>
+              {{/each workflows}}
+              <option>&nbsp;</option>
+              <option value="new">+ Create New Assessment Workflow</option>
+            </select>
+            <p class="note">
+              <strong>Note:</strong> Tasks and Review cycles you setup will be applied to all selected objects 
+              within assessment. However, you'll be able to adjust them on object level.
+            </p>
+          </div>
+          {{#if workflow._new}}
+          <div class="span6">
+            <label>
+              New Workflow Title
+              <span class="required">*</span>
+            </label>
+            <input class="input-block-level update" data-model="title" placeholder="" name="title" type="text" value="">
+          </div>
+          {{/if}}
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span1">&nbsp;</div>
+          <div class="span11">
+            
+            <div class="accordion workflow-accordion" id="workflow-accordion">
+              {{#if workflow}}       
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle active" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseTasks">
+                    <i class="grcicon-toggle-arrow"></i> Show tasks (<span id="showTasksCount">{{workflow.tasks.length}}</span>)
+                  </a>
+                </div>
+                <div id="collapseTasks" class="accordion-body in collapse">
+                  <div class="accordion-inner">
+                    <div class="row-fluid">
+                      <div class="span11">
+                      
+                        <div id="accordionContentTasks">
+                          {{#each workflow.tasks}}
+                          <div class="row-fluid">
+                            <div class="span11">
+                              <input type="text" class="input-block-level update" data-model="tasks" data-index="{{@index}}" value="{{.}}">
+                            </div>
+                            <div class="span1">
+                              <button type="submit" class="delete" data-type="tasks" data-index="{{@index}}"><i class="grcicon-deleted"></i></button>
+                            </div>
+                          </div>
+                          {{/each}}
+                        </div>
+                        
+                        <div class="more-button">
+                          <a href="#" data-type="tasks" class="btn btn-success add">Add Task</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle active" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseReview">
+                    <i class="grcicon-toggle-arrow"></i> Show review cycles (<span id="showReviewCount">{{workflow.reviews.length}}</span>)
+                  </a>
+                </div>
+                <div id="collapseReview" class="accordion-body in collapse">
+                  <div class="accordion-inner">
+                    <div id="accordionContentReview">
+                      <div class="row-fluid">
+                        <div class="span11">
+                          {{#each workflow.reviews}}
+                          <div class="row-fluid">
+                            <div class="span7">
+                              <input type="text" class="input-block-level update" data-type="title" data-model="reviews" data-index="{{@index}}" value="{{title}}">
+                            </div>
+                            <div class="span4">
+                              <i class="grcicon-person-green pull-left icon-field"></i>
+                              <div class="objective-selector">
+                                <input type="text" name="assessment_lead.email" class="span10 update" data-type="reviewer" data-index="{{@index}}" data-model="reviews"  value="{{reviewer}}" placeholder="Choose Reviewer">
+                              </div>
+                            </div>
+                            <div class="span1">
+                              <button type="submit" class="delete" data-type="reviews" data-index="{{@index}}"><i class="grcicon-deleted"></i></button>
+                            </div>
+                          </div>
+                          {{/each workflow.reviews}}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="more-button">
+                      <a href="#" data-type="reviews" class="btn btn-success add">Add review</a>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-group">
+                <div class="accordion-heading">
+                  <a class="accordion-toggle active" data-toggle="collapse" data-parent="#workflow-accordion" href="#collapseFrequency">
+                    <i class="grcicon-toggle-arrow"></i> Show reassessment frequency
+                  </a>
+                </div>
+                <div id="collapseFrequency" class="accordion-body in collapse">
+                  <div class="accordion-inner">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <select class="input-block-level">
+                          <option>One time</option>
+                          <option>Monthly</option>
+                          <option>Every 3 months</option>
+                          <option>Every 6 months</option>
+                          <option selected="selected">Annually</option>
+                          <option>Biannually</option>
+                          <option>Ongoing</option>
+                        </select>
+                      </div>
+                      <div class="span8">
+                        <span class="workflow-repeat">Repeat every:</span>
+                        <select class="input-mini">
+                          <option>1</option>
+                          <option>2</option>
+                          <option>3</option>
+                          <option>4</option>
+                          <option>5</option>
+                          <option>6</option>
+                          <option>7</option>
+                          <option>8</option>
+                          <option>9</option>
+                          <option>10</option>
+                          <option>11</option>
+                          <option>12</option>
+                          <option>13</option>
+                          <option>14</option>
+                          <option>15</option>
+                          <option>16</option>
+                          <option>17</option>
+                          <option>18</option>
+                          <option>19</option>
+                          <option>20</option>
+                          <option>21</option>
+                          <option>22</option>
+                          <option>23</option>
+                          <option>24</option>
+                          <option selected="selected">25</option>
+                          <option>26</option>
+                          <option>27</option>
+                          <option>28</option>
+                          <option>29</option>
+                          <option>30</option>
+                          <option>31</option>
+                        </select>
+                        <select class="input-medium">
+                          <option>January</option>
+                          <option>Febraury</option>
+                          <option>March</option>
+                          <option selected="selected">April</option>
+                          <option>May</option>
+                          <option>June</option>
+                          <option>July</option>
+                          <option>August</option>
+                          <option>September</option>
+                          <option>October</option>
+                          <option>November</option>
+                          <option>December</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                            {{/if}}
+            </div>
+          </div>
+        </div>
+        
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a id="addWorkflowNow" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</workflow-app>

@@ -110,7 +110,7 @@ if(workflowList.length === 0){
 can.Component.extend({
   tag: 'assessments-app',
   scope: {
-    assessments: new Assessment.List({}),
+    assessments: assessmentList,
     select: function(assessment, el, ev){
       ev.preventDefault();
       $("assessment-app").trigger("selected", assessment);
@@ -130,9 +130,9 @@ can.Component.extend({
 can.Component.extend({
   tag: 'assessment-app',
   scope: {
-    assessments : new Assessment.List({}),
-    assessment: new Assessment.List({})[0],
-    workflow: new Assessment.List({})[0].workflow,
+    assessments : assessmentList,
+    assessment: assessmentList[0],
+    workflow: assessmentList[0].workflow,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -140,6 +140,7 @@ can.Component.extend({
     },
     ' selected' : function(el, ev, assessment){
       this.scope.attr('assessment', assessment);
+      this.scope.attr('workflow', assessment.workflow);
     },
     ' workflow_selected' : function(el, ev, workflow){
       this.scope.attr('workflow', workflow);
@@ -153,11 +154,11 @@ can.Component.extend({
   name: 'workflow-app',
   edited: false,
   scope: {
-    assessments : new Assessment.List({}),
-    assessment: new Assessment.List({})[0],
+    assessments : assessmentList,
+    assessment: assessmentList[0],
     workflows : new Workflow.List({}),
     workflow : null,
-    workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
+    //workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -292,6 +293,6 @@ $("#confirmChangeWorkflow").on('click', function(ev){
 $("#cancelChangeWorkflow").on('click', function(ev){
   $("workflow-app").trigger("select_previous", workflow);
 });
-$("#assessments-lhn").html(can.view("assessments", {}))
-$("#assessment-app").html(can.view("assessment", {}))
-$("#workflow-app").html(can.view("workflow", {}))
+$("#assessments-lhn").html(can.view("/static/mockups/mustache/assessments.mustache", {}))
+$("#assessment-app").html(can.view("/static/mockups/mustache/assessment.mustache", {}))
+$("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
