@@ -565,6 +565,11 @@
   .info-widget-footer {
     border-top: 1px solid $footerBorder;
     padding-top: 10px;
+    .pull-right {
+      i {
+        margin-top: 1px;
+      }
+    }
   }
 }
 
@@ -924,6 +929,9 @@
 // Mockups Assessment Page V1.0
 .info-utility-link {
   margin: 10px 0 15px 0;
+  i {
+    margin-top: 1px;
+  }
 }
 .workflow-list {
   @include reset-list();
@@ -938,9 +946,6 @@
   font-weight:bold;
   text-transform:uppercase;
   margin-bottom: 15px;
-  i {
-    margin-top: 2px;
-  }
 }
 .right-button {
   text-align: right;

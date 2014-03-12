@@ -193,6 +193,9 @@
       label {
         line-height: 32px;
         margin-bottom: 0;
+        input {
+          margin-top: -1px;
+        }
       }
     }
   }
@@ -260,15 +263,7 @@ ul.new-tree {
       }
     }
   }
-  &.tasks-list {
-    li.tree-item {
-      &.completed {
-        .row-fluid {
-          background: $rqAccepted;
-        }
-      }
-    }
-  }
+  
 }
 
 .choose-object-wrap {
