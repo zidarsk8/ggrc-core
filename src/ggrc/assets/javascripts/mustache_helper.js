@@ -25,6 +25,106 @@ function get_template_path(url) {
   return match && match[1];
 }
 
+
+// From https://www.artandlogic.com/blog/2013/06/ajax-caching-transports-compatible-with-jquery-deferred/
+var storage = (typeof(sessionStorage) == undefined) ?
+    (typeof(localStorage) == undefined) ? {
+        getItem: function(key){
+            return this.store[key];
+        },
+        setItem: function(key, value){
+            this.store[key] = value;
+        },
+        removeItem: function(key){
+            delete this.store[key];
+        },
+        clear: function(){
+            for (var key in this.store)
+            {
+                if (this.store.hasOwnProperty(key)) delete this.store[key];
+            }
+        },
+        store:{}
+    } : localStorage : sessionStorage;
+
+
+GGRC.RequestStoreDoRecord = function() {
+  storage.clear();
+  storage.setItem("RequestStore.state", "record");
+  window.location.reload();
+}
+
+GGRC.RequestStoreDoReplay = function() {
+  storage.setItem("RequestStore.state", "replay");
+  window.location.reload();
+}
+
+GGRC.RequestStoreDoNothing = function() {
+  storage.clear();
+  window.location.reload();
+}
+
+var RequestStoreState = storage.getItem("RequestStore.state");
+
+$.ajaxTransport("json", function(options, _originalOptions, _jqXHR) {
+  var state = RequestStoreState;
+
+  if (state !== 'record' && state !== 'replay')
+    return;
+
+  if (_originalOptions._canonical_url) {
+    console.debug("Found re-entrant request: " + _originalOptions._canonical_url);
+    return;
+  }
+
+  var url = options.url,
+      match = url.match(/^(.*)([?&])_=\d+(?:([?&])(.*))?$/);
+
+  if (match) {
+    if (match[4]) {
+      url = match[1] + match[2] + match[4];
+    }
+    else {
+      url = match[1];
+    }
+  }
+
+  _originalOptions._canonical_url = url;
+
+  return {
+    send: function(headers, completeCallback) {
+      if (state === "replay") {
+        var data = storage.getItem("RequestStore:" + url);
+        if (data) {
+          console.debug('Using cache: ', url);
+          setTimeout(function() {
+            completeCallback(200, 'success', { json: JSON.parse(data) });
+          }, 1);
+        }
+        else {
+          console.debug('Missed cache: ', url);
+        }
+      }
+      else {
+        console.debug('Using server: ', url);
+        jQuery.ajax(_originalOptions).done(function(data, statusText, jqXHR) {
+          if (state === "record") {
+            console.debug('Recording: ', url);
+            storage.setItem("RequestStore:" + url, JSON.stringify(data));
+            completeCallback(jqXHR.status, statusText, { json: data });
+          }
+        }).fail(function() {
+          console.debug('fail', arguments);
+        });
+      }
+    },
+    abort: function() {
+      console.debug("Aborted ajax");
+    }
+  };
+});
+
+
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
