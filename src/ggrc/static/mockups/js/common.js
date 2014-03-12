@@ -159,7 +159,7 @@ $(document).ready(function(){
     $( ".objective-selector input" ).autocomplete({
       source: people
     });
-    $( ".objective-selector input[name='program.title']" ).autocomplete({
+    $( ".objective-selector input[name='program_title'],input[name='program.title']" ).autocomplete({
       source: program
     });
     $( ".objective-selector input[name='object.title']" ).autocomplete({
@@ -265,6 +265,20 @@ $(document).ready(function(){
   });
   
   $('#assessmentWorkflowChoose').on('change', function(){
+    var id = $(this).val()
+      , workflow = null;
+    new Workflow.List({}).each(function(v){
+      if(v.id == id){
+        workflow = v;
+      }
+    });
+    if(id == "new"){
+      workflow = new Workflow({_new: true, title: "", tasks: [], reviews: []});
+    }
+    $("workflow-app").trigger("workflow_selected", workflow);
+    $('#accordionContentReview').show();
+    $('#accordionContentTasks').show();
+    return;
     if($(this).val() == 'newWorkflow') {
       $('#regularWorkflowLabel').hide();
       $('#newWorkflowLabel').show();
