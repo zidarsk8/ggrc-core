@@ -720,13 +720,6 @@ can.Model("can.Model.Cacheable", {
     this._pending_refresh.fn();
     return this._pending_refresh.dfd;
   }
-  // , attr : function() {
-  //   if(arguments.length < 1) {
-  //     return this.serialize();  // Short-circuit CanJS's "attr"-based serialization which leads to infinite recursion
-  //   } else {
-  //     return this._super.apply(this, arguments);
-  //   }
-  // }
   , serialize : function() {
     var that = this, serial = {};
     if(arguments.length) {
