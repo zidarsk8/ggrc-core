@@ -660,7 +660,7 @@
     }
     .filter-date-range {
       @include clearfix();
-      padding-left: 20px;
+      padding-left: 5px;
       li {
         line-height: 30px;
       }
@@ -668,6 +668,13 @@
         font-size: 12px;
         color: $black;
       }
+    }
+    .btn {
+      margin-top: 4px;
+      padding: 3px 6px;
+      line-height: 15px;
+      margin-right: 5px;
+      float: right;
     }
   }
 }
