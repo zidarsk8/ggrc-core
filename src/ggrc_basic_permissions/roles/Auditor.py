@@ -11,8 +11,9 @@ permissions = {
             "terms": {
                 "property_name": "status",
                 "value": [
+                    "Submitted",
                     "Accepted",
-                    "Completed"
+                    "Rejected"
                 ]
             },
             "type": "DocumentationResponse",
@@ -22,8 +23,9 @@ permissions = {
             "terms": {
                 "property_name": "status",
                 "value": [
+                    "Submitted",
                     "Accepted",
-                    "Completed"
+                    "Rejected"
                 ]
             },
             "type": "InterviewResponse",
@@ -33,8 +35,9 @@ permissions = {
             "terms": {
                 "property_name": "status",
                 "value": [
+                    "Submitted",
                     "Accepted",
-                    "Completed"
+                    "Rejected"
                 ]
             },
             "type": "PopulationSampleResponse",
@@ -59,7 +62,9 @@ permissions = {
     ],
     "update": [
         "Request",
-        "Response"
+         "DocumentationResponse",
+         "InterviewResponse",
+         "PopulationSampleResponse"
     ],
     "delete": [
         "Request",
