@@ -33,7 +33,7 @@ var makeFindRelated = function(thistype, othertype) {
   };
 };
 
-function dateConverter(d) {
+function dateConverter(d, oldValue, fn, key) {
   var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
   if(typeof d === "object") {
@@ -54,13 +54,17 @@ function dateConverter(d) {
       && !/[-+]\d\d:?\d\d/.test(d)) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
+
+  if(typeof oldValue === "object" && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
+    return oldValue;  // avoid changing to new Date object if the value is the same.
+  }
   return ret ? ret.toDate() : undefined;
 }
 
 function makeDateUnpacker(keys) {
   return function(d) {
     return can.reduce(keys, function(curr, key) {
-      return curr || (d[key] && dateConverter(d[key]));
+      return curr || (d[key] && dateConverter.apply(this, [d[key]].concat(arguments.slice(1))));
     }, null) || d;
   };
 }
