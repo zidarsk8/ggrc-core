@@ -62,9 +62,9 @@ function dateConverter(d, oldValue, fn, key) {
 }
 
 function makeDateUnpacker(keys) {
-  return function(d) {
+  return function(d, oldValue, fn, attr) {
     return can.reduce(keys, function(curr, key) {
-      return curr || (d[key] && dateConverter.apply(this, [d[key]].concat(arguments.slice(1))));
+      return curr || (d[key] && dateConverter.call(this, d[key], oldValue, fn, attr));
     }, null) || d;
   };
 }
