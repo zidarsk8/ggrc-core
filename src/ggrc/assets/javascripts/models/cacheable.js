@@ -55,7 +55,7 @@ function dateConverter(d, oldValue, fn, key) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
 
-  if(typeof oldValue === "object" && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
+  if(oldValue && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
     return oldValue;  // avoid changing to new Date object if the value is the same.
   }
   return ret ? ret.toDate() : undefined;
