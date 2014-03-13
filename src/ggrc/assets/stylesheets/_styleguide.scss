@@ -448,3 +448,19 @@ ul.new-tree {
     }
   }
 }
+.lhs-nav {
+  ul.sub-level,
+  ul.sub-actions {
+    li {
+      a {
+        .lhs-main-title {
+          &.span8 {
+            span.lhs-item {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

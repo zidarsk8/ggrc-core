@@ -542,6 +542,10 @@
       margin-right: 4px;
       margin-top: 6px;
     }
+    .icon-text {
+      margin-right: 4px;
+      margin-top: 1px;
+    }
     input,
     textarea {
       @include placeholder($footerBorder);
