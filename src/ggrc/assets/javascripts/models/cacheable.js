@@ -36,7 +36,7 @@ var makeFindRelated = function(thistype, othertype) {
 function dateConverter(d, oldValue, fn, key) {
   var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
-  if(typeof d === "object") {
+  if(typeof d === "object" && d) {
     d = d.getTime();
   }
   if(typeof d === "number") {
@@ -46,6 +46,7 @@ function dateConverter(d, oldValue, fn, key) {
   if(typeof d === "string" && ~d.indexOf("/")) {
     conversion = "MM/DD/YYYY";
   }
+  d = d || "";
   ret = moment(d.toString(), conversion);
   if (typeof d === "string" && ret
       //  Don't correct timezone for dates
