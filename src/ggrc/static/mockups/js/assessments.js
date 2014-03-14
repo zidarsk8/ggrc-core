@@ -22,6 +22,16 @@ var Workflow = can.Model.LocalStorage.extend({
   }
 });
 
+var Objects = [
+   {type: "control", name: "Secure Backups"},
+   {type: "control", name: "Data Storage"},
+   {type: "control", name: "Password Security"},
+   {type: "control", name: "Access Control"},
+   {type: "control", name: "Stability and Perpetuability"}
+];
+
+
+
 var assessmentList = new Assessment.List({});
 can.Component.extend({
   tag: 'assessments-app',
@@ -50,6 +60,8 @@ can.Component.extend({
     assessments : assessmentList,
     assessment: assessmentList[0],
     workflow: assessmentList[0].workflow,
+    objects : [],
+    filter : assessmentList[0].objects.length == 0,
   },
   events: {
     '{Assessment} created' : function(Custruct, ev, assessment){
@@ -72,6 +84,29 @@ can.Component.extend({
         });
         assessment.save();
     },
+    "a#objectReview click" : function(el, ev){
+      this.scope.attr('filter', false);
+      this.scope.attr('objects', Objects);
+    },
+    "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
+      this.scope.attr('filter', true);
+      this.scope.attr('objects', []);
+      this.scope.assessment.attr('objects', []);
+    },
+    "a#addSelected click" : function(el, ev){
+      var scope = this.scope
+        , assessment = scope.assessment
+        , selected = $('.object-check-single').map(function(_, v){return v.checked;})
+        , filtered = []
+        , i;
+      
+      scope.objects.each(function(v,i){
+        if(selected[i]) filtered.push(v);
+      });
+      assessment.attr('objects', filtered);
+      assessment.save();
+      scope.attr('objects', []);
+    }
   }
 });
 
@@ -84,6 +119,7 @@ can.Component.extend({
     assessment: assessmentList[0],
     workflows : new Workflow.List({}),
     workflow : null,
+    objectsFilter : false,
     //workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
   },
   events: {
@@ -92,6 +128,7 @@ can.Component.extend({
     },
     ' selected' : function(el, ev, assessment){
       this.scope.attr('assessment', assessment);
+      this.scope.attr('objectsFilter', false);
       this.scope.attr('workflow_id', 'workflow' in assessment ? assessment.workflow : 0)
     },
     ' workflow_selected' : function(el, ev, workflow){
@@ -198,6 +235,7 @@ $("#addAssessmentCreated").on('click', function(ev){
   })
   attrs['status'] = 'Pending';
   attrs['workflow'] = 0;
+  attrs['objects'] = [];
   $modal.modal('hide')
   
   new Assessment(attrs).save();

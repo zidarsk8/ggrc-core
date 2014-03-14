@@ -7,6 +7,7 @@ if(assessmentList.length === 0){
     end_date: "",
     status: "Pending",
     workflow: 0,
+    objects: []
   }).save();
 }
 var workflowList = new Workflow.List({});
