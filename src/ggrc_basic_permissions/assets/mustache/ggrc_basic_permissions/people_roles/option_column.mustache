@@ -42,6 +42,9 @@
       <div class="tier-2-info item-content">
         <div class="tier-2-info-content">
           <p>{{{description}}}</p>
+
+          {{{render_hooks 'Role.option_detail'}}}
+
           {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
         </div>
       </div>

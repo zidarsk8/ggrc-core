@@ -21,4 +21,4 @@ dashboard-js-template-files:
   - people/gplus_photo.mustache
   - gdrive/auth_button.mustache
   - gdrive/gapi_errors.mustache
-  
+  - roles/gdrive_option_detail.mustache
