@@ -1158,7 +1158,7 @@
         }
         else {
           return model.findAll(params).done(function(mappings) {
-            binding.instance.attr(object_join_attr, mappings);
+            //binding.instance.attr(object_join_attr, mappings);
             self.insert_instances_from_mappings(binding, mappings.reify());
           });
         }
@@ -1325,7 +1325,7 @@
               mappings.entries[i] = new _class({ id: entry.id });
             });
 
-            binding.instance.attr(object_join_attr, mappings.entries);
+            //binding.instance.attr(object_join_attr, mappings.entries);
             self.insert_instances_from_mappings(binding, mappings.entries.reify());
             return mappings.entries;
           });
