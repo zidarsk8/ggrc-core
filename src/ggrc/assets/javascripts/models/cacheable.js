@@ -115,8 +115,12 @@ can.Model("can.Model.Cacheable", {
 
         deferred.then(success, error);
         sourceDeferred.then(function(sourceData) {
-          var obsList = new self.List([]);
-          
+          var obsList = new self.List([])
+            , start
+            , dt
+            , increment
+            ;
+
           if(sourceData[self.root_collection + "_collection"]) {
             sourceData = sourceData[self.root_collection + "_collection"];
           }
@@ -124,16 +128,37 @@ can.Model("can.Model.Cacheable", {
             sourceData = sourceData[self.root_collection];
           }
 
-          setTimeout(function(){
-            var piece = sourceData.splice ? sourceData.splice(0,Math.min(sourceData.length, 5)) : [sourceData];
-            obsList.push.apply(obsList, self.models(piece));
+          if (!sourceData.splice) {
+            sourceData = [sourceData];
+          }
 
-            if(sourceData.length) {
-              setTimeout(arguments.callee, 10);
-            } else {
+          // modelizeN adds the next N results into the result list
+          function modelizeN(n) {
+            var piece;
+
+            can.Observe.startBatch();
+            piece = sourceData.splice(0, Math.min(sourceData.length, n));
+            obsList.push.apply(obsList, self.models(piece));
+            can.Observe.stopBatch();
+          }
+
+          // Estimate how many objects we can modelize in 200ms, and batch by
+          // that amount
+          start = Date.now();
+          modelizeN(5);
+          dt = Date.now() - start + 1;
+          increment = Math.ceil(200 / dt) * 5;
+
+          // Trigger a setTimeout loop to modelize remaining objects
+          (function() {
+            modelizeN(increment);
+            if (sourceData.length) {
+              setTimeout(arguments.callee, 5);
+            }
+            else {
               deferred.resolve(obsList);
             }
-          }, 10);
+          })();
         }, function() {
           deferred.reject.apply(deferred, arguments);
         });
