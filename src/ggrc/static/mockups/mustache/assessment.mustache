@@ -130,7 +130,7 @@
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="info-utility-link">
-                          <a href="#setupWorkflow" class="info-edit" title="Edit"  id="workflowSetup" data-toggle="modal">
+                          <a href="#editAssessmentStandAlone" class="info-edit" title="Edit"  id="workflowSetup" data-toggle="modal">
                             <i class="grcicon-edit"></i>
                             Edit Assessment Info
                           </a>
@@ -581,4 +581,136 @@
       </div>
     </section>
   </div>
+  
+  <div id="editAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Edit Assessment</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
+        <div class="row-fluid">
+          <div class="span8">
+            <label>
+              Assessment Title
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{assessment.title}}" tabindex="1">
+          </div>
+          <div class="span4">
+            <label>
+              Program
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <i class="grcicon-program-color pull-left icon-field"></i>
+            <div class="objective-selector">
+              <input tabindex="2" type="text" name="program_title" class="span11 search-icon" value="{{assessment.program_title}}" placeholder="Enter text to search for Program">
+            </div>
+          </div>
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span6">
+            <label>
+              Assessment Lead
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <i class="grcicon-person-green pull-left icon-field"></i>
+            <div class="objective-selector">
+              <input tabindex="3" type="text" name="lead_email" class="span11 search-icon" value="{{assessment.lead_email}}" placeholder="Enter text to search for Assessment Lead" value="Cassius Clay">
+            </div>
+          </div>
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span3">
+            <label>
+              Requested on
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input tabindex="4" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="start_date" placeholder="MM/DD/YYYY" type="text" value="{{assessment.start_date}}">
+          </div>
+          <div class="span3">
+            <label>
+              Due on
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{assessment.end_date}}">
+          </div>
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="expand-link">
+              <a class="show-hidden-fields" href="javascript://">
+                <span class="out">
+                  <i class="grcicon-show"></i>
+                  Show 
+                </span>
+                <span class="in">
+                  <i class="grcicon-hide"></i>
+                  Hide
+                </span>
+                Advanced
+                <span class="hidden-fields out">
+                  Description, gDrive Folder
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hidden-fields-area" style="display:none">
+          <div class="row-fluid">
+            <div class="span6">
+              <label>
+                Description
+                <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+              </label>
+              <div class="wysiwyg-area">
+                <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="6"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <div class="span12">
+              <label>
+                gGRC Folder
+                <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+              </label>
+              <span class="gray"><em>Not yet defined</em></span>
+            </div>
+          </div>
+        </div>
+        
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a id="saveAssessment" tabindex="24" class="btn btn-primary" href="javascript://">Savessss</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
 </assessment-app>
