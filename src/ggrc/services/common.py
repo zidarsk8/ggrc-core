@@ -322,6 +322,16 @@ class Resource(ModelView):
         :service: The instance of Resource handling the PUT request.
       """,
       )
+  model_deleted = signals.signal('Model DELETEd',
+      """
+      Indicates that a model object was DELETEd and will be removed from the
+      databse. The sender in the signal will be the model class of the DELETEd
+      resource. The followin garguments will be sent along with the signal:
+
+        :obj: The model instance removed.
+        :service: The instance of Resource handling the DELETE request.
+      """,
+      )
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -460,6 +470,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete_for(obj):
       raise Forbidden()
     db.session.delete(obj)
+    self.model_deleted.send(obj.__class__, obj=obj, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Commit"):

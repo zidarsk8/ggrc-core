@@ -97,7 +97,9 @@ def handle_get_example_resource(context, name, expected_status=200):
   example = getattr(context, name)
   url = example.get('selfLink')
   response = get_resource(context, url)
-  assert response.status_code == expected_status
+  assert response.status_code == expected_status, \
+      'Expected status code {0}, received {1}'\
+        .format(expected_status, response.status_code)
   if expected_status == 200 or expected_status == 201:
     example = Example(
         example.resource_type, response.json(), response=response)

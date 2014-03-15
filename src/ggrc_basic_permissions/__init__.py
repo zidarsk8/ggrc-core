@@ -411,6 +411,20 @@ def assign_role_reader(user):
           )
       db.session.add(role_reader_for_user)
 
+@Resource.model_deleted.connect
+def handle_resoruce_deleted(sender, obj=None, service=None):
+  if obj.context \
+      and obj.context.related_object_id \
+      and obj.id == obj.context.related_object_id \
+      and obj.__class__.__name__ == obj.context.related_object_type:
+    db.session.query(UserRole) \
+        .filter(UserRole.context_id == obj.context_id) \
+        .delete()
+    db.session.query(ContextImplication) \
+        .filter(ContextImplication.context_id == obj.context_id) \
+        .delete()
+    db.session.delete(obj.context)
+
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.
 # @BaseObjectView.extension_contributions.connect_via(Program)
