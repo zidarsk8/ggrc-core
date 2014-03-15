@@ -1,9 +1,12 @@
 import unittest
 
-from cache import CacheManager, Config, Factory
+from ggrc.cache import CacheManager, Config
+from ggrc.testcache.testfactory import TestFactory
 import json
 import logging
 import sys
+from google.appengine.api import memcache
+from google.appengine.ext import testbed
 
 class TestCacheManager(unittest.TestCase):
   cache_manager = None
@@ -11,11 +14,15 @@ class TestCacheManager(unittest.TestCase):
   factory = None
   #log_level=logging.DEBUG
   log_level=logging.INFO
-  defaultproperties={'CACHEMECHANISM':'local'}
+  defaultproperties={'CACHEMECHANISM':'memcache'}
+  testbed=None
 
   def setUp(self):
     logging.basicConfig(level=self.log_level)
     self.cache_manager= CacheManager()
+    self.testbed = testbed.Testbed()
+    self.testbed.activate()
+    self.testbed.init_memcache_stub()
 
     # setup config
     self.config = Config();
@@ -23,7 +30,7 @@ class TestCacheManager(unittest.TestCase):
     self.config.initialize()
 
     # setup config
-    self.factory = Factory()
+    self.factory = TestFactory()
 
     # initialize cache manager
     self.cache_manager.set_config(self.config)
@@ -33,6 +40,9 @@ class TestCacheManager(unittest.TestCase):
     for i in range(50):
       data = {i: {'name':'control'+str(i), 'type': 'type'+str(i)}}
       self.cache_manager.add_collection('collection', 'controls', data)
+
+  def tearDown(self):
+    self.testbed.activate()
 
   def runTest(self):
     logging.info("\nTest Case #1: Getting data from cache")

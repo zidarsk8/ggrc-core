@@ -1,6 +1,8 @@
 
 import unittest
-from cache import LocalCache
-from cache import CacheManager
-from testlocalcache import TestLocalCache
-from testcachemanager import TestCacheManager
+from ggrc.cache import LocalCache
+from ggrc.cache import MemCache
+from ggrc.cache import CacheManager
+from ggrc.cache import Factory
+from ggrc.testcache.testcachemanager import TestCacheManager
+from ggrc.testcache.testfactory import TestFactory
