@@ -277,6 +277,39 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             that.update_permission_for(binding.instance, GGRC.config.GAPI_ADMIN_GROUP, admin_permission_id, "writer");
           });
         }
+        if(instance instanceof CMS.Models.Program) {
+          var auths = {};
+          can.each(instance.get_mapping("authorizations"), function(authmapping) {
+            var auth = authmapping.instance;
+            if(!auths[auth.person.reify().email]
+               || auth.created_at.getTime() > auths[auth.person.reify().email].created_at.getTime()
+            ) {
+              auths[auth.person.reify().email] = auth;
+            }
+          });
+          can.each(auths, function(auth) {
+            var person = auth.person.reify()
+            , role = auth.role.reify()
+            , rolesmap = {
+              ProgramOwner : "writer"
+              , ProgramEditor : "writer"
+              , ProgramReader : "reader"
+            };
+
+            //setting user roles does create a quirk because we want to be sure that a user with
+            //  access doesn't accidentally remove his own access to a resource while trying to change it.
+            //  So a user may have more than one role at this point, and we only want to change the GDrive
+            //  permission based on the most recent one.
+
+            $.when(
+              permission_ids[person.email]
+              || CMS.Models.GDriveFilePermission.findUserPermissionId(person)
+            ).then(function(user_permission_id) {
+              permission_ids[person.email] = user_permission_id;
+              that.update_permission_for(binding.instance, person, user_permission_id, rolesmap[role.name]);
+            });
+          });
+        }
       });
     });
   }
@@ -684,11 +717,14 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
       can.each(Object.keys(cache), function(key) {
         if(cache[key].context && cache[key].context.id === instance.context.id) {
-          that.update_permissions(
-            model
-            , ev
-            , cache[key]
-          );
+          //delay this because the user role isn't updated in the object yet.
+          setTimeout(function() {
+            that.update_permissions(
+              cache[key].constructor
+              , ev
+              , cache[key]
+            );
+          }, 10);
         }
       });
     }

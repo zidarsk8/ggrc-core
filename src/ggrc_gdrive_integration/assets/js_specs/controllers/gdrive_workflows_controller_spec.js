@@ -228,12 +228,44 @@ describe("GDrive Workflows Controller", function() {
 
     });
 
-    afterEach(function() {
-      delete CMS.Models.Program.cache;
-      delete CMS.Models.Audit.cache;
-      delete CMS.Models.Request.cache;
-      delete CMS.Models.ObjectFolder.cache;
+
+  });
+
+  describe("UserRole created event", function() {
+
+    it("calls update_permissions only for program with matching context", function() {
+      spyOn(ctl, "update_permissions");
+
+      var p1 = new CMS.Models.Program({id : 1, context : { id : 1 }});
+      var p2 = new CMS.Models.Program({id : 2, context : { id : 2 }});
+
+      var role = new CMS.Models.Role({ id : 1, name : "ProgramOwner"});
+
+      var userrole = new CMS.Models.UserRole({
+        role : role.stub()
+        , context : { id : 1 }
+      });
+
+      ctl["{CMS.Models.UserRole} created"](CMS.Models.UserRole, {}, userrole);
+
+      waitsFor(function() {
+        return ctl.update_permissions.callCount;
+      }, "waiting on delayed update_permissions");
+      runs(function() {
+        expect(ctl.update_permissions).toHaveBeenCalledWith(CMS.Models.Program, jasmine.any(Object), p1);
+        expect(ctl.update_permissions).not.toHaveBeenCalledWith(CMS.Models.Program, jasmine.any(Object), p2);
+      });
     });
+
+  });
+
+  afterEach(function() {
+    delete CMS.Models.Program.cache;
+    delete CMS.Models.Audit.cache;
+    delete CMS.Models.Request.cache;
+    delete CMS.Models.ObjectFolder.cache;
+    delete CMS.Models.UserRole.cache;
+    delete CMS.Models.Role.cache;
   });
 
 });
