@@ -7,16 +7,22 @@ from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
 from ggrc.models import create_db, drop_db
+from google.appengine.api import memcache  
+from google.appengine.ext import testbed 
 
 use_migrations = False
 
 class TestCase(BaseTestCase):
   def setUp(self):
     create_db(use_migrations, quiet=True)
+    self.testbed = testbed.Testbed()
+    self.testbed.activate()
+    self.testbed.init_memcache_stub()
 
   def tearDown(self):
     db.session.remove()
     drop_db(use_migrations, quiet=True)
+    self.testbed.deactivate()
 
   def create_app(self):
     app.testing = True
