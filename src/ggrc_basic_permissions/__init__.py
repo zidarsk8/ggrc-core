@@ -412,7 +412,7 @@ def assign_role_reader(user):
       db.session.add(role_reader_for_user)
 
 @Resource.model_deleted.connect
-def handle_resoruce_deleted(sender, obj=None, service=None):
+def handle_resource_deleted(sender, obj=None, service=None):
   if obj.context \
       and obj.context.related_object_id \
       and obj.id == obj.context.related_object_id \
