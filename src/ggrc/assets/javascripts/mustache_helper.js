@@ -1712,10 +1712,29 @@ Mustache.registerHelper("global_count", function(model_type, options) {
   if (!state.attr('status')) {
     state.attr('status', 'loading');
 
+    if (!GGRC._search_cache_deferred) {
+      //  TODO: This should really be RefreshQueue-style
+      var models = [
+          "Program", "Regulation", "Contract", "Policy", "Standard"
+        , "Section", "Objective", "Control"
+        , "System", "Process"
+        , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
+        , "Audit"
+        ];
+      GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
+    }
+
     var model = CMS.Models[model_type]
       , update_count = function(ev, instance) {
           if (!instance || instance instanceof model) {
-            GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+            GGRC._search_cache_deferred.then(function(result) {
+              if (!result.counts.hasOwnProperty(model_type)) {
+                return GGRC.Models.Search.counts_for_types(null, [model_type]);
+              }
+              else {
+                return result;
+              }
+            }).then(function(result) {
               state.attr({
                   status: 'loaded'
                 , count: result.counts[model_type]
