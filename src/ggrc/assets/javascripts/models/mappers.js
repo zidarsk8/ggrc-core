@@ -220,9 +220,6 @@
         this.loader = loader;
 
         this.list = new can.Observe.List();
-        this.refresh_queue = new RefreshQueue();
-
-        //this.listeners = {};
       }
 
     , refresh_stubs: function() {
@@ -233,8 +230,24 @@
         return this.loader.refresh_instances(this);
       }
 
+    //  `refresh_count`
+    //  - Returns a `can.compute`, which in turn returns the length of
+    //    `this.list`
+    //  - Attempts to do the minimal work (e.g., loading only stubs, not full
+    //    instances) to return an accurate length
+    , refresh_count: function() {
+        var self = this;
+        return this.refresh_stubs().then(function() {
+          return can.compute(function() {
+            return self.list.attr("length");
+          });
+        });
+      }
+
+    //  `refresh_list`
+    //  - Returns a list which will *only* ever contain fully loaded / reified
+    //    instances
     , refresh_list: function() {
-        // Returns a list which will *only* ever contain fully loaded instances
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
           ;

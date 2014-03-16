@@ -2289,4 +2289,29 @@ Mustache.registerHelper("fadeout", function(delay, prop, options) {
   }
 });
 
+Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, options) {
+  var args = can.makeArray(arguments)
+    , options = args[args.length-1]
+    , mapping_name
+    ;
+
+  mapping_names = args.slice(1, args.length - 1);
+
+  instance = Mustache.resolve(instance);
+
+  // Find the most appropriate mapping
+  for (var i = 0; i < mapping_names.length; i++) {
+    mapping_name = Mustache.resolve(mapping_names[i]);
+    if (instance.get_binding(mapping_name)) {
+      break;
+    }
+  }
+
+  var finish = function(count) {
+    return options.fn({ count: count });
+  };
+
+  return defer_render("span", finish, instance.get_list_counter(mapping_name))
+});
+
 })(this, jQuery, can);

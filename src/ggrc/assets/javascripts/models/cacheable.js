@@ -596,6 +596,11 @@ can.Model("can.Model.Cacheable", {
   }
   , computed_errors : can.compute(function() { return this.errors(); })
 
+  , get_list_counter: function(name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_count();
+    }
+
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
       return binding.refresh_list();
