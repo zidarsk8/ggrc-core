@@ -33,6 +33,7 @@ var Objects = [
 
 
 var assessmentList = new Assessment.List({});
+create_seed();
 can.Component.extend({
   tag: 'assessments-app',
   scope: {
@@ -61,19 +62,23 @@ can.Component.extend({
     assessment: assessmentList[0],
     workflow: assessmentList[0].workflow,
     objects : [],
+    Objects : Objects,
     filter : assessmentList[0].objects.length == 0,
+    filter_list : [{value: assessmentList[0].program_title}],
+    can_start : assessmentList[0].workflow && assessmentList[0].objects.length,
+    set_fields : function(assessment){
+      this.attr('filter_list', [{value: assessment.program_title}]);
+      this.attr('assessment', assessment);
+      this.attr('workflow', assessment.workflow);
+      this.attr('can_start', this.assessment.workflow && this.assessment.objects.length)
+    },
   },
   events: {
-    '{Assessment} created' : function(Custruct, ev, assessment){
-      this.scope.attr('assessment', assessment);
-    },
-    ' selected' : function(el, ev, assessment){
-      this.scope.attr('assessment', assessment);
-      this.scope.attr('workflow', assessment.workflow);
-    },
+    '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
+    ' selected' : function(){this.scope.set_fields(arguments[2])},
     ' workflow_selected' : function(el, ev, workflow){
-      this.scope.attr('workflow', workflow);
       this.scope.assessment.attr('workflow', workflow).save();
+      this.scope.set_fields(this.scope.assessment);
     },
     'a#saveAssessment click' : function(el, ev){
       var $modal = $('#editAssessmentStandAlone')
@@ -82,6 +87,7 @@ can.Component.extend({
         $modal.find('input').each(function(_, e){
           assessment.attr(e.name, e.value);
         });
+        $modal.modal('hide');
         assessment.save();
     },
     "a#objectReview click" : function(el, ev){
@@ -99,13 +105,33 @@ can.Component.extend({
         , selected = $('.object-check-single').map(function(_, v){return v.checked;})
         , filtered = []
         , i;
-      
+      console.log(scope.objects, 'adding')
       scope.objects.each(function(v,i){
         if(selected[i]) filtered.push(v);
       });
       assessment.attr('objects', filtered);
       assessment.save();
       scope.attr('objects', []);
+      this.scope.set_fields(assessment);
+    },
+    "a#startAssessment click":  function(){
+      $("#assessmentStart").modal('hide');
+      $("a.objects_widget").trigger('click');
+      this.scope.assessment.attr('started', true);
+      this.scope.assessment.save();
+    },
+    "#objectAll click": function(el){
+      $('.object-check-single').prop('checked', $(el).prop('checked'));
+    },
+    "#addSingleControl click": function(){
+      this.scope.assessment.objects.push({name: $("#new_object_name").val(), type:$("new_object_type").val()});
+      this.scope.assessment.save();
+    },
+    "#addFilterRule click": function(){
+      this.scope.filter_list.push([{value: ""}]);
+    },
+    ".remove_filter click" : function(el){
+      this.scope.filter_list.splice(el.data('index'), 1);
     }
   }
 });
@@ -167,7 +193,7 @@ can.Component.extend({
     },
     "a#addWorkflowNow click" : function(el, ev){
       $("assessment-app").trigger("workflow_selected", this.scope.workflow);
-      if(this.scope.workflow.attr('_new')){
+      if(typeof this.scope.workflow !== 'undefined' && this.scope.workflow.attr('_new')){
         this.scope.workflow.attr('_new', false);
         this.scope.workflow.save();
         
