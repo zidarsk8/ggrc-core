@@ -2308,10 +2308,17 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
   }
 
   var finish = function(count) {
-    return options.fn({ count: count });
+    return options.fn(options.contexts.add({ count: count }));
   };
 
-  return defer_render("span", finish, instance.get_list_counter(mapping_name))
+  var progress = function() {
+    return options.inverse(options.contexts);
+  };
+
+  return defer_render(
+      "span",
+      { done: finish, progress: progress },
+      instance.get_list_counter(mapping_name))
 });
 
 })(this, jQuery, can);
