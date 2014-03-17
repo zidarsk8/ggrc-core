@@ -105,7 +105,6 @@ can.Component.extend({
         , selected = $('.object-check-single').map(function(_, v){return v.checked;})
         , filtered = []
         , i;
-      console.log(scope.objects, 'adding')
       scope.objects.each(function(v,i){
         if(selected[i]) filtered.push(v);
       });
@@ -115,10 +114,20 @@ can.Component.extend({
       this.scope.set_fields(assessment);
     },
     "a#startAssessment click":  function(){
-      $("#assessmentStart").modal('hide');
-      $("a.objects_widget").trigger('click');
-      this.scope.assessment.attr('started', true);
+      var that = this
+        , assessment = this.scope.assessment
+        , workflow = this.scope.workflow
+        ;
+      
+      assessment.attr('started', true);
+      var a = $.map(assessment.objects, function(v){
+        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "unstarted"}}));
+        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "unstarted"}}));
+        v.attr('status', "unstarted")
+      });
       this.scope.assessment.save();
+      $("a.objects_widget").trigger('click');
+      $("#assessmentStart").modal('hide');
     },
     "#objectAll click": function(el){
       $('.object-check-single').prop('checked', $(el).prop('checked'));
@@ -130,8 +139,26 @@ can.Component.extend({
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
     },
+    "#addEntry click" : function(el){
+      var object_id = el.closest('.object-top').data('index')
+        , task_id = el.data('index')
+        , value = el.parent().find('textarea').first().val();
+      el.closest(".add-entry").hide();
+      el.parent().next().show();
+      
+      this.scope.assessment.objects[object_id].tasks[task_id].entries.push({content: value});
+      this.scope.assessment.save();
+      
+    },
     ".remove_filter click" : function(el){
       this.scope.filter_list.splice(el.data('index'), 1);
+    },
+    ".reset_filter click" : function(){
+      this.scope.attr('filter_list', [{value: this.scope.assessment.program_title}]);
+    },
+    ".show_review click" : function(el){
+      $(el).parent().hide();
+      $(el).parent().prev().show();
     }
   }
 });

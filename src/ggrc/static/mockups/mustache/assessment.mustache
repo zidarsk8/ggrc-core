@@ -280,7 +280,7 @@
                         <div class="row-fluid">
                           <div class="span3">
                             <div class="deny-buttons">
-                              <a class="btn" href="#">Reset</a>
+                              <a class="btn reset_filter" href="#">Reset</a>
                             </div>
                           </div>
                           <div class="span3">
@@ -346,7 +346,7 @@
                      {{#if assessment.started}}
                      <ul class="tree-structure new-tree mockup-tree colored-list">
                      {{#each assessment.objects}}
-	                    <li class="tree-item rq-amended-request">
+	                    <li class="tree-item rq-amended-request object-top" data-index="{{@index}}">
 	                      <div class="item-main">
 	                        <a href="javascript://" class="openclose">
 	                          <div class="row-fluid">
@@ -372,7 +372,7 @@
 	                            <div class="span1">
 	                              <div class="counter">
 	                                <i class="grcicon-object-black" rel="tooltip" data-placement="top" data-original-title="Mapped Objects"></i>
-	                                3
+	                                {{tasks.length}}
 	                              </div>
 	                            </div>
 	                            <div class="span2">
@@ -396,9 +396,10 @@
 	                        </div>
 	                        <div class="inner-tree">
 	                          <h6>
-	                            Tasks (3)
+	                            Tasks ({{tasks.length}})
 	                          </h6>
 	                          <ul class="tree-structure new-tree mockup-tree colored-list">
+	                            {{#tasks}}
 	                            <li class="tree-item rq-draft">
 	                              <div class="item-main">
 	                                <a href="javascript://" class="openclose">
@@ -406,14 +407,14 @@
 	                                    <div class="span7">
 	                                      <div class="item-data">
 	                                        <div class="tree-title-area">
-	                                          Proof Reading
+	                                          {{task_title}}
 	                                        </div>
 	                                      </div>
 	                                    </div>
 	                                    <div class="span3">
 	                                      <i class="grcicon-person-green pull-left"></i>
 	                                      <div class="objective-selector">
-	                                        <input type="text" class="span10 short-field search-icon" placeholder="Enter text to search for Assessment Lead" value="Cassius Clay">
+	                                        <input type="text" class="span10 short-field search-icon" placeholder="Enter text to search for Assessment Lead" value="{{task_lead}}">
 	                                      </div>
 	                                    </div>
 	                                    <div class="span2">
@@ -444,10 +445,12 @@
 	                                  <div class="row-fluid">
 	                                    <div class="span11">
 	                                      <div class="inner-row">
-	                                        <strong>Entries (<span id="entriesCount">1</span>)</strong>
+	                                      
+	                                        <strong>Entries (<span id="entriesCount">{{entries.length}}</span>)</strong>
 	                                        <ul class="entry-list">
+	                                          {{#each entries}}
 	                                          <li>
-	                                            Curabitur fringilla sagittis elit eget hendrerit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id quam euismod, gravida nunc eget, malesuada enim. Cras ullamcorper vulputate quam, lacinia pulvinar ligula mollis venenatis.
+	                                            {{content}}
 	                                            <ul class="attachment-list">
 	                                              <li>
 	                                                <a href="#">
@@ -464,89 +467,26 @@
 	                                            </ul>
 	                                            <span class="entry-author">By <a href="#">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
 	                                          </li>
-	                                          <li id="newEntry">
-	                                            Looking for answers
-	                                            <span class="entry-author">By <a href="#">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
-	                                          </li>
-	                                          <li id="entryText" class="add-entry">
-	                                            <textarea class="span10" placeholder="Entry">Looking for answers</textarea>
-	                                            <a href="#" class="entry-attachment">
-	                                              <i class="grcicon-attach-color"></i> Attach supporting file
-	                                            </a>
-	                                            <br>
-	                                            <a href="#" id="addEntryButton" class="btn btn-small btn-primary">
-	                                              <strong>Add Entry</strong>
-	                                            </a>
-	                                          </li>
+	                                          {{/each}}
 	                                        </ul>
-	                                        <a href="#" id="addEntryTrigger"><strong>Add Entry</strong></a>
+	                                        <div class="add-entry" style="display:none;">
+                                              <textarea class="span10" placeholder="Entry"></textarea>
+                                              <a href="#" class="entry-attachment">
+                                                <i class="grcicon-attach-color"></i> Attach supporting file
+                                              </a>
+                                              <br>
+                                              <a href="#" class="btn btn-small btn-primary" id="addEntry" data-index="{{@index}}">
+                                                <strong>Add Entry</strong>
+                                              </a>
+                                            </div>
+	                                        <a href="#" class="add-entry-btn"><strong class="show_review">Add Entry</strong></a>
 	                                      </div>
 	                                    </div>
 	                                  </div>
 	                                </div>
 	                              </div>
 	                            </li>
-	                            <li class="tree-item rq-draft">
-	                              <div class="item-main">
-	                                <a href="javascript://" class="openclose">
-	                                  <div class="row-fluid">
-	                                    <div class="span7">
-	                                      <div class="item-data">
-	                                        <div class="tree-title-area">
-	                                          Validate mappings
-	                                        </div>
-	                                      </div>
-	                                    </div>
-	                                    <div class="span3">
-	                                      <i class="grcicon-person-green pull-left"></i>
-	                                      <div class="objective-selector">
-	                                        <input type="text" class="span10 short-field search-icon" placeholder="Enter text to search for Assessment Lead" value="Cassius Clay">
-	                                      </div>
-	                                    </div>
-	                                    <div class="span2">
-	                                      <div class="control-wrap">
-	                                        <div class="request-control">
-	                                          <button id="startTask2" class="btn btn-primary">Start</button>
-	                                          <button id="finishTask2" class="btn">Finish</button>
-	                                          <span class="task-done" id="taskDone2"><em>Completed</em></span>
-	                                        </div>
-	                                      </div>
-	                                    </div>
-	                                  </div>
-	                                </a>
-	                              </div>
-	                            </li>
-	                            <li class="tree-item rq-draft">
-	                              <div class="item-main">
-	                                <a href="javascript://" class="openclose">
-	                                  <div class="row-fluid">
-	                                    <div class="span7">
-	                                      <div class="item-data">
-	                                        <div class="tree-title-area">
-	                                          Validate supporting documents
-	                                        </div>
-	                                      </div>
-	                                    </div>
-	                                    <div class="span3">
-	                                      <i class="grcicon-person-green pull-left"></i>
-	                                      <div class="objective-selector">
-	                                        <input type="text" class="span10 short-field search-icon" placeholder="Enter text to search for Assessment Lead" value="Cassius Clay">
-	                                      </div>
-	                                    </div>
-	                                    <div class="span2">
-	                                      <div class="control-wrap">
-	                                        <div class="request-control">
-	                                          <button id="startTask3" class="btn btn-primary">Start</button>
-	                                          <button id="finishTask3" class="btn">Finish</button>
-	                                          <span class="task-done" id="taskDone3"><em>Completed</em></span>
-	                                        </div>
-	                                      </div>
-	                                    </div>
-	                                  </div>
-	                                </a>
-	                              </div>
-	                            </li>
-	                            
+	                            {{/each}}
 	                            <li class="tree-item tree-item-add tree-footer">
 	                              <div class="row-fluid">
 	                                <div class="span12">
@@ -564,16 +504,18 @@
 	                            <strong>Reviews</strong>
 	                            <i class="grcicon-attribute-color review-icon"></i>
 	                          </p>
-	                          <div class="review-wrap" id="peerReview">
+	                          {{#each reviews}}
+	                          <div class="review-wrap" style="display:none;">
 	                            <div class="inner-tree">
 	                              <h6>
-	                                Peer Review Notes (1)
+	                                {{review_title}} Notes (1)
 	                                <div class="pull-right review-note-action">
 	                                  <a href="#" class="btn" id="peerReviewComplete">Complete Peer Review</a>
 	                                  <span class="task-done" id="reviewNoteDone"><em>Peer Review Completed</em></span>
 	                                </div>
 	                              </h6>
 	                              <ul class="tree-structure new-tree mockup-tree">
+	                                {{#each notes}}
 	                                <li class="tree-item">
 	                                  <div class="row-fluid">
 	                                    <div class="span12">
@@ -596,7 +538,8 @@
 	                                    </div>
 	                                  </div>
 	                                </li>
-	                                <li class="tree-item tree-item-add tree-footer" id="addNote">
+	                                {{/each}}
+	                                <li class="tree-item tree-item-add tree-footer">
 	                                  <div class="row-fluid">
 	                                    <div class="span12">
 	                                      <a href="#" class="section-create">
@@ -608,58 +551,11 @@
 	                              </ul>
 	                            </div>
 	                          </div>
-	                          <div class="review-wrap" id="partyReview">
-	                            <div class="inner-tree">
-	                              <h6>
-	                                3rd Party Review Notes (1)
-	                                <div class="pull-right review-note-action">
-	                                  <a href="#" class="btn" id="partyReviewComplete">Complete 3rd Party Review</a>
-	                                  <span class="task-done" id="reviewNoteDone2"><em>3rd Party Review Completed</em></span>
-	                                </div>
-	                              </h6>
-	                              <ul class="tree-structure new-tree mockup-tree">
-	                                <li class="tree-item">
-	                                  <div class="row-fluid">
-	                                    <div class="span12">
-	                                      <div class="item-data">
-	                                        <div class="show-description">
-	                                          <div class="tree-description">
-	                                            Curabitur fringilla sagittis elit eget hendrerit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id quam euismod, gravida nunc eget, malesuada enim. Cras ullamcorper vulputate quam, lacinia pulvinar ligula mollis venenatis.
-	                                            <ul class="attachment-list">
-	                                              <li>
-	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
-	                                                  <span>screenshot.pdf</span>
-	                                                </a>
-	                                              </li>
-	                                            </ul>
-	                                            <span class="entry-author">By <a href="#">Ronnie Cederman</a> on 2014-01-27 7:45am UTC</span>
-	                                          </div>
-	                                        </div>
-	                                      </div>
-	                                    </div>
-	                                  </div>
-	                                </li>
-	                                <li class="tree-item tree-item-add tree-footer" id="addNote2">
-	                                  <div class="row-fluid">
-	                                    <div class="span12">
-	                                      <a href="#" class="section-create">
-	                                        Add Note
-	                                      </a>
-	                                    </div>
-	                                  </div>
-	                                </li>
-	                              </ul>
-	                            </div>
-	                          </div>
-	                          <label class="main-label" id="peerReviewActive">
-	                            <input type="checkbox">
-	                            Ready for Peer review
+	                          <label class="main-label">
+	                            <input type="checkbox" class="show_review">
+	                            Ready for {{review_title}}
 	                          </label>
-	                          <label class="main-label" id="partyReviewActive">
-	                            <input type="checkbox">
-	                            Ready for 3rd Party review
-	                          </label>
+	                          {{/each}}
 	                        </div>
 	                        
 	                      </div>
