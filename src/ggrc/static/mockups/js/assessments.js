@@ -77,6 +77,12 @@ can.Component.extend({
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
     ' selected' : function(){this.scope.set_fields(arguments[2])},
     ' workflow_selected' : function(el, ev, workflow){
+      workflow.tasks.each(function(v,i){
+        if(v === "") workflow.tasks.splice(i, 1);
+      });
+      workflow.reviews.each(function(v,i){
+        if(v.title === "") workflow.reviews.splice(i, 1);
+      });
       this.scope.assessment.attr('workflow', workflow).save();
       this.scope.set_fields(this.scope.assessment);
     },
@@ -121,9 +127,9 @@ can.Component.extend({
       
       assessment.attr('started', true);
       var a = $.map(assessment.objects, function(v){
-        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "unstarted"}}));
-        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "unstarted"}}));
-        v.attr('status', "unstarted")
+        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "rq-draft"}}));
+        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "rq-draft"}}));
+        v.attr('status', "rq-draft")
       });
       this.scope.assessment.save();
       $("a.objects_widget").trigger('click');
@@ -150,6 +156,20 @@ can.Component.extend({
       this.scope.assessment.save();
       
     },
+    ".startObjectNow click" : function(el){
+      console.log("hello")
+      var object_id = el.closest('.object-top').data('index')
+        , type = el.data('type')
+        , id = el.data('id')
+        , status = el.data('status')
+        ;
+      if(type === 'object')
+        this.scope.assessment.objects[object_id].attr('status', status);
+      else{
+        this.scope.assessment.objects[object_id][type][id].attr('task_state', status);
+      }
+      this.scope.assessment.save();
+    },
     ".remove_filter click" : function(el){
       this.scope.filter_list.splice(el.data('index'), 1);
     },
@@ -159,6 +179,40 @@ can.Component.extend({
     ".show_review click" : function(el){
       $(el).parent().hide();
       $(el).parent().prev().show();
+    }
+  },
+  helpers: {
+    
+    "if_equals": function(val1, val2, options) {
+      var that = this, _val1, _val2;
+      function exec() {
+        if(_val1 == _val2) return options.fn(options.contexts);
+        else return options.inverse(options.contexts);
+      }
+        if(typeof val1 === "function") { 
+          if(val1.isComputed) {
+            val1.bind("change", function(ev, newVal, oldVal) {
+              _val1 = newVal;
+              return exec();
+            });
+          }
+          _val1 = val1.call(this);
+        } else {
+          _val1 = val1;
+        }
+        if(typeof val2 === "function") { 
+          if(val2.isComputed) {
+            val2.bind("change", function(ev, newVal, oldVal) {
+              _val2 = newVal;
+              exec();
+            });
+          }
+          _val2 = val2.call(this);
+        } else {
+          _val2 = val2;
+        }
+
+      return exec();
     }
   }
 });
@@ -219,12 +273,13 @@ can.Component.extend({
       //workflow.save()
     },
     "a#addWorkflowNow click" : function(el, ev){
+      var workflow = this.scope.workflow;
       $("assessment-app").trigger("workflow_selected", this.scope.workflow);
-      if(typeof this.scope.workflow !== 'undefined' && this.scope.workflow.attr('_new')){
-        this.scope.workflow.attr('_new', false);
-        this.scope.workflow.save();
-        
+      if(typeof workflow !== 'undefined' && workflow.attr('_new')){
+        workflow.attr('_new', false);
+        workflow.save();
       }
+      
       $("#setupWorkflow").modal('hide');
     },
     '.update change' : function(el, ev){

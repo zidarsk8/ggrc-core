@@ -196,7 +196,7 @@
                       <div class="right-button">
                         <span class="gray small"><em>
                         {{^if assessment.workflow}}
-                        <span>No selected workflow</span>
+                        <span>No selected workflow</span>{{^if assessment.objects.length}}, {{/if}}
                         {{/if}}
                         {{^if assessment.objects.length}}
                         <span>No selected objects</span>
@@ -346,7 +346,7 @@
                      {{#if assessment.started}}
                      <ul class="tree-structure new-tree mockup-tree colored-list">
                      {{#each assessment.objects}}
-	                    <li class="tree-item rq-amended-request object-top" data-index="{{@index}}">
+	                    <li class="tree-item {{status}} object-top" data-index="{{@index}}">
 	                      <div class="item-main">
 	                        <a href="javascript://" class="openclose">
 	                          <div class="row-fluid">
@@ -378,9 +378,15 @@
 	                            <div class="span2">
 	                              <div class="control-wrap">
 	                                <div class="request-control">
-	                                  <button id="startObject" class="btn btn-primary">Start</button>
-	                                  <button id="finishObject" class="btn disabled">Finish</button>
-	                                  <span id="objectMessage" class="task-done"><em>Completed</em></span>
+	                                  {{#if_equals status 'rq-draft'}}
+	                                  <button class="startObjectNow btn btn-primary" data-status="rq-responded" data-type="object">Start</button>
+	                                  {{/if_equals}}
+	                                  {{#if_equals status 'rq-responded'}}
+	                                  <button class="startObjectNow btn disabled" data-status="rq-accepted" data-type="object">Finish</button>
+	                                  {{/if_equals}}
+	                                  {{#if_equals status 'rq-accepted'}}
+	                                  <span class="objectMessageNow task-done" data-type="object"><em>Completed</em></span>
+	                                  {{/if_equals}}
 	                                </div>
 	                              </div>
 	                            </div>
@@ -420,9 +426,15 @@
 	                                    <div class="span2">
 	                                      <div class="control-wrap">
 	                                        <div class="request-control">
-	                                          <button id="startTask" class="btn btn-primary">Start</button>
-	                                          <button id="finishTask" class="btn">Finish</button>
-	                                          <span class="task-done" id="taskDone"><em>Completed</em></span>
+	                                        {{#if_equals task_state 'rq-draft'}}
+			                                    <button class="startObjectNow btn" data-status="rq-responded" data-type="tasks" data-id="{{@index}}">Start</button>
+			                                    {{/if_equals}}
+			                                    {{#if_equals task_state 'rq-responded'}}
+			                                    <button class="startObjectNow btn" data-status="rq-accepted" data-type="tasks"  data-id="{{@index}}">Finish</button>
+			                                    {{/if_equals}}
+			                                    {{#if_equals task_state 'rq-accepted'}}
+			                                    <span class="objectMessageNow task-done" data-type="tasks"><em>Completed</em></span>
+			                                    {{/if_equals}}
 	                                        </div>
 	                                      </div>
 	                                    </div>
