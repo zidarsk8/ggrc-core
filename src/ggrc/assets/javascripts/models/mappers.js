@@ -1403,4 +1403,25 @@
         return binding.source_binding.refresh_stubs(binding);
       }
   });
+
+  GGRC.all_local_results = function(instance) {
+    // Returns directly-linked objects
+    var loaders = GGRC.Mappings[instance.constructor.shortName]
+      , local_loaders = []
+      , multi_loader
+      , multi_binding
+      ;
+
+    can.each(loaders, function(loader, name) {
+      if (loader instanceof GGRC.ListLoaders.DirectListLoader
+          || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
+        local_loaders.push(name);
+      }
+    });
+
+    multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders);
+    multi_binding = multi_loader.attach(instance);
+    return multi_binding.refresh_stubs();
+  };
+
 })(GGRC, can);

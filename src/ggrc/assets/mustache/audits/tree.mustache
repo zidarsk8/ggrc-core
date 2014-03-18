@@ -8,7 +8,7 @@
 
 {{!tree node mustache}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  <div class="item-main" data-model="true" {{data 'model'}}>
+  <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
     <a href="javascript://" class="openclose">
       <div class="row-fluid">
         <div class="span10">

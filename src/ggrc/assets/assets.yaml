@@ -109,6 +109,7 @@ dashboard-js-template-files:
   - base_objects/map_related_modal_content.mustache
   - base_objects/mappings_detail.mustache
   - base_objects/page_header.mustache
+  - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache

@@ -7,10 +7,10 @@
 
 
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main" {{data 'model'}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span9">
+          <div class="span6">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -65,6 +65,9 @@
               </div>
             {{/prune_context}}
           {{/with_mapping_count}}
+          <div class="span3">
+            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+          </div>
         </div>
       </a>
     </div>

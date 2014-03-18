@@ -469,6 +469,8 @@ $(function() {
   $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
     var $el = $(this)
       ;
+    //  Prevent toggling `openclose` state in trees
+    ev.stopPropagation();
     $el.fadeTo('fast', 0.25);
     $el.children(".result").each(function(i, result_el) {
       var $result_el = $(result_el)
@@ -499,7 +501,12 @@ $(function() {
   });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
-    var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
+    //  Prevent toggling `openclose` state in trees
+    ev.stopPropagation();
+
+    var $target = $(ev.target)
+    , follow = $target.data("follow")
+    , inst = $target.data("instance")
     , page_model = GGRC.infer_object_type(GGRC.page_object)
     , page_instance = GGRC.page_instance()
     , join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0]
@@ -542,8 +549,8 @@ $(function() {
             }
         );
 
-      // Switch the active widget view
-      if (type !== "error") {
+      // Switch the active widget view if 'data-follow' was specified
+      if (follow && type !== "error") {
         window.location.hash = '#' + inst.constructor.root_object + '_widget';
         $('a[href="' + window.location.hash + '"]').trigger("click");
       }

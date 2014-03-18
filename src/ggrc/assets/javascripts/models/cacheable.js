@@ -586,6 +586,13 @@ can.Model("can.Model.Cacheable", {
         return findPageFunc(collection_url, params);
       };
     }
+
+  , get_mapper: function(name) {
+      mappers = GGRC.Mappings[this.shortName];
+      mapper = mappers[name];
+      return mapper;
+    }
+
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -693,8 +700,7 @@ can.Model("can.Model.Cacheable", {
       if (!binding) {
         if (typeof(mapper) === "string") {
           // Lookup and attach named mapper
-          mappings = GGRC.Mappings[this.constructor.shortName];
-          mapping = mappings && mappings[mapper];
+          mapping = this.constructor.get_mapper(mapper);
           if (!mapping)
             console.debug("No such mapper:  " + this.constructor.shortName + "." + mapper);
           else

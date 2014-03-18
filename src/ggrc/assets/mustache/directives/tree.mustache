@@ -9,7 +9,7 @@
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <a href="javascript://" class="openclose">
         <div class="row-fluid">
-          <div class="span10">
+          <div class="span7">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -40,6 +40,9 @@
                   {{instance.sections.length}}
                 {{/if expanded}}
             </div>
+          </div>
+          <div class="span3">
+            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
           </div>
         </div>
       </a>
