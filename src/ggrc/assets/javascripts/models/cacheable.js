@@ -117,9 +117,7 @@ can.Model("can.Model.Cacheable", {
         deferred.then(success, error);
         sourceDeferred.then(function(sourceData) {
           var obsList = new self.List([])
-            , start
-            , dt
-            , increment
+            , index = 0
             ;
 
           if(sourceData[self.root_collection + "_collection"]) {
@@ -133,27 +131,28 @@ can.Model("can.Model.Cacheable", {
             sourceData = [sourceData];
           }
 
-          // modelizeN adds the next N results into the result list
-          function modelizeN(n) {
-            var piece;
-
+          function modelizeMS(ms) {
+            var item
+              , start
+              , instances = []
+              ;
+            start = Date.now();
+            while(sourceData.length > index && (Date.now() - start) < ms) {
+              can.Observe.startBatch();
+              item = sourceData[index];
+              index = index + 1;
+              instances.push.apply(instances, self.models([item]));
+              can.Observe.stopBatch();
+            }
             can.Observe.startBatch();
-            piece = sourceData.splice(0, Math.min(sourceData.length, n));
-            obsList.push.apply(obsList, self.models(piece));
+            obsList.push.apply(obsList, instances);
             can.Observe.stopBatch();
           }
 
-          // Estimate how many objects we can modelize in 200ms, and batch by
-          // that amount
-          start = Date.now();
-          modelizeN(5);
-          dt = Date.now() - start + 1;
-          increment = Math.ceil(200 / dt) * 5;
-
           // Trigger a setTimeout loop to modelize remaining objects
           (function() {
-            modelizeN(increment);
-            if (sourceData.length) {
+            modelizeMS(100);
+            if (sourceData.length > index) {
               setTimeout(arguments.callee, 5);
             }
             else {
