@@ -1,7 +1,7 @@
 var Assessment = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessments";
+    this.name = "assessments-v2";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
@@ -13,7 +13,7 @@ var Assessment = can.Model.LocalStorage.extend({
 var Workflow = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessmentWorkflows";
+    this.name = "assessmentWorkflows-v2";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
