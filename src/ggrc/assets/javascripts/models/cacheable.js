@@ -293,7 +293,7 @@ can.Model("can.Model.Cacheable", {
         that.defaults.contact = typeof that.defaults.contact !== "undefined"
                                 ? that.defaults.contact
                                 : CMS.Models.Person.model(GGRC.current_user).stub();
-        that.defaults.owners = typeof that.defaults.contact !== "undefined"
+        that.defaults.owners = typeof that.defaults.owners !== "undefined"
                                ? that.defaults.owners
                                : [CMS.Models.Person.model(GGRC.current_user).stub()];
       }
