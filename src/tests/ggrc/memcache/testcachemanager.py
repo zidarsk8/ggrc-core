@@ -1,4 +1,7 @@
-import unittest
+# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
 
 from ggrc.cache import CacheManager, MemCache
 import json
@@ -6,18 +9,17 @@ import logging
 import sys
 from google.appengine.api import memcache
 from google.appengine.ext import testbed
+from tests.ggrc import TestCase
 
-class TestCacheManager(unittest.TestCase):
+class TestCacheManager(TestCase):
   cache_manager = None
   log_level=logging.DEBUG
   testbed=None
 
   def setUp(self):
+    super(TestResource, self).setUp()
     self.logger=logging.getLogger('testcache')
     self.logger.setLevel(self.log_level)
-    self.testbed = testbed.Testbed()
-    self.testbed.activate()
-    self.testbed.init_memcache_stub()
 
     # initialize cache manager
     self.cache_manager= CacheManager()
@@ -29,11 +31,11 @@ class TestCacheManager(unittest.TestCase):
       self.cache_manager.add_collection('collection', 'controls', data)
 
   def tearDown(self):
-    self.testbed.deactivate()
+    super(TestResource, self).tearDown()
     self.memcache = None
     self.cache_manager= None
 
-  def runTest(self):
+  def get_cache_tests(self):
     self.logger.info("Test Case #1: Getting data from cache with one attribute")
     filter1={'ids':[1,5,10,25,49], 'attrs':['name']}
     data = self.cache_manager.get_collection('collection', 'controls', filter1)
