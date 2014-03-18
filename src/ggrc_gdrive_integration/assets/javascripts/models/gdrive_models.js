@@ -351,6 +351,10 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
     });
   }
 
+  , destroy : function(etag) {
+    return this.cache[etag].destroy();
+  }
+
   , findUserPermissionId : function(person) {
     var person_email = typeof person === "string" ? person : person.email;
     return gapi_request_with_auth({
@@ -366,7 +370,26 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
       , scopes : scopes
     });
   }
-}, {});
+}, {
+  destroy : function() {
+    var etag = this.etag
+    , that = this;
+    return gapi_request_with_auth({
+      path : this.selfLink.replace(/https?:\/\/[^\/]+/, "") // have to relativize the url
+      , method : "delete"
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          can.trigger(that, "destroyed", that);
+          can.trigger(that.constructor, "destroyed", that);
+          dfd.resolve(result);
+        }
+      }
+      , scopes : scopes
+    });
+  }
+});
 
 CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
   create : function(params) {
