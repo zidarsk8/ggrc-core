@@ -194,13 +194,16 @@
                     {{^if assessment.started}}
                     <div class="info-widget-footer">
                       <div class="right-button">
-                        <span class="gray small"><em>
-                        {{^if assessment.workflow}}
-                        <span>No selected workflow</span>{{^if assessment.objects.length}}, {{/if}}
-                        {{/if}}
-                        {{^if assessment.objects.length}}
-                        <span>No selected objects</span>
-                        {{/if}}
+                        <span class="gray small">
+                          <em>
+                          {{^if assessment.workflow}}
+                          <span>No selected workflow</span>{{^if assessment.objects.length}}, {{/if}}
+                          {{/if}}
+                          {{^if assessment.objects.length}}
+                          <span>No selected objects</span>
+                          {{/if}}
+                          </em>
+                        </span>
                         <a href="#assessmentStart" class="btn btn-small btn-primary {{^if can_start}}disabled{{/if}}" data-toggle="modal">Start Assessment</a>
                       </div>
                     </div>
@@ -271,7 +274,7 @@
                               <button type="submit" data-index="{{@index}}" class="remove_filter"><i class="grcicon-deleted"></i></button>
                             </div>
                             {{/each}}
-                            <div class="add-rule">
+                            <div class="add-rule indent-row">
                               <a href="#" id="addFilterRule">+ Add Rule</a>
                             </div>
                           </div>
@@ -427,7 +430,7 @@
 	                                      <div class="control-wrap">
 	                                        <div class="request-control">
 	                                        {{#if_equals task_state 'rq-amended-request'}}
-			                                    <button class="startObjectNow btn" data-status="rq-responded" data-type="tasks" data-id="{{@index}}">Start</button>
+			                                    <button class="startObjectNow btn btn-primary" data-status="rq-responded" data-type="tasks" data-id="{{@index}}">Start</button>
 			                                    {{/if_equals}}
 			                                    {{#if_equals task_state 'rq-responded'}}
 			                                    <button class="startObjectNow btn" data-status="rq-accepted" data-type="tasks"  data-id="{{@index}}">Finish</button>

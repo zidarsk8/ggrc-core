@@ -532,14 +532,6 @@ ul.new-tree {
           &.tree-item-add {
             padding: 0 0 0 20px;
           }
-          .item-main {
-            .row-fluid {
-              &:hover {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-                @include background-size(30px 6px);
-              }
-            }
-          }
         }
       }
       &.rq-draft {
