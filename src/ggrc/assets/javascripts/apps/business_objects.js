@@ -189,63 +189,8 @@ $(function() {
       }
 
     , extra_content_controller_options = apply_mixins({
-          extended_objectives: {
-              Objective: {
-                  mapping: "extended_related_objectives"
-                , draw_children: true
-                , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
-                , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
-                }
-            }
-        , extended_controls: {
-              Control: {
-                  mapping: "extended_related_controls"
-                , draw_children: true
-                , show_view: GGRC.mustache_path + "/controls/tree.mustache"
-                , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
-                }
-            }
-        , extended_business_objects: {
-              DataAsset: {
-                  mapping: "extended_related_data_assets"
-                }
-            , Facility: {
-                  mapping: "extended_related_facilities"
-                }
-            , Market: {
-                  mapping: "extended_related_markets"
-                }
-            , OrgGroup: {
-                  mapping: "extended_related_org_groups"
-                }
-            , Process: {
-                  mapping: "extended_related_processes"
-                }
-            , Product: {
-                  mapping: "extended_related_products"
-                }
-            , Project: {
-                  mapping: "extended_related_projects"
-                }
-            , System: {
-                  mapping: "extended_related_systems"
-                }
-            , Document: {
-                  mapping: "extended_related_documents"
-                }
-            , Person: {
-                  mapping: "extended_related_people"
-                }
-            }
-
-        , Program: {
-              _mixins: [
-                  "extended_objectives"
-                , "extended_controls"
-                , "extended_business_objects"
-                ]
-
-            , Regulation: {
+          Program: {
+              Regulation: {
                 mapping: "regulations"
               , draw_children: true
               , child_options: [section_child_options]
@@ -287,12 +232,7 @@ $(function() {
           }
 
         , directive: {
-              _mixins: [
-                  "extended_objectives"
-                , "extended_controls"
-                , "extended_business_objects"
-                ]
-            , Section : section_child_options
+              Section : section_child_options
             }
 
         , Regulation: {
