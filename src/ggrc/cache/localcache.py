@@ -5,6 +5,7 @@
 # Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # 
+# Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 #
 
@@ -26,27 +27,18 @@ class LocalCache(Cache):
 
   cache_entries=OrderedDict()
 
-  def __init__(self, configparam=None):
-    self.config = configparam
+  def __init__(self):
     self.name = 'local'
 
     for cache_entry in all_cache_entries():
       if cache_entry.cache_type is self.name:
         self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
  
-    # initialize collection for each resource type
-    #
     for key in self.supported_resources.keys():
      self.cache_entries['collection:'+key] =  {}
 
   def get_name(self):
      return self.name
-
-  def set_config(self, configparam):
-     self.config = configparam
-	
-  def get_config(self):
-     return self.config
 
   def get(self, category, resource, filter): 
     """ Get data from local cache for the specified filter
@@ -81,7 +73,7 @@ class LocalCache(Cache):
       else:
         return self.get_data(ids, entries, attrs)
 
-  def add(self, category, resource, data): 
+  def add(self, category, resource, data, expiration_time=0): 
     """ Add data to local cache for the specified data
 
     Args:
@@ -104,19 +96,19 @@ class LocalCache(Cache):
     if entries is None:
       return None
 
-    # TODO(ggrcdev): Should we perform deep copy of data
+    # TODO(dan): Should we perform deep copy of data
     for key in data.keys(): 
       entries[key] = data.get(key)
 
     return entries
 
-  def update(self, category, resource, data): 
+  def update(self, category, resource, data, expiration_time=0): 
     """ Update data in local cache for the specified data
-    TODO(ggrcdev): updates is not available for local cache
+    TODO(dan): updates is not available for local cache
     """
     return None
 
-  def remove(self, category, resource, data): 
+  def remove(self, category, resource, data, lockadd_seconds=0): 
     """ Remove data from local cache for the specified data
     Args:
       category: collection or stub
@@ -143,7 +135,7 @@ class LocalCache(Cache):
 
   def get_data(self, keys, cacheitems, attrs):
     """ Get data from cache for the given set of keys and attributes in cache
-        TODO(ggrcdev): all or none default policy is implemeted here, it should be in cachemanager
+        TODO(dan): all or none default policy is implemeted here, it should be in cachemanager
     Args:
       keys: set of keys to search from local cache
       cacheitems: cache entries
@@ -168,10 +160,8 @@ class LocalCache(Cache):
         # Do nothing as there are no attrs to get
         continue
       else:
-        # set the targetattrs
         targetattrs=attrs
 
-      # populate result data for the object with key and specified target attrs
       attr_dict = {}
       for attr in targetattrs:
         if attrvalues.has_key(attr): 

@@ -5,12 +5,14 @@
 # Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # 
+# Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 #
 
 from collections import namedtuple
-CacheEntry = namedtuple('CacheEntry', 'model_plural class_name cache_type')
-MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type source_name dest_type dest_name polymorph, cache_type')
+CacheEntry   = namedtuple('CacheEntry', 'model_plural class_name cache_type')
+MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type source_name,\
+                          dest_type, dest_name polymorph, cache_type')
 
 def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
@@ -114,57 +116,45 @@ def all_mapping_entries():
 
 class Cache:
   name = None
-  config = None
   supported_resources = {}
 
-  def __init__(self, configparam):
+  def __init__(self):
     pass
 
   def get_name(self):
     return None
 
-  def set_config(self, configparam):
-    pass
-	
-  def get_config(self):
-    return None
-
   def get(self, category, resource, filter): 
     return None
 
-  def add(self, category, resource, data): 
+  def add(self, category, resource, data, expiration_time=0): 
     return None
 
-  def update(self, category, resource, data): 
+  def update(self, category, resource, data, expiration_time=0): 
     return None
 
-  def remove(self, category, resource, data): 
+  def remove(self, category, resource, data, lockadd_seconds=0): 
     return None
 
   def get_multi(self, filter): 
     return None
 
-  def add_multi(self, data): 
+  def add_multi(self, data, expiration_time=0): 
     return None
 
-  def update_multi(self, data): 
+  def update_multi(self, data, expiration_time=0): 
     return None
 
-  def remove_multi(self, category, resource, data): 
+  def remove_multi(self, category, resource, data, lockadd_seconds=0): 
     return None
 
   def clean(self):
     return False
 
-  # Get the Cache key for the specified category and resource
-  #
   def get_key(self, category, resource):
     cache_key = category + ":" + resource
     return cache_key
 
-  # parse the filter for incoming request and extracts the 'ids' and 'attrs'
-  # This is used for GET collection 
-  #
   def parse_filter(self, filter):
     ids = None
     attrs = None
@@ -184,7 +174,7 @@ class Cache:
     return ids, attrs
 
   def is_caching_supported(self, category, resource):
-    if category is 'collection' or category is 'stubs':
+    if category is 'collection':
       return self.supported_resources.has_key(resource)
     else:
       return False

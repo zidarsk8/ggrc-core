@@ -32,15 +32,31 @@ from wsgiref.handlers import format_date_time
 from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 
-from ggrc.cache import CacheManager, get_cache_manager
+from ggrc import settings
+from ggrc.cache import CacheManager, MemCache
 from copy import deepcopy
 from sqlalchemy.orm.session import Session
 from sqlalchemy import event
+from sqlalchemy.exc import SQLAlchemyError
 
+cache_expiration=60
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
 """
+
+def build_cache_status(data, key, expiry_timeout, status):
+  """
+  build the dictionary for storing operational status of cache
+  Args:
+    data: dictionary to update
+    key: key to dictionary
+    expiry_timeout: timeout for expiry cache
+    status: Update status entry, e.g.InProgress
+  Returns:
+    None 
+  """
+  data[key] = {'expiry': expiry_timeout, 'status': status}
 
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
@@ -363,7 +379,6 @@ class Resource(ModelView):
 
   # Default JSON request handlers
   def get(self, id):
-    current_app.logger.info("CACHE: GET resource: " + self.model._inflector.table_plural + " id: " + str(id))
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -444,8 +459,12 @@ class Resource(ModelView):
     self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update Memcache before Commit"):
+      self.update_memcache_before_commit(modified_objects)
     with benchmark("Commit"):
       db.session.commit()
+    with benchmark("Update Memcache after Commit"):
+      self.update_memcache_after_commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
@@ -470,9 +489,13 @@ class Resource(ModelView):
     db.session.delete(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update Memcache before Commit"):
+      self.update_memcache_before_commit(modified_objects)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Update Memcache before Commit"):
+      self.update_memcache_after_commit()
     with benchmark("Query for object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -484,25 +507,23 @@ class Resource(ModelView):
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
-    # Check if collection is available in cache to return
-    cache_response = None
-
-    # Check in supported list of models
-    model_plural = self.model._inflector.table_plural
-    collection_name = '{0}_collection'.format(model_plural)
-
-    stubs_in_args = '__stubs_only' in request.args
-    if stubs_in_args:
-      category = 'stubs'
-    else:
-      category = 'collection'
-    cache_manager = get_cache_manager()
-    cache_supported=cache_manager.is_caching_supported(category, model_plural)
-    cache_in_porgress = False
-    if cache_supported:
-      cache_in_progress=self.is_caching_in_progress(category, model_plural, True) 
-      if cache_in_progress is False:
-        cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
+    cache_supported = False
+    if getattr(settings, 'MEMCACHE_MECHANISM', False):
+      cache_response = None
+      model_plural = self.model._inflector.table_plural
+      collection_name = '{0}_collection'.format(model_plural)
+      stubs_in_args = '__stubs_only' in request.args
+      if stubs_in_args:
+        category = 'stubs'
+      else:
+        category = 'collection'
+      cache_manager = CacheManager()
+      cache_manager.initialize(MemCache())
+      self.request.cache_manager = cache_manager
+      cache_supported=self.request.cache_manager.is_caching_supported(category, model_plural)
+      if cache_supported:
+        with benchmark("Get Collection from cache"):
+          cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
         if cache_response is not None:
           return cache_response
         else:
@@ -510,7 +531,7 @@ class Resource(ModelView):
             " object in caching layer, checking Data-ORM layer" + \
             " in " + category + " category")
       else:
-         current_app.logger.info("CACHE: Caching operation is in progress for " + \
+        current_app.logger.info("CACHE: Caching operation is in progress for " + \
           model_plural + " in " + category + " category")
     else:
       current_app.logger.info("CACHE: Get Collection from cache is not supported for "  + \
@@ -528,10 +549,16 @@ class Resource(ModelView):
         '', 304, [('Etag', self.etag(collection))]))
 
     # Write collection to cache, if caching is supported for the model
-    # TODO(ggrcdev): checks for cache in progress is not done prior to rewriting contents from DB into cache
     #
     if cache_supported:
-      cache_response = self.write_collection_to_cache(collection, category, model_plural, collection_name, model_plural)
+      with benchmark("Write Collection to cache"):
+        cache_in_progress=self.is_caching_in_progress(category, model_plural) 
+      if cache_in_progress is False:
+        cache_response = self.write_collection_to_cache(collection, category, model_plural,\
+                                collection_name, model_plural)
+      else:
+        current_app.logger.warn("CACHE: Cache is busy, Unable to write collection to cache for resource: "  +\
+          model_plural + " in " + category + " category")
     else:
       current_app.logger.info("CACHE: Write Collection to cache is not supported for "  +\
         model_plural + " in " + category + " category")
@@ -539,25 +566,159 @@ class Resource(ModelView):
     return self.json_success_response(
       collection, self.collection_last_modified())
 
-  def is_caching_in_progress(self, category, resource, delete_on_expiry): 
+  def update_memcache_before_commit(self, modified_objects):
+    """
+    Preparing the memccache entries to be updated before DB commit
+    Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
+    Raises Exception on failures, cannot proceed with DB commit
+
+    """
+    cache_manager = CacheManager()
+    cache_manager.initialize(MemCache())
+    self.request.cache_manager = cache_manager
+
+    if len(modified_objects.new) > 0: 
+      items_to_add = modified_objects.new.items()
+      for o, json_obj in items_to_add:
+        json_obj = o.log_json()
+        cls = o.__class__.__name__
+        if self.request.cache_manager.supported_classes.has_key(cls):
+          model_plural = self.request.cache_manager.supported_classes[cls]
+          key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+          self.request.cache_manager.marked_for_add[key]=json_obj
+
+          # Marking mapping links to be deleted from cache
+          if self.request.cache_manager.supported_mappings.has_key(cls):
+            (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                     self.request.cache_manager.supported_mappings[cls]
+            srcid  = json_obj[srcname] 
+            dstid = json_obj[dstname] 
+            model_plural = None
+            if polymorph is True:
+              dsttype = json_obj[dsttype]
+              model_plural = self.request.cache_manager.supported_classes[dsttype]
+            else:
+              model_plural = dsttype
+            if srctype is not None:
+              from_key = 'collection:' + srctype + ':' + str(srcid)
+              self.request.cache_manager.marked_for_delete.append(from_key)
+            if model_plural is not None:
+              to_key   = 'collection:' + model_plural + ':' + str(dstid)
+              self.request.cache_manager.marked_for_delete.append(to_key)
+            else:
+              # This error should not happen, it indicates that class is not in the supported_classes map
+              # Log error
+              current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+      
+    if len(modified_objects.dirty) > 0: 
+      items_to_update = modified_objects.dirty.items()
+      for o, json_obj in items_to_update:
+        json_obj = o.log_json()
+        cls = o.__class__.__name__
+        if self.request.cache_manager.supported_classes.has_key(cls):
+          model_plural = self.request.cache_manager.supported_classes[cls]
+          current_app.logger.info("CACHE: Marking cache updates for object instance of model: " + cls + \
+              " resource type: " + self.request.cache_manager.supported_classes[cls])
+          key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+          self.request.cache_manager.marked_for_update[key]=json_obj
+
+    if len(modified_objects.deleted) > 0: 
+      items_to_delete=modified_objects.deleted.items()
+      for o, json_obj in items_to_delete:
+        cls = o.__class__.__name__
+        if self.request.cache_manager.supported_classes.has_key(cls):
+          model_plural = self.request.cache_manager.supported_classes[cls]
+          object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+          self.request.cache_manager.marked_for_delete.append(object_key)
+          # Marking mapping links to be deleted from cache
+          if self.request.cache_manager.supported_mappings.has_key(cls):
+            (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                     self.request.cache_manager.supported_mappings[cls]
+            srcid  = json_obj[srcname] 
+            dstid = json_obj[dstname] 
+            model_plural = None
+            if polymorph is True:
+              dsttype = json_obj[dsttype]
+              model_plural = self.request.cache_manager.supported_classes[dsttype]
+            else:
+              model_plural = dsttype
+            if srctype is not None:
+              from_key = 'collection:' + srctype + ':' + str(srcid)
+              self.request.cache_manager.marked_for_delete.append(from_key)
+            if model_plural is not None:
+              to_key   = 'collection:' + model_plural + ':' + str(dstid)
+              self.request.cache_manager.marked_for_delete.append(to_key)
+            else:
+              # This should not happen, it indicates that class is not in the supproted_classes map
+              current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+
+    status_entries ={}
+    for key in self.request.cache_manager.marked_for_add.keys():
+      build_cache_status(status_entries, 'CreateOp:' + key, cache_expiration, 'InProgress')
+    for key in self.request.cache_manager.marked_for_update.keys():
+      build_cache_status(status_entries, 'UpdateOp:' + key, cache_expiration, 'InProgress')
+    for key in self.request.cache_manager.marked_for_delete:
+      build_cache_status(status_entries, 'DeleteOp:' + key, cache_expiration, 'InProgress')
+    if len(status_entries) > 0:
+      ret = self.request.cache_manager.bulk_add(status_entries, cache_expiration)
+      if ret is not None and len(ret) == 0:
+        pass
+      else:
+       current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ')
+       raise SQLAlchemyError("Unable to update cache in progress state")
+
+  def update_memcache_after_commit(self):
+    """
+    The memccache entries is updated after DB commit
+    Logs error if there are errors in updating entries in cache
+
+    """
+    if self.request.cache_manager is None: 
+      current_app.logger.error("CACHE: Error in initiaizing cache manager")
+      return
+
+    cache_manager = self.request.cache_manager
+
+    if len(cache_manager.marked_for_add) > 0:
+      add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
+      # result is empty on success, non-empty on failure
+      # TODO(dan): handling failure including network errors, currently we log errors
+      if len(add_result) > 0: 
+        current_app.logger.error("CACHE: Failed to add entries to cache: " + str(add_result))
+
+    if len(cache_manager.marked_for_update) > 0:
+      update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
+      # result is empty on success, non-empty on failure returns list of keys including network failures
+      # TODO(dan): handling failure including network errors, currently we log errors
+      if len(update_result) > 0: 
+        current_app.logger.error("CACHE: Failed to update entries in cache: " + str(update_result))
+
+    # TODO(dan): check for duplicates in marked_for_delete
+    #
+    if len(cache_manager.marked_for_delete) > 0:
+      delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, cache_expiration)
+      # TODO(dan): handling failure including network errors, currently we log errors
+      if delete_result is not True:
+        current_app.logger.error("CACHE: Failed to deleted entries from cache") 
+
+    cache_manager.clear_cache()
+
+  def is_caching_in_progress(self, category, resource): 
     """Check the current state of cache and in progress
 
     Calls the cachemanager to do a bulk GET of status of any operation in cache for the resource 
     The status entries for create, update and delete operation is maintained in memcache
     
     Args:
-       category: collection, stub, etc.
+       category: collection
        resource: regulations, programs, controls, etc.
-       delete_on_expiry: An flag indicating that we need to delete status entries if expiry time is reached
 
     Returns:
-      True if any resource is question has operation in progress
+      True if any resource is question has operation in progress (All or None policy)
       False otherwise
     """
-    current_app.logger.info("CACHE: checking status of cache for " + resource + " in " + category + " category")
-    cache_manager = get_cache_manager()
-    if cache_manager is None:
-      current_app.logger.error("CACHE: CacheManager is not initialized")
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
       return False
 
     # Check in cache for collection and stubs to determine if cache needs to be invalidated
@@ -570,83 +731,57 @@ class Resource(ModelView):
            status_keys.append('UpdateOp:' + category + ':' + resource + ':' + str(id))
            status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
     else:
-      if category is 'stubs':
-        status_keys.append('CreateOp:' + category + ':' + resource + ':0')  
-        status_keys.append('UpdateOp:' + category + ':' + resource + ':0')
-        status_keys.append('DeleteOp:' + category + ':' + resource + ':0')
-      else:
-        return False
+      return False
 
-    return_status = False
-    delete_candidates=[]
-    expiration_time=300
-    current_app.logger.info("CACHE: deleting entries from cache: " + str(delete_candidates))
-    result = cache_manager.bulk_get(status_keys)
+    result = self.request.cache_manager.bulk_get(status_keys)
     if len(result) > 0:
       for key, value in result:
-        timestamp = value['timestamp']
         status = value['status']
-        now = datetime.datetime.now()
         if status == 'InProgress':
-          return_status = True
-        if (now-timestamp).total_seconds() > expiration_time:
-          delete_candidates.append(key)
-      #TODO(ggrcdev): Use set Cache expiration time during creation to avoid deleting here 
-      if delete_on_expiry is True and len(delete_candidates):
-        current_app.logger.info("CACHE: deleting entries from cache: " + str(delete_candidates))
-        result = cache_manager.bulk_delete(delete_candidates) 
-        if result is not True:
-          current_app.logger.error("CACHE: Unable to delete entries from memcache")
-    return return_status
+          return True
+
+    return False
 
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
     """Get collection (objects or stubs) from cache
 
     Parse the request arguments and handles stubs and eager query related collection requests
     Invokes cache manager interface to get collection from cache (e.g. memcache) 
-    The stubs entry key is stubs.<resource>.0 and value is JSON object (dictionary of attr names, values)
     The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
     
     Args:
-       category: collection, stub, etc.
+       category: collection 
        resource: regulations, programs, controls, etc.
        x_category: Output category for the JSON response (resource_collection)
        x_resource: Output resource for JSON response (resource)
 
     Returns:
       None if any one of the entries is not found in cache, caching is not supported for the resource, 
-           request is neither a stub or a collection
-      JSON response on successfully retreiving entries from cache
+           request is not a collection
+      JSON response on successfully retreiving entries from cache, caching is supported, and
+           request is an eager query and collection 
     """
-    current_app.logger.info("CACHE: Get collection from cache for " + resource + " in " + category + " category")
-    cache_manager = get_cache_manager()
-    if cache_manager is None:
-      current_app.logger.error("CACHE: CacheManager is not initialized")
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
       return None
 
-    # Check in cache for 'eager_query' related requests and args with with 'id_in' 
-    #
     cacheobjids = request.args.get('id__in', False)
     etag = request.args.get('_', False)
     if cacheobjids and hasattr(self.model, 'eager_query'):
-      current_app.logger.info("CACHE: GET request for resource collection and eager query")
       cacheobjidstr = cacheobjids.replace(',', '%2C')
       ids = [long(i) for i in cacheobjids.split(',')]
       filter={'ids':ids, 'attrs':None}
-      # Apply cacheManager policies to verify if caching is supported 
-      # E.g. RBACPolicy, to ensure that resource type is allowed to person/role logged in
-      data = cache_manager.get_collection(category, resource, filter)
-      if data is not None or len(data) > 0: 
+      data = self.request.cache_manager.get_collection(category, resource, filter)
+      if data is not None and len(data) > 0: 
         converted_data = {x_category: {x_resource: []}}
-        for cachetype, cachedata in data.items():
-          for id, attrs in cachedata.items():
-            context_id = self.get_context_id_from_json(attrs) 
-            if context_id is not None:
-              current_app.logger.info("CACHE: Verifying read permissions, Context ID: " + str(context_id) + " Object ID: " + str(id))
-              if not permissions.is_allowed_read(self.model.__name__, context_id):
-                current_app.logger.error("CACHE: Forbidden permissions")
-                raise Forbidden()
-            converted_data[x_category][x_resource].append(attrs)
+        for id, attrs in data.items():
+          context_id = self.get_context_id_from_json(attrs) 
+          if context_id is not None:
+            # TODO(dan): Need to check read permissions for extended mappings as well
+            if not permissions.is_allowed_read(self.model.__name__, context_id):
+              current_app.logger.error("CACHE: Forbidden permissions")
+              raise Forbidden()
+          converted_data[x_category][x_resource].append(attrs)
         selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
         converted_data[x_category]['selfLink'] = selfLink
         controls_data = converted_data[x_category][x_resource]
@@ -654,62 +789,37 @@ class Resource(ModelView):
           current_app.logger.info("CACHE: Successfully converted data to return as JSON response")
           return self.json_success_response(converted_data, datetime.datetime.now())
         else:
-          current_app.logger.info("CACHE: Unable to find data for model: " + \
-            resource + " in cache")
+          current_app.logger.info("CACHE: Unable to find data for model: " + resource + " in cache")
           return None
       else:
         current_app.logger.info("CACHE: Model: " + resource + "not found in cache")
         return None
     else:
-      if category is 'stubs':
-        ids = [0]
-        filter={'ids':ids, 'attrs':None}
-        # TODO(ggrcdev): No RBAC policies are applied for reading stubs, as context_id is not available at the resource level
-        #
-        data = cache_manager.get_collection(category, resource, filter)
-        if data is not None or len(data) > 0: 
-          converted_data = {x_category: {x_resource: []}}
-          for cachetype, cachedata in data.items():
-            for id, attrs in cachedata.items():
-              converted_data[x_category][x_resource]=attrs
-          selfLink = "/api/" + x_resource + "?__stubs_only=true" + "&_="+ etag 
-          converted_data[x_category]['selfLink'] = selfLink
-        controls_data = converted_data[x_category][x_resource]
-        if len(controls_data) > 0:
-          current_app.logger.info("CACHE: Successfully converted stub data to return as JSON response") 
-          return self.json_success_response(converted_data, datetime.datetime.now())
-        else:
-          current_app.logger.info("CACHE: Unable to find stub data for model: " + \
-            resource + " in cache")
-          return None
-      else:
-        current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
-        return None
+      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+      return None
 
   def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
-    """Write collection (objects or stubs) to cache
+    """Write collection (objects) to cache
 
-    Parse the request arguments and handles stubs and eager query related collection requests
+    Parse the request arguments and handles eager query related collection requests
     Invokes cache manager interface to write collection into cache (e.g. memcache) 
-    The stubs entry key is stubs.<resource>.0 and value is JSON object (dictionary of attr names, values)
     The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
     
     Args:
        collection: JSON object returned from SQLAlchemy data-ORM layer
-       category: collection, stub, etc.
+       category: collection, etc.
        resource: regulations, programs, controls, etc.
        x_category: Output category for the JSON response (resource_collection)
        x_resource: Output resource for JSON response (resource)
 
     Returns:
       None Errors in writing to cache, caching is not supported for the resource, 
-           request is neither a stub or a collection
-      JSON response on successfully retreiving entries from cache
+           and request is not a collection
+      JSON response on successfully retreiving entries from cache, if caching is supported,
+           and request is an eager query and collection
     """
-    current_app.logger.info("CACHE: Write collection to cache for " + resource + " in " + category + " category")
-    cache_manager = get_cache_manager()
-    if cache_manager is None:
-      current_app.logger.info("CACHE: CacheManager is not initialized")
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
       return None
     
     cacheobjids=None
@@ -717,16 +827,15 @@ class Resource(ModelView):
       cacheobjids = request.args.get('id__in', False)
 
     if cacheobjids and hasattr(self.model, 'eager_query'):
-      current_app.logger.info("CACHE: GET request for resource collection and eager query")
       if collection.has_key(x_category):
         resource_collection= collection.get(x_category).get(x_resource)
         cacheData={}
         for aresource in resource_collection:
           id = aresource['id']
           cacheData[id] = deepcopy(aresource)
-        write_result = cache_manager.add_collection(category, resource, cacheData)
+        write_result = self.request.cache_manager.add_collection(category, resource, cacheData)
         if write_result is None:
-           current_app.logger.info("CACHE: Unable to write collection to cache")
+           current_app.logger.error("CACHE: Unable to write collection to cache")
            return None
         else:
            current_app.logger.info("CACHE: Successfully written data in cache for resource: " + resource)
@@ -735,25 +844,8 @@ class Resource(ModelView):
          current_app.logger.info("CACHE: Unable to find data in source collection for model: " + resource)
 	 return None
     else:
-      if category is 'stubs':
-        current_app.logger.info("CACHE: GET request for stubs")
-        if collection.has_key(x_category):
-          resource_stubs = collection.get(x_category).get(x_resource)
-          cacheData={}
-          cacheData[0] = deepcopy(resource_stubs)
-          write_result = cache_manager.add_collection(category, resource, cacheData)
-          if write_result is None:
-             current_app.logger.info("CACHE: Unable to write stub to cache")
-             return None
-          else:
-             current_app.logger.info("CACHE: Successfully written data in cache for stub: " + resource)
-             return write_result
-        else:
-           current_app.logger.info("CACHE: Unable to find data in stubs for model: " + resource)
-	   return None
-      else:
-        current_app.logger.info("CACHE: Caching is only supported for stubs and collection for model: " + resource)
-	return None
+      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+      return None
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
