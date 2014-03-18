@@ -8,7 +8,8 @@
 
   <li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span4">
             <div class="item-data">
@@ -86,7 +87,7 @@
               </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
     
     <div class="tier-2-info item-content">
