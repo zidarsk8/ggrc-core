@@ -88,7 +88,9 @@
         </div>
       </a>
     </div>
-    
+
+    {{#if expanded}}
+
     <div class="tier-2-info item-content">
         {{! The parent is Audit on My Work/Profile pages }}
         {{#if_instance_of parent_instance "Audit"}}
@@ -235,6 +237,7 @@
         </ul>
       </div>
       {{/if_equals}}
-      
+
     </div>
+    {{/if}}
   </li>
