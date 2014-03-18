@@ -527,7 +527,7 @@
 	                          <div class="review-wrap" style="display:none;">
 	                            <div class="inner-tree">
 	                              <h6>
-	                                {{review_title}} Notes (1)
+	                                {{review_title}} Notes ({{notes.length}})
 	                                <div class="pull-right review-note-action">
 	                                  {{#if_equals 'rq-amended-request' review_state}}
 	                                  <a href="#" class="startObjectNow btn" data-status="rq-responded" data-type="reviews" data-id="{{@index}}">Complete {{review_title}}</a>
@@ -566,7 +566,7 @@
 	                                  <div class="row-fluid">
 	                                    <div class="span12">
 	                                      <div class="add-entry" style="display:none;">
-			                                      <textarea class="span10" placeholder="Entry"></textarea>
+			                                      <textarea class="span10" placeholder="Note"></textarea>
 			                                      <a href="#" class="entry-attachment">
 			                                        <i class="grcicon-attach-color"></i> Attach supporting file
 			                                      </a>

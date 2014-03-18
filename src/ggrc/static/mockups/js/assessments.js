@@ -164,13 +164,15 @@ can.Component.extend({
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
-        , value = el.parent().find('textarea').first().val()
+        , textarea = el.parent().find('textarea').first()
+        , value = textarea.val()
         , objects = el.data('objects')
         , list = objects === 'tasks' ? 'entries' : 'notes' ;
       el.closest(".add-entry").hide();
       el.parent().next().show();
       this.scope.assessment.objects[object_id][objects][task_id][list].push({content: value});
       this.scope.assessment.save();
+      textarea.val('');
       
     },
     ".startObjectNow click" : function(el){
