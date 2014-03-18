@@ -88,13 +88,19 @@ can.Component.extend({
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
     ' selected' : function(){this.scope.set_fields(arguments[2])},
     ' workflow_selected' : function(el, ev, workflow){
-      workflow.tasks.each(function(v,i){
-        if(v === "") workflow.tasks.splice(i, 1);
-      });
-      workflow.reviews.each(function(v,i){
-        if(v.title === "") workflow.reviews.splice(i, 1);
-      });
-      this.scope.assessment.attr('workflow', workflow).save();
+      var assessment = this.scope.assessment;
+      
+      if(typeof workflow !== "undefined"){
+        workflow.tasks.each(function(v,i){
+          if(v === "") workflow.tasks.splice(i, 1);
+        });
+        workflow.reviews.each(function(v,i){
+          if(v.title === "") workflow.reviews.splice(i, 1);
+        });
+      }
+      assessment.attr('workflow', workflow).save();
+      assessment.workflow.attr('tasks', workflow.tasks.splice(0));
+      assessment.workflow.attr('reviews', workflow.reviews.splice(0));
       this.scope.set_fields(this.scope.assessment);
     },
     'a#saveAssessment click' : function(el, ev){
@@ -161,6 +167,10 @@ can.Component.extend({
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
     },
+    "#workflowSetup click" : function(){
+      this.scope.assessment.workflow.confirmed = true;
+      $("workflow-app").trigger("workflow_selected", this.scope.assessment.workflow);
+    },
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
@@ -173,7 +183,6 @@ can.Component.extend({
       this.scope.assessment.objects[object_id][objects][task_id][list].push({content: value});
       this.scope.assessment.save();
       textarea.val('');
-      
     },
     ".startObjectNow click" : function(el){
       var object_id = el.closest('.object-top').data('index')
