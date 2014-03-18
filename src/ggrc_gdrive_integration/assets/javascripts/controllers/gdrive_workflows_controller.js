@@ -272,7 +272,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           person = person.email;
           push_person(role, person, true);
         } else {
-          permissions_dfd.push(person.refresh().then(function(p) { return p.email; }).then($.proxy(push_person, null, role)));
+          permission_dfds.push(person.refresh().then(function(p) { return p.email; }).then($.proxy(push_person, null, role)));
         }
       });
     });
