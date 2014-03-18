@@ -9,6 +9,9 @@ from ggrc.app import app
 from ggrc.models import create_db, drop_db
 from wsgiref.simple_server import make_server
 
+from google.appengine.api import memcache
+from google.appengine.ext import testbed
+
 use_migrations = True 
 
 def before_all(context):
@@ -16,6 +19,10 @@ def before_all(context):
   create_db(use_migrations)
   app.debug = False
   app.testing = True
+
+  context.testbed = testbed.Testbed()
+  context.testbed.activate()
+  context.testbed.init_memcache_stub()
 
   context.query_count = 0
   def increment_query_count(conn, clauseelement, multiparams, params):
@@ -32,4 +39,5 @@ def after_all(context):
   context.thread.join()
   db.session.remove()
   drop_db(use_migrations)
+  context.testbed.deactivate()
 

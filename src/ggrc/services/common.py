@@ -708,7 +708,7 @@ class Resource(ModelView):
     for key in self.request.cache_manager.marked_for_delete:
       status_entries.append('DeleteOp:' + str(key))
     if len(status_entries) > 0:
-      ret = self.request.cache_manager.bulk_delete(status_entries, 0)
+      delete_result = self.request.cache_manager.bulk_delete(status_entries, 0)
       # TODO(dan): handling failure including network errors, currently we log errors
       if delete_result is not True:
         current_app.logger.error("CACHE: Failed to remove status entries from cache") 
