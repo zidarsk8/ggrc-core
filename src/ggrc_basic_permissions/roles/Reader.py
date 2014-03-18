@@ -7,6 +7,8 @@ permissions = {
     "read": [
         "Categorization",
         "Category",
+        "ControlCategory",
+        "ControlAssertion",
         "Control",
         "ControlControl",
         "ControlSection",

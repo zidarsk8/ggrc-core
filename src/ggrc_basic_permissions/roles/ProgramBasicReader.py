@@ -5,6 +5,10 @@ description = """
   """
 permissions = {
     "read": [
+        "Category",
+        "ControlCategory",
+        "ControlAssertion",
+        "Option",
         "Role",
         "Person",
         {
