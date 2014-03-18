@@ -10,6 +10,7 @@ from flask import flash, render_template, request, redirect
 from ggrc.app import app
 from ggrc.converters.common import ImportException
 from ggrc.converters.import_helper import handle_csv_import, handle_converter_csv_export
+from ggrc.login import get_current_user
 from ggrc.models.task import create_task, queued_task
 from ggrc.rbac import permissions
 
@@ -157,7 +158,9 @@ def import_controls_to_program(program_id):
       'csv_file': csv_file.read(),
       'return_to': return_to,
   }
-  tq = create_task("import_control", import_control_program_task, parameters)
+  tq = create_task(
+      get_current_user(), "import_control", import_control_program_task,
+      parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/standards/<directive_id>/import_objectives", methods=['GET', 'POST'])
@@ -192,7 +195,9 @@ def import_objectives(directive_id):
       'csv_file': csv_file.read(),
       'return_to': return_to,
   }
-  tq = create_task("import_objective", import_objective_directive_task, parameters)
+  tq = create_task(
+      get_current_user(), "import_objective", import_objective_directive_task,
+      parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/task/import_objective_directive", methods=['POST'])
@@ -265,7 +270,9 @@ def import_controls(directive_id):
       'csv_file': csv_file.read(),
       'return_to': return_to,
   }
-  tq = create_task("import_control", import_control_directive_task, parameters)
+  tq = create_task(
+      get_current_user(), "import_control", import_control_directive_task,
+      parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route('/task/import_control_directive', methods=['POST'])
@@ -453,7 +460,9 @@ def import_people(import_type):
   parameters = {"dry_run": dry_run,
                 "csv_file": csv_file.read(),
                 "csv_filename": filename}
-  tq = create_task("import_"+import_type, import_task[import_type], parameters)
+  tq = create_task(
+      get_current_user(), "import_" + import_type, import_task[import_type],
+      parameters)
   return tq.make_response(import_dump({"id":tq.id, "status":tq.status}))
 
 @app.route("/audits/<audit_id>/import_pbcs", methods=['GET', 'POST'])
@@ -616,7 +625,8 @@ def import_systems_processes(object_kind):
     file_msg = "Could not import: invalid csv file."
     return render_template("directives/import_errors.haml", exception_message=file_msg)
   parameters = {"dry_run": dry_run, "csv_file": csv_file.read(), "csv_filename": filename, "object_kind": object_kind}
-  tq = create_task("import_system", import_system_task, parameters)
+  tq = create_task(
+      get_current_user(), "import_system", import_system_task, parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/programs/<program_id>/import_systems", methods=['GET', 'POST'])
@@ -685,7 +695,8 @@ def export(export_type):
     "system": export_system_task,
   }
 
-  tq = create_task("export_" + export_type, export_task[export_type])
+  tq = create_task(
+      get_current_user(), "export_" + export_type, export_task[export_type])
   return import_dump({"id":tq.id, "status":tq.status})
 
 @app.route("/standards/<directive_id>/export_sections", methods=['GET'])

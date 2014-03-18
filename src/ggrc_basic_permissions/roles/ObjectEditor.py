@@ -47,6 +47,14 @@ permissions = {
         "Person",
         "Program",
         "Role",
+        {
+            "type": "Task",
+            "terms": {
+                "property_name": "modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
     ],
     "create": [
         "Categorization",
