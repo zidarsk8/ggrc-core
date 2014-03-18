@@ -72,6 +72,17 @@ can.Component.extend({
       this.attr('workflow', assessment.workflow);
       this.attr('can_start', this.assessment.workflow && this.assessment.objects.length)
     },
+    initObjects : function(){
+      var assessment = this.assessment
+        , workflow = this.workflow;
+      
+      $.map(assessment.objects, function(v){
+        if(typeof v.attr('status') !== 'undefined') return;
+        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "rq-amended-request"}}));
+        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "rq-amended-request"}}));
+        v.attr('status', "rq-amended-request")
+      });
+    },
   },
   events: {
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
@@ -115,22 +126,19 @@ can.Component.extend({
         if(selected[i]) filtered.push(v);
       });
       assessment.attr('objects', filtered);
+      if(assessment.attr('started')){
+        this.scope.initObjects();
+      }
       assessment.save();
       scope.attr('objects', []);
       this.scope.set_fields(assessment);
     },
     "a#startAssessment click":  function(){
-      var that = this
-        , assessment = this.scope.assessment
-        , workflow = this.scope.workflow
+      var assessment = this.scope.assessment
         ;
       
       assessment.attr('started', true);
-      var a = $.map(assessment.objects, function(v){
-        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "rq-draft"}}));
-        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "rq-draft"}}));
-        v.attr('status', "rq-draft")
-      });
+      this.scope.initObjects();
       this.scope.assessment.save();
       $("a.objects_widget").trigger('click');
       $("#assessmentStart").modal('hide');
@@ -138,36 +146,59 @@ can.Component.extend({
     "#objectAll click": function(el){
       $('.object-check-single').prop('checked', $(el).prop('checked'));
     },
-    "#addSingleControl click": function(){
+    "#addSingleControlNow click": function(){
       this.scope.assessment.objects.push({name: $("#new_object_name").val(), type:$("new_object_type").val()});
+      if(this.scope.assessment.attr('started')){
+        this.scope.initObjects();
+      }
       this.scope.assessment.save();
+      $('.add-single-object').hide();
+      
+      $('.section-add').show();
+      $('.section-expander').hide();
+      $('#objectFooterUtility').show();
     },
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
     },
-    "#addEntry click" : function(el){
+    ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
-        , value = el.parent().find('textarea').first().val();
+        , value = el.parent().find('textarea').first().val()
+        , objects = el.data('objects')
+        , list = objects === 'tasks' ? 'entries' : 'notes' ;
       el.closest(".add-entry").hide();
       el.parent().next().show();
-      
-      this.scope.assessment.objects[object_id].tasks[task_id].entries.push({content: value});
+      this.scope.assessment.objects[object_id][objects][task_id][list].push({content: value});
       this.scope.assessment.save();
       
     },
     ".startObjectNow click" : function(el){
-      console.log("hello")
       var object_id = el.closest('.object-top').data('index')
         , type = el.data('type')
         , id = el.data('id')
         , status = el.data('status')
+        , can_finish = true
+        , state = type === 'tasks' ? 'task_state' : 'review_state'
+        , object = this.scope.assessment.objects[object_id]
         ;
       if(type === 'object')
-        this.scope.assessment.objects[object_id].attr('status', status);
+        object.attr('status', status);
       else{
-        this.scope.assessment.objects[object_id][type][id].attr('task_state', status);
+        object[type][id].attr(state, status);
       }
+      // Check if the finish button can be enabled:
+      object.tasks.each(function(v){
+        if(v.task_state !== 'rq-accepted'){
+          can_finish = false;
+        }
+      });
+      object.reviews.each(function(v){
+        if(v.review_state !== 'rq-responded'){
+          can_finish = false;
+        }
+      });
+      object.attr('can_finish', can_finish)
       this.scope.assessment.save();
     },
     ".remove_filter click" : function(el){

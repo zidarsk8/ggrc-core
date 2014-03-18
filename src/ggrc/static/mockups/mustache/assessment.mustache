@@ -378,11 +378,11 @@
 	                            <div class="span2">
 	                              <div class="control-wrap">
 	                                <div class="request-control">
-	                                  {{#if_equals status 'rq-draft'}}
+	                                  {{#if_equals status 'rq-amended-request'}}
 	                                  <button class="startObjectNow btn btn-primary" data-status="rq-responded" data-type="object">Start</button>
 	                                  {{/if_equals}}
 	                                  {{#if_equals status 'rq-responded'}}
-	                                  <button class="startObjectNow btn disabled" data-status="rq-accepted" data-type="object">Finish</button>
+	                                  <button class="startObjectNow btn {{^if can_finish}}disabled{{/if}}" data-status="rq-accepted" data-type="object">Finish</button>
 	                                  {{/if_equals}}
 	                                  {{#if_equals status 'rq-accepted'}}
 	                                  <span class="objectMessageNow task-done" data-type="object"><em>Completed</em></span>
@@ -405,8 +405,8 @@
 	                            Tasks ({{tasks.length}})
 	                          </h6>
 	                          <ul class="tree-structure new-tree mockup-tree colored-list">
-	                            {{#tasks}}
-	                            <li class="tree-item rq-draft">
+	                            {{#each tasks}}
+	                            <li class="tree-item {{task_state}}">
 	                              <div class="item-main">
 	                                <a href="javascript://" class="openclose">
 	                                  <div class="row-fluid">
@@ -426,7 +426,7 @@
 	                                    <div class="span2">
 	                                      <div class="control-wrap">
 	                                        <div class="request-control">
-	                                        {{#if_equals task_state 'rq-draft'}}
+	                                        {{#if_equals task_state 'rq-amended-request'}}
 			                                    <button class="startObjectNow btn" data-status="rq-responded" data-type="tasks" data-id="{{@index}}">Start</button>
 			                                    {{/if_equals}}
 			                                    {{#if_equals task_state 'rq-responded'}}
@@ -481,17 +481,19 @@
 	                                          </li>
 	                                          {{/each}}
 	                                        </ul>
+	                                        {{^if_equals task_state 'rq-accepted'}}
 	                                        <div class="add-entry" style="display:none;">
                                               <textarea class="span10" placeholder="Entry"></textarea>
                                               <a href="#" class="entry-attachment">
                                                 <i class="grcicon-attach-color"></i> Attach supporting file
                                               </a>
                                               <br>
-                                              <a href="#" class="btn btn-small btn-primary" id="addEntry" data-index="{{@index}}">
+                                              <a href="#" class="btn btn-small btn-primary addEntry" data-objects='tasks' data-index="{{@index}}">
                                                 <strong>Add Entry</strong>
                                               </a>
-                                            </div>
+                                          </div>
 	                                        <a href="#" class="add-entry-btn"><strong class="show_review">Add Entry</strong></a>
+	                                        {{/if}}
 	                                      </div>
 	                                    </div>
 	                                  </div>
@@ -499,6 +501,7 @@
 	                              </div>
 	                            </li>
 	                            {{/each}}
+	                            {{^if_equals status 'rq-accepted'}}
 	                            <li class="tree-item tree-item-add tree-footer">
 	                              <div class="row-fluid">
 	                                <div class="span12">
@@ -508,6 +511,7 @@
 	                                </div>
 	                              </div>
 	                            </li>
+	                            {{/if}}
 	                          </ul>
 	                        </div>
 	                        
@@ -522,8 +526,11 @@
 	                              <h6>
 	                                {{review_title}} Notes (1)
 	                                <div class="pull-right review-note-action">
-	                                  <a href="#" class="btn" id="peerReviewComplete">Complete Peer Review</a>
-	                                  <span class="task-done" id="reviewNoteDone"><em>Peer Review Completed</em></span>
+	                                  {{#if_equals 'rq-amended-request' review_state}}
+	                                  <a href="#" class="startObjectNow btn" data-status="rq-responded" data-type="reviews" data-id="{{@index}}">Complete {{review_title}}</a>
+	                                  {{else}}
+	                                  <span class="task-done"><em>{{review_title}} Completed</em></span>
+	                                  {{/if_equals}}
 	                                </div>
 	                              </h6>
 	                              <ul class="tree-structure new-tree mockup-tree">
@@ -534,7 +541,7 @@
 	                                      <div class="item-data">
 	                                        <div class="show-description">
 	                                          <div class="tree-description">
-	                                            Curabitur fringilla sagittis elit eget hendrerit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id quam euismod, gravida nunc eget, malesuada enim. Cras ullamcorper vulputate quam, lacinia pulvinar ligula mollis venenatis.
+	                                            {{content}}
 	                                            <ul class="attachment-list">
 	                                              <li>
 	                                                <a href="#">
@@ -551,15 +558,25 @@
 	                                  </div>
 	                                </li>
 	                                {{/each}}
+	                                {{#if_equals 'rq-amended-request' review_state}}
 	                                <li class="tree-item tree-item-add tree-footer">
 	                                  <div class="row-fluid">
 	                                    <div class="span12">
-	                                      <a href="#" class="section-create">
-	                                        Add Note
-	                                      </a>
+	                                      <div class="add-entry" style="display:none;">
+			                                      <textarea class="span10" placeholder="Entry"></textarea>
+			                                      <a href="#" class="entry-attachment">
+			                                        <i class="grcicon-attach-color"></i> Attach supporting file
+			                                      </a>
+			                                      <br>
+			                                      <a href="#" class="btn btn-small btn-primary addEntry" data-objects='reviews' data-index="{{@index}}">
+			                                        <strong>Add Note</strong>
+			                                      </a>
+			                                  </div>
+	                                      <a href="#" class="add-entry-btn"><strong class="show_review">Add Note</strong></a>
 	                                    </div>
 	                                  </div>
 	                                </li>
+	                                {{/if}}
 	                              </ul>
 	                            </div>
 	                          </div>
@@ -638,7 +655,7 @@
                                 </div>
                               </div>
                               <div class="span2">
-                                <a href="#" class="btn btn-primary btn-footer" id="addSingleControl">Add</a>
+                                <a href="#" class="btn btn-primary btn-footer" id="addSingleControlNow">Add</a>
                                 <a href="#" id="cancelSingleControl"><i class="grcicon-x-grey"></i></a>
                               </div>
                             </div>
