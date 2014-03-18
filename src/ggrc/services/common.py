@@ -39,7 +39,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy import event
 from sqlalchemy.exc import SQLAlchemyError
 
-cache_expiration=60
+cache_collection_expiry=60
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
@@ -460,11 +460,11 @@ class Resource(ModelView):
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Update Memcache before Commit"):
-      self.update_memcache_before_commit(modified_objects)
+      self.update_memcache_before_commit(modified_objects, cache_collection_expiry)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Update Memcache after Commit"):
-      self.update_memcache_after_commit()
+      self.update_memcache_after_commit(cache_collection_expiry)
     with benchmark("Query for object"):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
@@ -490,12 +490,12 @@ class Resource(ModelView):
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Update Memcache before Commit"):
-      self.update_memcache_before_commit(modified_objects)
+      self.update_memcache_before_commit(modified_objects, cache_collection_expiry)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
     with benchmark("Update Memcache before Commit"):
-      self.update_memcache_after_commit()
+      self.update_memcache_after_commit(cache_collection_expiry)
     with benchmark("Query for object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -522,7 +522,7 @@ class Resource(ModelView):
       self.request.cache_manager = cache_manager
       cache_supported=self.request.cache_manager.is_caching_supported(category, model_plural)
       if cache_supported:
-        with benchmark("Get Collection from cache"):
+        with benchmark("Get resource collection from Memcache"):
           cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
         if cache_response is not None:
           return cache_response
@@ -531,7 +531,7 @@ class Resource(ModelView):
             " object in caching layer, checking Data-ORM layer" + \
             " in " + category + " category")
       else:
-        current_app.logger.info("CACHE: Caching operation is in progress for " + \
+        current_app.logger.info("CACHE: Caching is not supported for " + \
           model_plural + " in " + category + " category")
     else:
       current_app.logger.info("CACHE: Get Collection from cache is not supported for "  + \
@@ -551,13 +551,14 @@ class Resource(ModelView):
     # Write collection to cache, if caching is supported for the model
     #
     if cache_supported:
-      with benchmark("Write Collection to cache"):
+      with benchmark("Check status entries in Memcache"):
         cache_in_progress=self.is_caching_in_progress(category, model_plural) 
       if cache_in_progress is False:
-        cache_response = self.write_collection_to_cache(collection, category, model_plural,\
+        with benchmark("Write resource collection to Memcache"):
+          cache_response = self.write_collection_to_cache(collection, category, model_plural,\
                                 collection_name, model_plural)
       else:
-        current_app.logger.warn("CACHE: Cache is busy, Unable to write collection to cache for resource: "  +\
+        current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
           model_plural + " in " + category + " category")
     else:
       current_app.logger.info("CACHE: Write Collection to cache is not supported for "  +\
@@ -566,7 +567,7 @@ class Resource(ModelView):
     return self.json_success_response(
       collection, self.collection_last_modified())
 
-  def update_memcache_before_commit(self, modified_objects):
+  def update_memcache_before_commit(self, modified_objects, expiry_time):
     """
     Preparing the memccache entries to be updated before DB commit
     Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
@@ -617,8 +618,6 @@ class Resource(ModelView):
         cls = o.__class__.__name__
         if self.request.cache_manager.supported_classes.has_key(cls):
           model_plural = self.request.cache_manager.supported_classes[cls]
-          current_app.logger.info("CACHE: Marking cache updates for object instance of model: " + cls + \
-              " resource type: " + self.request.cache_manager.supported_classes[cls])
           key = 'collection:' + model_plural + ':' + str(json_obj['id'])
           self.request.cache_manager.marked_for_update[key]=json_obj
 
@@ -654,20 +653,20 @@ class Resource(ModelView):
 
     status_entries ={}
     for key in self.request.cache_manager.marked_for_add.keys():
-      build_cache_status(status_entries, 'CreateOp:' + key, cache_expiration, 'InProgress')
+      build_cache_status(status_entries, 'CreateOp:' + key, expiry_time, 'InProgress')
     for key in self.request.cache_manager.marked_for_update.keys():
-      build_cache_status(status_entries, 'UpdateOp:' + key, cache_expiration, 'InProgress')
+      build_cache_status(status_entries, 'UpdateOp:' + key, expiry_time, 'InProgress')
     for key in self.request.cache_manager.marked_for_delete:
-      build_cache_status(status_entries, 'DeleteOp:' + key, cache_expiration, 'InProgress')
+      build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
     if len(status_entries) > 0:
-      ret = self.request.cache_manager.bulk_add(status_entries, cache_expiration)
+      ret = self.request.cache_manager.bulk_add(status_entries, expiry_time)
       if ret is not None and len(ret) == 0:
         pass
       else:
-       current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ')
+       current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
        raise SQLAlchemyError("Unable to update cache in progress state")
 
-  def update_memcache_after_commit(self):
+  def update_memcache_after_commit(self, expiry_time):
     """
     The memccache entries is updated after DB commit
     Logs error if there are errors in updating entries in cache
@@ -684,22 +683,35 @@ class Resource(ModelView):
       # result is empty on success, non-empty on failure
       # TODO(dan): handling failure including network errors, currently we log errors
       if len(add_result) > 0: 
-        current_app.logger.error("CACHE: Failed to add entries to cache: " + str(add_result))
+        current_app.logger.error("CACHE: Failed to add collection to cache: " + str(add_result))
 
     if len(cache_manager.marked_for_update) > 0:
       update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
       # result is empty on success, non-empty on failure returns list of keys including network failures
       # TODO(dan): handling failure including network errors, currently we log errors
       if len(update_result) > 0: 
-        current_app.logger.error("CACHE: Failed to update entries in cache: " + str(update_result))
+        current_app.logger.error("CACHE: Failed to update collection in cache: " + str(update_result))
 
     # TODO(dan): check for duplicates in marked_for_delete
     #
     if len(cache_manager.marked_for_delete) > 0:
-      delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, cache_expiration)
+      delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, expiry_time)
       # TODO(dan): handling failure including network errors, currently we log errors
       if delete_result is not True:
-        current_app.logger.error("CACHE: Failed to deleted entries from cache") 
+        current_app.logger.error("CACHE: Failed to remoe collection from cache") 
+
+    status_entries =[]
+    for key in self.request.cache_manager.marked_for_add.keys():
+      status_entries.append('CreateOp:' + str(key))
+    for key in self.request.cache_manager.marked_for_update.keys():
+      status_entries.append('UpdateOp:' + str(key))
+    for key in self.request.cache_manager.marked_for_delete:
+      status_entries.append('DeleteOp:' + str(key))
+    if len(status_entries) > 0:
+      ret = self.request.cache_manager.bulk_delete(status_entries, 0)
+      # TODO(dan): handling failure including network errors, currently we log errors
+      if delete_result is not True:
+        current_app.logger.error("CACHE: Failed to remove status entries from cache") 
 
     cache_manager.clear_cache()
 
@@ -789,10 +801,9 @@ class Resource(ModelView):
           current_app.logger.info("CACHE: Successfully converted data to return as JSON response")
           return self.json_success_response(converted_data, datetime.datetime.now())
         else:
-          current_app.logger.info("CACHE: Unable to find data for model: " + resource + " in cache")
           return None
       else:
-        current_app.logger.info("CACHE: Model: " + resource + "not found in cache")
+        current_app.logger.info("CACHE: Model: " + resource + " is not found in cache")
         return None
     else:
       current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
@@ -841,7 +852,7 @@ class Resource(ModelView):
            current_app.logger.info("CACHE: Successfully written data in cache for resource: " + resource)
            return write_result
       else:
-         current_app.logger.info("CACHE: Unable to find data in source collection for model: " + resource)
+         current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
 	 return None
     else:
       current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
