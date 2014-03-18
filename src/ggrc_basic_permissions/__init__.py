@@ -275,6 +275,15 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   db.session.add(user_role)
   db.session.flush()
 
+  #Create the context implication for Program roles to default context
+  db.session.add(ContextImplication(
+      source_context=context,
+      context=None,
+      source_context_scope='Program',
+      context_scope=None,
+      modified_by=get_current_user(),
+      ))
+
   assign_role_reader(get_current_user())
   if not src.get('private'):
     # Add role implication - all users can read a public program
