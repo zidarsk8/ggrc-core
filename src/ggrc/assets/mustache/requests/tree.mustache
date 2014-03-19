@@ -6,7 +6,8 @@
 }}
 <li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
-    <a href="javascript://" class="openclose">
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
         <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
@@ -132,7 +133,7 @@
           </div>
         </div>
       </div>
-    </a>
+    </div>
   </div>
 
   {{#if expanded}}

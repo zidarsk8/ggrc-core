@@ -7,10 +7,11 @@
 
 
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main" {{data 'model'}}>
-      <a href="javascript://" class="openclose">
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span9">
+          <div class="span6">
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -51,22 +52,25 @@
               </div>
             {{/prune_context}}
           {{/pack}}
-          {{#with_mapping 'related_objects' instance}}
+          {{#with_mapping_count instance 'related_objects'}}
             {{#prune_context}}
               <div class="span1 section-item-count">
                 <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                   <i class="grcicon-object-black"></i>
-                    {{#if related_objects.length}} 
-                      <span>{{related_objects.length}}</span>
+                    {{#if count}}
+                      <span>{{count}}</span>
                     {{else}}
                       <strong class="error">0</strong>
                     {{/if}}
                 </div>
               </div>
             {{/prune_context}}
-          {{/with_mapping}}
+          {{/with_mapping_count}}
+          <div class="span3">
+            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+          </div>
         </div>
-      </a>
+      </div>
     </div>
 
     {{#if expanded}}

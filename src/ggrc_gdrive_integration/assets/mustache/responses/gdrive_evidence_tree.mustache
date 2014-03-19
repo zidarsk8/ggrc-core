@@ -8,7 +8,8 @@
 
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class='item-main' {{data 'model'}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class='row-fluid'>
           <div class='span12'>
             <div class='item-data'>
@@ -21,7 +22,7 @@
             </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
 
     {{#if expanded}}

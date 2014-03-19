@@ -1094,6 +1094,27 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap";
 });
 
+Mustache.registerHelper("with_direct_mappings_as",
+    function(var_name, parent_instance, instance, options) {
+  // Finds the mapping, if any, between `parent_object` and `instance`, then
+  // renders the block with those mappings available in the scope as `var_name`
+
+  parent_instance = Mustache.resolve(parent_instance);
+  instance = Mustache.resolve(instance);
+
+  var frame = new can.Observe();
+  frame.attr(var_name, []);
+  GGRC.all_local_results(parent_instance).then(function(results) {
+    can.each(results, function(result) {
+      if (result.instance === instance) {
+        frame.attr(var_name).push(result);
+      }
+    });
+  });
+
+  return options.fn(options.contexts.add(frame));
+});
+
 Mustache.registerHelper("result_direct_mappings", function(
     bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
@@ -2287,6 +2308,38 @@ Mustache.registerHelper("fadeout", function(delay, prop, options) {
       }, delay);
     };
   }
+});
+
+Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, options) {
+  var args = can.makeArray(arguments)
+    , options = args[args.length-1]
+    , mapping_name
+    ;
+
+  mapping_names = args.slice(1, args.length - 1);
+
+  instance = Mustache.resolve(instance);
+
+  // Find the most appropriate mapping
+  for (var i = 0; i < mapping_names.length; i++) {
+    mapping_name = Mustache.resolve(mapping_names[i]);
+    if (instance.get_binding(mapping_name)) {
+      break;
+    }
+  }
+
+  var finish = function(count) {
+    return options.fn(options.contexts.add({ count: count }));
+  };
+
+  var progress = function() {
+    return options.inverse(options.contexts);
+  };
+
+  return defer_render(
+      "span",
+      { done: finish, progress: progress },
+      instance.get_list_counter(mapping_name))
 });
 
 })(this, jQuery, can);
