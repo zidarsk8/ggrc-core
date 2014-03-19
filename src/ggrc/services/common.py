@@ -39,15 +39,177 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy import event
 from sqlalchemy.exc import SQLAlchemyError
 
-cache_collection_expiry=60
+CACHE_EXPIRY_COLLECTION=60
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
 """
 
+def update_memcache_before_commit(context, modified_objects, expiry_time):
+  """
+  Preparing the memccache entries to be updated before DB commit
+  Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
+  Raises Exception on failures, cannot proceed with DB commit
+
+  Args:
+    context: POST/PUT/DELETE HTTP request or import Converter contextual object
+    modified_objects:  objects in cache maintained prior to commiting to DB
+    expiry_time: Expiry time specified for memcache ADD and DELETE
+  Returns:
+    None 
+
+  """
+  cache_manager = CacheManager()
+  cache_manager.initialize(MemCache())
+  context.cache_manager = cache_manager
+
+  if len(modified_objects.new) > 0: 
+    items_to_add = modified_objects.new.items()
+    for o, json_obj in items_to_add:
+      json_obj = o.log_json()
+      cls = o.__class__.__name__
+      if context.cache_manager.supported_classes.has_key(cls):
+        model_plural = context.cache_manager.supported_classes[cls]
+        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+        context.cache_manager.marked_for_add[key]=json_obj
+
+        # Marking mapping links to be deleted from cache
+        if context.cache_manager.supported_mappings.has_key(cls):
+          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                   context.cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname] 
+          dstid = json_obj[dstname] 
+          model_plural = None
+          if polymorph is True:
+            dsttype = json_obj[dsttype]
+            model_plural = context.cache_manager.supported_classes[dsttype]
+          else:
+            model_plural = dsttype
+          if srctype is not None:
+            from_key = 'collection:' + srctype + ':' + str(srcid)
+            context.cache_manager.marked_for_delete.append(from_key)
+          if model_plural is not None:
+            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+            context.cache_manager.marked_for_delete.append(to_key)
+          else:
+            # This error should not happen, it indicates that class is not in the supported_classes map
+            # Log error
+            current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+      
+  if len(modified_objects.dirty) > 0: 
+    items_to_update = modified_objects.dirty.items()
+    for o, json_obj in items_to_update:
+      json_obj = o.log_json()
+      cls = o.__class__.__name__
+      if context.cache_manager.supported_classes.has_key(cls):
+        model_plural = context.cache_manager.supported_classes[cls]
+        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+        context.cache_manager.marked_for_update[key]=json_obj
+
+  if len(modified_objects.deleted) > 0: 
+    items_to_delete=modified_objects.deleted.items()
+    for o, json_obj in items_to_delete:
+      cls = o.__class__.__name__
+      if context.cache_manager.supported_classes.has_key(cls):
+        model_plural = context.cache_manager.supported_classes[cls]
+        object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
+        context.cache_manager.marked_for_delete.append(object_key)
+        # Marking mapping links to be deleted from cache
+        if context.cache_manager.supported_mappings.has_key(cls):
+          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+                   context.cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname] 
+          dstid = json_obj[dstname] 
+          model_plural = None
+          if polymorph is True:
+            dsttype = json_obj[dsttype]
+            model_plural = context.cache_manager.supported_classes[dsttype]
+          else:
+            model_plural = dsttype
+          if srctype is not None:
+            from_key = 'collection:' + srctype + ':' + str(srcid)
+            context.cache_manager.marked_for_delete.append(from_key)
+          if model_plural is not None:
+            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+            context.cache_manager.marked_for_delete.append(to_key)
+          else:
+            # This should not happen, it indicates that class is not in the supproted_classes map
+            current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+
+  status_entries ={}
+  for key in context.cache_manager.marked_for_add.keys():
+    build_cache_status(status_entries, 'CreateOp:' + key, expiry_time, 'InProgress')
+  for key in context.cache_manager.marked_for_update.keys():
+    build_cache_status(status_entries, 'UpdateOp:' + key, expiry_time, 'InProgress')
+  for key in context.cache_manager.marked_for_delete:
+    build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
+  if len(status_entries) > 0:
+    ret = context.cache_manager.bulk_add(status_entries, expiry_time)
+    if ret is not None and len(ret) == 0:
+      pass
+    else:
+     current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
+     raise SQLAlchemyError("Unable to update cache in progress state")
+
+def update_memcache_after_commit(context, expiry_time):
+  """
+  The memccache entries is updated after DB commit
+  Logs error if there are errors in updating entries in cache
+
+  Args:
+    context: POST/PUT/DELETE HTTP request or import Converter contextual object
+    modified_objects:  objects in cache maintained prior to commiting to DB
+    expiry_time: Expiry time specified for memcache ADD and DELETE
+  Returns:
+    None 
+
+  """
+  if context.cache_manager is None: 
+    current_app.logger.error("CACHE: Error in initiaizing cache manager")
+    return
+
+  cache_manager = context.cache_manager
+
+  if len(cache_manager.marked_for_add) > 0:
+    add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
+    # result is empty on success, non-empty on failure
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if len(add_result) > 0: 
+      current_app.logger.error("CACHE: Failed to add collection to cache: " + str(add_result))
+
+  if len(cache_manager.marked_for_update) > 0:
+    update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
+    # result is empty on success, non-empty on failure returns list of keys including network failures
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if len(update_result) > 0: 
+      current_app.logger.error("CACHE: Failed to update collection in cache: " + str(update_result))
+
+  # TODO(dan): check for duplicates in marked_for_delete
+  if len(cache_manager.marked_for_delete) > 0:
+    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, expiry_time)
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if delete_result is not True:
+      current_app.logger.error("CACHE: Failed to remoe collection from cache") 
+
+  status_entries =[]
+  for key in cache_manager.marked_for_add.keys():
+    status_entries.append('CreateOp:' + str(key))
+  for key in cache_manager.marked_for_update.keys():
+    status_entries.append('UpdateOp:' + str(key))
+  for key in cache_manager.marked_for_delete:
+    status_entries.append('DeleteOp:' + str(key))
+  if len(status_entries) > 0:
+    delete_result = cache_manager.bulk_delete(status_entries, 0)
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if delete_result is not True:
+      current_app.logger.error("CACHE: Failed to remove status entries from cache") 
+
+  cache_manager.clear_cache()
+
 def build_cache_status(data, key, expiry_timeout, status):
   """
-  build the dictionary for storing operational status of cache
+  Build the dictionary for storing operational status of cache
+
   Args:
     data: dictionary to update
     key: key to dictionary
@@ -459,12 +621,12 @@ class Resource(ModelView):
     self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
-    with benchmark("Update Memcache before Commit"):
-      self.update_memcache_before_commit(modified_objects, cache_collection_expiry)
+    with benchmark("Update memcache before commit for resource collection PUT"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
-    with benchmark("Update Memcache after Commit"):
-      self.update_memcache_after_commit(cache_collection_expiry)
+    with benchmark("Update memcache after commit for resource collection PUT"):
+      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
     with benchmark("Query for object"):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
@@ -489,13 +651,13 @@ class Resource(ModelView):
     db.session.delete(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
-    with benchmark("Update Memcache before Commit"):
-      self.update_memcache_before_commit(modified_objects, cache_collection_expiry)
+    with benchmark("Update memcache before commit for resource collection DELETE"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
-    with benchmark("Update Memcache before Commit"):
-      self.update_memcache_after_commit(cache_collection_expiry)
+    with benchmark("Update memcache after commit for resource collection DELETE"):
+      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
     with benchmark("Query for object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -566,154 +728,6 @@ class Resource(ModelView):
 
     return self.json_success_response(
       collection, self.collection_last_modified())
-
-  def update_memcache_before_commit(self, modified_objects, expiry_time):
-    """
-    Preparing the memccache entries to be updated before DB commit
-    Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
-    Raises Exception on failures, cannot proceed with DB commit
-
-    """
-    cache_manager = CacheManager()
-    cache_manager.initialize(MemCache())
-    self.request.cache_manager = cache_manager
-
-    if len(modified_objects.new) > 0: 
-      items_to_add = modified_objects.new.items()
-      for o, json_obj in items_to_add:
-        json_obj = o.log_json()
-        cls = o.__class__.__name__
-        if self.request.cache_manager.supported_classes.has_key(cls):
-          model_plural = self.request.cache_manager.supported_classes[cls]
-          key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-          self.request.cache_manager.marked_for_add[key]=json_obj
-
-          # Marking mapping links to be deleted from cache
-          if self.request.cache_manager.supported_mappings.has_key(cls):
-            (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-                     self.request.cache_manager.supported_mappings[cls]
-            srcid  = json_obj[srcname] 
-            dstid = json_obj[dstname] 
-            model_plural = None
-            if polymorph is True:
-              dsttype = json_obj[dsttype]
-              model_plural = self.request.cache_manager.supported_classes[dsttype]
-            else:
-              model_plural = dsttype
-            if srctype is not None:
-              from_key = 'collection:' + srctype + ':' + str(srcid)
-              self.request.cache_manager.marked_for_delete.append(from_key)
-            if model_plural is not None:
-              to_key   = 'collection:' + model_plural + ':' + str(dstid)
-              self.request.cache_manager.marked_for_delete.append(to_key)
-            else:
-              # This error should not happen, it indicates that class is not in the supported_classes map
-              # Log error
-              current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
-      
-    if len(modified_objects.dirty) > 0: 
-      items_to_update = modified_objects.dirty.items()
-      for o, json_obj in items_to_update:
-        json_obj = o.log_json()
-        cls = o.__class__.__name__
-        if self.request.cache_manager.supported_classes.has_key(cls):
-          model_plural = self.request.cache_manager.supported_classes[cls]
-          key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-          self.request.cache_manager.marked_for_update[key]=json_obj
-
-    if len(modified_objects.deleted) > 0: 
-      items_to_delete=modified_objects.deleted.items()
-      for o, json_obj in items_to_delete:
-        cls = o.__class__.__name__
-        if self.request.cache_manager.supported_classes.has_key(cls):
-          model_plural = self.request.cache_manager.supported_classes[cls]
-          object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-          self.request.cache_manager.marked_for_delete.append(object_key)
-          # Marking mapping links to be deleted from cache
-          if self.request.cache_manager.supported_mappings.has_key(cls):
-            (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-                     self.request.cache_manager.supported_mappings[cls]
-            srcid  = json_obj[srcname] 
-            dstid = json_obj[dstname] 
-            model_plural = None
-            if polymorph is True:
-              dsttype = json_obj[dsttype]
-              model_plural = self.request.cache_manager.supported_classes[dsttype]
-            else:
-              model_plural = dsttype
-            if srctype is not None:
-              from_key = 'collection:' + srctype + ':' + str(srcid)
-              self.request.cache_manager.marked_for_delete.append(from_key)
-            if model_plural is not None:
-              to_key   = 'collection:' + model_plural + ':' + str(dstid)
-              self.request.cache_manager.marked_for_delete.append(to_key)
-            else:
-              # This should not happen, it indicates that class is not in the supproted_classes map
-              current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
-
-    status_entries ={}
-    for key in self.request.cache_manager.marked_for_add.keys():
-      build_cache_status(status_entries, 'CreateOp:' + key, expiry_time, 'InProgress')
-    for key in self.request.cache_manager.marked_for_update.keys():
-      build_cache_status(status_entries, 'UpdateOp:' + key, expiry_time, 'InProgress')
-    for key in self.request.cache_manager.marked_for_delete:
-      build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
-    if len(status_entries) > 0:
-      ret = self.request.cache_manager.bulk_add(status_entries, expiry_time)
-      if ret is not None and len(ret) == 0:
-        pass
-      else:
-       current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
-       raise SQLAlchemyError("Unable to update cache in progress state")
-
-  def update_memcache_after_commit(self, expiry_time):
-    """
-    The memccache entries is updated after DB commit
-    Logs error if there are errors in updating entries in cache
-
-    """
-    if self.request.cache_manager is None: 
-      current_app.logger.error("CACHE: Error in initiaizing cache manager")
-      return
-
-    cache_manager = self.request.cache_manager
-
-    if len(cache_manager.marked_for_add) > 0:
-      add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
-      # result is empty on success, non-empty on failure
-      # TODO(dan): handling failure including network errors, currently we log errors
-      if len(add_result) > 0: 
-        current_app.logger.error("CACHE: Failed to add collection to cache: " + str(add_result))
-
-    if len(cache_manager.marked_for_update) > 0:
-      update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
-      # result is empty on success, non-empty on failure returns list of keys including network failures
-      # TODO(dan): handling failure including network errors, currently we log errors
-      if len(update_result) > 0: 
-        current_app.logger.error("CACHE: Failed to update collection in cache: " + str(update_result))
-
-    # TODO(dan): check for duplicates in marked_for_delete
-    #
-    if len(cache_manager.marked_for_delete) > 0:
-      delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, expiry_time)
-      # TODO(dan): handling failure including network errors, currently we log errors
-      if delete_result is not True:
-        current_app.logger.error("CACHE: Failed to remoe collection from cache") 
-
-    status_entries =[]
-    for key in self.request.cache_manager.marked_for_add.keys():
-      status_entries.append('CreateOp:' + str(key))
-    for key in self.request.cache_manager.marked_for_update.keys():
-      status_entries.append('UpdateOp:' + str(key))
-    for key in self.request.cache_manager.marked_for_delete:
-      status_entries.append('DeleteOp:' + str(key))
-    if len(status_entries) > 0:
-      delete_result = self.request.cache_manager.bulk_delete(status_entries, 0)
-      # TODO(dan): handling failure including network errors, currently we log errors
-      if delete_result is not True:
-        current_app.logger.error("CACHE: Failed to remove status entries from cache") 
-
-    cache_manager.clear_cache()
 
   def is_caching_in_progress(self, category, resource): 
     """Check the current state of cache and in progress

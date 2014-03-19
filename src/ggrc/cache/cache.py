@@ -95,7 +95,7 @@ def all_mapping_entries():
   ret = [
    mapping('control_controls', 'ControlControl', 'controls', 'control_id', 'controls', 'implemented_control_id'),
    mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
-   mapping('directive_controls', 'DirectiveControl', 'directives', 'directives_id', 'controls', 'control_id'),
+   mapping('directive_controls', 'DirectiveControl', 'directives', 'directive_id', 'controls', 'control_id'),
    mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', True),
    mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable', 'documentable_id', True),
    mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', True),
@@ -103,7 +103,7 @@ def all_mapping_entries():
    mapping('object_people', 'ObjectPerson', 'people', 'person_id', 'personable_type', 'personable_id', True),
    mapping('object_sections', 'ObjectSection', 'sections', 'section_id', 'sectionable_type', 'sectionable_id', True),
    mapping('objective_controls', 'ObjectiveControl', 'objectives', 'objective_id', 'controls', 'control_id'),
-   mapping('program_controls', 'ProgramControl', 'programs', 'program_id', 'controls', 'controls_id'),
+   mapping('program_controls', 'ProgramControl', 'programs', 'program_id', 'controls', 'control_id'),
    mapping('program_directives', 'ProgramDirective', 'programs', 'program_id', 'directives', 'directive_id'),
    mapping('section_objectives', 'SectionObjective', 'sections', 'section_id', 'objectives', 'objective_id'),
    mapping('user_roles', 'UserRole', 'people', 'person_id', 'roles', 'role_id'),
