@@ -402,8 +402,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
 
   , update_permission_for : function(item, person, permissionId, role) {
+    //short circuit any operation if the user isn't allowed to add permissions
     if(item.userPermission.role !== "writer" && item.userPermission.role !== "owner")
-      return;  //short circuit any operation if the user isn't allowed to add permissions
+      return new $.Deferred().reject("User is not authorized to modify this object");
 
     if(person.email) {
       person = person.email;
