@@ -595,7 +595,7 @@ can.Control("GGRC.Controllers.Modals", {
       delete this.options.model.cache[undefined];
     }
     this._super && this._super.apply(this, arguments);
-    if(this.options.instance._transient) {
+    if(this.options.instance && this.options.instance._transient) {
       this.options.instance.removeAttr("_transient");
     }
   }
