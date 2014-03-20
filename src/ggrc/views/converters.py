@@ -200,6 +200,41 @@ def import_objectives(directive_id):
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
+@app.route("/programs/<program_id>/import_objectives", methods=['GET', 'POST'])
+def import_controls_to_program(program_id):
+  from ggrc.models import Program
+  from werkzeug import secure_filename
+
+  program = Program.query.get(program_id)
+  return_to = unicode(request.args.get('return_to') or '')
+
+  if request.method != 'POST':
+    return render_template("programs/import_objectives.haml", program_id=program_id, import_kind='Objectives', return_to=return_to, parent_type="Program")
+
+  if 'cancel' in request.form:
+    program_url = request.args.get("return_to") or view_url_for(program)
+    return import_redirect(program_url)
+  dry_run = not ('confirm' in request.form)
+  csv_file = request.files['file']
+  if csv_file and allowed_file(csv_file.filename):
+    filename = secure_filename(csv_file.filename)
+  else:
+    file_msg = "Could not import: invalid csv file."
+    return render_template("programs/import_errors.haml",
+        directive_id=directive_id, exception_message=file_msg)
+  parameters = {
+      'parent_type': Program,
+      'parent_id': int(program_id),
+      'dry_run': dry_run,
+      'csv_filename': filename,
+      'csv_file': csv_file.read(),
+      'return_to': return_to,
+  }
+  tq = create_task(
+      get_current_user(), "import_objective", import_objective_program_task,
+      parameters)
+  return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
+
 @app.route("/task/import_objective_directive", methods=['POST'])
 @queued_task
 def import_objective_directive_task(task):
@@ -342,6 +377,43 @@ def import_control_program_task(task):
     if e.show_preview:
       converter = e.converter
       return render_template("programs/import_controls_result.haml",
+          exception_message=e, converter=converter, results=converter.objects,
+          program_id=program.id, heading_map=converter.object_map)
+    return render_template("programs/import_errors.haml",
+        program_id=program.id, exception_message=str(e))
+
+@app.route("/task/import_objective_program", methods=['POST'])
+@queued_task
+def import_objective_program_task(task):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.models import Program
+  from ggrc.utils import view_url_for
+
+  csv_file = task.parameters.get("csv_file")
+  dry_run = task.parameters.get("dry_run")
+  program_id = task.parameters.get("parent_id")
+  program = Program.query.get(program_id)
+  program_url = view_url_for(program)
+  return_to = task.parameters.get("return_to") or program_url
+
+  try:
+    converter = handle_csv_import(ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
+    if dry_run:
+      options = {
+          'converter': converter,
+          'results': converter.objects,
+          'heading_map': converter.object_map,
+      }
+      return render_template("programs/import_objectives_result.haml", **options)
+    else:
+      count = len(converter.objects)
+      flash(u'Successfully imported {} objectives{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return import_redirect(return_to)
+
+  except ImportException as e:
+    if e.show_preview:
+      converter = e.converter
+      return render_template("programs/import_objectives_result.haml",
           exception_message=e, converter=converter, results=converter.objects,
           program_id=program.id, heading_map=converter.object_map)
     return render_template("programs/import_errors.haml",
