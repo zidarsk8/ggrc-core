@@ -766,30 +766,6 @@ def import_directive_sections_template(directive_id):
   body = render_template("csv_files/Section_Import_Template.csv", **options)
   return current_app.make_response((body, 200, headers))
 
-@app.route("/standards/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/regulations/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/policies/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/contracts/<directive_id>/import_objectives_template", methods=['GET'])
-def import_directive_objectives_template(directive_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive
-  DIRECTIVE_TYPES = ['Contract', 'Regulation', 'Standard', 'Policy']
-  directive = Directive.query.get(directive_id)
-  directive_kind = directive.__class__.__name__
-  if directive_kind not in DIRECTIVE_TYPES:
-    return current_app.make_response((
-        "No template for that type.", 404, []))
-  template_name = "Objective_Import_Template.csv"
-  filename = "{0}_{1}".format(directive_kind, template_name)
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
-  options = {
-    # (Policy/Standard/Regulation/Contract) Code
-    'object_kind': directive_kind,
-    'object_slug': directive.slug,
-  }
-  body = render_template("csv_files/" + template_name, **options)
-  return current_app.make_response((body, 200, headers))
-
 @app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])
 def export_requests(audit_id):
   from ggrc.converters.requests import RequestsConverter
@@ -874,10 +850,18 @@ def export_systems_from_program(program_id):
     systems = [r.System_destination for r in program.related_destinations if r.System_destination]
   return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
+@app.route("/<object_type>/<object_id>/import_objectives_template", methods=['GET'])
 @app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
 def import_controls_template(object_type, object_id):
   from flask import current_app
   from ggrc.models.all_models import Directive, Program
+  # mapping from template/import type to formatted type name
+  IMPORT_TYPE_MAP = {
+      "import_objectives_template": "Objective",
+      "import_controls_template": "Control",
+  }
+  end_of_path = request.path.split("/")[-1]
+  import_type = IMPORT_TYPE_MAP[end_of_path]
   DIRECTIVE_TYPES = ["regulations", "contracts", "policies", "standards"]
   OTHER_TYPES = ["programs"]
   if object_type in DIRECTIVE_TYPES + OTHER_TYPES:
@@ -890,7 +874,7 @@ def import_controls_template(object_type, object_id):
   else:
     return current_app.make_response(
         ("No template for that type.", 404, []))
-  template_name = "Control_Import_Template.csv"
+  template_name = "{}_Import_Template.csv".format(import_type)
   headers = [
       ('Content-Type', 'text/csv'),
       (
