@@ -189,8 +189,87 @@ $(function() {
       }
 
     , extra_content_controller_options = apply_mixins({
-          Program: {
+          objectives: {
+              Objective: {
+                  mapping: "objectives"
+                , draw_children: true
+                , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
+                }
+            }
+        , controls: {
+              Control: {
+                  mapping: "controls"
+                , draw_children: true
+                , show_view: GGRC.mustache_path + "/controls/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
+                }
+            }
+        , business_objects: {
+              DataAsset: {
+                  mapping: "related_data_assets"
+                }
+            , Facility: {
+                  mapping: "related_facilities"
+                }
+            , Market: {
+                  mapping: "related_markets"
+                }
+            , OrgGroup: {
+                  mapping: "related_org_groups"
+                }
+            , Process: {
+                  mapping: "related_processes"
+                }
+            , Product: {
+                  mapping: "related_products"
+                }
+            , Project: {
+                  mapping: "related_projects"
+                }
+            , System: {
+                  mapping: "related_systems"
+                }
+            , Document: {
+                  mapping: "documents"
+                }
+            , Person: {
+                  mapping: "people"
+                }
+            , Program: {
+                  mapping: "programs"
+                }
+            }
+
+        , governance_objects: {
               Regulation: {
+                  mapping: "regulations"
+                }
+            , Contract: {
+                  mapping: "contracts"
+                }
+            , Policy: {
+                  mapping: "policies"
+                }
+            , Standard: {
+                  mapping: "standards"
+                }
+            , Control: {
+                  mapping: "controls"
+                }
+            , Objective: {
+                  mapping: "objectives"
+                }
+            }
+
+        , Program: {
+              _mixins: [
+                  "objectives"
+                , "controls"
+                , "business_objects"
+                ]
+
+            , Regulation: {
                 mapping: "regulations"
               , draw_children: true
               , child_options: [section_child_options]
@@ -222,7 +301,7 @@ $(function() {
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
-            , Audit : { 
+            , Audit: {
               mapping: "audits"
               , allow_mapping : true
               , draw_children : true
@@ -232,7 +311,12 @@ $(function() {
           }
 
         , directive: {
-              Section : section_child_options
+              _mixins: [
+                  "objectives"
+                , "controls"
+                , "business_objects"
+                ]
+            , Section : section_child_options
             }
 
         , Regulation: {
@@ -259,35 +343,38 @@ $(function() {
             }
           }
 
+        , Objective: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
         , Control: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , DataAsset: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Facility: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Market: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , OrgGroup: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Process: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Product: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Project: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , System: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Document: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
 
         , Person : {
@@ -324,7 +411,7 @@ $(function() {
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
-            , Audit : { 
+            , Audit: {
                 mapping: "extended_related_audits_via_search"
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
@@ -335,7 +422,7 @@ $(function() {
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               , draw_children : true
-              } 
+              }
             , Objective: {
                 mapping: "extended_related_objectives_via_search"
               , draw_children: true
