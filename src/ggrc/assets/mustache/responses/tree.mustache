@@ -23,7 +23,10 @@
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
-                {{#if_can_edit_request instance.request}}
+                {{#if_helpers '\
+                  #if_can_edit_request' parent_instance '\
+                  and ^if_auditor' parent_instance '\
+                  or #is_allowed' '__GGRC_ADMIN__' model.shortName _2_context=instance.context.id}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
                 {{else}}
                 <span class="read-only">
@@ -126,8 +129,11 @@
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
-          and #is_allowed' 'update' instance '\
-        ' _1_context=instance.context.id}}
+            and #is_allowed' 'update' instance _1_context=instance.context.id '\
+            and #if_can_edit_request' parent_instance '\
+            and ^if_auditor' parent_instance '\
+          or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=instance.context.id '\
+          and #if' allow_mapping_or_creating}}
           <div class="tier-2-info-content">
             <div class="show-description">
               <div class="row-fluid">
