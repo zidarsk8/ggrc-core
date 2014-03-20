@@ -4,7 +4,7 @@
       {{#with_direct_mappings_as 'mappings' page_instance instance}}
         {{#if mappings.length}}
           {{#is_allowed_all 'delete' mappings}}
-            <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
               {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
               <i class="grcicon-remove"></i>
               Make Not Relevant
@@ -12,7 +12,7 @@
           {{/is_allowed_all}}
         {{else}}
           {{#is_allowed_to_map page_instance instance join=true}}
-          <a class="info-action pull-right map-to-page-object" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}}>
+          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}}>
             Make Relevant
             <i class="grcicon-reg-map"></i>
           </a>
