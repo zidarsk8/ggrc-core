@@ -971,6 +971,8 @@ jQuery(function($){
           $(event.target).trigger("change");
         }
 
+        , minLength: 0
+
         // Search for the people based on the term
         , source : function(request, response) {
           var query = request.term || ''
@@ -1012,7 +1014,10 @@ jQuery(function($){
         , close : function() {
           //$that.val($that.attr("value"));
         }
-      }).data('ui-autocomplete');
+      }).focus(function(){     
+        //Use the below line instead of triggering keydown
+        $(this).data("uiAutocomplete").search($(this).val());
+    }).data('ui-autocomplete');
     });
     acs.each(function(i, ac) {
       ac._renderMenu = function(ul, items) {
