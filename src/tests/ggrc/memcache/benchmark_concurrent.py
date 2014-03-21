@@ -84,7 +84,7 @@ class TestPutThread(threading.Thread):
     self.loop_cnt = loop_cnt
 
   def run(self):
-    self.endtime=datetime.now()
+    self.starttime=datetime.now()
     for cnt in range(self.loop_cnt):
       print "Running PUT/GET Thread: " + self.name + " Iteration#" + str(cnt+1)
       for resource, payload in self.put_data.items():
