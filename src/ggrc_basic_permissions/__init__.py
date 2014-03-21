@@ -371,6 +371,28 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   obj.context = context
 
 
+@Resource.model_deleted.connect
+def handle_resource_deleted(sender, obj=None, service=None):
+  if obj.context \
+      and obj.context.related_object_id \
+      and obj.id == obj.context.related_object_id \
+      and obj.__class__.__name__ == obj.context.related_object_type:
+    db.session.query(UserRole) \
+        .filter(UserRole.context_id == obj.context_id) \
+        .delete()
+    db.session.query(ContextImplication) \
+        .filter(
+            or_(
+              ContextImplication.context_id == obj.context_id,
+              ContextImplication.source_context_id == obj.context_id
+              ))\
+        .delete()
+    # Deleting the context itself is problematic, because unattached objects
+    #   may still exist and cause a database error.  Instead of implicitly
+    #   cascading to delete those, just leave the `Context` object in place.
+    #   It and its objects will be visible *only* to Admin users.
+    #db.session.delete(obj.context)
+
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.
 # @BaseObjectView.extension_contributions.connect_via(Program)
