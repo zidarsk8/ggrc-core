@@ -1087,6 +1087,15 @@ ul.new-tree {
       @include opacity(1);
     }
   }
+  &.relevant-action {
+    padding-right: 20px;
+    color: $subTitle;
+    @include opacity(0.5);
+    &:hover {
+      color: $subTitle;
+      @include opacity(1);
+    }
+  }
 }
 
 .counter {
