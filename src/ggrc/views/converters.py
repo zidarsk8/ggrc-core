@@ -200,6 +200,41 @@ def import_objectives(directive_id):
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
+@app.route("/programs/<program_id>/import_objectives", methods=['GET', 'POST'])
+def import_controls_to_program(program_id):
+  from ggrc.models import Program
+  from werkzeug import secure_filename
+
+  program = Program.query.get(program_id)
+  return_to = unicode(request.args.get('return_to') or '')
+
+  if request.method != 'POST':
+    return render_template("programs/import_objectives.haml", program_id=program_id, import_kind='Objectives', return_to=return_to, parent_type="Program")
+
+  if 'cancel' in request.form:
+    program_url = request.args.get("return_to") or view_url_for(program)
+    return import_redirect(program_url)
+  dry_run = not ('confirm' in request.form)
+  csv_file = request.files['file']
+  if csv_file and allowed_file(csv_file.filename):
+    filename = secure_filename(csv_file.filename)
+  else:
+    file_msg = "Could not import: invalid csv file."
+    return render_template("programs/import_errors.haml",
+        directive_id=directive_id, exception_message=file_msg)
+  parameters = {
+      'parent_type': Program,
+      'parent_id': int(program_id),
+      'dry_run': dry_run,
+      'csv_filename': filename,
+      'csv_file': csv_file.read(),
+      'return_to': return_to,
+  }
+  tq = create_task(
+      get_current_user(), "import_objective", import_objective_program_task,
+      parameters)
+  return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
+
 @app.route("/task/import_objective_directive", methods=['POST'])
 @queued_task
 def import_objective_directive_task(task):
@@ -342,6 +377,43 @@ def import_control_program_task(task):
     if e.show_preview:
       converter = e.converter
       return render_template("programs/import_controls_result.haml",
+          exception_message=e, converter=converter, results=converter.objects,
+          program_id=program.id, heading_map=converter.object_map)
+    return render_template("programs/import_errors.haml",
+        program_id=program.id, exception_message=str(e))
+
+@app.route("/task/import_objective_program", methods=['POST'])
+@queued_task
+def import_objective_program_task(task):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.models import Program
+  from ggrc.utils import view_url_for
+
+  csv_file = task.parameters.get("csv_file")
+  dry_run = task.parameters.get("dry_run")
+  program_id = task.parameters.get("parent_id")
+  program = Program.query.get(program_id)
+  program_url = view_url_for(program)
+  return_to = task.parameters.get("return_to") or program_url
+
+  try:
+    converter = handle_csv_import(ObjectivesConverter, csv_file.splitlines(True), **task.parameters)
+    if dry_run:
+      options = {
+          'converter': converter,
+          'results': converter.objects,
+          'heading_map': converter.object_map,
+      }
+      return render_template("programs/import_objectives_result.haml", **options)
+    else:
+      count = len(converter.objects)
+      flash(u'Successfully imported {} objectives{}'.format(count, 's' if count > 1 else ''), 'notice')
+      return import_redirect(return_to)
+
+  except ImportException as e:
+    if e.show_preview:
+      converter = e.converter
+      return render_template("programs/import_objectives_result.haml",
           exception_message=e, converter=converter, results=converter.objects,
           program_id=program.id, heading_map=converter.object_map)
     return render_template("programs/import_errors.haml",
@@ -766,30 +838,6 @@ def import_directive_sections_template(directive_id):
   body = render_template("csv_files/Section_Import_Template.csv", **options)
   return current_app.make_response((body, 200, headers))
 
-@app.route("/standards/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/regulations/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/policies/<directive_id>/import_objectives_template", methods=['GET'])
-@app.route("/contracts/<directive_id>/import_objectives_template", methods=['GET'])
-def import_directive_objectives_template(directive_id):
-  from flask import current_app
-  from ggrc.models.all_models import Directive
-  DIRECTIVE_TYPES = ['Contract', 'Regulation', 'Standard', 'Policy']
-  directive = Directive.query.get(directive_id)
-  directive_kind = directive.__class__.__name__
-  if directive_kind not in DIRECTIVE_TYPES:
-    return current_app.make_response((
-        "No template for that type.", 404, []))
-  template_name = "Objective_Import_Template.csv"
-  filename = "{0}_{1}".format(directive_kind, template_name)
-  headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
-  options = {
-    # (Policy/Standard/Regulation/Contract) Code
-    'object_kind': directive_kind,
-    'object_slug': directive.slug,
-  }
-  body = render_template("csv_files/" + template_name, **options)
-  return current_app.make_response((body, 200, headers))
-
 @app.route("/audits/<audit_id>/export_pbcs", methods=['GET'])
 def export_requests(audit_id):
   from ggrc.converters.requests import RequestsConverter
@@ -874,10 +922,18 @@ def export_systems_from_program(program_id):
     systems = [r.System_destination for r in program.related_destinations if r.System_destination]
   return handle_converter_csv_export(filename, systems, SystemsConverter, **options)
 
+@app.route("/<object_type>/<object_id>/import_objectives_template", methods=['GET'])
 @app.route("/<object_type>/<object_id>/import_controls_template", methods=['GET'])
 def import_controls_template(object_type, object_id):
   from flask import current_app
   from ggrc.models.all_models import Directive, Program
+  # mapping from template/import type to formatted type name
+  IMPORT_TYPE_MAP = {
+      "import_objectives_template": "Objective",
+      "import_controls_template": "Control",
+  }
+  end_of_path = request.path.split("/")[-1]
+  import_type = IMPORT_TYPE_MAP[end_of_path]
   DIRECTIVE_TYPES = ["regulations", "contracts", "policies", "standards"]
   OTHER_TYPES = ["programs"]
   if object_type in DIRECTIVE_TYPES + OTHER_TYPES:
@@ -890,7 +946,7 @@ def import_controls_template(object_type, object_id):
   else:
     return current_app.make_response(
         ("No template for that type.", 404, []))
-  template_name = "Control_Import_Template.csv"
+  template_name = "{}_Import_Template.csv".format(import_type)
   headers = [
       ('Content-Type', 'text/csv'),
       (
