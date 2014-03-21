@@ -114,4 +114,7 @@ headers=localhost_headers
 prefix="http"
 batchsize=20
 num_iterations=10
-run_benchmark_tests(prefix, targethost, num_iterations, headers, batchsize)
+if __name__ == '__main__':
+  print "Running benchmark load tests"
+  run_benchmark_tests(prefix, targethost, num_iterations, headers, batchsize)
+
