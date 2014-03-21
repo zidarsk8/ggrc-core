@@ -72,7 +72,8 @@
           {{#using assignee=instance.assignee}}
           {{#if_helpers "\
             #if_can_edit_request" instance "\
-            and ^if_auditor" instance _1_include_admin=false}}
+            and ^if_auditor" instance _1_include_admin=false "\
+            or #is_allowed" "__GGRC_ADMIN__" instance }}
               <div class="objective-selector">
                 <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
               </div>
