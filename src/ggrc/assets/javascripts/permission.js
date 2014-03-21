@@ -9,7 +9,7 @@
 var ADMIN_PERMISSION
 , _CONDITIONS_MAP = {
     contains: function(instance, args) {
-      var value = _resolve_permission_variable(args.value);
+      var value = Permission._resolve_permission_variable(args.value);
       var list_value = instance[args.list_property];
       for (var i = 0; i < list_value.length; i++) {
         if (list_value[i].id == value.id) return true;
@@ -17,12 +17,12 @@ var ADMIN_PERMISSION
       return false;
     }
     , is: function(instance, args) {
-      var value = _resolve_permission_variable(args.value);
+      var value = Permission._resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
       return value == property_value;
     }
     , in: function(instance, args) {
-      var value = _resolve_permission_variable(args.value);
+      var value = Permission._resolve_permission_variable(args.value);
       var property_value = instance[args.property_name];
       return value.indexOf(property_value) >= 0;
     }

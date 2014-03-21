@@ -9,19 +9,29 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
   var that = this
   , dfd
   , folder
+  , has_parent = true
   , owner = cls === CMS.Models.Request ? "assignee" : "contact";
 
   if(instance instanceof cls) {
     if(parent_attr) {
       dfd = instance[parent_attr].reify().get_binding("folders").refresh_instances();
     } else {
+      has_parent = false;
       dfd = $.when([{}]); //make parent_folder instance be undefined; 
                           // GDriveFolder.create will translate that into 'root'
     }
     return dfd.then(function(parent_folders) {
+      parent_folders = can.map(parent_folders, function(pf) {
+        return pf.instance && pf.instance.userPermission &&
+          (pf.instance.userPermission.role === "writer" || 
+           pf.instance.userPermission.role === "owner") ? pf : undefined;
+      });
+      if(has_parent && parent_folders.length < 1){
+        return new $.Deferred().reject("no write permissions on parent");
+      }
       var xhr = new CMS.Models.GDriveFolder({
         title : title_generator(instance)
-        , parents : parent_folders[0].instance
+        , parents : parent_folders.length > 0 ? parent_folders[0].instance : undefined
       }).save();
 
       report_progress("Creating Drive folder for " + title_generator(instance), xhr);
@@ -57,6 +67,9 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
       return $.when();
     }).then(function(){
       return folder;
+    }, function() {
+      //rejected case from previous
+      return $.when();
     });
   }
   else {
@@ -120,10 +133,25 @@ function report_progress(str, xhr) {
   return xhr;
 }
 
+var permissions_by_type = {
+  "Program" : {
+    "owners" : "writer"
+    , "contact" : "writer"
+  }
+  , "Audit" : {
+    "contact" : "writer"
+    , "findAuditors" : "reader"
+  }
+  , "Request" : {
+    "assignee" : "writer"
+  }
+};
+
 can.Control("GGRC.Controllers.GDriveWorkflow", {
 
 }, {
   request_create_queue : []
+  , user_permission_ids : {}
 
   , create_program_folder : partial_proxy(create_folder, CMS.Models.Program, function(inst) { return inst.title + " Audits"; }, null)
   /*
@@ -140,9 +168,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       .then(this.proxy("create_folder_if_nonexistent"))
       .then($.proxy(instance.program.reify(), "refresh"))
       .then(function() {
-        return that.create_audit_folder(model, ev, instance);
         delete that._audit_create_in_progress;
-      })
+      	return that.create_audit_folder(model, ev, instance);
+       })
       .then(function(){
         instance.saveDeferreds.auditFolder.resolve(instance);
       });
@@ -198,97 +226,215 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         if(instance.objective) {
           return this.create_request_folder(model, ev, instance);
         } else {
-          return report_progress(
-            'Linking new Request to Audit folder'
-            , new CMS.Models.ObjectFolder({
-              folder_id : instance.audit.reify().object_folders[0].reify().folder_id
-              , folderable : instance
-              , context : instance.context || { id : null }
-            }).save()
-          );
+
+          if(Permission.is_allowed("create", "ObjectFolder", instance.context.id || null)) {
+
+            return report_progress(
+              'Linking new Request to Audit folder'
+              , new CMS.Models.ObjectFolder({
+                folder_id : instance.audit.reify().object_folders[0].reify().folder_id
+                , folderable : instance
+                , context : instance.context || { id : null }
+              }).save()
+            );
+          } else {
+            return $.when();
+          }
         }
       }
     }
   }
 
-  , update_owner_permission : function(model, ev, instance, role, person) {
-    var dfd
-    , owner = instance instanceof CMS.Models.Request ? "assignee" : "contact";
+  , resolve_permissions : function(folder, instance) {
+    var permissions = {};
+    var permission_dfds = [];
+    var that = this;
 
-    // TODO check whether person is the logged-in user, and use OAuth2 identifier if so?
-    role = role || "writer";
-    if(~can.inArray(instance.constructor.shortName, ["Program", "Audit", "Request"]) && (person || instance[owner])) {
-      person = (person || instance[owner]).reify();
-      if(person.selfLink) {
-        dfd = $.when(person);
-      } else {
-        dfd = person.refresh();
-      }
-      return dfd.then(function() {
-        return $.when(
-          CMS.Models.GDriveFilePermission.findUserPermissionId(person)
-          , instance.get_binding("folders").refresh_instances()
-          , GGRC.config.GAPI_ADMIN_GROUP 
-            ? CMS.Models.GDriveFilePermission.findUserPermissionId(GGRC.config.GAPI_ADMIN_GROUP)
-            : undefined
-        ).then(function(user_permission_id, list, admin_permission_id) {
-          return $.when(can.map(list, function(binding) {
-            if(binding.instance.userPermission.role !== "writer" && binding.instance.userPermission.role !== "owner")
-              return $.when();  //short circuit any operation if the user isn't allowed to add permissions
-
-            return binding.instance.findPermissions().then(function(permissions) {
-              var owners_matched = !GGRC.config.GAPI_ADMIN_GROUP;  //if no admin group, ignore.
-              var matching = can.map(permissions, function(permission) {
-                if(admin_permission_id
-                   && permission.type === "group"
-                   && (permission.id === admin_permission_id)
-                       || (permission.emailAddress && permission.emailAddress.toLowerCase() === GGRC.config.GAPI_ADMIN_GROUP.toLowerCase())
-                ) {
-                  owners_matched = true;
-                }
-                /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
-                   Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
-                   while "Permission IDs" will match on internal account permissions (where email address is
-                   usually not provided).  Check both.
-                */
-                if(permission.type === "user"
-                  && (permission.id === user_permission_id
-                      || (permission.emailAddress && permission.emailAddress.toLowerCase() === person.email.toLowerCase()))
-                  && (permission.role === "owner" || permission.role === "writer" || permission.role === role)
-                ) {
-                  return permission;
-                }
-              });
-              if(matching.length < 1) {
-                return report_progress(
-                  "Creating Drive folder " + (role.name || role) + " permission for " + person.email + ' on folder "' + binding.instance.title + '"'
-                  , new CMS.Models.GDriveFolderPermission({
-                    folder : binding.instance
-                    , person : person
-                    , role : role
-                  }).save()
-                );
-              }
-              if(!owners_matched) {
-                return report_progress(
-                  'Creating admin group permission on folder "' + binding.instance.title + '"'
-                  , new CMS.Models.GDriveFolderPermission({
-                    folder : binding.instance
-                    , email : GGRC.config.GAPI_ADMIN_GROUP
-                    , role : "writer"
-                    , permission_type : "group"
-                  }).save()
-                );
-              }
+    var push_person = function(role, email, queue_to_top) {
+      if(!permissions[email] || permissions[email] !== "writer" || role !== "reader") {
+        email = email.toLowerCase();
+        permissions[email] = role;
+        if(!that.user_permission_ids[email]) {
+          if(queue_to_top) {
+            permission_dfds.push(CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
+              that.user_permission_ids[permissionId] = email;
+              that.user_permission_ids[email] = permissionId;
+            }));
+          } else {
+            return CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
+              that.user_permission_ids[permissionId] = email;
+              that.user_permission_ids[email] = permissionId;
             });
-          }));
-        });
+          }
+        }
+      }
+    };
+
+    can.each(permissions_by_type[instance.constructor.model_singular], function(role, key) {
+      var people = instance[key];
+      if(typeof people === "function") {
+        people = people.call(instance);
+      }
+      can.each(!people || people.push ? people : [people], function(person) {
+        if(person.person) {
+          person = person.person;
+        }
+        person = person.reify();
+        if(person.selfLink) {
+          person = person.email;
+          push_person(role, person, true);
+        } else {
+          permission_dfds.push(person.refresh().then(function(p) { return p.email; }).then($.proxy(push_person, null, role)));
+        }
+      });
+    });
+    if(GGRC.config.GAPI_ADMIN_GROUP) {
+      push_person("writer", GGRC.config.GAPI_ADMIN_GROUP, true);
+    }
+    if(instance instanceof CMS.Models.Program) {
+      var auths = {};
+      //setting user roles does create a quirk because we want to be sure that a user with
+      //  access doesn't accidentally remove his own access to a resource while trying to change it.
+      //  So a user may have more than one role at this point, and we only want to change the GDrive
+      //  permission based on the most recent one.
+
+      can.each(instance.get_mapping("authorizations"), function(authmapping) {
+        var auth = authmapping.instance;
+        if(!auths[auth.person.reify().email]
+           || auth.created_at.getTime() > auths[auth.person.reify().email].created_at.getTime()
+        ) {
+          auths[auth.person.reify().email] = auth;
+        }
+      });
+      can.each(auths, function(auth) {
+        var person = auth.person.reify()
+        , role = auth.role.reify()
+        , rolesmap = {
+          ProgramOwner : "writer"
+          , ProgramEditor : "writer"
+          , ProgramReader : "reader"
+        };
+
+        push_person(rolesmap[role.name], person.email, true);
       });
     }
+
+    return $.when.apply($, permission_dfds).then(function() {
+      return permissions;
+    });
+  }
+
+
+  , update_permissions : function(model, ev, instance) {
+    var dfd
+    , that = this
+    , permission_ids = {};
+
+    if(!(instance instanceof model) || instance.__permissions_update_in_progress)
+      return;
+
+    instance.__permissions_update_in_progress = true;
+
+    // TODO check whether person is the logged-in user, and use OAuth2 identifier if so?
+    instance.get_binding("folders").refresh_instances().then(function(binding_list) {
+      var binding_dfds = [];
+      can.each(binding_list, function(binding) {
+        binding_dfds.push($.when(
+          that.resolve_permissions(binding.instance, instance)
+          , binding.instance.findPermissions()
+        ).then(function(permissions_to_create, permissions_to_delete) {
+          var permissions_dfds = [];
+          permissions_to_delete = can.map(permissions_to_delete, function(permission) {
+            /* NB: GDrive sometimes provides the email address assigned to a permission and sometimes not.
+               Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
+               while "Permission IDs" will match on internal account permissions (where email address is
+               usually not provided).  Check both.
+            */
+
+            var email = permission.emailAddress 
+                        ? permission.emailAddress.toLowerCase() 
+                        : that.user_permission_ids[permission.id];
+            var pending_permission = permissions_to_create[email];
+
+            // Case matrix.
+            // 0: existing is owner -- delete existing and current.  Owner remains owner.
+            // 1: pending (to create) does not exist, existing (to delete) exists -- do nothing, delete existing later
+            // 2: pending exists, existing does not. -- we won't get here because we're iterating (do nothing, create pending later)
+            // 3: pending and existing exist, have same role. -- delete both, do nothing later.
+            // 4: pending and existing exist, pending is writer but existing is reader -- delete existing, create writer later.
+            // 5: pending and existing exist, pending is reader but existing is writer -- do nothing, delete writer first.
+
+            switch(true) {
+            case (permission.role === "owner"):
+              delete permissions_to_create[email];
+              return;
+            case (!pending_permission):
+              return permission;
+            case (pending_permission === permission.role):
+              delete permissions_to_create[email];
+              return;
+            case (pending_permission !== "reader" && permission.role === "reader"):
+              return;
+            case (pending_permission === "reader" && permission.role !== "reader"):
+              return permission;
+            }
+
+          });
+
+          can.each(permissions_to_delete, function(permission) {
+            permissions_dfds.push(report_progress(
+              'Removing '
+              + permission.role
+              + ' permission on folder "'
+              + binding.instance.title
+              + '" for '
+              + that.user_permission_ids[permission.id] || permission.emailAddress|| permission.value || permission.id
+              , permission.destroy()
+            ).then(null, function() {
+              return new $.Deferred().resolve(); //wait on these even if they fail.
+            }));
+          });
+
+          can.each(permissions_to_create, function(role, user) {
+            permissions_dfds.push(
+              that.update_permission_for(binding.instance, user, that.user_permission_ids[user], role)
+              .then(null, function() {
+                return new $.Deferred().resolve(); //wait on these even if they fail.
+              })
+            );
+          });
+
+          return $.when.apply($, permissions_dfds);
+        }));
+      });
+      return $.when.apply($, binding_dfds);
+    }).always(function() {
+      delete instance.__permissions_update_in_progress;
+    });
+  }
+
+  , update_permission_for : function(item, person, permissionId, role) {
+    //short circuit any operation if the user isn't allowed to add permissions
+    if(item.userPermission.role !== "writer" && item.userPermission.role !== "owner")
+      return new $.Deferred().reject("User is not authorized to modify this object");
+
+    if(person.email) {
+      person = person.email;
+    }
+
+    return report_progress(
+      'Creating ' + role + ' permission on folder "' + item.title + '" for ' + person
+      , new CMS.Models.GDriveFolderPermission({
+        folder : item
+        , email : person
+        , role : role
+        , permission_type : person === GGRC.config.GAPI_ADMIN_GROUP ? "group" : "user"
+      }).save()
+    );
   }
 
   // extracted out of {Request updated} for readability.
-  , move_files_to_new_folder : function(audit_folders, new_folder, audit_files) {
+  , move_files_to_new_folder : function(audit_folders, new_folder, audit_files, request_responses) {
     var tldfds = [];
     can.each(audit_files, function(file) {
       //if the file is still referenced in more than one request without an objective,
@@ -298,33 +444,40 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           "document.link" : file.alternateLink
         }).then(function(obds) {
           //filter out any object-documents that aren't Responses.
+          var connected_request_responses = [], other_responses = [];
           var responses = can.map(obds, function(obd) {
-            if(obd.documentable.reify() instanceof CMS.Models.Response)
+            var dable = obd.documentable.reify();
+            if(dable instanceof CMS.Models.Response) {
+              if(~can.inArray(dable, request_responses)) {
+                connected_request_responses.push(dable);
+              } else {
+                other_responses.push(dable);
+              }
               return obd.documentable.reify();
+            }
           });
-          
-          file.addToParent(new_folder);
-          return new RefreshQueue().enqueue(responses).trigger().then(function(reified_responses) {
-            var dfds = [];
 
-            if(obds.length < 2
-              || can.map(reified_responses, function(resp) {
-                  if(resp.request.reify() !== instance
-                     && !resp.request.reify().objective) {
+          if(connected_request_responses.length > 0) {
+            file.addToParent(new_folder);
+            return new RefreshQueue().enqueue(other_responses).trigger().then(function(reified_responses) {
+              var dfds = [];
+
+              if(can.map(reified_responses, function(resp) {
+                  if(!resp.request.reify().objective) {
                     return resp;
                   }
-                })
-              .length < 1
-            ) {
-              //If no other request is still using the Audit folder version,
-              // remove from the audit folder.
-              can.each(audit_folders, function(af) {
-                dfds.push(file.removeFromParent(af));
-              });
-            }
+                }).length < 1
+              ) {
+                //If no other request is still using the Audit folder version,
+                // remove from the audit folder.
+                can.each(audit_folders, function(af) {
+                  dfds.push(file.removeFromParent(af));
+                });
+              }
 
-            return $.when.apply($, dfds);
-          });
+              return $.when.apply($, dfds);
+            });
+          }
         })
       );
     });
@@ -351,6 +504,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       "Moving files to the Audit folder"
       , $.when.apply($, move_dfds).done(function() {
         can.each(req_folders, function(rf) {
+          if(!rf.selfLink || rf.userPermission.role !== "writer" && rf.userPermission.role !== "owner")
+            return;  //short circuit any operation if the user isn't allowed to add permissions
+
           report_progress(
             'Checking whether folder "' + rf.title + '" is empty'
             , CMS.Models.GDriveFile.findAll({parents : rf.id}).then(function(orphs) {
@@ -377,7 +533,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     );
   }
 
-  , "{CMS.Models.Program} updated" : "update_owner_permission"
+  , "{CMS.Models.Program} updated" : function(model, ev, instance) {
+    if(instance instanceof CMS.Models.Program) {
+      this.update_permissions(model, ev, instance);
+    }
+  }
   , "{CMS.Models.Audit} updated" : "update_audit_owner_permission"
   , update_audit_owner_permission : function(model, ev, instance){
     
@@ -385,12 +545,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       return;
     }
     
-    var dfd = this.update_owner_permission.apply(this, arguments);
+    var dfd = this.update_permissions(model, ev, instance);
     if(typeof(instance.saveDeferreds) !== 'undefined'){
       dfd.then(function(){
         instance.saveDeferreds.auditPermissions.resolve(instance);
       });
-    }
   }
   , "{CMS.Models.Request} updated" : "update_request_folder"
 
@@ -411,7 +570,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return; //can't do anything if the audit has no folder
       //reduce the binding lists to instances only -- makes for easier comparison
       var req_folders =  can.map(req_folders_mapping, function(rf) { return rf.instance; });
-      var audit_folders = can.map(audit_folders_mapping, function(af) { return af.instance; });
+      //Check whether or not the current user has permissions to modify the audit folder.
+      var audit_folders = can.map(audit_folders_mapping, function(af) {
+        if(!af.instance.selfLink || af.instance.userPermission.role !== "writer" && af.instance.userPermission.role !== "owner")
+          return;  //short circuit any operation if the user isn't allowed to edit
+        return af.instance;
+      });
+
+      if(audit_folders.length < 1) {
+        return;  // no audit folder to work on, or none that the user can edit.
+      }
 
       // check the array of request_folers against the array of audit_folders to see if there is a match.
       af_index = can.reduce(req_folders, function(res, folder) {
@@ -441,14 +609,15 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             })
           )
           , CMS.Models.GDriveFile.findAll({parentfolderid : audit_folders[0].id})
-          , obj_folder_to_destroy.refresh().then(function(of) { of.destroy(); })
+          , instance.responses.reify()
+          , obj_folder_to_destroy.refresh().then(function(of) { return of.destroy(); })
         ).then(
           that.proxy("move_files_to_new_folder", audit_folders)
           , function() {
             console.warn("a prerequisite failed", arguments[0]);
           }
         ).done(function() {
-          that.update_owner_permission(model, ev, instance);
+          that.update_permissions(model, ev, instance);
         });
       } else if(req_folders.length < 1) {
         return;
@@ -471,7 +640,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         ).then(
           that.proxy("move_files_to_audit_folder", instance, audit_folders, req_folders)
         ).done(function() {
-          return that.update_owner_permission(model, ev, instance);
+          return that.update_permissions(model, ev, instance);
         });
       }
     }).always(function() {
@@ -582,10 +751,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       , "Audit" : "program"
       , "Request" : "audit"
     };
-    if(parent_prop[object.constructor.shortName]) {
+    // maybe we also need to create a parent folder if we don't already have a folder for this object.
+    if(parent_prop[object.constructor.shortName] && !object.get_mapping("folders").length) {
       dfd = this.create_folder_if_nonexistent(object[parent_prop[object.constructor.shortName]].reify());
-    } else {
+    } else if(!object.get_mapping("folders").length) {
       dfd.resolve();
+    } else {
+      return $.when(object.get_mapping("folders")[0].instance);
     }
     return dfd.then(function foldercheck() {
       var folder_dfd;
@@ -595,7 +767,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         if(that._audit_create_in_progress || object.audit.reify().get_mapping("folders").length < 1) {
           that.request_create_queue.push(object);
         } else {
-          that.create_request_folder(object.constructor, {}, object);
+          that.link_request_to_new_folder_or_audit_folder(object.constructor, {}, object);
         }
       } else {
         folder_dfd = that["create_" + object.constructor.table_singular + "_folder"](object.constructor, {}, object);
@@ -624,68 +796,83 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   , "{CMS.Models.UserRole} created" : function(model, ev, instance) {
     var cache, that = this;
     if(instance instanceof CMS.Models.UserRole
+       && instance.context // Only proceed if not the common context
        && /^Program|^Auditor/.test(instance.role.reify().name)
     ) {
       cache = /^Program/.test(instance.role.reify().name) ? CMS.Models.Program.cache : CMS.Models.Audit.cache;
 
+      if (!cache)
+        return;
+
       can.each(Object.keys(cache), function(key) {
         if(cache[key].context && cache[key].context.id === instance.context.id) {
-          that.update_owner_permission(
-            model
-            , ev
-            , cache[key]
-            , /^ProgramReader$|^Auditor/.test(instance.role.reify().name) ? "reader" : "writer"
-            , instance.person
-          );
+          //delay this because the user role isn't updated in the object yet.
+          setTimeout(function() {
+            that.update_permissions(
+              cache[key].constructor
+              , ev
+              , cache[key]
+            );
+          }, 10);
         }
       });
     }
   }
-
+  , "a.show-meeting click" : function(el, ev){
+    var instance = el.closest("[data-model], :data(model)").data("model")
+      , cev = el.closest("[data-model], :data(cev)").data("cev")
+      , subwin;
+    function poll() {
+      if(!subwin) {
+        return; //popup blocker didn't allow a reference to the open window.
+      } else if(subwin.closed) {
+        cev.refresh().then(function() {
+          instance.attr({
+            title : cev.summary
+            , start_at : cev.start
+            , end_at : cev.end
+          });
+          can.each(instance.get_mapping("people"), function(person_binding) {
+            instance.mark_for_deletion("people", person_binding.instance);
+          });
+          can.each(cev.attendees, function(attendee) {
+            instance.mark_for_addition("people", attendee);
+          });
+          instance.save();
+        });
+      } else {
+        setTimeout(poll, 5000);
+      }
+    }
+    subwin = window.open(cev.htmlLink, cev.summary);
+    setTimeout(poll, 5000);
+  }
+  , create_meeting : function(instance){
+    
+    new CMS.Models.GCalEvent({
+      calendar : GGRC.config.DEFAULT_CALENDAR
+      , summary : instance.title
+      , start : instance.start_at
+      , end : instance.end_at
+      , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
+    }).save().then(function(cev) {
+      
+      new CMS.Models.ObjectEvent({
+        eventable : instance
+        , calendar : GGRC.config.DEFAULT_CALENDAR
+        , event : cev
+        , context : instance.context || { id : null }
+      }).save();
+    });
+  }
   , "{CMS.Models.Meeting} created" : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Meeting) {
-      new CMS.Models.GCalEvent({
-        calendar : GGRC.config.DEFAULT_CALENDAR
-        , summary : instance.title
-        , start : instance.start_at
-        , end : instance.end_at
-        , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
-      }).save().then(function(cev) {
-        var subwin;
-
-        function poll() {
-          if(subwin.closed) {
-            cev.refresh().then(function() {
-              instance.attr({
-                title : cev.summary
-                , start_at : cev.start
-                , end_at : cev.end
-              });
-              can.each(instance.get_mapping("people"), function(person_binding) {
-                instance.mark_for_deletion("people", person_binding.instance);
-              });
-              can.each(cev.attendees, function(attendee) {
-                instance.mark_for_addition("people", attendee);
-              });
-              instance.save();
-            });
-          } else {
-            setTimeout(poll, 5000);
-          }
-        }
-
-        new CMS.Models.ObjectEvent({
-          eventable : instance
-          , calendar : GGRC.config.DEFAULT_CALENDAR
-          , event : cev
-          , context : instance.context || { id : null }
-        }).save();
-
-        subwin = window.open(cev.htmlLink, cev.summary);
-        setTimeout(poll, 5000);
-
-      });
+      this.create_meeting(instance);
     }
+  }
+  , "a.create-meeting click" : function(el, ev){
+    var instance = el.closest("[data-model], :data(model)").data("model");
+    this.create_meeting(instance);
   }
 });
 

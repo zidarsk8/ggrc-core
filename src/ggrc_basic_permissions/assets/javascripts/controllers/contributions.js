@@ -286,8 +286,20 @@
       return this.options.option_model.findAll(
         $.extend(params, this.option_query),
         function(options) {
+          var scope = params.scope || "System";
           options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
-          options.unshift({name: "No access", id: 0});
+          if (params.scope == "Private Program") {
+            description = "A person with the No Access role will not be able to see this Private Program.";
+          }
+          else {
+            description = "This role allows a user access to the MyWork dashboard and applications Help files.";
+          }
+          options.unshift({
+            name: "No access",
+            id: 0,
+            description: description,
+            scope: params.scope || "System"
+          });
           self.option_list.replace(options);
         });
     },
@@ -318,20 +330,22 @@
 
     update_option_radios: function() {
       var self = this
+        , role_found = false
         , $option_list = $(this.element).find('.option_column ul')
         ;
 
-      if(this.join_list.length === 0){
-        setTimeout(function(){
-          $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
-        }, 0);
-        return;
-      }
       this.join_list.forEach(function(join, index, list) {
-        $option_list
-          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]')
-          .prop('checked', true);
+        var $option = $option_list
+          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]');
+        if($option.length == 1){
+          $option.prop('checked', true);
+          role_found = true;
+        }
       });
+      if(!role_found){
+        $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+      }
+      
     },
 
     /*" hide": function(el, ev) {

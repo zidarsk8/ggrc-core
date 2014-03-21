@@ -9,7 +9,7 @@
     <div class="row-fluid">
       <div class="span4">
         <ul class="filter-date-range">
-          <li class="pull-right">
+          <li>
             <span class="requested-text">requested on or after:</span>
             <input class="input-small date" name="requested_on" data-toggle="datepicker" data-after="filter_start_date" placeholder="/ /" type="text" value="">
           </li>
@@ -17,7 +17,9 @@
       </div>
       <div class="span2">
         <i class="grcicon-person-green pull-left"></i>
-        <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="">
+        <div class="objective-selector">
+          <input type="text" name="assignee.name" data-lookup="Person" class="span10 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+        </div>
       </div>
       <div class="span2">
         <span class="pull-left request-type">type:</span>

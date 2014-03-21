@@ -94,37 +94,10 @@ var gdrive_findAll = function(extra_params, extra_path) {
   };
 };
 
-var gapi_request_with_auth = GGRC.gapi_request_with_auth = function gapi_request_with_auth(params) {
-  return window.gapi_authorize(params.scopes).then(function() {
-    var dfd = new $.Deferred();
-    var cb = params.callback;
-    var check_auth = function(result) {
-      var args = can.makeArray(arguments);
-      args.unshift(dfd);
-      if(result && result.error && result.error.code === 401) {
-        doGAuth(); //changes oauth_dfd to a new deferred
-        params.callback = cb;
-        window.gapi_authorize(params.scopes).then($.proxy(gapi_request_with_auth, window, params))
-        .then(
-          function() {
-            dfd.resolve.apply(dfd, arguments);
-          }, function() {
-            dfd.reject.apply(dfd, arguments);
-          });
-      } else {
-        cb.apply(window, args);
-      }
-    };
-    params.callback = check_auth;
-    if(typeof params.path === "function") {
-      params.path = params.path();
-    }
-    gapi.client.request(params);
-    return dfd.promise();
-  });
-}
-
-
+var gapi_request_with_auth;
+$(function() {
+  gapi_request_with_auth = GGRC.gapi_request_with_auth;
+});
 /**
   GDrive files not including folders.  Folders are also files in GDrive,
   with a particular MIME type, but we distinguish between them here as
@@ -287,7 +260,7 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
     if(typeof params !== "string") {
       params = params.id;
     }
-    return this.findAll({ parent : params.id });
+    return this.findAll({ parents : params });
   }
   , addChildFolder : function(parent, params) {
     return this.create($.extend({ parent : parent }, params));
@@ -322,9 +295,8 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           var picker = new google.picker.PickerBuilder()
           .addView(new google.picker.DocsUploadView().setParent(that.id))
           .addView(google.picker.ViewId.DOCS)
-          //.setOAuthToken(gapi.auth.getToken().access_token) //NB: setOAuthToken is the preferred way of choosing a user for the 
-          .setAuthUser(oauth_user.email)                      // picker, but it doesn't work with DocsUploadView. So we use 
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)  // setAuthUser instead.  --BM 10/28/13
+          .setOAuthToken(gapi.auth.getToken().access_token)
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
           .setDeveloperKey(GGRC.config.GAPI_KEY)
           .setCallback(pickerCallback)
           .build();
@@ -379,6 +351,10 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
     });
   }
 
+  , destroy : function(etag) {
+    return this.cache[etag].destroy();
+  }
+
   , findUserPermissionId : function(person) {
     var person_email = typeof person === "string" ? person : person.email;
     return gapi_request_with_auth({
@@ -394,7 +370,26 @@ can.Model.Cacheable("CMS.Models.GDriveFilePermission", {
       , scopes : scopes
     });
   }
-}, {});
+}, {
+  destroy : function() {
+    var etag = this.etag
+    , that = this;
+    return gapi_request_with_auth({
+      path : this.selfLink.replace(/https?:\/\/[^\/]+/, "") // have to relativize the url
+      , method : "delete"
+      , callback : function(dfd, result) {
+        if(result && result.error) {
+          dfd.reject(dfd, result.error.status, result.error);
+        } else {
+          can.trigger(that, "destroyed", that);
+          can.trigger(that.constructor, "destroyed", that);
+          dfd.resolve(result);
+        }
+      }
+      , scopes : scopes
+    });
+  }
+});
 
 CMS.Models.GDriveFilePermission("CMS.Models.GDriveFolderPermission", {
   create : function(params) {

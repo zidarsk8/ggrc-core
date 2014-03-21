@@ -34,13 +34,7 @@
         Owner
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text"
-        {{#if new_object_form}}
-           value="{{current_user.email}}"
-        {{else}}
-           value="{{firstexist owner.email ''}}" 
-        {{/if}}
-      />
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
       {{/using}}
       {{#using contact=instance.contact model_singular=model.model_singular}}
       <label>
@@ -79,11 +73,11 @@
       <div class="expand-link">
         <a class="show-hidden-fields" href="javascript://">
           <span class="out">
-            <i class="grcicon-show"></i>
+            <i class="grcicon-show-arrow"></i>
             Show 
           </span>
           <span class="in">
-            <i class="grcicon-hide"></i>
+            <i class="grcicon-hide-arrow"></i>
             Hide
           </span>
           Advanced

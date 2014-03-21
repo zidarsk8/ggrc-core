@@ -1,7 +1,8 @@
 
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span11">
             <div class="item-data">
@@ -24,7 +25,7 @@
             </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
 
     {{#if expanded}}
@@ -83,7 +84,7 @@
               {{#if people.length}}
                 <ul>
                   {{#people}}
-                    <li>{{instance.name}}</li>
+                    <li>{{{renderLive '/static/mustache/people/popover.mustache' person=instance}}}</li>
                   {{/people}}
                 </ul>
               {{/if}}

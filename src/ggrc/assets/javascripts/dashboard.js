@@ -318,7 +318,7 @@ jQuery(function($) {
         $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
-          var jsonResult = $.parseJSON($(task.result.content).html());
+          var jsonResult = $.parseJSON($(task.result.content).text());
           if("location" in jsonResult){
             window.location.assign(jsonResult.location);
             return;
@@ -335,6 +335,10 @@ jQuery(function($) {
         }
         $("#results-container").html(task.result.content);
         $('form.import .btn').unbind().unbind().click(disableButton);
+        if(msg === "Upload and Review"){
+          // Don't display "Upload and Review successful." message
+          return;
+        }
         $('body').trigger(
           'ajax:flash', 
             { "success" : msg + " successful."}
@@ -827,7 +831,7 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 55;
+  internavHeight = lhsHeight - 50;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav

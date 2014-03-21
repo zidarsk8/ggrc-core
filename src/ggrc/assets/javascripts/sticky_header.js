@@ -62,13 +62,12 @@ can.Control("StickyHeader", {
       var el = items.eq(i)
         , margin = el.data('sticky').margin
         ;
+      
+      // Always remove the sticky header so that it's width will get updated
+      this.remove(el);
 
       // Remove the clone if its content no longer inside the viewport
-      if (margin === false) {
-        this.remove(el);
-      }
-      // Otherwise inject the clone
-      else {
+      if (margin !== false) {
         var clone = this.clone(el);
 
         // Inject the clone to take up the original's space

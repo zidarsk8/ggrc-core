@@ -503,7 +503,7 @@ jQuery(document).ready(function($) {
   });
 
   // Contract/Expand widget
-  $('body').on('click', '.widget .header .showhide, .widget .header .widget-showhide a', function(e) {
+  $('body').on('click', '.widget .header .showhide', function(e) {
 
     if($(this).is(".widget-showhide"))
       e.preventDefault();
@@ -886,22 +886,6 @@ $(window).load(function(){
     
   });
   
-  // Evidence cleanup
-  $('body').on('click', '.generated-tree li .item-main .row-fluid', function() {
-    $('.generated-tree li').each(function() {
-      var $this = $(this),
-          $urlOneline = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:nth-child(3n) .span12'),
-          $editLink = $this.closest('li').find('.tier-2-info .tier-2-info-content .row-fluid:last-child a');
-      
-      function tierClean() {
-        $urlOneline.removeClass('span12').addClass('span6');
-        $editLink.addClass('info-action');
-        $editLink.find('i.grcicon-edit').css('margin-top', '7px');
-        $editLink.closest('.span12').css('margin-top', '-7px');
-      }
-      setTimeout(tierClean,100)
-    });
-  });
 });
 
 jQuery(function($){
@@ -966,6 +950,88 @@ jQuery(function($){
   });
 });
 
+jQuery(function($){
+  $.cms_autocomplete = function(el){
+    var ctl = this;
+    // Add autocomplete to the owner field
+    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
+      var $that = $(this)
+        , name = $that.attr("name") || ""
+        , prop = name.substr(name.lastIndexOf(".") + 1)
+        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
+
+      // Return if this field temporarily isn't storing data
+      if (!name) return false;
+
+      return $that.autocomplete({
+        // Ensure that the input.change event still occurs
+        change : function(event, ui) {
+          if(!$(event.target).parents(document.body).length)
+            console.warn("autocomplete menu change event is coming from detached nodes");
+          $(event.target).trigger("change");
+        }
+
+        , minLength: 0
+
+        // Search for the people based on the term
+        , source : function(request, response) {
+          var query = request.term || ''
+            , that = this;
+
+          if (query.indexOf('@') > -1)
+            query = '"' + query + '"';
+
+          ctl.bindXHRToButton(GGRC.Models.Search
+          .search_for_types(
+              request.term || '',
+              searchtypes,
+              {
+              // FIXME: Remove or figure out when this is necessary.
+              //{
+              //  __permission_type: 'create'
+              //  , __permission_model: 'Object' + $that.data("lookup")
+              })
+          .then(function(search_result) {
+            var objects = search_result.getResultsForType(searchtypes.join(","))
+              , queue = new RefreshQueue()
+              ;
+
+            // Retrieve full people data
+            can.each(objects, function(object) {
+              queue.enqueue(object);
+            });
+            queue.trigger().then(function(objs) {
+              if(objs.length) {
+                response(objs);
+              } else {
+                that._suggest( [] );
+                that._trigger( "open" );
+              }
+            });
+          }), $that, null, false);
+        }
+        , select : ctl.proxy("autocomplete_select", $that)
+        , close : function() {
+          //$that.val($that.attr("value"));
+        }
+      }).focus(function(){     
+        //Use the below line instead of triggering keydown
+        $(this).data("uiAutocomplete").search($(this).val());
+    }).data('ui-autocomplete');
+    });
+    acs.each(function(i, ac) {
+      ac._renderMenu = function(ul, items) {
+        var model_class = ac.element.data("lookup")
+          , model = CMS.Models[model_class] || GGRC.Models[model_class]
+          ;
+        can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', {model_class: model_class, items: items}, function(frag) {
+          $(ul).html(frag);
+          can.view.hookup(ul);
+        });
+      };
+    });
+  }
+});
 
 (function($) {
 

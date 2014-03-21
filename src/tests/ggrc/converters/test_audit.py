@@ -67,7 +67,7 @@ class TestRequest(TestCase):
 
   def test_no_objective(self):
     csv_filename = join(CSV_DIR, "request_import_no_objective.csv")
-    expected_warning = 'You will need to connect an Objective later.'
+    expected_warning = 'An Objective will need to be mapped later'
     converter = handle_csv_import(
         RequestsConverter, csv_filename, **self.options)
     actual_warning = converter.objects[0].warnings_for('objective_id')[0]

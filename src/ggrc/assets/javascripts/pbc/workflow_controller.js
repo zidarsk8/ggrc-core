@@ -20,7 +20,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
 
         instance.program.reify().refresh()
         .then(function(program) {
-          return program.get_binding("extended_related_objectives").refresh_instances();
+          return program.get_binding("objectives").refresh_instances();
         }).then(function(objective_mappings) {
           return can.reduce(objective_mappings, function(deferred, objective_mapping){
             return deferred.then(function(){

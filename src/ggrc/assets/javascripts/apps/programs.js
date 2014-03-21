@@ -304,7 +304,7 @@ function authorizations_list_loader() {
   }
 
   // Insert mapped people with a custom user role "Mapped"
-  lists.push(GGRC.page_instance().get_list_loader('extended_related_people').pipe(function(mappings) {
+  lists.push(GGRC.page_instance().get_list_loader('people').pipe(function(mappings) {
     var insert_mappings = function(mappings) {
           var refresh_queue = new RefreshQueue()
           can.each(mappings, function(mapping) {
@@ -371,7 +371,7 @@ $(function() {
             , allow_mapping: true
             , allow_creating: true
             , model: CMS.Models.Person
-            , mapping: "extended_related_people"
+            , mapping: "related_people"
             }
         }
   };

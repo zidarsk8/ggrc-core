@@ -314,7 +314,7 @@ can.Control("CMS.Controllers.LHN", {
       }
 
       window.resize_areas();
-
+      $(window).trigger('resize');
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
       })
@@ -343,6 +343,7 @@ can.Control("CMS.Controllers.LHN", {
     
     $search.width(resize - 100);
     window.resize_areas();
+    $(window).trigger('resize');
 
   }
   , ".bar-v mousedown" : function(el, ev) {
@@ -442,9 +443,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         if(visible_model_names.indexOf(model_name) > -1) {
           self.options.visible_lists[model_name].unshift(instance);
           self.options.results_lists[model_name].unshift(instance);
-          // Refresh the counts whenever the lists change
-          self.refresh_counts();
         }
+        // Refresh the counts whenever the lists change
+        self.refresh_counts();
       });
     }
 

@@ -6,7 +6,7 @@
 }}
 
 {{#if allow_mapping_or_creating}}
-{{#if_instance_of parent_instance 'Directive|Regulation|Policy|Standard|Contract'}}
+{{#if_instance_of parent_instance 'Program|Directive|Regulation|Policy|Standard|Contract'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=null}}
 <li class="tree-footer tree-item tree-item-add">
@@ -26,8 +26,7 @@
           data-join-object-id="{{parent_instance.id}}"
           data-join-object-type="{{parent_instance.class.shortName}}"
           data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-          <i class="grcicon-add-black"></i>
-          Objective
+          Map Objective
         </a>
         &nbsp;
         &nbsp;
@@ -67,7 +66,7 @@
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        + Objective
+        Map Objective
       </a>
     </div>
   </div>

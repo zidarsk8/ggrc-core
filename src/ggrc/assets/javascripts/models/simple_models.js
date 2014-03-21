@@ -40,6 +40,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   }
   , tree_view_options : {
       "show_view" : GGRC.mustache_path + "/programs/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -169,6 +170,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -211,6 +213,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -253,6 +256,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -295,6 +299,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -1045,7 +1050,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
-    , contact: {id : null}//gets replaced in init()
   }
   , tree_view_options : {
     draw_children : true
@@ -1085,6 +1089,16 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validatePresenceOf("title");
+    this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
+      var audit_firm = this.attr("audit_firm");
+      var audit_firm_text = this.attr("_transient.audit_firm");
+      if(!audit_firm && audit_firm_text
+        || (audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
+        return "No valid org group selected for firm";
+      }
+    });
+    // Preload auditor role:
+    CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
   save : function() {
@@ -1095,6 +1109,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
         , auditFolder: $.Deferred()
         , linkFolders: $.Deferred()
         , auditPermissions: $.Deferred()
+    }
+    // Make sure the context is always set to the parent program
+    if(!this.context.id){
+      this.context = this.program.reify().context;
     }
     
     return this._super.apply(this, arguments).then(function(instance) {
@@ -1155,7 +1173,19 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }).then(function(){
       return instance;
     });
-  }
+  }, findAuditors : function(){
+    var loader = this.get_binding('authorizations');
+    
+    return $.map(loader.list, function(binding) {
+      var role = binding.instance.role.reify();
+      if (role.attr('name') === 'Auditor') {
+        return {
+          person: binding.instance.person.reify()
+          , binding: binding.instance
+        }
+      }
+    });
+  } 
 });
 
 can.Model.Cacheable("CMS.Models.Request", {

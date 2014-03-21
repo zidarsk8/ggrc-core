@@ -19,7 +19,7 @@ from ggrc.services.registry import service
 from ggrc.services.common import Resource
 from . import basic_roles
 from .contributed_roles import lookup_role_implications
-from .models import Role, RoleImplication, UserRole, ContextImplication
+from .models import Role, UserRole, ContextImplication
 
 blueprint = Blueprint(
     'permissions',
@@ -183,7 +183,7 @@ def load_permissions_for(user):
         or_(
           ContextImplication.source_context_id == None,
           ContextImplication.source_context_id.in_(keys),
-          ))#.all()
+          )).all()
   elif keys:
     all_context_implications = all_context_implications.filter(
           ContextImplication.source_context_id.in_(keys)).all()
@@ -192,36 +192,35 @@ def load_permissions_for(user):
           ContextImplication.source_context_id == None).all()
   else:
     all_context_implications = []
-  context_implications_by_source = {}
-  for context_implication in all_context_implications:
-    context_implications_by_source.setdefault(
-        context_implication.source_context_id, set())\
-            .add(context_implication.context_id)
 
   # Gather all roles required by context implications
-  all_implied_roles = {}
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        all_implied_roles.setdefault(implied_rolename, None)
+  implied_context_to_implied_roles = {}
+  all_implied_roles_set = set()
+  for context_implication in all_context_implications:
+    for rolename in source_contexts_to_rolenames.get(
+        context_implication.source_context_id, []):
+      implied_role_names_list = implied_context_to_implied_roles.setdefault(
+          context_implication.context_id, list())
+      implied_role_names = lookup_role_implications(
+          rolename, context_implication)
+      all_implied_roles_set.update(implied_role_names)
+      implied_role_names_list.extend(implied_role_names)
   # If some roles are required, query for them in bulk
-  if all_implied_roles:
+  all_implied_roles_by_name = {}
+  if implied_context_to_implied_roles:
     implied_roles = db.session.query(Role)\
-        .filter(Role.name.in_(all_implied_roles.keys()))\
+        .filter(Role.name.in_(all_implied_roles_set))\
         .options(sqlalchemy.orm.undefer_group('Role_complete'))\
         .all()
     for implied_role in implied_roles:
-      all_implied_roles[implied_role.name] = implied_role
+      all_implied_roles_by_name[implied_role.name] = implied_role
   # Now aggregate permissions resulting from these roles
-  for source_context, implied_contexts \
-      in context_implications_by_source.items():
-    for rolename in source_contexts_to_rolenames.get(source_context, []):
-      for implied_rolename in lookup_role_implications(rolename):
-        implied_role = all_implied_roles[implied_rolename]
-        for implied_context in implied_contexts:
-          collect_permissions(
-              implied_role.permissions, implied_context, permissions)
+  for implied_context_id, implied_rolenames \
+      in implied_context_to_implied_roles.items():
+    for implied_rolename in implied_rolenames:
+      implied_role = all_implied_roles_by_name[implied_rolename]
+      collect_permissions(
+          implied_role.permissions, implied_context_id, permissions)
 
   #grab personal context
   personal_context = db.session.query(Context).filter(
@@ -247,6 +246,7 @@ def load_permissions_for(user):
 
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   # get the personal context for this logged in user
   personal_context = service.personal_context()
 
@@ -275,19 +275,19 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   db.session.add(user_role)
   db.session.flush()
 
-  assign_role_reader(get_current_user())
+  #Create the context implication for Program roles to default context
+  db.session.add(ContextImplication(
+      source_context=context,
+      context=None,
+      source_context_scope='Program',
+      context_scope=None,
+      modified_by=get_current_user(),
+      ))
+
   if not src.get('private'):
     # Add role implication - all users can read a public program
     add_public_program_context_implication(context)
 
-def add_role_reader_implications(source_role, context):
-  db.session.add(RoleImplication(
-    source_context=context,
-    source_role=source_role,
-    role=basic_roles.program_basic_reader(),
-    context=None,
-    modified_by=get_current_user(),
-    ))
 
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
@@ -300,38 +300,18 @@ def add_public_program_context_implication(context, check_exists=False):
   db.session.add(ContextImplication(
     source_context=None,
     context=context,
+    source_context_scope=None,
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
 
-def add_public_program_role_implication(
-    source_role, context, check_exists=False):
-  if check_exists and db.session.query(RoleImplication)\
-      .filter(
-          and_(
-            RoleImplication.context_id == context.id,
-            RoleImplication.source_context_id == None))\
-      .count() > 0:
-    return
-  db.session.add(RoleImplication(
-    source_context=None,
-    source_role=source_role,
-    context=context,
-    role=basic_roles.program_reader(),
-    modified_by=get_current_user(),
-    ))
 
 @Resource.model_put.connect_via(Program)
 def handle_program_put(sender, obj=None, src=None, service=None):
   #Check to see if the private property of the program has changed
   if get_history(obj, 'private').has_changes():
     if obj.private:
-      #ensure that any implications from null context are removed
-      implications = db.session.query(RoleImplication)\
-          .filter(
-              RoleImplication.context_id == obj.context_id,
-              RoleImplication.source_context_id == None)\
-                  .delete()
-      db.session.flush()
+      # Ensure that any implications from null context are removed
       implications = db.session.query(ContextImplication)\
           .filter(
               ContextImplication.context_id == obj.context_id,
@@ -343,8 +323,10 @@ def handle_program_put(sender, obj=None, src=None, service=None):
       add_public_program_context_implication(obj.context, check_exists=True)
       db.session.flush()
 
+
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
   #Create an audit context
   context = Context(
       context=obj.context,
@@ -353,6 +335,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       description='',
       modified_by=get_current_user(),
       )
+  context.related_object = obj
   db.session.add(context)
   db.session.flush()
 
@@ -360,6 +343,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=obj.context,
     context=context,
+    source_context_scope='Program',
+    context_scope='Audit',
     modified_by=get_current_user(),
     ))
 
@@ -367,13 +352,17 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(ContextImplication(
     source_context=context,
     context=obj.context,
+    source_context_scope='Audit',
+    context_scope='Program',
     modified_by=get_current_user(),
     ))
-  
+
   #Create the role implication for Auditor from Audit for default context
   db.session.add(ContextImplication(
       source_context=context,
       context=None,
+      source_context_scope='Audit',
+      context_scope=None,
       modified_by=get_current_user(),
       ))
   db.session.flush()
@@ -381,25 +370,6 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   #Place the audit in the audit context
   obj.context = context
 
-@Resource.model_posted.connect_via(UserRole)
-def handle_program_owner_role_assignment(
-    sender, obj=None, src=None, service=None):
-  if 'read' in obj.role.permissions and \
-      'UserRole' in obj.role.permissions['read']:
-    # Make sure that the user can read roles, too
-    assign_role_reader(obj.person)
-
-def assign_role_reader(user):
-    role_reader_role = db.session.query(Role)\
-        .filter(Role.name == 'RoleReader').first()
-    user_permissions = BasicUserPermissions(user)
-    if not user_permissions.is_allowed_read('Role', None):
-      role_reader_for_user = UserRole(
-          person_id=user.id,
-          role=role_reader_role,
-          context_id=None,
-          )
-      db.session.add(role_reader_for_user)
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.

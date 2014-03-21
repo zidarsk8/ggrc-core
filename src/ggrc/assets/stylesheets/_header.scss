@@ -282,17 +282,41 @@
 
 .header-content {
   background: $white;
-  border-top:4px solid #444;
-  border-bottom:1px solid #ccc;
   z-index:3;
   h1 {
     line-height: 36px;
     padding-left:20px;
-    padding:6px 5px 4px 20px;
+    padding:7px 5px 3px 20px;
     span.private {
       i {
         margin-top:11px;
       }
+    }
+    span.status {
+      font-size: 13px;
+      color: $gray;
+      font-style: italic;
+      display: inline-block;
+      line-height: 36px;
+      vertical-align: middle;
+    }
+  }
+  .object-header-notification {
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: bold;
+    margin: 18px 20px 0 103px;
+    i {
+      margin-top: 1px;
+      &.grcicon-attribute-color {
+        margin-top: 3px;
+        margin-left: -4px;
+      }
+    }
+    &.object-approved {
+      margin: 18px 20px 0 223px;
+      color: $green;
     }
   }
   .btn-group {

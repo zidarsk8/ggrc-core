@@ -8,7 +8,9 @@ from .base import *
 from ggrc import db
 from ggrc.models import Audit, Program, Request
 from .base_row import *
+
 from collections import OrderedDict
+from datetime import datetime
 
 class RequestRowConverter(BaseRowConverter):
   model_class = Request
@@ -26,7 +28,7 @@ class RequestRowConverter(BaseRowConverter):
     self.handle('objective_id', ObjectiveHandler, is_needed_later=True)
     self.handle('request_type', RequestTypeColumnHandler, is_required=True)
     self.handle('status', StatusColumnHandler, valid_states=Request.VALID_STATES, default_value='Draft')
-    self.handle_date('requested_on', is_required=True)
+    self.handle_date('requested_on', default_value=datetime.today())
     self.handle_date('due_on', is_required=True)
     self.handle_text_or_html('description')
     self.handle_text_or_html('test')
@@ -65,13 +67,18 @@ class RequestsConverter(BaseConverter):
 
   row_converter = RequestRowConverter
 
+  # code is optional for this object; do the same as in super class
+  # but with slug in optional_headers
+  def read_headers(self, import_map, row, required_headers=[], optional_headers=[]):
+    return super(RequestsConverter, self).read_headers(import_map, row, required_headers, ['slug'] + optional_headers)
+
   # Overwrite validate functions since they assume a program rather than a directive
 
   def validate_code(self, attrs):
-    if not attrs.get('slug'):
-      self.errors.append('Missing Program Code heading')
-    elif attrs['slug'] != self.program().slug:
-      self.errors.append('Program Code must be {}'.format(self.program().slug))
+    true_program_slug = self.program().slug
+    given_program_slug = attrs.get('slug')
+    if given_program_slug and given_program_slug != true_program_slug:
+      self.warnings.append('You have provided {0} as the program code, but this will be imported to program with code {1}.'.format(given_program_slug, true_program_slug))
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Requests")

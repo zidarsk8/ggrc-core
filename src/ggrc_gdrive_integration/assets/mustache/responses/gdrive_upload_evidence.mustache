@@ -9,17 +9,25 @@
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
-
-      <a
-        href="javascript://"
-        data-placement="left"
-        data-toggle="gdrive-picker"
-        data-response-id="{{parent_instance.id}}"
-        title="Upload Evidence"
-        >
-        + Upload Evidence
-      </a>
-
+      {{#using request=parent_instance.request}}
+      {{#with_mapping 'folders' request}}
+	      {{#if folders.0.instance.selfLink}}
+	      <a
+	        href="javascript://"
+	        data-placement="left"
+	        data-toggle="gdrive-picker"
+	        data-response-id="{{parent_instance.id}}"
+	        title="Upload Evidence"
+	        >
+	        Upload Evidence
+	      </a>
+	      {{else}}
+	      The Audit Lead must create a Request folder before Evidence can be uploaded.
+	      {{/if}}
+      {{else}}
+        The Audit Lead must create a Request folder before Evidence can be uploaded.
+      {{/with_mapping}}
+      {{/using}}
     </div>
   </div>
 </li>

@@ -76,7 +76,11 @@ class InterviewResponse(
       }
   _table_plural = 'interview_responses'
 
-  meetings = db.relationship('Meeting', backref='response')
+  meetings = db.relationship(
+    'Meeting',
+    backref='response',
+    cascade='all, delete-orphan'
+    )
   _publish_attrs = [
     'meetings',
       ]
