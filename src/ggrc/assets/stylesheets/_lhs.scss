@@ -557,11 +557,30 @@
     }
     border-top:1px solid #ccc;
     font-size:12px;
-    .primary {
-      float:right;
+    a {
+      display: inline-block;
+      line-height: 26px;
+      &.primary {
+        float:right;
+        i {
+          margin-top: 5px;
+        }
+      }
     }
     .secondary {
-      color:#999;
+      color: #999;
+    }
+    span {
+      &.primary {
+        float:right;
+        display: inline-block;
+        line-height: 26px;
+        color: #999;
+        i {
+          margin-top: 4px;
+          @include opacity(0.45);
+        }
+      }
     }
   }
   .info {

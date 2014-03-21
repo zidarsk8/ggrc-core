@@ -36,7 +36,7 @@ var makeFindRelated = function(thistype, othertype) {
 function dateConverter(d, oldValue, fn, key) {
   var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
-  if(typeof d === "object") {
+  if(typeof d === "object" && d) {
     d = d.getTime();
   }
   if(typeof d === "number") {
@@ -46,6 +46,7 @@ function dateConverter(d, oldValue, fn, key) {
   if(typeof d === "string" && ~d.indexOf("/")) {
     conversion = "MM/DD/YYYY";
   }
+  d = d || "";
   ret = moment(d.toString(), conversion);
   if (typeof d === "string" && ret
       //  Don't correct timezone for dates
@@ -115,8 +116,10 @@ can.Model("can.Model.Cacheable", {
 
         deferred.then(success, error);
         sourceDeferred.then(function(sourceData) {
-          var obsList = new self.List([]);
-          
+          var obsList = new self.List([])
+            , index = 0
+            ;
+
           if(sourceData[self.root_collection + "_collection"]) {
             sourceData = sourceData[self.root_collection + "_collection"];
           }
@@ -124,16 +127,38 @@ can.Model("can.Model.Cacheable", {
             sourceData = sourceData[self.root_collection];
           }
 
-          setTimeout(function(){
-            var piece = sourceData.splice ? sourceData.splice(0,Math.min(sourceData.length, 5)) : [sourceData];
-            obsList.push.apply(obsList, self.models(piece));
+          if (!sourceData.splice) {
+            sourceData = [sourceData];
+          }
 
-            if(sourceData.length) {
-              setTimeout(arguments.callee, 10);
-            } else {
+          function modelizeMS(ms) {
+            var item
+              , start
+              , instances = []
+              ;
+            start = Date.now();
+            while(sourceData.length > index && (Date.now() - start) < ms) {
+              can.Observe.startBatch();
+              item = sourceData[index];
+              index = index + 1;
+              instances.push.apply(instances, self.models([item]));
+              can.Observe.stopBatch();
+            }
+            can.Observe.startBatch();
+            obsList.push.apply(obsList, instances);
+            can.Observe.stopBatch();
+          }
+
+          // Trigger a setTimeout loop to modelize remaining objects
+          (function() {
+            modelizeMS(100);
+            if (sourceData.length > index) {
+              setTimeout(arguments.callee, 5);
+            }
+            else {
               deferred.resolve(obsList);
             }
-          }, 10);
+          })();
         }, function() {
           deferred.reject.apply(deferred, arguments);
         });
@@ -267,7 +292,7 @@ can.Model("can.Model.Cacheable", {
         that.defaults.contact = typeof that.defaults.contact !== "undefined"
                                 ? that.defaults.contact
                                 : CMS.Models.Person.model(GGRC.current_user).stub();
-        that.defaults.owners = typeof that.defaults.contact !== "undefined"
+        that.defaults.owners = typeof that.defaults.owners !== "undefined"
                                ? that.defaults.owners
                                : [CMS.Models.Person.model(GGRC.current_user).stub()];
       }
@@ -561,6 +586,13 @@ can.Model("can.Model.Cacheable", {
         return findPageFunc(collection_url, params);
       };
     }
+
+  , get_mapper: function(name) {
+      mappers = GGRC.Mappings[this.shortName];
+      mapper = mappers[name];
+      return mapper;
+    }
+
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -570,6 +602,11 @@ can.Model("can.Model.Cacheable", {
     this.attr("class", this.constructor);
   }
   , computed_errors : can.compute(function() { return this.errors(); })
+
+  , get_list_counter: function(name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_count();
+    }
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
@@ -663,8 +700,7 @@ can.Model("can.Model.Cacheable", {
       if (!binding) {
         if (typeof(mapper) === "string") {
           // Lookup and attach named mapper
-          mappings = GGRC.Mappings[this.constructor.shortName];
-          mapping = mappings && mappings[mapper];
+          mapping = this.constructor.get_mapper(mapper);
           if (!mapping)
             console.debug("No such mapper:  " + this.constructor.shortName + "." + mapper);
           else

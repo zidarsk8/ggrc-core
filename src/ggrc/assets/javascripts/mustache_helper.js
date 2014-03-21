@@ -1094,6 +1094,27 @@ Mustache.registerHelper("unmap_or_delete", function(instance, mappings) {
     return "Unmap";
 });
 
+Mustache.registerHelper("with_direct_mappings_as",
+    function(var_name, parent_instance, instance, options) {
+  // Finds the mapping, if any, between `parent_object` and `instance`, then
+  // renders the block with those mappings available in the scope as `var_name`
+
+  parent_instance = Mustache.resolve(parent_instance);
+  instance = Mustache.resolve(instance);
+
+  var frame = new can.Observe();
+  frame.attr(var_name, []);
+  GGRC.all_local_results(parent_instance).then(function(results) {
+    can.each(results, function(result) {
+      if (result.instance === instance) {
+        frame.attr(var_name).push(result);
+      }
+    });
+  });
+
+  return options.fn(options.contexts.add(frame));
+});
+
 Mustache.registerHelper("result_direct_mappings", function(
     bindings, parent_instance, options) {
   bindings = Mustache.resolve(bindings);
@@ -1712,10 +1733,29 @@ Mustache.registerHelper("global_count", function(model_type, options) {
   if (!state.attr('status')) {
     state.attr('status', 'loading');
 
+    if (!GGRC._search_cache_deferred) {
+      //  TODO: This should really be RefreshQueue-style
+      var models = [
+          "Program", "Regulation", "Contract", "Policy", "Standard"
+        , "Section", "Objective", "Control"
+        , "System", "Process"
+        , "DataAsset", "Product", "Project", "Facility", "OrgGroup"
+        , "Audit"
+        ];
+      GGRC._search_cache_deferred = GGRC.Models.Search.counts_for_types(null, models);
+    }
+
     var model = CMS.Models[model_type]
       , update_count = function(ev, instance) {
           if (!instance || instance instanceof model) {
-            GGRC.Models.Search.counts_for_types(null, [model_type]).done(function(result) {
+            GGRC._search_cache_deferred.then(function(result) {
+              if (!result.counts.hasOwnProperty(model_type)) {
+                return GGRC.Models.Search.counts_for_types(null, [model_type]);
+              }
+              else {
+                return result;
+              }
+            }).then(function(result) {
               state.attr({
                   status: 'loaded'
                 , count: result.counts[model_type]
@@ -2175,10 +2215,12 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
       , map = Permission.is_allowed("mapping", instance)
       , create = Permission.is_allowed("creating", instance)
       , assignee = instance.assignee.id === GGRC.current_user.id
+      , audit_lead = audit.contact.id === GGRC.current_user.id
       , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
       , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
-      , can_auditor_edit = auditor && $.inArray(instance.status, auditor_states) != -1
-      , can_assignee_edit = assignee && instance.status === "Draft"
+      , assignee_states = ["Requested", "Amended Request"]
+      , can_auditor_edit = auditor && ~can.inArray(instance.status, auditor_states)
+      , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.status, assignee_states)
       ;
     //    instead of
     //    ^if' allow_mapping_or_creating '\
@@ -2268,6 +2310,38 @@ Mustache.registerHelper("fadeout", function(delay, prop, options) {
       }, delay);
     };
   }
+});
+
+Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, options) {
+  var args = can.makeArray(arguments)
+    , options = args[args.length-1]
+    , mapping_name
+    ;
+
+  mapping_names = args.slice(1, args.length - 1);
+
+  instance = Mustache.resolve(instance);
+
+  // Find the most appropriate mapping
+  for (var i = 0; i < mapping_names.length; i++) {
+    mapping_name = Mustache.resolve(mapping_names[i]);
+    if (instance.get_binding(mapping_name)) {
+      break;
+    }
+  }
+
+  var finish = function(count) {
+    return options.fn(options.contexts.add({ count: count }));
+  };
+
+  var progress = function() {
+    return options.inverse(options.contexts);
+  };
+
+  return defer_render(
+      "span",
+      { done: finish, progress: progress },
+      instance.get_list_counter(mapping_name))
 });
 
 })(this, jQuery, can);

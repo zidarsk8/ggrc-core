@@ -8,7 +8,8 @@
 
   <li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span4">
             <div class="item-data">
@@ -22,7 +23,10 @@
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
               {{#using contact=instance.contact}}
-                {{#if_can_edit_request instance.request}}
+                {{#if_helpers '\
+                  #if_can_edit_request' parent_instance '\
+                  and ^if_auditor' parent_instance '\
+                  or #is_allowed' '__GGRC_ADMIN__' model.shortName _2_context=instance.context.id}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
                 {{else}}
                 <span class="read-only">
@@ -86,9 +90,11 @@
               </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
-    
+
+    {{#if expanded}}
+
     <div class="tier-2-info item-content">
         {{! The parent is Audit on My Work/Profile pages }}
         {{#if_instance_of parent_instance "Audit"}}
@@ -123,8 +129,11 @@
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
-          and #is_allowed' 'update' instance '\
-        ' _1_context=instance.context.id}}
+            and #is_allowed' 'update' instance _1_context=instance.context.id '\
+            and #if_can_edit_request' parent_instance '\
+            and ^if_auditor' parent_instance '\
+          or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=instance.context.id '\
+          and #if' allow_mapping_or_creating}}
           <div class="tier-2-info-content">
             <div class="show-description">
               <div class="row-fluid">
@@ -235,6 +244,7 @@
         </ul>
       </div>
       {{/if_equals}}
-      
+
     </div>
+    {{/if}}
   </li>

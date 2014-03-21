@@ -137,10 +137,11 @@ $(document).ready(function(){
   
   $(function() {
     var people = [
-      "Vladan Mitevski vladan@reciprocitylabs.com",
-      "Predrag Kanazir predrag@reciprocitylabs.com",
-      "Dan Ring danring@reciprocitylabs.com",
-      "Silas Barta silas@reciprocitylabs.com"
+      "Vladan Mitevski",
+      "Predrag Kanazir",
+      "Dan Ring",
+      "Silas Barta",
+      "Cassius Clay"
     ];
     var program = [
       "Google Fiber",
@@ -156,7 +157,7 @@ $(document).ready(function(){
     var object = [
       "Stability and Perpetuability"
     ]
-    $( ".objective-selector input" ).autocomplete({
+    $( ".objective-selector input[name='assessment_lead.email']" ).autocomplete({
       source: people
     });
     $( ".objective-selector input[name='program_title'],input[name='program.title']" ).autocomplete({

@@ -1050,7 +1050,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
-    , contact: {id : null}//gets replaced in init()
   }
   , tree_view_options : {
     draw_children : true

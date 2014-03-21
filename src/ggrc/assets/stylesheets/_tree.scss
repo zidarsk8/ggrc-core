@@ -532,14 +532,6 @@ ul.new-tree {
           &.tree-item-add {
             padding: 0 0 0 20px;
           }
-          .item-main {
-            .row-fluid {
-              &:hover {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-                @include background-size(30px 6px);
-              }
-            }
-          }
         }
       }
       &.rq-draft {
@@ -1092,6 +1084,15 @@ ul.new-tree {
     @include opacity(0.25);
     &:hover {
       color:$error;
+      @include opacity(1);
+    }
+  }
+  &.relevant-action {
+    padding-right: 20px;
+    color: $subTitle;
+    @include opacity(0.5);
+    &:hover {
+      color: $subTitle;
       @include opacity(1);
     }
   }

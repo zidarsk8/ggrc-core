@@ -1,0 +1,24 @@
+{{^is_dashboard}}
+  {{#with_page_object_as 'page_instance'}}
+    {{^if_equals parent_instance page_instance}}
+      {{#with_direct_mappings_as 'mappings' page_instance instance}}
+        {{#if mappings.length}}
+          {{#is_allowed_all 'delete' mappings}}
+            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
+              {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
+              <i class="grcicon-checked"></i>
+              Make Relevant
+            </a>
+          {{/is_allowed_all}}
+        {{else}}
+          {{#is_allowed_to_map page_instance instance join=true}}
+          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}}>
+            <i class="grcicon-check"></i>
+            Make Relevant
+          </a>
+          {{/is_allowed_to_map}}
+        {{/if}}
+      {{/with_direct_mapping_as}}
+    {{/if_equals}}
+  {{/with_page_object_as}}
+{{/is_dashboard}}

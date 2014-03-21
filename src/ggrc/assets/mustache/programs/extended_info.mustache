@@ -42,25 +42,25 @@
       {{#visibility_delay 500}}
       <div class="info">
         <i class="grcicon-control-color"></i>
-        {{#mapping_count instance 'extended_related_controls'}}
-          {{.}}
+        {{#with_mapping_count instance 'controls'}}
+          {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{/with_mapping_count}}
         &nbsp;&nbsp;
         <i class="grcicon-process-color"></i>
-        {{#mapping_count instance 'extended_related_processes'}}
-          {{.}}
+        {{#with_mapping_count instance 'related_processes'}}
+          {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{/with_mapping_count}}
         &nbsp;&nbsp;
         <i class="grcicon-system-color"></i>
-        {{#mapping_count instance 'extended_related_systems'}}
-          {{.}}
+        {{#with_mapping_count instance 'related_systems'}}
+          {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-        {{/mapping_count}}
+        {{/with_mapping_count}}
       </div>
       {{/visibility_delay}}
     </div>
@@ -82,7 +82,7 @@
       <div class="span6">
       {{#with_page_object_as 'page_object'}}
         {{#is_allowed_to_map page_object instance join=true}}
-        <a class="primary map-to-page-object" href="javascript://">
+        <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
           Map to this {{#page_object.class.title_singular}}{{toLowerCase}}{{/page_object.class.title_singular}}
           <i class="grcicon-reg-map"></i>
         </a>

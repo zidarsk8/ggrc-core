@@ -56,10 +56,11 @@ class Task(Base, Stateful, db.Model):
     return app.make_response((self.result['content'], self.result['status_code'],
                               self.result['headers']))
 
-def create_task(name, queued_task, parameters={}):
+def create_task(user, name, queued_task, parameters={}):
   from time import time
   task = Task(name=name + str(int(time()))) # task name must be unique
   task.parameters = parameters
+  task.modified_by = user
   from ggrc.app import db
   db.session.add(task)
   db.session.commit()
