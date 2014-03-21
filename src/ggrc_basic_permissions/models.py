@@ -12,6 +12,7 @@ from ggrc.models.mixins import Base, Described
 from sqlalchemy.orm import backref
 from .contributed_roles import DECLARED_ROLE, get_declared_role
 
+
 class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
@@ -55,6 +56,7 @@ class Role(Base, Described, db.Model):
 from ggrc.models.person import Person
 Person._publish_attrs.extend(['user_roles'])
 Person._include_links = ['user_roles']
+
 
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
@@ -102,65 +104,6 @@ class UserRole(Base, db.Model):
     return '{0} <-> {1}{2}'.format(
         self.person.display_name, self.role.display_name, context_related)
 
-class RoleImplication(Base, db.Model):
-  __tablename__ = 'role_implications'
-
-  context_id = db.Column(
-      db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
-  source_context_id = db.Column(
-      db.Integer(), db.ForeignKey('contexts.id'), nullable=True)
-  source_role_id = db.Column(
-      db.Integer(), db.ForeignKey('roles.id'), nullable=False)
-  role_id = db.Column(
-      db.Integer(), db.ForeignKey('roles.id'), nullable=False)
-
-  context = db.relationship(
-      'Context',
-      uselist=False,
-      foreign_keys=[context_id],
-      )
-  source_context = db.relationship(
-      'Context',
-      uselist=False,
-      foreign_keys=[source_context_id],
-      )
-  source_role = db.relationship(
-      'Role',
-      uselist=False,
-      foreign_keys=[source_role_id],
-      )
-  role = db.relationship(
-      'Role',
-      uselist=False,
-      foreign_keys=[role_id],
-      )
-
-  #@classmethod
-  #def eager_query(cls):
-    #from sqlalchemy import orm
-
-    #query = super(RoleImplication, cls).eager_query()
-    #return query.options(
-        #orm.subqueryload('source_context'),
-        #orm.subqueryload('source_role'),
-        #orm.subqueryload('role'),
-        #)
-
-  def _display_name(self):
-    if self.source_context:
-      source_context_display_name = self.source_context.display_name
-    else:
-      source_context_display_name = 'Default Context'
-    if self.context:
-      context_display_name = self.context.display_name
-    else:
-      context_display_name = 'Default Context'
-    return '{source_role},{source_context} -> {role},{context}'.format(
-      source_role=self.source_role.display_name,
-      source_context=source_context_display_name,
-      role=self.role.display_name,
-      context=context_display_name,
-    )
 
 class ContextImplication(Base, db.Model):
   '''A roles implication between two contexts. An implication may be scoped
