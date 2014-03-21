@@ -53,6 +53,10 @@ update_resources2 = {
  'regulations': '{"regulation":{"kind":"Regulation","contact":{"id":1260,"href":"/api/people/1260","type":"Person"},"description":"Benchmark Regulation","object_people":[],"program_directives":[],"controls":[],"url":"","type":"Regulation","status":"Draft","owners":[{"id":1260,"href":"/api/people/1260","type":"Person"}],"scope":"","directive_controls":[],"sections":[],"selfLink":"/api/regulations/71","programs":[],"created_at":"2014-03-20T22:09:24Z","updated_at":"2014-03-20T22:09:24Z","object_owners":[{"status":"Draft","modified_by":{"href":"/api/people/1260","id":1260,"type":"Person"},"id":1083,"selfLink":"/api/object_owners/1083","person":{"href":"/api/people/1260","id":1260,"type":"Person"},"context":null,"created_at":"2014-03-20T22:09:24","updated_at":"2014-03-20T22:09:24","type":"ObjectOwner","ownable":{"href":"/api/regulations/71","id":71,"type":"Regulation"}}],"reference_url":"","organization":"","documents":[],"title":"Benchmark Regulation","object_objectives":[],"objectives":[],"modified_by":{"id":1260,"href":"/api/people/1260","type":"Person"},"people":[],"id":71,"notes":"Benchmark Regulation UPDATED 2","version":"","viewLink":"/regulations/71","object_documents":[],"related_sources":[],"related_destinations":[],"slug": "REGULATION-101", "start_date":"","end_date":"","context":{"id":null}}}'
 }
 
+mapping_resource = {
+ 'regulations' : 'regulation'
+}
+
 class TestGetThread(threading.Thread):
   def __init__(self, name, data, loop_cnt):
     super(TestGetThread, self).__init__()
@@ -63,10 +67,10 @@ class TestGetThread(threading.Thread):
     self.loop_cnt = loop_cnt
 
   def run(self):
-    self.endtime=datetime.now()
+    self.starttime=datetime.now()
     for cnt in range(self.loop_cnt):
-      print "Running Put Thread: " + self.name + " Iteration#" + str(cnt+1)
-      benchmark_get(self.data, 1)
+      print "Running GET Thread: " + self.name + " Iteration#" + str(cnt+1)
+      benchmark_get(self.data, 1, "Test")
     self.endtime=datetime.now()
 
 class TestPutThread(threading.Thread):
@@ -82,9 +86,13 @@ class TestPutThread(threading.Thread):
   def run(self):
     self.endtime=datetime.now()
     for cnt in range(self.loop_cnt):
-      print "Running Put Thread: " + self.name + " Iteration#" + str(cnt+1)
+      print "Running PUT/GET Thread: " + self.name + " Iteration#" + str(cnt+1)
+      for resource, payload in self.put_data.items():
+       json_payload = json.loads(payload)
+       json_payload[mapping_resource[resource]]['notes'] = "Benchmark Regulation UPDATED#" + str(cnt+1)
+       self.put_data[resource] = json.dumps(json_payload)
       benchmark_update(self.put_data, self.get_data, 1)
-      benchmark_get(self.get_data, 1)
+      benchmark_get(self.get_data, 1, self.name)
     self.endtime=datetime.now()
 
 def invoke_url(op, prefix, host, url, payload, headers, count): 
@@ -137,9 +145,9 @@ def benchmark_delete(resource_data, num_iterations):
       else:
         print "DELETE Successful: " + str(response.status_code)
 
-def benchmark_get(resource_data, num_iterations):
+def benchmark_get(resource_data, num_iterations, name):
   for resource, data in resource_data.items():
-    print "Test GET for resource: " + resource + " with ids " + str(data['ids'])
+    print "Test GET for owner: " + name + " resource: " + resource + " with ids " + str(data['ids'])
     testurl = "/api/" + resource 
     ids = ""
     idslen= len(data['ids'])
@@ -234,7 +242,7 @@ def run_concurrent_tests(loop_cnt):
     get_threads=[]
     put_threads=[]
     for cnt in range(1):
-     get_threads.append(TestGetThread("GET Thread" + str(cnt+1), resource_dict, loop_cnt))
+     get_threads.append(TestGetThread("GET Thread" + str(cnt+1), resource_dict, loop_cnt+20))
      put_threads.append(TestPutThread("PUT Thread" + str(cnt+1), update_resources, resource_dict, loop_cnt))
     for cnt in range(1):
      get_threads[cnt].start()
