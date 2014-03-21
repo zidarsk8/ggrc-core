@@ -22,6 +22,21 @@ can.Control("GGRC.Controllers.TreeFilter", {
     ev.stopPropagation();
   }
 
+  , "input[data-lookup] focus" : function(el, ev) {
+    this.autocomplete(el);
+  }
+
+  , autocomplete : function(el) {
+    $.cms_autocomplete.call(this, el);
+  }
+
+  , autocomplete_select : function(el, event, ui) {
+    setTimeout(function(){
+      el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
+      el.trigger('change');
+    }, 0);
+  }
+
   , "{states} change" : function(states) {
     var that = this;
     this.element
