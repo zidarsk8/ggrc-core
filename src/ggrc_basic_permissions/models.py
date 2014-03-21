@@ -49,14 +49,6 @@ class Role(Base, Described, db.Model):
 
   _publish_attrs = ['name', 'permissions', 'scope']
 
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import not_
-    query = super(Role, cls).eager_query()
-    # FIXME: 'RoleReader' role should not be shown in interface, but this is
-    #   the wrong place to filter it.
-    return query.filter(not_(cls.name == 'RoleReader'))
-
   def _display_name(self):
     return self.name
 

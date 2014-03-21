@@ -381,9 +381,17 @@ def handle_resource_deleted(sender, obj=None, service=None):
         .filter(UserRole.context_id == obj.context_id) \
         .delete()
     db.session.query(ContextImplication) \
-        .filter(ContextImplication.context_id == obj.context_id) \
+        .filter(
+            or_(
+              ContextImplication.context_id == obj.context_id,
+              ContextImplication.source_context_id == obj.context_id
+              ))\
         .delete()
-    db.session.delete(obj.context)
+    # Deleting the context itself is problematic, because unattached objects
+    #   may still exist and cause a database error.  Instead of implicitly
+    #   cascading to delete those, just leave the `Context` object in place.
+    #   It and its objects will be visible *only* to Admin users.
+    #db.session.delete(obj.context)
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.
