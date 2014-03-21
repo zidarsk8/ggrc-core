@@ -133,13 +133,11 @@ var permissions_by_type = {
     , "contact" : "writer"
   }
   , "Audit" : {
-    "owners" : "writer"
-    , "contact" : "writer"
+    "contact" : "writer"
     , "findAuditors" : "reader"
   }
   , "Request" : {
-    "owners" : "writer"
-    , "assignee" : "writer"
+    "assignee" : "writer"
   }
 };
 
