@@ -14,7 +14,7 @@ from ggrc.services.common import get_modified_objects, update_index
 from ggrc.services.common import update_memcache_before_commit, update_memcache_after_commit
 from ggrc.utils import benchmark
 
-CACHE_EXPIRY_IMPORT=300
+CACHE_EXPIRY_IMPORT=600
 
 class BaseConverter(object):
 

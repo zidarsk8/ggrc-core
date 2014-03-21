@@ -33,7 +33,6 @@ from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 
 from ggrc import settings
-from ggrc.cache import CacheManager, MemCache
 from copy import deepcopy
 from sqlalchemy.orm.session import Session
 from sqlalchemy import event
@@ -44,6 +43,12 @@ CACHE_EXPIRY_COLLECTION=60
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
 """
+
+def _get_cache_manager():
+  from ggrc.cache import CacheManager, MemCache
+  cache_manager = CacheManager()
+  cache_manager.initialize(MemCache())
+  return cache_manager
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
@@ -59,9 +64,10 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     None 
 
   """
-  cache_manager = CacheManager()
-  cache_manager.initialize(MemCache())
-  context.cache_manager = cache_manager
+  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+   return
+    
+  context.cache_manager = _get_cache_manager()
 
   if len(modified_objects.new) > 0: 
     items_to_add = modified_objects.new.items()
@@ -164,6 +170,9 @@ def update_memcache_after_commit(context, expiry_time):
     None 
 
   """
+  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+   return
+
   if context.cache_manager is None: 
     current_app.logger.error("CACHE: Error in initiaizing cache manager")
     return
@@ -670,18 +679,16 @@ class Resource(ModelView):
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
     cache_supported = False
-    if getattr(settings, 'MEMCACHE_MECHANISM', False):
-      cache_response = None
-      model_plural = self.model._inflector.table_plural
-      collection_name = '{0}_collection'.format(model_plural)
+    if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
       stubs_in_args = '__stubs_only' in request.args
       if stubs_in_args:
         category = 'stubs'
       else:
         category = 'collection'
-      cache_manager = CacheManager()
-      cache_manager.initialize(MemCache())
-      self.request.cache_manager = cache_manager
+      model_plural = self.model._inflector.table_plural
+      cache_response = None
+      collection_name = '{0}_collection'.format(model_plural)
+      self.request.cache_manager = _get_cache_manager()
       cache_supported=self.request.cache_manager.is_caching_supported(category, model_plural)
       if cache_supported:
         with benchmark("Get resource collection from Memcache"):
@@ -695,9 +702,6 @@ class Resource(ModelView):
       else:
         current_app.logger.info("CACHE: Caching is not supported for " + \
           model_plural + " in " + category + " category")
-    else:
-      current_app.logger.info("CACHE: Get Collection from cache is not supported for "  + \
-        model_plural + " in " + category + " category")
 
     with benchmark("Query for collection"):
       objs = self.get_collection()
@@ -722,9 +726,6 @@ class Resource(ModelView):
       else:
         current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
           model_plural + " in " + category + " category")
-    else:
-      current_app.logger.info("CACHE: Write Collection to cache is not supported for "  +\
-        model_plural + " in " + category + " category")
 
     return self.json_success_response(
       collection, self.collection_last_modified())
@@ -805,8 +806,12 @@ class Resource(ModelView):
           if context_id is not None:
             # TODO(dan): Need to check read permissions for extended mappings as well
             if not permissions.is_allowed_read(self.model.__name__, context_id):
-              current_app.logger.error("CACHE: Forbidden permissions")
-              raise Forbidden()
+              current_app.logger.warn("CACHE: Forbidden permissions" + " for id: " + str(id))
+              continue
+          #for key, val in attrs.items():
+            # json.py - UpdateAttrHandler
+            #if isinstance(getattr(self.model, key), RelationshipProperty):
+              #getattr(self.model, key).mapper.class_)
           converted_data[x_category][x_resource].append(attrs)
         selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
         converted_data[x_category]['selfLink'] = selfLink
@@ -860,7 +865,7 @@ class Resource(ModelView):
           cacheData[id] = deepcopy(aresource)
         write_result = self.request.cache_manager.add_collection(category, resource, cacheData)
         if write_result is None:
-           current_app.logger.error("CACHE: Unable to write collection to cache")
+           current_app.logger.error("CACHE: Unable to write collection to cache: " + str(write_result))
            return None
         else:
            current_app.logger.info("CACHE: Successfully written data in cache for resource: " + resource)
