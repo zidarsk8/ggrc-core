@@ -586,7 +586,7 @@ can.Control("GGRC.Controllers.Modals", {
       // Open newly created responses
       var object_type = instance.constructor.table_singular;
       $('[data-object-id="'+instance.id+'"][data-object-type="'+object_type+'"]')
-        .find('.openclose').openclose('open');
+        .find('.openclose').click().openclose("open");
     }
   }
 
