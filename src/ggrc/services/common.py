@@ -728,7 +728,7 @@ class Resource(ModelView):
           model_plural + " in " + category + " category")
 
     return self.json_success_response(
-      collection, self.collection_last_modified())
+      collection, self.collection_last_modified(), cache_op='Miss')
 
   def is_caching_in_progress(self, category, resource): 
     """Check the current state of cache and in progress
@@ -818,7 +818,7 @@ class Resource(ModelView):
         controls_data = converted_data[x_category][x_resource]
         if len(controls_data) > 0:
           current_app.logger.info("CACHE: Successfully converted data to return as JSON response")
-          return self.json_success_response(converted_data, datetime.datetime.now())
+          return self.json_success_response(converted_data, datetime.datetime.now(), cache_op='Hit')
         else:
           return None
       else:
@@ -1082,7 +1082,7 @@ class Resource(ModelView):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
 
   def json_success_response(
-      self, response_object, last_modified, status=200, id=None):
+      self, response_object, last_modified, status=200, id=None, cache_op=None):
     headers = [
         ('Last-Modified', self.http_timestamp(last_modified)),
         ('Etag', self.etag(response_object)),
@@ -1090,6 +1090,8 @@ class Resource(ModelView):
         ]
     if id:
       headers.append(('Location', self.url_for(id=id)))
+    if cache_op:
+      headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
       (self.as_json(response_object), status, headers))
 
