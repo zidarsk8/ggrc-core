@@ -10,6 +10,10 @@
 #
 
 from collections import namedtuple
+POLYMORPH_NONE=0
+POLYMORPH_DEST_ONLY=1
+POLYMORPH_SRCDEST=2
+
 CacheEntry   = namedtuple('CacheEntry', 'model_plural class_name cache_type')
 MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type source_name,\
                           dest_type, dest_name polymorph, cache_type')
@@ -17,7 +21,7 @@ MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type s
 def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
 
-def mapping(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph=False, cache_type='memcache'):
+def mapping(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph=POLYMORPH_NONE, cache_type='memcache'):
   return MappingEntry(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph, cache_type)
 
 def all_cache_entries():
@@ -96,20 +100,22 @@ def all_mapping_entries():
    mapping('control_controls', 'ControlControl', 'controls', 'control_id', 'controls', 'implemented_control_id'),
    mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
    mapping('directive_controls', 'DirectiveControl', 'directives', 'directive_id', 'controls', 'control_id'),
-   mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', True),
-   mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable', 'documentable_id', True),
-   mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', True),
-   mapping('object_owners', 'ObjectOwner', 'people', 'person_id', 'ownable_type', 'ownable_id', True),
-   mapping('object_people', 'ObjectPerson', 'people', 'person_id', 'personable_type', 'personable_id', True),
-   mapping('object_sections', 'ObjectSection', 'sections', 'section_id', 'sectionable_type', 'sectionable_id', True),
+   mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable', 'documentable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', \
+            POLYMORPH_DEST_ONLY),
+   mapping('object_owners', 'ObjectOwner', 'people', 'person_id', 'ownable_type', 'ownable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_people', 'ObjectPerson', 'people', 'person_id', 'personable_type', 'personable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_sections', 'ObjectSection', 'sections', 'section_id', 'sectionable_type', 'sectionable_id', POLYMORPH_DEST_ONLY),
    mapping('objective_controls', 'ObjectiveControl', 'objectives', 'objective_id', 'controls', 'control_id'),
    mapping('program_controls', 'ProgramControl', 'programs', 'program_id', 'controls', 'control_id'),
    mapping('program_directives', 'ProgramDirective', 'programs', 'program_id', 'directives', 'directive_id'),
    mapping('section_objectives', 'SectionObjective', 'sections', 'section_id', 'objectives', 'objective_id'),
    mapping('user_roles', 'UserRole', 'people', 'person_id', 'roles', 'role_id'),
-   mapping('object_events', 'ObjectEvent', None, 'event_id', 'eventable_type', 'eventable_id', True),
-   mapping('object_folders', 'ObjectFolder', None, 'folder_id', 'folderable_type', 'folderable_id', True),
-   mapping('object_files', 'ObjectFile', None, 'fileable_type', 'fileable_id', True),
+   mapping('object_events', 'ObjectEvent', None, 'event_id', 'eventable_type', 'eventable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_folders', 'ObjectFolder', None, 'folder_id', 'folderable_type', 'folderable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_files', 'ObjectFile', None, 'file_id', 'fileable_type', 'fileable_id', POLYMORPH_DEST_ONLY),
+   mapping('relationships', 'Relationship', 'source_type', 'source_id', 'destination_type', 'destination_id', POLYMORPH_SRCDEST),
   ]
 
   return ret

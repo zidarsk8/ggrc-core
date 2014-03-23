@@ -39,6 +39,9 @@ from sqlalchemy import event
 from sqlalchemy.exc import SQLAlchemyError
 
 CACHE_EXPIRY_COLLECTION=60
+POLYMORPH_NONE=0
+POLYMORPH_DEST_ONLY=1
+POLYMORPH_SRCDEST=2
 
 """gGRC Collection REST services implementation. Common to all gGRC collection
 resources.
@@ -85,22 +88,24 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
                    context.cache_manager.supported_mappings[cls]
           srcid  = json_obj[srcname] 
           dstid = json_obj[dstname] 
-          model_plural = None
-          if polymorph is True:
-            dsttype = json_obj[dsttype]
-            model_plural = context.cache_manager.supported_classes[dsttype]
-          else:
-            model_plural = dsttype
+          if polymorph != POLYMORPH_NONE:
+            if polymorph == POLYMORPH_SRCDEST: 
+              if srctype is not None:
+                srctype = json_obj[srctype]
+                srctype = context.cache_manager.supported_classes[srctype]
+            if dsttype is not None:
+              dsttype = json_obj[dsttype]
+              dsttype = context.cache_manager.supported_classes[dsttype]
           if srctype is not None:
             from_key = 'collection:' + srctype + ':' + str(srcid)
             context.cache_manager.marked_for_delete.append(from_key)
-          if model_plural is not None:
-            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+          if dsttype is not None:
+            to_key   = 'collection:' + dsttype + ':' + str(dstid)
             context.cache_manager.marked_for_delete.append(to_key)
           else:
             # This error should not happen, it indicates that class is not in the supported_classes map
             # Log error
-            current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+            current_app.logger.warn("CACHE: destination type is not provided for direct mapping") 
       
   if len(modified_objects.dirty) > 0: 
     items_to_update = modified_objects.dirty.items()
@@ -126,21 +131,23 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
                    context.cache_manager.supported_mappings[cls]
           srcid  = json_obj[srcname] 
           dstid = json_obj[dstname] 
-          model_plural = None
-          if polymorph is True:
-            dsttype = json_obj[dsttype]
-            model_plural = context.cache_manager.supported_classes[dsttype]
-          else:
-            model_plural = dsttype
+          if polymorph != POLYMORPH_NONE:
+            if polymorph == POLYMORPH_SRCDEST: 
+              if srctype is not None:
+                srctype = json_obj[srctype]
+                srctype = context.cache_manager.supported_classes[srctype]
+            if dsttype is not None:
+              dsttype = json_obj[dsttype]
+              dsttype = context.cache_manager.supported_classes[dsttype]
           if srctype is not None:
             from_key = 'collection:' + srctype + ':' + str(srcid)
             context.cache_manager.marked_for_delete.append(from_key)
-          if model_plural is not None:
-            to_key   = 'collection:' + model_plural + ':' + str(dstid)
+          if dsttype is not None:
+            to_key   = 'collection:' + dsttype + ':' + str(dstid)
             context.cache_manager.marked_for_delete.append(to_key)
           else:
             # This should not happen, it indicates that class is not in the supproted_classes map
-            current_app.logger.warn("CACHE: destination class : " + dsttype + " is not supported for caching") 
+            current_app.logger.warn("CACHE: destination type is not provided for direct mapping") 
 
   status_entries ={}
   for key in context.cache_manager.marked_for_add.keys():
@@ -634,11 +641,11 @@ class Resource(ModelView):
       update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
-    with benchmark("Update memcache after commit for resource collection PUT"):
-      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
     with benchmark("Query for object"):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for resource collection PUT"):
+      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -944,9 +951,13 @@ class Resource(ModelView):
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update memcache before commit for resource collection POST"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for resource collection POST"):
+      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
