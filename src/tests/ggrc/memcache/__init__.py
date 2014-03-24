@@ -4,7 +4,10 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from ggrc.cache import LocalCache
-from ggrc.cache import MemCache
-from ggrc.cache import CacheManager
-from tests.ggrc.memcache.testcachemanager import TestCacheManager
+from ggrc import settings
+
+if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
+  from ggrc.cache import LocalCache
+  from ggrc.cache import MemCache
+  from ggrc.cache import CacheManager
+  from tests.ggrc.memcache.testcachemanager import TestCacheManager
