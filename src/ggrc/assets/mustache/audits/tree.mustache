@@ -176,7 +176,7 @@
                 <strong>Auditor: </strong>
                   {{! `with_auditors` requires `authorizations` mapping, so preload it }}
                   {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance}}
+                  {{#with_auditors instance decoy=authorizations}}
                     {{#using auditor=auditors.0.person}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                     {{/using}}

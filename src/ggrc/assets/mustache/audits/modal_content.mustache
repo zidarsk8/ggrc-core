@@ -145,7 +145,7 @@
         <div class="objective-selector">
           {{! `with_auditors` requires `authorizations` mapping, so preload it }}
           {{#with_mapping 'authorizations' instance}}
-          {{#with_auditors instance}}
+          {{#with_auditors instance decoy=authorizations}}
             {{#using auditor=auditors.0.person}}
             <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8 search-icon" placeholder="Enter text to search for Auditor" value="{{auditor.email}}">
             {{/using}}
