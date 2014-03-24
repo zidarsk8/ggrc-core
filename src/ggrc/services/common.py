@@ -37,6 +37,8 @@ from copy import deepcopy
 from sqlalchemy.orm.session import Session
 from sqlalchemy import event
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm.properties import RelationshipProperty
 
 CACHE_EXPIRY_COLLECTION=60
 POLYMORPH_NONE=0
@@ -702,10 +704,6 @@ class Resource(ModelView):
           cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
         if cache_response is not None:
           return cache_response
-        else:
-          current_app.logger.info("CACHE: Unable to find " + model_plural + \
-            " object in caching layer, checking Data-ORM layer" + \
-            " in " + category + " category")
       else:
         current_app.logger.info("CACHE: Caching is not supported for " + \
           model_plural + " in " + category + " category")
@@ -776,6 +774,42 @@ class Resource(ModelView):
 
     return False
 
+  def filter_relationship_attrs(self, id, attrs):
+    """ Filter relationship that have read permission
+
+    Traverse through JSON representation in cache and find attributes with "RelationshipProperty"
+    The relationship property value dictionary keys 'type' and 'context' are extracted.
+    If context is not None, RBAC permission allowed_for_read permission is performed and filtered if needed. 
+    
+    Args:
+       id: Resource ID
+       attrs: dictionary containing JSON representation in cache
+
+    Returns:
+      filter_attrs: Dictionary that filters out relationship items that pass RBAC permission checks
+    """
+
+    filter_attrs={}
+    for key, val in attrs.items():
+     filter_attrs[key] = val
+     if hasattr(self.model, key):
+       class_attr = getattr(self.model, key)
+       if isinstance(class_attr, InstrumentedAttribute) and  \
+          isinstance(class_attr.property, RelationshipProperty):
+         if type(val) is list:
+           updated_val=[]
+           for item in val:
+             if type(item) is dict:
+               if item.has_key('type') and item.has_key('context'):
+                 if item['context'] is not None and \
+                    not permissions.is_allowed_read(item['type'], item['context']['id']):
+                   current_app.logger.info("CACHE: Read Permission is not allowed for id: " + \
+                     str(id) + " relationship type: " + str(item['type']))
+                 else:
+                   updated_val.append(item)
+           filter_attrs[key] = updated_val
+    return filter_attrs
+
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
     """Get collection (objects or stubs) from cache
 
@@ -811,25 +845,19 @@ class Resource(ModelView):
         for id, attrs in data.items():
           context_id = self.get_context_id_from_json(attrs) 
           if context_id is not None:
-            # TODO(dan): Need to check read permissions for extended mappings as well
             if not permissions.is_allowed_read(self.model.__name__, context_id):
-              current_app.logger.warn("CACHE: Forbidden permissions" + " for id: " + str(id))
+              current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
               continue
-          #for key, val in attrs.items():
-            # json.py - UpdateAttrHandler
-            #if isinstance(getattr(self.model, key), RelationshipProperty):
-              #getattr(self.model, key).mapper.class_)
-          converted_data[x_category][x_resource].append(attrs)
+          filter_attrs=self.filter_relationship_attrs(id, attrs)
+          converted_data[x_category][x_resource].append(filter_attrs)
         selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
         converted_data[x_category]['selfLink'] = selfLink
         controls_data = converted_data[x_category][x_resource]
         if len(controls_data) > 0:
-          current_app.logger.info("CACHE: Successfully converted data to return as JSON response")
           return self.json_success_response(converted_data, datetime.datetime.now(), cache_op='Hit')
         else:
           return None
       else:
-        current_app.logger.info("CACHE: Model: " + resource + " is not found in cache")
         return None
     else:
       current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
@@ -875,7 +903,6 @@ class Resource(ModelView):
            current_app.logger.error("CACHE: Unable to write collection to cache: " + str(write_result))
            return None
         else:
-           current_app.logger.info("CACHE: Successfully written data in cache for resource: " + resource)
            return write_result
       else:
          current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
