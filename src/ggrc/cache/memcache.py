@@ -200,7 +200,7 @@ class MemCache(Cache):
     """
     # TODO(dan): import scenarios, add will return non-empty list, we should invoke update_multi for those items
     #
-    return self.memcache_client.add_multi(data, expiration_time)
+    return self.memcache_client.add_multi(data)
 
   def get_multi(self, data): 
     """ Get multiple entries from memcache
