@@ -7,8 +7,6 @@ from ggrc.cache import CacheManager, MemCache
 import json
 import logging
 import sys
-from google.appengine.api import memcache
-from google.appengine.ext import testbed
 from tests.ggrc import TestCase
 
 class TestCacheManager(TestCase):
