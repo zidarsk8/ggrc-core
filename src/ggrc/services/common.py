@@ -189,7 +189,7 @@ def update_memcache_after_commit(context, expiry_time):
   cache_manager = context.cache_manager
 
   if len(cache_manager.marked_for_add) > 0:
-    current_app.logger.info("CACHE: Bulk add: " + str(cache_manager.marked_for_add))
+    #current_app.logger.info("CACHE: Bulk add: " + str(cache_manager.marked_for_add))
     add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
     # result is empty on success, non-empty on failure
     # TODO(dan): handling failure including network errors, currently we log errors
@@ -197,7 +197,7 @@ def update_memcache_after_commit(context, expiry_time):
       current_app.logger.error("CACHE: Failed to add collection to cache: " + str(add_result))
 
   if len(cache_manager.marked_for_update) > 0:
-    current_app.logger.info("CACHE: Bulk Update : " + str(cache_manager.marked_for_update))
+    #current_app.logger.info("CACHE: Bulk Update : " + str(cache_manager.marked_for_update))
     update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
     # result is empty on success, non-empty on failure returns list of keys including network failures
     # TODO(dan): handling failure including network errors, currently we log errors
@@ -206,7 +206,7 @@ def update_memcache_after_commit(context, expiry_time):
 
   # TODO(dan): check for duplicates in marked_for_delete
   if len(cache_manager.marked_for_delete) > 0:
-    current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
+    #current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
     delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, 0)
     # TODO(dan): handling failure including network errors, currently we log errors
     if delete_result is not True:
