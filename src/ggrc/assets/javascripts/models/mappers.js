@@ -297,6 +297,45 @@
         return found_result;
       }
 
+    , is_duplicate_result: function(old_result, new_result) {
+        var o = old_result
+          , n = new_result
+          ;
+
+        if (o.instance === n.instance) {// && o.binding  === n.binding) {
+          if (o.mappings === n.mappings) {
+            return true;
+          }
+          o = o.mappings;
+          n = n.mappings;
+          if (o && n && o.length === 1 && n.length === 1) {
+            o = o[0];
+            n = n[0];
+            if (o.binding === n.binding) {
+              if (o.instance === n.instance
+                  && (o.mappings.length > 0 || n.mappings.length > 0)) {
+                o = o.mappings;
+                n = n.mappings;
+                if (o && n && o.length === 1 && n.length === 1) {
+                  o = o[0];
+                  n = n[0];
+                }
+              }
+
+              if (o.binding === n.binding
+                  && o.instance === true
+                  && n.instance === true
+                  && o.mappings && o.mappings.length === 0
+                  && n.mappings && n.mappings.length === 0) {
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+
     , insert_results: function(binding, results) {
         var self = this
           , all_binding_results = []
@@ -318,6 +357,10 @@
           }
 
           if (found_result) {
+            if (self.is_duplicate_result(found_result, new_result)) {
+              return;
+            }
+
             mapping_attr = found_result.mappings;
             // Since we're adding the result as its own mapping, use
             // new_result as the mapping instead of new_result.mappings?
@@ -329,6 +372,8 @@
                 instances_to_refresh.push(new_result.instance);
               }
             });
+
+            all_binding_results.push(found_result);
           } else {
             //  FIXME: Loaders should be passing in newly instantiated results,
             //    so this line should be:
@@ -338,9 +383,9 @@
             new_instance_results.push(found_result);
             instances_to_refresh.push(new_result.instance);
             // FIXME: Also queue mappings to refresh?
-          }
 
-          all_binding_results.push(found_result);
+            all_binding_results.push(found_result);
+          }
         });
 
         if (new_instance_results.length > 0) {
@@ -792,7 +837,18 @@
     , init_listeners: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
+          , object_join_value = binding.instance[this.object_join_attr]
           ;
+
+        binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
+          self._refresh_stubs(binding);
+        });
+
+        if (object_join_value) {
+          object_join_value.bind('length', function(ev, _new, _old) {
+            self._refresh_stubs(binding);
+          });
+        }
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model)
