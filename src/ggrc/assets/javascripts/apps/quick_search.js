@@ -504,7 +504,7 @@ $(function() {
     //  Prevent toggling `openclose` state in trees
     ev.stopPropagation();
 
-    var $target = $(ev.target)
+    var $target = $(ev.currentTarget)
     , follow = $target.data("follow")
     , inst = $target.data("instance")
     , page_model = GGRC.infer_object_type(GGRC.page_object)
@@ -518,7 +518,7 @@ $(function() {
     }
 
     function triggerFlash(type) {
-      $(ev.target).trigger(
+      $target.trigger(
         "ajax:flash"
         , type === "error" 
           ? {
@@ -597,7 +597,7 @@ $(function() {
             // Currently, the only error we encounter here is uniqueness
             // constraint violations.  Let's use a nicer message!
             var message = "That object is already mapped";
-            $(ev.target).trigger("ajax:flash", { error: message });
+            $target.trigger("ajax:flash", { error: message });
           });
       }
       // Otherwise throw a warning
