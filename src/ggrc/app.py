@@ -78,20 +78,6 @@ if settings.ENABLE_JASMINE:
   jasmine.specs(
       Asset("dashboard-js-specs"))
 
-import datetime
-
-app.logger.info("this should happen only once")
-
-@app.before_request
-def log_start(*args, **kwargs):
-  global start_time
-  start_time = datetime.datetime.now()
-
-@app.after_request
-def log_end(response):
-  app.logger.info("total time: {}".format(datetime.datetime.now() - start_time))
-  return response
- 
 if hasattr(settings, 'SQLALCHEMY_RECORD_QUERIES')\
     and settings.SQLALCHEMY_RECORD_QUERIES:
 

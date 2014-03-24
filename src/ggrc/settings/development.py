@@ -15,4 +15,3 @@ LOGIN_MANAGER = 'ggrc.login.noop'
 AUTOBUILD_ASSETS = True
 ENABLE_JASMINE = True
 #DEBUG_ASSETS = True
-

@@ -11,4 +11,3 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/ggrc-dev.db'
 SQLALCHEMY_ECHO = True
 AUTOBUILD_ASSETS = True
 ENABLE_JASMINE = True
-

@@ -9,6 +9,7 @@ from .registry import service
 
 """All gGRC REST services."""
 
+
 def all_collections():
   """The list of all gGRC collection services as a list of
   (url, ModelClass) tuples.
@@ -104,4 +105,3 @@ def init_all_services(app):
   from .description import ServiceDescription
   app.add_url_rule(
     '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
-

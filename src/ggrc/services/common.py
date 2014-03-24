@@ -528,7 +528,6 @@ class Resource(ModelView):
       )
 
   def dispatch_request(self, *args, **kwargs):
-   with benchmark("dispatch_request"):
     method = request.method
 
     if method in ('POST', 'PUT', 'DELETE')\

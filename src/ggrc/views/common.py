@@ -28,7 +28,6 @@ class BaseObjectView(ModelView):
       )
 
   def dispatch_request(self, *args, **kwargs):
-   with benchmark("view dispatch_request"):
     method = request.method.lower()
 
     if method == 'get':
