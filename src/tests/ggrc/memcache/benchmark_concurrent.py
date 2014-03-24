@@ -70,7 +70,7 @@ class TestGetThread(threading.Thread):
     self.starttime=datetime.now()
     for cnt in range(self.loop_cnt):
       print "Running GET Thread: " + self.name + " Iteration#" + str(cnt+1)
-      benchmark_get(self.data, 1, "Test")
+      benchmark_get(self.data, 1, "Concurrency GET Test")
     self.endtime=datetime.now()
 
 class TestPutThread(threading.Thread):
@@ -92,7 +92,7 @@ class TestPutThread(threading.Thread):
        json_payload[mapping_resource[resource]]['notes'] = "Benchmark Regulation UPDATED#" + str(cnt+1)
        self.put_data[resource] = json.dumps(json_payload)
       benchmark_update(self.put_data, self.get_data, 1)
-      benchmark_get(self.get_data, 1, self.name)
+      benchmark_get(self.get_data, 1, "Concurrency GET Test")
     self.endtime=datetime.now()
 
 def invoke_url(op, prefix, host, url, payload, headers, count): 
@@ -226,11 +226,11 @@ def run_singlethreaded_tests():
   print "Running benchmark tests (create, GET, PUT, GET, DELETE) ..."
   resource_dict=benchmark_create(create_resources, 1, 1)
   if resource_dict is not None:
-    benchmark_get(resource_dict, 1)
+    benchmark_get(resource_dict, 1, "Single Threaded GET Test")
     benchmark_update(update_resources, resource_dict, 1)
-    benchmark_get(resource_dict, 1)
+    benchmark_get(resource_dict, 1, "Single Threaded GET Test")
     benchmark_update(update_resources2, resource_dict, 1)
-    benchmark_get(resource_dict, 1)
+    benchmark_get(resource_dict, 1, "Single Threaded GET Test")
     benchmark_delete(resource_dict, 1)
   else:
     print "ERROR: Unable to run benchmark tests"

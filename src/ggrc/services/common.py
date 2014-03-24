@@ -207,7 +207,7 @@ def update_memcache_after_commit(context, expiry_time):
   # TODO(dan): check for duplicates in marked_for_delete
   if len(cache_manager.marked_for_delete) > 0:
     current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
-    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, expiry_time)
+    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, 0)
     # TODO(dan): handling failure including network errors, currently we log errors
     if delete_result is not True:
       current_app.logger.error("CACHE: Failed to remoe collection from cache") 
