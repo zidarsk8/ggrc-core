@@ -17,6 +17,7 @@ from .control_section import ControlSection
 from .data_asset import DataAsset
 from .directive import Directive, Regulation, Policy, Contract, Standard
 from .directive_control import DirectiveControl
+from .directive_section import DirectiveSection
 from .document import Document
 from .facility import Facility
 from .help import Help
@@ -45,7 +46,7 @@ from .task import Task
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
-from .section import Section
+from .section import SectionBase, Section, Clause
 from .section_objective import SectionObjective
 from .system import SystemOrProcess, System, Process
 
@@ -68,6 +69,7 @@ all_models = [
     Regulation,
     Standard,
   DirectiveControl,
+  DirectiveSection,
   Document,
   Facility,
   Help,
@@ -96,7 +98,9 @@ all_models = [
     DocumentationResponse,
     InterviewResponse,
     PopulationSampleResponse,
-  Section,
+  SectionBase,
+    Section,
+    Clause,
   SectionObjective,
   SystemOrProcess,
     System,
