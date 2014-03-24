@@ -101,7 +101,7 @@ def all_mapping_entries():
    mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
    mapping('directive_controls', 'DirectiveControl', 'directives', 'directive_id', 'controls', 'control_id'),
    mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', POLYMORPH_DEST_ONLY),
-   mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable', 'documentable_id', POLYMORPH_DEST_ONLY),
+   mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable_type', 'documentable_id', POLYMORPH_DEST_ONLY),
    mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', \
             POLYMORPH_DEST_ONLY),
    mapping('object_owners', 'ObjectOwner', 'people', 'person_id', 'ownable_type', 'ownable_id', POLYMORPH_DEST_ONLY),
