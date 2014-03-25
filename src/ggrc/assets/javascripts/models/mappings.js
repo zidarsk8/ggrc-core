@@ -231,8 +231,10 @@
       }
 
     , sectionable: {
-        sections: Proxy(
+        _sections_base : Proxy(
           null, "section", "ObjectSection", "sectionable", "object_sections")
+        , sections : TypeFilter("_sections_base", "Section")
+        , clauses : TypeFilter("_sections_base", "Clause")
       }
 
     , personable: {
