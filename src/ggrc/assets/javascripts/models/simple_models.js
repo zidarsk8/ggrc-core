@@ -13,7 +13,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
   , category : "programs"
-  , findAll : "/api/programs?kind=Directive"
+  , findAll : "/api/programs"
   , findOne : "/api/programs/{id}"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
@@ -31,7 +31,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directives : "CMS.Models.Directive.stubs"
     , program_controls : "CMS.Models.ProgramControl.stubs"
@@ -122,7 +122,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , defaults : {
@@ -138,15 +138,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
   init : function() {
     this._super && this._super.apply(this, arguments);
     var that = this;
-    /*this.attr("descendant_sections", can.compute(function() {
-      var sections = [].slice.call(that.attr("sections"), 0);
-      return can.reduce(that.sections, function(a, b) {
-        return a.concat(can.makeArray(b.descendant_sections()));
-      }, sections);
-    }));
-    this.attr("descendant_sections_count", can.compute(function() {
-      return that.attr("descendant_sections")(true).length; //giving it a value to force revalidation
-    }));*/
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
 });
@@ -187,7 +178,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Standard" ]
@@ -230,7 +221,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Regulation" ]
@@ -273,7 +264,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
@@ -315,9 +306,11 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -347,7 +340,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -428,7 +421,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -493,7 +486,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -574,7 +567,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , kind : "CMS.Models.Option.stub"
   }
   , defaults : {
@@ -678,7 +671,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -759,7 +752,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -873,7 +866,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , risk_tree_options : { show_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
   , tree_view_options : {
@@ -932,7 +925,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , section_objectives : "CMS.Models.SectionObjective.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , objective_controls : "CMS.Models.ObjectiveControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
@@ -1298,7 +1291,9 @@ CMS.Models.get_stub = function(object) {
 }
 
 CMS.Models.get_stubs = function(objects) {
-  return CMS.Models.get_instances(objects).stubs();
+  return can.map(CMS.Models.get_instances(objects), function(o) {
+    return o.stub();
+  });
 };
 
 CMS.Models.get_instances = function(objects) {
@@ -1309,7 +1304,6 @@ CMS.Models.get_instances = function(objects) {
     instances[i] = CMS.Models.get_instance(objects[i]);
   }
   return instances;
-  //return can.map(instances, CMS.Models.get_instance);
 };
 
 CMS.Models.get_link_type = function(instance, attr) {

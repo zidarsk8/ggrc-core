@@ -117,11 +117,11 @@
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
       , controls: Proxy(
-         "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
+          "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , sections: Proxy(
-          "Section", "section", "ControlSection", "control", "control_sections")
+          null, "section", "ControlSection", "control", "control_sections")
       , implemented_controls: Proxy(
           "Control", "implemented_control", "ControlControl", "control", "control_controls")
       , implementing_controls: Proxy(
@@ -139,6 +139,7 @@
       , orphaned_objects: Multi([
           "related_objects"
         , "sections"
+        , "clauses"
         , "controls"
         , "programs"
         , "objectives"
@@ -163,9 +164,9 @@
       , related_systems:     TypeFilter("related_objects", "System")
 
       , regulations: TypeFilter("related_objects", "Regulation")
-      , contracts: TypeFilter("related_objects", "Regulation")
-      , policies: TypeFilter("related_objects", "Regulation")
-      , standards: TypeFilter("related_objects", "Regulation")
+      , contracts: TypeFilter("related_objects", "Contract")
+      , policies: TypeFilter("related_objects", "Policy")
+      , standards: TypeFilter("related_objects", "Standard")
       , programs: TypeFilter("related_objects", "Program")
 
       , objectives: Proxy(
@@ -173,15 +174,16 @@
       , controls: Proxy(
           "Control", "control", "ObjectiveControl", "objective", "objective_controls")
       , sections: Proxy(
-          "Section", "section", "SectionObjective", "objective", "section_objectives")
+          null, "section", "SectionObjective", "objective", "section_objectives")
       , orphaned_objects: Multi([
           "related_objects"
         , "controls"
         , "sections"
+        , "clauses"
         , "people"
         ])
       }
-    , Section: {
+    , section_base: {
         _mixins: ["personable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
@@ -208,6 +210,16 @@
         ])
       }
 
+    , Section: {
+        _mixins: ["section_base"]
+      }
+
+    , Clause: {
+        _mixins: ["section_base"]
+      , contracts: Proxy(
+          "Contract", "directive", "DirectiveSection", "section", "directive_sections")
+      }
+
     , controllable: {
         controls: Proxy(
           "Control", "control", "ObjectControl", "controllable", "object_controls")
@@ -220,7 +232,7 @@
 
     , sectionable: {
         sections: Proxy(
-          "Section", "section", "ObjectSection", "sectionable", "object_sections")
+          null, "section", "ObjectSection", "sectionable", "object_sections")
       }
 
     , personable: {
@@ -249,9 +261,9 @@
       , related_systems:     TypeFilter("related_objects", "System")
 
       , regulations: TypeFilter("related_objects", "Regulation")
-      , contracts: TypeFilter("related_objects", "Regulation")
-      , policies: TypeFilter("related_objects", "Regulation")
-      , standards: TypeFilter("related_objects", "Regulation")
+      , contracts: TypeFilter("related_objects", "Contract")
+      , policies: TypeFilter("related_objects", "Policy")
+      , standards: TypeFilter("related_objects", "Standard")
       , programs: TypeFilter("related_objects", "Program")
 
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
@@ -304,7 +316,11 @@
           "related_object", "personable", "objectiveable"
           ]
       , sections: Direct("Section", "directive")
-      , extended_related_sections: Multi(["sections"])
+      , joined_sections: Proxy(
+          "Section", "section", "DirectiveSection", "directive", "directive_sections")
+      , clauses: Proxy(
+          "Clause", "section", "DirectiveSection", "directive", "directive_sections")
+      //, extended_related_sections: Multi(["sections"])
 
       , direct_controls: Direct("Control", "directive")
       , joined_controls: Proxy(
@@ -316,6 +332,7 @@
 
       , orphaned_objects: Multi([
           "sections"
+        , "clauses"
         , "people"
         , "controls"
         , "programs"
@@ -350,6 +367,7 @@
         , "controls"
         , "objectives"
         , "sections"
+        , "clauses"
         ])
       }
 
@@ -387,6 +405,7 @@
       , owned_objectives: Indirect("Objective", "contact")
       , owned_controls: Indirect("Control", "contact")
       , owned_sections: Indirect("Section", "contact")
+      , owned_clauses: Indirect("Clause", "contact")
       , owned_data_assets: Indirect("DataAsset", "contact")
       , owned_facilities: Indirect("Facility", "contact")
       , owned_markets: Indirect("Market", "contact")
@@ -406,6 +425,7 @@
       , related_objectives:  TypeFilter("related_objects", "Objective")
       , related_controls:    TypeFilter("related_objects", "Control")
       , related_sections:    TypeFilter("related_objects", "Section")
+      , related_clauses:     TypeFilter("related_objects", "Clause")
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -425,6 +445,7 @@
       , extended_related_objectives:  Multi(["related_objectives", "owned_objectives"])
       , extended_related_controls:    Multi(["related_controls", "owned_controls"])
       , extended_related_sections:    Multi(["related_sections", "owned_sections"])
+      , extended_related_clauses:     Multi(["related_clauses", "owned_clauses"])
       , extended_related_data_assets: Multi(["related_data_assets", "owned_data_assets"])
       , extended_related_facilities:  Multi(["related_facilities", "owned_facilities"])
       , extended_related_markets:     Multi(["related_markets", "owned_markets"])
@@ -435,8 +456,9 @@
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
 
       , related_objects_via_search: Search("", [
-          "Program",  "Regulation", "Contract", "Policy", "Standard", "Section", "Objective",
-          "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility",
+          "Program",  "Regulation", "Contract", "Policy", "Standard",
+          "Section", "Clause", "Objective", "Control",
+          "System", "Process", "DataAsset", "Product", "Project", "Facility",
           "Market", "OrgGroup", "Audit"//, "Request", "Response"
         ], { contact_id: "id" })
 
@@ -448,6 +470,7 @@
       , extended_related_objectives_via_search:  TypeFilter("related_objects_via_search", "Objective")
       , extended_related_controls_via_search:    TypeFilter("related_objects_via_search", "Control")
       , extended_related_sections_via_search:    TypeFilter("related_objects_via_search", "Section")
+      , extended_related_clauses_via_search:     TypeFilter("related_objects_via_search", "Clause")
       , extended_related_data_assets_via_search: TypeFilter("related_objects_via_search", "DataAsset")
       , extended_related_facilities_via_search:  TypeFilter("related_objects_via_search", "Facility")
       , extended_related_markets_via_search:     TypeFilter("related_objects_via_search", "Market")
