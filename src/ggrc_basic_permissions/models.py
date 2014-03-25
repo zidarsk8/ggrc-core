@@ -55,7 +55,7 @@ class Role(Base, Described, db.Model):
 
 from ggrc.models.person import Person
 Person._publish_attrs.extend(['user_roles'])
-Person._include_links = ['user_roles']
+Person._include_links.extend(['user_roles'])
 
 
 class UserRole(Base, db.Model):

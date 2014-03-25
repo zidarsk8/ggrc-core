@@ -47,6 +47,9 @@ class Person(Base, db.Model):
       'company',
       'name',
       ]
+  _include_links = [
+      'object_people',
+      ]
 
   # Methods required by Flask-Login
   def is_authenticated(self):

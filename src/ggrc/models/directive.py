@@ -86,6 +86,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
   _include_links = [
       'program_directives',
       'directive_controls',
+      'directive_sections',
       ]
 
   @validates('kind')
