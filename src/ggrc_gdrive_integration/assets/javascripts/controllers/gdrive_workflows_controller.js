@@ -731,7 +731,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     this.create_folder_if_nonexistent(data);
   }
   , create_folder_if_nonexistent : function(object) {
-    var dfd = new $.Deferred()
+    var dfd = object.get_binding("folders").refresh_instances()
     , that = this
     , parent_prop = {
       "Program" : null
@@ -740,11 +740,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     };
     // maybe we also need to create a parent folder if we don't already have a folder for this object.
     if(parent_prop[object.constructor.shortName] && !object.get_mapping("folders").length) {
-      dfd = this.create_folder_if_nonexistent(object[parent_prop[object.constructor.shortName]].reify());
-    } else if(!object.get_mapping("folders").length) {
-      dfd.resolve();
-    } else {
-      return $.when(object.get_mapping("folders")[0].instance);
+      dfd = $.when(dfd, this.create_folder_if_nonexistent(object[parent_prop[object.constructor.shortName]].reify()));
     }
     return dfd.then(function foldercheck() {
       var folder_dfd;

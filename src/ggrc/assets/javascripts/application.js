@@ -240,7 +240,7 @@ jQuery.extend(GGRC, {
     }
 
     if(GGRC._page_dfds && GGRC._page_dfds.length > 1) {
-      GGRC._page_dfds.dfd.always(go);
+      GGRC._page_dfds.dfd.progress(go);
     } else {
       go();
     }
@@ -255,7 +255,7 @@ jQuery.extend(GGRC, {
       return window.confirm("There are operations in progress.  Are you sure you want to leave the page?");
     }
 
-    if(!GGRC._page_dfds.dfd || GGRC._page_dfds.dfd.state() !== "pending") {
+    if(!GGRC._page_dfds.dfd) {
       GGRC._page_dfds.dfd = new $.Deferred();
     }
 
@@ -265,7 +265,7 @@ jQuery.extend(GGRC, {
       ~idx && GGRC._page_dfds.splice(idx, 1);
       if(GGRC._page_dfds.length < 1) {
         $(window).off("unload", confirmleaving);
-        GGRC._page_dfds.dfd.resolve();
+        GGRC._page_dfds.dfd.notify();
       }
     });
 
