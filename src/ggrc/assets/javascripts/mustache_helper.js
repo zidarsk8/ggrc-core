@@ -2034,7 +2034,7 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("with_auditors", function(instance, decoy, options) {
+Mustache.registerHelper("with_auditors", function(instance, options) {
   var auditors
     , decoy
     ;
