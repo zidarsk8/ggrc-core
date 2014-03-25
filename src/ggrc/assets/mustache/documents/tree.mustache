@@ -7,22 +7,30 @@
 
 
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class='item-main' {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
-        <div class='row-fluid'>
-          <div class='span9'>
-            <div class='item-data'>
-              <div class='tree-title-area'>
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                {{firstnonempty instance.title instance.link}}
-                <span class="option">
-                </span>
-                {{#infer_roles instance}}
-                  <span class="role">
-                    {{.}}
-                  </span>
-                {{/infer_roles}}
+        <div class="row-fluid">
+          <div class="span9">
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span9">
+                  <div class="tree-title-area">
+                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                    {{firstnonempty instance.title instance.link}}
+                    <span class="option">
+                    </span>
+                  </div>
+                </div>
+                <div class="span3">
+                  <div class="tree-title-area">
+                    {{#infer_roles instance}}
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    {{/infer_roles}}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

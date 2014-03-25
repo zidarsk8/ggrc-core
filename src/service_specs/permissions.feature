@@ -71,6 +71,7 @@ Feature: RBAC Permissions enforcement for REST API
       #| Program            |
       #| ProgramDirective   |
       | Section            |
+      | Clause             |
       | SectionObjective   |
       | System             |
 
@@ -145,6 +146,7 @@ Feature: RBAC Permissions enforcement for REST API
       #| Program            |
       #| ProgramDirective   |
       | Section            |
+      | Clause             |
       | SectionObjective   |
       | System             |
 
@@ -229,6 +231,7 @@ Feature: RBAC Permissions enforcement for REST API
       #| Program            |
       #| ProgramDirective   |
       | Section            |
+      | Clause             |
       | SectionObjective   |
       | System             |
 
@@ -315,6 +318,7 @@ Feature: RBAC Permissions enforcement for REST API
       #FIXME programs can have special behavior | Program            |
       #| ProgramDirective   |
       | Section            |
+      | Clause             |
       | SectionObjective   |
       | System             |
 

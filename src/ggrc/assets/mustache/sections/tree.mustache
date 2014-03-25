@@ -13,14 +13,22 @@
         <div class="row-fluid">
           <div class="span6">
             <div class="item-data">
-              <div class="tree-title-area">
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                {{instance.title}}
-                {{#infer_roles instance}}
-                  <span class="role">
-                    {{.}}
-                  </span>
-                {{/infer_roles}}
+              <div class="row-fluid">
+                <div class="span9">
+                  <div class="tree-title-area">
+                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                    {{instance.title}}
+                  </div>
+                </div>
+                <div class="span3">
+                  <div class="tree-title-area">
+                    {{#infer_roles instance}}
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    {{/infer_roles}}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -145,7 +153,7 @@
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
-            <h6>Objectives, Controls, and Business Objects ({{child_count}})</h6>
+            <h6>Objectives, Controls, and Business Objects ({{child_count}})<!-- {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}--></h6>
             {{#child_options}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}

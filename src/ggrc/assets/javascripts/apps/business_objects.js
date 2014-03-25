@@ -116,7 +116,7 @@ $(function() {
               }
           }
         , Contract : {
-            Section : {
+            Clause: {
               widget_name : function() {
                 var $objectArea = $(".object-area");
                 if ( $objectArea.hasClass("dashboard-area") ) {
@@ -280,7 +280,14 @@ $(function() {
             , Contract: {
                 mapping: "contracts"
               , draw_children: true
-              , child_options: [section_child_options]
+              , child_options: [
+                  {
+                    model: CMS.Models.Clause
+                  , mapping: "clauses"
+                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+                  , draw_children: true
+                  }]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
@@ -316,20 +323,29 @@ $(function() {
                 , "controls"
                 , "business_objects"
                 ]
-            , Section : section_child_options
             }
 
         , Regulation: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
         , Standard: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
         , Policy: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
-        , Contract : {
+        , Contract: {
               _mixins: ["directive"]
+            , Clause: {
+                model: CMS.Models.Clause
+              , mapping: "clauses"
+              , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+              , draw_children: true
+              }
             }
 
         , extended_audits: {
@@ -343,6 +359,9 @@ $(function() {
             }
           }
 
+        , Clause: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
         , Objective: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
@@ -393,7 +412,14 @@ $(function() {
             , Contract: {
                 mapping: "extended_related_contracts_via_search"
               , draw_children: true
-              , child_options: [section_child_options]
+              , child_options: [
+                  {
+                    model: CMS.Models.Clause
+                  , mapping: "clauses"
+                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+                  , draw_children: true
+                  }]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
@@ -419,6 +445,13 @@ $(function() {
             , Section : {
                 model : CMS.Models.Section
               , mapping : "extended_related_sections_via_search"
+              , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , draw_children : true
+              }
+            , Clause : {
+                model : CMS.Models.Clause
+              , mapping : "extended_related_clauses_via_search"
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               , draw_children : true
@@ -517,9 +550,6 @@ $(function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
                 if (/dashboard/.test(window.location)) {
-                  if (far_model.title_plural === 'Sections') {
-                    return "My Sections / Clauses";
-                  }
                   return "My " + far_model.title_plural;
                 } else {
                   return far_model.title_plural;

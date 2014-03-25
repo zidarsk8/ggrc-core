@@ -142,7 +142,7 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , response : "CMS.Models.Response.stub"
     , network_zone : "CMS.Models.Option.stub"
     }
@@ -199,7 +199,7 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , network_zone : "CMS.Models.Option.stub"
     , response : "CMS.Models.Response.stub"
     }

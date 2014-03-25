@@ -154,6 +154,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "clause" : CMS.Models.Clause
       , "section_objective" : CMS.Models.SectionObjective
       , "person" : CMS.Models.Person
       , "role" : CMS.Models.Role

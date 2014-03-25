@@ -2035,13 +2035,19 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
-  var auditors;
-  
+  var auditors
+    , decoy
+    ;
+
   instance = resolve_computed(instance);
+  if (options.decoy) {
+    decoy = resolve_computed(options.decoy);
+    decoy.attr('0');
+  }
 
   if(!instance) 
     return "";
-  
+
   auditors = resolve_computed(instance).findAuditors();
   if(auditors.length > 0){
     return options.fn(options.contexts.add({"auditors": auditors}));

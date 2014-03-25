@@ -6,14 +6,22 @@
         <div class="row-fluid">
           <div class="span11">
             <div class="item-data">
-              <div class="tree-title-area">
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                  {{firstnonempty instance.title 'Unnamed meeting'}}
-                {{#infer_roles instance}}
-                  <span class="role">
-                    {{.}}
-                  </span>
-                {{/infer_roles}}
+              <div class="row-fluid">
+                <div class="span9">
+                  <div class="tree-title-area">
+                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                    {{firstnonempty instance.title 'Unnamed meeting'}}
+                  </div>
+                </div>
+                <div class="span3">
+                  <div class="tree-title-area">
+                    {{#infer_roles instance}}
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    {{/infer_roles}}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -14,15 +14,23 @@
       <div class="row-fluid">
         <div class="span10">
           <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-              {{instance.title}}
-              <span class="small gray">{{instance.status}}</span>
-              {{#infer_roles instance}}
-                <span class="role">
-                  {{.}}
-                </span>
-              {{/infer_roles}}
+            <div class="row-fluid">
+              <div class="span9">
+                <div class="tree-title-area">
+                  <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                  {{instance.title}}
+                  <span class="small gray">{{instance.status}}</span>
+                </div>
+              </div>
+              <div class="span3">
+                <div class="tree-title-area">
+                  {{#infer_roles instance}}
+                    <span class="role">
+                      {{.}}
+                    </span>
+                  {{/infer_roles}}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,7 +184,7 @@
                 <strong>Auditor: </strong>
                   {{! `with_auditors` requires `authorizations` mapping, so preload it }}
                   {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance}}
+                  {{#with_auditors instance decoy=authorizations}}
                     {{#using auditor=auditors.0.person}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                     {{/using}}
