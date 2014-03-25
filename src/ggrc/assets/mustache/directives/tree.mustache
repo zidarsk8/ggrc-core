@@ -33,13 +33,15 @@
           <div class="span1">
             <div class="counter">
               <i class="grcicon-section-black"></i>
-                {{#if expanded}}
-                {{#prune_context}}
-                  {{child_count}}        
-                {{/prune_context}}
-                {{else}}
-                  {{instance.sections.length}}
-                {{/if expanded}}
+              {{#if_instance_of instance 'Contract'}}
+              {{#with_mapping_count instance 'clauses'}}
+              {{count}}
+              {{/with_mapping_count}}
+              {{else}}
+              {{#with_mapping_count instance 'sections'}}
+              {{count}}
+              {{/with_mapping_count}}
+              {{/if_instance_of}}
             </div>
           </div>
           <div class="span3">
