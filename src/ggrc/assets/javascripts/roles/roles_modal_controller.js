@@ -172,7 +172,7 @@
         if (form_target == 'refresh') {
           refresh_page();
         } else if (form_target == 'redirect') {
-          window.location.assign(xhr.getResponseHeader('location'));
+          GGRC.navigate(xhr.getResponseHeader('location'));
         } else {
           var dirty;
           $target.modal_form('hide');

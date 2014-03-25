@@ -229,6 +229,50 @@ jQuery.extend(GGRC, {
         GGRC.eventqueueTimeout =
           setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
     }
+
+  , navigate : function(url) {
+    function go() {
+      if(!url) {
+        window.location.reload();
+      } else {
+        window.location.assign(url);
+      }
+    }
+
+    if(GGRC._page_dfds && GGRC._page_dfds.length > 1) {
+      GGRC._page_dfds.dfd.always(go);
+    } else {
+      go();
+    }
+  }
+
+  , delay_leaving_page_until : function(dfd) {
+    var idx;
+    GGRC._page_dfds = GGRC._page_dfds || [];
+    idx = GGRC._page_dfds.indexOf(dfd);
+
+    function confirmleaving() {
+      return window.confirm("There are operations in progress.  Are you sure you want to leave the page?");
+    }
+
+    if(!GGRC._page_dfds.dfd || GGRC._page_dfds.dfd.state() !== "pending") {
+      GGRC._page_dfds.dfd = new $.Deferred();
+    }
+
+    ~idx || GGRC._page_dfds.push(dfd);
+    dfd.always(function() {
+      var idx = GGRC._page_dfds.indexOf(dfd);
+      ~idx && GGRC._page_dfds.splice(idx, 1);
+      if(GGRC._page_dfds.length < 1) {
+        $(window).off("unload", confirmleaving);
+        GGRC._page_dfds.dfd.resolve();
+      }
+    });
+
+    $(window).on("unload", confirmleaving);
+
+    return dfd;
+  }
 });
 })(GGRC);
 

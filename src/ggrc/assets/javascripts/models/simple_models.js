@@ -1103,13 +1103,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
 }, {
   save : function() {
     
-    var that = this, isNew = that.isNew();
-    this.saveDeferreds = {
-        objectives: $.Deferred()
-        , auditFolder: $.Deferred()
-        , linkFolders: $.Deferred()
-        , auditPermissions: $.Deferred()
-    }
+    var that = this;
     // Make sure the context is always set to the parent program
     if(!this.context.id){
       this.context = this.program.reify().context;
@@ -1117,13 +1111,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
     
     return this._super.apply(this, arguments).then(function(instance) {
       return that._save_auditor(instance);
-    }).then(function(instance){
-      if(!isNew){
-        return instance;
-      }
-      return $.when.apply(instance, can.map(that.saveDeferreds, function(d){
-        return d;
-      }));
     });
   }
   , _save_auditor : function(instance){

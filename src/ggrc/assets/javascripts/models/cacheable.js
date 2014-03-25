@@ -838,6 +838,19 @@ can.Model("can.Model.Cacheable", {
     }
     this._pending_joins.push({how : "add", what : obj, through : join_attr });
   }
+
+  , created : function() {
+    var oldbindings = this.constructor.__bindEvents.created;
+    this.constructor.__bindEvents.created = can.map(oldbindings, function(handler) {
+      var fn = handler.handler;
+      return $.extend({}, handler, { handler : function() {
+        console.log(fn.apply(this, arguments));
+      }});
+    });
+    this._super.apply(this, arguments);
+    this.constructor.__bindEvents.created = oldbindings;
+  }
+
   , save : function() {
     if(this.isNew()) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));

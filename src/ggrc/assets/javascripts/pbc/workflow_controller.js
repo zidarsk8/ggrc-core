@@ -17,21 +17,18 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     
     if(instance instanceof CMS.Models.Audit) {
       if(instance.auto_generate) {
-
-        instance.program.reify().refresh()
-        .then(function(program) {
-          return program.get_binding("objectives").refresh_instances();
-        }).then(function(objective_mappings) {
-          return can.reduce(objective_mappings, function(deferred, objective_mapping){
-            return deferred.then(function(){
-              return that.create_request(instance, objective_mapping.instance)
-            });
-          }, $.when());
-        }).then(function(){
-          instance.saveDeferreds.objectives.resolve(instance);
-        });
-      } else {
-        instance.saveDeferreds.objectives.resolve(instance);
+        GGRC.delay_leaving_page_until(
+          instance.program.reify().refresh()
+          .then(function(program) {
+            return program.get_binding("objectives").refresh_instances();
+          }).then(function(objective_mappings) {
+            return can.reduce(objective_mappings, function(deferred, objective_mapping){
+              return deferred.then(function(){
+                return that.create_request(instance, objective_mapping.instance);
+              });
+            }, $.when());
+          })
+        );
       }
     }
   }
