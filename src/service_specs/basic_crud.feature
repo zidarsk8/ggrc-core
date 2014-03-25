@@ -24,6 +24,7 @@ Feature: Basic RESTful CRUD Support
       | DataAsset          |
       #| Directive          |
       | DirectiveControl   |
+      | DirectiveSection   |
       | Contract           |
       | Policy             |
       | Regulation         |
@@ -46,6 +47,7 @@ Feature: Basic RESTful CRUD Support
       | ProgramDirective   |
       #| Relationship       |
       | Section            |
+      | Clause             |
       | SectionObjective   |
       #| SystemOrProcess    |
       | System             |

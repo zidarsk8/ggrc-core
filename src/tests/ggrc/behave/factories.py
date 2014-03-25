@@ -213,6 +213,13 @@ class StandardFactory(ModelFactory):
   kind = FuzzyChoice(MODEL.valid_kinds)
   status = FuzzyChoice(MODEL.VALID_STATES)
 
+class SectionFactory(ModelFactory):
+  MODEL = models.Section
+  directive = FactoryStubMarker(models.Regulation)
+
+class ClauseFactory(ModelFactory):
+  MODEL = models.Clause
+
 class ObjectiveFactory(ModelFactory):
   MODEL = models.Objective
   status = FuzzyChoice(MODEL.VALID_STATES)
@@ -304,6 +311,10 @@ class ControlSectionFactory(ModelFactory):
 
 class DirectiveControlFactory(ModelFactory):
   MODEL = models.DirectiveControl
+  status = FuzzyChoice(MODEL.VALID_STATES)
+
+class DirectiveSectionFactory(ModelFactory):
+  MODEL = models.DirectiveSection
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 class ObjectControlFactory(ModelFactory):
