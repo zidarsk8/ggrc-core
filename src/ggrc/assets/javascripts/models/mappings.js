@@ -120,8 +120,10 @@
           "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
-      , sections: Proxy(
+      , _sections_base: Proxy(
           null, "section", "ControlSection", "control", "control_sections")
+      , sections: TypeFilter("_sections_base", "Section")
+      , clauses: TypeFilter("_sections_base", "Clause")
       , implemented_controls: Proxy(
           "Control", "implemented_control", "ControlControl", "control", "control_controls")
       , implementing_controls: Proxy(
@@ -173,8 +175,10 @@
           "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
       , controls: Proxy(
           "Control", "control", "ObjectiveControl", "objective", "objective_controls")
-      , sections: Proxy(
+      , _sections_base: Proxy(
           null, "section", "SectionObjective", "objective", "section_objectives")
+      , sections: TypeFilter("_sections_base", "Section")
+      , clauses: TypeFilter("_sections_base", "Clause")
       , orphaned_objects: Multi([
           "related_objects"
         , "controls"
