@@ -422,7 +422,7 @@ can.Model.Join("CMS.Models.ControlRisk", {
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"
-  , findAll: "GET /api/object_people?__include=person"
+  , findAll: "GET /api/object_people"
   , create : "POST /api/object_people"
   , update : "PUT /api/object_people/{id}"
   , destroy : "DELETE /api/object_people/{id}"

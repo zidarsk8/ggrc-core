@@ -412,7 +412,14 @@ $(function() {
             , Contract: {
                 mapping: "extended_related_contracts_via_search"
               , draw_children: true
-              , child_options: [section_child_options]
+              , child_options: [
+                  {
+                    model: CMS.Models.Clause
+                  , mapping: "clauses"
+                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+                  , draw_children: true
+                  }]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
