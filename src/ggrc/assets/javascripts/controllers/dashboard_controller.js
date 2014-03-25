@@ -169,8 +169,6 @@ can.Control("CMS.Controllers.Dashboard", {
       can.each(this.get_active_widget_containers().toArray(), function(elem) {
         $(elem).trigger("apply_widget_sort", [widget_ids])
       });
-
-      this.update_inner_nav();
     }
 
   , update_inner_nav: function(el, ev, data) {
@@ -216,6 +214,10 @@ can.Control("CMS.Controllers.Dashboard", {
         , control = new descriptor.controller(
             $element, descriptor.controller_options)
         ;
+
+      // FIXME: This should be elsewhere -- currently required so TreeView can
+      //   initialize ObjectNav with counts
+      control.prepare();
 
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
@@ -372,14 +374,66 @@ can.Control("CMS.Controllers.InnerNav", {
 
       this.sortable();
 
-      can.view(this.options.internav_view, this.options, function(frag) {
-        that.element.append(frag);
-      });
+      can.route.ready(false);
 
       if (!(this.options.contexts instanceof can.Observe))
         this.options.contexts = new can.Observe(this.options.contexts);
 
+      // FIXME: Initialize from `*_widget` hash when hash has no `#!`
+      can.route(":path", {});
+
+      can.route.bind("change", function(ev, attr, how, newVal, oldVal) {
+        if (attr === "path") {
+          if (newVal) {
+            that.display_path(newVal);
+          }
+          else {
+            that.display_path('info_widget');
+          }
+        }
+      });
+
+      can.view(this.options.internav_view, this.options, function(frag) {
+        that.element.append(frag);
+        can.route.ready(true);
+        if (window.location.hash.substr(0,2) === "#!") {
+          can.route.attr('path', window.location.hash.substr(2));
+        }
+        else {
+          can.route.attr('path', window.location.hash.substr(1));
+        }
+      });
+
       this.on();
+    }
+
+  , display_path: function(path) {
+      var step = path.split("/")[0]
+        , rest = path.substr(step.length + 1)
+        ;
+
+      // Find and make active the widget specified by `step`
+      widget = this.find_widget_by_target("#" + step);
+      if (widget) {
+        this.set_active_widget(widget);
+        return this.display_widget_path(rest);
+      }
+      else {
+        return new $.Deferred().resolve();
+      }
+    }
+
+  , display_widget_path: function(path) {
+      var active_widget_selector = this.options.contexts.active_widget.selector
+        , $active_widget = $(active_widget_selector)
+        , widget_controller = $active_widget.control()
+        ;
+      if (widget_controller && widget_controller.display_path) {
+        return widget_controller.display_path(path);
+      }
+      else {
+        return new $.Deferred().resolve();
+      }
     }
 
   , sortable: function() {
@@ -410,32 +464,31 @@ can.Control("CMS.Controllers.InnerNav", {
     else {
       this.options.contexts.attr("active_widget", widget);
     }
+    this.show_active_widget();
   }
 
   , show_active_widget : function(selector) {
-    var widget = $(selector || this.options.contexts.attr('active_widget').selector);
+    var that = this
+      , widget = $(selector || this.options.contexts.attr('active_widget').selector);
     if (widget.length) {
       this.options.dashboard_controller.show_widget_area();
       widget.siblings(':visible').hide().end().show();
-      $('[href=' + (selector || this.options.contexts.attr('active_widget').selector) + ']')
+      $('[href=' + (selector || that.options.contexts.attr('active_widget').selector) + ']')
         .closest('li').addClass('active')
         .siblings().removeClass('active');
     }
   }
 
-  , "{contexts} active_widget" : function(contexts, ev) {
-    this.show_active_widget();
-  }
-
-  , "a click" : function(el, ev) {
-    var that = this;
-    can.each(this.options.widget_list, function(widget) {
-      if(widget.selector === el.attr("href")) {
-        that.options.contexts.attr("active_widget", widget);
-        return false;
+  , find_widget_by_target: function(target) {
+      var i
+        , widget
+        ;
+      for (i=0; i<this.options.widget_list.length; i++) {
+        widget = this.options.widget_list[i];
+        if (widget.selector === target)
+          return widget;
       }
-    });
-  }
+    }
 
   , widget_by_selector : function(selector) {
     return $.map(this.options.widget_list, function(widget) {
@@ -510,17 +563,6 @@ can.Control("CMS.Controllers.InnerNav", {
         widget_list.push(widget);
       });
       this.options.widget_list.replace(widget_list);
-
-      if (widget_list.length) {
-        $(this.options.widget_list[0].selector).siblings().hide();
-        var active_widget = this.options.contexts.attr('active_widget');
-        if (window.location.hash && (!active_widget || active_widget.selector !== window.location.hash) && (active_widget = this.widget_by_selector(window.location.hash))) {
-          this.set_active_widget(active_widget);
-        }
-        else {
-          this.show_active_widget(!this.options.contexts.attr('active_widget') ? this.options.widget_list[0].selector : undefined);
-        }
-      }
     }
 
   , update_widget_count : function($el, count) {

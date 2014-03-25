@@ -954,7 +954,7 @@ jQuery(function($) {
     }
   });  
 
-  $('body').on('click', 'ul.internav li a', function(e) {
+  /*$('body').on('click', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
@@ -962,7 +962,7 @@ jQuery(function($) {
     
     $targetWidget.addClass("widget-active");
     $('.cms_controllers_inner_nav').control('inner_nav').set_active_widget($widgetID);
-  });    
+  });*/
 
   $('body').on('mouseenter', '.widget', function(e) {
     var $this = $(this)
