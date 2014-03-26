@@ -17,7 +17,7 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     
     if(instance instanceof CMS.Models.Audit) {
       if(instance.auto_generate) {
-        GGRC.delay_leaving_page_until(
+        instance.delay_resolving_save_until(
           instance.program.reify().refresh()
           .then(function(program) {
             return program.get_binding("objectives").refresh_instances();

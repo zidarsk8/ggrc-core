@@ -153,7 +153,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     if(instance instanceof CMS.Models.Audit) {
       var that = this;
       this._audit_create_in_progress = true;
-      GGRC.delay_leaving_page_until(
+      instance.delay_resolving_save_until(
          instance.program.reify().refresh()
         .then(this.proxy("create_folder_if_nonexistent"))
         .then($.proxy(instance.program.reify(), "refresh"))
@@ -172,30 +172,32 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   , "{CMS.Models.ObjectFolder} created" : function(model, ev, instance) {
     var i, that = this, folderable, create_deferreds = [];
     if(instance instanceof CMS.Models.ObjectFolder && (folderable = instance.folderable.reify()) instanceof CMS.Models.Audit) {
-      folderable.refresh().then(function() {
-        return folderable.get_binding("folders").refresh_instances().then(function() {
-          for(i = that.request_create_queue.length; i--;) {
-            if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
-              if(that.request_create_queue[i].objective) {
-                create_deferreds.push(that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]));
-              } else {
-                var dfd = new CMS.Models.ObjectFolder({
-                  folder_id : instance.folder_id
-                  , folderable : that.request_create_queue[i]
-                  , context : that.request_create_queue[i].context || { id : null }
-                }).save();
-                create_deferreds.push(dfd);
-                report_progress(
-                  'Linking new Request to Audit folder'
-                  , dfd
-                );
+      instance.delay_resolving_save_until(
+        folderable.refresh().then(function() {
+          return folderable.get_binding("folders").refresh_instances().then(function() {
+            for(i = that.request_create_queue.length; i--;) {
+              if(that.request_create_queue[i].audit.reify() === instance.folderable.reify()) {
+                if(that.request_create_queue[i].objective) {
+                  create_deferreds.push(that.create_request_folder(CMS.Models.Request, ev, that.request_create_queue[i]));
+                } else {
+                  var dfd = new CMS.Models.ObjectFolder({
+                    folder_id : instance.folder_id
+                    , folderable : that.request_create_queue[i]
+                    , context : that.request_create_queue[i].context || { id : null }
+                  }).save();
+                  create_deferreds.push(dfd);
+                  report_progress(
+                    'Linking new Request to Audit folder'
+                    , dfd
+                  );
+                }
+                that.request_create_queue.splice(i, 1);
               }
-              that.request_create_queue.splice(i, 1);
             }
-          }
-          return $.when.apply($, create_deferreds);
-        });
-      });
+            return $.when.apply($, create_deferreds);
+          });
+        })
+      );
     }
   }
 
@@ -212,12 +214,12 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         this.request_create_queue.push(instance);
       } else {
         if(instance.objective) {
-          return GGRC.delay_leaving_page_until(this.create_request_folder(model, ev, instance));
+          return instance.delay_resolving_save_until(this.create_request_folder(model, ev, instance));
         } else {
 
           if(Permission.is_allowed("create", "ObjectFolder", instance.context.id || null)) {
 
-            return GGRC.delay_leaving_page_until(
+            return instance.delay_resolving_save_until(
               report_progress(
                 'Linking new Request to Audit folder'
                 , new CMS.Models.ObjectFolder({
@@ -274,7 +276,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           person = person.email;
           push_person(role, person, true);
         } else {
-          permission_dfds.push(person.refresh().then(function(p) { return p.email; }).then($.proxy(push_person, null, role)));
+          permission_dfds.push(
+            person.refresh()
+            .then(function(p) { return p.email; })
+            .then($.proxy(push_person, null, role))
+          );
         }
       });
     });
@@ -341,9 +347,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                usually not provided).  Check both.
             */
 
-            var email = permission.emailAddress 
-                        ? permission.emailAddress.toLowerCase() 
-                        : that.user_permission_ids[permission.id];
+            var email = permission.emailAddress
+                        ? permission.emailAddress.toLowerCase()
+                        : (permission.name && permission.domain
+                          ? (permission.name + "@" + permission.domain)
+                          : that.user_permission_ids[permission.id]);
             var pending_permission = permissions_to_create[email];
 
             // Case matrix.
@@ -378,7 +386,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
               + ' permission on folder "'
               + binding.instance.title
               + '" for '
-              + that.user_permission_ids[permission.id] || permission.emailAddress|| permission.value || permission.id
+              + (that.user_permission_ids[permission.id]
+                || permission.emailAddress
+                || permission.value
+                || (permission.name && permission.domain && (permission.name + "@" + permission.domain))
+                || permission.id)
               , permission.destroy()
             ).then(null, function() {
               return new $.Deferred().resolve(); //wait on these even if they fail.
@@ -525,7 +537,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
   , "{CMS.Models.Program} updated" : function(model, ev, instance) {
     if(instance instanceof CMS.Models.Program) {
-      GGRC.delay_leaving_page_until(this.update_permissions(model, ev, instance));
+      instance.delay_resolving_save_until(this.update_permissions(model, ev, instance));
     }
   }
   , "{CMS.Models.Audit} updated" : "update_audit_owner_permission"
@@ -535,7 +547,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       return;
     }
     
-    var dfd = GGRC.delay_leaving_page_until(this.update_permissions(model, ev, instance));
+    var dfd = instance.delay_resolving_save_until(this.update_permissions(model, ev, instance));
   }
   , "{CMS.Models.Request} updated" : "update_request_folder"
 
@@ -547,7 +559,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
     instance._folders_mutex = true;
 
-    return GGRC.delay_leaving_page_until( $.when(
+    return instance.delay_resolving_save_until(
+      $.when(
       instance.get_binding("folders").refresh_instances()
       , instance.audit.reify().get_binding("folders").refresh_instances()
     ).then(function(req_folders_mapping, audit_folders_mapping) {
@@ -788,16 +801,16 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return;
 
       can.each(Object.keys(cache), function(key) {
+        var dfd = new $.Deferred();
         if(cache[key].context && cache[key].context.id === instance.context.id) {
           //delay this because the user role isn't updated in the object yet.
+          instance.delay_resolving_save_until(dfd);
           setTimeout(function() {
-            GGRC.delay_leaving_page_until(
-              that.update_permissions(
-                cache[key].constructor
-                , ev
-                , cache[key]
-              )
-            );
+            that.update_permissions(
+              cache[key].constructor
+              , ev
+              , cache[key]
+            ).always($.proxy(dfd, "resolve"));
           }, 10);
         }
       });
