@@ -785,7 +785,14 @@ def export_sections(directive_id):
   options['directive'] = directive
   options['export'] = True
   filename = "{}.csv".format(directive.slug)
-  return handle_converter_csv_export(filename, directive.sections, SectionsConverter, **options)
+  # TODO: Be able to to look up directives directly from section/clause
+  # object rather than do this double lookup
+  # due to new section/clauses convention
+  if directive.type == "Contract":
+    sections = directive.joined_sections
+  else:
+    sections = directive.sections
+  return handle_converter_csv_export(filename, sections, SectionsConverter, **options)
 
 @app.route("/standards/<directive_id>/export_objectives", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_objectives", methods=['GET'])
