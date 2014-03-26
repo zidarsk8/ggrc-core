@@ -69,8 +69,10 @@ class TestGetThread(threading.Thread):
   def run(self):
     self.starttime=datetime.now()
     for cnt in range(self.loop_cnt):
-      print "Running GET Thread: " + self.name + " Iteration#" + str(cnt+1)
-      benchmark_get(self.data, 1, "Concurrency GET Test")
+      #print "Running GET Thread: " + self.name + " Iteration " + str(cnt+1)
+      if not cnt % 100:
+        print "GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt) 
+      benchmark_get(self.data, 1, "Concurrency Test")
     self.endtime=datetime.now()
 
 class TestPutThread(threading.Thread):
@@ -86,13 +88,16 @@ class TestPutThread(threading.Thread):
   def run(self):
     self.starttime=datetime.now()
     for cnt in range(self.loop_cnt):
-      print "Running PUT/GET Thread: " + self.name + " Iteration#" + str(cnt+1)
+      #print "Running PUT/GET Thread: " + self.name + " Iteration " + str(cnt+1)
+      if not cnt % 100:
+        print "PUT/GET Iteration " + str(cnt+1)  + " of " + str(self.loop_cnt) 
       for resource, payload in self.put_data.items():
        json_payload = json.loads(payload)
-       json_payload[mapping_resource[resource]]['notes'] = "Benchmark Regulation UPDATED#" + str(cnt+1)
+       updated_notes = "Benchmark Regulation UPDATED#" + str(cnt+1)
+       json_payload[mapping_resource[resource]]['notes'] = updated_notes
        self.put_data[resource] = json.dumps(json_payload)
       benchmark_update(self.put_data, self.get_data, 1)
-      benchmark_get(self.get_data, 1, "Concurrency GET Test")
+      benchmark_get(self.get_data, 1, "Concurrency GET Test", updated_notes)
     self.endtime=datetime.now()
 
 def invoke_url(op, prefix, host, url, payload, headers, count): 
@@ -129,7 +134,7 @@ prefix="http"
 def benchmark_delete(resource_data, num_iterations):
   payload=None
   for resource, data in resource_data.items():
-    print "Test DELETE for resource: " + resource + " with ids " + str(data['ids'])
+    #print "Test DELETE for resource: " + resource + " with ids " + str(data['ids'])
     testurl = "/api/" + resource 
     ids = data['ids']
     etags= data['etag']
@@ -142,12 +147,10 @@ def benchmark_delete(resource_data, num_iterations):
       response = invoke_url('delete', prefix, targethost, testurl+ "/" + str(id), payload, delete_headers, num_iterations)
       if response.status_code != 200:
         print "DELETE Failed: " + str(response.status_code)
-      else:
-        print "DELETE Successful: " + str(response.status_code)
 
-def benchmark_get(resource_data, num_iterations, name):
+def benchmark_get(resource_data, num_iterations, name, verify_notes=None):
   for resource, data in resource_data.items():
-    print "Test GET for owner: " + name + " resource: " + resource + " with ids " + str(data['ids'])
+    #print "Test GET for owner: " + name + " resource: " + resource + " with ids " + str(data['ids'])
     testurl = "/api/" + resource 
     ids = ""
     idslen= len(data['ids'])
@@ -163,7 +166,8 @@ def benchmark_get(resource_data, num_iterations, name):
     if response.status_code != 200:
       print "GET Failed: " + str(response.status_code)
     else:
-      print "GET Successful: " + str(response.status_code)
+      #print "GET Successful: " + str(response.status_code)
+      #print "Cache Hit/Miss: " + response.headers['X-GGRC-Cache']
       json_response = json.loads(response.text)
       #print "Regulation etag: " + str(response.headers['etag'])
       #print "Regulation last-modified: " + str(response.headers['last-modified'])
@@ -171,7 +175,10 @@ def benchmark_get(resource_data, num_iterations, name):
       #resource_data[resource]['etag']=[]
       responses = json_response[resource + '_collection'][resource] 
       for item in responses:
-        print "Regulation Benchmark Notes: " + item["notes"]
+        if verify_notes is not None:
+          #print "UPDATE Notes: " + verify_notes
+          if item["notes"] != verify_notes:
+            print "[WARN]: UPDATE Notes: " + verify_notes + "GET Notes: " + item["notes"]
         #resource_data[resource]['last-modified'].append(response.headers['last-modified'])
         #resource_data[resource]['etag'].append(response.headers['etag'])
 
@@ -192,7 +199,7 @@ def benchmark_create(resource_data, resource_cnt, num_iterations):
           resource_dict[resource]['ids'].append(value['id'])
           resource_dict[resource]['etag'].append(response.headers['etag'])
           resource_dict[resource]['last-modified'].append(response.headers['last-modified'])
-          print "Test CREATE for resource: " + resource + " with id " + str(value[u'id'])
+          #print "Test CREATE for resource: " + resource + " with id " + str(value[u'id'])
       else:
         print "CREATE Failed: " + str(response.status_code)
         return None
@@ -202,7 +209,7 @@ def benchmark_update(resource_data, resource_dict, num_iterations):
   for resource, payload in resource_data.items():
     testurl = "/api/" + resource 
     ids = resource_dict[resource]['ids']
-    print "Test UPDATE for resource: " + resource + " with ids " + str(ids)
+    #print "Test UPDATE for resource: " + resource + " with ids " + str(ids)
     etags= resource_dict[resource]['etag']
     last_modified_items = resource_dict[resource]['last-modified']
     for cnt in range(len(ids)):
@@ -216,14 +223,13 @@ def benchmark_update(resource_data, resource_dict, num_iterations):
       if response.status_code != 200:
         print "UPDATE Failed: " + str(response.status_code)
       else:
-        print "UPDATE Successful: " + str(response.status_code)
         resource_dict[resource]['etag'][cnt] = response.headers['etag']
         resource_dict[resource]['last-modified'][cnt] = response.headers['last-modified']
         #print response.headers['etag']
         #print response.headers['last-modified']
 
 def run_singlethreaded_tests():
-  print "Running benchmark tests (create, GET, PUT, GET, DELETE) ..."
+  print "Running single threaded benchmark tests (create, GET, PUT, GET, DELETE) ..."
   resource_dict=benchmark_create(create_resources, 1, 1)
   if resource_dict is not None:
     benchmark_get(resource_dict, 1, "Single Threaded GET Test")
@@ -257,4 +263,4 @@ def run_concurrent_tests(loop_cnt):
 
 if __name__ == '__main__':
   run_singlethreaded_tests()
-  run_concurrent_tests(10)
+  run_concurrent_tests(1000)
