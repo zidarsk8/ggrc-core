@@ -159,12 +159,13 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
   for key in context.cache_manager.marked_for_delete:
     build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
   if len(status_entries) > 0:
+    current_app.logger.info("CACHE: status entries: " + str(status_entries))
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
     if ret is not None and len(ret) == 0:
       pass
     else:
      current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
-     raise SQLAlchemyError("Unable to update cache in progress state")
+     #raise SQLAlchemyError("Unable to update cache in progress state")
 
 def update_memcache_after_commit(context, expiry_time):
   """
