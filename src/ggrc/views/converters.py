@@ -774,7 +774,6 @@ def export(export_type):
 @app.route("/standards/<directive_id>/export_sections", methods=['GET'])
 @app.route("/regulations/<directive_id>/export_sections", methods=['GET'])
 @app.route("/policies/<directive_id>/export_sections", methods=['GET'])
-@app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
 def export_sections(directive_id):
   from ggrc.converters.sections import SectionsConverter
   from ggrc.converters.import_helper import handle_converter_csv_export
@@ -785,13 +784,21 @@ def export_sections(directive_id):
   options['directive'] = directive
   options['export'] = True
   filename = "{}.csv".format(directive.slug)
-  # TODO: Be able to to look up directives directly from section/clause
-  # object rather than do this double lookup
-  # due to new section/clauses convention
-  if directive.type == "Contract":
-    sections = directive.joined_sections
-  else:
-    sections = directive.sections
+  sections = directive.sections
+  return handle_converter_csv_export(filename, sections, SectionsConverter, **options)
+
+@app.route("/contracts/<directive_id>/export_clauses", methods=['GET'])
+def export_clauses(directive_id):
+  from ggrc.converters.sections import SectionsConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Directive
+
+  options = {}
+  directive = Directive.query.filter_by(id=int(directive_id)).first()
+  options['directive'] = directive
+  options['export'] = True
+  filename = "{}.csv".format(directive.slug)
+  sections = directive.joined_sections
   return handle_converter_csv_export(filename, sections, SectionsConverter, **options)
 
 @app.route("/standards/<directive_id>/export_objectives", methods=['GET'])
