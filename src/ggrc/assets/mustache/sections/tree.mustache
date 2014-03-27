@@ -80,16 +80,34 @@
         <div class="row-fluid">
 
           <div class="span12">
+            {{#if_helpers '\
+              if_instance_of' instance "Section" '\
+              and if_instance_of' parent_instance "Directive"}}
             {{#is_allowed 'update' instance}}
               <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
                 Edit {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
               </a>
             {{/is_allowed}}
+            {{else}}
+            {{#if allow_mapping}}
+            {{#if mappings}}
+            {{#is_allowed_all 'delete' mappings}}
+            {{^is_dashboard}}
+              <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                <i class="grcicon-remove"></i>
+                Unmap
+              </a>
+            {{/is_dashboard}}
+            {{/is_allowed_all}}
+            {{/if}}
+            {{/if}}
+            {{/if_helpers}}
           </div>
 
         </div>
-        
+
         {{#instance.description}}
           <div class="show-description">
             <div class="row-fluid">
@@ -132,7 +150,7 @@
             </div>
           </div>
         </div>
-        
+
         <span class="tier-2-code">
           Code: {{instance.slug}}
         </span>
