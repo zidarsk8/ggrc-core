@@ -159,17 +159,22 @@ class BaseConverter(object):
     return keys
 
   def trim_list(self, a):
-    while len(a) > 0 and self.isblank(a[-1]):
+    while len(a) > 0 and self.is_blank(a[-1]):
       a.pop()
 
-  def isblank(self, string):
+  def is_blank(self, string):
     return not len(string) or string.isspace()
+
+  def is_blank_row(self, row_attrs):
+    return all(self.is_blank(value) for key, value in row_attrs.iteritems())
 
   def do_import(self, dry_run = True, **options):
     self.import_metadata()
     object_headers = self.read_headers(self.object_map, self.rows.pop(0), required_headers=['title'])
     row_attrs = self.read_objects(object_headers, self.rows)
     for index, row_attrs in enumerate(row_attrs):
+      if self.is_blank_row(row_attrs):
+        continue  # ignore blank lines entirely
       row = self.row_converter(self, row_attrs, index, **options)
       row.setup()
       row.reify()
