@@ -218,7 +218,13 @@ class MysqlIndexer(SqlIndexer):
         self._get_type_query(types, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
-    query = query.order_by('fulltext_record_properties.content')
+    # Sort by title:
+    query = query.order_by(
+      # We make sure properties with title are at the front:
+      "CASE WHEN fulltext_record_properties.property = 'title' THEN 0 ELSE 1 END,"
+      # And then sort by content:
+      "fulltext_record_properties.content"
+    )
     return query
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None):
