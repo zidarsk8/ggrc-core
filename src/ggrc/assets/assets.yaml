@@ -187,6 +187,7 @@ dashboard-js-template-files:
   - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
   - roles/object_list.mustache
+  - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - selectors/active_column.mustache

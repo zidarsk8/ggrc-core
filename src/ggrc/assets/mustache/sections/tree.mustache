@@ -129,6 +129,18 @@
           </div>
         {{/instance.description}}
 
+        {{#using directive=instance.directive}}
+          <div class="row-fluid">
+            <div class="span12">
+              Part of
+              <a href="{{directive.viewLink}}">
+                <i class="grcicon-{{directive.class.table_singular}}-color"></i>
+                {{directive.title}}
+              </a>
+            </div>
+          </div>
+        {{/using}}
+
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
         {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
