@@ -41,6 +41,7 @@ dashboard-js-files:
   - sticky_header.js
   - models/mappers.js
   - models/mappings.js
+  - models/mixins.js
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js

@@ -25,6 +25,7 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
   , create: "POST /api/section_bases"
   , update: "PUT /api/section_bases/{id}"
   , destroy: "DELETE /api/section_bases/{id}"
+  , mixins : ["ownable", "contactable"]
 
   , model: function(params) {
       if (this.shortName !== 'SectionBase')

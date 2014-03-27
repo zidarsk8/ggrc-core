@@ -67,6 +67,7 @@ can.Model.Cacheable("CMS.Models.Response", {
     }
   }
 
+  , mixins : ["contactable"]
 
   , attributes : {
       object_documents : "CMS.Models.ObjectDocument.stubs"

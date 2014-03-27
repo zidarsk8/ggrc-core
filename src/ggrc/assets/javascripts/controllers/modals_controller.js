@@ -424,10 +424,10 @@ can.Control("GGRC.Controllers.Modals", {
       //   `context` to be present even if `null`, unlike other attributes
       if (!instance.context)
         instance.attr('context', { id: null });
-      // FIXME: This should not depend on presence of `<model>.attributes`
-      if (instance.isNew()) {
-        instance.set_owner_to_current_user_if_unset();
-      }
+      // // FIXME: This should not depend on presence of `<model>.attributes`
+      // if (instance.isNew()) {
+      //   instance.set_owner_to_current_user_if_unset();
+      // }
 
       this.disable_hide = true;
       ajd = instance.save().done(function(obj) {

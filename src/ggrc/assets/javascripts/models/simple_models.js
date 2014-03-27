@@ -18,6 +18,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
+  , mixins : ["contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -63,12 +64,15 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {
-  set_owner_to_current_user_if_unset : function() {
+  before_save : function() {
     // Do not add an owner to a private program. Ownership is managed
     // through role assignment for private programs.
-    if (!this.private)
-    {
-      this._super();
+    if (this.private) {
+      this.removeAttr("owners");
+    } else {
+      if(!this.owners || this.owners.length === 0) {
+        this.attr('owners', [{ id: GGRC.current_user.id }]);
+      }
     }
   }
 });
@@ -85,6 +89,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
+  , mixins : ["ownable", "contactable"]
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -325,6 +330,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -406,6 +412,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -471,6 +478,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -552,6 +560,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -633,6 +642,7 @@ can.Model.Cacheable("CMS.Models.Product", {
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
   , root_collection : "options"
+  , mixins : ["ownable"]
   , cache_by_role: {}
   , for_role: function(role) {
       var self = this;
@@ -656,6 +666,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -737,6 +748,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -917,6 +929,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
+  , mixins : ["ownable", "contactable"]
   , links_to : {
       "Section" : "SectionObjective"
   }
@@ -971,6 +984,7 @@ can.Model.Cacheable("CMS.Models.Help", {
   , update : "PUT /api/help/{id}"
   , destroy : "DELETE /api/help/{id}"
   , create : "POST /api/help"
+  , mixins : ["ownable"]
 }, {});
 
 can.Model.Cacheable("CMS.Models.Event", {
@@ -1028,6 +1042,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
+  , mixins : ["contactable"]
   , attributes : {
     program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
@@ -1156,10 +1171,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
         return {
           person: binding.instance.person.reify()
           , binding: binding.instance
-        }
+        };
       }
     });
-  } 
+  }
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
@@ -1168,6 +1183,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
+  , mixins : ["assignable"]
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
