@@ -201,7 +201,7 @@ def import_objectives(directive_id):
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
 @app.route("/programs/<program_id>/import_objectives", methods=['GET', 'POST'])
-def import_controls_to_program(program_id):
+def import_objectives_to_program(program_id):
   from ggrc.models import Program
   from werkzeug import secure_filename
 
