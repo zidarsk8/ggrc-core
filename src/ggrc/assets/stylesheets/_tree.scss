@@ -1000,6 +1000,15 @@ ul.new-tree {
         margin: 6px 0 0 0;
         display: inline-block;
       }
+      .evidence {
+        padding-top: 0;
+        .row-fluid {
+          margin-bottom: 0 !important;
+        }
+      }
+      input {
+        margin-bottom: 0;
+      }
       .span2 {
         margin-left: 0;
       }
