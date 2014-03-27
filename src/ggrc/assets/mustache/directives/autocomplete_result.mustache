@@ -1,0 +1,35 @@
+{{#items}}
+<li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
+  <a href="javascript://">
+    <i class="grcicon-{{class.table_singular}}-color"></i>
+    {{title}}
+  </a>
+  <!--<div class="extended-content">
+    <div class="row-fluid">
+      <div class="span12">
+        {{title}}
+      </div>
+    </div>
+  </div>-->
+</li>
+{{/items}}
+{{^items}}
+  {{#is_allowed "create" "Directive" context=null}}
+  <li data-ui-autocomplete-item="">
+    No results
+  </li>
+  {{else}}
+  <li class="ui-menu-item" data-ui-autocomplete-item="">
+    No results
+  </li>
+  {{/is_allowed}}
+{{/items}}
+<!--
+{{#is_allowed "create" "Directive" context=null}}
+<li class="ui-menu-item add-new" data-ui-autocomplete-item="">
+  <a data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Directive" data-toggle="modal-ajax-form" data-modal-reset="reset">
+    + Create New
+  </a>
+</li>
+{{/is_allowed}}
+-->
