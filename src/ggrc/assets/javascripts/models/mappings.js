@@ -104,7 +104,7 @@
           ])
       , related_and_able_objects: Multi([
           "objectives", "implemented_controls", "related_business_objects",
-          "people", "joined_directives", "programs"
+          "people", "joined_directives", "programs", "sections", "clauses"
           ])
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
@@ -155,7 +155,9 @@
         _mixins: ["personable"] //objectiveable
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
-      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people"])
+      , related_and_able_objects : Multi([
+          "controls", "objectives", "related_objects", "people",
+          "sections", "clauses"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -191,7 +193,8 @@
         _mixins: ["personable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
-      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people"])
+      , related_and_able_objects : Multi([
+          "objectives", "controls", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
