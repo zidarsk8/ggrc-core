@@ -824,6 +824,26 @@ def export_objectives(directive_id):
     objectives = directive.objectives
   return handle_converter_csv_export(filename, objectives, ObjectivesConverter, **options)
 
+@app.route("/programs/<program_id>/export_objectives", methods=['GET'])
+def export_objectives_from_program(program_id):
+  from ggrc.converters.objectives import ObjectivesConverter
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc.models.all_models import Program, Objective
+
+  program = Program.query.filter_by(id=int(program_id)).first()
+  options = {
+      'export': True,
+      'parent_type': Program,
+      'parent_id': program_id,
+  }
+  filename = "{}-objectives.csv".format(program.slug)
+  if 'ids' in request.args:
+    ids = request.args['ids'].split(",")
+    objectives = Objective.query.filter(Objective.id.in_(ids))
+  else:
+    objectives = program.objectives
+  return handle_converter_csv_export(filename, objectives, ObjectivesConverter, **options)
+
 @app.route("/standards/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/regulations/<directive_id>/import_sections_template", methods=['GET'])
 @app.route("/policies/<directive_id>/import_sections_template", methods=['GET'])
