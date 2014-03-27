@@ -993,10 +993,14 @@ jQuery(function($){
               //  , __permission_model: 'Object' + $that.data("lookup")
               })
           .then(function(search_result) {
-            var objects = search_result.getResultsForType(searchtypes.join(","))
+            var objects = []
               , queue = new RefreshQueue()
               ;
 
+            can.each(searchtypes, function(searchtype) {
+              objects.push.apply(
+                objects, search_result.getResultsForType(searchtype));
+            });
             // Retrieve full people data
             can.each(objects, function(object) {
               queue.enqueue(object);
@@ -1023,12 +1027,23 @@ jQuery(function($){
     acs.each(function(i, ac) {
       ac._renderMenu = function(ul, items) {
         var model_class = ac.element.data("lookup")
-          , model = CMS.Models[model_class] || GGRC.Models[model_class]
+          , template = ac.element.data("template")
+          , model
           ;
-        can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', {model_class: model_class, items: items}, function(frag) {
-          $(ul).html(frag);
-          can.view.hookup(ul);
-        });
+
+        if (!template) {
+          model = CMS.Models[model_class] || GGRC.Models[model_class];
+          template =
+              '/' + model.table_plural + '/autocomplete_result.mustache';
+        }
+
+        can.view.render(
+          GGRC.mustache_path + template,
+          {model_class: model_class, items: items},
+          function(frag) {
+            $(ul).html(frag);
+            can.view.hookup(ul);
+          });
       };
     });
   }

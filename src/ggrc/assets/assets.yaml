@@ -136,6 +136,7 @@ dashboard-js-template-files:
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
+  - directives/autocomplete_result.mustache
   - directives/tree.mustache
   - events/object_list.mustache
   - facilities/modal_content.mustache
