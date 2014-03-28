@@ -808,7 +808,7 @@ can.Model("can.Model.Cacheable", {
   , autocomplete_label : function() {
     return this.title;
   }
-  , set_owner_to_current_user_if_unset : function() { }
+
   /**
    Set up a deferred join object deletion when this object is updated.
   */

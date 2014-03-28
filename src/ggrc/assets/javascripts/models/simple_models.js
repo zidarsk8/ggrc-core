@@ -64,17 +64,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {
-  before_save : function() {
-    // Do not add an owner to a private program. Ownership is managed
-    // through role assignment for private programs.
-    if (this.private) {
-      this.removeAttr("owners");
-    } else {
-      if(!this.owners || this.owners.length === 0) {
-        this.attr('owners', [{ id: GGRC.current_user.id }]);
-      }
-    }
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Cycle", {
@@ -642,7 +631,6 @@ can.Model.Cacheable("CMS.Models.Product", {
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
   , root_collection : "options"
-  , mixins : ["ownable"]
   , cache_by_role: {}
   , for_role: function(role) {
       var self = this;
@@ -984,7 +972,6 @@ can.Model.Cacheable("CMS.Models.Help", {
   , update : "PUT /api/help/{id}"
   , destroy : "DELETE /api/help/{id}"
   , create : "POST /api/help"
-  , mixins : ["ownable"]
 }, {});
 
 can.Model.Cacheable("CMS.Models.Event", {
