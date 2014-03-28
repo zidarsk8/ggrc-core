@@ -639,14 +639,17 @@ def import_sections(directive_id):
 
     if 'cancel' in request.form:
       return import_redirect(return_to)
-    dry_run = not ('confirm' in request.form)
     csv_file = request.files['file']
+    dry_run = not ('confirm' in request.form)
+    options = {
+        "dry_run": dry_run,
+        "directive_id": directive_id,
+        "import_kind": import_kind[:-1],  # strip off plural
+    }
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SectionsConverter, csv_file,
-          directive_id=directive_id, dry_run=dry_run)
-
+        converter = handle_csv_import(SectionsConverter, csv_file, **options)
         if dry_run:
           return render_template("directives/import_sections_result.haml",
               directive_id=directive_id, converter=converter,
