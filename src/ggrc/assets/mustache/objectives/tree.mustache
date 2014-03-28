@@ -11,36 +11,39 @@
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span8">
-            <div class="item-data">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="tree-title-area">
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                    {{instance.title}}
+          <div class="span12">
+            
+            <ul class="tree-action-list">
+              {{^instance.contact}}
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-people-warning"></i>
                   </div>
-                </div>
-                <div class="span3">
-                  <div class="tree-title-area">
-                    {{#infer_roles instance}}
+                </li>
+              {{/instance.contact}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
                       <span class="role">
                         {{.}}
                       </span>
-                    {{/infer_roles}}
+                    </div>
                   </div>
-                </div>
+                </li>
+              {{/infer_roles}}
+            </ul>
+            
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{instance.title}}
               </div>
             </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
-              {{^instance.contact}}
-                <i class="grcicon-people-warning"></i>
-              {{/instance.contact}}
-            </div>
-          </div>
-          <div class="span3">
-            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+            
           </div>
         </div>
       </div>

@@ -116,6 +116,7 @@ ul.new-tree {
     .item-data {
       padding-left: 5px;
       @include clearfix();
+      overflow: visible;
       .type {
         float: left;
         width: 23%;
@@ -508,6 +509,31 @@ ul.new-tree {
       float: right;
       max-width: 3.5em;
       margin-left: 0.5em;
+    }
+    .tree-action-right {
+      float: right;
+    }
+    .tree-action-list {
+      @include reset-list();
+      @include clearfix();
+      float: right;
+      margin-right: 20px;
+      li {
+        float: left;
+        margin-left: 15px;
+        line-height: 31px;
+        .item-data {
+          padding-left: 0;
+          float: none;
+          clear: both;
+          overflow: visible;
+        }
+        .info-action {
+          &.relevant-action {
+            padding-right: 0;
+          }
+        }
+      }
     }
   }
   &.colored-list {
@@ -1019,6 +1045,8 @@ ul.new-tree {
 .item-data {
   padding-left:20px;
   color:#222;
+  overflow: hidden;
+  zoom: 1;
   .tree-title-area {
     @include oneline();
     .event-action {
