@@ -5,7 +5,7 @@
 
 from .base import *
 
-from ggrc.models import Directive, Section
+from ggrc.models import Directive, DirectiveSection, Section
 from .base_row import *
 from collections import OrderedDict
 
@@ -34,9 +34,17 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_raw_attr('title', is_required=True)
 
   def save_object(self, db_session, **options):
-    if options.get('directive_id'):
-      self.obj.directive_id = int(options.get('directive_id'))
-      db_session.add(self.obj)
+    directive_id = options.get('directive_id')
+    if directive_id:
+      # connect via DirectiveSection if clause, but directily if section
+      import_kind = options.get('import_kind')
+      if import_kind == 'Clause':
+        db_session.add(self.obj)
+        ds = DirectiveSection(directive_id=directive_id, section=self.obj)
+        db_session.add(ds)
+      elif import_kind == 'Section':
+        self.obj.directive_id = int(directive_id)
+        db_session.add(self.obj)
 
 
 class SectionsConverter(BaseConverter):
