@@ -11,71 +11,76 @@
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span6">
-            <div class="item-data">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="tree-title-area">
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                    {{instance.title}}
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="tree-title-area">
-                    {{#infer_roles instance}}
+          <div class="span12">
+            
+            <ul class="tree-action-list">
+              {{#with_mapping_count instance 'related_objects'}}
+                {{#prune_context}}
+                  <li>
+                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                      <i class="grcicon-object-black"></i>
+                        {{#if count}}
+                          <span>{{count}}</span>
+                        {{else}}
+                          <strong class="error">0</strong>
+                        {{/if}}
+                    </div>
+                  </li>
+                {{/prune_context}}
+              {{/with_mapping_count}}
+              
+              {{#pack list=instance.objectives}}
+                {{#prune_context}}
+                  <li>
+                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
+                      <i class="grcicon-objective-black"></i>
+                        {{#if list.length}} 
+                          <span>{{list.length}}</span>
+                        {{else}}
+                          <strong class="error">0</strong>
+                        {{/if}}
+                    </div>
+                  </li>
+                {{/prune_context}}
+              {{/pack}}
+              
+              {{#pack list=instance.controls}}
+                {{#prune_context}}
+                  <li>
+                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
+                      <i class="grcicon-control-black"></i>
+                      {{#if list.length}} 
+                        <span>{{list.length}}</span>
+                      {{else}}
+                        <strong class="error">0</strong>
+                      {{/if}}
+                    </div>
+                  </li>
+                {{/prune_context}}
+              {{/pack}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
                       <span class="role">
                         {{.}}
                       </span>
-                    {{/infer_roles}}
+                    </div>
                   </div>
-                </div>
+                </li>
+              {{/infer_roles}}
+            </ul>
+            
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{instance.title}}
               </div>
             </div>
-          </div>
-          {{#pack list=instance.controls}}
-            {{#prune_context}}
-              <div class="span1 section-item-count">
-                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
-                  <i class="grcicon-control-black"></i>
-                    {{#if list.length}} 
-                      <span>{{list.length}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                </div>
-              </div>
-            {{/prune_context}}
-          {{/pack}}
-          {{#pack list=instance.objectives}}
-            {{#prune_context}}
-              <div class="span1 section-item-count">
-                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
-                  <i class="grcicon-objective-black"></i>
-                    {{#if list.length}} 
-                      <span>{{list.length}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                </div>
-              </div>
-            {{/prune_context}}
-          {{/pack}}
-          {{#with_mapping_count instance 'related_objects'}}
-            {{#prune_context}}
-              <div class="span1 section-item-count">
-                <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                  <i class="grcicon-object-black"></i>
-                    {{#if count}}
-                      <span>{{count}}</span>
-                    {{else}}
-                      <strong class="error">0</strong>
-                    {{/if}}
-                </div>
-              </div>
-            {{/prune_context}}
-          {{/with_mapping_count}}
-          <div class="span3">
-            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+            
           </div>
         </div>
       </div>
