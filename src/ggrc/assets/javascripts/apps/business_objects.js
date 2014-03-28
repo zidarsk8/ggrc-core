@@ -21,6 +21,7 @@ $(function() {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
     , 'policies': GGRC.mustache_path + "/policies/info.mustache"
+    , 'sections': GGRC.mustache_path + "/sections/info.mustache"
     , 'objectives': GGRC.mustache_path + "/objectives/info.mustache"
     , 'controls': GGRC.mustache_path + "/controls/info.mustache"
     , 'systems': GGRC.mustache_path + "/systems/info.mustache"
