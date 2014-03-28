@@ -303,16 +303,6 @@ can.Model("can.Model.Cacheable", {
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
     });
-    // $(function() {
-    //   if (GGRC.current_user) {
-    //     that.defaults.contact = typeof that.defaults.contact !== "undefined"
-    //                             ? that.defaults.contact
-    //                             : CMS.Models.Person.model(GGRC.current_user).stub();
-    //     that.defaults.owners = typeof that.defaults.owners !== "undefined"
-    //                            ? that.defaults.owners
-    //                            : [CMS.Models.Person.model(GGRC.current_user).stub()];
-    //   }
-    // });
   }
 
   , resolve_deferred_bindings : function(obj) {
