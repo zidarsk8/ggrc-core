@@ -224,7 +224,9 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
-    return dfd;
+    return dfd.done(function() {
+      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
+    });
   }
 
   , fetch_all : function() {

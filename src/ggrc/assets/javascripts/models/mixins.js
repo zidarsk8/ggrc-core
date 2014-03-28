@@ -82,6 +82,13 @@ can.Model.Mixin("ownable", {
       this.attr('owners', [{ id: GGRC.current_user.id }]);
     }
   }
+  , form_preload : function(new_object_form) {
+    if(new_object_form) {
+      if(!this.owners || this.owners.length === 0) {
+        this.attr('owners', [{ id: GGRC.current_user.id }]);
+      }
+    }
+  }
 });
 
 can.Model.Mixin("contactable" ,{
@@ -90,15 +97,13 @@ can.Model.Mixin("contactable" ,{
       this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
     }
   }
-});
-
-can.Model.Mixin("assignable", {
-  before_create : function() {
-    if(!this.assignee) {
-      this.attr('assignee', { id: GGRC.current_user.id, type : "Person" });
+  , form_preload : function(new_object_form) {
+    if(new_object_form) {
+      if(!this.contact) {
+        this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
+      }
     }
   }
 });
-
 
 })(this.can);

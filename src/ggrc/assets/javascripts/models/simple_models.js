@@ -1183,7 +1183,6 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
-  , mixins : ["assignable"]
   , attributes : {
     audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
@@ -1238,6 +1237,29 @@ can.Model.Cacheable("CMS.Models.Request", {
           .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
         + "Response";
     }, this));
+  }
+
+  , before_create : function() {
+    var audit, that = this;
+    if(!this.assignee) {
+      audit = this.audit.reify();
+      (audit.selfLink ? $.when(audit) : audit.refresh())
+      .then(function(audit) {
+        that.attr('assignee', audit.contact);
+      });
+    }
+  }
+  , form_preload : function(new_object_form) {
+    var audit, that = this;
+    if(new_object_form) {
+      if(!this.assignee && this.audit) {
+        audit = this.audit.reify();
+        (audit.selfLink ? $.when(audit) : audit.refresh())
+        .then(function(audit) {
+          that.attr('assignee', audit.contact);
+        });
+      }
+    }
   }
 });
 
