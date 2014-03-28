@@ -123,7 +123,7 @@ can.Control("GGRC.Controllers.Modals", {
           if(el.val() === ""){
             // Setting el.val is needed for Auditor field to work
             var obj = that.options.instance.attr(path);
-            if(obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
+            if(obj && obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
               el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
             }
             instance._transient || instance.attr("_transient", new can.Observe({}));
