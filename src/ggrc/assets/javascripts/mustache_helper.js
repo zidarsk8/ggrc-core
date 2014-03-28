@@ -2040,9 +2040,9 @@ Mustache.registerHelper("with_auditors", function(instance, options) {
     ;
 
   instance = resolve_computed(instance);
-  if (options.decoy) {
-    decoy = resolve_computed(options.decoy);
-    decoy.attr('0');
+  if (options.hash && options.hash.decoy) {
+    decoy = resolve_computed(options.hash.decoy);
+    decoy.attr();
   }
 
   if(!instance) 
