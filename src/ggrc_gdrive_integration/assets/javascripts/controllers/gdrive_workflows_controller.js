@@ -301,7 +301,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           , ProgramReader : "reader"
         };
 
-        push_person(rolesmap[role.name], person.email, true);
+        if(rolesmap[role.name]) {
+          //Authorizations like "Auditor" do not get Program permissions. 
+          //  Only the ones in the map above get permissions
+          push_person(rolesmap[role.name], person.email, true);
+        }
       });
     }
 
