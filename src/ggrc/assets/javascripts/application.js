@@ -583,6 +583,7 @@ jQuery(document).ready(function($) {
     }
   });
 
+  /*
   // Remove widgets
   $('body').on('click', '.widget .header .remove', function(e) {
     e.preventDefault();
@@ -598,7 +599,7 @@ jQuery(document).ready(function($) {
       e.preventDefault();
 
       showhide(".widget", ".content, .filter").call(this);
-  });
+  });*/
 
   function showhide(upsel, downsel) {
     return function(command) {

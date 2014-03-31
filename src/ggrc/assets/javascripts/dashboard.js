@@ -5,29 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-/*
- *= require application
- *= require jquery
- *= require jquery-migrate
- *= require fastfix
- *= require jquery-ui
- *= require bootstrap
- *= require related_selector
- *= require single_selector
- *= require spin.min
- *= require tmpl
- *= require can.jquery-all
- *= require mustache_helper
- *= require_tree ./models
- *= require_tree ./controllers
- *= require_tree ./apps
- *= require sections/notes_controller.js
- *= require_self
- *= require jquery.remotipart-patched
- *= require d3.v2
- *= require related
- *= require related_graph
- */
 
 // Initialize delegated event handlers
 jQuery(function($) {
@@ -53,14 +30,15 @@ jQuery(function($) {
   };
 
   // Display spinners included in initial page load
-  $('.spinner').each(function() {
+  /*$('.spinner').each(function() {
     var spinner = new Spinner({ }).spin();
     $(this).html(spinner.el);
     // Scroll up so spinner doesn't get pushed out of visibility
     $(this).scrollTop(0);
     $(spinner.el).css({ width: '100px', height: '100px', left: '50px', top: '50px', zIndex : calculate_spinner_z_index});
-  });
+  });*/
 
+  /*
   // Before submitting, remove any disabled form elements
   $('body').on('submit', 'form[data-remote]', function(e, xhr, req) {
     $(this)
@@ -68,7 +46,7 @@ jQuery(function($) {
       .each(function(i, el) {
         $(el).attr('name', '');
       });
-  });
+  });*/
 
   // On-demand creation of datepicker() objects
   $('body').on('focus', '[data-toggle="datepicker"]', function(e) {
@@ -108,12 +86,14 @@ jQuery(function($) {
     }, 100);
   });
 
+  /*
   // When clicking a slot-link, don't toggle collapse
   // FIXME: We should avoid hacks like this
   $('body').on('click', '.slot > a', function(e) {
     e.stopPropagation();
-  });
+  });*/
 
+  /*
   // expandAll and shrinkAll buttons
   $('body').on('click', 'a.expandAll', function(e) {
     var $tabs = $(this).closest('.tabbable');
@@ -138,8 +118,9 @@ jQuery(function($) {
       //$section.find('.tree-structure .oneline').oneline("hide");
     }
     e.preventDefault();
-  });
+  });*/
 
+  /*
   // Tabs via AJAX on 'Quick Find'
   $('body').on('show', '.tabbable ul.nav-tabs > li > a', function(e, href) {
 
@@ -151,7 +132,7 @@ jQuery(function($) {
       //   $(this).html($data).trigger("loaded", xhr, data);
       // });
 
-  });
+  });*/
 
   // // Clear the .widgetsearch box when tab is changed
   // $('body').on('show', '.tabbable ul.nav-tabs > li > a', function(e) {
@@ -184,6 +165,7 @@ jQuery(function($) {
     $(e.target).find(".modal-body .source").each(spin);
   });
 
+  /*
   function with_params(href, params) {
     if (href.charAt(href.length - 1) === '?')
       return href + params;
@@ -233,7 +215,7 @@ jQuery(function($) {
         , href = with_params($child.data('href'), $.param({ s: $this.val() }));
       $box.load(href, function() { clear_selection($this[0], true); });
     }
-  });
+  });*/
 
   $('body').on('click', '[data-toggle="list-remove"]', function(e) {
     e.preventDefault();
@@ -254,6 +236,7 @@ jQuery(function($) {
     }
   });
 
+  /*
   $('body').on('click', '[data-toggle="dropdown-select-list"] > li > a', function(e) {
     var $this = $(this)
       , value = $(this).data('value')
@@ -262,15 +245,17 @@ jQuery(function($) {
     $this.closest('ul').siblings('a').text(value[0].toUpperCase() + value.substr(1));
     $this.trigger('change');
     e.preventDefault();
-  });
+  });*/
 
+  /*
   $('body').on('click', '[data-toggle="collapse-additional"]', function(e) {
     if (!e.isDefaultPrevented()) {
       $(this).siblings('.additional').slideToggle();
     }
-  });
+  });*/
 });
 
+/*
 jQuery(function($) {
   // Onload trigger tab with 'active' class or default to first tab
   $('.tabbable > ul').each(function(i, el) {
@@ -292,7 +277,7 @@ jQuery(function($) {
     })
   });
   //$('.tabbable > ul > li:first-child > a').tab('show');
-});
+});*/
 
 // This is only used by import to redirect on successful import
 // - this cannot use other response headers because it is proxied through
@@ -394,7 +379,7 @@ jQuery(function($) {
 
   $('body').on('ajax:complete', '[data-ajax-complete="refresh"]', refresh_page);
 });
-
+/*
 jQuery(function($) {
   $('body').on('change', 'form.import input#upload', function(e) {
     var $this = $(this)
@@ -406,7 +391,7 @@ jQuery(function($) {
       $this.data('last-value', value);
     }
   });
-});
+});*/
 
 jQuery(function($) {
   $('body').on('ajax:success', 'form[data-remote][data-update-target]', function(e, data, status, xhr) {
@@ -425,7 +410,7 @@ jQuery(function($) {
     $modal.find('.modal-body #helpedit').collapse('hide');
   });
 });
-
+/*
 jQuery(function($) {
   $('body').on('change', 'select[name="category[scope_id]"]', function(e) {
     var $this = $(this)
@@ -440,8 +425,8 @@ jQuery(function($) {
       });
     });
   });
-});
-
+});*/
+/*
 // Filters on PBC List
 jQuery(function($) {
   $('body').on('change', '[data-toggle="filter-requests"]', function(e) {
@@ -510,8 +495,8 @@ jQuery(function($) {
       }
     });
   });
-});
-
+});*/
+/*
 jQuery(function($) {
   $("body").on("change", ".pbc-requests .main-item", function(ev) {
     if($(ev.target).parents().is(".status")) {
@@ -600,7 +585,7 @@ jQuery(function($) {
       $elem.change();
     });
   });
-});
+});*/
 
 jQuery(function($) {
   // Used in object_list sidebars (References, People, Categories)
@@ -623,7 +608,7 @@ jQuery(function($) {
     }
   });
 });
-
+/*
 // Sorting on PBC List
 jQuery(function($) {
   var sort_elements, compare_values
@@ -715,7 +700,7 @@ jQuery(function($) {
 
 
 
-});
+});*/
 
 //make buttons non-clickable when saving
 jQuery(function($) {
@@ -739,7 +724,7 @@ jQuery(function($) {
     }
   });
 });
-
+/*
 jQuery(function($) {
   $('body').on('change', '.modal select[name="system[is_biz_process]"]', function(e) {
     var $this = $(this)
@@ -753,7 +738,7 @@ jQuery(function($) {
       $header_elem.text($header_elem.text().replace(/system/i, 'process'));
     }
   });
-});
+});*/
 
 jQuery(function($) {
 
