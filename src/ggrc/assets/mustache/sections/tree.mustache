@@ -14,6 +14,20 @@
           <div class="span12">
             
             <ul class="tree-action-list">
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              {{/infer_roles}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
               {{#with_mapping_count instance 'related_objects'}}
                 {{#prune_context}}
                   <li>
@@ -58,20 +72,6 @@
                   </li>
                 {{/prune_context}}
               {{/pack}}
-              <li>
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
-              </li>
-              {{#infer_roles instance}}
-                <li>
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      <span class="role">
-                        {{.}}
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              {{/infer_roles}}
             </ul>
             
             <div class="item-data">

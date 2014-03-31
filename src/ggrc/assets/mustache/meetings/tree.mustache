@@ -7,13 +7,6 @@
           <div class="span12">
             
             <ul class="tree-action-list">
-              {{^instance.people}}
-                <li>
-                  <div class="counter">
-                    <i class="grcicon-people-warning"></i>
-                  </div>
-                </li>
-              {{/instance.people}}
               {{#infer_roles instance}}
                 <li>
                   <div class="item-data">
@@ -25,6 +18,13 @@
                   </div>
                 </li>
               {{/infer_roles}}
+              {{^instance.people}}
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-people-warning"></i>
+                  </div>
+                </li>
+              {{/instance.people}}
             </ul>
             
             <div class="item-data">
