@@ -289,14 +289,14 @@
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
             {{#child_options.1}}
-              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
             {{#child_options.2}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
           </div>
         {{else}}
@@ -310,21 +310,21 @@
                 {{/child_options.0.header_view}}
               </h6>
               {{#child_options.0}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.0}}
             </div>
           {{else}}
             <div class="inner-tree">
               <h6>PBC Requests which contain object ({{child_options.3.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
               {{#child_options.3}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.3}}
             </div>
 
             <div class="inner-tree">
               <h6>PBC Responses which contain object ({{child_options.4.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
               {{#child_options.4}}
-                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.4}}
             </div>
           {{/if_instance_of}}

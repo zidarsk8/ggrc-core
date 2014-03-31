@@ -102,7 +102,15 @@ can.Control("CMS.Controllers.TreeView", {
     can.each(this.options.child_options, function(options, i) {
       that.options.child_options.attr(i, new can.Observe(can.extend(options.attr(), allowed)));
     });
+
+    this._attached_deferred = new $.Deferred();
+    if (this.element && this.element.closest('body').length)
+      this._attached_deferred.resolve();
   }
+
+  , " inserted": function() {
+      this._attached_deferred.resolve();
+    }
 
   , prepare: function() {
       var that = this;
@@ -111,16 +119,16 @@ can.Control("CMS.Controllers.TreeView", {
         return this._prepare_deferred;
 
       this._prepare_deferred = new $.Deferred();
-      // In some cases, this controller is immediately replaced
-      //setTimeout(function() {
+      this._prepare_deferred.resolve();
+
+      this._attached_deferred.then(function() {
         if (that.element) {
           that.element.trigger("updateCount", 0)
           if (that.options.allow_reading) {
             that.init_count();
           }
-          that._prepare_deferred.resolve();
         }
-      //}, 100);
+      });
 
       return this._prepare_deferred;
     }
@@ -264,7 +272,9 @@ can.Control("CMS.Controllers.TreeView", {
         return this._display_deferred;
       }
 
-      this._display_deferred = this.prepare().then(function() {
+      this._display_deferred = $.when(this._attached_deferred, this.prepare());
+
+      this._display_deferred.then(function() {
         return $.when(that.fetch_list(), that.init_view())
           .then(that.proxy("draw_list"));
       });

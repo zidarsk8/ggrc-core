@@ -123,7 +123,7 @@
             {{#child_options}}
               <div class="inner-tree">
                 <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})</h6>
-                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               </div>
             {{/child_options}}
         {{/prune_context}}
