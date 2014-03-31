@@ -418,7 +418,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if self.request.headers['Content-Type'] != 'application/json':
+    if self.request.mimetype != 'application/json':
       return current_app.make_response((
         'Content-Type must be application/json', 415,[]))
     header_error = self.validate_headers_for_put_or_delete(obj)
@@ -535,7 +535,7 @@ class Resource(ModelView):
     pass
 
   def collection_post(self):
-    if self.request.headers['Content-Type'] != 'application/json':
+    if self.request.mimetype != 'application/json':
       return current_app.make_response((
         'Content-Type must be application/json', 415,[]))
     obj = self.model()
