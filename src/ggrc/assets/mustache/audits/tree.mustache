@@ -15,6 +15,17 @@
         <div class="span12">
           
           <ul class="tree-action-list">
+            {{#infer_roles instance}}
+              <li>
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    <span class="role">
+                      {{.}}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            {{/infer_roles}}
             {{#with_page_object_as 'page_object'}}
               {{#if_instance_of page_object 'Person'}}
               
@@ -51,18 +62,6 @@
                 {{/instance.contact}}
               {{/if_instance_of}}
             {{/with_page_object_as}}
-            
-            {{#infer_roles instance}}
-              <li>
-                <div class="item-data">
-                  <div class="tree-title-area">
-                    <span class="role">
-                      {{.}}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            {{/infer_roles}}
           </ul>
           
           <div class="item-data">
