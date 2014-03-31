@@ -18,6 +18,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
+  , mixins : ["contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -63,14 +64,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {
-  set_owner_to_current_user_if_unset : function() {
-    // Do not add an owner to a private program. Ownership is managed
-    // through role assignment for private programs.
-    if (!this.private)
-    {
-      this._super();
-    }
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Cycle", {
@@ -85,6 +78,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
+  , mixins : ["ownable", "contactable"]
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -325,6 +319,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -406,6 +401,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -471,6 +467,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -552,6 +549,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -656,6 +654,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -737,6 +736,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -917,6 +917,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
+  , mixins : ["ownable", "contactable"]
   , links_to : {
       "Section" : "SectionObjective"
   }
@@ -1028,6 +1029,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
+  , mixins : ["contactable"]
   , attributes : {
     program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
@@ -1162,10 +1164,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
         return {
           person: binding.instance.person.reify()
           , binding: binding.instance
-        }
+        };
       }
     });
-  } 
+  }
 });
 
 can.Model.Cacheable("CMS.Models.Request", {
@@ -1228,6 +1230,29 @@ can.Model.Cacheable("CMS.Models.Request", {
           .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
         + "Response";
     }, this));
+  }
+
+  , before_create : function() {
+    var audit, that = this;
+    if(!this.assignee) {
+      audit = this.audit.reify();
+      (audit.selfLink ? $.when(audit) : audit.refresh())
+      .then(function(audit) {
+        that.attr('assignee', audit.contact);
+      });
+    }
+  }
+  , form_preload : function(new_object_form) {
+    var audit, that = this;
+    if(new_object_form) {
+      if(!this.assignee && this.audit) {
+        audit = this.audit.reify();
+        (audit.selfLink ? $.when(audit) : audit.refresh())
+        .then(function(audit) {
+          that.attr('assignee', audit.contact);
+        });
+      }
+    }
   }
 });
 

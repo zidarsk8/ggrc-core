@@ -206,6 +206,22 @@ can.Model("can.Model.Cacheable", {
     //  whether it gets in and when.  --BM 3/4/14
     //this.__bindEvents = {};
 
+    var that = this;
+    if(statics.mixins) {
+      can.each(statics.mixins, function(mixin) {
+        var _mixin = mixin;
+        if(typeof _mixin === "string") {
+          _mixin = can.getObject(_mixin, CMS.Models.Mixins);
+        }
+        if(_mixin) {
+          _mixin.add_to(that);
+        } else {
+          throw "Error: Cannot find mixin " + mixin + " for class " + that.fullName;
+        }
+      });
+      delete this.mixins;
+    }
+
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
       this.findAll = can.Model.Cacheable.findAll;
@@ -286,16 +302,6 @@ can.Model("can.Model.Cacheable", {
         risk_child_options.model = CMS.Models.Risk;
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
-    });
-    $(function() {
-      if (GGRC.current_user) {
-        that.defaults.contact = typeof that.defaults.contact !== "undefined"
-                                ? that.defaults.contact
-                                : CMS.Models.Person.model(GGRC.current_user).stub();
-        that.defaults.owners = typeof that.defaults.owners !== "undefined"
-                               ? that.defaults.owners
-                               : [CMS.Models.Person.model(GGRC.current_user).stub()];
-      }
     });
   }
 
@@ -803,12 +809,7 @@ can.Model("can.Model.Cacheable", {
   , autocomplete_label : function() {
     return this.title;
   }
-  , set_owner_to_current_user_if_unset : function() {
-    if(this.constructor.attributes.owners
-          && (!this.owners || this.owners.length === 0)) {
-      this.attr('owners', [{ id: GGRC.current_user.id }]);
-    }
-  }
+
   /**
    Set up a deferred join object deletion when this object is updated.
   */
@@ -845,16 +846,30 @@ can.Model("can.Model.Cacheable", {
   }
 
   , save : function() {
-    var xhr
-    , that = this
-    , dfd = new $.Deferred();
+    var that = this
+      , isNew = this.isNew()
+      , xhr
+      , dfd = new $.Deferred()
+      ;
 
-    if(this.isNew()) {
+    this.before_save && this.before_save();
+    if(isNew) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
       can.getObject("provisional_cache", can.Model.Cacheable, true)[this.provisional_id] = this;
+      this.before_create && this.before_create();
+    } else {
+      this.before_update && this.before_update();
     }
 
-    xhr = this._super.apply(this, arguments);
+    xhr = this._super.apply(this, arguments).then(function(result) {
+      if(isNew) {
+        this.after_create && this.after_create();
+      } else {
+        this.after_update && this.after_update();
+      }
+      this.after_save && this.after_save();
+      return result;
+    });
 
     xhr.always(function() {
       that.notifier.on_empty(function() {
