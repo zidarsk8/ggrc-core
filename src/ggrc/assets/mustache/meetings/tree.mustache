@@ -4,33 +4,36 @@
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span11">
-            <div class="item-data">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="tree-title-area">
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                    {{firstnonempty instance.title 'Unnamed meeting'}}
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="tree-title-area">
-                    {{#infer_roles instance}}
+          <div class="span12">
+            
+            <ul class="tree-action-list">
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
                       <span class="role">
                         {{.}}
                       </span>
-                    {{/infer_roles}}
+                    </div>
                   </div>
-                </div>
+                </li>
+              {{/infer_roles}}
+              {{^instance.people}}
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-people-warning"></i>
+                  </div>
+                </li>
+              {{/instance.people}}
+            </ul>
+            
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{firstnonempty instance.title 'Unnamed meeting'}}
               </div>
             </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
-              {{^instance.people}}
-                <i class="grcicon-people-warning"></i>
-              {{/instance.people}}
-            </div>
+            
           </div>
         </div>
       </div>

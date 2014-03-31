@@ -12,7 +12,47 @@
       <div class="item-main">
         <div class="openclose">
           <div class="row-fluid">
-            <div class="span9">
+            <div class="span12">
+              
+              <ul class="tree-action-list">
+                {{#if roles.length}}
+                  <li>
+                    <div class="item-data">
+                      <div class="tree-title-area">
+                        <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                          {{#if_helpers '\
+                            #if_equals' roles.0.role.permission_summary 'Mapped' '\
+                            and ^if_equals' roles.length 1}}
+                            {{roles.1.role.permission_summary}}
+                          {{else}}
+                            {{roles.0.role.permission_summary}}
+                          {{/if_helpers}}
+                          {{#roles.1}}
+                            {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+                              {{^if_equals roles.length 2}}
+                                + {{sum roles.length '-2'}}
+                              {{/if_equals}}
+                            {{else}}
+                              + {{sum roles.length '-1'}}
+                            {{/if_in_map}}
+                          {{/roles.1}}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                  {{else}}
+                  <li>
+                    <div class="item-data">
+                      <div class="tree-title-area">
+                        <span class="no-role">
+                          No Access
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                {{/if}}
+              </ul>
+              
               <div class="item-data">
                 <div class="tree-title-area">
                   {{{render '/static/mustache/people/popover.mustache' person=this}}}
@@ -23,36 +63,7 @@
                   {{/if_match}}
                 </div>
               </div>
-            </div>
-            <div class="span3">
-              <div class="item-data">
-                <div class="tree-title-area">
-                  {{#if roles.length}}
-                    <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
-                      {{#if_helpers '\
-                        #if_equals' roles.0.role.permission_summary 'Mapped' '\
-                        and ^if_equals' roles.length 1}}
-                        {{roles.1.role.permission_summary}}
-                      {{else}}
-                        {{roles.0.role.permission_summary}}
-                      {{/if_helpers}}
-                      {{#roles.1}}
-                        {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
-                          {{^if_equals roles.length 2}}
-                            + {{sum roles.length '-2'}}
-                          {{/if_equals}}
-                        {{else}}
-                          + {{sum roles.length '-1'}}
-                        {{/if_in_map}}
-                      {{/roles.1}}
-                    </span>
-                  {{else}}
-                    <span class="no-role">
-                      No Access
-                    </span>
-                  {{/if}}
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>

@@ -11,31 +11,34 @@
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span9">
-            <div class="item-data">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="tree-title-area">
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
-                    {{firstnonempty instance.title instance.link}}
-                    <span class="option">
-                    </span>
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="tree-title-area">
-                    {{#infer_roles instance}}
+          <div class="span12">
+            
+            <ul class="tree-action-list">
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
                       <span class="role">
                         {{.}}
                       </span>
-                    {{/infer_roles}}
+                    </div>
                   </div>
-                </div>
+                </li>
+              {{/infer_roles}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
+            </ul>
+            
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{firstnonempty instance.title instance.link}}
+                <span class="option">
+                </span>
               </div>
             </div>
-          </div>
-          <div class="span3">
-            {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+            
           </div>
         </div>
       </div>

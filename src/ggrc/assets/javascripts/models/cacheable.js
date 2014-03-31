@@ -175,9 +175,9 @@ can.Model("can.Model.Cacheable", {
       };
       this.findPage = function() {
         throw "No default findPage() exists for subclasses of Cacheable";
-      }
+      };
     }
-    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
+    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
       if(this.root_collection) {
         this.findAll = "GET /api/" + this.root_collection;
       } else {
@@ -606,6 +606,7 @@ can.Model("can.Model.Cacheable", {
     if (this[id_key])
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
+    this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
   }
   , computed_errors : can.compute(function() { return this.errors(); })
 
@@ -839,10 +840,18 @@ can.Model("can.Model.Cacheable", {
     }
     this._pending_joins.push({how : "add", what : obj, through : join_attr });
   }
+
+  , delay_resolving_save_until : function(dfd) {
+    return this.notifier.queue(dfd);
+  }
+
   , save : function() {
     var that = this
-    , isNew = this.isNew();
-    
+      , isNew = this.isNew()
+      , xhr
+      , dfd = new $.Deferred()
+      ;
+
     this.before_save && this.before_save();
     if(isNew) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
@@ -851,7 +860,8 @@ can.Model("can.Model.Cacheable", {
     } else {
       this.before_update && this.before_update();
     }
-    return this._super.apply(this, arguments).then(function(result) {
+
+    xhr = this._super.apply(this, arguments).then(function(result) {
       if(isNew) {
         this.after_create && this.after_create();
       } else {
@@ -860,6 +870,17 @@ can.Model("can.Model.Cacheable", {
       this.after_save && this.after_save();
       return result;
     });
+
+    xhr.always(function() {
+      that.notifier.on_empty(function() {
+        dfd.resolve();
+      });
+    });
+
+    GGRC.delay_leaving_page_until(xhr);
+    GGRC.delay_leaving_page_until(dfd);
+
+    return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
   }
 });
 

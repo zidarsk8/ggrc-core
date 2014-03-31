@@ -1097,57 +1097,63 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
 }, {
   save : function() {
-
+    
+    var that = this;
     // Make sure the context is always set to the parent program
     if(!this.context.id){
       this.context = this.program.reify().context;
     }
+    
     return this._super.apply(this, arguments).then(function(instance) {
-      var no_change = false
-        , auditor_role
-        ;
+      return that._save_auditor(instance);
+    });
+  }
+  , _save_auditor : function(instance){
 
-      Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
-      
-      if(typeof instance.auditor === 'undefined'){
-        return instance;
+    var no_change = false
+      , auditor_role
+      ;
+
+    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
+    
+    if(typeof instance.auditor === 'undefined'){
+      return instance;
+    }
+    // Find the Auditor user role
+    return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
+      if(roles.length === 0) {
+        console.warn("No Auditor role");
+        return new $.Deferred().reject();
       }
-      // Find the Auditor user role
-      return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-        if(roles.length === 0) {
-          console.warn("No Auditor role");
-          return new $.Deferred().reject();
-        }
-        auditor_role = roles[0];
-        
-        return CMS.Models.UserRole.findAll({
-          context_id__in: instance.context.id,
-          role_id__in: auditor_role.id
-        });
-      }).then(function(auditor_roles){
-        return $.when(
-          can.map(auditor_roles, function(role){
-            if(typeof instance.auditor !== "undefined" &&
-                instance.auditor != null &&
-                role.person.id === instance.auditor.id) {
-              // Auditor hasn't changed
-              no_change = true;
-              return $.when();
-            }
-            return role.refresh().then(function(role){role.destroy();});
-        }));
-      }).then(function(){
-        if(!instance.auditor || no_change){
-          return $.when();
-        }
-        return $.when(new CMS.Models.UserRole({
-          context : instance.context,
-          role : auditor_role,
-          person : instance.auditor
-        }).save());
-      }).then(function(){
-        return instance;
+      auditor_role = roles[0];
+      
+      return CMS.Models.UserRole.findAll({
+        context_id__in: instance.context.id,
+        role_id__in: auditor_role.id
       });
+    }).then(function(auditor_roles){
+      return $.when(
+        can.map(auditor_roles, function(role){
+          if(typeof instance.auditor !== "undefined" &&
+              instance.auditor != null &&
+              role.person.id === instance.auditor.id) {
+            // Auditor hasn't changed
+            no_change = true;
+            return $.when();
+          }
+          return role.refresh().then(function(role){role.destroy();});
+      }));
+    }).then(function(){
+      if(!instance.auditor || no_change){
+        return $.when();
+      }
+      return $.when(new CMS.Models.UserRole({
+        context : instance.context,
+        role : auditor_role,
+        person : instance.auditor
+      }).save());
+    }).then(function(){
+      return instance;
     });
   }, findAuditors : function(){
     var loader = this.get_binding('authorizations');
