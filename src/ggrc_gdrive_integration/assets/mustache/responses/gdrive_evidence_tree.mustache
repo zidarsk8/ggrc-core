@@ -139,7 +139,7 @@
             <div class="inner-tree">
               <h6>Mapped Objects ({{child_count}})</h6>
               {{#child_options}}
-                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options}}
             </div>
           {{/prune_context}}
