@@ -47,6 +47,21 @@ can.Control("StickyHeader", {
     this.update_items('footer');
   }
 
+  , "{scroll_area} updateSticky" : function(el, ev) {
+    // `updateSticky` is triggered manually by controllers and other event
+    //    handlers, namely `TreeViewController` and `$.fn.openclose`
+    // Only process if this section is visible
+    if (!this.element.is(":visible"))
+      return;
+
+    // Update the header/footer positions
+    // Should only have to reconsider footers -- if collapse of an element
+    //   causes the header to return to the viewport, it will also trigger a
+    //   scroll event, and sticky headers will be updated that way.
+    //this.update_items('header');
+    this.update_items('footer');
+  }
+
     // Resize clones on window resize
   , "{window} resize" : function(el, ev) {
     // Update the header/footer positions

@@ -537,6 +537,10 @@ can.Control("CMS.Controllers.TreeView", {
     if (list_window.length > 0)
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
+    final_dfd.done(function() {
+      //  Trigger update for sticky headers and footers
+      that.element.trigger("updateSticky");
+    });
     return final_dfd;
   }
 
