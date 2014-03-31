@@ -54,7 +54,7 @@ GGRC.RequestStore = function() {
         replaying = storage.getItem("RequestStore.replay");
 
     if (_originalOptions._canonical_url) {
-      console.debug("Found re-entrant request: " + _originalOptions._canonical_url);
+      //console.debug("Found re-entrant request: " + _originalOptions._canonical_url);
       return;
     }
 
@@ -93,7 +93,7 @@ GGRC.RequestStore = function() {
         }
 
         if (!data && (!replaying || recording)) {
-          console.debug('Using server: ', url);
+          //console.debug('Using server: ', url);
           jQuery.ajax(_originalOptions).done(function(data, statusText, jqXHR) {
             if (recording) {
               console.debug('Recording: ', url);
