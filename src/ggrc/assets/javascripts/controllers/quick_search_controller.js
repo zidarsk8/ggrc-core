@@ -402,6 +402,64 @@ can.Control("CMS.Controllers.LHN", {
     }
 });
 
+
+can.Control("CMS.Controllers.InfiniteScroll", {
+    defaults: {
+    }
+}, {
+    init: function() {
+    }
+
+  , " DOMMouseScroll": "prevent_overscroll"
+  , " mousewheel": "prevent_overscroll"
+
+  , prevent_overscroll: function($el, ev) {
+      // Based on Troy Alford's response on StackOverflow:
+      //   http://stackoverflow.com/a/16324762
+      var scrollTop = $el[0].scrollTop
+        , scrollHeight = $el[0].scrollHeight
+        , height = $el.height()
+        , scrollTopMax = scrollHeight - height
+        , delta
+        , up
+        , loadTriggerOffset = 50
+        ;
+
+      if (ev.type === "DOMMouseScroll")
+        delta = ev.originalEvent.detail * -40;
+      else
+        delta = ev.originalEvent.wheelDelta;
+
+      up = delta > 0;
+
+      var prevent = function() {
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.returnValue = false;
+        return false;
+      }
+
+      if (!up && scrollTop - delta > scrollTopMax) {
+        // Scrolling down, but this will take us past the bottom.
+        $el.scrollTop(scrollHeight);
+        this.show_more($el);
+        return prevent();
+      } else if (up && delta > scrollTop) {
+        // Scrolling up, but this will take us past the top.
+        $el.scrollTop(0);
+        return prevent();
+      } else if (!up && scrollTop - delta > scrollTopMax - loadTriggerOffset) {
+        // Scrolling down, close to bottom, so start loading more
+        this.show_more($el);
+      }
+    }
+
+  , show_more: function($el) {
+      this.element.trigger("scrollNext");
+    }
+});
+
+
 can.Control("CMS.Controllers.LHN_Search", {
     defaults : {
         list_view : GGRC.mustache_path + "/base_objects/search_result.mustache"
@@ -425,6 +483,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       can.view(template_path, {}, function(frag, xhr) {
         self.element.html(frag);
         self.post_init();
+        self.element.find(".sub-level").cms_controllers_infinite_scroll();
       });
     }
 
@@ -549,7 +608,9 @@ can.Control("CMS.Controllers.LHN_Search", {
     this.run_search(this.current_term, newval ? { "contact_id": GGRC.current_user.id } : null);
   }
 
-  , show_more: function($el) {
+  , ".sub-level scrollNext": "show_more"
+
+  , show_more: function($el, ev) {
       if (this._show_more_pending)
         return;
 
@@ -581,50 +642,6 @@ can.Control("CMS.Controllers.LHN_Search", {
         delete that._show_more_pending;
       });
       visible_list.attr('is_loading', true)
-    }
-
-  , ".sub-level DOMMouseScroll": "prevent_overscroll"
-  , ".sub-level mousewheel": "prevent_overscroll"
-
-  , prevent_overscroll: function($el, ev) {
-      // Based on Troy Alford's response on StackOverflow:
-      //   http://stackoverflow.com/a/16324762
-      var scrollTop = $el[0].scrollTop
-        , scrollHeight = $el[0].scrollHeight
-        , height = $el.height()
-        , scrollTopMax = scrollHeight - height
-        , delta
-        , up
-        , loadTriggerOffset = 50
-        ;
-
-      if (ev.type === "DOMMouseScroll")
-        delta = ev.originalEvent.detail * -40;
-      else
-        delta = ev.originalEvent.wheelDelta;
-
-      up = delta > 0;
-
-      var prevent = function() {
-        ev.stopPropagation();
-        ev.preventDefault();
-        ev.returnValue = false;
-        return false;
-      }
-
-      if (!up && scrollTop - delta > scrollTopMax) {
-        // Scrolling down, but this will take us past the bottom.
-        $el.scrollTop(scrollHeight);
-        this.show_more($el);
-        return prevent();
-      } else if (up && delta > scrollTop) {
-        // Scrolling up, but this will take us past the top.
-        $el.scrollTop(0);
-        return prevent();
-      } else if (!up && scrollTop - delta > scrollTopMax - loadTriggerOffset) {
-        // Scrolling down, close to bottom, so start loading more
-        this.show_more($el);
-      }
     }
 
   , init_object_lists: function() {
