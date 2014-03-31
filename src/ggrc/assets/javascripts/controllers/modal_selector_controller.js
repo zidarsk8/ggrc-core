@@ -817,6 +817,7 @@
             self.options.$header = self.element.find('.modal-header');
             deferred.resolve();
             self.element.trigger('loaded');
+            self.element.find(".selector-list").cms_controllers_infinite_scroll();
             setTimeout(function() {
               self.element.find('#search').focus();
             }, 200);
@@ -897,40 +898,63 @@
         return dfd;
       }
 
-    , refresh_option_list: function() {
+    , _start_pager: function(objects, page_size, active_fn, draw_fn) {
         var self = this
-          , visible_options
-          , current_option_model = this.options.option_model
-          , current_option_model_name = current_option_model.shortName
-          , current_search_term = this.options.option_search_term
-          , $option_list = this.element.find('.option_column ul.new-tree')
+          , pager
           ;
 
-        function refresh_up_to(objects, request_limit, render_limit) {
-          var i = 0
-            , count = 0
-            , refresh_queue = new RefreshQueue()
+        pager = function(objects) {//request_limit, render_limit) {
+          var refresh_queue = new RefreshQueue()
             ;
 
-          while (i < objects.length && count < request_limit && i < render_limit) {
-            if (!objects[i].selfLink)
-              count++;
-            refresh_queue.enqueue(objects[i]);
-            i++;
-          }
+          self._show_next_page = null;
+
+          refresh_queue.enqueue(objects.slice(0, page_size));
           refresh_queue.trigger().then(function(options) {
-            if (self.element
-                && self.options.option_model === current_option_model
-                && self.options.option_search_term === current_search_term) {
-              self.insert_options(options);
-              if (i < objects.length) {
-                setTimeout(function() {
-                  refresh_up_to(objects.slice(i), request_limit, render_limit);
-                }, 100);
-              }
+            if (active_fn()) {
+              draw_fn(options);
+
+              //  Enforce minimum wait between render operations
+              setTimeout(function() {
+                self._show_next_page = function() {
+                  if (objects.length > page_size) {
+                    pager(objects.slice(page_size));
+                  }
+                }
+              }, 50);
             }
           });
         }
+
+        pager(objects);
+      }
+
+    , show_next_page: function() {
+        if (this._show_next_page) {
+          this._show_next_page();
+        }
+      }
+
+    , ".selector-list scrollNext": "show_next_page"
+
+    , refresh_option_list: function() {
+        var self = this
+          , current_option_model = this.options.option_model
+          , current_option_model_name = current_option_model.shortName
+          , current_search_term = this.options.option_search_term
+          , active_fn
+          , draw_fn
+          ;
+
+        active_fn = function() {
+          return self.element &&
+                 self.options.option_model === current_option_model &&
+                 self.options.option_search_term === current_search_term;
+        };
+
+        draw_fn = function(options) {
+          self.insert_options(options);
+        };
 
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
@@ -951,12 +975,10 @@
               permission_parms)
           .then(function(search_result) {
             var options;
-            if (self.element
-                && self.options.option_model === current_option_model
-                && self.options.option_search_term === current_search_term) {
+            if (active_fn()) {
               options = search_result.getResultsForType(current_option_model_name);
               self.option_list.push.apply(self.option_list, options);
-              return refresh_up_to(options, 50, 50);
+              self._start_pager(options, 20, active_fn, draw_fn);
             }
           });
       }
