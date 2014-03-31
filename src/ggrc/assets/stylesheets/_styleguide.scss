@@ -448,3 +448,25 @@ ul.new-tree {
     }
   }
 }
+.lhs-nav {
+  ul.sub-level,
+  ul.sub-actions {
+    li {
+      a {
+        .lhs-main-title {
+          &.span8 {
+            span.lhs-item {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.tree-footer {
+  .add-entry {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}

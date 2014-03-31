@@ -43,7 +43,8 @@ def reindex(task):
   # Find all models then remove base classes
   #   (If we don't remove base classes, we get duplicates in the index.)
   inheritance_base_models = [
-      all_models.Directive, all_models.SystemOrProcess, all_models.Response
+      all_models.Directive, all_models.SectionBase, all_models.SystemOrProcess,
+      all_models.Response
       ]
   models = set(all_models.all_models) - set(inheritance_base_models)
   models = [model for model in models if model_is_indexed(model)]
@@ -122,7 +123,7 @@ def admin_reindex():
   from ggrc import settings
   if not permissions.is_allowed_read("/admin", 1):
     raise Forbidden()
-  tq = create_task("reindex", reindex)
+  tq = create_task(get_current_user(), "reindex", reindex)
   return tq.make_response(app.make_response(("scheduled %s" % tq.name,
                                             200,
                                             [('Content-Type', 'text/html')])))
@@ -166,6 +167,8 @@ def contributed_object_views():
       object_view(models.Policy),
       object_view(models.Regulation),
       object_view(models.Standard),
+      object_view(models.Clause),
+      object_view(models.Section),
       object_view(models.Control),
       object_view(models.Objective),
       object_view(models.System),

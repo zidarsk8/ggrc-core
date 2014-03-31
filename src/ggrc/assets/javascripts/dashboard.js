@@ -320,7 +320,7 @@ jQuery(function($) {
         try{
           var jsonResult = $.parseJSON($(task.result.content).text());
           if("location" in jsonResult){
-            window.location.assign(jsonResult.location);
+            GGRC.navigate(jsonResult.location);
             return;
           }
         } catch(e){}
@@ -360,7 +360,7 @@ jQuery(function($) {
       var result = $.parseJSON(data);
       if("location" in result){
         // Redirect
-        window.location.assign(result.location);
+       GGRC.navigate(result.location);
       }
       // Check if task has completed:
       setTimeout(function(){
@@ -764,7 +764,7 @@ jQuery(function($) {
         d.unbind("change"); //forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
       });
-      $.when.apply($, destroys).done($.proxy(window.location, 'reload'));
+      $.when.apply($, destroys).done($.proxy(GGRC, 'navigate'));
     });
   })
   .on('click', '.set-display-settings-default', function(e) {
@@ -954,7 +954,7 @@ jQuery(function($) {
     }
   });  
 
-  $('body').on('click', 'ul.internav li a', function(e) {
+  /*$('body').on('click', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
@@ -962,7 +962,7 @@ jQuery(function($) {
     
     $targetWidget.addClass("widget-active");
     $('.cms_controllers_inner_nav').control('inner_nav').set_active_widget($widgetID);
-  });    
+  });*/
 
   $('body').on('mouseenter', '.widget', function(e) {
     var $this = $(this)

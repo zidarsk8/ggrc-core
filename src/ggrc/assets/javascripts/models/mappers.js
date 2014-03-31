@@ -220,9 +220,6 @@
         this.loader = loader;
 
         this.list = new can.Observe.List();
-        this.refresh_queue = new RefreshQueue();
-
-        //this.listeners = {};
       }
 
     , refresh_stubs: function() {
@@ -233,8 +230,24 @@
         return this.loader.refresh_instances(this);
       }
 
+    //  `refresh_count`
+    //  - Returns a `can.compute`, which in turn returns the length of
+    //    `this.list`
+    //  - Attempts to do the minimal work (e.g., loading only stubs, not full
+    //    instances) to return an accurate length
+    , refresh_count: function() {
+        var self = this;
+        return this.refresh_stubs().then(function() {
+          return can.compute(function() {
+            return self.list.attr("length");
+          });
+        });
+      }
+
+    //  `refresh_list`
+    //  - Returns a list which will *only* ever contain fully loaded / reified
+    //    instances
     , refresh_list: function() {
-        // Returns a list which will *only* ever contain fully loaded instances
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
           ;
@@ -284,6 +297,45 @@
         return found_result;
       }
 
+    , is_duplicate_result: function(old_result, new_result) {
+        var o = old_result
+          , n = new_result
+          ;
+
+        if (o.instance === n.instance) {// && o.binding  === n.binding) {
+          if (o.mappings === n.mappings) {
+            return true;
+          }
+          o = o.mappings;
+          n = n.mappings;
+          if (o && n && o.length === 1 && n.length === 1) {
+            o = o[0];
+            n = n[0];
+            if (o.binding === n.binding) {
+              if (o.instance === n.instance
+                  && (o.mappings.length > 0 || n.mappings.length > 0)) {
+                o = o.mappings;
+                n = n.mappings;
+                if (o && n && o.length === 1 && n.length === 1) {
+                  o = o[0];
+                  n = n[0];
+                }
+              }
+
+              if (o.binding === n.binding
+                  && o.instance === true
+                  && n.instance === true
+                  && o.mappings && o.mappings.length === 0
+                  && n.mappings && n.mappings.length === 0) {
+                return true;
+              }
+            }
+          }
+        }
+
+        return false;
+      }
+
     , insert_results: function(binding, results) {
         var self = this
           , all_binding_results = []
@@ -305,6 +357,10 @@
           }
 
           if (found_result) {
+            if (self.is_duplicate_result(found_result, new_result)) {
+              return;
+            }
+
             mapping_attr = found_result.mappings;
             // Since we're adding the result as its own mapping, use
             // new_result as the mapping instead of new_result.mappings?
@@ -316,6 +372,8 @@
                 instances_to_refresh.push(new_result.instance);
               }
             });
+
+            all_binding_results.push(found_result);
           } else {
             //  FIXME: Loaders should be passing in newly instantiated results,
             //    so this line should be:
@@ -325,9 +383,9 @@
             new_instance_results.push(found_result);
             instances_to_refresh.push(new_result.instance);
             // FIXME: Also queue mappings to refresh?
-          }
 
-          all_binding_results.push(found_result);
+            all_binding_results.push(found_result);
+          }
         });
 
         if (new_instance_results.length > 0) {
@@ -779,7 +837,18 @@
     , init_listeners: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
+          , object_join_value = binding.instance[this.object_join_attr]
           ;
+
+        binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
+          self._refresh_stubs(binding);
+        });
+
+        if (object_join_value) {
+          object_join_value.bind('length', function(ev, _new, _old) {
+            self._refresh_stubs(binding);
+          });
+        }
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model)
@@ -1158,7 +1227,7 @@
         }
         else {
           return model.findAll(params).done(function(mappings) {
-            binding.instance.attr(object_join_attr, mappings);
+            //binding.instance.attr(object_join_attr, mappings);
             self.insert_instances_from_mappings(binding, mappings.reify());
           });
         }
@@ -1325,7 +1394,7 @@
               mappings.entries[i] = new _class({ id: entry.id });
             });
 
-            binding.instance.attr(object_join_attr, mappings.entries);
+            //binding.instance.attr(object_join_attr, mappings.entries);
             self.insert_instances_from_mappings(binding, mappings.entries.reify());
             return mappings.entries;
           });
@@ -1390,4 +1459,25 @@
         return binding.source_binding.refresh_stubs(binding);
       }
   });
+
+  GGRC.all_local_results = function(instance) {
+    // Returns directly-linked objects
+    var loaders = GGRC.Mappings[instance.constructor.shortName]
+      , local_loaders = []
+      , multi_loader
+      , multi_binding
+      ;
+
+    can.each(loaders, function(loader, name) {
+      if (loader instanceof GGRC.ListLoaders.DirectListLoader
+          || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
+        local_loaders.push(name);
+      }
+    });
+
+    multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders);
+    multi_binding = multi_loader.attach(instance);
+    return multi_binding.refresh_stubs();
+  };
+
 })(GGRC, can);

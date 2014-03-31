@@ -12,7 +12,34 @@
       <div class="item-main">
         <div class="openclose">
           <div class="row-fluid">
-            <div class="span9">
+            <div class="span12">
+              
+              <ul class="tree-action-list">
+                {{#person_roles this "System|Admin"}}
+                  {{#if roles.length}}
+                    <li>
+                      <div class="item-data">
+                        <div class="tree-title-area">
+                          <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
+                            {{roles.0.permission_summary}}
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  {{else}}
+                    <li>
+                      <div class="item-data">
+                        <div class="tree-title-area">
+                          <span class="no-role">
+                            No Access
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  {{/if}}
+                {{/person_roles}}
+              </ul>
+              
               <div class="item-data">
                 <div class="tree-title-area">
                   {{{render '/static/mustache/people/popover.mustache' person=this}}}
@@ -23,23 +50,7 @@
                   {{/if_match}}
                 </div>
               </div>
-            </div>
-            <div class="span3">
-              <div class="item-data">
-                <div class="tree-title-area">
-                  {{#person_roles this "System|Admin"}}
-                    {{#if roles.length}}
-                      <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
-                        {{roles.0.permission_summary}}
-                      </span>
-                    {{else}}
-                      <span class="no-role">
-                        No Access
-                      </span>
-                    {{/if}}
-                  {{/person_roles}}
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -128,14 +139,14 @@
     </a>
 
     {{#if has_next_page}}
-    <a href="javascript://" class="pull-right view-more-paging">
-      View More
-      <i class="grcicon-down"></i>
+    <a href="javascript://" class="pull-right view-more-paging" data-next="true">
+      Next Page
     </a>
-    {{else}}
-    <span class="pull-right view-more-paging">
-      All results shown
-    </span>
+    {{/if}}
+    {{#if has_prev_page}}
+    <a href="javascript://" class="pull-right view-more-paging">
+      Previous Page
+    </a>
     {{/if}}
   </li>
 </ul>

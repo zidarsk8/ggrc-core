@@ -19,7 +19,7 @@ from ggrc.services.registry import service
 from ggrc.services.common import Resource
 from . import basic_roles
 from .contributed_roles import lookup_role_implications
-from .models import Role, RoleImplication, UserRole, ContextImplication
+from .models import Role, UserRole, ContextImplication
 
 blueprint = Blueprint(
     'permissions',
@@ -275,19 +275,19 @@ def handle_program_post(sender, obj=None, src=None, service=None):
   db.session.add(user_role)
   db.session.flush()
 
-  assign_role_reader(get_current_user())
+  #Create the context implication for Program roles to default context
+  db.session.add(ContextImplication(
+      source_context=context,
+      context=None,
+      source_context_scope='Program',
+      context_scope=None,
+      modified_by=get_current_user(),
+      ))
+
   if not src.get('private'):
     # Add role implication - all users can read a public program
     add_public_program_context_implication(context)
 
-def add_role_reader_implications(source_role, context):
-  db.session.add(RoleImplication(
-    source_context=context,
-    source_role=source_role,
-    role=basic_roles.program_basic_reader(),
-    context=None,
-    modified_by=get_current_user(),
-    ))
 
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
@@ -305,35 +305,13 @@ def add_public_program_context_implication(context, check_exists=False):
     modified_by=get_current_user(),
     ))
 
-def add_public_program_role_implication(
-    source_role, context, check_exists=False):
-  if check_exists and db.session.query(RoleImplication)\
-      .filter(
-          and_(
-            RoleImplication.context_id == context.id,
-            RoleImplication.source_context_id == None))\
-      .count() > 0:
-    return
-  db.session.add(RoleImplication(
-    source_context=None,
-    source_role=source_role,
-    context=context,
-    role=basic_roles.program_reader(),
-    modified_by=get_current_user(),
-    ))
 
 @Resource.model_put.connect_via(Program)
 def handle_program_put(sender, obj=None, src=None, service=None):
   #Check to see if the private property of the program has changed
   if get_history(obj, 'private').has_changes():
     if obj.private:
-      #ensure that any implications from null context are removed
-      implications = db.session.query(RoleImplication)\
-          .filter(
-              RoleImplication.context_id == obj.context_id,
-              RoleImplication.source_context_id == None)\
-                  .delete()
-      db.session.flush()
+      # Ensure that any implications from null context are removed
       implications = db.session.query(ContextImplication)\
           .filter(
               ContextImplication.context_id == obj.context_id,
@@ -344,6 +322,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
       #ensure that implications from null are present
       add_public_program_context_implication(obj.context, check_exists=True)
       db.session.flush()
+
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
@@ -377,7 +356,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
     context_scope='Program',
     modified_by=get_current_user(),
     ))
-  
+
   #Create the role implication for Auditor from Audit for default context
   db.session.add(ContextImplication(
       source_context=context,
@@ -391,25 +370,28 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   #Place the audit in the audit context
   obj.context = context
 
-@Resource.model_posted.connect_via(UserRole)
-def handle_program_owner_role_assignment(
-    sender, obj=None, src=None, service=None):
-  if 'read' in obj.role.permissions and \
-      'UserRole' in obj.role.permissions['read']:
-    # Make sure that the user can read roles, too
-    assign_role_reader(obj.person)
 
-def assign_role_reader(user):
-    role_reader_role = db.session.query(Role)\
-        .filter(Role.name == 'RoleReader').first()
-    user_permissions = BasicUserPermissions(user)
-    if not user_permissions.is_allowed_read('Role', None):
-      role_reader_for_user = UserRole(
-          person_id=user.id,
-          role=role_reader_role,
-          context_id=None,
-          )
-      db.session.add(role_reader_for_user)
+@Resource.model_deleted.connect
+def handle_resource_deleted(sender, obj=None, service=None):
+  if obj.context \
+      and obj.context.related_object_id \
+      and obj.id == obj.context.related_object_id \
+      and obj.__class__.__name__ == obj.context.related_object_type:
+    db.session.query(UserRole) \
+        .filter(UserRole.context_id == obj.context_id) \
+        .delete()
+    db.session.query(ContextImplication) \
+        .filter(
+            or_(
+              ContextImplication.context_id == obj.context_id,
+              ContextImplication.source_context_id == obj.context_id
+              ))\
+        .delete()
+    # Deleting the context itself is problematic, because unattached objects
+    #   may still exist and cause a database error.  Instead of implicitly
+    #   cascading to delete those, just leave the `Context` object in place.
+    #   It and its objects will be visible *only* to Admin users.
+    #db.session.delete(obj.context)
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.

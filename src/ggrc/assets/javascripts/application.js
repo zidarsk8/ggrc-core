@@ -110,7 +110,81 @@ window.onerror = function(message, url, linenumber) {
     return zindex + 10;
   };
 
+(function(can) {
+  can.Construct("PersistentNotifier", {
+    defaults : {
+      one_time_cbs : true
+      , while_queue_has_elements : function() {}
+      , when_queue_empties : function() {}
+    }
+  }, {
+    init : function(options) {
+      var that = this;
+      this.dfds = [];
+      this.list_empty_cbs = [];
+      can.each(this.constructor.defaults, function(val, key) {
+          that[key] = val;
+      });
+      can.each(options, function(val, key) {
+        that[key] = val;
+      });
+    }
+    , queue : function(dfd) {
+      var idx
+      , oldlen = this.list_empty_cbs.length
+      , that = this;
+      if(!dfd || !dfd.then) {
+        throw "ERROR: attempted to queue something other than a Deferred or Promise";
+      }
+      idx = this.dfds.indexOf(dfd);
+
+      if(!~idx) { //enforce uniqueness
+        this.dfds.push(dfd);
+        dfd.always(function() {
+          var i = that.dfds.indexOf(dfd);
+          ~i && that.dfds.splice(i, 1);
+          if(that.dfds.length < 1) {
+            can.each(that.list_empty_cbs, Function.prototype.call);
+            if(that.one_time_cbs) {
+              that.list_empty_cbs = [];
+            }
+            that.when_queue_empties();
+          }
+        });
+      }
+      if(oldlen < 1 && that.dfds.length > 0) {
+        that.while_queue_has_elements();
+      }
+    }
+    , on_empty : function(fn) {
+      if(!this.one_time_cbs || this.dfds.length < 1) {
+        fn();
+      }
+      if((this.dfds.length > 0 || !this.one_time_cbs) && !~this.list_empty_cbs.indexOf(fn)) {
+          this.list_empty_cbs.push(fn);
+      }
+    }
+    , off_empty : function(fn) {
+      var idx;
+      if(~(idx = this.list_empty_cbs.indexOf(fn)))
+        this.list_empty_cbs.splice(idx, 1);
+    }
+  });
+})(this.can);
+
 (function(GGRC) {
+var confirmleaving = function confirmleaving() {
+  return window.confirm("There are operations in progress.  Are you sure you want to leave the page?");
+}
+, notifier = new PersistentNotifier({
+  while_queue_has_elements : function() {
+    $(window).on("unload", confirmleaving);
+  }
+  , when_queue_empties : function() {
+    $(window).off("unload", confirmleaving);
+  }
+  , name : "GGRC/window"
+});
 jQuery.extend(GGRC, {
   infer_object_type : function(data) {
     var decision_tree = {
@@ -154,6 +228,7 @@ jQuery.extend(GGRC, {
       , "risky_attribute" : CMS.Models.RiskyAttribute
       , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
+      , "clause" : CMS.Models.Clause
       , "section_objective" : CMS.Models.SectionObjective
       , "person" : CMS.Models.Person
       , "role" : CMS.Models.Role
@@ -229,8 +304,22 @@ jQuery.extend(GGRC, {
         GGRC.eventqueueTimeout =
           setTimeout(GGRC.queue_exec_next, GGRC.eventqueueTimegap);
     }
+
+  , navigate : function(url) {
+    function go() {
+      if(!url) {
+        window.location.reload();
+      } else {
+        window.location.assign(url);
+      }
+    }
+    notifier.on_empty(go);
+  }
+
+  , delay_leaving_page_until : $.proxy(notifier, "queue")
 });
 })(GGRC);
+
 
 (function($){
 
@@ -950,6 +1039,103 @@ jQuery(function($){
   });
 });
 
+jQuery(function($){
+  $.cms_autocomplete = function(el){
+    var ctl = this;
+    // Add autocomplete to the owner field
+    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
+      var $that = $(this)
+        , name = $that.attr("name") || ""
+        , prop = name.substr(name.lastIndexOf(".") + 1)
+        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
+
+      // Return if this field temporarily isn't storing data
+      if (!name) return false;
+
+      return $that.autocomplete({
+        // Ensure that the input.change event still occurs
+        change : function(event, ui) {
+          if(!$(event.target).parents(document.body).length)
+            console.warn("autocomplete menu change event is coming from detached nodes");
+          $(event.target).trigger("change");
+        }
+
+        , minLength: 0
+
+        // Search for the people based on the term
+        , source : function(request, response) {
+          var query = request.term || ''
+            , that = this;
+
+          if (query.indexOf('@') > -1)
+            query = '"' + query + '"';
+
+          ctl.bindXHRToButton(GGRC.Models.Search
+          .search_for_types(
+              request.term || '',
+              searchtypes,
+              {
+              // FIXME: Remove or figure out when this is necessary.
+              //{
+              //  __permission_type: 'create'
+              //  , __permission_model: 'Object' + $that.data("lookup")
+              })
+          .then(function(search_result) {
+            var objects = []
+              , queue = new RefreshQueue()
+              ;
+
+            can.each(searchtypes, function(searchtype) {
+              objects.push.apply(
+                objects, search_result.getResultsForType(searchtype));
+            });
+            // Retrieve full people data
+            can.each(objects, function(object) {
+              queue.enqueue(object);
+            });
+            queue.trigger().then(function(objs) {
+              if(objs.length) {
+                response(objs);
+              } else {
+                that._suggest( [] );
+                that._trigger( "open" );
+              }
+            });
+          }), $that, null, false);
+        }
+        , select : ctl.proxy("autocomplete_select", $that)
+        , close : function() {
+          //$that.val($that.attr("value"));
+        }
+      }).focus(function(){     
+        //Use the below line instead of triggering keydown
+        $(this).data("uiAutocomplete").search($(this).val());
+    }).data('ui-autocomplete');
+    });
+    acs.each(function(i, ac) {
+      ac._renderMenu = function(ul, items) {
+        var model_class = ac.element.data("lookup")
+          , template = ac.element.data("template")
+          , model
+          ;
+
+        if (!template) {
+          model = CMS.Models[model_class] || GGRC.Models[model_class];
+          template =
+              '/' + model.table_plural + '/autocomplete_result.mustache';
+        }
+
+        can.view.render(
+          GGRC.mustache_path + template,
+          {model_class: model_class, items: items},
+          function(frag) {
+            $(ul).html(frag);
+            can.view.hookup(ul);
+          });
+      };
+    });
+  }
+});
 
 (function($) {
 

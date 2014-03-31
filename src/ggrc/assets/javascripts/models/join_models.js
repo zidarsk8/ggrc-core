@@ -175,12 +175,12 @@ can.Model.Join("CMS.Models.ObjectSection", {
     root_object: "object_section"
   , root_collection: "object_sections"
   , join_keys : {
-      "section" : CMS.Models.Section
+      "section" : CMS.Models.SectionBase
     , "sectionable" : can.Model.Cacheable
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , sectionable : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/object_sections"
@@ -297,12 +297,12 @@ can.Model.Join("CMS.Models.ControlSection", {
   , create : "POST /api/control_sections"
   , destroy : "DELETE /api/control_sections/{id}"
   , join_keys : {
-      section : CMS.Models.Section
+      section : CMS.Models.SectionBase
     , control : CMS.Models.Control
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , control : "CMS.Models.Control.stub"
   }
 }, {
@@ -315,12 +315,12 @@ can.Model.Join("CMS.Models.SectionObjective", {
   , create : "POST /api/section_objectives"
   , destroy : "DELETE /api/section_objectives/{id}"
   , join_keys : {
-      section : CMS.Models.Section
+      section : CMS.Models.SectionBase
     , objective : CMS.Models.Objective
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , objective : "CMS.Models.Objective.stub"
   }
 }, {
@@ -340,6 +340,24 @@ can.Model.Join("CMS.Models.DirectiveControl", {
       modified_by : "CMS.Models.Person.stub"
     , directive : "CMS.Models.Directive.stub"
     , control : "CMS.Models.Control.stub"
+  }
+}, {
+});
+
+can.Model.Join("CMS.Models.DirectiveSection", {
+    root_collection : "directive_sections"
+  , root_object : "directive_section"
+  , findAll : "GET /api/directive_sections"
+  , create : "POST /api/directive_sections"
+  , destroy : "DELETE /api/directive_sections/{id}"
+  , join_keys : {
+      directive : CMS.Models.Directive
+    , section : CMS.Models.SectionBase
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , directive : "CMS.Models.Directive.stub"
+    , section : "CMS.Models.get_stub"
   }
 }, {
 });
@@ -404,7 +422,7 @@ can.Model.Join("CMS.Models.ControlRisk", {
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"
-  , findAll: "GET /api/object_people?__include=person"
+  , findAll: "GET /api/object_people"
   , create : "POST /api/object_people"
   , update : "PUT /api/object_people/{id}"
   , destroy : "DELETE /api/object_people/{id}"

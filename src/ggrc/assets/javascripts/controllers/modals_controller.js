@@ -95,79 +95,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , autocomplete : function(el) {
-    var ctl = this;
-    // Add autocomplete to the owner field
-    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this)
-        , name = $that.attr("name") || ""
-        , prop = name.substr(name.lastIndexOf(".") + 1)
-        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
-
-      // Return if this field temporarily isn't storing data
-      if (!name) return false;
-
-      return $that.autocomplete({
-        // Ensure that the input.change event still occurs
-        change : function(event, ui) {
-          if(!$(event.target).parents(document.body).length)
-            console.warn("autocomplete menu change event is coming from detached nodes");
-          $(event.target).trigger("change");
-        }
-
-        // Search for the people based on the term
-        , source : function(request, response) {
-          var query = request.term || ''
-            , that = this;
-
-          if (query.indexOf('@') > -1)
-            query = '"' + query + '"';
-
-          ctl.bindXHRToButton(GGRC.Models.Search
-          .search_for_types(
-              request.term || '',
-              searchtypes,
-              {
-              // FIXME: Remove or figure out when this is necessary.
-              //{
-              //  __permission_type: 'create'
-              //  , __permission_model: 'Object' + $that.data("lookup")
-              })
-          .then(function(search_result) {
-            var objects = search_result.getResultsForType(searchtypes.join(","))
-              , queue = new RefreshQueue()
-              ;
-
-            // Retrieve full people data
-            can.each(objects, function(object) {
-              queue.enqueue(object);
-            });
-            queue.trigger().then(function(objs) {
-              if(objs.length) {
-                response(objs);
-              } else {
-                that._suggest( [] );
-                that._trigger( "open" );
-              }
-            });
-          }), $that, null, false);
-        }
-        , select : ctl.proxy("autocomplete_select", $that)
-        , close : function() {
-          //$that.val($that.attr("value"));
-        }
-      }).data('ui-autocomplete');
-    });
-    acs.each(function(i, ac) {
-      ac._renderMenu = function(ul, items) {
-        var model_class = ac.element.data("lookup")
-          , model = CMS.Models[model_class] || GGRC.Models[model_class]
-          ;
-        can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', {model_class: model_class, items: items}, function(frag) {
-          $(ul).html(frag);
-          can.view.hookup(ul);
-        });
-      };
-    });
+    $.cms_autocomplete.call(this, el);
   }
 
   , autocomplete_select : function(el, event, ui) {
@@ -193,8 +121,9 @@ can.Control("GGRC.Controllers.Modals", {
         // Make sure person name/email gets written to the input field
         setTimeout(function(){
           if(el.val() === ""){
+            // Setting el.val is needed for Auditor field to work
             var obj = that.options.instance.attr(path);
-            if(obj.type === "Person"){
+            if(obj && obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
               el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
             }
             instance._transient || instance.attr("_transient", new can.Observe({}));
@@ -300,7 +229,9 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
-    return dfd;
+    return dfd.done(function() {
+      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
+    });
   }
 
   , fetch_all : function() {
@@ -500,10 +431,6 @@ can.Control("GGRC.Controllers.Modals", {
       //   `context` to be present even if `null`, unlike other attributes
       if (!instance.context)
         instance.attr('context', { id: null });
-      // FIXME: This should not depend on presence of `<model>.attributes`
-      if (instance.isNew()) {
-        instance.set_owner_to_current_user_if_unset();
-      }
 
       this.disable_hide = true;
       ajd = instance.save().done(function(obj) {
@@ -586,7 +513,7 @@ can.Control("GGRC.Controllers.Modals", {
       // Open newly created responses
       var object_type = instance.constructor.table_singular;
       $('[data-object-id="'+instance.id+'"][data-object-type="'+object_type+'"]')
-        .find('.openclose').openclose('open');
+        .find('.openclose').click().openclose("open");
     }
   }
 
@@ -595,7 +522,7 @@ can.Control("GGRC.Controllers.Modals", {
       delete this.options.model.cache[undefined];
     }
     this._super && this._super.apply(this, arguments);
-    if(this.options.instance._transient) {
+    if(this.options.instance && this.options.instance._transient) {
       this.options.instance.removeAttr("_transient");
     }
   }

@@ -79,6 +79,10 @@ blockquote {
   border:none;
 }
 
+u {
+  text-decoration: underline;
+}
+
 // helpers
 .centered {
   text-align: center;
@@ -603,7 +607,7 @@ strong {
   left:0;
   width:50%;
   margin-left:25%;
-  z-index:10000;
+  z-index:1000;
   .notice {
     p {
       color:$green;
@@ -617,6 +621,12 @@ strong {
         margin-top:6px;
       }
     }
+  }
+}
+
+.modal-header {
+  .flash {
+    z-index:9999;
   }
 }
 

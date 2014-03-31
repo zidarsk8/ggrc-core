@@ -72,13 +72,17 @@ class MysqlIndexer(SqlIndexer):
         or_(*type_queries))
 
   def _get_filter_query(self, terms):
+    whitelist = MysqlRecordProperty.property.in_(['title', 'name', 'email', 'notes', 'description'])
     if not terms:
-      return True
+      return whitelist
+    elif terms:
+      return and_(whitelist, MysqlRecordProperty.content.contains(terms))
+
     # FIXME: Temporary (slow) fix for words shorter than MySQL default limit
-    elif len(terms) < 4:
-      return MysqlRecordProperty.content.contains(terms)
-    else:
-      return MysqlRecordProperty.content.match(terms)
+    # elif len(terms) < 4:
+    #   return MysqlRecordProperty.content.contains(terms)
+    # else:
+    #   return MysqlRecordProperty.content.match(terms)
 
   # filters by "myview" for a given person
   def _add_owner_query(self, query, types=None, contact_id=None):
@@ -214,6 +218,13 @@ class MysqlIndexer(SqlIndexer):
         self._get_type_query(types, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
+    # Sort by title:
+    query = query.order_by(
+      # We make sure properties with title are at the front:
+      "CASE WHEN fulltext_record_properties.property = 'title' THEN 0 ELSE 1 END,"
+      # And then sort by content:
+      "fulltext_record_properties.content"
+    )
     return query
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None):

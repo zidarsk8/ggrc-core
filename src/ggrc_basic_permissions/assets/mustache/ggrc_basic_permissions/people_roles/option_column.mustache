@@ -24,7 +24,8 @@
     {{#options}}
     <li class="tree-item" {{ data 'option' }} data-id="{{ id }}">
       <div class="item-main">
-        <a href="javascript://" class="openclose">
+        <div class="openclose">
+          <a class="openclose-placeholder" href="javascript://"> </a>
           <div class="row-fluid">
             <div class="span11">
               <div class="item-data">
@@ -37,11 +38,14 @@
               <input type="radio" name="map" rel="tooltip" title="map">
             </div>
           </div>
-        </a>
+        </div>
       </div>
       <div class="tier-2-info item-content">
         <div class="tier-2-info-content">
           <p>{{{description}}}</p>
+
+          {{{render_hooks 'Role.option_detail'}}}
+
           {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
         </div>
       </div>

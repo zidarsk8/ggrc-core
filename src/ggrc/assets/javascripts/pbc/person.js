@@ -46,6 +46,8 @@ can.Model.Cacheable("CMS.Models.Person", {
     , defaults : {
       name : ""
       , email : ""
+      , contact : null
+      , owners : null
     }
     , convert : {
       "trimmed" : function(val) {

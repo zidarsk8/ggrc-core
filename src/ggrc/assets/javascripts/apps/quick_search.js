@@ -367,13 +367,16 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   directive_object_types = ["Regulation", "Policy", "Standard", "Contract"];
 
+  section_object_types = ["Section", "Clause"]
   response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"];
 
   business_plus_program_and_directive_object_types =
     business_plus_program_object_types.concat(directive_object_types);
 
   governance_object_types =
-    directive_object_types.concat(["Control", "Section", "Objective"]);
+    directive_object_types
+      .concat(section_object_types)
+      .concat(["Control", "Objective"]);
 
   person_object_types = governance_object_types.concat(business_plus_program_object_types).concat(["Audit"])
 
@@ -402,24 +405,34 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Person", person_object_types,
           "ObjectPerson", "personable", "person", "object_people"]
       , [business_object_types,
+          "Clause", "ObjectSection", "section", "sectionable"]
+      , [business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
+      , ["Clause", business_object_types,
+          "ObjectSection", "sectionable", "section"]
       , ["Section", business_object_types,
           "ObjectSection", "sectionable", "section"]
       , ["Control", "Program", "ProgramControl", "program", "control"]
       , ["Program", "Control", "ProgramControl", "control", "program"]
-      // , ["Control", "Section", "ControlSection", "section", "control"]
+      , ["Control", "Section", "ControlSection", "section", "control"]
+      , ["Control", "Clause", "ControlSection", "section", "control"]
       , ["Section", "Control", "ControlSection", "control", "section"]
+      , ["Clause", "Control", "ControlSection", "control", "section"]
       , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
       , ["Objective", "Control", "ObjectiveControl", "control", "objective"]
       , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
       , ["Program", "Audit", null, null, "program"]
       , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
-      , [directive_object_types, "Section", null, null, "directive"]
+      , [["Regulation", "Standard", "Policy"], "Section", null, null, "directive"]
+      , ["Contract", "Clause", "DirectiveSection", "section", "directive"]
+      , ["Clause", "Contract", "DirectiveSection", "directive", "section"]
       , ["Control", directive_object_types, "DirectiveControl", "directive", "control"]
       , [directive_object_types, "Control", "DirectiveControl", "control", "directive"]
       , [directive_object_types, "Control", null, null, "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
-      //, ["Objective", "Section", "SectionObjective", "section", "objective"]
+      , ["Clause", "Objective", "SectionObjective", "objective", "section"]
+      , ["Objective", "Section", "SectionObjective", "section", "objective"]
+      , ["Objective", "Clause", "SectionObjective", "section", "objective"]
       //, ["Risk", "Control", "RiskControl", "control", "risk"]
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
       , ["Audit", "Request", null, null, "audit"]
@@ -469,6 +482,8 @@ $(function() {
   $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
     var $el = $(this)
       ;
+    //  Prevent toggling `openclose` state in trees
+    ev.stopPropagation();
     $el.fadeTo('fast', 0.25);
     $el.children(".result").each(function(i, result_el) {
       var $result_el = $(result_el)
@@ -499,7 +514,12 @@ $(function() {
   });
 
   $(document.body).on("click", ".map-to-page-object", function(ev) {
-    var inst = $(ev.target).closest("[data-model], :data(model)").data("model")
+    //  Prevent toggling `openclose` state in trees
+    ev.stopPropagation();
+
+    var $target = $(ev.currentTarget)
+    , follow = $target.data("follow")
+    , inst = $target.data("instance")
     , page_model = GGRC.infer_object_type(GGRC.page_object)
     , page_instance = GGRC.page_instance()
     , join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0]
@@ -511,7 +531,7 @@ $(function() {
     }
 
     function triggerFlash(type) {
-      $(ev.target).trigger(
+      $target.trigger(
         "ajax:flash"
         , type === "error" 
           ? {
@@ -542,8 +562,8 @@ $(function() {
             }
         );
 
-      // Switch the active widget view
-      if (type !== "error") {
+      // Switch the active widget view if 'data-follow' was specified
+      if (follow && type !== "error") {
         window.location.hash = '#' + inst.constructor.root_object + '_widget';
         $('a[href="' + window.location.hash + '"]').trigger("click");
       }
@@ -590,7 +610,7 @@ $(function() {
             // Currently, the only error we encounter here is uniqueness
             // constraint violations.  Let's use a nicer message!
             var message = "That object is already mapped";
-            $(ev.target).trigger("ajax:flash", { error: message });
+            $target.trigger("ajax:flash", { error: message });
           });
       }
       // Otherwise throw a warning

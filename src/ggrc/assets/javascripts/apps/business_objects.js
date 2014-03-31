@@ -21,6 +21,7 @@ $(function() {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
     , 'policies': GGRC.mustache_path + "/policies/info.mustache"
+    , 'sections': GGRC.mustache_path + "/sections/info.mustache"
     , 'objectives': GGRC.mustache_path + "/objectives/info.mustache"
     , 'controls': GGRC.mustache_path + "/controls/info.mustache"
     , 'systems': GGRC.mustache_path + "/systems/info.mustache"
@@ -116,7 +117,7 @@ $(function() {
               }
           }
         , Contract : {
-            Section : {
+            Clause: {
               widget_name : function() {
                 var $objectArea = $(".object-area");
                 if ( $objectArea.hasClass("dashboard-area") ) {
@@ -189,60 +190,84 @@ $(function() {
       }
 
     , extra_content_controller_options = apply_mixins({
-          extended_objectives: {
+          objectives: {
               Objective: {
-                  mapping: "extended_related_objectives"
+                  mapping: "objectives"
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/objectives/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/objectives/tree_footer.mustache"
                 }
             }
-        , extended_controls: {
+        , controls: {
               Control: {
-                  mapping: "extended_related_controls"
+                  mapping: "controls"
                 , draw_children: true
                 , show_view: GGRC.mustache_path + "/controls/tree.mustache"
                 , footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache"
                 }
             }
-        , extended_business_objects: {
+        , business_objects: {
               DataAsset: {
-                  mapping: "extended_related_data_assets"
+                  mapping: "related_data_assets"
                 }
             , Facility: {
-                  mapping: "extended_related_facilities"
+                  mapping: "related_facilities"
                 }
             , Market: {
-                  mapping: "extended_related_markets"
+                  mapping: "related_markets"
                 }
             , OrgGroup: {
-                  mapping: "extended_related_org_groups"
+                  mapping: "related_org_groups"
                 }
             , Process: {
-                  mapping: "extended_related_processes"
+                  mapping: "related_processes"
                 }
             , Product: {
-                  mapping: "extended_related_products"
+                  mapping: "related_products"
                 }
             , Project: {
-                  mapping: "extended_related_projects"
+                  mapping: "related_projects"
                 }
             , System: {
-                  mapping: "extended_related_systems"
+                  mapping: "related_systems"
                 }
             , Document: {
-                  mapping: "extended_related_documents"
+                  mapping: "documents"
                 }
             , Person: {
-                  mapping: "extended_related_people"
+                  mapping: "people"
+                }
+            , Program: {
+                  mapping: "programs"
+                }
+            }
+
+        , governance_objects: {
+              Regulation: {
+                  mapping: "regulations"
+                }
+            , Contract: {
+                  mapping: "contracts"
+                }
+            , Policy: {
+                  mapping: "policies"
+                }
+            , Standard: {
+                  mapping: "standards"
+                }
+            , Control: {
+                  mapping: "controls"
+                }
+            , Objective: {
+                  mapping: "objectives"
                 }
             }
 
         , Program: {
               _mixins: [
-                  "extended_objectives"
-                , "extended_controls"
-                , "extended_business_objects"
+                  "objectives"
+                , "controls"
+                , "business_objects"
                 ]
 
             , Regulation: {
@@ -256,7 +281,14 @@ $(function() {
             , Contract: {
                 mapping: "contracts"
               , draw_children: true
-              , child_options: [section_child_options]
+              , child_options: [
+                  {
+                    model: CMS.Models.Clause
+                  , mapping: "clauses"
+                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+                  , draw_children: true
+                  }]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
@@ -277,7 +309,7 @@ $(function() {
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
               }
-            , Audit : { 
+            , Audit: {
               mapping: "audits"
               , allow_mapping : true
               , draw_children : true
@@ -288,24 +320,33 @@ $(function() {
 
         , directive: {
               _mixins: [
-                  "extended_objectives"
-                , "extended_controls"
-                , "extended_business_objects"
+                  "objectives"
+                , "controls"
+                , "business_objects"
                 ]
-            , Section : section_child_options
             }
 
         , Regulation: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
         , Standard: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
         , Policy: {
               _mixins: ["directive"]
+            , Section: section_child_options
             }
-        , Contract : {
+        , Contract: {
               _mixins: ["directive"]
+            , Clause: {
+                model: CMS.Models.Clause
+              , mapping: "clauses"
+              , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+              , draw_children: true
+              }
             }
 
         , extended_audits: {
@@ -319,35 +360,41 @@ $(function() {
             }
           }
 
+        , Clause: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
+        , Objective: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
         , Control: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , DataAsset: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Facility: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Market: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , OrgGroup: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Process: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Product: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Project: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , System: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Document: {
-            _mixins: ["extended_audits"]
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
 
         , Person : {
@@ -366,7 +413,14 @@ $(function() {
             , Contract: {
                 mapping: "extended_related_contracts_via_search"
               , draw_children: true
-              , child_options: [section_child_options]
+              , child_options: [
+                  {
+                    model: CMS.Models.Clause
+                  , mapping: "clauses"
+                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+                  , draw_children: true
+                  }]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
@@ -384,7 +438,7 @@ $(function() {
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
-            , Audit : { 
+            , Audit: {
                 mapping: "extended_related_audits_via_search"
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
@@ -395,7 +449,14 @@ $(function() {
               , show_view : GGRC.mustache_path + "/sections/tree.mustache"
               , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
               , draw_children : true
-              } 
+              }
+            , Clause : {
+                model : CMS.Models.Clause
+              , mapping : "extended_related_clauses_via_search"
+              , show_view : GGRC.mustache_path + "/sections/tree.mustache"
+              , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+              , draw_children : true
+              }
             , Objective: {
                 mapping: "extended_related_objectives_via_search"
               , draw_children: true
@@ -490,9 +551,6 @@ $(function() {
               var $objectArea = $(".object-area");
               if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
                 if (/dashboard/.test(window.location)) {
-                  if (far_model.title_plural === 'Sections') {
-                    return "My Sections / Clauses";
-                  }
                   return "My " + far_model.title_plural;
                 } else {
                   return far_model.title_plural;

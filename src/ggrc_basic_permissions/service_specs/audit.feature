@@ -436,7 +436,7 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Completed"
+    When "response" property "status" is "Rejected"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user
@@ -483,7 +483,7 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Completed"
+    When "response" property "status" is "Rejected"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user
@@ -543,7 +543,7 @@ Feature: Private Program Audits and Role Implication
       { "email": "program.editor@example.com" }
       """
     Then GET of "response" is allowed
-    When "response" property "status" is "Completed"
+    When "response" property "status" is "Rejected"
     Then PUT of "response" is allowed
     Then GET of "response" is allowed
     Given the current user

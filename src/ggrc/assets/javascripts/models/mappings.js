@@ -80,21 +80,6 @@
     return mappings;
   }
 
-  function extended_related(name) {
-    return function(definition) {
-      definition["related_" + name + "_via_extended_sections"] = Cross("extended_related_sections", "related_" + name);
-      definition["related_" + name + "_via_extended_controls"] = Cross("extended_related_controls", "related_" + name);
-      definition["related_" + name + "_via_extended_objectives"] = Cross("extended_related_objectives", "related_" + name);
-
-      definition["extended_related_" + name] = Multi([
-            "related_" + name + "_via_extended_sections"
-          , "related_" + name + "_via_extended_controls"
-          , "related_" + name + "_via_extended_objectives"
-          , "related_" + name
-          ]);
-    };
-  }
-
   GGRC.Mappings = create_mappings({
       base: {
       }
@@ -119,7 +104,7 @@
           ])
       , related_and_able_objects: Multi([
           "objectives", "implemented_controls", "related_business_objects",
-          "people", "joined_directives", "programs"
+          "people", "joined_directives", "programs", "sections", "clauses"
           ])
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
@@ -132,11 +117,13 @@
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
       , controls: Proxy(
-         "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
+          "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
-      , sections: Proxy(
-          "Section", "section", "ControlSection", "control", "control_sections")
+      , _sections_base: Proxy(
+          null, "section", "ControlSection", "control", "control_sections")
+      , sections: TypeFilter("_sections_base", "Section")
+      , clauses: TypeFilter("_sections_base", "Clause")
       , implemented_controls: Proxy(
           "Control", "implemented_control", "ControlControl", "control", "control_controls")
       , implementing_controls: Proxy(
@@ -154,6 +141,7 @@
       , orphaned_objects: Multi([
           "related_objects"
         , "sections"
+        , "clauses"
         , "controls"
         , "programs"
         , "objectives"
@@ -161,17 +149,15 @@
         , "implementing_controls"
         , "joined_directives"
         , "people"
-        // These don't exist client-side yet:
-        // , "risks"
-        // , "control_risks"
-        // , "control_assessments"
         ])
       }
     , Objective: {
         _mixins: ["personable"] //objectiveable
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
-      , related_and_able_objects : Multi(["controls", "objectives", "related_objects", "people"])
+      , related_and_able_objects : Multi([
+          "controls", "objectives", "related_objects", "people",
+          "sections", "clauses"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -180,24 +166,35 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+
+      , regulations: TypeFilter("related_objects", "Regulation")
+      , contracts: TypeFilter("related_objects", "Contract")
+      , policies: TypeFilter("related_objects", "Policy")
+      , standards: TypeFilter("related_objects", "Standard")
+      , programs: TypeFilter("related_objects", "Program")
+
       , objectives: Proxy(
           "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
       , controls: Proxy(
           "Control", "control", "ObjectiveControl", "objective", "objective_controls")
-      , sections: Proxy(
-          "Section", "section", "SectionObjective", "objective", "section_objectives")
+      , _sections_base: Proxy(
+          null, "section", "SectionObjective", "objective", "section_objectives")
+      , sections: TypeFilter("_sections_base", "Section")
+      , clauses: TypeFilter("_sections_base", "Clause")
       , orphaned_objects: Multi([
           "related_objects"
         , "controls"
         , "sections"
+        , "clauses"
         , "people"
         ])
       }
-    , Section: {
+    , section_base: {
         _mixins: ["personable"] //sectionable
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
-      , related_and_able_objects : Multi(["objectives", "controls", "related_objects", "people"])
+      , related_and_able_objects : Multi([
+          "objectives", "controls", "related_objects", "people"])
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -220,6 +217,16 @@
         ])
       }
 
+    , Section: {
+        _mixins: ["section_base"]
+      }
+
+    , Clause: {
+        _mixins: ["section_base"]
+      , contracts: Proxy(
+          "Contract", "directive", "DirectiveSection", "section", "directive_sections")
+      }
+
     , controllable: {
         controls: Proxy(
           "Control", "control", "ObjectControl", "controllable", "object_controls")
@@ -231,8 +238,10 @@
       }
 
     , sectionable: {
-        sections: Proxy(
-          "Section", "section", "ObjectSection", "sectionable", "object_sections")
+        _sections_base : Proxy(
+          null, "section", "ObjectSection", "sectionable", "object_sections")
+        , sections : TypeFilter("_sections_base", "Section")
+        , clauses : TypeFilter("_sections_base", "Clause")
       }
 
     , personable: {
@@ -259,6 +268,13 @@
       , related_products:    TypeFilter("related_objects", "Product")
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
+
+      , regulations: TypeFilter("related_objects", "Regulation")
+      , contracts: TypeFilter("related_objects", "Contract")
+      , policies: TypeFilter("related_objects", "Policy")
+      , standards: TypeFilter("related_objects", "Standard")
+      , programs: TypeFilter("related_objects", "Program")
+
       , related_documentation_responses:        TypeFilter("related_objects", "DocumentationResponse")
       , related_interview_responses:            TypeFilter("related_objects", "InterviewResponse")
       , related_population_sample_responses:    TypeFilter("related_objects", "PopulationSampleResponse")
@@ -274,14 +290,6 @@
     , Program: {
         _mixins: [
             "related_object", "personable", "objectiveable"
-          , extended_related("data_assets")
-          , extended_related("facilities")
-          , extended_related("markets")
-          , extended_related("org_groups")
-          , extended_related("processes")
-          , extended_related("products")
-          , extended_related("projects")
-          , extended_related("systems")
           ]
       , controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls")
@@ -293,69 +301,17 @@
       , policies: TypeFilter("directives", "Policy")
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
+
       , audits: Direct("Audit", "program")
-      , related_objects_via_audits: Cross("audits", "extended_related_objects")
+      //, related_objects_via_audits: Cross("audits", "extended_related_objects")
       , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
-      , related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
+      //, related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
       , authorizations: Indirect("UserRole", "context")
       , authorizations_via_audits: Cross("audits", "authorizations")
       , extended_authorizations: Multi([
           "authorizations", "authorizations_via_audits"])
 
-      , sections_via_directives: Cross("directives", "sections")
-      , controls_via_directives: Cross("directives", "controls")
-
-      , sections_via_directive_controls: Cross("controls_via_directives", "sections")
-      , extended_related_sections: Multi([
-          "sections_via_directive_controls", "sections_via_directives"])
-
-      , controls_via_directive_sections: Cross("sections_via_directives", "controls")
-      , objectives_via_sections: Cross("extended_related_sections", "objectives")
-      , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
-      , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
-      , extended_related_controls: Multi([
-            "controls_via_extended_objectives"
-          , "controls_via_directive_sections"
-          , "controls_via_directives"
-          , "related_controls_via_audits"
-          , "controls"
-          ])
-
-      , related_people_via_sections: Cross("extended_related_sections", "people")
-      , related_people_via_extended_controls: Cross("extended_related_controls", "people")
-      , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
-      , extended_related_people:
-          Multi([
-              "people"
-            , "related_people_via_extended_controls"
-            , "related_people_via_extended_objectives"
-            , "related_people_via_audits"
-            , "related_people_via_sections"
-            ])
-
-      , related_objects_via_sections:
-          Cross("extended_related_sections", "related_objects")
-      , related_objects_via_extended_controls:
-          Cross("extended_related_controls", "related_objects")
-      , related_objects_via_extended_objectives:
-          Cross("extended_related_objectives", "related_objects")
-      , extended_related_objects:
-          Multi([
-              "related_objects_via_extended_controls"
-            , "related_objects_via_extended_objectives"
-            , "related_objects_via_sections"
-            , "related_objects_via_audits"
-            , "related_objects"
-            ])
-      , extended_related_data_assets: TypeFilter("extended_related_objects", "DataAsset")
-      , extended_related_facilities:  TypeFilter("extended_related_objects", "Facility")
-      , extended_related_markets:     TypeFilter("extended_related_objects", "Market")
-      , extended_related_org_groups:  TypeFilter("extended_related_objects", "OrgGroup")
-      , extended_related_processes:   TypeFilter("extended_related_objects", "Process")
-      , extended_related_products:    TypeFilter("extended_related_objects", "Product")
-      , extended_related_projects:    TypeFilter("extended_related_objects", "Project")
-      , extended_related_systems:     TypeFilter("extended_related_objects", "System")
       , orphaned_objects: Multi([
           "related_objects"
         , "controls"
@@ -367,17 +323,13 @@
     , directive_object: {
         _mixins: [
           "related_object", "personable", "objectiveable"
-          , extended_related("data_assets")
-          , extended_related("facilities")
-          , extended_related("markets")
-          , extended_related("org_groups")
-          , extended_related("processes")
-          , extended_related("products")
-          , extended_related("projects")
-          , extended_related("systems")
           ]
       , sections: Direct("Section", "directive")
-      , extended_related_sections: Multi(["sections"])
+      , joined_sections: Proxy(
+          "Section", "section", "DirectiveSection", "directive", "directive_sections")
+      , clauses: Proxy(
+          "Clause", "section", "DirectiveSection", "directive", "directive_sections")
+      //, extended_related_sections: Multi(["sections"])
 
       , direct_controls: Direct("Control", "directive")
       , joined_controls: Proxy(
@@ -387,31 +339,9 @@
       , programs: Proxy(
           "Program", "program", "ProgramDirective", "directives", "program_directives")
 
-      , controls_via_sections: Cross("sections", "controls")
-      , objectives_via_sections: Cross("sections", "objectives")
-      , extended_related_objectives: Multi(["objectives_via_sections", "objectives"])
-      , controls_via_extended_objectives: Cross("extended_related_objectives", "controls")
-      , extended_related_controls: Multi([
-            "controls_via_extended_objectives"
-          , "controls_via_sections"
-          , "controls"
-          ])
-
-      , related_objects_via_sections: Cross("sections", "related_objects")
-
-      , related_people_via_sections: Cross("sections", "people")
-      , related_people_via_extended_controls: Cross("extended_related_controls", "people")
-      , related_people_via_extended_objectives: Cross("extended_related_objectives", "people")
-      , extended_related_people:
-          Multi([
-              "people"
-            , "related_people_via_extended_controls"
-            , "related_people_via_extended_objectives"
-            , "related_people_via_sections"
-            ])
-
       , orphaned_objects: Multi([
           "sections"
+        , "clauses"
         , "people"
         , "controls"
         , "programs"
@@ -446,6 +376,7 @@
         , "controls"
         , "objectives"
         , "sections"
+        , "clauses"
         ])
       }
 
@@ -483,6 +414,7 @@
       , owned_objectives: Indirect("Objective", "contact")
       , owned_controls: Indirect("Control", "contact")
       , owned_sections: Indirect("Section", "contact")
+      , owned_clauses: Indirect("Clause", "contact")
       , owned_data_assets: Indirect("DataAsset", "contact")
       , owned_facilities: Indirect("Facility", "contact")
       , owned_markets: Indirect("Market", "contact")
@@ -502,6 +434,7 @@
       , related_objectives:  TypeFilter("related_objects", "Objective")
       , related_controls:    TypeFilter("related_objects", "Control")
       , related_sections:    TypeFilter("related_objects", "Section")
+      , related_clauses:     TypeFilter("related_objects", "Clause")
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
       , related_facilities:  TypeFilter("related_objects", "Facility")
       , related_markets:     TypeFilter("related_objects", "Market")
@@ -521,6 +454,7 @@
       , extended_related_objectives:  Multi(["related_objectives", "owned_objectives"])
       , extended_related_controls:    Multi(["related_controls", "owned_controls"])
       , extended_related_sections:    Multi(["related_sections", "owned_sections"])
+      , extended_related_clauses:     Multi(["related_clauses", "owned_clauses"])
       , extended_related_data_assets: Multi(["related_data_assets", "owned_data_assets"])
       , extended_related_facilities:  Multi(["related_facilities", "owned_facilities"])
       , extended_related_markets:     Multi(["related_markets", "owned_markets"])
@@ -531,8 +465,9 @@
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
 
       , related_objects_via_search: Search("", [
-          "Program",  "Regulation", "Contract", "Policy", "Standard", "Section", "Objective",
-          "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility",
+          "Program",  "Regulation", "Contract", "Policy", "Standard",
+          "Section", "Clause", "Objective", "Control",
+          "System", "Process", "DataAsset", "Product", "Project", "Facility",
           "Market", "OrgGroup", "Audit"//, "Request", "Response"
         ], { contact_id: "id" })
 
@@ -544,6 +479,7 @@
       , extended_related_objectives_via_search:  TypeFilter("related_objects_via_search", "Objective")
       , extended_related_controls_via_search:    TypeFilter("related_objects_via_search", "Control")
       , extended_related_sections_via_search:    TypeFilter("related_objects_via_search", "Section")
+      , extended_related_clauses_via_search:     TypeFilter("related_objects_via_search", "Clause")
       , extended_related_data_assets_via_search: TypeFilter("related_objects_via_search", "DataAsset")
       , extended_related_facilities_via_search:  TypeFilter("related_objects_via_search", "Facility")
       , extended_related_markets_via_search:     TypeFilter("related_objects_via_search", "Market")

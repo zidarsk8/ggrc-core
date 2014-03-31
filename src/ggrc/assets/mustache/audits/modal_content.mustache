@@ -54,7 +54,7 @@
       <i class="grcicon-person-green pull-left icon-field"></i>
       <div class="objective-selector">
         {{#using contact=instance.contact}}
-        <input tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
+          <input tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
         {{/using}}
       </div>
     </div>
@@ -74,7 +74,7 @@
     <div class="span12">
       <label class="spacing">
         <input type="checkbox" name="auto_generate" value="checked" tabindex="4">
-        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#using program=instance.program}}{{#with_mapping 'extended_related_objectives' program}}{{extended_related_objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)</a></span>
+        Auto-Generate PBC List based on Objectives <span class="small"><a href="#">({{#using program=instance.program}}{{#with_mapping 'objectives' program}}{{objectives.length}}{{/with_mapping}}{{/using}} Objectives Found)</a></span>
       </label>
     </div>
   </div>
@@ -145,7 +145,7 @@
         <div class="objective-selector">
           {{! `with_auditors` requires `authorizations` mapping, so preload it }}
           {{#with_mapping 'authorizations' instance}}
-          {{#with_auditors instance}}
+          {{#with_auditors instance decoy=authorizations}}
             {{#using auditor=auditors.0.person}}
             <input tabindex="10" type="text" name="auditor.email" data-lookup="Person" class="span8 search-icon" placeholder="Enter text to search for Auditor" value="{{auditor.email}}">
             {{/using}}

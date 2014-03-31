@@ -33,10 +33,10 @@ var makeFindRelated = function(thistype, othertype) {
   };
 };
 
-function dateConverter(d) {
+function dateConverter(d, oldValue, fn, key) {
   var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
   var ret;
-  if(typeof d === "object") {
+  if(typeof d === "object" && d) {
     d = d.getTime();
   }
   if(typeof d === "number") {
@@ -46,6 +46,7 @@ function dateConverter(d) {
   if(typeof d === "string" && ~d.indexOf("/")) {
     conversion = "MM/DD/YYYY";
   }
+  d = d || "";
   ret = moment(d.toString(), conversion);
   if (typeof d === "string" && ret
       //  Don't correct timezone for dates
@@ -54,13 +55,17 @@ function dateConverter(d) {
       && !/[-+]\d\d:?\d\d/.test(d)) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
+
+  if(oldValue && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
+    return oldValue;  // avoid changing to new Date object if the value is the same.
+  }
   return ret ? ret.toDate() : undefined;
 }
 
 function makeDateUnpacker(keys) {
-  return function(d) {
+  return function(d, oldValue, fn, attr) {
     return can.reduce(keys, function(curr, key) {
-      return curr || (d[key] && dateConverter(d[key]));
+      return curr || (d[key] && dateConverter(d[key], oldValue, fn, attr));
     }, null) || d;
   };
 }
@@ -111,8 +116,10 @@ can.Model("can.Model.Cacheable", {
 
         deferred.then(success, error);
         sourceDeferred.then(function(sourceData) {
-          var obsList = new self.List([]);
-          
+          var obsList = new self.List([])
+            , index = 0
+            ;
+
           if(sourceData[self.root_collection + "_collection"]) {
             sourceData = sourceData[self.root_collection + "_collection"];
           }
@@ -120,16 +127,38 @@ can.Model("can.Model.Cacheable", {
             sourceData = sourceData[self.root_collection];
           }
 
-          setTimeout(function(){
-            var piece = sourceData.splice ? sourceData.splice(0,Math.min(sourceData.length, 5)) : [sourceData];
-            obsList.push.apply(obsList, self.models(piece));
+          if (!sourceData.splice) {
+            sourceData = [sourceData];
+          }
 
-            if(sourceData.length) {
-              setTimeout(arguments.callee, 10);
-            } else {
+          function modelizeMS(ms) {
+            var item
+              , start
+              , instances = []
+              ;
+            start = Date.now();
+            while(sourceData.length > index && (Date.now() - start) < ms) {
+              can.Observe.startBatch();
+              item = sourceData[index];
+              index = index + 1;
+              instances.push.apply(instances, self.models([item]));
+              can.Observe.stopBatch();
+            }
+            can.Observe.startBatch();
+            obsList.push.apply(obsList, instances);
+            can.Observe.stopBatch();
+          }
+
+          // Trigger a setTimeout loop to modelize remaining objects
+          (function() {
+            modelizeMS(100);
+            if (sourceData.length > index) {
+              setTimeout(arguments.callee, 5);
+            }
+            else {
               deferred.resolve(obsList);
             }
-          }, 10);
+          })();
         }, function() {
           deferred.reject.apply(deferred, arguments);
         });
@@ -146,9 +175,9 @@ can.Model("can.Model.Cacheable", {
       };
       this.findPage = function() {
         throw "No default findPage() exists for subclasses of Cacheable";
-      }
+      };
     }
-    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) { 
+    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
       if(this.root_collection) {
         this.findAll = "GET /api/" + this.root_collection;
       } else {
@@ -176,6 +205,22 @@ can.Model("can.Model.Cacheable", {
     //  I've submitted a fix to CanJS for this but it remains to be seen
     //  whether it gets in and when.  --BM 3/4/14
     //this.__bindEvents = {};
+
+    var that = this;
+    if(statics.mixins) {
+      can.each(statics.mixins, function(mixin) {
+        var _mixin = mixin;
+        if(typeof _mixin === "string") {
+          _mixin = can.getObject(_mixin, CMS.Models.Mixins);
+        }
+        if(_mixin) {
+          _mixin.add_to(that);
+        } else {
+          throw "Error: Cannot find mixin " + mixin + " for class " + that.fullName;
+        }
+      });
+      delete this.mixins;
+    }
 
     var ret = this._super.apply(this, arguments);
     if(overrideFindAll)
@@ -257,12 +302,6 @@ can.Model("can.Model.Cacheable", {
         risk_child_options.model = CMS.Models.Risk;
       if(that.risk_tree_options.child_options && that.risk_tree_options.child_options.length > 1)
         that.risk_tree_options.child_options[1].model = that;
-    });
-    $(function() {
-      if (GGRC.current_user) {
-        that.defaults.contact = CMS.Models.Person.model(GGRC.current_user).stub();
-        that.defaults.owners = [CMS.Models.Person.model(GGRC.current_user).stub()];
-      }
     });
   }
 
@@ -405,9 +444,9 @@ can.Model("can.Model.Cacheable", {
     }
 
   , stubs : function(params) {
-      return can.map(this.models(params), function(instance) {
+      return new can.List(can.map(this.models(params), function(instance) {
         return instance.stub();
-      });
+      }));
     }
 
   , stub : function(params) {
@@ -553,6 +592,13 @@ can.Model("can.Model.Cacheable", {
         return findPageFunc(collection_url, params);
       };
     }
+
+  , get_mapper: function(name) {
+      mappers = GGRC.Mappings[this.shortName];
+      mapper = mappers[name];
+      return mapper;
+    }
+
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -560,8 +606,14 @@ can.Model("can.Model.Cacheable", {
     if (this[id_key])
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
+    this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
   }
   , computed_errors : can.compute(function() { return this.errors(); })
+
+  , get_list_counter: function(name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_count();
+    }
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
@@ -655,8 +707,7 @@ can.Model("can.Model.Cacheable", {
       if (!binding) {
         if (typeof(mapper) === "string") {
           // Lookup and attach named mapper
-          mappings = GGRC.Mappings[this.constructor.shortName];
-          mapping = mappings && mappings[mapper];
+          mapping = this.constructor.get_mapper(mapper);
           if (!mapping)
             console.debug("No such mapper:  " + this.constructor.shortName + "." + mapper);
           else
@@ -758,12 +809,7 @@ can.Model("can.Model.Cacheable", {
   , autocomplete_label : function() {
     return this.title;
   }
-  , set_owner_to_current_user_if_unset : function() {
-    if(this.constructor.attributes.owners
-          && (!this.owners || this.owners.length === 0)) {
-      this.attr('owners', [{ id: GGRC.current_user.id }]);
-    }
-  }
+
   /**
    Set up a deferred join object deletion when this object is updated.
   */
@@ -794,12 +840,47 @@ can.Model("can.Model.Cacheable", {
     }
     this._pending_joins.push({how : "add", what : obj, through : join_attr });
   }
+
+  , delay_resolving_save_until : function(dfd) {
+    return this.notifier.queue(dfd);
+  }
+
   , save : function() {
-    if(this.isNew()) {
+    var that = this
+      , isNew = this.isNew()
+      , xhr
+      , dfd = new $.Deferred()
+      ;
+
+    this.before_save && this.before_save();
+    if(isNew) {
       this.attr("provisional_id", "provisional_" + Math.floor(Math.random() * 10000000));
       can.getObject("provisional_cache", can.Model.Cacheable, true)[this.provisional_id] = this;
+      this.before_create && this.before_create();
+    } else {
+      this.before_update && this.before_update();
     }
-    return this._super.apply(this, arguments);
+
+    xhr = this._super.apply(this, arguments).then(function(result) {
+      if(isNew) {
+        this.after_create && this.after_create();
+      } else {
+        this.after_update && this.after_update();
+      }
+      this.after_save && this.after_save();
+      return result;
+    });
+
+    xhr.always(function() {
+      that.notifier.on_empty(function() {
+        dfd.resolve();
+      });
+    });
+
+    GGRC.delay_leaving_page_until(xhr);
+    GGRC.delay_leaving_page_until(dfd);
+
+    return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
   }
 });
 

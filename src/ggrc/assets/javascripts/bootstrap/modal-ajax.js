@@ -48,7 +48,7 @@
   }
 
   function refresh_page() {
-    setTimeout(can.proxy(window.location.reload, window.location), 10);
+    setTimeout(can.proxy(GGRC.navigate, GGRC), 10);
   }
 
   var handlers = {
@@ -183,10 +183,10 @@
       $target.on('modal:success', function(e, data) {
         var model_name = $trigger.attr("data-object-plural").toLowerCase();
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
-          window.location.assign('/dashboard');
+          GGRC.navigate('/dashboard');
         } else if (model_name  == 'people' || model_name  == 'roles') {
           window.location.assign('/admin#' + model_name + "_list_widget");
-          window.location.reload();
+          GGRC.navigate();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
@@ -284,12 +284,14 @@
       $target.on('modal:success', function(e, data, xhr) {
         if (form_target == 'refresh') {
           refresh_page();
-        } else if (form_target == 'redirect' && data.type != 'Audit' && data.type != 'Program') {
+        } else if (form_target == 'redirect') {
           if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
-            window.location.assign(xhr.getResponseHeader('location'));
+            GGRC.navigate(xhr.getResponseHeader('location'));
           }
+          else if(data.type === "Audit"){
+            GGRC.navigate(data.program.reify().viewLink + "#audit_widget");          }
           else {
-            window.location.assign(data.selfLink.replace('/api', ''));
+            GGRC.navigate(data.selfLink.replace('/api', ''));
           }
         } else {
           var dirty;

@@ -7,6 +7,8 @@ permissions = {
     "read": [
         "Categorization",
         "Category",
+        "ControlCategory",
+        "ControlAssertion",
         "Control",
         "ControlControl",
         "ControlSection",
@@ -17,6 +19,7 @@ permissions = {
         "Regulation",
         "Standard",
         "DirectiveControl",
+        "DirectiveSection",
         "Document",
         "Facility",
         "Help",
@@ -37,7 +40,9 @@ permissions = {
         "Project",
         "Relationship",
         "RelationshipType",
+        "SectionBase",
         "Section",
+        "Clause",
         "SectionObjective",
         "SystemOrProcess",
         "System",
@@ -48,6 +53,14 @@ permissions = {
         "Person",
         "Program",
         "Role",
+        {
+            "type": "Task",
+            "terms": {
+                "property_name": "modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
     ],
     "create": [],
     "view_object_page": [

@@ -7,42 +7,65 @@
 
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span10">
+          <div class="span12">
+            
+            <ul class="tree-action-list">
+              {{#infer_roles instance}}
+                <li>
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <span class="role">
+                        {{.}}
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              {{/infer_roles}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+              </li>
+              {{^instance.contact}}
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-people-warning"></i>
+                  </div>
+                </li>
+              {{/instance.contact}}
+              
+              {{#if_instance_of instance 'Contract'}}
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-section-black"></i>
+                    {{#with_mapping_count instance 'clauses'}}
+                      {{count}}
+                    {{/with_mapping_count}}
+                  </div>
+                </li>
+              {{else}}  
+                <li>
+                  <div class="counter">
+                    <i class="grcicon-section-black"></i>
+                    {{#with_mapping_count instance 'sections'}}
+                      {{count}}
+                    {{/with_mapping_count}}
+                  </div>
+                </li>
+              {{/if_instance_of}}
+            </ul>
+            
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
-                {{#infer_roles instance}}
-                  <span class="role">
-                    {{.}}
-                  </span>
-                {{/infer_roles}}
               </div>
             </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
-              {{^instance.contact}}
-                <i class="grcicon-people-warning"></i>
-              {{/instance.contact}}
-            </div>
-          </div>
-          <div class="span1">
-            <div class="counter">
-              <i class="grcicon-section-black"></i>
-                {{#if expanded}}
-                {{#prune_context}}
-                  {{child_count}}        
-                {{/prune_context}}
-                {{else}}
-                  {{instance.sections.length}}
-                {{/if expanded}}
-            </div>
+            
           </div>
         </div>
-      </a>
+      </div>
     </div>
 
     {{#if expanded}}
@@ -110,7 +133,7 @@
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
-            <h6>{{#if_equals instance.class.model_singular 'Contract'}}Clauses{{else}}Sections{{/if_equals}} ({{child_count}}) {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}</h6>
+            <h6>{{#if_equals instance.class.model_singular 'Contract'}}Clauses{{else}}Sections{{/if_equals}} ({{child_count}})<!-- {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}--></h6>
             {{#child_options}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}

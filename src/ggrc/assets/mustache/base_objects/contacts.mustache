@@ -11,7 +11,7 @@
             {{#if_equals role.name 'ProgramOwner'}}
               {{#using contact=instance.person}}
                 <p>
-                  {{{render '/static/mustache/people/popover.mustache' person=contact}}}
+                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
                 </p>
               {{/using}}
             {{/if_equals}}
@@ -27,7 +27,7 @@
       {{#using contacts=owners}}
       {{#contacts}}
         <p>
-          {{{render '/static/mustache/people/popover.mustache' person=this}}}
+          {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
         </p>
       {{/contacts}}
       {{/using}}
@@ -47,7 +47,7 @@
       <p>
         <strong>Contact</strong>
         <br>
-        {{{render '/static/mustache/people/popover.mustache' person=person}}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
       </p>
     {{else}}
       <p>
