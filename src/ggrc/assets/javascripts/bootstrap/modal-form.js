@@ -70,13 +70,13 @@
         delete_target = this.$trigger.data('delete-target');
         if (delete_target == 'refresh') {
           // Refresh the page
-          window.location.assign(window.location.href.replace(/#.*/, ''));
+          GGRC.navigate(window.location.href.replace(/#.*/, ''));
         } else if (xhr && xhr.getResponseHeader('location')) {
           // Otherwise redirect if possible
-          window.location.assign(xhr.getResponseHeader('location'));
+          GGRC.navigate(xhr.getResponseHeader('location'));
         } else {
           // Otherwise refresh the page
-          window.location.assign(window.location.href.replace(/#.*/, ''));
+          GGRC.navigate(window.location.href.replace(/#.*/, ''));
         }
       }
     }
@@ -239,10 +239,10 @@
         // Maybe handle AJAX/JSON redirect or refresh
         if (xhr.status == 278) {
           // Handle 278 redirect (AJAX redirect)
-          window.location.assign(xhr.getResponseHeader('location'));
+          GGRC.navigate(xhr.getResponseHeader('location'));
         } else if (xhr.status == 279) {
           // Handle 279 page refresh
-          window.location.assign(window.location.href.replace(/#.*/, ''));
+          GGRC.navigate(window.location.href.replace(/#.*/, ''));
         }
         else {
           var modal_form = $(".modal:visible:last").data("modal_form");

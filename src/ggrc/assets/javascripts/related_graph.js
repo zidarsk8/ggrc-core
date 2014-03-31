@@ -155,7 +155,7 @@ $(document).ready(function() {
       var mouseClick = function() {
         var $this = $(this)
         var node = fullData.nodes[$this.data('node')]
-        window.location.href = node.link
+        GGRC.navigate(window.location.host + node.link);
       }
 
 

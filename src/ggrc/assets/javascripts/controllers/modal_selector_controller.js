@@ -198,7 +198,7 @@
       //   - (actually, the "Related Widget" should just be Can-ified instead)
       var list_target = this.options.$trigger.data('list-target');
       if (list_target === "refresh" && this._data_changed)
-        setTimeout(can.proxy(window.location.reload, window.location), 10);
+        setTimeout(can.proxy(GGRC.navigate, GGRC), 10);
     },
 
     ".option_column li.tree-item click": function(el, ev) {
