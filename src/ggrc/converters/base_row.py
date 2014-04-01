@@ -10,7 +10,8 @@ from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
-    Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
+    Relationship, Request, Section, SectionBase, SectionObjective,
+    System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 
@@ -1029,7 +1030,7 @@ class LinkControlObjective(LinkObjectHandler):
 
 class LinkSectionObjective(LinkObjectHandler):
 
-  model_class = Section
+  model_class = SectionBase  # Needs to see clauses
 
   def get_existing_items(self):
     importer_cls_name = self.importer.obj.__class__.__name__
@@ -1040,13 +1041,13 @@ class LinkSectionObjective(LinkObjectHandler):
 
   def after_save(self, obj):
     # Assumption: only one linked section, at most, at this point
-    # If it's present, overwrite ObjectiveRowImporter's options
-    # to have the section as a parent instead of directive
-    # so that it ONLY maps to that section, not the section's directive
-    section_list = [x for x in self.created_links() if type(x) == Section]
+    # If it's present, add to ObjectiveRowImporter's options
+    # so that it has values for section_id and section_type
+    # and can additionally connect to those
+    section_list = [x for x in self.created_links() if isinstance(x, SectionBase)] # get the section or clause that was created
     if len(section_list) >= 1:
       section = section_list[0]
       db.session.add(section)
-      self.importer.options['parent_id'] = section.id
-      self.importer.options['parent_type'] = Section
+      self.importer.options['section_id'] = section.id
+      self.importer.options['section_type'] = type(section)
 
