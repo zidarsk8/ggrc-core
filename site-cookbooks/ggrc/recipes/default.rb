@@ -53,8 +53,16 @@ execute "Prepare dev virtualenv" do
 end
 
 # `compass` gem is required for building CSS assets
-# ..
+# `sass` gem is required for `compass`, but the default version doesn't work,
+#   so explicitly install a good version
+#
+#   sudo gem install sass --version 3.2.13
 #   sudo gem install compass --version '= 0.12.2'
+gem_package "sass" do
+  version "3.2.13"
+  action :install
+end
+
 gem_package "compass" do
   version "0.12.2"
   action :install
