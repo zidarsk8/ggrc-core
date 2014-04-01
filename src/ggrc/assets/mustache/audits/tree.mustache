@@ -287,14 +287,14 @@
       {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.original_list.length}}{{#with_mapping_count instance 'requests'}}/{{count}}{{else}}/...{{/with_mapping_count}})</h6>
             {{#child_options.1}}
               <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.original_list.length}}{{#with_mapping_count instance 'responses_via_requests'}}/{{count}}{{else}}/...{{/with_mapping_count}})</h6>
             {{#child_options.2}}
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
@@ -304,7 +304,7 @@
           {{#if_instance_of page_object 'Audit|Program|Person'}}
             <div class="inner-tree">
               <h6>
-                PBC Requests ({{child_options.0.list.length}})
+                PBC Requests ({{#with_mapping_count instance 'requests'}}{{count}}{{else}}/...{{/with_mapping_count}})
                 {{#child_options.0.header_view}}
                 <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
                 {{/child_options.0.header_view}}
