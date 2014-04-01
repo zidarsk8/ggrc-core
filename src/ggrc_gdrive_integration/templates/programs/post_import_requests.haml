@@ -50,8 +50,8 @@
               , ctl.create_folder_if_nonexistent(audit)
             );
           });
-        }).done(function() {
-          window.location.assign(can.deparam(window.location.search.substr(1)).return_to);
+        }).always(function() {
+          GGRC.navigate(can.deparam(window.location.search.substr(1)).return_to);
         });
       });
     })();
