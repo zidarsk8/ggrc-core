@@ -43,8 +43,9 @@ GGRC.RequestStore = function() {
           store:{}
       } : localStorage : sessionStorage;
 
-
-  $.ajaxTransport("json", function(options, _originalOptions, _jqXHR) {
+  // Transport layer for saving responses from API requests and short-
+  // circuiting later, duplicate requests
+  var record_replay_transport = function(options, _originalOptions, _jqXHR) {
     var recording = storage.getItem("RequestStore.record"),
         replaying = storage.getItem("RequestStore.replay");
 
@@ -104,22 +105,41 @@ GGRC.RequestStore = function() {
         console.debug("Aborted ajax");
       }
     };
-  });
+  };
 
+  // Only apply Ajax Transport when requested
+  var enabled = false;
+  var enable_record_replay_transport = function() {
+    if (!enabled) {
+      $.ajaxTransport("json", record_replay_transport);
+      enabled = true;
+    }
+  };
+
+  // Initialize Ajax Transport if storage record or replay is enabled
+  var recording = storage.getItem("RequestStore.record"),
+      replaying = storage.getItem("RequestStore.replay");
+  if (recording || replaying) {
+    enable_record_replay_transport();
+  }
 
   return {
     set_record: function(state) {
-      if (state)
+      if (state) {
+        enable_record_replay_transport();
         storage.setItem("RequestStore.record", true);
-      else
+      } else {
         storage.removeItem("RequestStore.record");
+      }
     },
 
     set_replay: function(state) {
-      if (state)
+      if (state) {
+        enable_record_replay_transport();
         storage.setItem("RequestStore.replay", true);
-      else
+      } else {
         storage.removeItem("RequestStore.replay");
+      }
     },
 
     clear: function() {
