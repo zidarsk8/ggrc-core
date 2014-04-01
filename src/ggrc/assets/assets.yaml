@@ -37,6 +37,7 @@ dashboard-js-files:
   - single_selector.js
   - spin.min.js
   - tmpl.js
+  - client_record_replay.js
   - mustache_helper.js
   - sticky_header.js
   - models/mappers.js
