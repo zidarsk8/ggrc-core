@@ -173,8 +173,12 @@ can.Control("CMS.Controllers.Dashboard", {
 
   , update_inner_nav: function(el, ev, data) {
       if (this.inner_nav_controller) {
-        this.inner_nav_controller.update_widget_list(
-          this.get_active_widget_elements());
+        if(data) {
+          this.inner_nav_controller.update_widget(data.widget || data, data.index);
+        } else {
+          this.inner_nav_controller.update_widget_list(
+            this.get_active_widget_elements());
+        }
       }
     }
 
@@ -233,7 +237,7 @@ can.Control("CMS.Controllers.Dashboard", {
       $element
         .trigger("sortreceive")
         .trigger("section_created")
-        .trigger("widgets_updated")
+        .trigger("widgets_updated", $element);
 
       return control;
     }
@@ -374,7 +378,7 @@ can.Control("CMS.Controllers.InnerNav", {
 
       this.sortable();
 
-      can.route.ready(false);
+      can.route.ready();
 
       if (!(this.options.contexts instanceof can.Observe))
         this.options.contexts = new can.Observe(this.options.contexts);
@@ -394,14 +398,20 @@ can.Control("CMS.Controllers.InnerNav", {
       });
 
       can.view(this.options.internav_view, this.options, function(frag) {
-        that.element.append(frag);
-        can.route.ready(true);
-        if (window.location.hash.substr(0,2) === "#!") {
-          can.route.attr('path', window.location.hash.substr(2));
+        function fn() {
+          that.element.append(frag);
+          if (window.location.hash.substr(0,2) === "#!") {
+            can.route.attr('path', window.location.hash.substr(2));
+          }
+          else {
+            can.route.attr('path', window.location.hash.substr(1));
+          }
+          delete that.delayed_display;
         }
-        else {
-          can.route.attr('path', window.location.hash.substr(1));
-        }
+        that.delayed_display = {
+          fn : fn
+          , timeout : setTimeout(fn, 50)
+        };
       });
 
       this.on();
@@ -496,28 +506,9 @@ can.Control("CMS.Controllers.InnerNav", {
     })[0] || undefined;
   }
 
-  /*, "{document.body} loading" : function(body, ev) {
-    var that = this;
-    can.each(this.options.widget_list, function(widget) {
-      var spinner;
-      if($(widget.selector).has(ev.target).length) {
-        widget.attr("spinner", true);
-        that.options.spinners[widget.selector] = true;
-      }
-    });
-  }
-
   , "{document.body} loaded" : function(body, ev) {
-    var that = this;
-    can.each(this.options.widget_list, function(widget) {
-      var spinner;
-      if($(widget.selector).has(ev.target).length) {
-        widget.attr("spinner", false);
-        delete that.options.spinners[widget.selector];
-      }
-    });
     this.element.sortable("enable");
-  }*/
+  }
 
   , update_widget_list : function(widget_elements) {
       var starttime = Date.now()
@@ -526,59 +517,76 @@ can.Control("CMS.Controllers.InnerNav", {
         ;
 
       can.each(widget_elements, function(widget_element, index) {
-        var $widget = $(widget_element)
-          , widget = that.widget_by_selector("#" + $widget.attr("id"))
-          , $header = $widget.find(".header h2")
-          , icon = $header.find("i").attr("class")
-          , menuItem = $header.text().trim()
-          , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
-          , title = match[1]
-          , count = match[2] || undefined
-          , existing_index
-          ;
-
-        // If the metadata is unrendered, find it via options
-        if (!title) {
-          var widget_options = $widget.control("dashboard_widgets").options
-            , widget_name = widget_options.widget_name;
-          icon = icon || widget_options.widget_icon;
-          // Strips html
-          title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (''+widget_name)).text();
-        }
-        title = title.replace(/^(Mapped|Linked|My)\s+/,'');
-
-        // Only create the observable once, this gets updated elsewhere
-        if (!widget) {
-          widget = new can.Observe({
-              selector: "#" + $widget.attr("id")
-            , count: count
-            , has_count: count != null
-          });
-        }
-        existing_index = that.options.widget_list.indexOf(widget);
-
-        widget.attr({
-          internav_icon: icon
-        , internav_display: title
-        , spinner : that.options.spinners["#" + $widget.attr("id")]
-        });
-
-        if(existing_index !== index) {
-          if(existing_index > -1) {
-            that.options.widget_list.splice(existing_index, 1);
-          }
-          that.options.widget_list.splice(index, 0, widget);
-        }
-        widget_list.splice(can.inArray(widget, widget_list), 1);
+        widget_list.splice(
+          can.inArray(
+            that.update_widget(widget_element, index)
+            , widget_list)
+          , 1);
       });
-  // This line is the slow bit.
-      //this.options.widget_list.replace(widget_list);
+
       can.each(widget_list, function(widget) {
         that.options.widget_list.splice(can.inArray(widget, that.options.widget_list), 1);
       });
-
-      console.log("post-replace", Date.now() - starttime, "ms");
     }
+
+  , update_widget : function(widget_element, index) {
+      var $widget = $(widget_element)
+        , widget = this.widget_by_selector("#" + $widget.attr("id"))
+        , $header = $widget.find(".header h2")
+        , icon = $header.find("i").attr("class")
+        , menuItem = $header.text().trim()
+        , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
+        , title = match[1]
+        , count = match[2] || undefined
+        , existing_index
+        ;
+
+      index = (index == null) ? this.options.widget_list.length : index;
+
+      if(this.delayed_display) {
+        clearTimeout(this.delayed_display.timeout);
+        this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
+      }
+
+
+      // If the metadata is unrendered, find it via options
+      if (!title) {
+        var widget_options = $widget.control("dashboard_widgets").options
+          , widget_name = widget_options.widget_name;
+        icon = icon || widget_options.widget_icon;
+        // Strips html
+        title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (''+widget_name)).text();
+      }
+      title = title.replace(/^(Mapped|Linked|My)\s+/,'');
+
+      // Only create the observable once, this gets updated elsewhere
+      if (!widget) {
+        widget = new can.Observe({
+            selector: "#" + $widget.attr("id")
+          , count: count
+          , has_count: count != null
+        });
+      }
+      existing_index = this.options.widget_list.indexOf(widget);
+
+      widget.attr({
+        internav_icon: icon
+      , internav_display: title
+      , spinner : this.options.spinners["#" + $widget.attr("id")]
+      });
+
+      if(existing_index !== index) {
+        if(existing_index > -1) {
+          this.options.widget_list.splice(existing_index, 1);
+        }
+        if(index >= this.options.widget_list.length) {
+          this.options.widget_list.push(widget);
+        } else {
+          this.options.widget_list.splice(index, 0, widget);
+        }
+      }
+      return widget;
+  }
 
   , update_widget_count : function($el, count) {
       var widget_id = $el.closest('.widget').attr('id')
