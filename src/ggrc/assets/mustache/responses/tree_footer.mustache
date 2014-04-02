@@ -1,4 +1,4 @@
-{{#if allow_creating}}
+{{#if allow_mapping_or_creating}}
 {{#if_helpers '\
   #is_allowed' 'create' model.shortName _0_context=parent_instance.context.id '\
   and #if_can_edit_request' parent_instance '\
