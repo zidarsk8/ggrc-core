@@ -5547,7 +5547,12 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
       this.loaded = true;
 
       // Trigger the callback
-      setTimeout(function() { that.callback(that); }, 0);
+      setTimeout(function() {
+        // If the iframe has been removed, don't continue initializing
+        if (wysihtml5.dom.contains(doc.documentElement, iframe)) {
+          that.callback(that);
+        }
+      }, 0);
     },
 
     _getHtml: function(templateVars) {
