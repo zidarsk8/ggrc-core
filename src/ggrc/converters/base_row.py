@@ -525,6 +525,7 @@ class LinksHandler(ColumnHandler):
     super(LinksHandler, self).__init__(importer, key, **options)
 
     self.pre_existing_links = None
+    self.processed_link_objs = set()  # to track duplicates
     self.link_status = {}
     self.link_objects = {}
     self.link_index = 0
@@ -539,12 +540,20 @@ class LinksHandler(ColumnHandler):
     self.link_warnings.setdefault(self.link_index, []).append(message)
 
   def add_created_link(self, obj):
-    self.link_status[self.link_index] = 'created'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'created'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def add_existing_link(self, obj):
-    self.link_status[self.link_index] = 'existing'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'existing'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def has_errors(self):
     return any(self.errors) or any(self.link_errors.values())
@@ -560,7 +569,18 @@ class LinksHandler(ColumnHandler):
 
   def created_links(self):
     created_indices = [index for index in self.link_objects.keys() if self.link_status[index] == 'created']
-    return [self.link_objects[index] for index in created_indices]
+    output_links = []
+    output_set = set()  # to track uniques
+    # filter out duplicates while preserving order
+    for index in created_indices:
+      link_obj = self.link_objects[index]
+      if link_obj not in output_set:
+        output_links.append(link_obj)
+        output_set.add(link_obj)
+    # append a warning if there are duplicates
+    if len(output_links) != len(output_set):
+      self.add_warning("There are duplicates in this list of linked objects.")
+    return output_links
 
   def display(self):
     return "XXX"
