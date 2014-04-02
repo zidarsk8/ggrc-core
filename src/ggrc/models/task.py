@@ -84,6 +84,7 @@ def make_task_response(id):
   return task.make_response()
 
 def queued_task(func):
+  from ggrc.app import app
 
   @wraps(func)
   def decorated_view(*args, **kwargs):
@@ -96,7 +97,7 @@ def queued_task(func):
       result = func(task)
     except:
       import traceback
-      from ggrc.app import app
+      app.logger.error("Task failed", exc_info=True)
       task.finish("Failure", app.make_response((
         traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
 
