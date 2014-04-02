@@ -496,7 +496,7 @@ can.Control("CMS.Controllers.InnerNav", {
     })[0] || undefined;
   }
 
-  , "{document.body} loading" : function(body, ev) {
+  /*, "{document.body} loading" : function(body, ev) {
     var that = this;
     can.each(this.options.widget_list, function(widget) {
       var spinner;
@@ -517,14 +517,15 @@ can.Control("CMS.Controllers.InnerNav", {
       }
     });
     this.element.sortable("enable");
-  }
+  }*/
 
   , update_widget_list : function(widget_elements) {
-      var widget_list = []
+      var starttime = Date.now()
+        , widget_list = this.options.widget_list.slice(0)
         , that = this
         ;
 
-      can.each(widget_elements, function(widget_element) {
+      can.each(widget_elements, function(widget_element, index) {
         var $widget = $(widget_element)
           , widget = that.widget_by_selector("#" + $widget.attr("id"))
           , $header = $widget.find(".header h2")
@@ -533,6 +534,7 @@ can.Control("CMS.Controllers.InnerNav", {
           , match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {}
           , title = match[1]
           , count = match[2] || undefined
+          , existing_index
           ;
 
         // If the metadata is unrendered, find it via options
@@ -553,6 +555,7 @@ can.Control("CMS.Controllers.InnerNav", {
             , has_count: count != null
           });
         }
+        existing_index = that.options.widget_list.indexOf(widget);
 
         widget.attr({
           internav_icon: icon
@@ -560,9 +563,21 @@ can.Control("CMS.Controllers.InnerNav", {
         , spinner : that.options.spinners["#" + $widget.attr("id")]
         });
 
-        widget_list.push(widget);
+        if(existing_index !== index) {
+          if(existing_index > -1) {
+            that.options.widget_list.splice(existing_index, 1);
+          }
+          that.options.widget_list.splice(index, 0, widget);
+        }
+        widget_list.splice(can.inArray(widget, widget_list), 1);
       });
-      this.options.widget_list.replace(widget_list);
+  // This line is the slow bit.
+      //this.options.widget_list.replace(widget_list);
+      can.each(widget_list, function(widget) {
+        that.options.widget_list.splice(can.inArray(widget, that.options.widget_list), 1);
+      });
+
+      console.log("post-replace", Date.now() - starttime, "ms");
     }
 
   , update_widget_count : function($el, count) {
