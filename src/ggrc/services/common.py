@@ -369,7 +369,8 @@ class ModelView(View):
         if j_contexts is not None:
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
-    query = query.order_by(self.modified_attr.desc())
+    if '__sort' not in request.args:
+      query = query.order_by(self.modified_attr.desc())
     order_properties = []
     if '__sort' in request.args:
       sort_attrs = request.args['__sort'].split(",")
@@ -527,6 +528,16 @@ class Resource(ModelView):
         :service: The instance of Resource handling the PUT request.
       """,
       )
+  model_deleted = signals.signal('Model DELETEd',
+      """
+      Indicates that a model object was DELETEd and will be removed from the
+      databse. The sender in the signal will be the model class of the DELETEd
+      resource. The followin garguments will be sent along with the signal:
+
+        :obj: The model instance removed.
+        :service: The instance of Resource handling the DELETE request.
+      """,
+      )
 
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -614,7 +625,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if self.request.headers['Content-Type'] != 'application/json':
+    if self.request.mimetype != 'application/json':
       return current_app.make_response((
         'Content-Type must be application/json', 415,[]))
     header_error = self.validate_headers_for_put_or_delete(obj)
@@ -670,6 +681,7 @@ class Resource(ModelView):
     if not permissions.is_allowed_delete_for(obj):
       raise Forbidden()
     db.session.delete(obj)
+    self.model_deleted.send(obj.__class__, obj=obj, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
     with benchmark("Update memcache before commit for resource collection DELETE"):
@@ -1024,7 +1036,7 @@ class Resource(ModelView):
     pass
 
   def collection_post(self):
-    if self.request.headers['Content-Type'] != 'application/json':
+    if self.request.mimetype != 'application/json':
       return current_app.make_response((
         'Content-Type must be application/json', 415,[]))
     obj = self.model()

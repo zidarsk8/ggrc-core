@@ -10,7 +10,8 @@ from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
-    Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
+    Relationship, Request, Section, SectionBase, SectionObjective,
+    System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 
@@ -412,11 +413,16 @@ class SlugColumnHandler(ColumnHandler):
       if self.value in self.base_importer.get_slugs():
         self.add_error('Slug Code is duplicated in CSV')
       else:
+        self.validate(content)
         self.base_importer.add_slug_to_slugs(self.value)
-      self.validate(content)
+      self.value = content
+      self.set_attr(content)
     else:
-      self.add_warning('Code will be generated on completion of import')
-    return content
+      if self.options.get('is_required'):
+        # execute usual validation behavior
+        self.validate(content)
+      else:
+        self.add_warning('Code will be generated on completion of import')
 
 class OptionColumnHandler(ColumnHandler):
 
@@ -488,13 +494,17 @@ class DateColumnHandler(ColumnHandler):
           date_result = datetime.strptime(value, "%Y-%m-%d")
         elif value:
           raise ValueError("Error parsing the date string")
-
+      default_value = self.options.get('default_value')
+      if default_value and value == '':
+        self.add_warning("This field will be set to the date {}".format(
+            default_value.strftime("%m/%d/%Y")))
+        date_result = default_value
       if date_result:
         return "{year}-{month}-{day}".format(year=date_result.year,month=date_result.month,day=date_result.day)
       else:
         return ''
     except ValueError as e:
-      self.warnings.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
+      self.errors.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
 
   def display(self):
     if self.has_errors():
@@ -516,6 +526,7 @@ class LinksHandler(ColumnHandler):
     super(LinksHandler, self).__init__(importer, key, **options)
 
     self.pre_existing_links = None
+    self.processed_link_objs = set()  # to track duplicates
     self.link_status = {}
     self.link_objects = {}
     self.link_index = 0
@@ -530,12 +541,20 @@ class LinksHandler(ColumnHandler):
     self.link_warnings.setdefault(self.link_index, []).append(message)
 
   def add_created_link(self, obj):
-    self.link_status[self.link_index] = 'created'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'created'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def add_existing_link(self, obj):
-    self.link_status[self.link_index] = 'existing'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'existing'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def has_errors(self):
     return any(self.errors) or any(self.link_errors.values())
@@ -551,7 +570,18 @@ class LinksHandler(ColumnHandler):
 
   def created_links(self):
     created_indices = [index for index in self.link_objects.keys() if self.link_status[index] == 'created']
-    return [self.link_objects[index] for index in created_indices]
+    output_links = []
+    output_set = set()  # to track uniques
+    # filter out duplicates while preserving order
+    for index in created_indices:
+      link_obj = self.link_objects[index]
+      if link_obj not in output_set:
+        output_links.append(link_obj)
+        output_set.add(link_obj)
+    # append a warning if there are duplicates
+    if len(output_links) != len(output_set):
+      self.add_warning("There are duplicates in this list of linked objects.")
+    return output_links
 
   def display(self):
     return "XXX"
@@ -681,14 +711,14 @@ class ObjectiveHandler(ColumnHandler):
   def parse_item(self, value):
     # if this slug exists, return the objective_id, otherwise throw error
     if value:
-      objective = Objective.query.filter_by(slug=value.upper()).first()
+      objective = Objective.query.filter_by(slug=value).first()
       if not objective:
         self.add_error("Objective code '{}' does not exist.".format(value))
       else:
         return objective.id
     else:
       if self.options.get('is_needed_later'):
-        self.add_warning("You will need to connect an Objective later.")
+        self.add_warning("An Objective will need to be mapped later")
       return None
 
   def export(self):
@@ -715,7 +745,7 @@ class LinkControlsHandler(LinksHandler):
   model_class = Control
 
   def parse_item(self, data):
-    return {'slug' : data.upper()}
+    return {'slug' : data}
 
   def create_item(self, data):
     self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
@@ -854,7 +884,7 @@ class LinkSystemsHandler(LinksHandler):
   model_class = System
 
   def parse_item(self, value):
-    return { 'slug' : value.upper(), 'title' : value }
+    return { 'slug' : value, 'title' : value }
 
   def find_existing_item(self, data):
     system = SystemOrProcess.query.filter_by(slug=data.get('slug')).first()
@@ -888,7 +918,7 @@ class LinkRelationshipsHandler(LinksHandler):
       else:
         self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
-      return {'slug' : value.upper()}
+      return {'slug' : value}
 
   def get_existing_items(self):
     where_params= {}
@@ -945,7 +975,7 @@ class LinkObjectHandler(LinksHandler):
       else:
         self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
-      return {'slug' : value.upper()}
+      return {'slug' : value}
 
   def create_item(self, data):
     model_class = self.options.get('model_class') or self.model_class
@@ -1020,7 +1050,7 @@ class LinkControlObjective(LinkObjectHandler):
 
 class LinkSectionObjective(LinkObjectHandler):
 
-  model_class = Section
+  model_class = SectionBase  # Needs to see clauses
 
   def get_existing_items(self):
     importer_cls_name = self.importer.obj.__class__.__name__
@@ -1031,13 +1061,13 @@ class LinkSectionObjective(LinkObjectHandler):
 
   def after_save(self, obj):
     # Assumption: only one linked section, at most, at this point
-    # If it's present, overwrite ObjectiveRowImporter's options
-    # to have the section as a parent instead of directive
-    # so that it ONLY maps to that section, not the section's directive
-    section_list = [x for x in self.created_links() if type(x) == Section]
+    # If it's present, add to ObjectiveRowImporter's options
+    # so that it has values for section_id and section_type
+    # and can additionally connect to those
+    section_list = [x for x in self.created_links() if isinstance(x, SectionBase)] # get the section or clause that was created
     if len(section_list) >= 1:
       section = section_list[0]
       db.session.add(section)
-      self.importer.options['parent_id'] = section.id
-      self.importer.options['parent_type'] = Section
+      self.importer.options['section_id'] = section.id
+      self.importer.options['section_type'] = type(section)
 

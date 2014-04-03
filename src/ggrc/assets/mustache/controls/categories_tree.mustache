@@ -8,7 +8,8 @@
 {{#list}}
   <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="category" data-object-meta-type="category" {{^instance.descendant_controls}}style="display:none"{{/instance.descendant_controls}}>
     <div class="item-main" {{data 'model'}}>
-      <a href="javascript://" class="openclose">
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span10">
             <div class="item-data">
@@ -28,7 +29,7 @@
             </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
     
     <div class="tier-2-info item-content">

@@ -318,9 +318,9 @@ jQuery(function($) {
         $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
-          var jsonResult = $.parseJSON($(task.result.content).html());
+          var jsonResult = $.parseJSON($(task.result.content).text());
           if("location" in jsonResult){
-            window.location.assign(jsonResult.location);
+            GGRC.navigate(jsonResult.location);
             return;
           }
         } catch(e){}
@@ -335,6 +335,10 @@ jQuery(function($) {
         }
         $("#results-container").html(task.result.content);
         $('form.import .btn').unbind().unbind().click(disableButton);
+        if(msg === "Upload and Review"){
+          // Don't display "Upload and Review successful." message
+          return;
+        }
         $('body').trigger(
           'ajax:flash', 
             { "success" : msg + " successful."}
@@ -356,7 +360,7 @@ jQuery(function($) {
       var result = $.parseJSON(data);
       if("location" in result){
         // Redirect
-        window.location.assign(result.location);
+       GGRC.navigate(result.location);
       }
       // Check if task has completed:
       setTimeout(function(){
@@ -760,7 +764,7 @@ jQuery(function($) {
         d.unbind("change"); //forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
       });
-      $.when.apply($, destroys).done($.proxy(window.location, 'reload'));
+      $.when.apply($, destroys).done($.proxy(GGRC, 'navigate'));
     });
   })
   .on('click', '.set-display-settings-default', function(e) {
@@ -827,7 +831,7 @@ function resize_areas() {
   winWidth = $window.width();
   lhsHeight = winHeight - 70;
   footerMargin = lhsHeight;
-  internavHeight = lhsHeight - 55;
+  internavHeight = lhsHeight - 50;
   lhsWidth = $lhsHolder.width();
   barWidth = $bar.is(":visible") ? $bar.outerWidth() : 0;
   internavWidth = $innerNav.width() || 0; // || 0 for pages without inner-nav
@@ -950,7 +954,7 @@ jQuery(function($) {
     }
   });  
 
-  $('body').on('click', 'ul.internav li a', function(e) {
+  /*$('body').on('click', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href") 
     ,   $targetWidget = $($widgetID)
@@ -958,7 +962,7 @@ jQuery(function($) {
     
     $targetWidget.addClass("widget-active");
     $('.cms_controllers_inner_nav').control('inner_nav').set_active_widget($widgetID);
-  });    
+  });*/
 
   $('body').on('mouseenter', '.widget', function(e) {
     var $this = $(this)

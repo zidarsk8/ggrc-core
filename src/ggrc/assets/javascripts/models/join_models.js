@@ -14,24 +14,25 @@ can.Model.Cacheable("can.Model.Join", {
   }
   , init : function() {
     this._super && this._super.apply(this, arguments);
-    //this.reinit();
-    if(this === can.Model.Join) {
-      this.bind("created.reinit destroyed.reinit", function(ev, instance) {
-        if (instance instanceof can.Model.Join) {
-          instance.reinit();
-        //can.proxy(this, "reinit"));
+    function reinit(ev, instance) {
+      if (instance instanceof can.Model.Join) {
+        instance.reinit();
+      //can.proxy(this, "reinit"));
 
-          can.each(instance.constructor.join_keys, function(cls, key) {
-            if (instance[key].reify && instance[key].reify().refresh)
-              instance[key].reify().refresh();
-            else {
-              var obj =
-                cls.findInCacheById(instance[key].id);
-              obj && obj.refresh();
-            }
-          });
-        }
-      });
+        can.each(instance.constructor.join_keys, function(cls, key) {
+          if (instance[key].reify && instance[key].reify().refresh)
+            instance[key].reify().refresh();
+          else {
+            var obj =
+              cls.findInCacheById(instance[key].id);
+            obj && obj.refresh();
+          }
+        });
+      }
+    }
+    if(this === can.Model.Join) {
+      this.bind("created", reinit);
+      this.bind("destroyed", reinit);
     }
   }
 }, {
@@ -174,12 +175,12 @@ can.Model.Join("CMS.Models.ObjectSection", {
     root_object: "object_section"
   , root_collection: "object_sections"
   , join_keys : {
-      "section" : CMS.Models.Section
+      "section" : CMS.Models.SectionBase
     , "sectionable" : can.Model.Cacheable
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , sectionable : "CMS.Models.get_stub"
   }
   , findAll: "GET /api/object_sections"
@@ -296,12 +297,12 @@ can.Model.Join("CMS.Models.ControlSection", {
   , create : "POST /api/control_sections"
   , destroy : "DELETE /api/control_sections/{id}"
   , join_keys : {
-      section : CMS.Models.Section
+      section : CMS.Models.SectionBase
     , control : CMS.Models.Control
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , control : "CMS.Models.Control.stub"
   }
 }, {
@@ -314,12 +315,12 @@ can.Model.Join("CMS.Models.SectionObjective", {
   , create : "POST /api/section_objectives"
   , destroy : "DELETE /api/section_objectives/{id}"
   , join_keys : {
-      section : CMS.Models.Section
+      section : CMS.Models.SectionBase
     , objective : CMS.Models.Objective
   }
   , attributes : {
       modified_by : "CMS.Models.Person.stub"
-    , section : "CMS.Models.Section.stub"
+    , section : "CMS.Models.get_stub"
     , objective : "CMS.Models.Objective.stub"
   }
 }, {
@@ -339,6 +340,24 @@ can.Model.Join("CMS.Models.DirectiveControl", {
       modified_by : "CMS.Models.Person.stub"
     , directive : "CMS.Models.Directive.stub"
     , control : "CMS.Models.Control.stub"
+  }
+}, {
+});
+
+can.Model.Join("CMS.Models.DirectiveSection", {
+    root_collection : "directive_sections"
+  , root_object : "directive_section"
+  , findAll : "GET /api/directive_sections"
+  , create : "POST /api/directive_sections"
+  , destroy : "DELETE /api/directive_sections/{id}"
+  , join_keys : {
+      directive : CMS.Models.Directive
+    , section : CMS.Models.SectionBase
+  }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    , directive : "CMS.Models.Directive.stub"
+    , section : "CMS.Models.get_stub"
   }
 }, {
 });
@@ -403,7 +422,7 @@ can.Model.Join("CMS.Models.ControlRisk", {
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"
-  , findAll: "GET /api/object_people?__include=person"
+  , findAll: "GET /api/object_people"
   , create : "POST /api/object_people"
   , update : "PUT /api/object_people/{id}"
   , destroy : "DELETE /api/object_people/{id}"

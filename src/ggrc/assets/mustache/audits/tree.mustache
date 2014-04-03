@@ -8,55 +8,73 @@
 
 {{!tree node mustache}}
 <li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  <div class="item-main" data-model="true" {{data 'model'}}>
-    <a href="javascript://" class="openclose">
+  <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="span10">
+        <div class="span12">
+          
+          <ul class="tree-action-list">
+            {{#infer_roles instance}}
+              <li>
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    <span class="role">
+                      {{.}}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            {{/infer_roles}}
+            {{#with_page_object_as 'page_object'}}
+              {{#if_instance_of page_object 'Person'}}
+              
+                {{^instance.contact}}
+                  <li>
+                    <div class="counter">
+                      <i class="grcicon-people-warning"></i>
+                    </div>
+                  </li>
+                {{/instance.contact}}
+                
+                {{#mapping_count instance 'related_owned_objects'}}
+                  <li>
+                    <div class="counter">
+                      <i class="grcicon-object-black"></i>
+                        {{.}}
+                    </div>
+                  </li>
+                  {{else}}
+                  <li>
+                    <div class="counter">
+                      <i class="grcicon-object-black"></i>
+                        ...
+                    </div>
+                  </li>
+                {{/mapping_count}}
+                {{else}}
+                {{^instance.contact}}
+                  <li>
+                    <div class="counter">
+                      <i class="grcicon-people-warning"></i>
+                    </div>
+                  </li>
+                {{/instance.contact}}
+              {{/if_instance_of}}
+            {{/with_page_object_as}}
+          </ul>
+          
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-{{instance.class.table_singular}}-color"></i>
               {{instance.title}}
               <span class="small gray">{{instance.status}}</span>
-              {{#infer_roles instance}}
-                <span class="role">
-                  {{.}}
-                </span>
-              {{/infer_roles}}
             </div>
           </div>
+          
         </div>
-        {{#with_page_object_as 'page_object'}}
-        {{#if_instance_of page_object 'Person'}}
-        <div class="span1">
-          <div class="counter">
-            {{^instance.contact}}
-              <i class="grcicon-people-warning"></i>
-            {{/instance.contact}}
-          </div>
-        </div>
-        <div class="span1">
-          <div class="counter">
-            <i class="grcicon-object-black"></i>
-            {{#mapping_count instance 'related_owned_objects'}}
-              {{.}}
-            {{else}}
-              ...
-            {{/mapping_count}}
-          </div>
-        </div>
-        {{else}}
-        <div class="span1"></div>
-        <div class="span1">
-          <div class="counter">
-            {{^instance.contact}}
-              <i class="grcicon-people-warning"></i>
-            {{/instance.contact}}
-          </div>
-        </div>
-        {{/if_instance_of}}
-        {{/with_page_object_as}}
       </div>
-    </a>
+    </div>
   </div>
   
   {{#if expanded}}
@@ -172,45 +190,17 @@
                 {{/using}}
               </li>
               <li>
-                {{#if_helpers '\
-                #if' allow_mapping_or_creating '\
-                and #is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
                 <strong>Auditor: </strong>
                   {{! `with_auditors` requires `authorizations` mapping, so preload it }}
                   {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance}}
+                  {{#with_auditors instance decoy=authorizations}}
                     {{#using auditor=auditors.0.person}}
                       {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
                     {{/using}}
-                    <!--<span class="edit-auditor">
-                      <a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit" data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}}, "userRole_id": {{auditors.0.binding.id}} }' data-base-modal="auditor">
-                        <i class="grcicon-edit"></i>
-                        Edit
-                      </a>
-                    </span>-->
                   {{else}}
                     No auditor assigned
-                    <!--<a href="javascript://" data-toggle="audit-role-modal-selector" data-modal-selector-options="user_roles" data-list-target="refresh" data-modal-class="modal" data-modal-title="Add Auditor to {{instance.display_name}}" data-modal-scope="Audit"  data-object-id="{{instance.id}}" data-object-params='{ "context": { "id" : {{firstexist instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}"}, "scope_id": {{instance.id}} }' data-base-modal="auditor">
-                    + Auditor
-                    </a>-->
                   {{/with_auditors}}
                   {{/with_mapping}}
-                {{else}}
-                <!-- TODO: Figure out how to fetch authorizations for user with no access roles
-                <strong>Auditor: </strong>
-                {{! `with_auditors` requires `authorizations` mapping, so preload it }}
-                  {{#with_mapping 'authorizations' instance}}
-                  {{#with_auditors instance}}
-                    {{#using auditor=auditors.0.person}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
-                    {{/using}}
-                  {{else}}
-                    None
-                  {{/with_auditors}}
-                  {{/with_mapping}}
-                -->
-                {{/if_helpers}}
               </li>
             </ul>
           </div>
@@ -244,16 +234,22 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        {{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}
-          {{#using program=instance.program}}
+        {{#using program=instance.program}}
+        {{#with_mapping 'authorizations' instance}}
+        {{#if_helpers '\
+            #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
+            and ^if_auditor' instance '\
+            and ^is_page_instance' instance.program '\
+           ' _0_context='' _1_include_admin=false}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
                 View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
               </a>
             </li>
-          {{/using}}
-        {{/is_allowed}}
+        {{/if_helpers}}
+        {{/with_mapping}}
+        {{/using}}
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
@@ -271,25 +267,29 @@
           </li>
           -->
         {{/if_helpers}}
-
-        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-          <li>
-          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
-          </li>
-        {{/is_allowed}}
-
-        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-          <li>
-          {{! FIXME: Better way to get the Audit link }}
-          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
-          </li>
-          
-          <!--
-          <li>
-          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
-          </li>
-          -->
-        {{/is_allowed}}
+        {{#if_helpers '\
+          #is_page_instance' instance.program '\
+          or #is_profile'}}
+	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
+	          
+	          <li>
+	          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
+	          </li>
+	        {{/is_allowed}}
+	
+	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
+	          <li>
+	          {{! FIXME: Better way to get the Audit link }}
+	          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
+	          </li>
+	          
+	          <!--
+	          <li>
+	          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
+	          </li>
+	          -->
+	        {{/is_allowed}}
+        {{/if_helpers}}
       </ul>
     </div>
 
@@ -297,16 +297,16 @@
       {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
             {{#child_options.1}}
-              <ul class="tree-structure new-tree rq-colors" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
             {{#child_options.2}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
           </div>
         {{else}}
@@ -314,27 +314,27 @@
           {{#if_instance_of page_object 'Audit|Program|Person'}}
             <div class="inner-tree">
               <h6>
-                PBC Requests ({{child_options.0.list.length}})
+                PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
                 {{#child_options.0.header_view}}
                 <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
                 {{/child_options.0.header_view}}
               </h6>
               {{#child_options.0}}
-                <ul class="tree-structure new-tree rq-colors" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.0}}
             </div>
           {{else}}
             <div class="inner-tree">
-              <h6>PBC Requests which contain object ({{child_options.3.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+              <h6>PBC Requests which contain object ({{#if_null child_options.3.original_list}}...{{else}}{{child_options.3.original_list.length}}{{/if_null}})</h6>
               {{#child_options.3}}
-                <ul class="tree-structure new-tree rq-colors" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.3}}
             </div>
 
             <div class="inner-tree">
-              <h6>PBC Responses which contain object ({{child_options.4.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+              <h6>PBC Responses which contain object ({{#if_null child_options.4.original_list}}...{{else}}{{child_options.4.original_list.length}}{{/if_null}})</h6>
               {{#child_options.4}}
-                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.4}}
             </div>
           {{/if_instance_of}}

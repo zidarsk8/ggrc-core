@@ -17,6 +17,7 @@ can.Model.Cacheable("CMS.Models.Control", {
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
   , destroy : "DELETE /api/controls/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -35,7 +36,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , objectives : "CMS.Models.Objective.stubs"
     , directive : "CMS.Models.Directive.stub"
     , control_sections : "CMS.Models.ControlSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , program_controls : "CMS.Models.ProgramControl.stubs"
     , programs : "CMS.Models.Program.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"

@@ -10,15 +10,13 @@ from .registry import service
 """All gGRC REST services."""
 
 
-def all_collections():
+def contributed_services():
   """The list of all gGRC collection services as a list of
   (url, ModelClass) tuples.
   """
   import ggrc.models.all_models as models
-  import sys
-  from ggrc import settings
 
-  ret = [
+  return [
     service('tasks', models.Task),
     service('audits', models.Audit),
     service('categorizations', models.Categorization),
@@ -36,6 +34,7 @@ def all_collections():
       service('regulations', models.Regulation),
       service('standards', models.Standard),
     service('directive_controls', models.DirectiveControl),
+    service('directive_sections', models.DirectiveSection),
     service('documents', models.Document),
     service('events', models.Event, ReadOnlyResource),
     service('facilities', models.Facility),
@@ -65,34 +64,32 @@ def all_collections():
       service('interview_responses', models.InterviewResponse),
       service('population_sample_responses', models.PopulationSampleResponse),
     service('revisions', models.Revision, ReadOnlyResource),
-    service('sections', models.Section),
+    service('section_bases', models.SectionBase, ReadOnlyResource),
+      service('sections', models.Section),
+      service('clauses', models.Clause),
     service('section_objectives', models.SectionObjective),
     service('systems_or_processes', models.SystemOrProcess, ReadOnlyResource),
       service('systems', models.System),
       service('processes', models.Process),
     ]
 
-  for extension in settings.EXTENSIONS:
-    __import__(extension)
-    extension_module = sys.modules[extension]
-    if hasattr(extension_module, 'all_collections'):
-      entries = extension_module.all_collections
-      if callable(entries):
-        entries = entries()
-      ret.extend(entries)
-  return ret
 
-def init_all_services(app):
-  """Register all gGRC REST services with the Flask application ``app``."""
+def all_services():
+  from ggrc.extensions import get_extension_modules
+
+  services = contributed_services()
+
+  for extension_module in get_extension_modules():
+    contributions = getattr(extension_module, 'contributed_services', None)
+    if contributions:
+      if callable(contributions):
+        contributions = contributions()
+      services.extend(contributions)
+  return services
+
+
+def init_extra_services(app):
   from ggrc.login import login_required
-
-  for entry in all_collections():
-    entry.service_class.add_to(
-      app,
-      '/api/{0}'.format(entry.name),
-      entry.model_class,
-      decorators=(login_required,),
-      )
 
   from .search import search
   app.add_url_rule(
@@ -105,3 +102,23 @@ def init_all_services(app):
   from .description import ServiceDescription
   app.add_url_rule(
     '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
+
+
+def init_all_services(app):
+  """Register all gGRC REST services with the Flask application ``app``."""
+  from ggrc.extensions import get_extension_modules
+  from ggrc.login import login_required
+
+  for entry in all_services():
+    entry.service_class.add_to(
+      app,
+      '/api/{0}'.format(entry.name),
+      entry.model_class,
+      decorators=(login_required,),
+      )
+
+  init_extra_services(app)
+  for extension_module in get_extension_modules():
+    ext_extra_services = getattr(extension_module, 'init_extra_services', None)
+    if ext_extra_services:
+      ext_extra_services(app)

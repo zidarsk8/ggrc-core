@@ -22,6 +22,7 @@ can.Model.Cacheable("CMS.Models.Meeting", {
     , start_at : "datetime"
     , end_at : "datetime"
   }
+  , defaults : {}
   , init : function() {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("title");
@@ -44,6 +45,15 @@ can.Model.Cacheable("CMS.Models.Meeting", {
         if (value === null)
           that.removeAttr(name);
       });
+        that.bind("change", function(){
+          if(typeof that.response !== "undefined" && !that._preloaded_people){
+            that._preloaded_people = true;
+
+            can.map(that.response.reify().people, function(person){
+              that.mark_for_addition("people", person);
+            })
+          }
+        })
   }
 
 });

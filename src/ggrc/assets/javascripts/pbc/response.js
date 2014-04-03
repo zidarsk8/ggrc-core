@@ -67,7 +67,6 @@ can.Model.Cacheable("CMS.Models.Response", {
     }
   }
 
-
   , attributes : {
       object_documents : "CMS.Models.ObjectDocument.stubs"
     , documents : "CMS.Models.Document.stubs"
@@ -126,6 +125,17 @@ can.Model.Cacheable("CMS.Models.Response", {
     }]
   }
 }, {
+  before_create : function() {
+    if(!this.contact) {
+      this.attr("contact", this.request.reify().assignee);
+    }
+  }
+  , preload_form : function(new_object_form) {
+    if(new_object_form && !this.contact) {
+      this.attr("contact", this.request.reify().assignee);
+    }
+  }
+
 });
 
 CMS.Models.Response("CMS.Models.DocumentationResponse", {
@@ -171,11 +181,16 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
 }, {
   save : function() {
     if(this.isNew()) {
+      var audit = this.request.reify().audit.reify()
+        , auditors = audit.findAuditors();
+      
+      if(auditors.length > 0){
+        this.mark_for_addition("people", auditors[0].person);
+      }
       this.mark_for_addition("people", this.contact);
     }
     return this._super.apply(this, arguments);
   }
-
 });
 
 CMS.Models.Response("CMS.Models.PopulationSampleResponse", {

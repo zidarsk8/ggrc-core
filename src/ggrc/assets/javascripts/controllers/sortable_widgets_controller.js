@@ -17,6 +17,7 @@
    , "policy_widget"
    , "standard_widget"
    , "section_widget"
+   , "clause_widget"
    , "objective_widget"
    , "control_widget"
    , "system_widget"
@@ -158,6 +159,16 @@ can.Control("CMS.Controllers.SortableWidgets", {
 
       this.update_event();
     }
+
+  , " widgets_updated" : function(el, ev, widget) {
+    var index;
+    if(!this.element.is(ev.target) && widget) {
+      ev.stopPropagation();
+      index = can.inArray($(widget).attr("id"), this.options.sort);
+      this.element.trigger("widgets_updated", {widget : widget, index : (~index ? index : null) });
+    }
+  }
+
 });
 
 })(this.can, this.can.$);

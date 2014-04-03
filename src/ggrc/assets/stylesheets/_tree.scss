@@ -26,7 +26,150 @@ ul.new-tree {
     }
     
   }
-  
+  &.request-list,
+  &.responses-list {
+    .short-field {
+      min-height: 23px;
+      margin-bottom: 0;
+      margin-top: 4px;
+    }
+    select {
+      &.short-field {
+        min-height: 23px;
+        height: 23px;
+        line-height: 23px;
+        margin-top: 4px;
+        padding-top: 1px;
+        padding-bottom: 0;
+      }
+    }
+    .request-type {
+      margin-right: 4px;
+    }
+    .utility-link {
+      font-size:11px;
+      font-weight:bold;
+      color:#111;
+      text-transform:uppercase;
+      @include opacity(0.4);
+      @include transition(opacity 0.2s);
+      &:hover {
+        @include opacity(1);
+        text-decoration:none;
+      }
+      &.controls {
+        @include opacity(1);
+      }
+    }
+    .request-read-only {
+      .small {
+        font-size: 11px;
+      }
+      .request-status {
+        font-size: 11px;
+        font-style: italic;
+      }
+    }
+  }
+  &.responses-list {
+    .response-control {
+      text-align: right;
+      padding-right: 5px;
+      .rejected {
+        text-transform: uppercase;
+        color: $red;
+      }
+    }
+    li.tree-item {
+      ul.new-tree {
+        li.tree-item {
+          border-bottom: 1px solid #ddd;
+        }
+        &.tree-open {
+          li.tree-item {
+            background: #eee !important;
+            &.item-open {
+              .openclose {
+                .row-fluid {
+                  &:hover {
+                    background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
+                    @include background-size(30px 6px);
+                    .counter {
+                      @include opacity(1);
+                    }
+                  }
+                }
+                &.active {
+                  font-weight:bold;
+                  .row-fluid {
+                    background:$white;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &.request-list {
+    .item-data {
+      padding-left: 5px;
+      @include clearfix();
+      overflow: visible;
+      .type {
+        float: left;
+        width: 23%;
+        .grcicon-carot {
+          margin-left: -6px;
+        }
+      }
+      .tree-title-area {
+        float: left;
+        width: 73%;
+      }
+    }
+    .accepted {
+      text-transform: uppercase;
+      color: $green;
+    }
+    .controls {
+      color: $controls;
+      border: none;
+      background: none;
+      padding: 0;
+      &.danger {
+        color: $red;
+      }
+      &:hover {
+        text-decoration: underline;
+      }
+      &:focus {
+        outline: none;
+      }
+    }
+    .control-wrap {
+      @include clearfix();
+      padding-right: 5px;
+    }
+    .date {
+      color: $gray;
+      float: left;
+      width: 30%;
+    }
+    input {
+      &.date {
+        float: none;
+        width: 40%;
+      }
+    }
+    .request-control {
+      float: left;
+      width: 66%;
+      margin-left: 4%;
+      text-align: right;
+    }
+  }
   .request-readonly {
     width: 6px;
     height: 8px;
@@ -367,114 +510,34 @@ ul.new-tree {
       max-width: 3.5em;
       margin-left: 0.5em;
     }
-    &.request-list,
-    &.responses-list {
-      .short-field {
-        min-height: 23px;
-        margin-bottom: 0;
-        margin-top: 4px;
-      }
-      select {
-        &.short-field {
-          min-height: 23px;
-          height: 23px;
-          line-height: 23px;
-          margin-top: 4px;
-          padding-top: 1px;
-          padding-bottom: 0;
-        }
-      }
-      .request-type {
-        margin-right: 4px;
-      }
-      .utility-link {
-        font-size:11px;
-        font-weight:bold;
-        color:#111;
-        text-transform:uppercase;
-        @include opacity(0.4);
-        @include transition(opacity 0.2s);
-        &:hover {
-          @include opacity(1);
-          text-decoration:none;
-        }
-      }
-      .request-read-only {
-        .small {
-          font-size: 11px;
-        }
-        .request-status {
-          font-size: 11px;
-          font-style: italic;
-        }
-      }
+    .tree-action-right {
+      float: right;
     }
-    &.responses-list {
-      .response-control {
-        text-align: right;
-        padding-right: 5px;
-        .rejected {
-          text-transform: uppercase;
-          color: $red;
-        }
-      }
-    }
-    &.request-list {
-      &.request-redesign {
+    .tree-action-list {
+      @include reset-list();
+      @include clearfix();
+      float: right;
+      margin-right: 20px;
+      li {
+        float: left;
+        margin-left: 15px;
+        line-height: 31px;
         .item-data {
-          padding-left: 5px;
-          @include clearfix();
-          .type {
-            float: left;
-            width: 15%;
-            .grcicon-carot {
-              margin-left: -6px;
-            }
-          }
-          .tree-title-area {
-            float: left;
-            width: 85%;
-          }
+          padding-left: 0;
+          float: none;
+          clear: both;
+          overflow: visible;
         }
-        .accepted {
-          text-transform: uppercase;
-          color: $green;
-        }
-        .controls {
-          color: $controls;
-          border: none;
-          background: none;
-          padding: 0;
-          &.danger {
-            color: $red;
+        .info-action {
+          &.relevant-action {
+            padding-right: 0;
           }
-          &:hover {
-            text-decoration: underline;
-          }
-          &:focus {
-            outline: none;
-          }
-        }
-        .control-wrap {
-          @include clearfix();
-          padding-right: 5px;
-        }
-        .date {
-          color: $gray;
-          float: left;
-          width: 30%;
-        }
-        .request-control {
-          float: left;
-          width: 66%;
-          margin-left: 4%;
-          text-align: right;
         }
       }
     }
   }
-  &.rq-colors {
-    li.tree-item {
+  &.colored-list {
+    > li.tree-item {
       padding: 1px 1px 0px 1px;
       background: $white;
       border-bottom: none !important;
@@ -492,32 +555,16 @@ ul.new-tree {
       }
       .new-tree {
         li.tree-item {
-          padding: 0;
-          background: #fafafa;
-          border-bottom: 1px solid #ddd !important;
           &.tree-item-add {
             padding: 0 0 0 20px;
-          }
-          .item-main {
-            .row-fluid {
-              background: #fafafa;
-              &:hover {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-                @include background-size(30px 6px);
-              }
-            }
           }
         }
       }
       &.rq-draft {
-        .item-main {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqDraft,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -526,30 +573,14 @@ ul.new-tree {
             .tree-title-area {
               color: $text;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
       &.rq-requested {
-        .item-main {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqStarted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -558,30 +589,16 @@ ul.new-tree {
             .tree-title-area {
               color: $darkText;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
-      &.rq-responded-request {
-        .item-main {
+      &.rq-responded-request,
+      &.rq-responded,
+      &.rq-updated-response {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqRespond,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -590,30 +607,15 @@ ul.new-tree {
             .tree-title-area {
               color: $darkText;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
-      &.rq-amended-request {
-        .item-main {
+      &.rq-amended-request,
+      &.rq-amended {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqAmmend,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -622,30 +624,14 @@ ul.new-tree {
             .tree-title-area {
               color: $darkText;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
       &.rq-updated {
-        .item-main {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqUpdate,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -654,30 +640,14 @@ ul.new-tree {
             .tree-title-area {
               color: $darkText;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
       &.rq-accepted {
-        .item-main {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqAccepted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -686,30 +656,14 @@ ul.new-tree {
             .tree-title-area {
               color: #3e7b39;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
-          }
-        }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
-            }
           }
         }
       }
       &.rq-warning {
-        .item-main {
+        > .item-main {
           &:hover {
             .row-fluid {
-              background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom;
-              @include background-size(30px 6px);
-              .row-fluid {
-                background-image: none;
-              }
+              background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
             }
           }
           .row-fluid {
@@ -718,107 +672,99 @@ ul.new-tree {
             .tree-title-area {
               color: #c73535;
             }
-            .row-fluid {
-              border-bottom: none;
-            }
           }
         }
-        .new-tree {
-          li.tree-item {
-            .item-main {
-              .row-fluid {
-                border-bottom: none;
-              }
+      }
+      &.rq-assigned {
+        > .item-main {
+          &:hover {
+            .row-fluid {
+              background:darken($rqAssigned,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+            }
+          }
+          .row-fluid {
+            background: $rqAssigned !important;
+            border-bottom: 1px solid #f0f076 !important;
+            .tree-title-area {
+              color: $darkText;
             }
           }
         }
       }
-    }
-    &.rq-colors-inner {
-      li.tree-item {
-        &.rq-assigned {
-          .item-main {
-            &:hover {
-              .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
-                @include background-size(30px 6px !important);
-                .row-fluid {
-                  background-image: none;
-                }
-              }
-            }
+      &.rq-submitted {
+        > .item-main {
+          &:hover {
             .row-fluid {
-              background: $rqAssigned !important;
-              border-bottom: 1px solid #f0f076 !important;
-              .tree-title-area {
-                color: $darkText;
-              }
-              .row-fluid {
-                border-bottom: none;
-              }
+              background:darken($rqSubmitted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+            }
+          }
+          .row-fluid {
+            background: $rqSubmitted !important;
+            border-bottom: 1px solid #86c5ef !important;
+            .tree-title-area {
+              color: $darkText;
             }
           }
         }
-        &.rq-submitted {
-          .item-main {
-            &:hover {
-              .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
-                @include background-size(30px 6px !important);
-                .row-fluid {
-                  background-image: none;
-                }
-              }
-            }
+      }
+      &.rq-rejected {
+        > .item-main {
+          &:hover {
             .row-fluid {
-              background: $rqSubmitted !important;
-              border-bottom: 1px solid #86c5ef !important;
-              .tree-title-area {
-                color: $darkText;
-              }
-              .row-fluid {
-                border-bottom: none;
-              }
+              background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+            }
+          }
+          .row-fluid {
+            background: $rqWarning !important;
+            border-bottom: 1px solid #f1977a !important;
+            .tree-title-area {
+              color: #c73535;
             }
           }
         }
-        &.rq-rejected {
-          .item-main {
-            &:hover {
-              .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
-                @include background-size(30px 6px !important);
-                .row-fluid {
-                  background-image: none;
-                }
-              }
-            }
+      }
+      &.rq-accepted {
+        > .item-main {
+          &:hover {
             .row-fluid {
-              background: $rqWarning !important;
-              border-bottom: 1px solid #f1977a !important;
-              .tree-title-area {
-                color: #c73535;
-              }
+              background:darken($rqAccepted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom !important;
+            }
+          }
+          .row-fluid {
+            background: $rqAccepted !important;
+            border-bottom: 1px solid #a8de84 !important;
+            .tree-title-area {
+              color: #3e7b39;
             }
           }
         }
-        &.rq-accepted {
-          .item-main {
-            &:hover {
+      }
+      &.rq-draft,
+      &.rq-requested,
+      &.rq-responded-request,
+      &.rq-responded,
+      &.rq-updated-response,
+      &.rq-amended-request,
+      &.rq-amended,
+      &.rq-updated,
+      &.rq-accepted,
+      &.rq-warning,
+      &.rq-assigned,
+      &.rq-submitted,
+      &.rq-rejected,
+      &.rq-accepted {
+        > .item-main {
+          &:hover {
+            .row-fluid {
+              @include background-size(30px 6px !important);
               .row-fluid {
-                background:#eee image-url("bgnds/hover.png") no-repeat 50% bottom !important;
-                @include background-size(30px 6px !important);
-                .row-fluid {
-                  background-image: none;
-                }
+                background-image: none;
               }
             }
+          }
+          .row-fluid {
             .row-fluid {
-              background: $rqAccepted !important;
-              border-bottom: 1px solid #a8de84 !important;
-              .tree-title-area {
-                color: #3e7b39;
-              }
+              border-bottom: none;
             }
           }
         }
@@ -899,6 +845,9 @@ ul.new-tree {
       margin: 6px 0 2px 0;
       li {
         padding-bottom: 4px;
+        i {
+          margin-top: 1px;
+        }
       }
     }
   }
@@ -949,7 +898,6 @@ ul.new-tree {
 }
 
 .inner-tree {
-  margin-bottom:20px;
   ul.new-tree {
     @include reset-list();
     li.tree-item {
@@ -1004,7 +952,7 @@ ul.new-tree {
   &.content-open {
     @include box-shadow(inset 0 4px 3px -3px #bbb);
     background:#fff;
-    padding-bottom:2px;
+    padding-bottom:20px;
   }
 }
 .tier-2-info-content {
@@ -1065,6 +1013,7 @@ ul.new-tree {
   }
   .population-upload {
     @include reset-list();
+    margin-top: 20px;
     li {
       margin-bottom: 20px;
       label {
@@ -1077,6 +1026,15 @@ ul.new-tree {
         margin: 6px 0 0 0;
         display: inline-block;
       }
+      .evidence {
+        padding-top: 0;
+        .row-fluid {
+          margin-bottom: 0 !important;
+        }
+      }
+      input {
+        margin-bottom: 0;
+      }
       .span2 {
         margin-left: 0;
       }
@@ -1087,6 +1045,8 @@ ul.new-tree {
 .item-data {
   padding-left:20px;
   color:#222;
+  overflow: hidden;
+  zoom: 1;
   .tree-title-area {
     @include oneline();
     .event-action {
@@ -1164,6 +1124,15 @@ ul.new-tree {
       @include opacity(1);
     }
   }
+  &.relevant-action {
+    padding-right: 20px;
+    color: $subTitle;
+    @include opacity(0.5);
+    &:hover {
+      color: $subTitle;
+      @include opacity(1);
+    }
+  }
 }
 
 .counter {
@@ -1191,6 +1160,7 @@ ul.new-tree {
 }
 
 .inner-tree {
+  padding-top: 20px;
   h6 {
     @include border-radius(4px 4px 0 0);
     border:1px solid #ccc;
@@ -1198,7 +1168,6 @@ ul.new-tree {
     background:#ddd;
     color:#666;
     padding-left:20px;
-    margin-top:20px;
     margin-left:20px;
     margin-right:20px;
     line-height:24px;

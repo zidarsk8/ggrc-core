@@ -3,7 +3,7 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from ggrc import db
+from ggrc.app import app, db
 from sqlalchemy.orm import validates
 from .mixins import deferred, Base
 from .reflection import PublishOnly
@@ -13,7 +13,7 @@ import re
 
 class Person(Base, db.Model):
   __tablename__ = 'people'
-  EMAIL_RE_STRING = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])"
+  EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 
   email = deferred(db.Column(db.String), 'Person')
   name = deferred(db.Column(db.String), 'Person')
@@ -46,6 +46,9 @@ class Person(Base, db.Model):
   _sanitize_html = [
       'company',
       'name',
+      ]
+  _include_links = [
+      'object_people',
       ]
 
   # Methods required by Flask-Login
@@ -102,6 +105,13 @@ class Person(Base, db.Model):
     the system-wide context, it shows the highest ranked one (if there are
     multiple) or "No Access" if there are none.
     """
+    # FIXME: This method should be in `ggrc_basic_permissions`, since it
+    #   depends on `Role` and `UserRole` objects
+
+    if 'BOOTSTRAP_ADMIN_USERS' in app.config \
+        and self.email in app.config['BOOTSTRAP_ADMIN_USERS']:
+      return u"Superuser"
+
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
         u'ProgramCreator': 1,

@@ -5,7 +5,7 @@
 
 from .base import *
 
-from ggrc.models import Directive, Section
+from ggrc.models import Directive, DirectiveSection, Section
 from .base_row import *
 from collections import OrderedDict
 
@@ -16,7 +16,7 @@ class SectionRowConverter(BaseRowConverter):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
         and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Slug code is already used.')
+          self.importer.errors.append('Section code is already used.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
@@ -34,9 +34,17 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_raw_attr('title', is_required=True)
 
   def save_object(self, db_session, **options):
-    if options.get('directive_id'):
-      self.obj.directive_id = int(options.get('directive_id'))
-      db_session.add(self.obj)
+    directive_id = options.get('directive_id')
+    if directive_id:
+      # connect via DirectiveSection if clause, but directily if section
+      import_kind = options.get('import_kind')
+      if import_kind == 'Clause':
+        db_session.add(self.obj)
+        ds = DirectiveSection(directive_id=directive_id, section=self.obj)
+        db_session.add(ds)
+      elif import_kind == 'Section':
+        self.obj.directive_id = int(directive_id)
+        db_session.add(self.obj)
 
 
 class SectionsConverter(BaseConverter):
@@ -69,10 +77,10 @@ class SectionsConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.directive().type))
+      self.errors.append('Missing {} Code heading'.format(self.directive_kind()))
     elif attrs['slug'] != self.directive().slug:
       self.errors.append('{0} Code must be {1}'.format(
-          self.directive(),
+          self.directive_kind(),
           self.directive().slug
       ))
 

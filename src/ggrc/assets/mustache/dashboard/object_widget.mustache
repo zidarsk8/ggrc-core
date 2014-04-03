@@ -13,7 +13,7 @@
           <i class="{{widget_icon}}"></i>
           {{{widget_name}}}
           <span class="object_count">
-            {{#widget_count}}{{#count}}({{count}}{{#is_profile}}{{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}{{#global_count model.model_singular}}/{{.}}{{/global_count}}{{/is_allowed}}{{/is_profile}}){{/count}}{{/widget_count}}</span>
+            {{#widget_count}}{{#count}}({{count}}){{/count}}{{/widget_count}}</span>
           <span class="explanation">{{widget_info}}</span>
         </h2>
       </div>
@@ -25,9 +25,6 @@
           </a>
         </div>
         {{/if}}
-        <div class="widget-action pull-right widget-showhide" rel="tooltip" title="Expand / Collapse">
-          <a class="active" href="javascript://"></a>
-        </div>
         <div class="widget-action pull-right widget-action-help">
           <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="{{firstnonempty widget_help widget_id modal.table_plural}}" href="javascript://" rel="tooltip" data-original-title="Help">
             <i class="grcicon-help-black"></i>

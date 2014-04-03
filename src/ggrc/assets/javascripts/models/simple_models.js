@@ -13,11 +13,12 @@ can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
   , category : "programs"
-  , findAll : "/api/programs?kind=Directive"
+  , findAll : "/api/programs"
   , findOne : "/api/programs/{id}"
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
+  , mixins : ["contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -31,7 +32,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
     , objectives : "CMS.Models.Objective.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directives : "CMS.Models.Directive.stubs"
     , program_controls : "CMS.Models.ProgramControl.stubs"
@@ -40,6 +41,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   }
   , tree_view_options : {
       "show_view" : GGRC.mustache_path + "/programs/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     }
   , links_to : {
     "Regulation" : "ProgramDirective"
@@ -62,14 +64,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {
-  set_owner_to_current_user_if_unset : function() {
-    // Do not add an owner to a private program. Ownership is managed
-    // through role assignment for private programs.
-    if (!this.private)
-    {
-      this._super();
-    }
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Cycle", {
@@ -84,6 +78,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
+  , mixins : ["ownable", "contactable"]
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -121,7 +116,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , defaults : {
@@ -137,15 +132,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
   init : function() {
     this._super && this._super.apply(this, arguments);
     var that = this;
-    /*this.attr("descendant_sections", can.compute(function() {
-      var sections = [].slice.call(that.attr("sections"), 0);
-      return can.reduce(that.sections, function(a, b) {
-        return a.concat(can.makeArray(b.descendant_sections()));
-      }, sections);
-    }));
-    this.attr("descendant_sections_count", can.compute(function() {
-      return that.attr("descendant_sections")(true).length; //giving it a value to force revalidation
-    }));*/
   }
   , lowercase_kind : function() { return this.kind ? this.kind.toLowerCase() : undefined; }
 });
@@ -169,6 +155,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -185,7 +172,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Standard" ]
@@ -211,6 +198,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -227,7 +215,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [ "Regulation" ]
@@ -253,6 +241,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -269,7 +258,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
@@ -295,6 +284,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   }
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
+    , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
       contact : "CMS.Models.Person.stub"
@@ -310,9 +300,11 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , objectives : "CMS.Models.Objective.stubs"
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.Section.stubs"
     , controls : "CMS.Models.Control.stubs"
+    , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true)
@@ -327,6 +319,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -342,7 +335,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -408,6 +401,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -423,7 +417,7 @@ can.Model.Cacheable("CMS.Models.Project", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -473,6 +467,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -488,7 +483,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -554,6 +549,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -569,7 +565,7 @@ can.Model.Cacheable("CMS.Models.Product", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , kind : "CMS.Models.Option.stub"
   }
   , defaults : {
@@ -658,6 +654,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -673,7 +670,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -739,6 +736,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
+  , mixins : ["ownable", "contactable"]
   , attributes : {
       contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
@@ -754,7 +752,7 @@ can.Model.Cacheable("CMS.Models.Market", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
@@ -868,7 +866,7 @@ can.Model.Cacheable("CMS.Models.Risk", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
   }
   , risk_tree_options : { show_view : GGRC.mustache_path + "/risks/tree.mustache", child_options : [], draw_children : false}
   , tree_view_options : {
@@ -919,6 +917,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
+  , mixins : ["ownable", "contactable"]
   , links_to : {
       "Section" : "SectionObjective"
   }
@@ -927,7 +926,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , section_objectives : "CMS.Models.SectionObjective.stubs"
-    , sections : "CMS.Models.Section.stubs"
+    , sections : "CMS.Models.get_stubs"
     , objective_controls : "CMS.Models.ObjectiveControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , object_objectives : "CMS.Models.ObjectObjective.stubs"
@@ -1030,6 +1029,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
+  , mixins : ["contactable"]
   , attributes : {
     program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
@@ -1045,7 +1045,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
   , defaults : {
     status : "Draft"
-    , contact: {id : null}//gets replaced in init()
   }
   , tree_view_options : {
     draw_children : true
@@ -1085,49 +1084,87 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validatePresenceOf("title");
+    this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
+      var audit_firm = this.attr("audit_firm");
+      var audit_firm_text = this.attr("_transient.audit_firm");
+      if(!audit_firm && audit_firm_text
+        || (audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
+        return "No valid org group selected for firm";
+      }
+    });
+    // Preload auditor role:
+    CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
   save : function() {
+    
+    var that = this;
+    // Make sure the context is always set to the parent program
+    if(!this.context.id){
+      this.context = this.program.reify().context;
+    }
+    
     return this._super.apply(this, arguments).then(function(instance) {
-      var no_change = false
-        , auditor_role
-        ;
+      return that._save_auditor(instance);
+    });
+  }
+  , _save_auditor : function(instance){
+
+    var no_change = false
+      , auditor_role
+      ;
+
+    Permission.refresh(); //Creating an audit creates new contexts.  Make sure they're reflected client-side
+    
+    if(typeof instance.auditor === 'undefined'){
+      return instance;
+    }
+    // Find the Auditor user role
+    return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
+      if(roles.length === 0) {
+        console.warn("No Auditor role");
+        return new $.Deferred().reject();
+      }
+      auditor_role = roles[0];
       
-      if(typeof instance.auditor !== 'undefined'){
-        // Find the Auditor user role
-        return CMS.Models.Role.findAll({name__in: "Auditor"}).then(function(roles){
-          if(roles.length === 0) {
-            console.warn("No Auditor role");
-            return new $.Deferred().reject();
-          }
-          auditor_role = roles[0];
-          
-          return CMS.Models.UserRole.findAll({
-            context_id__in: instance.context.id,
-            role_id__in: auditor_role.id
-          });
-        }).then(function(auditor_roles){
-          return $.when(
-            can.map(auditor_roles, function(role){
-              if(typeof instance.auditor !== "undefined" &&
-                  instance.auditor != null &&
-                  role.person.id === instance.auditor.id) {
-                // Auditor hasn't changed
-                no_change = true;
-                return $.when();
-              }
-              return role.refresh().then(function(role){role.destroy();});
-          }));
-        }).then(function(){
-          if(!instance.auditor || no_change){
+      return CMS.Models.UserRole.findAll({
+        context_id__in: instance.context.id,
+        role_id__in: auditor_role.id
+      });
+    }).then(function(auditor_roles){
+      return $.when(
+        can.map(auditor_roles, function(role){
+          if(typeof instance.auditor !== "undefined" &&
+              instance.auditor != null &&
+              role.person.id === instance.auditor.id) {
+            // Auditor hasn't changed
+            no_change = true;
             return $.when();
           }
-          return $.when(new CMS.Models.UserRole({
-            context : instance.context,
-            role : auditor_role,
-            person : instance.auditor
-          }).save());
-        });
+          return role.refresh().then(function(role){role.destroy();});
+      }));
+    }).then(function(){
+      if(!instance.auditor || no_change){
+        return $.when();
+      }
+      return $.when(new CMS.Models.UserRole({
+        context : instance.context,
+        role : auditor_role,
+        person : instance.auditor
+      }).save());
+    }).then(function(){
+      return instance;
+    });
+  }, findAuditors : function(){
+    var loader = this.get_binding('authorizations');
+    
+    return $.map(loader.list, function(binding) {
+      var role = binding.instance.role.reify();
+      if (role.attr('name') === 'Auditor') {
+        return {
+          person: binding.instance.person.reify()
+          , binding: binding.instance
+        };
       }
     });
   }
@@ -1193,6 +1230,29 @@ can.Model.Cacheable("CMS.Models.Request", {
           .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
         + "Response";
     }, this));
+  }
+
+  , before_create : function() {
+    var audit, that = this;
+    if(!this.assignee) {
+      audit = this.audit.reify();
+      (audit.selfLink ? $.when(audit) : audit.refresh())
+      .then(function(audit) {
+        that.attr('assignee', audit.contact);
+      });
+    }
+  }
+  , form_preload : function(new_object_form) {
+    var audit, that = this;
+    if(new_object_form) {
+      if(!this.assignee && this.audit) {
+        audit = this.audit.reify();
+        (audit.selfLink ? $.when(audit) : audit.refresh())
+        .then(function(audit) {
+          that.attr('assignee', audit.contact);
+        });
+      }
+    }
   }
 });
 
@@ -1262,7 +1322,9 @@ CMS.Models.get_stub = function(object) {
 }
 
 CMS.Models.get_stubs = function(objects) {
-  return CMS.Models.get_instances(objects).stubs();
+  return can.map(CMS.Models.get_instances(objects), function(o) {
+    return o.stub();
+  });
 };
 
 CMS.Models.get_instances = function(objects) {
@@ -1273,7 +1335,6 @@ CMS.Models.get_instances = function(objects) {
     instances[i] = CMS.Models.get_instance(objects[i]);
   }
   return instances;
-  //return can.map(instances, CMS.Models.get_instance);
 };
 
 CMS.Models.get_link_type = function(instance, attr) {

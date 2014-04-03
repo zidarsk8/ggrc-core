@@ -43,31 +43,33 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
       this.options.object_category = this.options.model.category;
     }
 
-    this.element
-    .addClass("widget")
-    .addClass(this.options.object_category)
-    .attr("id", this.options.widget_id + "_widget")
-    //.css("height", this.options.minimum_widget_height)
-    .html($(new Spinner().spin().el).css({
-        width: '100px',
-        height: '100px',
-        left: '0px',
-        top: '10px'
-        }))
-    .trigger("section_created");
-
     this.options.widget_count = new can.Observe();
 
-    $.when(
-      can.view(this.options.widget_view, $.when(this.options))
-      , CMS.Models.DisplayPrefs.findAll()
-    ).done(this.proxy("draw_widget"));
+    this.element
+      .addClass("widget")
+      .addClass(this.options.object_category)
+      .attr("id", this.options.widget_id + "_widget")
+      //  This is used only by ResizeWidgets controller
+      .trigger("section_created");
+      ;
   }
+
+  , prepare: function() {
+      if (this._prepare_deferred)
+        return this._prepare_deferred;
+
+      this._prepare_deferred = $.when(
+        can.view(this.options.widget_view, $.when(this.options))
+        , CMS.Models.DisplayPrefs.findAll()
+      ).then(this.proxy("draw_widget"));
+
+      return this._prepare_deferred;
+    }
 
   , draw_widget : function(frag, prefs) {
 
     this.element.html(frag[0]);
-    this.element.trigger("widgets_updated");
+    this.element.trigger("widgets_updated", this.element);
 
     this.element.sticky_header();
 
@@ -122,17 +124,6 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
             "read", mapping_model_name, Permission.page_context_id());
       }
 
-      if (options.allow_reading) {
-        controller_content
-          .html($(new Spinner().spin().el)
-            .css({
-              width: '100px',
-              height: '100px',
-              left: '50px',
-              top: '40px'
-            }));
-      }
-      
       if (!options.allow_creating && !options.allow_reading) {
         options.footer_view = GGRC.mustache_path + "/base_objects/tree_footer_no_access.mustache"
       }
@@ -141,14 +132,37 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         this.options.content_controller_options.init();
       }
 
-      new this.options.content_controller(
+      this.content_controller = new this.options.content_controller(
           controller_content
         , this.options.content_controller_options
       );
+
+      if (this.content_controller.prepare) {
+        return this.content_controller.prepare();
+      }
+      else {
+        return new $.Deferred().resolve();
+      }
     }
   }
 
-  , ".remove-widget click" : function() {
+  , display: function() {
+      if (this._display_deferred)
+        return this._display_deferred;
+
+      this._display_deferred = this.prepare().then(function() {
+        if (this.content_controller && this.content_controller.display) {
+          return this.content_controller.display();
+        }
+        else {
+          return new $.Deferred().resolve();
+        }
+      });
+
+      return this._display_deferred;
+    }
+
+  /*, ".remove-widget click" : function() {
     var parent = this.element.parent();
     this.element.remove();
     parent.trigger("sortremove");
@@ -161,9 +175,16 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     }
     ev.stopPropagation();
     ev.originalEvent && ev.originalEvent.stopPropagation();
-  }
-
+  }*/
   , " updateCount" : function(el, ev, count) {
     this.options.widget_count.attr('count', ''+count);
   }
+
+  , display_path: function(path) {
+      var that = this;
+      return this.display().then(function() {
+        if (that.content_controller && that.content_controller.display_path)
+          return that.content_controller.display_path(path);
+      });
+    }
 });

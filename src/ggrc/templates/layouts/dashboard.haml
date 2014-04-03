@@ -64,10 +64,6 @@
                         %i.grcicon-desktop
                         Reset Layout to Default
                     %li
-                      %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-desktop
-                        Set Layout as Default
-                    %li
                       -# FIXME: Fix link
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
@@ -133,8 +129,7 @@
           %p
             -#FIXME: Copyright footer
             -#=CMS_CONFIG['COMPANY']
-            Confidential.
-            Copyright &copy;
+            =config.get('COPYRIGHT')
             -#=Time.now.year
             =config.get('COMPANY')
             Version

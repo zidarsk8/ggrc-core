@@ -95,78 +95,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , autocomplete : function(el) {
-    var ctl = this;
-    // Add autocomplete to the owner field
-    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this)
-        , name = $that.attr("name") || ""
-        , prop = name.substr(name.lastIndexOf(".") + 1);
-
-      // Return if this field temporarily isn't storing data
-      if (!name) return false;
-
-      return $that.autocomplete({
-        // Ensure that the input.change event still occurs
-        change : function(event, ui) {
-          if(!$(event.target).parents(document.body).length)
-            console.warn("autocomplete menu change event is coming from detached nodes");
-          $(event.target).trigger("change");
-        }
-
-        // Search for the people based on the term
-        , source : function(request, response) {
-          var query = request.term || ''
-            , that = this;
-
-          if (query.indexOf('@') > -1)
-            query = '"' + query + '"';
-
-          ctl.bindXHRToButton(GGRC.Models.Search
-          .search_for_types(
-              request.term || '',
-              [$that.data("lookup")],
-              {
-              // FIXME: Remove or figure out when this is necessary.
-              //{
-              //  __permission_type: 'create'
-              //  , __permission_model: 'Object' + $that.data("lookup")
-              })
-          .then(function(search_result) {
-            var objects = search_result.getResultsForType($that.data("lookup"))
-              , queue = new RefreshQueue()
-              ;
-
-            // Retrieve full people data
-            can.each(objects, function(object) {
-              queue.enqueue(object);
-            });
-            queue.trigger().then(function(objs) {
-              if(objs.length) {
-                response(objs);
-              } else {
-                that._suggest( [] );
-                that._trigger( "open" );
-              }
-            });
-          }), $that, null, false);
-        }
-        , select : ctl.proxy("autocomplete_select", $that)
-        , close : function() {
-          //$that.val($that.attr("value"));
-        }
-      }).data('ui-autocomplete');
-    });
-    acs.each(function(i, ac) {
-      ac._renderMenu = function(ul, items) {
-        var model_class = ac.element.data("lookup")
-          , model = CMS.Models[model_class] || GGRC.Models[model_class]
-          ;
-        can.view.render(GGRC.mustache_path + '/' + model.table_plural + '/autocomplete_result.mustache', {model_class: model_class, items: items}, function(frag) {
-          $(ul).html(frag);
-          can.view.hookup(ul);
-        });
-      };
-    });
+    $.cms_autocomplete.call(this, el);
   }
 
   , autocomplete_select : function(el, event, ui) {
@@ -176,9 +105,8 @@ can.Control("GGRC.Controllers.Modals", {
         , instance = this.options.instance
         , index = 0
         , that = this
-        ;
+        , prop = path.pop();
 
-      path.pop();
       if (/^\d+$/.test(path[path.length - 1])) {
         index = parseInt(path.pop(), 10);
         path = path.join(".");
@@ -193,10 +121,18 @@ can.Control("GGRC.Controllers.Modals", {
         // Make sure person name/email gets written to the input field
         setTimeout(function(){
           if(el.val() === ""){
+            // Setting el.val is needed for Auditor field to work
             var obj = that.options.instance.attr(path);
-            if(obj.type === "Person"){
+            if(obj && obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
               el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
             }
+            instance._transient || instance.attr("_transient", new can.Observe({}));
+            can.reduce(path.split("."), function(current, next) {
+              current = current + "." + next;
+              instance.attr(current) || instance.attr(current, new can.Observe({}));
+              return current;
+            }, "_transient");
+            instance.attr("_transient." + path, ui.item[prop]);
           }
         }, 150);
       }
@@ -220,6 +156,34 @@ can.Control("GGRC.Controllers.Modals", {
       return false;
     }
   }
+
+  , immediate_find_or_create : function(el, ev, data) {
+    var that = this
+    , prop = el.data("drop")
+    , model = CMS.Models[el.data("lookup")]
+    , params = { context : that.options.instance.context && that.options.instance.context.serialize ? that.options.instance.context.serialize() : that.options.instance.context };
+
+    setTimeout(function() {
+      params[prop] = el.val();
+      el.prop("disabled", true);
+      model.findAll(params).then(function(list) {
+        if(list.length) {
+          that.autocomplete_select(el, ev, { item : list[0] });
+        } else {
+          new model(params).save().then(function(d) {
+            that.autocomplete_select(el, ev, { item : d });
+          });
+        }
+      })
+      .always(function() {
+        el.prop("disabled", false);
+      });
+    }, 100);
+  }
+  , "input[data-lookup][data-drop] paste" : "immediate_find_or_create"
+  , "input[data-lookup][data-drop] drop" : "immediate_find_or_create"
+
+
 
   , fetch_templates : function(dfd) {
     var that = this;
@@ -265,7 +229,9 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     
-    return dfd;
+    return dfd.done(function() {
+      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
+    });
   }
 
   , fetch_all : function() {
@@ -289,8 +255,6 @@ can.Control("GGRC.Controllers.Modals", {
     header != null && this.options.$header.find("h2").html(header);
     content != null && this.options.$content.html(content).removeAttr("style");
     footer != null && this.options.$footer.html(footer);
-
-    this.options.$content.find("input:first").focus();
 
     this.element.find('.wysihtml5').each(function() {
       $(this).cms_wysihtml5();
@@ -365,7 +329,20 @@ can.Control("GGRC.Controllers.Modals", {
     if ($elem.is("[null-if-empty]") && (!value || value.length === 0))
       value = null;
 
-    if($elem.is("[data-binding]")) {
+    if($elem.is("[data-binding]") && $elem.is("[type=checkbox]")){
+      can.map($elem, function(el){
+        if(el.value != value.id) 
+          return;
+        if($(el).is(":checked")){
+          instance.mark_for_addition($elem.data("binding"), value);
+        }
+        else{
+          instance.mark_for_deletion($elem.data("binding"), value);
+        }
+      });
+      return;
+    }
+    else if($elem.is("[data-binding]")) {
       can.each(can.makeArray($elem[0].options), function(opt) {
         instance.mark_for_deletion($elem.data("binding"), CMS.Models.get_instance(model, opt.value));
       });
@@ -382,8 +359,15 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
 
         if($elem.is("[data-lookup]")) {
+          name.pop(); //set the owner to null, not the email
+          instance._transient || instance.attr("_transient", new can.Observe({}));
+          can.reduce(name.slice(0, -1), function(current, next) {
+            current = current + "." + next;
+            instance.attr(current) || instance.attr(current, new can.Observe({}));
+            return current;
+          }, "_transient");
+          instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
-            name.pop(); //set the owner to null, not the email
             value = null;
           } else {
             // Setting a "lookup field is handled in the autocomplete() method"
@@ -421,14 +405,15 @@ can.Control("GGRC.Controllers.Modals", {
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else {
-      instance.attr(name[0], value);
+      if(name[0] !== "people")
+        instance.attr(name[0], value);
     }
   }
 
   , "[data-before], [data-after] change" : function(el, ev) {
     var start_date = el.datepicker('getDate');
-    this.element.find("[name=" + el.data("before") + "]").datepicker().datepicker("option", "minDate", start_date);
-    this.element.find("[name=" + el.data("after") + "]").datepicker().datepicker("option", "maxDate", start_date);
+    this.element.find("[name=" + el.data("before") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "minDate", start_date);
+    this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
@@ -446,15 +431,28 @@ can.Control("GGRC.Controllers.Modals", {
       //   `context` to be present even if `null`, unlike other attributes
       if (!instance.context)
         instance.attr('context', { id: null });
-      // FIXME: This should not depend on presence of `<model>.attributes`
-      if (instance.isNew()) {
-        instance.set_owner_to_current_user_if_unset();
-      }
 
+      this.disable_hide = true;
       ajd = instance.save().done(function(obj) {
-        that.element.trigger("modal:success", obj).modal_form("hide");
+        function finish() {
+          delete that.disable_hide;
+          that.element.trigger("modal:success", obj).modal_form("hide");
+        };
+
+        // If this was an Objective created directly from a Section, create a join
+        var params = that.options.object_params;
+        if (obj instanceof CMS.Models.Objective && params && params.section) {
+          new CMS.Models.SectionObjective({
+            objective: obj
+            , section: CMS.Models.Section.findInCacheById(params.section.id)
+            , context: { id: null }
+          }).save().done(finish);
+        } else {
+          finish();
+        }
       }).fail(function(xhr, status) {
         el.trigger("ajax:flash", { error : xhr.responseText });
+        delete that.disable_hide;
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");
     }
@@ -494,6 +492,12 @@ can.Control("GGRC.Controllers.Modals", {
   , "{instance} destroyed" : " hide"
 
   , " hide" : function(el, ev) {
+      if(this.disable_hide) {
+        ev.stopImmediatePropagation();
+        ev.stopPropagation();
+        ev.preventDefault();
+        return false;
+      }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
           && ev.target === this.element[0]
@@ -509,7 +513,7 @@ can.Control("GGRC.Controllers.Modals", {
       // Open newly created responses
       var object_type = instance.constructor.table_singular;
       $('[data-object-id="'+instance.id+'"][data-object-type="'+object_type+'"]')
-        .find('.openclose').openclose('open');
+        .find('.openclose').click().openclose("open");
     }
   }
 
@@ -518,6 +522,9 @@ can.Control("GGRC.Controllers.Modals", {
       delete this.options.model.cache[undefined];
     }
     this._super && this._super.apply(this, arguments);
+    if(this.options.instance && this.options.instance._transient) {
+      this.options.instance.removeAttr("_transient");
+    }
   }
 });
 

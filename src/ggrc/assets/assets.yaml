@@ -37,10 +37,12 @@ dashboard-js-files:
   - single_selector.js
   - spin.min.js
   - tmpl.js
+  - client_record_replay.js
   - mustache_helper.js
   - sticky_header.js
   - models/mappers.js
   - models/mappings.js
+  - models/mixins.js
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
@@ -109,10 +111,12 @@ dashboard-js-template-files:
   - base_objects/map_related_modal_content.mustache
   - base_objects/mappings_detail.mustache
   - base_objects/page_header.mustache
+  - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
+  - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
   - controls/info.mustache
@@ -134,6 +138,7 @@ dashboard-js-template-files:
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
+  - directives/autocomplete_result.mustache
   - directives/tree.mustache
   - events/object_list.mustache
   - facilities/modal_content.mustache
@@ -184,6 +189,7 @@ dashboard-js-template-files:
   - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
   - roles/object_list.mustache
+  - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - selectors/active_column.mustache

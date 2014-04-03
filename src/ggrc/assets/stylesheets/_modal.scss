@@ -5,16 +5,27 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 
+.modal-backdrop {
+  background-color: $white;
+}
+
 .modal {
   select.inline-select {
     width:auto;
     font-size:16px;
     margin-bottom:0;
   }
+  &:focus,
+  &:active {
+    outline: none;
+    outline: 0;
+  }
   width:700px;
   margin-left: -350px;
   height: auto !important;
   position: absolute;
+  @include border-radius(2px);
+  top: 12%;
   .member-failure {
     background: lighten($error,45%);
   }
@@ -464,17 +475,13 @@
     }
   }
   .modal-header {
-    @include gradient-vertical($modalLightBlue, $modalDarkBlue);
-    border-bottom: 1px solid $modalHeaderBorder;
-    @include box-shadow(inset 0 -1px 0 $modalHeaderShadow);
+    background: $white;
+    border-bottom: 1px solid $widgetHeader;
+    @include border-radius(2px 2px 0 0);
     cursor:move;
     .btn {
       margin-top: 2px;
       padding: 2px 0;
-      &:hover,
-      &:active {
-        border: 1px solid $white;
-      }
     }
     a.btn.btn-mini.pull-right.help-edit {
       margin-right:6px;
@@ -483,9 +490,11 @@
       }    
     }
     h2 {
-      color: $white;
       text-shadow: 0;
-      line-height:26px;
+      font-size: $f-headline;
+      font-weight: normal;
+      color: $subTitle;
+      
       span {
         display: block;
         line-height: 26px;
@@ -532,6 +541,10 @@
     .icon-field {
       margin-right: 4px;
       margin-top: 6px;
+    }
+    .icon-text {
+      margin-right: 4px;
+      margin-top: 1px;
     }
     input,
     textarea {
@@ -808,6 +821,7 @@
   .modal-footer {
     background: $lightGray;
     text-align: left;
+    @include border-radius(0 0 2px 2px);
     .btn {
       font-size:$f-regular;
     }
@@ -846,6 +860,15 @@
       li {
         margin-left: 0;
       }
+    }
+  }
+}
+
+.selector-info {
+  h4 {
+    .code-info {
+      font-style: italic;
+      font-size: $f-small;
     }
   }
 }
@@ -981,6 +1004,58 @@ p.modal-value {
         background: $dropPlaceholder;
         color: $text;
       }
+    }
+  }
+}
+
+// Mockups Assessment Page V1.0
+.note {
+  font-size: $f-medium;
+}
+.workflow-accordion {
+  .accordion-group {
+    @include border-radius(0);
+    border: none;
+    border-bottom: 1px solid $footerBorder;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  .accordion-heading {
+    .accordion-toggle  {
+      padding: 4px 0;
+      font-weight: bold;
+      .grcicon-toggle-arrow {
+        background-position:-126px -56px;
+        margin-left: -7px;
+      }
+      &.active {
+        .grcicon-toggle-arrow {
+          background-position:-102px -56px;
+          margin-left: -5px;
+        }
+      }
+    }
+  }
+  .accordion-inner {
+    border-top: none;
+    padding-left: 19px;
+    button {
+      border: none;
+      background: none;
+      padding: 0;
+      i {
+        margin-top: 5px;
+      }
+      &:focus,
+      &:active {
+        outline: 0;
+      }
+    }
+    .workflow-repeat {
+      float: left;
+      line-height: 26px;
+      margin-right: 4px; 
     }
   }
 }

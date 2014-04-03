@@ -17,8 +17,8 @@
   function preload_content() {
     var template =
       [ '<div class="modal-header">'
-      , '  <a class="btn btn-mini pull-right" href="#" data-dismiss="modal">'
-      , '    <i class="grcicon-x-grey"></i>'
+      , '  <a class="btn btn-danger btn-mini pull-right" href="#" data-dismiss="modal">'
+      , '    <i class="grcicon-x-white"></i>'
       , '  </a>'
       , '  <h2>Loading...</h2>'
       , '</div>'
@@ -48,7 +48,7 @@
   }
 
   function refresh_page() {
-    setTimeout(can.proxy(window.location.reload, window.location), 10);
+    setTimeout(can.proxy(GGRC.navigate, GGRC), 10);
   }
 
   var handlers = {
@@ -183,10 +183,10 @@
       $target.on('modal:success', function(e, data) {
         var model_name = $trigger.attr("data-object-plural").toLowerCase();
         if($trigger.attr('data-object-id') === "page" || (instance === GGRC.page_instance())) {
-          window.location.assign('/dashboard');
+          GGRC.navigate('/dashboard');
         } else if (model_name  == 'people' || model_name  == 'roles') {
           window.location.assign('/admin#' + model_name + "_list_widget");
-          window.location.reload();
+          GGRC.navigate();
         } else {
           $trigger.trigger('modal:success', data);
           $target.modal_form('hide');
@@ -284,12 +284,14 @@
       $target.on('modal:success', function(e, data, xhr) {
         if (form_target == 'refresh') {
           refresh_page();
-        } else if (form_target == 'redirect' && data.type != 'Audit' && data.type != 'Program') {
+        } else if (form_target == 'redirect') {
           if (typeof xhr !== 'undefined' && "getResponseHeader" in xhr) {
-            window.location.assign(xhr.getResponseHeader('location'));
+            GGRC.navigate(xhr.getResponseHeader('location'));
           }
+          else if(data.type === "Audit"){
+            GGRC.navigate(data.program.reify().viewLink + "#audit_widget");          }
           else {
-            window.location.assign(data.selfLink.replace('/api', ''));
+            GGRC.navigate(data.selfLink.replace('/api', ''));
           }
         } else {
           var dirty;
@@ -359,8 +361,8 @@
       _scrollY = window.scrollY;
       _top = _scrollY 
         + (offsetParent.height() 
-          - modal.height()) / 2 
-        + header_height / 2
+          - modal.height()) / 5 
+        + header_height / 5
 
         window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height()) 
     } else {

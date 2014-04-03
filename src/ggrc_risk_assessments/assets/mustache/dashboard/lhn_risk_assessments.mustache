@@ -12,5 +12,8 @@
       <ul class="sub-actions"></ul>
     </div>
   </li>
+  {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Threat" li_class="risk"}}}
+  {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Vulnerability" li_class="risk"}}}
+  {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Template" li_class="risk"}}}
 </ul>
 {{/is_allowed}}

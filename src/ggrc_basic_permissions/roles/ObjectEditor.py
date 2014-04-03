@@ -6,6 +6,8 @@ permissions = {
     "read": [
         "Categorization",
         "Category",
+        "ControlCategory",
+        "ControlAssertion",
         "Control",
         "ControlControl",
         "ControlSection",
@@ -16,6 +18,7 @@ permissions = {
         "Regulation",
         "Standard",
         "DirectiveControl",
+        "DirectiveSection",
         "Document",
         "Facility",
         "Help",
@@ -36,7 +39,9 @@ permissions = {
         "Project",
         "Relationship",
         "RelationshipType",
+        "SectionBase",
         "Section",
+        "Clause",
         "SectionObjective",
         "SystemOrProcess",
         "System",
@@ -47,6 +52,14 @@ permissions = {
         "Person",
         "Program",
         "Role",
+        {
+            "type": "Task",
+            "terms": {
+                "property_name": "modified_by",
+                "value": "$current_user"
+            },
+            "condition": "is"
+        },
     ],
     "create": [
         "Categorization",
@@ -61,6 +74,7 @@ permissions = {
         "Regulation",
         "Standard",
         "DirectiveControl",
+        "DirectiveSection",
         "Document",
         "Facility",
         "Market",
@@ -80,7 +94,9 @@ permissions = {
         "Project",
         "Relationship",
         "RelationshipType",
+        "SectionBase",
         "Section",
+        "Clause",
         "SectionObjective",
         "SystemOrProcess",
         "System",
@@ -161,6 +177,7 @@ permissions = {
             "condition": "contains"
         },
         "DirectiveControl",
+        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -237,7 +254,23 @@ permissions = {
         "Relationship",
         "RelationshipType",
         {
+            "type": "SectionBase",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
             "type": "Section",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "Clause",
             "terms": {
                 "list_property": "owners",
                 "value": "$current_user"
@@ -342,6 +375,7 @@ permissions = {
             "condition": "contains"
         },
         "DirectiveControl",
+        "DirectiveSection",
         {
             "type": "Document",
             "terms": {
@@ -418,7 +452,23 @@ permissions = {
         "Relationship",
         "RelationshipType",
         {
+            "type": "SectionBase",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
             "type": "Section",
+            "terms": {
+                "list_property": "owners",
+                "value": "$current_user"
+            },
+            "condition": "contains"
+        },
+        {
+            "type": "Clause",
             "terms": {
                 "list_property": "owners",
                 "value": "$current_user"

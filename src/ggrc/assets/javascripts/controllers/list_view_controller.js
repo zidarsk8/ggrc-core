@@ -95,6 +95,10 @@ can.Control("GGRC.Controllers.ListView", {
       var pager = that.context.attr("pager");
       return pager && pager.has_next && pager.has_next();
     }));
+    this.context.attr("has_prev_page", can.compute(function() {
+      var pager = that.context.attr("pager");
+      return pager && pager.has_prev && pager.has_prev();
+    }));
     this.context.attr(this.options);
 
     if(this.options.header_view) {
@@ -169,7 +173,8 @@ can.Control("GGRC.Controllers.ListView", {
     if (search_params.search_ids || search_params.user_role_ids) {
       var model = this.options.model
         , ids = search_params.search_ids || search_params.user_role_ids || []
-        , refresh_queue = new RefreshQueue()
+        , that = this
+        , pager
         ;
 
       // If there is a search for both a query an user roles, 
@@ -186,13 +191,41 @@ can.Control("GGRC.Controllers.ListView", {
           }
         });
       }
-
-      can.each(ids, function(id) {
-        refresh_queue.enqueue(CMS.Models.get_instance(model.shortName, id));
-      });
-      refresh_queue.trigger().then(function(instances) {
-        return new can.Observe.List(instances);
-      }).then(this.proxy("draw_list"));
+      // Create a new pager class to paginate over the ids:
+      pager = {
+        count: 100
+        , current: 0
+        , total: ids.length
+        , first: function(){
+          pager.current = 0;
+          pager.fetch();
+        }
+        , prev: function(){
+          pager.current--;
+          return pager.fetch();
+        }
+        , next: function(){
+          pager.current++;
+          return pager.fetch();
+        }
+        , fetch: function(){
+          var rq = new RefreshQueue();
+          window.scrollTo(0, 0);
+          can.each(ids.slice(pager.count*pager.current, pager.count*(pager.current+1)), function(id) {
+            rq.enqueue(CMS.Models.get_instance(model.shortName, id));
+          });
+          return rq.trigger().then(function(instances) {
+            that.context.attr('pager', that.options.pager);
+            return new can.Observe.List(instances);
+          }).then(that.proxy("draw_list"));
+        }
+        , has_next: function() { return pager.count*(pager.current+1) < ids.length; }
+        , has_prev: function() { return pager.count*(pager.current) > 0; }
+      };
+      // Load the first page:
+      pager.first();
+      this.options.pager = pager;
+      this.context.attr('pager', this.options.pager);
     } else {
       this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
     }
@@ -211,7 +244,7 @@ can.Control("GGRC.Controllers.ListView", {
 
     this.context.attr(this.options);
     can.view(this.options.list_view, this.context, function(frag) {
-      that.element.find('.spinner, .tree-structure').remove();
+      that.element.find('.spinner, .tree-structure').hide();
       that.element
         .append(frag)
         .trigger("loaded");
@@ -237,15 +270,26 @@ can.Control("GGRC.Controllers.ListView", {
   }
   , "{list} change": "update_count"
   , ".view-more-paging click" : function(el, ev) {
-      var that = this;
-      var collection_name = that.options.model.root_collection+"_collection";
-      if (that.options.pager.has_next()) {
-        that.options.pager.next().done(function(data) {
+      var that = this
+        , collection_name = that.options.model.root_collection+"_collection"
+        , is_next = el.data('next')
+        , can_load = is_next ? that.options.pager.has_next() : that.options.pager.has_prev()
+        , load = is_next ? that.options.pager.next : that.options.pager.prev;
+      that.options.list.replace([]);
+      that.element.find('.spinner').show();
+      that.element.find('.sticky-clone').remove();
+      that.element.find('.advanced-filters').removeClass('sticky sticky-header').removeAttr('style');
+      that.element.find('.tree-footer').removeClass('sticky sticky-footer').removeAttr('style').hide();
+      if (can_load) {
+        load().done(function(data) {
+          that.element.find('.spinner').hide();
+          if(typeof data === 'undefined') return;
           if (data[collection_name] && data[collection_name].length > 0) {
-            that.options.list.push.apply(that.options.list, data[collection_name]);
+            that.options.list.replace(data[collection_name]);
           }
           that.options.pager = data.paging;
           that.context.attr("pager", data.paging);
+          that.element.find('.tree-footer').show();
         });
       }
     }

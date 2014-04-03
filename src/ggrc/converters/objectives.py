@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from .base import *
-from ggrc.models import Control, Directive, Policy, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
+from ggrc.models import Control, Directive, Policy, Program, Regulation, Contract, Standard, Section, Objective, ObjectObjective, SectionObjective
 from ggrc.models.mixins import BusinessObject
 from .base_row import *
 from collections import OrderedDict
@@ -46,8 +46,10 @@ class ObjectiveRowConverter(BaseRowConverter):
     # use self.options, which will, if relevant, be overwritten
     # with data about section instead of directive
     parent_type = self.options.get('parent_type')
-    if parent_type in DIRECTIVE_CLASSES:
-      parent_id = options.get('parent_id')
+    parent_id = self.options.get('parent_id')
+    # always connect to directive; if parent is section/clause,
+    # find the directive through it
+    if parent_type in DIRECTIVE_CLASSES or parent_type == Program:
       parent_obj = parent_type.query.get(parent_id)
       parent_string = unicode(parent_obj.__class__.__name__)
       # check if no such directive/object mapping exists; if none, add
@@ -57,23 +59,26 @@ class ObjectiveRowConverter(BaseRowConverter):
         .filter(ObjectObjective.objective_id==self.obj.id)\
         .count()
       if matching_relationship_count == 0:
-        db_session.add(ObjectObjective(
-            objectiveable_type=parent_string,
-            objectiveable_id=parent_id,
-            objective=self.obj
-        ))
-    elif parent_type == Section:
-      # if section given, connect to that rather than directive if
-      # no such mapping currently exists
-      parent_id = self.options.get('parent_id')
-      parent_obj = parent_type.query.get(parent_id)
+        db_options = {
+                "objectiveable_type": parent_string,
+                "objectiveable_id": parent_id,
+                "objective": self.obj,
+        }
+        if parent_type == Program:
+          db_options["context_id"] = parent_id  # id of program
+        db_session.add(ObjectObjective(**db_options))
+    section_type = self.options.get('section_type')
+    section_id = self.options.get('section_id')
+    if section_type and section_id:
+      # if section given, connect to that in addition to parent type
+      section_obj = section_type.query.get(section_id)
       matching_relationship_count = SectionObjective.query\
         .filter(SectionObjective.objective_id==self.obj.id)\
-        .filter(SectionObjective.section_id==parent_id)\
+        .filter(SectionObjective.section_id==section_id)\
         .count()
       if matching_relationship_count == 0:
         db_session.add(SectionObjective(
-            section=parent_obj, objective=self.obj))
+            section=section_obj, objective=self.obj))
 
 
 class ObjectivesConverter(BaseConverter):
@@ -115,6 +120,9 @@ class ObjectivesConverter(BaseConverter):
     if parent_type in DIRECTIVE_CLASSES:
       self.metadata_map = OrderedDict( [(k.replace("Directive", self.directive_kind()), v) \
                           if 'Directive' in k else (k, v) for k, v in self.metadata_map.items()] )
+    elif parent_type == Program:
+      self.metadata_map = OrderedDict( [(k.replace("Directive", "Program"), v) if 'Directive' in k else (k, v) \
+          for k, v in self.metadata_map.items()] )
 
   def validate_metadata(self, attrs):
     self.validate_metadata_type(attrs, "Objectives")

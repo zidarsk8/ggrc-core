@@ -13,8 +13,7 @@
 
 [class^="grcicon-"],
 [class^="icon-"],
-.showhide,
-.widget-showhide {
+.showhide {
   display: inline-block;
   width: 20px;
   height: 16px;
@@ -298,13 +297,15 @@
 }
 .grcicon-document,
 .grcicon-document-color,
-.grcicon-objectdocument-color {
+.grcicon-objectdocument-color,
+.grcicon-documentation {
   background-position:-6px -176px;
 }
 .grcicon-populationsample {
   background-position:-30px -176px;
 }
-.grcicon-calendar {
+.grcicon-calendar,
+.grcicon-interview {
   background-position:-6px -248px;
 }
 .grcicon-remove {
@@ -388,6 +389,24 @@
 .grcicon-lock-small {
   background-position:-277px -396px;
 }
+.grcicon-objective-danger {
+  background-position:-198px -392px;
+}
+.grcicon-setup {
+  background-position: -222px -80px;
+}
+.grcicon-attach {
+  background-position: -222px -392px;
+}
+.grcicon-attach-color {
+  background-position: -246px -392px;
+}
+.grcicon-check {
+  background-position: -294px -8px;
+}
+.grcicon-checked {
+  background-position: -294px -32px;
+}
 
 .grcicon-watermark { background-position:-150px -368px; }
 .grcicon-watermark-green { background-position:-174px -368px; }
@@ -432,19 +451,6 @@
     }
   }
 }
-
-.widget-showhide {
-  a {
-    background-position: -241px -241px;
-    background-image: image-url("grcicons/icons.png");
-    background-repeat: no-repeat;
-    @include background-size(368px 416px);
-    &.active {
-     background-position: -241px -217px;
-    }
-  }
-}
-
 
 // diferentiation of objects by icons
 .grcobject {
@@ -498,6 +504,7 @@
 
 .grcicon-assessment-black { background-position:-150px -392px; }
 .grcicon-assessment-color { background-position:-126px -392px; }
+.grcicon-assessment-white { background-position:-174px -392px; }
 
 .grcicon-contract { background-position:-126px -128px; }
 .grcicon-contract-black { background-position:-126px -104px; }
@@ -604,6 +611,8 @@
 
 .grcicon-show { background-position:-222px -320px }
 .grcicon-hide { background-position:-246px -320px }
+.grcicon-show-arrow { background-position:-126px -56px }
+.grcicon-hide-arrow { background-position:-102px -56px }
 
 .grcicon-logout-color { background-position:-150px -8px; }
 
@@ -667,6 +676,7 @@ i.short {
   .grcicon-request-color { background-position:-30px -392px; }
   .grcicon-response-color { background-position:-78px -392px; }
   .grcicon-assessment-color { background-position:-150px -392px; }
+  .grcicon-object-color { background-position:-6px -344px; }
 
   li {
     &.active,
@@ -705,6 +715,7 @@ i.short {
       .grcicon-request-color { background-position:-54px -392px; }
       .grcicon-response-color { background-position:-102px -392px; }
       .grcicon-assessment-color { background-position:-174px -392px; }
+      .grcicon-object-color { background-position:-6px -368px; }
     }
   }
 }
@@ -712,54 +723,43 @@ i.short {
 // icons for active widget state
 
 .widget {
-  &.widget-active {
-    .header {
-      // turned icons to white
-      .grcicon-info { background-position:-198px -80px; }
-      .grcicon-role-color { background-position:-102px -32px; }
-      .grcicon-authorization-color { background-position:-102px -32px; }
-      .grcicon-directive-color { background-position:-78px -200px; }
-      .grcicon-control-color { background-position:-150px -248px }
-      .grcicon-link { background-position:-30px -128px; }
-      .grcicon-user { background-position:-6px -32px; } 
-      .grcicon-user-black { background-position:-6px -32px; } 
-      .grcicon-data_asset-color { background-position:-174px -248px; }
-      .grcicon-facility-color { background-position:-222px -128px; }
-      .grcicon-market-color { background-position:-246px -128px; }
-      .grcicon-org_group-color { background-position:-78px -248px; }
-      .grcicon-process-color { background-position:-102px -248px }
-      .grcicon-product-color { background-position:-270px -128px; }
-      .grcicon-project-color { background-position:-54px -248px; }
-      .grcicon-system-color { background-position:-126px -248px; }
-      .grcicon-contract-color { background-position:-126px -128px; }
-      .grcicon-policy-color { background-position:-150px -128px; }
-      .grcicon-regulation-color { background-position:-174px -128px; }
-      .grcicon-standard-color { background-position:-222px -368px; }
-      .grcicon-objective-color { background-position:-150px -80px; }
-      .grcicon-risk-color { background-position:-198px -248px; }
-      .grcicon-risky_attribute-color { background-position:-222px -248px; }
-      .grcicon-audit { background-position:-270px -32px; }
-      .grcicon-audit-color { background-position:-270px -32px; }
-      .grcicon-section-color { background-position:-198px -128px; }
-      .grcicon-clause-color { background-position:-198px -128px; }
-      .grcicon-event-color { background-position:-198px -56px; }
-      .grcicon-help-black { background-position:-78px -32px; }
-      .grcicon-x-grey { background-position:-174px -176px; }
-      .grcicon-program-color { background-position:-102px -128px; }
-      .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
-      .grcicon-request-color { background-position:-54px -392px; }
-      .grcicon-response-color { background-position:-102px -392px; }
-      .grcicon-assessment-color { background-position:-174px -392px; }
-      .widget-showhide {
-        a {
-          background-position: -265px -241px;
-          &.active {
-           background-position: -265px -217px;
-          }
-        }
-      }
-      
-      
-    }
+  .header {
+    // turned icons to white
+    .grcicon-info { background-position:-198px -80px; }
+    .grcicon-role-color { background-position:-102px -32px; }
+    .grcicon-authorization-color { background-position:-102px -32px; }
+    .grcicon-directive-color { background-position:-78px -200px; }
+    .grcicon-control-color { background-position:-150px -248px }
+    .grcicon-link { background-position:-30px -128px; }
+    .grcicon-user { background-position:-6px -32px; } 
+    .grcicon-user-black { background-position:-6px -32px; } 
+    .grcicon-data_asset-color { background-position:-174px -248px; }
+    .grcicon-facility-color { background-position:-222px -128px; }
+    .grcicon-market-color { background-position:-246px -128px; }
+    .grcicon-org_group-color { background-position:-78px -248px; }
+    .grcicon-process-color { background-position:-102px -248px }
+    .grcicon-product-color { background-position:-270px -128px; }
+    .grcicon-project-color { background-position:-54px -248px; }
+    .grcicon-system-color { background-position:-126px -248px; }
+    .grcicon-contract-color { background-position:-126px -128px; }
+    .grcicon-policy-color { background-position:-150px -128px; }
+    .grcicon-regulation-color { background-position:-174px -128px; }
+    .grcicon-standard-color { background-position:-222px -368px; }
+    .grcicon-objective-color { background-position:-150px -80px; }
+    .grcicon-risk-color { background-position:-198px -248px; }
+    .grcicon-risky_attribute-color { background-position:-222px -248px; }
+    .grcicon-audit { background-position:-270px -32px; }
+    .grcicon-audit-color { background-position:-270px -32px; }
+    .grcicon-section-color { background-position:-198px -128px; }
+    .grcicon-clause-color { background-position:-198px -128px; }
+    .grcicon-event-color { background-position:-198px -56px; }
+    .grcicon-help-black { background-position:-78px -32px; }
+    .grcicon-x-grey { background-position:-174px -176px; }
+    .grcicon-program-color { background-position:-102px -128px; }
+    .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
+    .grcicon-request-color { background-position:-54px -392px; }
+    .grcicon-response-color { background-position:-102px -392px; }
+    .grcicon-assessment-color { background-position:-174px -392px; }
+    .grcicon-object-color { background-position:-6px -368px; }
   }
 }

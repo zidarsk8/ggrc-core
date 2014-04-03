@@ -27,9 +27,15 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
 
   , autocomplete_select : function(el, event, ui) {
     var that = this;
+    var prop = el.attr("name").split(".").slice(0, -1).join(".");
     if(this._super.apply(this, arguments) !== false) {
       setTimeout(function() {
-        that.options.instance.save();
+        that.options.instance.save().then(function() {
+          var obj = that.options.instance.attr(prop);
+          if(obj.attr) {
+            obj.attr("saved", true);
+          }
+        });
       }, 100);
     } else {
       return false;
@@ -39,6 +45,41 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   , "input, select, textarea click" : function(el, ev) {
     this._super && this._super.apply(this, arguments);
     ev.stopPropagation();
+  }
+  
+  , ".dropdown-menu > li click" : function(el, ev){
+    ev.stopPropagation();
+    var that = this;
+    this.set_value({ name: el.data('name'), value: el.data('value') });
+    setTimeout(function() {
+      that.options.instance.save();
+      $(el).closest('.open').removeClass('open');
+    }, 100);
+  }
+  , "button,a.undo click" : function(el, ev){
+    ev.stopPropagation();
+    if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
+      return;
+    }
+    var that = this
+      , name = el.data('name')
+      , old_value = this.options.instance.attr(name);
+
+    // Check if the undo button was clicked:
+    this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);
+    if(!el.data('undo')){
+      that.options.instance.attr('_undo').unshift(old_value);
+    }
+    else{
+      that.options.instance.attr('_undo').shift();
+    }
+    that.options.instance.attr('_disabled', 'disabled');
+    that.options.instance.refresh().then(function(instance){ 
+      that.set_value({ name: el.data('name'), value: el.data('value') });
+      return instance.save();
+    }).then(function(){
+      that.options.instance.attr('_disabled', '');
+    });
   }
 
 });

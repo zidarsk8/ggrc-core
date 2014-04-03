@@ -4,105 +4,137 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="tree-item programs request-list rq-{{to_class instance.status}} {{#if_helpers '\
-      #if_null' instance.assignee '\
-      or #if_null' instance.objective '\
-         and #is_allowed' 'update' 'Objective' context=null}}rq-warning{{/if_helpers}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
-    <a href="javascript://" class="openclose">
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="span2">
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-request-color"></i>
-              {{instance.description}}
-            </div>
+	          <div class="type">
+	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
+	            <div class="state-type dropdown">
+	              {{#if_helpers '\
+			            #if_equals' 'Draft' instance.status '\
+			            and ^if' instance.responses.length '\
+			            ' _1_context=instance.context.id }}
+	              <span class="dropdown-toggle" data-toggle="dropdown" role="button">
+	                <i class="grcicon-carot"></i>
+	              </span>
+	              
+	              <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
+	                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+	                <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
+	                  <span>
+	                    <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
+	                    {{iterator}} 
+	                  </span>
+	                </li>
+	                {{/iterate}}
+	              </ul>
+	              {{else}}
+	              
+	              <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
+	              {{/if_helpers}}
+	            </div>
+	          </div>
+	          <div class="tree-title-area">
+	            <span>{{strip_html_tags instance.description}}</span>
+	          </div>
           </div>
         </div>
         <div class="span2">
           <div class="item-data">
-            <div class="tree-title-area">
-              <i class="grcicon-objective-color"></i>
-              {{#using objective=instance.objective}}
-                {{#if objective}}
+            {{#using objective=instance.objective}}
+              {{#if objective}}
+                <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
+                  <i class="grcicon-objective-color"></i>
                   {{objective.title}}
-                {{else}}
-                  {{#is_allowed "update" "Objective" context=null}}
-                    Missing Objective
-                  {{else}}
-                    NEW
-                  {{/is_allowed}}
-                {{/if}}
-              {{/using}}
-            </div>
+                </div>
+              {{else}}
+                
+                {{#if_helpers "\
+                  ^if_equals" instance.status "Accepted" "\
+			            and ^if_auditor" instance _1_include_admin=false}}
+			            <div class="tree-title-area">
+                    <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
+  			              <i class="grcicon-objective-danger"></i>
+  			              Map Objective
+  			            </a>
+                  </div>
+                {{/if_auditor}}
+              {{/if}}
+            {{/using}}
           </div>
         </div>
-        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <i class="grcicon-person-green pull-left"></i>
-        {{#using assignee=instance.assignee}}
-          <div class="objective-selector">
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-              {{else}}
-                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field" value="{{firstnonempty assignee.name assignee.email ''}}">
-              {{/if_helpers}}
-          </div>
-        {{/using}}
-        </div>
-        <div class="span2" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <span class="pull-left request-type black-font"></span>
-          {{#with_mapping 'responses' instance}}
-            {{#if_helpers '\
-              ^if' allow_mapping_or_creating '\
-              or ^is_allowed' 'update' instance '\
-              or #if' responses.length '\
-            ' _1_context=instance.context.id}}
-              <span class="request-readonly" rel="tooltip" title="Can't change Request Type since responses already exist"><i class="grcicon-lock-small"></i></span>
-              <select name="request_type" class="span8 short-field" disabled="true" readonly="true">
-                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
-            {{else}}
-              <select name="request_type" class="span8 short-field">
-                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-                <option {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                {{/iterate}}
-              </select>
-            {{/if_helpers}}
-          {{/with_mapping}}
-        </div>
-        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <div class="row-fluid">
-            <div class="span5">
-              {{#if_helpers '\
-                ^if' allow_mapping_or_creating '\
-                or ^is_allowed' 'update' instance '\
-              ' _1_context=instance.context.id}}
-                <span class="black-font">{{instance.status}}</span>
-              {{else}}
-                <select name="status" class="span12 short-field">
-                  {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-                  <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                  {{/iterate}}
-                </select>
-              {{/if_helpers}}
-            </div>
-            <div class="span6">
-              <div class="black-font">
-                &nbsp;&nbsp;
-                {{#if instance.due_on}}
-                  <strong>due on: </strong>{{localize_date instance.due_on}}
-                {{/if}}
+        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+	        <i class="grcicon-person-green pull-left"></i>
+          {{#using assignee=instance.assignee}}
+          {{#if_helpers "\
+            #if_can_edit_request" instance "\
+            and ^if_auditor" instance _1_include_admin=false "\
+            or #is_allowed" "__GGRC_ADMIN__" instance }}
+              <div class="objective-selector">
+                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
               </div>
+          {{else}}
+            <div class="item-data">
+              <span class="tree-title-area read-only">
+                {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+              </div>
+            </div>
+          {{/if_helpers}}
+          {{/using}}
+        </div>
+        
+        <div class="span4">
+          <div class="control-wrap">
+            <div class="date">
+              {{#if instance.due_on}}
+              <span rel="tooltip" data-placement="top" data-original-title="Due On"><span>{{localize_date instance.due_on}}</span></span>
+              {{/if}}
+            </div>
+            <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+              {{#if_equals instance.status "Draft"}}
+                {{#if_auditor instance}}
+                <button data-name="status" data-value="Requested" class="btn btn-warning {{instance._disabled}}">Request</button>
+                {{else}}
+                <small class="gray"><em>{{instance.status}}</em></small>
+                {{/if_auditor}}
+              {{/if_equals}}
+              {{#if_equals instance.status "Requested"}}
+                {{#if_can_edit_request instance}}
+                <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}}">Respond</button>
+                {{else}}
+                <small class="gray"><em>{{instance.status}}</em></small>
+                {{/if_can_edit_request}}
+              {{/if_equals}}
+              {{#if_equals instance.status "Amended Request"}}
+                {{#if_can_edit_request instance}}
+                <button data-name="status" data-value="Updated Response" class="btn btn-primary {{instance._disabled}}">Respond</button>
+                {{else}}
+                <small class="gray"><em>Amended</em></small>
+                {{/if_can_edit_request}}
+              {{/if_equals}}
+              {{#if_match instance.status "Respon"}}
+                {{#if_auditor instance}}
+                <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
+                <button data-name="status" data-value="Amended Request" class="btn btn-warning {{instance._disabled}}">Amend</button>
+                {{else}}
+                <small class="gray"><em>Responded</em></small>
+                {{/if_auditor}}
+              {{/if_match}}
+              {{#if_equals instance.status "Accepted"}}
+                <small class="accepted"><em>Accepted</em></small>
+              {{/if_equals}}
+              {{#instance._undo.0}}
+                <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+              {{/instance._undo.0}}
             </div>
           </div>
         </div>
       </div>
-    </a>
+    </div>
   </div>
 
   {{#if expanded}}
@@ -126,28 +158,26 @@
 
           {{{render_hooks 'Request.tree_view_info'}}}
  
-          {{#if_helpers '\
-            #if' allow_mapping_or_creating '\
-            and #is_allowed' 'update' instance '\
-          ' _1_context=instance.context.id}}
+          {{#if_can_edit_request instance}}
             <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
               <i class="grcicon-edit"></i>
               Edit PBC {{model.title_singular}}
             </a>
-          {{/if_helpers}}
+          {{/if_can_edit_request}}
         </div>
       </div>
     </div>
-
+    {{^if_equals instance.status "Draft"}}
     {{#if draw_children}}
       {{#each child_options}}
           <div class="inner-tree">
-            <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}}{{/prune_context}} ({{child_count}})</h6>
-            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}} ({{#if_null original_list}}...{{else}}{{original_list.length}}{{/if_null}}{{/prune_context}})</h6>
+            <ul class="tree-structure new-tree responses-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
             </ul>
           </div>
       {{/each}}
     {{/if}}
+    {{/if_equals}}
     
   </div>
   {{/if}}

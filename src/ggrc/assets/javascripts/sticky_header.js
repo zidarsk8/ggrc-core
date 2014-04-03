@@ -19,7 +19,8 @@ can.Control("StickyHeader", {
                       +", .tree-open > .item-open > .item-content > .inner-tree > .tree-structure > .advanced-filters"
                       +", .advanced-filters"
         // A selector for all sticky-able footers
-      , footer_selector: ".tree-footer"
+        // FIXME: This should not have to specifically ignore .tree-spinner
+      , footer_selector: ".tree-footer:not(.tree-spinner)"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
@@ -47,6 +48,21 @@ can.Control("StickyHeader", {
     this.update_items('footer');
   }
 
+  , "{scroll_area} updateSticky" : function(el, ev) {
+    // `updateSticky` is triggered manually by controllers and other event
+    //    handlers, namely `TreeViewController` and `$.fn.openclose`
+    // Only process if this section is visible
+    if (!this.element.is(":visible"))
+      return;
+
+    // Update the header/footer positions
+    // Should only have to reconsider footers -- if collapse of an element
+    //   causes the header to return to the viewport, it will also trigger a
+    //   scroll event, and sticky headers will be updated that way.
+    //this.update_items('header');
+    this.update_items('footer');
+  }
+
     // Resize clones on window resize
   , "{window} resize" : function(el, ev) {
     // Update the header/footer positions
@@ -62,13 +78,12 @@ can.Control("StickyHeader", {
       var el = items.eq(i)
         , margin = el.data('sticky').margin
         ;
+      
+      // Always remove the sticky header so that it's width will get updated
+      this.remove(el);
 
       // Remove the clone if its content no longer inside the viewport
-      if (margin === false) {
-        this.remove(el);
-      }
-      // Otherwise inject the clone
-      else {
+      if (margin !== false) {
         var clone = this.clone(el);
 
         // Inject the clone to take up the original's space

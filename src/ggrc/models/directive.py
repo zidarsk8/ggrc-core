@@ -30,13 +30,17 @@ class Directive(Timeboxed, BusinessObject, db.Model):
   kind = deferred(db.Column(db.String), 'Directive')
 
   sections = db.relationship(
-      'Section', backref='directive', order_by='Section.slug', cascade='all, delete-orphan')
+      'SectionBase', backref='directive', order_by='SectionBase.slug', cascade='all, delete-orphan')
   controls = db.relationship( 'Control', backref='directive', order_by='Control.slug')
   directive_controls = db.relationship(
       'DirectiveControl', backref='directive', cascade='all, delete-orphan')
   # Not needed for the client at this time
   #mapped_controls = association_proxy(
   #    'directive_controls', 'control', 'DirectiveControl')
+  directive_sections = db.relationship(
+      'DirectiveSection', backref='directive', cascade='all, delete-orphan')
+  joined_sections = association_proxy(
+      'directive_sections', 'section', 'DirectiveSection')
   program_directives = db.relationship('ProgramDirective', backref='directive', cascade='all, delete-orphan')
   programs = association_proxy(
       'program_directives', 'program', 'ProgramDirective')
@@ -67,6 +71,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
       'programs',
       PublishOnly('program_directives'),
       PublishOnly('directive_controls'),
+      PublishOnly('directive_sections'),
       'scope',
       'sections',
       'version',
@@ -81,6 +86,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
   _include_links = [
       'program_directives',
       'directive_controls',
+      'directive_sections',
       ]
 
   @validates('kind')
@@ -108,6 +114,7 @@ class Directive(Timeboxed, BusinessObject, db.Model):
         orm.subqueryload('controls'),
         orm.subqueryload('program_directives'),
         orm.subqueryload('directive_controls'),
+        orm.subqueryload('directive_sections'),
         orm.subqueryload('sections'))
 
 

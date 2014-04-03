@@ -9,26 +9,21 @@ GGRC.config.GDRIVE_SCRIPT_ID = 'AKfycbxb-W3rUBTKFF6Ua_eJ5PH9RAvGVL7W3aDqtmnbnUc7
 
 describe("GDrive integration models", function() {
 
+  beforeEach(function() {
+    spyOn(GGRC.Controllers.GAPI, "authorize").andCallFake(function() {
+      return $.when();
+    });
+  });
+
   describe("CMS.Models.GDriveFolder", function() {
 
     describe("::findAll", function() {
 
-      it("takes a parent folder id as a required parameter", function() {
-        var returned;
-        function ajaxtoreturn() { return returned; }
-        CMS.Models.GDriveFolder.findAll({parentfolderid : '0ByeYJ052BwIZb2hoTWtjcDV2dTg'}).done(function(d) {
-          expect(d.length).toBeGreaterThan(0);
-        }).always(function() {
-          returned = true;
-        });
-        waitsFor(ajaxtoreturn, 5000);
-      });
-
       it("calls the root when parentfolderid is not supplied", function() {
         var returned;
-        spyOn($, 'ajax').andReturn(new $.Deferred().resolve());
+        spyOn(gapi.client, 'request').andReturn(new $.Deferred().resolve());
         CMS.Models.GDriveFolder.findAll();
-        expect($.ajax.mostRecentCall.args[0].data.parameters).toMatch(new RegExp(GGRC.config.GDRIVE_ROOT_FOLDER));
+        expect(gapi.client.request.mostRecentCall.args[0].path).toMatch(/\?q=.*'root'%20in%20parents/);
       });
     });
 
@@ -38,11 +33,11 @@ describe("GDrive integration models", function() {
       });
       it("performs a findAll with a supplied string as parentfolderid", function() {
         CMS.Models.GDriveFolder.findChildFolders("foo");
-        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "foo" });
+        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parents : "foo" });
       });
       it("performs a findAll with a supplied object's id as parentfolderid", function() {
         CMS.Models.GDriveFolder.findChildFolders({id : "bar"});
-        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parentfolderid : "bar" });
+        expect(CMS.Models.GDriveFolder.findAll).toHaveBeenCalledWith({ parents : "bar" });
       });
     });
   });

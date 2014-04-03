@@ -50,7 +50,7 @@ class ObjectFile(Base, db.Model):
     return query.options()
 
   def _display_name(self):
-    return self.fileable.display_name + '<->' + self.file.display_name
+    return self.fileable.display_name + '<-> gdrive file' + self.file_id
 
 class Fileable(object):
   @classmethod

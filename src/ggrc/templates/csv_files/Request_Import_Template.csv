@@ -1,6 +1,6 @@
 Type,Program Code,,,,,,,,
 Requests,{{program_slug}},,,,,,,,
-,REQUIRED,,,,,,REQUIRED,REQUIRED,*Defaults to Draft if none given
+,REQUIRED,,,,,,*Defaults to current date if none given,REQUIRED,*Defaults to Draft if none given
 "Optional
 
 If you leave this field blank, the gGRC system will generate Codes automatically upon creation of the new object.  If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.  Otherwise, we recommend you leave this blank.
