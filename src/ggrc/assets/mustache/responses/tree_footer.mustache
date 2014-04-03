@@ -1,9 +1,10 @@
-{{#if allow_mapping_or_creating}}
+{{#if allow_creating}}
 {{#if_helpers '\
   #is_allowed' 'create' model.shortName _0_context=parent_instance.context.id '\
   and #if_can_edit_request' parent_instance '\
   and ^if_auditor' parent_instance '\
-  or #is_allowed' '__GGRC_ADMIN__' model.shortName _3_context=parent_instance.context.id}}
+  and ^if_equals' parent_instance.status 'Accepted' '\
+  or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=parent_instance.context.id}}
   <li class="tree-item tree-item-add tree-footer">
     <div class="row-fluid">
       <div class="span12">

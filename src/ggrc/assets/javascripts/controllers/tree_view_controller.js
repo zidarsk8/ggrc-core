@@ -91,9 +91,11 @@ can.Control("CMS.Controllers.TreeView", {
 
     if('parent_instance' in opts && 'status' in opts.parent_instance){
       var setAllowMapping = function(){
-        var is_accepted = opts.parent_instance.attr('status') === 'Accepted';
-        that.options.attr("allow_mapping_or_creating",
-            !is_accepted && (that.options.allow_mapping || that.options.allow_creating));
+        var is_accepted = opts.parent_instance.attr('status') === 'Accepted'
+          , admin = Permission.is_allowed("__GGRC_ADMIN__")
+          ;
+        that.options.attr("allow_mapping_or_creating", (admin || !is_accepted) &&
+            (that.options.allow_mapping || that.options.allow_creating));
       }
       setAllowMapping();
       opts.parent_instance.bind('change', setAllowMapping);
