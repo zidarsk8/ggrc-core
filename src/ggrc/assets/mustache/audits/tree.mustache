@@ -235,10 +235,11 @@
       
       <ul class="info-audit">
       {{#using program=instance.program}}
+        {{#with_mapping 'authorizations' instance}}
         {{#if_helpers '\
             #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
             and ^if_auditor' instance '\
-            and #is_profile' '\
+            and ^is_page_instance' instance.program '\
            ' _0_context='' _1_include_admin=false}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
@@ -247,6 +248,7 @@
               </a>
             </li>
         {{/if_helpers}}
+        {{/with_mapping}}
         {{/using}}
         
         {{#if_helpers '\
