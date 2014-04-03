@@ -412,7 +412,7 @@ can.Control("CMS.Controllers.InfiniteScroll", {
 
   , " DOMMouseScroll": "prevent_overscroll"
   , " mousewheel": "prevent_overscroll"
-  , ' scroll' : "prevent_overscroll"
+  , " scroll": "prevent_overscroll"
 
   , prevent_overscroll: function($el, ev) {
       // Based on Troy Alford's response on StackOverflow:
@@ -440,11 +440,11 @@ can.Control("CMS.Controllers.InfiniteScroll", {
         return false;
       }
 
-      if(ev.type === "scroll" && scrollTop === scrollTopMax){
+      if (ev.type === "scroll" &&
+          scrollTop > scrollTopMax - loadTriggerOffset) {
         this.show_more($el);
         return prevent();
-      }
-      if (!up && scrollTop - delta > scrollTopMax) {
+      } else if (!up && scrollTop - delta > scrollTopMax) {
         // Scrolling down, but this will take us past the bottom.
         $el.scrollTop(scrollHeight);
         this.show_more($el);
