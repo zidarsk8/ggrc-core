@@ -86,6 +86,7 @@ def init_app(app):
 
   # Register event listener on all String and Text attributes to sanitize them.
   import bleach
+  from HTMLParser import HTMLParser
   import sqlalchemy as sa
   from ggrc.models.reflection import SanitizeHtmlInfo
 
@@ -105,7 +106,16 @@ def init_app(app):
   for tag in bleach_tags:
     bleach_attrs[tag] = attrs
   def cleaner(target, value, oldvalue, initiator):
-    ret = bleach.clean(value, bleach_tags, bleach_attrs)
+    parser = HTMLParser()
+    lastvalue = value
+    value = parser.unescape(value)
+    while value != lastvalue:
+      lastvalue = value
+      value = parser.unescape(value)
+
+    ret = parser.unescape(
+      bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
+      )
     return ret
 
   for model in all_models:
