@@ -864,6 +864,15 @@
   }
 }
 
+.selector-info {
+  h4 {
+    .code-info {
+      font-style: italic;
+      font-size: $f-small;
+    }
+  }
+}
+
 .modal-controls {
   height:200px;
   overflow-y:scroll;
