@@ -527,6 +527,10 @@
             , is_mapped = function(responses) {
                 var i, j, response, relationships, relationship;
                 for (i = 0; response = responses[i]; i++) {
+                  //  FIXME: This avoids script errors due to stubs, but causes
+                  //    incorrect results.  `CustomFilter.filter_fn` should be
+                  //    refactored to return a deferred, and then this function
+                  //    should be cleaned up.
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
