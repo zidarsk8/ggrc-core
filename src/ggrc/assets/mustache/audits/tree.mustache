@@ -234,7 +234,7 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-      {{#using program=instance.program}}
+        {{#using program=instance.program}}
         {{#with_mapping 'authorizations' instance}}
         {{#if_helpers '\
             #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
