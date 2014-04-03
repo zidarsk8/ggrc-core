@@ -736,8 +736,9 @@ class Resource(ModelView):
         current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
           model_plural + " in " + category + " category")
 
+    filter_collection = self.filter_collection(collection_name, model_plural, collection)
     return self.json_success_response(
-      collection, self.collection_last_modified(), cache_op='Miss')
+      filter_collection, self.collection_last_modified(), cache_op='Miss')
 
   def is_caching_in_progress(self, category, resource): 
     """Check the current state of cache and in progress
@@ -778,6 +779,36 @@ class Resource(ModelView):
 
     return False
 
+  def filter_collection(self, name, resource, collection_data):
+    """ Filter JSON collection that have read permission
+
+    The collection GET gets all items with inclusion_filter set to True. The colleciton items are filtered
+    with read permission checks on the the items 
+
+    Args:
+       name: collection name such as regulations_collection
+       resource: regulations
+       collection_data : GET collection JSON response
+
+    Returns:
+     filter_data : Filtered collection data after adding only 
+    """
+    cacheobjids = request.args.get('id__in', False)
+    if not (cacheobjids and hasattr(self.model, 'eager_query')):
+      return collection_data
+
+    data = collection_data[name][resource]
+    filter_data = {name: {resource: []}}
+    for attrs in data:
+      context_id = self.get_context_id_from_json(attrs) 
+      if not permissions.is_allowed_read(self.model.__name__, context_id):
+        current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
+        continue
+      filter_attrs=self.filter_relationship_attrs(None, attrs)
+      filter_data[name][resource].append(filter_attrs)
+    filter_data[name]['selfLink'] = collection_data[name]['selfLink']
+    return filter_data
+
   def filter_relationship_attrs(self, id, attrs):
     """ Filter relationship that have read permission
 
@@ -803,33 +834,59 @@ class Resource(ModelView):
          if type(val) is list:
            updated_val=[]
            for item in val:
-             if type(item) is dict:
-               type_found    = item.has_key('type')
-               context_found = item.has_key('context')
-               item_type  = None
-               context_id = None
-               if type_found: 
-                 item_type = item['type']
-                 if context_found:
-                   if item['context'] is not None and item['context'].has_key('id'): 
-                     context_id = item['context']['id']
-                   elif item['context'] is None and item.has_key('context_id'):
-                     context_id = item['context_id']
-                   else:
-                     pass
-                 else:
-                   if item.has_key('context_id'):
-                     context_id = item['context_id']
-                   else:
-                     current_app.logger.warn("CACHE: context is not available for key: " + key + " item: " + str(item))
-                     pass
-                 if not permissions.is_allowed_read(item_type, context_id):
-                   current_app.logger.warn("CACHE: Filtering relationship, Read Permission is not allowed" \
-                     " for id: " + str(id) + " type: " + str(item_type))
-                 else:
-                   updated_val.append(item)
+              if self.is_read_allowed_for_item(key, item):
+                updated_val.append(item)
            filter_attrs[key] = updated_val
+         else:
+           if not self.is_read_allowed_for_item(key, val):
+             filter_attrs[key] = None
     return filter_attrs
+
+  def is_read_allowed_for_item(self, key, item):
+    """  Check allowed for each item of type dictionary
+
+    Get context_id for given dictionary item and check if there are permissions to read for the item
+    dictionary with keys type and context (or context_id)
+    
+    Args:
+       key:  name of the resource item
+       item: dictionary with keys type, context (or context_id)
+
+    Returns:
+      True if read permissions allowed or item is not a dictionary, type for the item is not found,
+            context or context-id is not set in the item to check
+      False otherwise
+    """
+    if type(item) is not dict:
+      return True
+    type_found    = item.has_key('type')
+    context_found = item.has_key('context')
+    context_id = None
+    if type_found: 
+      item_type = item['type']
+      if context_found:
+        if item['context'] is not None and item['context'].has_key('id'): 
+          context_id = item['context']['id']
+        elif item['context'] is not None and item.has_key('context_id'):
+          context_id = item['context_id']
+        elif item['context'] is None:
+          context_id = None
+        else:
+          current_app.logger.warn("CACHE: context-1 is not available for key: " + key + " item: " + str(item))
+          return True
+      else:
+        if item.has_key('context_id'):
+          context_id = item['context_id']
+        else:
+          current_app.logger.warn("CACHE: context-2 is not available for key: " + key + " item: " + str(item))
+          return True
+      if not permissions.is_allowed_read(item_type, context_id):
+        current_app.logger.warn("CACHE: Read Permission not allowed key: " + str(key) + " value: " + str(item))
+        return False
+      else:
+        return True
+    else:
+      return True
 
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
     """Get collection (objects or stubs) from cache
@@ -865,10 +922,8 @@ class Resource(ModelView):
         converted_data = {x_category: {x_resource: []}}
         for id, attrs in data.items():
           context_id = self.get_context_id_from_json(attrs) 
-          if context_id is not None:
-            if not permissions.is_allowed_read(self.model.__name__, context_id):
-              current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
-              continue
+          if not permissions.is_allowed_read(self.model.__name__, context_id):
+            continue
           filter_attrs=self.filter_relationship_attrs(id, attrs)
           converted_data[x_category][x_resource].append(filter_attrs)
         selfLink = "/api/" + x_resource + "?id__in=" + cacheobjidstr + "&_="+ etag 
@@ -1096,8 +1151,8 @@ class Resource(ModelView):
       if not stubs:
         object_for_json = ggrc.builder.json.publish(
             obj,
-            self.get_properties_to_include(request.args.get('__include')),
-            inclusion_filter)
+            self.get_properties_to_include(request.args.get('__include'))
+            )
       else:
         object_for_json = ggrc.builder.json.publish_stub(
             obj, (), inclusion_filter)
