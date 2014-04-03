@@ -1060,14 +1060,15 @@ class LinkSectionObjective(LinkObjectHandler):
     return [sec_cont.section for sec_cont in section_objectives]
 
   def after_save(self, obj):
-    # Assumption: only one linked section, at most, at this point
-    # If it's present, add to ObjectiveRowImporter's options
-    # so that it has values for section_id and section_type
-    # and can additionally connect to those
+    # connect any number of sections/clauses
     section_list = [x for x in self.created_links() if isinstance(x, SectionBase)] # get the section or clause that was created
-    if len(section_list) >= 1:
-      section = section_list[0]
-      db.session.add(section)
-      self.importer.options['section_id'] = section.id
-      self.importer.options['section_type'] = type(section)
+    for sec in section_list:
+      db.session.add(sec)
+      matching_relationship_count = SectionObjective.query\
+        .filter(SectionObjective.objective_id==obj.id)\
+        .filter(SectionObjective.section_id==sec.id)\
+        .count()
+      if matching_relationship_count == 0:
+        db.session.add(SectionObjective(
+            section=sec, objective=obj))
 
