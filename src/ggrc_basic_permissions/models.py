@@ -101,7 +101,7 @@ class UserRole(Base, db.Model):
       context_related = ''
     else:
       context_related = ''
-    return '{0} <-> {1}{2}'.format(
+    return u'{0} <-> {1}{2}'.format(
         self.person.display_name, self.role.display_name, context_related)
 
 
@@ -142,7 +142,7 @@ class ContextImplication(Base, db.Model):
       context_display_name = self.context.display_name
     else:
       context_display_name = 'Default Context'
-    return '{source_context} -> {context}'.format(
+    return u'{source_context} -> {context}'.format(
         source_context=source_context_display_name,
         context=context_display_name,
         )
