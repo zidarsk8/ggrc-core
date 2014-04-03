@@ -234,16 +234,22 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        {{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}
-          {{#using program=instance.program}}
+        {{#using program=instance.program}}
+        {{#with_mapping 'authorizations' instance}}
+        {{#if_helpers '\
+            #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
+            and ^if_auditor' instance '\
+            and ^is_page_instance' instance.program '\
+           ' _0_context='' _1_include_admin=false}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
                 View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
               </a>
             </li>
-          {{/using}}
-        {{/is_allowed}}
+        {{/if_helpers}}
+        {{/with_mapping}}
+        {{/using}}
         
         {{#if_helpers '\
           #if' allow_mapping_or_creating '\
