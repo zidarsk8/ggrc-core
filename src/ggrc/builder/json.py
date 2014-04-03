@@ -70,6 +70,7 @@ def publish_stub(obj, inclusions=(), inclusion_filter=None):
     if self_url:
       ret['href'] = self_url
     ret['type'] = obj.__class__.__name__
+    ret['context_id'] = obj.context_id
     if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
       ret.update(publisher.publish_stubs(obj, inclusions, inclusion_filter))
     return ret
@@ -263,9 +264,9 @@ class UpdateAttrHandler(object):
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  def generate_link_object_for_foreign_key(self, id, type):
+  def generate_link_object_for_foreign_key(self, id, type, context_id=None):
     """Generate a link object for this object reference."""
-    return {'id': id, 'type': type, 'href': url_for(type, id=id)}
+    return {'id': id, 'type': type, 'href': url_for(type, id=id), 'context_id': context_id}
 
   def generate_link_object_for(
       self, obj, inclusions, include, inclusion_filter):
@@ -276,7 +277,8 @@ class Builder(AttributeInfo):
     """
     if include and ((not inclusion_filter) or inclusion_filter(obj)):
       return publish(obj, inclusions, inclusion_filter)
-    result = {'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj)}
+    result = {
+      'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj), 'context_id': obj.context_id}
     for path in inclusions:
       if type(path) is not str and type(path) is not unicode:
         attr_name, remaining_path = path[0], path[1:]
@@ -331,7 +333,7 @@ class Builder(AttributeInfo):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
         return [self.generate_link_object_for_foreign_key(
-            getattr(o, target_name), getattr(o, target_type))
+            getattr(o, target_name), getattr(o, target_type), o.context_id)
               for o in join_objects]
       else:
         target_mapper = class_attr.remote_attr.property.mapper
@@ -346,7 +348,7 @@ class Builder(AttributeInfo):
           target_name = list(class_attr.remote_attr.property.local_columns)[0].key
           target_type = class_attr.remote_attr.property.mapper.class_.__name__
           return [self.generate_link_object_for_foreign_key(
-              getattr(o, target_name), target_type) for o in join_objects]
+              getattr(o, target_name), target_type, o.context_id) for o in join_objects]
 
   def publish_relationship(
       self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
@@ -369,7 +371,7 @@ class Builder(AttributeInfo):
       attr_value = getattr(obj, target_name)
       if attr_value is not None:
         return self.generate_link_object_for_foreign_key(
-            attr_value, target_type)
+            attr_value, target_type, obj.context_id)
       else:
         return None
 
@@ -387,7 +389,8 @@ class Builder(AttributeInfo):
       if not inclusions or include:
         return self.generate_link_object_for_foreign_key(
             getattr(obj, '{0}_id'.format(attr_name)),
-            getattr(obj, '{0}_type'.format(attr_name)))
+            getattr(obj, '{0}_type'.format(attr_name)),
+            obj.context_id)
       else:
         return self.publish_link(
             obj, attr_name, inclusions, include, inclusion_filter)

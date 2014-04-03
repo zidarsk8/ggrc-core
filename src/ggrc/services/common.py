@@ -804,11 +804,28 @@ class Resource(ModelView):
            updated_val=[]
            for item in val:
              if type(item) is dict:
-               if item.has_key('type') and item.has_key('context'):
-                 if item['context'] is not None and \
-                    not permissions.is_allowed_read(item['type'], item['context']['id']):
-                   current_app.logger.info("CACHE: Read Permission is not allowed for id: " + \
-                     str(id) + " relationship type: " + str(item['type']))
+               type_found    = item.has_key('type')
+               context_found = item.has_key('context')
+               item_type  = None
+               context_id = None
+               if type_found: 
+                 item_type = item['type']
+                 if context_found:
+                   if item['context'] is not None and item['context'].has_key('id'): 
+                     context_id = item['context']['id']
+                   elif item['context'] is None and item.has_key('context_id'):
+                     context_id = item['context_id']
+                   else:
+                     pass
+                 else:
+                   if item.has_key('context_id'):
+                     context_id = item['context_id']
+                   else:
+                     current_app.logger.warn("CACHE: context is not available for key: " + key + " item: " + str(item))
+                     pass
+                 if not permissions.is_allowed_read(item_type, context_id):
+                   current_app.logger.warn("CACHE: Filtering relationship, Read Permission is not allowed" \
+                     " for id: " + str(id) + " type: " + str(item_type))
                  else:
                    updated_val.append(item)
            filter_attrs[key] = updated_val
