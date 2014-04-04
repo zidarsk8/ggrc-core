@@ -70,6 +70,7 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
   , init: function() {
     this._super.apply(this, arguments);
     this.validatePresenceOf("title");
+    this.validatePresenceOf("directive");
   }
 }, {
 });
