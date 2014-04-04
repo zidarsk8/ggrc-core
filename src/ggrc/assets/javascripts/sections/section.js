@@ -70,7 +70,6 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
   , init: function() {
     this._super.apply(this, arguments);
     this.validatePresenceOf("title");
-    this.validatePresenceOf("directive");
   }
 }, {
 });
@@ -114,6 +113,12 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     , objectives : "CMS.Models.Objective.stubs"
     , object_sections : "CMS.Models.ObjectSection.stubs"
     }
+
+  , init: function() {
+    this._super.apply(this, arguments);
+    // Only Sections (not Clauses) need a parent Directive.
+    this.validatePresenceOf("directive");
+  }
 
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
