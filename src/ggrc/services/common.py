@@ -70,11 +70,11 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
 
   """
   if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
-   return
-    
+    return
+
   context.cache_manager = _get_cache_manager()
 
-  if len(modified_objects.new) > 0: 
+  if len(modified_objects.new) > 0:
     items_to_add = modified_objects.new.items()
     for o, json_obj in items_to_add:
       json_obj = o.log_json()
@@ -87,11 +87,11 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         # Marking mapping links to be deleted from cache
         if context.cache_manager.supported_mappings.has_key(cls):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-                   context.cache_manager.supported_mappings[cls]
-          srcid  = json_obj[srcname] 
-          dstid = json_obj[dstname] 
+              context.cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname]
+          dstid = json_obj[dstname]
           if polymorph != POLYMORPH_NONE:
-            if polymorph == POLYMORPH_SRCDEST: 
+            if polymorph == POLYMORPH_SRCDEST:
               if srctype is not None:
                 srctype = json_obj[srctype]
                 srctype = context.cache_manager.supported_classes[srctype]
@@ -107,9 +107,9 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
           else:
             # This error should not happen, it indicates that class is not in the supported_classes map
             # Log error
-            current_app.logger.warn("CACHE: destination type is not provided for direct mapping") 
-      
-  if len(modified_objects.dirty) > 0: 
+            current_app.logger.warn("CACHE: destination type is not provided for direct mapping")
+
+  if len(modified_objects.dirty) > 0:
     items_to_update = modified_objects.dirty.items()
     for o, json_obj in items_to_update:
       json_obj = o.log_json()
@@ -119,7 +119,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         key = 'collection:' + model_plural + ':' + str(json_obj['id'])
         context.cache_manager.marked_for_update[key]=json_obj
 
-  if len(modified_objects.deleted) > 0: 
+  if len(modified_objects.deleted) > 0:
     items_to_delete=modified_objects.deleted.items()
     for o, json_obj in items_to_delete:
       cls = o.__class__.__name__
@@ -130,11 +130,11 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         # Marking mapping links to be deleted from cache
         if context.cache_manager.supported_mappings.has_key(cls):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-                   context.cache_manager.supported_mappings[cls]
-          srcid  = json_obj[srcname] 
-          dstid = json_obj[dstname] 
+              context.cache_manager.supported_mappings[cls]
+          srcid  = json_obj[srcname]
+          dstid = json_obj[dstname]
           if polymorph != POLYMORPH_NONE:
-            if polymorph == POLYMORPH_SRCDEST: 
+            if polymorph == POLYMORPH_SRCDEST:
               if srctype is not None:
                 srctype = json_obj[srctype]
                 srctype = context.cache_manager.supported_classes[srctype]
@@ -149,7 +149,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
             context.cache_manager.marked_for_delete.append(to_key)
           else:
             # This should not happen, it indicates that class is not in the supproted_classes map
-            current_app.logger.warn("CACHE: destination type is not provided for direct mapping") 
+            current_app.logger.warn("CACHE: destination type is not provided for direct mapping")
 
   status_entries ={}
   for key in context.cache_manager.marked_for_add.keys():
@@ -164,8 +164,8 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     if ret is not None and len(ret) == 0:
       pass
     else:
-     current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
-     #raise SQLAlchemyError("Unable to update cache in progress state")
+      current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
+
 
 def update_memcache_after_commit(context, expiry_time):
   """
@@ -181,9 +181,9 @@ def update_memcache_after_commit(context, expiry_time):
 
   """
   if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
-   return
+    return
 
-  if context.cache_manager is None: 
+  if context.cache_manager is None:
     current_app.logger.error("CACHE: Error in initiaizing cache manager")
     return
 
@@ -216,7 +216,7 @@ def update_memcache_after_commit(context, expiry_time):
     delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, 0)
     # TODO(dan): handling failure including network errors, currently we log errors
     if delete_result is not True:
-      current_app.logger.error("CACHE: Failed to remoe collection from cache") 
+      current_app.logger.error("CACHE: Failed to remoe collection from cache")
 
   status_entries =[]
   for key in cache_manager.marked_for_add.keys():
@@ -229,7 +229,7 @@ def update_memcache_after_commit(context, expiry_time):
     delete_result = cache_manager.bulk_delete(status_entries, 0)
     # TODO(dan): handling failure including network errors, currently we log errors
     if delete_result is not True:
-      current_app.logger.error("CACHE: Failed to remove status entries from cache") 
+      current_app.logger.error("CACHE: Failed to remove status entries from cache")
 
   cache_manager.clear_cache()
 
@@ -583,7 +583,7 @@ class Resource(ModelView):
     if obj is None:
       return self.not_found_response()
     if 'Accept' in self.request.headers and \
-       'application/json' not in self.request.headers['Accept']:
+        'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
     if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
@@ -611,7 +611,7 @@ class Resource(ModelView):
       return current_app.make_response((
         'If-Match is required.', 428, [('Content-Type', 'text/plain')]))
     if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
-       request.headers['If-Unmodified-Since'] != \
+        request.headers['If-Unmodified-Since'] != \
           self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
           'The resource has been changed. The conflict must be resolved and '
@@ -703,7 +703,7 @@ class Resource(ModelView):
 
   def collection_get(self):
     if 'Accept' in self.request.headers and \
-       'application/json' not in self.request.headers['Accept']:
+        'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
@@ -723,7 +723,7 @@ class Resource(ModelView):
         with benchmark("Get resource collection from Memcache"):
           cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
         if cache_response is not None:
-          current_app.logger.info("CACHE: Successfully response from cache for resource collection: " + model_plural) 
+          current_app.logger.info("CACHE: Successfully response from cache for resource collection: " + model_plural)
           return cache_response
       else:
         current_app.logger.info("CACHE: Caching is not supported for " + \
@@ -744,7 +744,7 @@ class Resource(ModelView):
     #
     if cache_supported:
       with benchmark("Check status entries in Memcache"):
-        cache_in_progress=self.is_caching_in_progress(category, model_plural) 
+        cache_in_progress=self.is_caching_in_progress(category, model_plural)
       if cache_in_progress is False:
         with benchmark("Write resource collection to Memcache"):
           cache_response = self.write_collection_to_cache(collection, category, model_plural,\
@@ -757,7 +757,7 @@ class Resource(ModelView):
     return self.json_success_response(
       filter_collection, self.collection_last_modified(), cache_op='Miss')
 
-  def is_caching_in_progress(self, category, resource): 
+  def is_caching_in_progress(self, category, resource):
     """Check the current state of cache and in progress
 
     Calls the cachemanager to do a bulk GET of status of any operation in cache for the resource 
@@ -780,10 +780,10 @@ class Resource(ModelView):
     status_keys=[]
     cacheobjids = request.args.get('id__in', False)
     if cacheobjids and hasattr(self.model, 'eager_query'):
-      for id in cacheobjids: 
-           status_keys.append('CreateOp:' + category + ':' + resource + ':' + str(id))
-           status_keys.append('UpdateOp:' + category + ':' + resource + ':' + str(id))
-           status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
+      for id in cacheobjids:
+        status_keys.append('CreateOp:' + category + ':' + resource + ':' + str(id))
+        status_keys.append('UpdateOp:' + category + ':' + resource + ':' + str(id))
+        status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
     else:
       return False
 
@@ -817,7 +817,7 @@ class Resource(ModelView):
     data = collection_data[name][resource]
     filter_data = {name: {resource: []}}
     for attrs in data:
-      context_id = self.get_context_id_from_json(attrs) 
+      context_id = self.get_context_id_from_json(attrs)
       if not permissions.is_allowed_read(self.model.__name__, context_id):
         current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
         continue
@@ -843,20 +843,20 @@ class Resource(ModelView):
 
     filter_attrs={}
     for key, val in attrs.items():
-     filter_attrs[key] = val
-     if hasattr(self.model, key):
-       class_attr = getattr(self.model, key)
-       if isinstance(class_attr, InstrumentedAttribute) and  \
-          isinstance(class_attr.property, RelationshipProperty):
-         if type(val) is list:
-           updated_val=[]
-           for item in val:
+      filter_attrs[key] = val
+      if hasattr(self.model, key):
+        class_attr = getattr(self.model, key)
+        if isinstance(class_attr, InstrumentedAttribute) and  \
+            isinstance(class_attr.property, RelationshipProperty):
+          if type(val) is list:
+            updated_val=[]
+            for item in val:
               if self.is_read_allowed_for_item(key, item):
                 updated_val.append(item)
-           filter_attrs[key] = updated_val
-         else:
-           if not self.is_read_allowed_for_item(key, val):
-             filter_attrs[key] = None
+            filter_attrs[key] = updated_val
+          else:
+            if not self.is_read_allowed_for_item(key, val):
+              filter_attrs[key] = None
     return filter_attrs
 
   def is_read_allowed_for_item(self, key, item):
@@ -879,10 +879,10 @@ class Resource(ModelView):
     type_found    = item.has_key('type')
     context_found = item.has_key('context')
     context_id = None
-    if type_found: 
+    if type_found:
       item_type = item['type']
       if context_found:
-        if item['context'] is not None and item['context'].has_key('id'): 
+        if item['context'] is not None and item['context'].has_key('id'):
           context_id = item['context']['id']
         elif item['context'] is not None and item.has_key('context_id'):
           context_id = item['context_id']
@@ -935,10 +935,10 @@ class Resource(ModelView):
       ids = [long(i) for i in cacheobjids.split(',')]
       filter={'ids':ids, 'attrs':None}
       data = self.request.cache_manager.get_collection(category, resource, filter)
-      if data is not None and len(data) > 0: 
+      if data is not None and len(data) > 0:
         converted_data = {x_category: {x_resource: []}}
         for id, attrs in data.items():
-          context_id = self.get_context_id_from_json(attrs) 
+          context_id = self.get_context_id_from_json(attrs)
           if not permissions.is_allowed_read(self.model.__name__, context_id):
             continue
           filter_attrs=self.filter_relationship_attrs(id, attrs)
@@ -979,7 +979,7 @@ class Resource(ModelView):
     if self.request.cache_manager is None:
       current_app.logger.warn("CACHE: CacheManager is not initialized")
       return None
-    
+
     cacheobjids=None
     if category is 'collection':
       cacheobjids = request.args.get('id__in', False)
@@ -993,14 +993,14 @@ class Resource(ModelView):
           cacheData[id] = deepcopy(aresource)
         write_result = self.request.cache_manager.add_collection(category, resource, cacheData)
         if write_result is None:
-           current_app.logger.warn("CACHE: Unable to write collection to cache") 
-           return None
+          current_app.logger.warn("CACHE: Unable to write collection to cache")
+          return None
         else:
-           current_app.logger.info("CACHE: Successfully written collection to cache") 
-           return write_result
+          current_app.logger.info("CACHE: Successfully written collection to cache")
+          return write_result
       else:
-         current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
-	 return None
+        current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
+        return None
     else:
       current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
       return None

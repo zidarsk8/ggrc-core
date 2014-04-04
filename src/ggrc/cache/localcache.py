@@ -1,13 +1,8 @@
-# caching/localcache.py
-#
-# This module implements the local caching mechanism
-#
 # Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# 
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
-#
+
 
 from collections import OrderedDict
 from cache import Cache
@@ -33,14 +28,14 @@ class LocalCache(Cache):
     for cache_entry in all_cache_entries():
       if cache_entry.cache_type is self.name:
         self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
- 
+
     for key in self.supported_resources.keys():
-     self.cache_entries['collection:'+key] =  {}
+      self.cache_entries['collection:'+key] =  {}
 
   def get_name(self):
-     return self.name
+    return self.name
 
-  def get(self, category, resource, filter): 
+  def get(self, category, resource, filter):
     """ Get data from local cache for the specified filter
 
     Args:
@@ -62,7 +57,7 @@ class LocalCache(Cache):
 
     entries = self.cache_entries.get(cache_key)
     if entries is None:
-       return None
+      return None
 
     ids, attrs = self.parse_filter(filter)
     if ids is None and attrs is None:
@@ -73,7 +68,7 @@ class LocalCache(Cache):
       else:
         return self.get_data(ids, entries, attrs)
 
-  def add(self, category, resource, data, expiration_time=0): 
+  def add(self, category, resource, data, expiration_time=0):
     """ Add data to local cache for the specified data
 
     Args:
@@ -97,18 +92,18 @@ class LocalCache(Cache):
       return None
 
     # TODO(dan): Should we perform deep copy of data
-    for key in data.keys(): 
+    for key in data.keys():
       entries[key] = data.get(key)
 
     return entries
 
-  def update(self, category, resource, data, expiration_time=0): 
+  def update(self, category, resource, data, expiration_time=0):
     """ Update data in local cache for the specified data
     TODO(dan): updates is not available for local cache
     """
     return None
 
-  def remove(self, category, resource, data, lockadd_seconds=0): 
+  def remove(self, category, resource, data, lockadd_seconds=0):
     """ Remove data from local cache for the specified data
     Args:
       category: collection or stub
@@ -126,9 +121,9 @@ class LocalCache(Cache):
       return None
     if self.cache_entries is None:
       return None
-    entries = self.cache_entries.get(cache_key) 	
+    entries = self.cache_entries.get(cache_key)
 
-    for key in data.keys(): 
+    for key in data.keys():
       del entries[key]
 
     return entries
@@ -164,12 +159,12 @@ class LocalCache(Cache):
 
       attr_dict = {}
       for attr in targetattrs:
-        if attrvalues.has_key(attr): 
+        if attrvalues.has_key(attr):
           attr_dict[attr] = attrvalues.get(attr)
 
       data[key] = attr_dict
 
-    return data 
+    return data
 
   def clean(self):
     """ Cleanup
@@ -180,4 +175,3 @@ class LocalCache(Cache):
     """ Print content of cache
     """
     return str(self.cache_entries.keys()) + str(self.cache_entries.values())
-

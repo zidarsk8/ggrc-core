@@ -1,13 +1,7 @@
-# cache/cachemanager.py
-#
-# This module provides the encapsulation to GGRC cache mechanism 
-#
 # Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-#
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
-#
 
 
 """
@@ -35,16 +29,10 @@ class CacheManager:
   supported_classes={}
   supported_mappings={}
   factory = None
-  new = {}
-  dirty = {}
-  deleted = {}
-  marked_for_add={}
-  marked_for_update={}
-  marked_for_delete=[]
 
   def __init__(self):
-    pass	
-	
+    pass
+
   def initialize(self, cache):
     """
       Initialize Cache Manager, configure cache mechanism 
@@ -64,7 +52,7 @@ class CacheManager:
     self.marked_for_update={}
     self.marked_for_delete=[]
 
-  def get_collection(self, category, resource, filter): 
+  def get_collection(self, category, resource, filter):
     """ get collection from cache 
 
     Args:
@@ -75,12 +63,12 @@ class CacheManager:
     Returns:
       JSON string representation
     """
-    if not self.is_caching_supported(category, resource, filter, 'get_collection'): 
+    if not self.is_caching_supported(category, resource, filter, 'get_collection'):
       return None
     ret = self.cache_object.get(category, resource, filter)
     return ret
 
-  def add_collection(self, category, resource, data, expiration_time=0): 
+  def add_collection(self, category, resource, data, expiration_time=0):
     """ add collection in cache 
 
     Args:
@@ -91,12 +79,12 @@ class CacheManager:
      DTO formatted string, e.g. JSON string representation
     """
 
-    if not self.is_caching_supported(category, resource, data, 'add_collection'): 
+    if not self.is_caching_supported(category, resource, data, 'add_collection'):
       return None
     ret = self.cache_object.add(category, resource, data, expiration_time)
     return ret
 
-  def update_collection(category, resource, data, expiration_time=0): 
+  def update_collection(category, resource, data, expiration_time=0):
     """ update collection in cache 
 
     Args:
@@ -106,12 +94,12 @@ class CacheManager:
     Returns:
      JSON string representation
     """
-    if not self.is_caching_supported(category, resource, data, 'update_collection'): 
+    if not self.is_caching_supported(category, resource, data, 'update_collection'):
       return None
     ret = self.cache_object.update(category, resource, data, expiration_time)
     return ret
 
-  def delete_collection(self, category, resource, data, lockadd_seconds=0): 
+  def delete_collection(self, category, resource, data, lockadd_seconds=0):
     """ delete collection from cache 
 
     Args:
@@ -121,7 +109,7 @@ class CacheManager:
     Returns:
       JSON string representation
     """
-    if not self.is_caching_supported(category, resource, data, 'delete_collection'): 
+    if not self.is_caching_supported(category, resource, data, 'delete_collection'):
       return None
 
     ret = self.cacheObject.remove(category, resource, data, lockadd_seconds)
@@ -142,11 +130,11 @@ class CacheManager:
     """
     # TODO(dan): Leverage policy manager to apply configured policies 
     #
-    if self.cache_object.is_caching_supported(category, resource): 
+    if self.cache_object.is_caching_supported(category, resource):
       return True
     else:
-      return False 
-   
+      return False
+
   def bulk_get(self, data):
     """ Perform Bulk Get operations in cache for specified data
 
@@ -179,8 +167,8 @@ class CacheManager:
     """
     get_result = self.cache_object.get_multi(data.keys())
     for data_key, data_value in data.items():
-       for update_key, update_value in data_value.items():
-        if get_result.has_key(data_key): 
+      for update_key, update_value in data_value.items():
+        if get_result.has_key(data_key):
           get_result[data_key][update_key] = update_value
     return self.cache_object.update_multi(get_result, expiration_time)
 
