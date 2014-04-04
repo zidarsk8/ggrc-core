@@ -64,6 +64,16 @@ def get_collection_for(context, typename):
 def get_collection_for_with_stubs_only(context, typename):
   do_get_collection_for(context, typename, stubs_only=True)
 
+@when('GET of "{typename}" collection using id__in for "{resource}"')
+def get_collection_for_using_id__in(context, typename, resource):
+  resource = getattr(context, resource)
+  table_singular = get_resource_table_singular(typename)
+  id = resource.value[table_singular]['id']
+  handle_get_resource_and_name_it(
+      context,
+      get_service_endpoint_url(context, typename) + '?id__in={}'.format(id),
+      "collectionresource")
+
 def do_get_collection_for(context, typename, stubs_only=False):
   handle_get_resource_and_name_it(
       context,
@@ -137,6 +147,15 @@ def validate_status_201(context):
   assert context.response.status_code == 201, \
       'Expected status code 201, received {0}'.format(
           context.response.status_code)
+
+@then('the response has a header "{header}"')
+def validate_header_presence(context, header):
+  assert header in context.response.headers
+
+@then('the response header "{header}" is "{value}"')
+def validate_header_value(context, header, value):
+  assert header in context.response.headers
+  assert context.response.headers[header] == value
 
 @then('the response has a Location header')
 def validate_location_header(context):

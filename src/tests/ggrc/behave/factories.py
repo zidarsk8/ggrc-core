@@ -215,6 +215,8 @@ class StandardFactory(ModelFactory):
 
 class SectionFactory(ModelFactory):
   MODEL = models.Section
+  # Explicit `directive` factory is necessary, since it's a `nullable`
+  # column, but uses @validate to maintain requirement
   directive = FactoryStubMarker(models.Regulation)
 
 class ClauseFactory(ModelFactory):
@@ -320,26 +322,32 @@ class DirectiveSectionFactory(ModelFactory):
 class ObjectControlFactory(ModelFactory):
   MODEL = models.ObjectControl
   status = FuzzyChoice(MODEL.VALID_STATES)
+  controllable = FactoryStubMarker(models.Market)
 
 class ObjectDocumentFactory(ModelFactory):
   MODEL = models.ObjectDocument
   status = FuzzyChoice(MODEL.VALID_STATES)
+  documentable = FactoryStubMarker(models.Market)
 
 class ObjectObjectiveFactory(ModelFactory):
   MODEL = models.ObjectObjective
   status = FuzzyChoice(MODEL.VALID_STATES)
+  objectiveable = FactoryStubMarker(models.Market)
 
 class ObjectOwnerFactory(ModelFactory):
   MODEL = models.ObjectOwner
   status = FuzzyChoice(MODEL.VALID_STATES)
+  ownable = FactoryStubMarker(models.Market)
 
 class ObjectPersonFactory(ModelFactory):
   MODEL = models.ObjectPerson
   status = FuzzyChoice(MODEL.VALID_STATES)
+  personable = FactoryStubMarker(models.Market)
 
 class ObjectSectionFactory(ModelFactory):
   MODEL = models.ObjectSection
   status = FuzzyChoice(MODEL.VALID_STATES)
+  sectionable = FactoryStubMarker(models.Market)
 
 class ObjectiveControlFactory(ModelFactory):
   MODEL = models.ObjectiveControl
@@ -356,6 +364,8 @@ class ProgramDirectiveFactory(ModelFactory):
 class RelationshipFactory(ModelFactory):
   MODEL = models.Relationship
   status = FuzzyChoice(MODEL.VALID_STATES)
+  source = FactoryStubMarker(models.Market)
+  destination = FactoryStubMarker(models.Process)
 
 class SectionObjectiveFactory(ModelFactory):
   MODEL = models.SectionObjective

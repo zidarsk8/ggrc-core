@@ -57,6 +57,7 @@ def handle_named_example_resource(
 def handle_get_resource_and_name_it(context, url, name):
   response = get_resource(context, url)
   assert response.status_code == 200
+  setattr(context, 'response', response)
   setattr(context, name, response.json())
 
 def get_resource(context, url, headers=None):
