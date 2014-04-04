@@ -1047,6 +1047,9 @@ ul.new-tree {
   color:#222;
   overflow: hidden;
   zoom: 1;
+  &.no-space {
+    padding-left: 0;
+  }
   .tree-title-area {
     @include oneline();
     .event-action {
