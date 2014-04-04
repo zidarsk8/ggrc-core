@@ -2342,6 +2342,10 @@
                 prev,
                 // `foundObs` did we find an observable.
                 foundObs;
+
+            while(cur && cur.isComputed) {
+                cur = cur();
+            }
             for (var i = 0, readLength = reads.length; i < readLength; i++) {
                 // Update what we are reading from.
                 prev = cur;
