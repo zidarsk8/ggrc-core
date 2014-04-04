@@ -69,6 +69,7 @@ class TestResource(TestCase):
           u'href': u'/api/people/1',
           u'id': model.modified_by_id,
           u'type': 'Person',
+          u'context_id': None
           } if model.modified_by_id is not None else None,
         u'modified_by_id': int(model.modified_by_id),
         u'updated_at': updated_at,

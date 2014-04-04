@@ -182,6 +182,10 @@ def check_resource_equality_for_response(context, resource_type):
   for k in orig_json:
     original = context.example_resource[k]
     response = resp_json[unicode(k)]
+    # Remove `context_id` from comparison, since it isn't posted
+    if isinstance(response, dict) and 'context_id' in response:
+      response = dict(response)
+      del response['context_id']
     if isinstance(original, datetime.datetime):
       response = parse_date(response)
       assert dates_within_tolerance(original, response), \
