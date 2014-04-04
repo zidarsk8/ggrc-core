@@ -160,7 +160,9 @@ can.Control("CMS.Controllers.TreeView", {
           }));
       }
 
-      //this.init_spinner();
+      // Init the spinner if items need to be loaded:
+      if(this._count && this._count())
+        this._loading_started();
 
       if(this.options.footer_view) {
         dfds.push(
@@ -231,6 +233,7 @@ can.Control("CMS.Controllers.TreeView", {
       }
       if (this.get_count_deferred) {
         this.get_count_deferred.then(function(count) {
+          self._count = count;
           self.element && self.element.trigger("updateCount", count());
           count.bind("change", function() {
             self.element && self.element.trigger("updateCount", count());
