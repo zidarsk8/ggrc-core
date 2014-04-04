@@ -12,7 +12,6 @@ def initialize_sanitized_properties(
     context, resource_type, resource_name, properties):
   properties = properties.split(',')
   properties = dict([(p.strip(), '<script>foo</script>') for p in properties])
-  print properties
   handle_named_example_resource(
       context, resource_type, resource_name, **properties)
 
