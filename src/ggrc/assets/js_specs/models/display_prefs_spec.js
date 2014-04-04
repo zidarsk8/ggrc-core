@@ -14,7 +14,7 @@ describe("display prefs model", function() {
   });
 
   afterEach(function() {
-    display_prefs.removeAttr(window.location.pathName);
+    display_prefs.removeAttr(window.location.pathname);
     display_prefs.isNew() || display_prefs.destroy();
   });
 
