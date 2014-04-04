@@ -21,7 +21,7 @@ var COLLAPSE = "collapse"
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   autoupdate : true
-  , version : 20130909
+  , version : 20140403 // Last updated due to default sort of InnerNav being broken.
 
   , findAll : function() {
     var that = this;
