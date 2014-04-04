@@ -25,6 +25,7 @@
         {{#using directive=instance.directive}}
         <label>
           Policy / Regulation / Standard
+          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Policy / Regulation / Standard containing this Section"></i>
         </label>
         <input tabindex="4" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-template="/directives/autocomplete_result.mustache" placeholder="Enter email address" type="text" value="{{firstexist directive.title ''}}" />
