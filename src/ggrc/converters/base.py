@@ -86,7 +86,7 @@ class BaseConverter(object):
 
   def import_metadata(self):
     if len(self.rows) < 6:
-      self.errors.append("There is no data to import in this CSV file")
+      self.errors.append(u"There is no data to import in this CSV file")
       raise ImportException("", show_preview=True, converter=self)
 
     optional_metadata = []
@@ -147,13 +147,13 @@ class BaseConverter(object):
 
     for header in required_headers:
       if header in missing_columns:
-        self.errors.append("Missing required column: {}".format(self.get_header_for_column(import_map, header)))
+        self.errors.append(u"Missing required column: {}".format(self.get_header_for_column(import_map, header)))
         missing_columns.remove(header)
 
     if any(missing_columns):
       missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
-      self.warnings.append("Missing column{plural}: {missing}".format(
+      self.warnings.append(u"Missing column{plural}: {missing}".format(
         plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
 
     return keys
@@ -183,7 +183,7 @@ class BaseConverter(object):
     self.set_import_stats()
     if not dry_run:
       if self.has_errors():
-        raise ImportException("Attempted import with errors")
+        raise ImportException(u"Attempted import with errors")
       self.save_import()
     return self
 
@@ -225,15 +225,15 @@ class BaseConverter(object):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing "{}" Code heading'.format(self.directive().kind))
+      self.errors.append(u'Missing "{}" Code heading'.format(self.directive().kind))
     elif attrs['slug'] != self.directive().slug:
-      self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
+      self.errors.append(u'{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
   def validate_metadata_type(self, attrs, required_type):
     if attrs.get('type') is None:
-      self.errors.append('Missing "Type" heading')
+      self.errors.append(u'Missing "Type" heading')
     elif attrs['type'] != required_type:
-      self.errors.append('Type must be "{}"'.format(required_type))
+      self.errors.append(u'Type must be "{}"'.format(required_type))
 
   def do_export(self, csv_writer):
     for i,obj in enumerate(self.objects):

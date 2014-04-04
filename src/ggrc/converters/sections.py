@@ -81,9 +81,9 @@ class SectionsConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.directive_kind()))
+      self.errors.append(u'Missing {} Code heading'.format(self.directive_kind()))
     elif attrs['slug'] != self.directive().slug:
-      self.errors.append('{0} Code must be {1}'.format(
+      self.errors.append(u'{0} Code must be {1}'.format(
           self.directive_kind(),
           self.directive().slug
       ))

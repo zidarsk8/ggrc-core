@@ -339,7 +339,7 @@ class ContactEmailHandler(ColumnHandler):
     elif person_must_exist:
       value = self.find_contact(value, is_required=is_required)
     elif value and not re.match(Person.EMAIL_RE_STRING, value, re.IGNORECASE):
-      message = "{} is not a valid email. \
+      message = u"{} is not a valid email. \
                 Please use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
     return value
@@ -431,8 +431,8 @@ class OptionColumnHandler(ColumnHandler):
       role = self.options.get('role') or self.key
       option = Option.query.filter_by(role=role.lower(), title=value.lower()).first()
       if not option and self.key != 'network_zone':
-        self.warnings.append(
-          'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
+        self.add_warning(
+          u'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
             role, value.lower()))
       elif not option and self.key == "network_zone":
         self.warnings.append(
@@ -504,7 +504,7 @@ class DateColumnHandler(ColumnHandler):
       else:
         return ''
     except ValueError as e:
-      self.errors.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
+      self.errors.append(u"{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
 
   def display(self):
     if self.has_errors():
@@ -668,7 +668,7 @@ class LinksHandler(ColumnHandler):
     return obj
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning("'{0}' will be created".format(data.get('slug')))
+    self.add_link_warning(u"'{0}' will be created".format(data.get('slug')))
 
   def get_existing_items(self):
     return getattr(self.importer.obj, self.options.get('association'), None)
@@ -748,7 +748,7 @@ class LinkControlsHandler(LinksHandler):
     return {'slug' : data}
 
   def create_item(self, data):
-    self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
+    self.add_link_warning(u"Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
 
@@ -766,12 +766,12 @@ class LinkControlCategoriesHandler(LinksHandler):
     items = self.model_class.query.filter_by(**params).all()
 
     if len(items) > 1:
-      self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
+      self.add_link_error(u'Multiple matches found for "{}"'.format(data.get('name')))
     else:
       return items[0] if items else None
 
   def create_item(self, data):
-    self.add_link_warning('Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
+    self.add_link_warning(u'Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
 
   def render_item(self, item):
     return item.name
@@ -799,11 +799,11 @@ class LinkDocumentsHandler(LinksHandler):
       if result and self.is_valid_url(result.group(1)):
         data = { 'link': result.group(1), 'title': result.group(2), 'description': result.group(3)}
       else:
-        self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
+        self.add_link_error(u'Invalid format: use "[www.yoururl.com Title] Description"')
     elif self.is_valid_url(value):
       data = { 'link' : value.strip() }
     else:
-      self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
+      self.add_link_error(u'Invalid format: use "[www.yoururl.com Title] Description"')
 
     return data
 
@@ -811,7 +811,7 @@ class LinkDocumentsHandler(LinksHandler):
     return {'link' : data.get('link')}
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
+    self.add_link_warning(u'"{}" will be created'.format(data.get('title') or data.get('link')))
 
   def render_item(self, item):
     return u"[{} {}] {}".format(item.link, item.title, item.description)
@@ -827,18 +827,18 @@ class LinkPeopleHandler(LinksHandler):
       if match:
         data = { 'email' : match.group(1), 'name' : match.group(3) }
       else:
-        self.add_link_error('Invalid format')
+        self.add_link_error(u'Invalid format')
     else:
       data = { 'email' : value }
 
     if data:
       if data.get('email') and not re.match(Person.EMAIL_RE_STRING, data['email'], re.IGNORECASE):
-        self.add_link_warning("This email address is invalid and will not be mapped")
+        self.add_link_warning(u"This email address is invalid and will not be mapped")
       else:
         return data
 
   def create_item(self, data):
-    self.add_link_warning("This email does not exist and will not be mapped.")
+    self.add_link_warning(u"This email does not exist and will not be mapped.")
 
   def get_where_params(self, data):
     return { 'email' : data.get('email') } if data else {}
@@ -847,7 +847,7 @@ class LinkPeopleHandler(LinksHandler):
     return {'email' : data.get('email'), 'name' : data.get('name', '') } if data else {}
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning('"{}" will be created'.format(data.get('email')))
+    self.add_link_warning(u'"{}" will be created'.format(data.get('email')))
 
   def get_existing_items(self):
     where_params = {}
@@ -891,12 +891,12 @@ class LinkSystemsHandler(LinksHandler):
 
     if not system:
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
-      self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
+      self.add_link_warning(u"{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
       if self.options.get('is_biz_process') and not (system.__class__ is Process):
-        self.add_link_warning("That code is used by a System, and will not be mapped")
+        self.add_link_warning(u"That code is used by a System, and will not be mapped")
       elif not self.options.get('is_biz_process') and system.__class__ is Process:
-        self.add_link_warning('That code is used by a Process, and will not be mapped')
+        self.add_link_warning(u'That code is used by a Process, and will not be mapped')
       else:
         return system
 
@@ -916,7 +916,7 @@ class LinkRelationshipsHandler(LinksHandler):
       if match and len(match.groups()) == 2 and not (match.group(1) is None):
         return { 'slug' : match.group(1) , 'title' : match.group(2) }
       else:
-        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+        self.add_link_error(u"Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
       return {'slug' : value}
 
@@ -943,7 +943,7 @@ class LinkRelationshipsHandler(LinksHandler):
     return self.options.get('model_human_name') or self.model_class.__name__
 
   def create_item(self, data):
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+    self.add_link_warning(u"{} with code '{}' doesn't exist.".format(
       self.model_human_name(), data.get('slug')))
 
   def after_save(self, obj):
@@ -973,13 +973,13 @@ class LinkObjectHandler(LinksHandler):
       if match and len(match.groups()) == 2 and not (match.group(1) is None):
         return { 'slug' : match.group(1) , 'title' : match.group(2) }
       else:
-        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+        self.add_link_error(u"Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
       return {'slug' : value}
 
   def create_item(self, data):
     model_class = self.options.get('model_class') or self.model_class
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+    self.add_link_warning(u"{} with code '{}' doesn't exist.".format(
       model_class.__name__, data.get('slug')))
 
   def find_existing_item(self, data):

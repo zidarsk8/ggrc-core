@@ -107,9 +107,9 @@ class ObjectivesConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.parent_type_string()))
+      self.errors.append(u'Missing {} Code heading'.format(self.parent_type_string()))
     elif attrs['slug'] != self.parent_object().slug:
-      self.errors.append('{0} Code must be {1}'.format(
+      self.errors.append(u'{0} Code must be {1}'.format(
           self.parent_type_string(),
           self.parent_object().slug
       ))
