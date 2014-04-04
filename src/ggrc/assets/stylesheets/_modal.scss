@@ -869,6 +869,18 @@
     .code-info {
       font-style: italic;
       font-size: $f-small;
+      display: block;
+    }
+  }
+}
+
+.selector-list {
+  .tree-title-area {
+    .code-info {
+      font-size: $f-small;
+      font-style: italic;
+      color: $tabTitle;
+      font-weight: bold;
     }
   }
 }
