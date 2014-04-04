@@ -1268,6 +1268,10 @@ Mustache.registerHelper("is_allowed", function() {
     context_id = options.hash.context;
     if (typeof context_id === 'function' && context_id.isComputed)
       context_id = context_id();
+    if(context_id && typeof context_id === "object" && context_id.id) {
+      // Passed in the context object instead of the context ID, so use the ID
+      context_id = context_id.id;
+    }
     //  Using `context=null` in Mustache templates, when `null` is not defined,
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
