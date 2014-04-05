@@ -215,6 +215,45 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
     + " data-replace='true'/>";
   });
 
+  Mustache.registerHelper("addclass", function(prefix, compute, options) {
+    prefix = resolve_computed(prefix);
+    return function(el) {
+      var curClass = null
+        , wasAttached = false
+        , callback
+        ;
+
+      callback = function(_ev, newVal, _oldVal) {
+        var nowAttached = $(el).closest('body').length > 0
+          , newClass = null
+          ;
+
+        //  If we were once attached and now are not, unbind this callback.
+        if (wasAttached && !nowAttached) {
+          compute.unbind('change', callback);
+          return;
+        } else if (nowAttached && !wasAttached) {
+          wasAttached = true;
+        }
+
+        if (newVal && newVal.toLowerCase)
+          newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+
+        if (curClass) {
+          $(el).removeClass(curClass);
+          curClass = null;
+        }
+        if (newClass) {
+          $(el).addClass(newClass);
+          curClass = newClass;
+        }
+      };
+
+      compute.bind('change', callback);
+      callback(null, resolve_computed(compute));
+    };
+  });
+
   /**
     Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
     Usage:
