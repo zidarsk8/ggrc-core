@@ -610,7 +610,7 @@ $(function() {
             // Currently, the only error we encounter here is uniqueness
             // constraint violations.  Let's use a nicer message!
             var message = "That object is already mapped";
-            $target.trigger("ajax:flash", { error: message });
+            $(document.body).trigger("ajax:flash", { error: message });
           });
       }
       // Otherwise throw a warning

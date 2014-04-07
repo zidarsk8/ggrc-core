@@ -284,7 +284,7 @@
         }
 
         if (flash) {
-          $(e.target).trigger('ajax:flash', flash);
+          $(document.body).trigger('ajax:flash', flash);
         }
       }
     });
