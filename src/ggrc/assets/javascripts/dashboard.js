@@ -764,7 +764,7 @@ jQuery(function($) {
         d.unbind("change"); //forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
       });
-      $.when.apply($, destroys).done($.proxy(GGRC, 'navigate'));
+      $.when.apply($, destroys).done(function() { GGRC.navigate(); });
     });
   })
   .on('click', '.set-display-settings-default', function(e) {
