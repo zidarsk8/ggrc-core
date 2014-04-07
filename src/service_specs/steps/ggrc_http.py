@@ -226,7 +226,7 @@ def get_related_resource_types(resource_type, resource_types):
   for attr in ggrc.db.inspect(model).attrs:
     if isinstance(attr, RelationshipProperty):
       columns = tuple(attr.local_columns)[0]
-      if not (attr.uselist or columns.primary_key or columns.nullable):
+      if not (attr.uselist or columns.primary_key):# or columns.nullable):
         # If the resource has subclasses, then it is abstract, so use one of
         #   its subclasses
         related_resource_types = [

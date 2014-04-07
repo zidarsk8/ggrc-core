@@ -38,7 +38,6 @@ Feature: RBAC Permissions enforcement for REST API
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
     And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
-    And current user has create permissions on resource types that "<resource_type>" depends on in context "context2"
     Then POST of "resource" to its collection is allowed
     Given a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context2"
@@ -507,7 +506,7 @@ Feature: RBAC Permissions enforcement for REST API
     When Querying "Program" with "program_directives.directive.kind=Contract&__include=directives"
     Then query result selfLink query string is "program_directives.directive.kind=Contract&__include=directives"
     And "program" is in query result
-    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 1"
+    And evaluate "len(context.queryresultcollection['programs_collection']['programs'][0]['directives']) == 2"
     And evaluate "'kind' in context.queryresultcollection['programs_collection']['programs'][0]['directives'][0]"
     Given the current user
     """
