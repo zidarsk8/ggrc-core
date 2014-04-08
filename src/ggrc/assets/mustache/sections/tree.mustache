@@ -42,36 +42,32 @@
                   </li>
                 {{/prune_context}}
               {{/with_mapping_count}}
-              
-              {{#pack list=instance.objectives}}
-                {{#prune_context}}
+
+              {{#with_mapping_count instance 'objectives'}}
                   <li>
                     <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
                       <i class="grcicon-objective-black"></i>
-                        {{#if list.length}} 
-                          <span>{{list.length}}</span>
+                        {{#if count}}
+                          <span>{{count}}</span>
                         {{else}}
                           <strong class="error">0</strong>
                         {{/if}}
                     </div>
                   </li>
-                {{/prune_context}}
-              {{/pack}}
-              
-              {{#pack list=instance.controls}}
-                {{#prune_context}}
+              {{/with_mapping_count}}
+
+              {{#with_mapping_count instance 'controls'}}
                   <li>
                     <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
                       <i class="grcicon-control-black"></i>
-                      {{#if list.length}} 
-                        <span>{{list.length}}</span>
+                      {{#if count}}
+                        <span>{{count}}</span>
                       {{else}}
                         <strong class="error">0</strong>
                       {{/if}}
                     </div>
                   </li>
-                {{/prune_context}}
-              {{/pack}}
+              {{/with_mapping_count}}
             </ul>
             
             <div class="item-data">
