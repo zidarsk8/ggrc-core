@@ -99,6 +99,7 @@ def all_mapping_entries():
     mapping('control_controls', 'ControlControl', 'controls', 'control_id', 'controls', 'implemented_control_id'),
     mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
     mapping('directive_controls', 'DirectiveControl', 'directives', 'directive_id', 'controls', 'control_id'),
+    mapping('directive_sections', 'DirectiveSection', 'directives', 'directive_id', 'sections', 'section_id'),
     mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', POLYMORPH_DEST_ONLY),
     mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable_type', 'documentable_id', POLYMORPH_DEST_ONLY),
     mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', POLYMORPH_DEST_ONLY),
