@@ -336,7 +336,9 @@ jQuery(function($) {
         $("#results-container").html(task.result.content);
         $('form.import .btn').unbind().unbind().click(disableButton);
         if(msg === "Upload and Review"){
-          // Don't display "Upload and Review successful." message
+          // Don't display "Upload and Review successful." message;
+          // But kill progress message.
+          $('body').trigger('ajax:flash', {});
           return;
         }
         $('body').trigger(
