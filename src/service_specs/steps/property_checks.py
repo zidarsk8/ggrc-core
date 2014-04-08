@@ -19,8 +19,11 @@ def set_link_property(
   set_property(
       source,
       property_name,
-      {'id': target.get(u'id'), 'href': target.get(u'selfLink')},
-      )
+      {
+        'id': target.get(u'id'),
+        'href': target.get(u'selfLink'),
+        'type': target.get(u'type')
+      })
 
 @given(\
     '"{target_resource}" is added to links property "{property_name}" of '\
