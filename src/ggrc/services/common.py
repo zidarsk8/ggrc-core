@@ -88,26 +88,16 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         if context.cache_manager.supported_mappings.has_key(cls):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
               context.cache_manager.supported_mappings[cls]
-          srcid  = json_obj[srcname]
-          dstid = json_obj[dstname]
-          if polymorph != POLYMORPH_NONE:
-            if polymorph == POLYMORPH_SRCDEST:
-              if srctype is not None:
-                srctype = json_obj[srctype]
-                srctype = context.cache_manager.supported_classes[srctype]
-            if dsttype is not None:
-              dsttype = json_obj[dsttype]
-              dsttype = context.cache_manager.supported_classes[dsttype]
-          if srctype is not None:
-            from_key = 'collection:' + srctype + ':' + str(srcid)
-            context.cache_manager.marked_for_delete.append(from_key)
-          if dsttype is not None:
-            to_key   = 'collection:' + dsttype + ':' + str(dstid)
-            context.cache_manager.marked_for_delete.append(to_key)
-          else:
-            # This error should not happen, it indicates that class is not in the supported_classes map
-            # Log error
-            current_app.logger.warn("CACHE: destination type is not provided for direct mapping")
+          obj = getattr(o, srcname.replace('_id', ''), None)
+          if obj:
+            obj_key = 'collection:{}:{}'.format(
+                obj._inflector.table_plural, obj.id)
+            context.cache_manager.marked_for_delete.append(obj_key)
+          obj = getattr(o, dstname.replace('_id', ''), None)
+          if obj:
+            obj_key = 'collection:{}:{}'.format(
+                obj._inflector.table_plural, obj.id)
+            context.cache_manager.marked_for_delete.append(obj_key)
 
   if len(modified_objects.dirty) > 0:
     items_to_update = modified_objects.dirty.items()
@@ -131,25 +121,16 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         if context.cache_manager.supported_mappings.has_key(cls):
           (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
               context.cache_manager.supported_mappings[cls]
-          srcid  = json_obj[srcname]
-          dstid = json_obj[dstname]
-          if polymorph != POLYMORPH_NONE:
-            if polymorph == POLYMORPH_SRCDEST:
-              if srctype is not None:
-                srctype = json_obj[srctype]
-                srctype = context.cache_manager.supported_classes[srctype]
-            if dsttype is not None:
-              dsttype = json_obj[dsttype]
-              dsttype = context.cache_manager.supported_classes[dsttype]
-          if srctype is not None:
-            from_key = 'collection:' + srctype + ':' + str(srcid)
-            context.cache_manager.marked_for_delete.append(from_key)
-          if dsttype is not None:
-            to_key   = 'collection:' + dsttype + ':' + str(dstid)
-            context.cache_manager.marked_for_delete.append(to_key)
-          else:
-            # This should not happen, it indicates that class is not in the supproted_classes map
-            current_app.logger.warn("CACHE: destination type is not provided for direct mapping")
+          obj = getattr(o, srcname.replace('_id', ''), None)
+          if obj:
+            obj_key = 'collection:{}:{}'.format(
+                obj._inflector.table_plural, obj.id)
+            context.cache_manager.marked_for_delete.append(obj_key)
+          obj = getattr(o, dstname.replace('_id', ''), None)
+          if obj:
+            obj_key = 'collection:{}:{}'.format(
+                obj._inflector.table_plural, obj.id)
+            context.cache_manager.marked_for_delete.append(obj_key)
 
   status_entries ={}
   for key in context.cache_manager.marked_for_add.keys():
