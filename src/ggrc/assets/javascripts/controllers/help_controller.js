@@ -25,7 +25,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.Help", {
       this.options.instance.attr('context', { id: null });
 
     this.bindXHRToButton(this.options.instance.save().done(function() {
-      el.trigger("ajax:flash", { success : "Help content saved successfully"});
+      $(document.body).trigger("ajax:flash", { success : "Help content saved successfully"});
     }), el);
   }
 

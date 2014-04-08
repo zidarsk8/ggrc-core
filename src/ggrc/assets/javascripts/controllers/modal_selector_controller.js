@@ -1048,7 +1048,7 @@
           return;
         }
         if (!join_instance) {
-          that.element.trigger("ajax:flash", {
+          $(document.body).trigger("ajax:flash", {
             error: "Select an object to map" });
         } else {
           join_instance.save()
@@ -1063,7 +1063,7 @@
               //that.element.trigger("ajax:flash", { error : xhr.responseText });
               if (that.element) {
                 var message = "That object is already mapped";
-                that.element.trigger("ajax:flash", { error: message });
+                $(document.body).trigger("ajax:flash", { error: message });
               }
             });
         }

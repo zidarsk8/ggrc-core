@@ -1462,12 +1462,16 @@
 
   GGRC.all_local_results = function(instance) {
     // Returns directly-linked objects
-    var loaders = GGRC.Mappings[instance.constructor.shortName]
+    var loaders
       , local_loaders = []
       , multi_loader
       , multi_binding
       ;
 
+    if (instance._all_local_results_binding)
+      return instance._all_local_results_binding.refresh_stubs();
+
+    loaders = GGRC.Mappings[instance.constructor.shortName];
     can.each(loaders, function(loader, name) {
       if (loader instanceof GGRC.ListLoaders.DirectListLoader
           || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
@@ -1476,8 +1480,8 @@
     });
 
     multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders);
-    multi_binding = multi_loader.attach(instance);
-    return multi_binding.refresh_stubs();
+    instance._all_local_results_binding = multi_loader.attach(instance);
+    return instance._all_local_results_binding.refresh_stubs();
   };
 
 })(GGRC, can);

@@ -114,6 +114,12 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     , object_sections : "CMS.Models.ObjectSection.stubs"
     }
 
+  , init: function() {
+    this._super.apply(this, arguments);
+    // Only Sections (not Clauses) need a parent Directive.
+    this.validatePresenceOf("directive");
+  }
+
   , tree_view_options : {
       show_view : "/static/mustache/sections/tree.mustache"
     , footer_view : GGRC.mustache_path + "/sections/tree_footer.mustache"

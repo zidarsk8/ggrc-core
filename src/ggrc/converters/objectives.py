@@ -67,18 +67,6 @@ class ObjectiveRowConverter(BaseRowConverter):
         if parent_type == Program:
           db_options["context_id"] = parent_id  # id of program
         db_session.add(ObjectObjective(**db_options))
-    section_type = self.options.get('section_type')
-    section_id = self.options.get('section_id')
-    if section_type and section_id:
-      # if section given, connect to that in addition to parent type
-      section_obj = section_type.query.get(section_id)
-      matching_relationship_count = SectionObjective.query\
-        .filter(SectionObjective.objective_id==self.obj.id)\
-        .filter(SectionObjective.section_id==section_id)\
-        .count()
-      if matching_relationship_count == 0:
-        db_session.add(SectionObjective(
-            section=section_obj, objective=self.obj))
 
 
 class ObjectivesConverter(BaseConverter):
@@ -107,9 +95,9 @@ class ObjectivesConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.parent_type_string()))
+      self.errors.append(u'Missing {} Code heading'.format(self.parent_type_string()))
     elif attrs['slug'] != self.parent_object().slug:
-      self.errors.append('{0} Code must be {1}'.format(
+      self.errors.append(u'{0} Code must be {1}'.format(
           self.parent_type_string(),
           self.parent_object().slug
       ))

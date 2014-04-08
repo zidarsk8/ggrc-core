@@ -451,7 +451,7 @@ can.Control("GGRC.Controllers.Modals", {
           finish();
         }
       }).fail(function(xhr, status) {
-        el.trigger("ajax:flash", { error : xhr.responseText });
+        $(document.body).trigger("ajax:flash", { error : xhr.responseText });
         delete that.disable_hide;
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");
