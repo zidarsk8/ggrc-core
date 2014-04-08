@@ -577,12 +577,10 @@ can.Control("CMS.Controllers.InnerNav", {
 
       if(existing_index !== index) {
         if(existing_index > -1) {
-          this.options.widget_list.splice(existing_index, 1);
-        }
-        if(index >= this.options.widget_list.length) {
-          this.options.widget_list.push(widget);
+          this.options.widget_list.splice(existing_index, 1, this.options.widget_list[index]);
+          this.options.widget_list.splice(index, 1, widget);
         } else {
-          this.options.widget_list.splice(index, 0, widget);
+          this.options.widget_list.push(widget);
         }
       }
       return widget;
