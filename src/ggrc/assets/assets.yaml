@@ -22,7 +22,12 @@ dashboard-js-files:
   - bootstrap-typeahead.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
-  - can.jquery-all.js
+  - can.jquery.js 
+  - can.construct.super.js 
+  - can.map.validations.js 
+  - can.control.plugin.js 
+  - can.construct.proxy.js 
+  - can.map.attributes.js
   - bootstrap/modal-ajax.js
   - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
