@@ -183,10 +183,16 @@
       , clauses: TypeFilter("_sections_base", "Clause")
       , orphaned_objects: Multi([
           "related_objects"
-        , "controls"
-        , "sections"
         , "clauses"
+        , "contracts"
+        , "controls"
+        , "objectives"
         , "people"
+        , "policies"
+        , "programs"
+        , "regulations"
+        , "sections"
+        , "standards"
         ])
       }
     , section_base: {
