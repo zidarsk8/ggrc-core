@@ -26,7 +26,13 @@
                 </li>
               {{/infer_roles}}
               <li>
+                {{#with_page_object_as 'page_instance'}}
+                {{#if_helpers '\
+                  ^if_instance_of' page_instance 'Directive' '\
+                  or ^if_instance_of' instance 'Section'}}
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+                {{/if_helpers}}
+                {{/with_page_object_as}}
               </li>
               {{#with_mapping_count instance 'related_objects'}}
                 {{#prune_context}}
@@ -88,7 +94,16 @@
 
         <div class="row-fluid">
 
-          <div class="span12">
+          <div class="span6">
+          {{#if instance.viewLink}}
+            <a href="{{instance.viewLink}}" class="info-action">
+              View {{instance.class.title_singular}}
+              <i class="grcicon-goto"></i>
+            </a>
+          {{/if}}
+          </div>
+
+          <div class="span6">
             {{#if_helpers '\
               if_instance_of' instance "Section" '\
               and if_instance_of' parent_instance "Directive"}}

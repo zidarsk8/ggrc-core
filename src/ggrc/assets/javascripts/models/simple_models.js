@@ -116,6 +116,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -172,6 +174,8 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -215,6 +219,8 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -258,6 +264,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
