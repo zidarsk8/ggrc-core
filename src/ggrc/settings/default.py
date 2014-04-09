@@ -22,7 +22,7 @@ exports = []
 COMPANY = "Company, Inc."
 COMPANY_LOGO_TEXT = "Company GRC"
 COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
-VERSION = "s26"
+VERSION = "s26.1"
 
 # Initialize from environment if present
 import os
