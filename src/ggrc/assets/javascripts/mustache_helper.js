@@ -2393,4 +2393,13 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
       instance.get_list_counter(mapping_name))
 });
 
+Mustache.registerHelper("is_overdue", function(date, options){
+  if(+resolve_computed(date) < +new Date()){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
+});
+
 })(this, jQuery, can);
