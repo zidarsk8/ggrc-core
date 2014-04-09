@@ -541,8 +541,6 @@ can.Control("CMS.Controllers.InnerNav", {
         , existing_index
         ;
 
-      index = (index == null) ? this.options.widget_list.length : index;
-
       if(this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
         this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
@@ -575,10 +573,17 @@ can.Control("CMS.Controllers.InnerNav", {
       , spinner : this.options.spinners["#" + $widget.attr("id")]
       });
 
+      index = (index == null) ? this.options.widget_list.length : index;
+
       if(existing_index !== index) {
         if(existing_index > -1) {
-          this.options.widget_list.splice(existing_index, 1, this.options.widget_list[index]);
-          this.options.widget_list.splice(index, 1, widget);
+          if (index >= this.options.widget_list.length) {
+            this.options.widget_list.splice(existing_index, 1);
+            this.options.widget_list.push(widget);
+          } else {
+            this.options.widget_list.splice(existing_index, 1, this.options.widget_list[index]);
+            this.options.widget_list.splice(index, 1, widget);
+          }
         } else {
           this.options.widget_list.push(widget);
         }
