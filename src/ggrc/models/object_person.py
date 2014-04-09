@@ -84,7 +84,7 @@ class Personable(object):
       ]
 
   _include_links = [
-      'object_people',
+      #'object_people',
       ]
 
   @classmethod

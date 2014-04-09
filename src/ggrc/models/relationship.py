@@ -110,8 +110,8 @@ class Relatable(object):
       ]
 
   _include_links = [
-      'related_sources',
-      'related_destinations'
+      #'related_sources',
+      #'related_destinations'
       ]
 
   @classmethod

@@ -84,7 +84,7 @@ class Sectionable(object):
       ]
 
   _include_links = [
-      'object_sections',
+      #'object_sections',
       ]
 
   @classmethod

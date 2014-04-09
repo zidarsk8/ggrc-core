@@ -84,7 +84,7 @@ class Documentable(object):
       ]
 
   _include_links = [
-      'object_documents',
+      #'object_documents',
       ]
 
   @classmethod
