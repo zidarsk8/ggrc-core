@@ -84,7 +84,7 @@ class Objectiveable(object):
       ]
 
   _include_links = [
-      'object_objectives',
+      #'object_objectives',
       ]
 
   @classmethod
