@@ -94,7 +94,16 @@
 
         <div class="row-fluid">
 
-          <div class="span12">
+          <div class="span6">
+          {{#if instance.viewLink}}
+            <a href="{{instance.viewLink}}" class="info-action">
+              View {{instance.class.title_singular}}
+              <i class="grcicon-goto"></i>
+            </a>
+          {{/if}}
+          </div>
+
+          <div class="span6">
             {{#if_helpers '\
               if_instance_of' instance "Section" '\
               and if_instance_of' parent_instance "Directive"}}
