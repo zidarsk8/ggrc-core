@@ -1124,6 +1124,7 @@ ul.new-tree {
     text-decoration:none;
   }
   &.unmap {
+    margin-left:7px;
     @include opacity(0.25);
     &:hover {
       color:$error;

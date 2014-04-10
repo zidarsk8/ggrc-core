@@ -2202,7 +2202,7 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
     , page_instance = GGRC.page_instance()
     ;
   
-  if(instance.type === page_instance.type && instance.id === page_instance.id){
+  if(instance && instance.type === page_instance.type && instance.id === page_instance.id){
     return options.fn(options.contexts);
   }
   else{
