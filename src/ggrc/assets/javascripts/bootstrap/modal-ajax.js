@@ -250,6 +250,7 @@
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
       , model = CMS.Models[$trigger.attr("data-object-singular")]
+      , mapping = $trigger.data('mapping')
       , instance;
       if($trigger.attr('data-object-id') === "page") {
         instance = GGRC.page_instance();
@@ -279,6 +280,7 @@
         , instance : instance
         , modal_title : object_params.modal_title || modal_title
         , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
+        , mapping : mapping
       });
 
       $target.on('modal:success', function(e, data, xhr) {

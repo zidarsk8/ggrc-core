@@ -22,6 +22,7 @@ can.Control("GGRC.Controllers.Modals", {
     , model : null    // model class to use when finding or creating new
     , instance : null // model instance to use instead of finding/creating (e.g. for update)
     , new_object_form : false
+    , mapping : false
     , find_params : {}
   }
 
@@ -61,6 +62,7 @@ can.Control("GGRC.Controllers.Modals", {
     } else {
       this.after_preload()
     }
+    //this.options.attr("mapping", !!this.options.mapping);
   }
 
   , after_preload : function(content) {
@@ -436,6 +438,7 @@ can.Control("GGRC.Controllers.Modals", {
       ajd = instance.save().done(function(obj) {
         function finish() {
           delete that.disable_hide;
+          obj.attr('_map_and_save', $("#map-and-save").is(':checked'))
           that.element.trigger("modal:success", obj).modal_form("hide");
         };
 
