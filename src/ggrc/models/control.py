@@ -192,11 +192,11 @@ class Control(
       ]
 
   _include_links = [
-      'control_sections',
-      'objective_controls',
-      'directive_controls',
-      'program_controls',
-      'object_controls',
+      #'control_sections',
+      #'objective_controls',
+      #'directive_controls',
+      #'program_controls',
+      #'object_controls',
       ]
 
   @validates('kind', 'means', 'verify_frequency')

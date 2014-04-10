@@ -51,8 +51,8 @@ class Program(
       ]
 
   _include_links = [
-      'program_controls',
-      'program_directives',
+      #'program_controls',
+      #'program_directives',
       ]
 
   @classmethod

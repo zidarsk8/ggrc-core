@@ -48,7 +48,7 @@ class Person(Base, db.Model):
       'name',
       ]
   _include_links = [
-      'object_people',
+      #'object_people',
       ]
 
   # Methods required by Flask-Login
