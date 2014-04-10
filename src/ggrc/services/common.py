@@ -55,6 +55,36 @@ def _get_cache_manager():
   cache_manager.initialize(MemCache())
   return cache_manager
 
+
+def get_cache_key(obj, type=None, id=None):
+  if type is None:
+    type = obj._inflector.table_plural
+  if id is None:
+    id = obj.id
+  return 'collection:{type}:{id}'.format(type=type, id=id)
+
+
+def get_cache_class(obj):
+  return obj.__class__.__name__
+
+
+def get_related_keys_for_expiration(context, o):
+  cls = get_cache_class(o)
+  keys = []
+  if context.cache_manager.supported_mappings.has_key(cls):
+    (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
+        context.cache_manager.supported_mappings[cls]
+    obj = getattr(o, srcname.replace('_id', ''), None)
+    if obj:
+      obj_key = get_cache_key(obj)
+      keys.append(obj_key)
+    obj = getattr(o, dstname.replace('_id', ''), None)
+    if obj:
+      obj_key = get_cache_key(obj)
+      keys.append(obj_key)
+  return keys
+
+
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
   Preparing the memccache entries to be updated before DB commit
@@ -77,66 +107,35 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
   if len(modified_objects.new) > 0:
     items_to_add = modified_objects.new.items()
     for o, json_obj in items_to_add:
-      json_obj = o.log_json()
-      cls = o.__class__.__name__
+      cls = get_cache_class(o)
       if context.cache_manager.supported_classes.has_key(cls):
-        model_plural = context.cache_manager.supported_classes[cls]
-        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-        context.cache_manager.marked_for_add[key]=json_obj
-
-        # Marking mapping links to be deleted from cache
-        if context.cache_manager.supported_mappings.has_key(cls):
-          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-              context.cache_manager.supported_mappings[cls]
-          obj = getattr(o, srcname.replace('_id', ''), None)
-          if obj:
-            obj_key = 'collection:{}:{}'.format(
-                obj._inflector.table_plural, obj.id)
-            context.cache_manager.marked_for_delete.append(obj_key)
-          obj = getattr(o, dstname.replace('_id', ''), None)
-          if obj:
-            obj_key = 'collection:{}:{}'.format(
-                obj._inflector.table_plural, obj.id)
-            context.cache_manager.marked_for_delete.append(obj_key)
+        key = get_cache_key(o)
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
 
   if len(modified_objects.dirty) > 0:
     items_to_update = modified_objects.dirty.items()
     for o, json_obj in items_to_update:
-      json_obj = o.log_json()
-      cls = o.__class__.__name__
+      cls = get_cache_class(o)
       if context.cache_manager.supported_classes.has_key(cls):
-        model_plural = context.cache_manager.supported_classes[cls]
-        key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-        context.cache_manager.marked_for_update[key]=json_obj
+        key = get_cache_key(o)
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
 
   if len(modified_objects.deleted) > 0:
     items_to_delete=modified_objects.deleted.items()
     for o, json_obj in items_to_delete:
-      cls = o.__class__.__name__
+      cls = get_cache_class(o)
       if context.cache_manager.supported_classes.has_key(cls):
-        model_plural = context.cache_manager.supported_classes[cls]
-        object_key = 'collection:' + model_plural + ':' + str(json_obj['id'])
-        context.cache_manager.marked_for_delete.append(object_key)
-        # Marking mapping links to be deleted from cache
-        if context.cache_manager.supported_mappings.has_key(cls):
-          (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-              context.cache_manager.supported_mappings[cls]
-          obj = getattr(o, srcname.replace('_id', ''), None)
-          if obj:
-            obj_key = 'collection:{}:{}'.format(
-                obj._inflector.table_plural, obj.id)
-            context.cache_manager.marked_for_delete.append(obj_key)
-          obj = getattr(o, dstname.replace('_id', ''), None)
-          if obj:
-            obj_key = 'collection:{}:{}'.format(
-                obj._inflector.table_plural, obj.id)
-            context.cache_manager.marked_for_delete.append(obj_key)
+        # FIXME: is explicit `id=...` required here to avoid query to database?
+        key = get_cache_key(o)#, id=json_obj['id'])
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
 
   status_entries ={}
-  for key in context.cache_manager.marked_for_add.keys():
-    build_cache_status(status_entries, 'CreateOp:' + key, expiry_time, 'InProgress')
-  for key in context.cache_manager.marked_for_update.keys():
-    build_cache_status(status_entries, 'UpdateOp:' + key, expiry_time, 'InProgress')
   for key in context.cache_manager.marked_for_delete:
     build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
   if len(status_entries) > 0:
@@ -148,7 +147,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
       current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
 
 
-def update_memcache_after_commit(context, expiry_time):
+def update_memcache_after_commit(context):
   """
   The memccache entries is updated after DB commit
   Logs error if there are errors in updating entries in cache
@@ -156,7 +155,6 @@ def update_memcache_after_commit(context, expiry_time):
   Args:
     context: POST/PUT/DELETE HTTP request or import Converter contextual object
     modified_objects:  objects in cache maintained prior to commiting to DB
-    expiry_time: Expiry time specified for memcache ADD and DELETE
   Returns:
     None 
 
@@ -170,27 +168,6 @@ def update_memcache_after_commit(context, expiry_time):
 
   cache_manager = context.cache_manager
 
-  if len(cache_manager.marked_for_add) > 0:
-    #current_app.logger.info("CACHE: Bulk add: " + str(cache_manager.marked_for_add))
-    result = cache_manager.bulk_delete(cache_manager.marked_for_add.keys(), 0)
-    #add_result = cache_manager.bulk_add(cache_manager.marked_for_add)
-    # result is empty on success, non-empty on failure
-    # TODO(dan): handling failure including network errors, currently we log errors
-    #if len(add_result) > 0: 
-    #  current_app.logger.error("CACHE: Failed to add collection to cache: " + str(add_result))
-
-  if len(cache_manager.marked_for_update) > 0:
-    #current_app.logger.info("CACHE: Bulk Update : " + str(cache_manager.marked_for_update))
-    result = cache_manager.bulk_delete(cache_manager.marked_for_update.keys(), 0)
-    if result is not True:
-      current_app.logger.error("CACHE: Failed to remove updated cache entries")
-
-    #update_result = cache_manager.bulk_update(cache_manager.marked_for_update)
-    # result is empty on success, non-empty on failure returns list of keys including network failures
-    # TODO(dan): handling failure including network errors, currently we log errors
-    #if len(update_result) > 0: 
-    #  current_app.logger.error("CACHE: Failed to update collection in cache: " + str(update_result))
-
   # TODO(dan): check for duplicates in marked_for_delete
   if len(cache_manager.marked_for_delete) > 0:
     #current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
@@ -200,10 +177,6 @@ def update_memcache_after_commit(context, expiry_time):
       current_app.logger.error("CACHE: Failed to remoe collection from cache")
 
   status_entries =[]
-  for key in cache_manager.marked_for_add.keys():
-    status_entries.append('CreateOp:' + str(key))
-  for key in cache_manager.marked_for_update.keys():
-    status_entries.append('UpdateOp:' + str(key))
   for key in cache_manager.marked_for_delete:
     status_entries.append('DeleteOp:' + str(key))
   if len(status_entries) > 0:
@@ -647,7 +620,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection PUT"):
-      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
+      update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -676,7 +649,7 @@ class Resource(ModelView):
       db.session.commit()
     update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection DELETE"):
-      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
+      update_memcache_after_commit(self.request)
     with benchmark("Query for object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -762,8 +735,6 @@ class Resource(ModelView):
     cacheobjids = request.args.get('id__in', False)
     if cacheobjids and hasattr(self.model, 'eager_query'):
       for id in cacheobjids:
-        status_keys.append('CreateOp:' + category + ':' + resource + ':' + str(id))
-        status_keys.append('UpdateOp:' + category + ':' + resource + ':' + str(id))
         status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
     else:
       return False
@@ -1059,7 +1030,7 @@ class Resource(ModelView):
       db.session.commit()
     update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection POST"):
-      update_memcache_after_commit(self.request, CACHE_EXPIRY_COLLECTION)
+      update_memcache_after_commit(self.request)
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
