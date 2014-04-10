@@ -155,7 +155,7 @@ def factory_for(model_class):
   If there is a factory defined for this model in globals() that factory
   will be used. Otherwise, one will be created and added to globals().
   """
-  if type(model_class) is str or type(model_class) is unicode:
+  if isinstance(model_class, (str, unicode)):
     if '.' in model_class:
       import sys
       path = model_class.split('.')
@@ -166,7 +166,7 @@ def factory_for(model_class):
     else:
       factory_name = model_class
       import ggrc.models
-      model_class = getattr(ggrc.models, model_class)
+      model_class = ggrc.models.get_model(model_class)
   else:
     factory_name = model_class.__name__
   factory_name = '{0}Factory'.format(factory_name)
@@ -370,3 +370,28 @@ class RelationshipFactory(ModelFactory):
 class SectionObjectiveFactory(ModelFactory):
   MODEL = models.SectionObjective
   status = FuzzyChoice(MODEL.VALID_STATES)
+
+
+# ggrc_basic_permissions model factories
+class RoleFactory(ModelFactory):
+  MODEL = models.get_model("Role")
+
+class UserRoleFactory(ModelFactory):
+  MODEL = models.get_model("UserRole")
+
+class ContextImplicationFactory(ModelFactory):
+  MODEL = models.get_model("ContextImplication")
+
+
+# ggrc_gdrive_integration model factories
+class ObjectFileFactory(ModelFactory):
+  MODEL = models.get_model("ObjectFile")
+  fileable = FactoryStubMarker(models.Response)
+
+class ObjectFolderFactory(ModelFactory):
+  MODEL = models.get_model("ObjectFolder")
+  folderable = FactoryStubMarker(models.Response)
+
+class ObjectEventFactory(ModelFactory):
+  MODEL = models.get_model("ObjectEvent")
+  eventable = FactoryStubMarker(models.Response)
