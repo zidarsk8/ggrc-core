@@ -53,7 +53,7 @@ Feature: Resource caching
     And the response header "X-GGRC-Cache" is "Miss"
     And the "<table_plural>_collection.<table_plural>" property of the "collectionresource" is empty
 
-  Examples: Cached Resources
+  Examples: Resources to cache from Core
       | resource_type      | table_plural         | property    | value1   | value2   |
       | ControlAssertion   | control_assertions   | name        | name1    | name2    |
       | ControlCategory    | control_categories   | name        | name1    | name2    |
@@ -93,6 +93,18 @@ Feature: Resource caching
       | System             | systems              | description | desc1    | desc2    |
       | Process            | processes            | description | desc1    | desc2    |
 
+  Examples: Resources to cache from `ggrc_gdrive_integration`
+      | resource_type      | table_plural         | property    | value1   | value2   |
+      | ObjectFile         | object_files         | file_id     | 1        | 2        |
+      | ObjectFolder       | object_folders       | folder_id   | 1        | 2        |
+      | ObjectEvent        | object_events        | event_id    | 1        | 2        |
+
+  Examples: Resources to cache from `ggrc_basic_permissions`
+      | resource_type      | table_plural         | property    | value1   | value2   |
+      | Role               | roles                | name        | name1    | name2    |
+      # UserRole has no extraneous attributes (like status) to change to force
+      #   expiry, so will be harder to test.
+      #| UserRole           | user_roles           |
 
 
   Scenario Outline: Caching misses and hits when many-to-many mappings were affected
@@ -244,9 +256,9 @@ Feature: Resource caching
     And the response header "X-GGRC-Cache" is "Miss"
 
 
-  Examples: Cached resources with mappings
+  Examples: Cached resources with mappings from Core
       | near_resource_type        | near_resource_key    | mapping_near_key     | mapping_type              | property | value1 | value2 |
-      #| Audit                     | requests             | audit                | Request                  |
+      | Audit                     | requests             | audit                | Request                   | status   | Requested | Responded |
       | Audit                     | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Control                   | control_controls     | control              | ControlControl            | status   | Draft  | Final  |
       | Control                   | implementing_control_controls | implemented_control | ControlControl            | status   | Draft  | Final  |
@@ -284,6 +296,7 @@ Feature: Resource caching
       | Policy                    | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Policy                    | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Policy                    | related_destinations | source               | Relationship              | status   | Draft  | Final  |
+      | Policy                     | sections             | directive            | Section                   | title    | title1 | title2 |
       | Regulation                | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Regulation                | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Regulation                | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
@@ -293,6 +306,7 @@ Feature: Resource caching
       | Regulation                | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Regulation                | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Regulation                | related_destinations | source               | Relationship              | status   | Draft  | Final  |
+      | Regulation                 | sections             | directive            | Section                   | title    | title1 | title2 |
       | Standard                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Standard                  | directive_sections   | directive            | DirectiveSection          | status   | Draft  | Final  |
       | Standard                  | directive_controls   | directive            | DirectiveControl          | status   | Draft  | Final  |
@@ -302,6 +316,7 @@ Feature: Resource caching
       | Standard                  | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Standard                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Standard                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
+      | Standard                   | sections             | directive            | Section                   | title    | title1 | title2 |
       | Document                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Facility                  | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Facility                  | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
@@ -336,7 +351,6 @@ Feature: Resource caching
       | OrgGroup                  | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | OrgGroup                  | related_destinations | source               | Relationship              | status   | Draft  | Final  |
       | Person                    | object_people        | person               | ObjectPerson              | status   | Draft  | Final  |
-      #| Person                    | user_roles           | person               | UserRole                  | status   | Draft  | Final  |
       | Product                   | related_sources      | destination          | Relationship              | status   | Draft  | Final  |
       | Product                   | object_owners        | ownable              | ObjectOwner               | status   | Draft  | Final  |
       | Product                   | object_controls      | controllable         | ObjectControl             | status   | Draft  | Final  |
@@ -406,3 +420,19 @@ Feature: Resource caching
       | Process                   | object_people        | personable           | ObjectPerson              | status   | Draft  | Final  |
       | Process                   | object_objectives    | objectiveable        | ObjectObjective           | status   | Draft  | Final  |
       | Process                   | related_destinations | source               | Relationship              | status   | Draft  | Final  |
+
+  Examples: Cached resources with mappings from `ggrc_gdrive_integration`
+      | near_resource_type        | near_resource_key    | mapping_near_key     | mapping_type              | property  | value1 | value2 |
+      | Request                   | object_folders       | folderable           | ObjectFolder              | folder_id | 1      | 2      |
+      | Program                   | object_folders       | folderable           | ObjectFolder              | folder_id | 1      | 2      |
+      | Audit                     | object_folders       | folderable           | ObjectFolder              | folder_id | 1      | 2      |
+      | DocumentationResponse     | object_files         | fileable             | ObjectFile                | file_id   | 1      | 2      |
+      | PopulationSampleResponse  | object_files         | fileable             | ObjectFile                | file_id   | 1      | 2      |
+      | Document                  | object_files         | fileable             | ObjectFile                | file_id   | 1      | 2      |
+      | Meeting                   | object_events        | eventable            | ObjectEvent               | event_id | 1      | 2      |
+
+  Examples: Cached resources with mappings from `ggrc_basic_permissions`
+      | near_resource_type        | near_resource_key    | mapping_near_key     | mapping_type              | property  | value1 | value2 |
+      # UserRole has no extraneous attributes (like status) to change to force
+      #   expiry, so will be harder to test.
+      #| Person                    | user_roles           | person               | UserRole                  | status   | Draft  | Final  |
