@@ -7,23 +7,18 @@
 from collections import namedtuple
 
 
-POLYMORPH_NONE=0
-POLYMORPH_DEST_ONLY=1
-POLYMORPH_SRCDEST=2
-
 CacheEntry   = namedtuple('CacheEntry', 'model_plural class_name cache_type')
-MappingEntry = namedtuple('MappingEntry', 'model_plural class_name source_type source_name,\
-                          dest_type, dest_name polymorph, cache_type')
+MappingEntry = namedtuple('MappingEntry', 'class_name attr polymorph')
 
 def resource(model_plural, class_name, cache_type='memcache'):
   return CacheEntry(model_plural, class_name, cache_type)
 
-def mapping(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph=POLYMORPH_NONE, cache_type='memcache'):
-  return MappingEntry(model_plural, class_name, source_type, source_name, dest_type, dest_name, polymorph, cache_type)
+def mapping(class_name, attr, polymorph=False):
+  return MappingEntry(class_name, attr, polymorph)
+
 
 def all_cache_entries():
   ret = [
-    resource('tasks','Task'),
     resource('audits','Audit'),
     resource('categorizations','Categorization'),
     resource('category_bases', 'CategoryBase'),
@@ -93,28 +88,52 @@ def all_cache_entries():
   return ret
 
 def all_mapping_entries():
-  #mapping('risk_assessment_mappings', 'RiskAssessmentMapping'),
-  #mapping('risk_assessment_control_mappings', 'RiskAssessmentControlMapping'),
   ret = [
-    mapping('control_controls', 'ControlControl', 'controls', 'control_id', 'controls', 'implemented_control_id'),
-    mapping('control_sections', 'ControlSection', 'controls', 'control_id', 'sections', 'section_id'),
-    mapping('directive_controls', 'DirectiveControl', 'directives', 'directive_id', 'controls', 'control_id'),
-    mapping('directive_sections', 'DirectiveSection', 'directives', 'directive_id', 'sections', 'section_id'),
-    mapping('object_controls', 'ObjectControl', 'controls', 'control_id', 'controllable_type', 'controllable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_documents', 'ObjectDocument', 'documents', 'document_id', 'documentable_type', 'documentable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_objectives', 'ObjectObjective', 'objectives', 'objective_id', 'objectiveable_type', 'objectiveable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_owners', 'ObjectOwner', 'people', 'person_id', 'ownable_type', 'ownable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_people', 'ObjectPerson', 'people', 'person_id', 'personable_type', 'personable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_sections', 'ObjectSection', 'sections', 'section_id', 'sectionable_type', 'sectionable_id', POLYMORPH_DEST_ONLY),
-    mapping('objective_controls', 'ObjectiveControl', 'objectives', 'objective_id', 'controls', 'control_id'),
-    mapping('program_controls', 'ProgramControl', 'programs', 'program_id', 'controls', 'control_id'),
-    mapping('program_directives', 'ProgramDirective', 'programs', 'program_id', 'directives', 'directive_id'),
-    mapping('section_objectives', 'SectionObjective', 'sections', 'section_id', 'objectives', 'objective_id'),
-    mapping('user_roles', 'UserRole', 'people', 'person_id', 'roles', 'role_id'),
-    mapping('object_events', 'ObjectEvent', None, 'event_id', 'eventable_type', 'eventable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_folders', 'ObjectFolder', None, 'folder_id', 'folderable_type', 'folderable_id', POLYMORPH_DEST_ONLY),
-    mapping('object_files', 'ObjectFile', None, 'file_id', 'fileable_type', 'fileable_id', POLYMORPH_DEST_ONLY),
-    mapping('relationships', 'Relationship', 'source_type', 'source_id', 'destination_type', 'destination_id', POLYMORPH_SRCDEST),
+    mapping('Audit', 'requests'),
+    mapping('Request', 'audit'),
+    mapping('Request', 'responses'),
+    mapping('Response', 'request'),
+    mapping('DocumentationResponse', 'request'),
+    mapping('InterviewResponse', 'request'),
+    mapping('PopulationSampleResponse', 'request'),
+    mapping('ControlControl', 'control'),
+    mapping('ControlControl', 'implemented_control'),
+    mapping('ControlSection', 'control'),
+    mapping('ControlSection', 'section'),
+    mapping('DirectiveControl', 'directive'),
+    mapping('DirectiveControl', 'control'),
+    mapping('DirectiveSection', 'directive'),
+    mapping('DirectiveSection', 'section'),
+    mapping('ObjectControl', 'control'),
+    mapping('ObjectControl', 'controllable', True),
+    mapping('ObjectDocument', 'document'),
+    mapping('ObjectDocument', 'documentable', True),
+    mapping('ObjectObjective', 'objective'),
+    mapping('ObjectObjective', 'objectiveable', True),
+    mapping('ObjectOwner', 'person'),
+    mapping('ObjectOwner', 'ownable', True),
+    mapping('ObjectPerson', 'person'),
+    mapping('ObjectPerson', 'personable', True),
+    mapping('ObjectSection', 'section'),
+    mapping('ObjectSection', 'sectionable', True),
+    mapping('ObjectiveControl', 'objective'),
+    mapping('ObjectiveControl', 'control'),
+    mapping('ProgramControl', 'program'),
+    mapping('ProgramControl', 'control'),
+    mapping('ProgramDirective', 'program'),
+    mapping('ProgramDirective', 'directive'),
+    mapping('SectionObjective', 'section'),
+    mapping('SectionObjective', 'objective'),
+    mapping('Section', 'directive'),
+    mapping('Relationship', 'source', True),
+    mapping('Relationship', 'destination', True),
+    mapping('UserRole', 'person'),
+    mapping('UserRole', 'role'),
+    mapping('ObjectEvent', 'eventable', True),
+    mapping('ObjectFolder', 'folderable', True),
+    mapping('ObjectFile', 'fileable', True),
+    #mapping('RiskAssessmentMapping'),
+    #mapping('RiskAssessmentControlMapping'),
     ]
 
   return ret

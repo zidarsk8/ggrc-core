@@ -25,9 +25,6 @@ class CacheManager:
   Returns:
     None 
   """
-  cacheObject = None
-  supported_classes={}
-  supported_mappings={}
   factory = None
 
   def __init__(self):
@@ -37,11 +34,14 @@ class CacheManager:
     """
       Initialize Cache Manager, configure cache mechanism 
     """
+    self.supported_classes = {}
     for cache_entry in all_cache_entries():
       self.supported_classes[cache_entry.class_name] = cache_entry.model_plural
 
+    self.supported_mappings = {}
     for mapping_entry in all_mapping_entries():
-      self.supported_mappings[mapping_entry.class_name] = mapping_entry
+      self.supported_mappings.setdefault(mapping_entry.class_name, [])
+      self.supported_mappings[mapping_entry.class_name].append(mapping_entry)
 
     self.cache_object = cache
 
@@ -112,7 +112,7 @@ class CacheManager:
     if not self.is_caching_supported(category, resource, data, 'delete_collection'):
       return None
 
-    ret = self.cacheObject.remove(category, resource, data, lockadd_seconds)
+    ret = self.cache_object.remove(category, resource, data, lockadd_seconds)
     return ret
 
   def is_caching_supported(self, category, resource, data=None, operation=None):

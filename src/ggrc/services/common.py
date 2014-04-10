@@ -3,6 +3,12 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+
+"""gGRC Collection REST services implementation. Common to all gGRC collection
+resources.
+"""
+
+
 import datetime
 import ggrc.builder.json
 import hashlib
@@ -41,14 +47,9 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
 from sqlalchemy.ext.associationproxy import AssociationProxy
 
-CACHE_EXPIRY_COLLECTION=60
-POLYMORPH_NONE=0
-POLYMORPH_DEST_ONLY=1
-POLYMORPH_SRCDEST=2
 
-"""gGRC Collection REST services implementation. Common to all gGRC collection
-resources.
-"""
+CACHE_EXPIRY_COLLECTION=60
+
 
 def _get_cache_manager():
   from ggrc.cache import CacheManager, MemCache
@@ -72,17 +73,25 @@ def get_cache_class(obj):
 def get_related_keys_for_expiration(context, o):
   cls = get_cache_class(o)
   keys = []
-  if context.cache_manager.supported_mappings.has_key(cls):
-    (model, cls, srctype, srcname, dsttype, dstname, polymorph, cachetype) = \
-        context.cache_manager.supported_mappings[cls]
-    obj = getattr(o, srcname.replace('_id', ''), None)
-    if obj:
-      obj_key = get_cache_key(obj)
-      keys.append(obj_key)
-    obj = getattr(o, dstname.replace('_id', ''), None)
-    if obj:
-      obj_key = get_cache_key(obj)
-      keys.append(obj_key)
+  mappings = context.cache_manager.supported_mappings.get(cls, [])
+  if len(mappings) > 0:
+    for (cls, attr, polymorph) in mappings:
+      if polymorph:
+        key = get_cache_key(
+            None,
+            ggrc.models.get_model(getattr(o, '{0}_type'.format(attr)))._inflector.table_plural,
+            getattr(o, '{0}_id'.format(attr)))
+        keys.append(key)
+      else:
+        obj = getattr(o, attr, None)
+        if obj:
+          if isinstance(obj, list):
+            for o in obj:
+              key = get_cache_key(o)
+              keys.append(key)
+          else:
+            key = get_cache_key(obj)
+            keys.append(key)
   return keys
 
 
@@ -130,7 +139,8 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     for o, json_obj in items_to_delete:
       cls = get_cache_class(o)
       if context.cache_manager.supported_classes.has_key(cls):
-        # FIXME: is explicit `id=...` required here to avoid query to database?
+        # FIXME: is explicit `id=...` *required* here to avoid querying the
+        #   database for a possibly-deleted object?
         key = get_cache_key(o)#, id=json_obj['id'])
         context.cache_manager.marked_for_delete.append(key)
         context.cache_manager.marked_for_delete.extend(

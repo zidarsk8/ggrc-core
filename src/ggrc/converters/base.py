@@ -203,7 +203,7 @@ class BaseConverter(object):
       update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
     db.session.commit()
     with benchmark("Update memcache after commit for import"):
-      update_memcache_after_commit(self, CACHE_EXPIRY_IMPORT)
+      update_memcache_after_commit(self)
     update_index(db.session, modified_objects)
 
   def set_import_stats(self):
