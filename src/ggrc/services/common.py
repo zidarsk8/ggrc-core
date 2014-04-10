@@ -39,6 +39,7 @@ from sqlalchemy import event
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
+from sqlalchemy.ext.associationproxy import AssociationProxy
 
 CACHE_EXPIRY_COLLECTION=60
 POLYMORPH_NONE=0
@@ -798,13 +799,20 @@ class Resource(ModelView):
       filter_attrs[key] = val
       if hasattr(self.model, key):
         class_attr = getattr(self.model, key)
-        if isinstance(class_attr, InstrumentedAttribute) and  \
-            isinstance(class_attr.property, RelationshipProperty):
+        if (isinstance(class_attr, InstrumentedAttribute) and \
+            isinstance(class_attr.property, RelationshipProperty)) or \
+            isinstance(class_attr, AssociationProxy):
           if type(val) is list:
             updated_val=[]
             for item in val:
               if self.is_read_allowed_for_item(key, item):
+                if type(item) is dict:
+                  for sub_key, sub_val in item.items():
+                    if not self.is_read_allowed_for_item(sub_key, sub_val):
+                      item[sub_key] = None
                 updated_val.append(item)
+              #if self.is_read_allowed_for_item(key, item):
+              #  updated_val.append(item)
             filter_attrs[key] = updated_val
           else:
             if not self.is_read_allowed_for_item(key, val):
