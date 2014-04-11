@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+import os
+
 DEBUG = False
 TESTING = False
 
@@ -25,10 +27,9 @@ COPYRIGHT = u"Confidential. Copyright " + u"\u00A9" # \u00A9 is the (c) symbol
 VERSION = "s26.1"
 
 # Google Analytics variables
-GOOGLE_ANALYTICS_ID = ""
-GOOGLE_ANALYTICS_DOMAIN = ""
+GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
+GOOGLE_ANALYTICS_DOMAIN = os.environ.get('GGRC_GOOGLE_ANALYTICS_DOMAIN', '')
 
 # Initialize from environment if present
-import os
 SQLALCHEMY_DATABASE_URI = os.environ.get('GGRC_DATABASE_URI', '')
 SECRET_KEY = os.environ.get('GGRC_SECRET_KEY', 'Replace-with-something-secret')
