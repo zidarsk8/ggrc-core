@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 dashboard-js-files:
+  - tracker.js
   - jquery.js
   - rails.js
   - jquery-ui.js

@@ -600,9 +600,13 @@ can.Control("CMS.Controllers.LHN_Search", {
   , on_show_list: function(el, ev) {
       var $list = $(el).closest(this.get_lists())
         , model_name = this.get_list_model($list)
+        , tracker_stop = GGRC.Tracker.start("LHN_show_list", model_name)
+        , that = this
         ;
 
-      setTimeout(this.proxy("refresh_visible_lists"), 20);
+      setTimeout(function() {
+        that.refresh_visible_lists().done(tracker_stop);
+      }, 20);
     }
 
   , "{observer} value" : function(el, ev, newval) {
@@ -626,6 +630,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         , results_list = this.options.results_lists[model_name]
         , refresh_queue
         , new_visible_list
+        , tracker_stop = GGRC.Tracker.start("LHN", "show_more", model_name)
         ;
 
       if (visible_list.length >= results_list.length)
@@ -645,7 +650,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         visible_list.attr('is_loading', false)
         //visible_list.replace(new_visible_list);
         delete that._show_more_pending;
-      });
+      }).done(tracker_stop);
       visible_list.attr('is_loading', true)
     }
 
@@ -718,10 +723,9 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 
   , display_lists: function(search_result) {
-      // Todo(Dan): Need to add name of the collection to category
-      GGRC.Tracker_start("Expand LHN", "Display Collection");
       var self = this
         , lists = this.get_visible_lists()
+        , dfds = []
         ;
 
       can.each(lists, function(list) {
@@ -739,14 +743,15 @@ can.Control("CMS.Controllers.LHN_Search", {
         can.each(initial_visible_list, function(obj) {
           refresh_queue.enqueue(obj);
         });
-        refresh_queue.trigger().then(function(_) {
+
+        dfds.push(refresh_queue.trigger().then(function(_) {
           self.options.visible_lists[model_name].replace(initial_visible_list);
           // Stop spinner when request is complete
           $list.find(self.options.spinner_selector).html("");
-          // Todo(Dan): Need to add name of the collection to category
-          GGRC.Tracker_stop("Expand LHN", "Display Collection");
-        });
+        }));
       });
+
+      return $.when.apply($, dfds);
     }
 
   , refresh_counts: function() {
@@ -754,8 +759,9 @@ can.Control("CMS.Controllers.LHN_Search", {
       models = can.map(this.get_lists(), this.proxy("get_list_model"));
 
       // Retrieve and display counts
-      GGRC.Models.Search.counts_for_types(this.current_term, models, this.current_params)
-        .then(this.proxy("display_counts"));
+      return GGRC.Models.Search.counts_for_types(
+          this.current_term, models, this.current_params
+        ).then(this.proxy("display_counts"));
     }
 
   , refresh_visible_lists: function() {
@@ -781,13 +787,20 @@ can.Control("CMS.Controllers.LHN_Search", {
           $list.find('.spinner').html(self.make_spinner());
         });
 
-        GGRC.Models.Search.search_for_types(this.current_term, models, this.current_params)
-          .then(this.proxy("display_lists"));
+        return GGRC.Models.Search.search_for_types(
+            this.current_term, models, this.current_params
+          ).then(this.proxy("display_lists"));
+      } else {
+        return new $.Deferred().resolve();
       }
     }
 
   , run_search: function(term, extra_params) {
-      var self = this;
+      var self = this
+        , tracker_stop = GGRC.Tracker.start(
+            "LHN_run_search",
+            extra_params && extra_params.contact_id ? "MyWork" : "Normal")
+        ;
       if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
         can.each(this.options.results_lists, function(list) {
@@ -800,9 +813,11 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         this.current_term = term;
         this.current_params = extra_params;
-        this.refresh_counts();
         // Retrieve and display results for visible lists
-        this.refresh_visible_lists();
+        return $.when(
+            this.refresh_counts(),
+            this.refresh_visible_lists()
+          ).done(tracker_stop);
       }
     }
 

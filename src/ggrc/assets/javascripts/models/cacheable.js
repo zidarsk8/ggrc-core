@@ -112,6 +112,7 @@ can.Model("can.Model.Cacheable", {
         var deferred = $.Deferred()
           , sourceDeferred = finder.call(this, params)
           , self = this
+          , tracker_stop = GGRC.Tracker.start("modelize", self.shortName)
           ;
 
         deferred.then(success, error);
@@ -163,7 +164,7 @@ can.Model("can.Model.Cacheable", {
           deferred.reject.apply(deferred, arguments);
         });
 
-        return deferred;
+        return deferred.done(tracker_stop);
       };
     }
 
