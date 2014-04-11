@@ -55,7 +55,9 @@
           cookieDomain: '{{config.get("GOOGLE_ANALYTICS_DOMAIN")}}',
           siteSpeedSampleRate: 100,
         });
-        ga('set', 'appVersion', '{{config.get("VERSION")}}');
+        //  Presence of appName/appVersion seems to prevent 'Real-Time' metrics
+        //  https://code.google.com/p/analytics-issues/issues/detail?id=366
+        //ga('set', 'appVersion', '{{config.get("VERSION")}}');
         ga('send', 'pageview');
 
         GGRC.Tracker.init(ga);
