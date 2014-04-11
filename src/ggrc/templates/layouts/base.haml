@@ -45,24 +45,18 @@
       jQuery(function($) { $('head').append("<link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'></link>"); });
 
     -if config.get("GOOGLE_ANALYTICS_ID")
+      -# Note, this won't work on localhost
       :javascript
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-        (function() {
-          var _id = '{{config.get("GOOGLE_ANALYTICS_ID")}}',
-              _domain = '{{config.get("GOOGLE_ANALYTICS_DOMAIN")}}';
-          if (_domain.length > 0)
-            ga('create', _id, _domain);
-          else
-            ga('create', _id, {'cookieDomain': 'none'});
+        ga('create', '{{config.get("GOOGLE_ANALYTICS_ID")}}', '{{config.get("GOOGLE_ANALYTICS_DOMAIN")}}');
+        ga('send', 'pageview');
 
-          ga('set', 'appVersion', '{{config.get("VERSION")}}');
-          ga('send', 'pageview');
-          GGRC.Tracker.init(ga);
-        })()
+        ga('set', 'appVersion', '{{config.get("VERSION")}}');
+        GGRC.Tracker.init(ga);
 
 
     -#%link{ 'href': "http://fonts.googleapis.com/css?family=PT+Sans", :rel => "stylesheet", :type => "text/css" }
