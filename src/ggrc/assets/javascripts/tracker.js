@@ -9,8 +9,8 @@ GGRC = window.GGRC || {};
 
 GGRC.Tracker = {};
 
-GGRC.Tracker.init = function(ga) {
-  GGRC.Tracker.ga = ga;
+GGRC.Tracker.init = function() {
+  GGRC.Tracker.ga = this._ga;
 
   //  Emit any events already recorded
   for (var i = 0; i < this._pending_emit; i++) {
@@ -19,6 +19,11 @@ GGRC.Tracker.init = function(ga) {
   delete this._pending_emit;
 
   this.setup_jQuery();
+}
+
+GGRC.Tracker._ga = function(func, data) {
+  if (window.GoogleAnalyticsObject)
+    window[window.GoogleAnalyticsObject](func, data);
 }
 
 GGRC.Tracker.setup_jQuery = function() {
