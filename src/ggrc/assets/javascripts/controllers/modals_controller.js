@@ -100,6 +100,7 @@ can.Control("GGRC.Controllers.Modals", {
 
   , autocomplete_select : function(el, event, ui) {
     var original_event;
+    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
     if(ui.item) {
       var path = el.attr("name").split(".")
         , instance = this.options.instance

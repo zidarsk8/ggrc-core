@@ -8,7 +8,7 @@
 {{!div class="extended"}}
   <div class="row-fluid">
     <div class="span12">
-      {{#if_equals instance.constructor.table_singular 'person'}}
+      {{#if_equals instance.type 'Person'}}
         <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
           {{name}}
           {{#is_private}}

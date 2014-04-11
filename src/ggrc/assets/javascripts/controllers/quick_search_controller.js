@@ -911,12 +911,18 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
 
       if (tooltip_view) {
         this.fade_in_timeout = null;
-        can.view(tooltip_view, new can.Observe({ instance: instance }), function(frag) {
+        can.view(tooltip_view, { instance: instance }, function(frag) {
+          
+          var tooltip_width = self.options.$extended.outerWidth()
+            , el_left = el.parent().offset().left
+            , offset_left = el_left - tooltip_width > 0 ? 
+                el_left - tooltip_width : el_left + el.parent().width();
+          
           self.options.$extended
             .html(frag)
             .addClass('in')
             .removeClass('hide')
-            .css({ top: el.offset().top, left: self.options.$lhs.width() })
+            .css({ top: el.offset().top, left: offset_left })
             .data('model', instance);
           self.ensure_tooltip_visibility();
         });

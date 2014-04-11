@@ -1146,6 +1146,7 @@ jQuery(function($){
           {model_class: model_class, items: items},
           function(frag) {
             $(ul).html(frag);
+            $(ul).cms_controllers_lhn_tooltips()
             can.view.hookup(ul);
           });
       };
