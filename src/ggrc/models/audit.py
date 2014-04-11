@@ -48,7 +48,7 @@ class Audit(
     ]
 
   _include_links = [
-    'requests',
+    #'requests',
     ]
 
   @classmethod

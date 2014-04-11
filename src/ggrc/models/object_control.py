@@ -85,7 +85,7 @@ class Controllable(object):
       ]
 
   _include_links = [
-      'object_controls',
+      #'object_controls',
       ]
 
   @classmethod

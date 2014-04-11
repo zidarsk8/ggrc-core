@@ -40,9 +40,9 @@ class Objective(
       ]
 
   _include_links = [
-      'section_objectives',
-      'objective_controls',
-      'objective_objects',
+      #'section_objectives',
+      #'objective_controls',
+      #'objective_objects',
       ]
 
   @classmethod

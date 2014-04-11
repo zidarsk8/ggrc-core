@@ -77,7 +77,7 @@ class Ownable(object):
       ]
 
   _include_links = [
-      'object_owners',
+      #'object_owners',
       ]
 
   @classmethod

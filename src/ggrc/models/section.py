@@ -76,10 +76,10 @@ class SectionBase(
   #    ]
 
   _include_links = [
-      'control_sections',
-      'section_objectives',
-      'object_sections',
-      'directive_sections',
+      #'control_sections',
+      #'section_objectives',
+      #'object_sections',
+      #'directive_sections',
       ]
 
   @validates('type')
