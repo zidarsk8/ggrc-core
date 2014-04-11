@@ -67,12 +67,7 @@ ModelError.prototype = Error.prototype;
 
 window.onerror = function(message, url, linenumber) {
   $(document.body).trigger("ajax:flash", {"error" : message});
-  $.ajax({
-    type : "post"
-    , url : "/api/log_events"
-    , dataType : "text"
-    , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
-  });
+  GGRC.Tracker.exception(message + " (at " + url + ":" + linenumber + ")");
 };
 
   window.cms_singularize = function(type) {

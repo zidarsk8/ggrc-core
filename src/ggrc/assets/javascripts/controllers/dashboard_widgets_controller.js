@@ -147,6 +147,9 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   }
 
   , display: function() {
+      var tracker_stop = GGRC.Tracker.start(
+          "DashboardWidget", "display", this.options.model.shortName);
+
       if (this._display_deferred)
         return this._display_deferred;
 
@@ -157,7 +160,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         else {
           return new $.Deferred().resolve();
         }
-      });
+      }).done(tracker_stop);
 
       return this._display_deferred;
     }
