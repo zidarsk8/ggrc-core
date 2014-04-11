@@ -251,10 +251,7 @@
         {{/with_mapping}}
         {{/using}}
         
-        {{#if_helpers '\
-          #if' allow_mapping_or_creating '\
-          and #is_allowed' 'update' instance '\
-        ' _1_context=instance.context.id}}
+        {{#is_allowed' 'update' instance context=instance.context.id}}
           <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
               <i class="grcicon-edit"></i>
@@ -266,7 +263,7 @@
             <a href="#"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
           </li>
           -->
-        {{/if_helpers}}
+        {{/is_allowed}}
         {{#if_helpers '\
           #is_page_instance' instance.program '\
           or #is_profile'}}
