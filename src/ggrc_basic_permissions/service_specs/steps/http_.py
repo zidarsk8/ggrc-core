@@ -9,9 +9,9 @@ from ggrc.models import Person
 from ggrc_basic_permissions.models import Role, UserRole
 from tests.ggrc.behave.utils import (
     Example,
-    get_service_endpoint_url,
+    get_service_endpoint_url_for_type,
     get_resource,
-    get_resource_table_singular,
+    get_inflection,
     handle_named_example_resource,
     post_example,
     )
@@ -60,7 +60,7 @@ def retrieve_role_by_name_to_context(context, role_name):
 
 def retrieve_model_by_properties(
     context, model, properties, require_exactly_one=False):
-  url = get_service_endpoint_url(context, model)
+  url = get_service_endpoint_url_for_type(context, model)
   response = get_resource(context, '{0}?{1}'.format(
     url, urlencode(properties)))
   root = response.json().keys()[0]
@@ -164,7 +164,7 @@ def get_view_object_page(context, resourcename, expected_status=200):
       'X-Requested-By': 'Reciprocity Behave Tests',
       }
   resource = getattr(context, resourcename)
-  collection_name = get_resource_table_singular(resource.resource_type)
+  collection_name = get_inflection(resource.resource_type, 'table_singular')
   uri = '/{collection_name}s/{id}'\
       .format(collection_name=collection_name, id=resource.get('id'))
   response = get_resource(context, uri, headers)

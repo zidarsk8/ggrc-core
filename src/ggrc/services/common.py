@@ -3,6 +3,12 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+
+"""gGRC Collection REST services implementation. Common to all gGRC collection
+resources.
+"""
+
+
 import datetime
 import ggrc.builder.json
 import hashlib
@@ -32,9 +38,179 @@ from wsgiref.handlers import format_date_time
 from urllib import urlencode
 from .attribute_query import AttributeQueryBuilder
 
-"""gGRC Collection REST services implementation. Common to all gGRC collection
-resources.
-"""
+from ggrc import settings
+from copy import deepcopy
+from sqlalchemy.orm.session import Session
+from sqlalchemy import event
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm.properties import RelationshipProperty
+from sqlalchemy.ext.associationproxy import AssociationProxy
+
+
+CACHE_EXPIRY_COLLECTION=60
+
+
+def _get_cache_manager():
+  from ggrc.cache import CacheManager, MemCache
+  cache_manager = CacheManager()
+  cache_manager.initialize(MemCache())
+  return cache_manager
+
+
+def get_cache_key(obj, type=None, id=None):
+  if type is None:
+    type = obj._inflector.table_plural
+  if id is None:
+    id = obj.id
+  return 'collection:{type}:{id}'.format(type=type, id=id)
+
+
+def get_cache_class(obj):
+  return obj.__class__.__name__
+
+
+def get_related_keys_for_expiration(context, o):
+  cls = get_cache_class(o)
+  keys = []
+  mappings = context.cache_manager.supported_mappings.get(cls, [])
+  if len(mappings) > 0:
+    for (cls, attr, polymorph) in mappings:
+      if polymorph:
+        key = get_cache_key(
+            None,
+            ggrc.models.get_model(getattr(o, '{0}_type'.format(attr)))._inflector.table_plural,
+            getattr(o, '{0}_id'.format(attr)))
+        keys.append(key)
+      else:
+        obj = getattr(o, attr, None)
+        if obj:
+          if isinstance(obj, list):
+            for o in obj:
+              key = get_cache_key(o)
+              keys.append(key)
+          else:
+            key = get_cache_key(obj)
+            keys.append(key)
+  return keys
+
+
+def update_memcache_before_commit(context, modified_objects, expiry_time):
+  """
+  Preparing the memccache entries to be updated before DB commit
+  Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
+  Raises Exception on failures, cannot proceed with DB commit
+
+  Args:
+    context: POST/PUT/DELETE HTTP request or import Converter contextual object
+    modified_objects:  objects in cache maintained prior to commiting to DB
+    expiry_time: Expiry time specified for memcache ADD and DELETE
+  Returns:
+    None 
+
+  """
+  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+    return
+
+  context.cache_manager = _get_cache_manager()
+
+  if len(modified_objects.new) > 0:
+    items_to_add = modified_objects.new.items()
+    for o, json_obj in items_to_add:
+      cls = get_cache_class(o)
+      if context.cache_manager.supported_classes.has_key(cls):
+        key = get_cache_key(o)
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
+
+  if len(modified_objects.dirty) > 0:
+    items_to_update = modified_objects.dirty.items()
+    for o, json_obj in items_to_update:
+      cls = get_cache_class(o)
+      if context.cache_manager.supported_classes.has_key(cls):
+        key = get_cache_key(o)
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
+
+  if len(modified_objects.deleted) > 0:
+    items_to_delete=modified_objects.deleted.items()
+    for o, json_obj in items_to_delete:
+      cls = get_cache_class(o)
+      if context.cache_manager.supported_classes.has_key(cls):
+        # FIXME: is explicit `id=...` *required* here to avoid querying the
+        #   database for a possibly-deleted object?
+        key = get_cache_key(o)#, id=json_obj['id'])
+        context.cache_manager.marked_for_delete.append(key)
+        context.cache_manager.marked_for_delete.extend(
+            get_related_keys_for_expiration(context, o))
+
+  status_entries ={}
+  for key in context.cache_manager.marked_for_delete:
+    build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
+  if len(status_entries) > 0:
+    current_app.logger.info("CACHE: status entries: " + str(status_entries))
+    ret = context.cache_manager.bulk_add(status_entries, expiry_time)
+    if ret is not None and len(ret) == 0:
+      pass
+    else:
+      current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
+
+
+def update_memcache_after_commit(context):
+  """
+  The memccache entries is updated after DB commit
+  Logs error if there are errors in updating entries in cache
+
+  Args:
+    context: POST/PUT/DELETE HTTP request or import Converter contextual object
+    modified_objects:  objects in cache maintained prior to commiting to DB
+  Returns:
+    None 
+
+  """
+  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+    return
+
+  if context.cache_manager is None:
+    current_app.logger.error("CACHE: Error in initiaizing cache manager")
+    return
+
+  cache_manager = context.cache_manager
+
+  # TODO(dan): check for duplicates in marked_for_delete
+  if len(cache_manager.marked_for_delete) > 0:
+    #current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
+    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, 0)
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if delete_result is not True:
+      current_app.logger.error("CACHE: Failed to remoe collection from cache")
+
+  status_entries =[]
+  for key in cache_manager.marked_for_delete:
+    status_entries.append('DeleteOp:' + str(key))
+  if len(status_entries) > 0:
+    delete_result = cache_manager.bulk_delete(status_entries, 0)
+    # TODO(dan): handling failure including network errors, currently we log errors
+    if delete_result is not True:
+      current_app.logger.error("CACHE: Failed to remove status entries from cache")
+
+  cache_manager.clear_cache()
+
+def build_cache_status(data, key, expiry_timeout, status):
+  """
+  Build the dictionary for storing operational status of cache
+
+  Args:
+    data: dictionary to update
+    key: key to dictionary
+    expiry_timeout: timeout for expiry cache
+    status: Update status entry, e.g.InProgress
+  Returns:
+    None 
+  """
+  data[key] = {'expiry': expiry_timeout, 'status': status}
 
 def inclusion_filter(obj):
   return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
@@ -372,7 +548,7 @@ class Resource(ModelView):
     if obj is None:
       return self.not_found_response()
     if 'Accept' in self.request.headers and \
-       'application/json' not in self.request.headers['Accept']:
+        'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
     if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
@@ -381,6 +557,7 @@ class Resource(ModelView):
       raise Forbidden()
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
+
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(object_for_json):
       return current_app.make_response((
@@ -399,7 +576,7 @@ class Resource(ModelView):
       return current_app.make_response((
         'If-Match is required.', 428, [('Content-Type', 'text/plain')]))
     if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
-       request.headers['If-Unmodified-Since'] != \
+        request.headers['If-Unmodified-Since'] != \
           self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
           'The resource has been changed. The conflict must be resolved and '
@@ -446,11 +623,15 @@ class Resource(ModelView):
     self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update memcache before commit for resource collection PUT"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
     update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for resource collection PUT"):
+      update_memcache_after_commit(self.request)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -473,9 +654,13 @@ class Resource(ModelView):
     self.model_deleted.send(obj.__class__, obj=obj, service=self)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update memcache before commit for resource collection DELETE"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for resource collection DELETE"):
+      update_memcache_after_commit(self.request)
     with benchmark("Query for object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -483,12 +668,35 @@ class Resource(ModelView):
 
   def collection_get(self):
     if 'Accept' in self.request.headers and \
-       'application/json' not in self.request.headers['Accept']:
+        'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
+    cache_supported = False
+    if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
+      stubs_in_args = '__stubs_only' in request.args
+      if stubs_in_args:
+        category = 'stubs'
+      else:
+        category = 'collection'
+      model_plural = self.model._inflector.table_plural
+      cache_response = None
+      collection_name = '{0}_collection'.format(model_plural)
+      self.request.cache_manager = _get_cache_manager()
+      cache_supported=self.request.cache_manager.is_caching_supported(category, model_plural)
+      if cache_supported:
+        with benchmark("Get resource collection from Memcache"):
+          cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
+        if cache_response is not None:
+          current_app.logger.info("CACHE: Successfully response from cache for resource collection: " + model_plural)
+          return cache_response
+      else:
+        current_app.logger.info("CACHE: Caching is not supported for " + \
+          model_plural + " in " + category + " category")
+
     with benchmark("Query for collection"):
       objs = self.get_collection()
+
     with benchmark("Serialize collection"):
       collection = self.collection_for_json(objs)
 
@@ -496,8 +704,276 @@ class Resource(ModelView):
         self.request.headers['If-None-Match'] == self.etag(collection):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(collection))]))
+
+    # Write collection to cache, if caching is supported for the model
+    #
+    if cache_supported:
+      with benchmark("Check status entries in Memcache"):
+        cache_in_progress=self.is_caching_in_progress(category, model_plural)
+      if cache_in_progress is False:
+        with benchmark("Write resource collection to Memcache"):
+          cache_response = self.write_collection_to_cache(collection, category, model_plural,\
+                                collection_name, model_plural)
+      else:
+        current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
+          model_plural + " in " + category + " category")
+
+    filter_collection = self.filter_collection(collection_name, model_plural, collection)
     return self.json_success_response(
-      collection, self.collection_last_modified())
+      filter_collection, self.collection_last_modified(), cache_op='Miss')
+
+  def is_caching_in_progress(self, category, resource):
+    """Check the current state of cache and in progress
+
+    Calls the cachemanager to do a bulk GET of status of any operation in cache for the resource 
+    The status entries for create, update and delete operation is maintained in memcache
+    
+    Args:
+       category: collection
+       resource: regulations, programs, controls, etc.
+
+    Returns:
+      True if any resource is question has operation in progress (All or None policy)
+      False otherwise
+    """
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
+      return False
+
+    # Check in cache for collection and stubs to determine if cache needs to be invalidated
+    #
+    status_keys=[]
+    cacheobjids = request.args.get('id__in', False)
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      for id in cacheobjids:
+        status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
+    else:
+      return False
+
+    result = self.request.cache_manager.bulk_get(status_keys)
+    if len(result) > 0:
+      for key, value in result:
+        status = value['status']
+        if status == 'InProgress':
+          return True
+
+    return False
+
+  def filter_collection(self, name, resource, collection_data):
+    """ Filter JSON collection that have read permission
+
+    The collection GET gets all items with inclusion_filter set to True. The colleciton items are filtered
+    with read permission checks on the the items 
+
+    Args:
+       name: collection name such as regulations_collection
+       resource: regulations
+       collection_data : GET collection JSON response
+
+    Returns:
+     filter_data : Filtered collection data after adding only 
+    """
+    cacheobjids = request.args.get('id__in', False)
+    if not (cacheobjids and hasattr(self.model, 'eager_query')):
+      return collection_data
+
+    data = collection_data[name][resource]
+    filter_data = {name: {resource: []}}
+    for attrs in data:
+      context_id = self.get_context_id_from_json(attrs)
+      if not permissions.is_allowed_read(self.model.__name__, context_id):
+        current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
+        continue
+      filter_attrs=self.filter_relationship_attrs(None, attrs)
+      filter_data[name][resource].append(filter_attrs)
+    filter_data[name]['selfLink'] = collection_data[name]['selfLink']
+    return filter_data
+
+  def filter_relationship_attrs(self, id, attrs):
+    """ Filter relationship that have read permission
+
+    Traverse through JSON representation in cache and find attributes with "RelationshipProperty"
+    The relationship property value dictionary keys 'type' and 'context' are extracted.
+    If context is not None, RBAC permission allowed_for_read permission is performed and filtered if needed. 
+    
+    Args:
+       id: Resource ID
+       attrs: dictionary containing JSON representation in cache
+
+    Returns:
+      filter_attrs: Dictionary that filters out relationship items that pass RBAC permission checks
+    """
+
+    filter_attrs={}
+    for key, val in attrs.items():
+      filter_attrs[key] = val
+      if hasattr(self.model, key):
+        class_attr = getattr(self.model, key)
+        if (isinstance(class_attr, InstrumentedAttribute) and \
+            isinstance(class_attr.property, RelationshipProperty)) or \
+            isinstance(class_attr, AssociationProxy):
+          if type(val) is list:
+            updated_val=[]
+            for item in val:
+              if self.is_read_allowed_for_item(key, item):
+                if type(item) is dict:
+                  for sub_key, sub_val in item.items():
+                    if not self.is_read_allowed_for_item(sub_key, sub_val):
+                      item[sub_key] = None
+                updated_val.append(item)
+              #if self.is_read_allowed_for_item(key, item):
+              #  updated_val.append(item)
+            filter_attrs[key] = updated_val
+          else:
+            if not self.is_read_allowed_for_item(key, val):
+              filter_attrs[key] = None
+    return filter_attrs
+
+  def is_read_allowed_for_item(self, key, item):
+    """  Check allowed for each item of type dictionary
+
+    Get context_id for given dictionary item and check if there are permissions to read for the item
+    dictionary with keys type and context (or context_id)
+    
+    Args:
+       key:  name of the resource item
+       item: dictionary with keys type, context (or context_id)
+
+    Returns:
+      True if read permissions allowed or item is not a dictionary, type for the item is not found,
+            context or context-id is not set in the item to check
+      False otherwise
+    """
+    if type(item) is not dict:
+      return True
+    type_found    = item.has_key('type')
+    context_found = item.has_key('context')
+    context_id = None
+    if type_found:
+      item_type = item['type']
+      if context_found:
+        if item['context'] is not None and item['context'].has_key('id'):
+          context_id = item['context']['id']
+        elif item['context'] is not None and item.has_key('context_id'):
+          context_id = item['context_id']
+        elif item['context'] is None:
+          context_id = None
+        else:
+          current_app.logger.warn("CACHE: context-1 is not available for key: " + key + " item: " + str(item))
+          return True
+      else:
+        if item.has_key('context_id'):
+          context_id = item['context_id']
+        else:
+          current_app.logger.warn("CACHE: context-2 is not available for key: " + key + " item: " + str(item))
+          return True
+      if not permissions.is_allowed_read(item_type, context_id):
+        current_app.logger.warn("CACHE: Read Permission not allowed key: " + str(key) + " value: " + str(item))
+        return False
+      else:
+        return True
+    else:
+      return True
+
+  def get_collection_from_cache(self, category, resource, x_category, x_resource):
+    """Get collection (objects or stubs) from cache
+
+    Parse the request arguments and handles stubs and eager query related collection requests
+    Invokes cache manager interface to get collection from cache (e.g. memcache) 
+    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
+    
+    Args:
+       category: collection 
+       resource: regulations, programs, controls, etc.
+       x_category: Output category for the JSON response (resource_collection)
+       x_resource: Output resource for JSON response (resource)
+
+    Returns:
+      None if any one of the entries is not found in cache, caching is not supported for the resource, 
+           request is not a collection
+      JSON response on successfully retreiving entries from cache, caching is supported, and
+           request is an eager query and collection 
+    """
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
+      return None
+
+    cacheobjids = request.args.get('id__in', False)
+    etag = request.args.get('_', False)
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      cacheobjidstr = cacheobjids.replace(',', '%2C')
+      ids = [long(i) for i in cacheobjids.split(',')]
+      filter={'ids':ids, 'attrs':None}
+      data = self.request.cache_manager.get_collection(category, resource, filter)
+      if data is not None and len(data) > 0:
+        converted_data = {x_category: {x_resource: []}}
+        for id, attrs in data.items():
+          context_id = self.get_context_id_from_json(attrs)
+          if not permissions.is_allowed_read(self.model.__name__, context_id):
+            continue
+          filter_attrs=self.filter_relationship_attrs(id, attrs)
+          converted_data[x_category][x_resource].append(filter_attrs)
+        selfLink = self.url_for_preserving_querystring(),
+        converted_data[x_category]['selfLink'] = selfLink
+        controls_data = converted_data[x_category][x_resource]
+        if len(controls_data) > 0:
+          return self.json_success_response(converted_data, datetime.datetime.now(), cache_op='Hit')
+        else:
+          return None
+      else:
+        return None
+    else:
+      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+      return None
+
+  def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
+    """Write collection (objects) to cache
+
+    Parse the request arguments and handles eager query related collection requests
+    Invokes cache manager interface to write collection into cache (e.g. memcache) 
+    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
+    
+    Args:
+       collection: JSON object returned from SQLAlchemy data-ORM layer
+       category: collection, etc.
+       resource: regulations, programs, controls, etc.
+       x_category: Output category for the JSON response (resource_collection)
+       x_resource: Output resource for JSON response (resource)
+
+    Returns:
+      None Errors in writing to cache, caching is not supported for the resource, 
+           and request is not a collection
+      JSON response on successfully retreiving entries from cache, if caching is supported,
+           and request is an eager query and collection
+    """
+    if self.request.cache_manager is None:
+      current_app.logger.warn("CACHE: CacheManager is not initialized")
+      return None
+
+    cacheobjids=None
+    if category is 'collection':
+      cacheobjids = request.args.get('id__in', False)
+
+    if cacheobjids and hasattr(self.model, 'eager_query'):
+      if collection.has_key(x_category):
+        resource_collection= collection.get(x_category).get(x_resource)
+        cacheData={}
+        for aresource in resource_collection:
+          id = aresource['id']
+          cacheData[id] = deepcopy(aresource)
+        write_result = self.request.cache_manager.add_collection(category, resource, cacheData)
+        if write_result is None:
+          current_app.logger.warn("CACHE: Unable to write collection to cache")
+          return None
+        else:
+          current_app.logger.info("CACHE: Successfully written collection to cache")
+          return write_result
+      else:
+        current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
+        return None
+    else:
+      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
+      return None
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
@@ -566,9 +1042,13 @@ class Resource(ModelView):
     db.session.add(obj)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session, obj)
+    with benchmark("Update memcache before commit for resource collection POST"):
+      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for resource collection POST"):
+      update_memcache_after_commit(self.request)
     with benchmark("Serialize object"):
       object_for_json = self.object_for_json(obj)
     return self.json_success_response(
@@ -658,8 +1138,8 @@ class Resource(ModelView):
       if not stubs:
         object_for_json = ggrc.builder.json.publish(
             obj,
-            self.get_properties_to_include(request.args.get('__include')),
-            inclusion_filter)
+            self.get_properties_to_include(request.args.get('__include'))
+            )
       else:
         object_for_json = ggrc.builder.json.publish_stub(
             obj, (), inclusion_filter)
@@ -704,7 +1184,7 @@ class Resource(ModelView):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
 
   def json_success_response(
-      self, response_object, last_modified, status=200, id=None):
+      self, response_object, last_modified, status=200, id=None, cache_op=None):
     headers = [
         ('Last-Modified', self.http_timestamp(last_modified)),
         ('Etag', self.etag(response_object)),
@@ -712,6 +1192,8 @@ class Resource(ModelView):
         ]
     if id:
       headers.append(('Location', self.url_for(id=id)))
+    if cache_op:
+      headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
       (self.as_json(response_object), status, headers))
 
