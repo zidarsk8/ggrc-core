@@ -438,8 +438,7 @@ can.Control("GGRC.Controllers.Modals", {
       ajd = instance.save().done(function(obj) {
         function finish() {
           delete that.disable_hide;
-          obj.attr('_map_and_save', $("#map-and-save").is(':checked'))
-          that.element.trigger("modal:success", obj).modal_form("hide");
+          that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
         };
 
         // If this was an Objective created directly from a Section, create a join

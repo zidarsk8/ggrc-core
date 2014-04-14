@@ -310,7 +310,7 @@
             $active.click();
           }
           $trigger.trigger("routeparam", $trigger.data("route"));
-          $trigger.trigger('modal:success', data);
+          $trigger.trigger('modal:success', Array.prototype.slice.call(arguments, 1));
         }
       });
     },
