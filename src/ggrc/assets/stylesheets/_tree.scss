@@ -206,14 +206,19 @@ ul.new-tree {
         width: auto;
         ul {
           @include reset-list();
+          line-height: 18px;
+          padding-top: 7px;
+          padding-bottom: 5px;
           li {
-            display: inline-block;
-            margin-right: 5px;
+            display: inline;
+            margin-right: 8px;
             line-height: 18px;
-            padding-right: 8px;
+            padding-right: 5px;
             border-right: 1px solid #111;
             &:last-child {
               margin-right: 0;
+              border-right: none;
+              padding-right: 0;
             }
             &.governance,
             &.control,
