@@ -447,7 +447,11 @@ can.Control("GGRC.Controllers.Modals", {
             objective: obj
             , section: CMS.Models.Section.findInCacheById(params.section.id)
             , context: { id: null }
-          }).save().done(finish);
+          }).save().done(function(){
+            $(document.body).trigger("ajax:flash", 
+                { success : "Objective mapped successfully." });
+            finish(); 
+          });
         } else {
           finish();
         }
