@@ -102,7 +102,8 @@ GGRC.Tracker.start = function(category, action, label) {
       GGRC.Tracker.stop(category, action);
     };
   } else {
-    //  Ignore re-entrant events for now?
+    //  Ignore re-entrant events for now by returning no-op function
+    return function(){};
   }
 };
 
