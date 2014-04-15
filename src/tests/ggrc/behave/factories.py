@@ -281,12 +281,15 @@ class ResponseFactory(ModelFactory):
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 class DocumentationResponseFactory(ResponseFactory):
+  MODEL = models.DocumentationResponse
   response_type = 'documentation'
 
 class InterviewResponseFactory(ResponseFactory):
+  MODEL = models.InterviewResponse
   response_type = 'interview'
 
 class PopulationSampleResponseFactory(ResponseFactory):
+  MODEL = models.PopulationSampleResponse
   response_type = 'population sample'
 
 
@@ -386,12 +389,12 @@ class ContextImplicationFactory(ModelFactory):
 # ggrc_gdrive_integration model factories
 class ObjectFileFactory(ModelFactory):
   MODEL = models.get_model("ObjectFile")
-  fileable = FactoryStubMarker(models.Response)
+  fileable = FactoryStubMarker(models.DocumentationResponse)
 
 class ObjectFolderFactory(ModelFactory):
   MODEL = models.get_model("ObjectFolder")
-  folderable = FactoryStubMarker(models.Response)
+  folderable = FactoryStubMarker(models.Audit)
 
 class ObjectEventFactory(ModelFactory):
   MODEL = models.get_model("ObjectEvent")
-  eventable = FactoryStubMarker(models.Response)
+  eventable = FactoryStubMarker(models.Meeting)
