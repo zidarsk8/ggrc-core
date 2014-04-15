@@ -595,6 +595,7 @@ function defer_render(tag_prefix, funcs, deferred) {
   if(typeof funcs === "function") {
     funcs = { done : funcs };
   }
+  funcs.done();  //pre-hook up things below.
 
   function hookup(element, parent, view_id) {
     var $element = $(element)
