@@ -196,13 +196,14 @@ can.Control("CMS.Controllers.TreeView", {
           , "width": 2
           }).spin();
         $spinner = $(spinner.el);
-        $spinner_li = $('<li class="tree-footer tree-item tree-spinner" />');
+        $spinner_li = $('<li class="tree-item tree-spinner" />');
         $spinner_li.append($spinner);
         $spinner.css({
             display: 'inline-block'
           , paddingLeft: '20px'
           , left: '10px'
           , top: '-4px'
+          , position: 'relative'
         });
 
         if ($footer.length == 0) {
