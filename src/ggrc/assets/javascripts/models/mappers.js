@@ -250,10 +250,13 @@
     , refresh_list: function() {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
+          , self = this
           ;
 
         binding.name = this.name + "_instances";
-        return binding.refresh_instances(this);
+        return binding.refresh_instances(this).then(function(){
+          return self.refresh_instances();
+        });
       }
 
     , refresh_instance: function() {
