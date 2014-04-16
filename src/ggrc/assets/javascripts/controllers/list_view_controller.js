@@ -110,7 +110,7 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
     if (this.options.list) {
-      this.draw_list(this.options.list);
+      this.element.trigger("updateCount", this.options.list.length);
     } else {
       if (!this.options.list_loader) {
         if (this.options.is_related) {
@@ -157,14 +157,27 @@ can.Control("GGRC.Controllers.ListView", {
           this.options.list_loader = model_list_loader;
         }
       }
-      this.fetch_list({});
+      //this.fetch_list({});
     }
+  }
+
+  , prepare : function() {
+    var that = this;
+    this.element.trigger("updateCount", 0)
+
+    this.options.list_loader(this, this.options.extra_params || {}).done(function(list) {
+      that.element.trigger("updateCount", list.length)
+    });
+
+    return $.when();
   }
 
   , fetch_list : function(params) {
     // Assemble extra search params
     var extra_params = this.options.extra_params || {}
       , search_params = this.options.search_params
+      , that = this
+      , page
       ;
 
     this.element.trigger("loading");
@@ -198,7 +211,7 @@ can.Control("GGRC.Controllers.ListView", {
         , total: ids.length
         , first: function(){
           pager.current = 0;
-          pager.fetch();
+          return pager.fetch();
         }
         , prev: function(){
           pager.current--;
@@ -223,11 +236,15 @@ can.Control("GGRC.Controllers.ListView", {
         , has_prev: function() { return pager.count*(pager.current) > 0; }
       };
       // Load the first page:
-      pager.first();
+      page = pager.first();
       this.options.pager = pager;
       this.context.attr('pager', this.options.pager);
+      this.element.trigger("updateCount", ids.length);
+      return page;
     } else {
-      this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
+      return this.options.list_loader(this, extra_params).done(function(list) {
+        that.element.trigger("updateCount", list.length);
+      });
     }
   }
 
@@ -243,14 +260,35 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
     this.context.attr(this.options);
-    can.view(this.options.list_view, this.context, function(frag) {
+    this.update_count();
+  }
+
+  , init_view : function() {
+    var that = this;
+    return can.view(this.options.list_view, this.context, function(frag) {
       that.element.find('.spinner, .tree-structure').hide();
       that.element
         .append(frag)
         .trigger("loaded");
       that.options.state.attr('loading', false);
-      that.update_count();
     });
+  }
+
+  , display: function() {
+    var that = this;
+
+    if (this._display_deferred) {
+      return this._display_deferred;
+    }
+
+    this._display_deferred = this.prepare();
+
+    this._display_deferred.then(function() {
+      return $.when(that.fetch_list(), that.init_view())
+        .then(that.proxy("draw_list"));
+    });
+
+    return this._display_deferred;
   }
 
   , update_count: function() {
