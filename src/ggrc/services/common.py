@@ -1081,6 +1081,7 @@ class Resource(ModelView):
     model_name = model_name or self.model._inflector.table_singular
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
+    json_obj = ggrc.builder.json.publish_representation(json_obj)
     return { model_name: json_obj }
 
   def get_properties_to_include(self, inclusions):
@@ -1140,6 +1141,7 @@ class Resource(ModelView):
         object_for_json = ggrc.builder.json.publish_stub(
             obj, (), inclusion_filter)
       objects_json.append(object_for_json)
+    objects_json = ggrc.builder.json.publish_representation(objects_json)
     collection_json = {
         collection_name: {
           'selfLink': self.url_for_preserving_querystring(),
