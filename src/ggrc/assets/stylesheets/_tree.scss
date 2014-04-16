@@ -1265,3 +1265,8 @@ ul.new-tree {
     }
   }
 }
+
+.tree-spinner {
+  position: relative;
+  z-index: 100 !important;
+}
