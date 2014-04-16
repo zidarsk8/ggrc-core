@@ -70,3 +70,11 @@ class Eventable(object):
   _publish_attrs = [
       'object_events',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Eventable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('object_events'))
