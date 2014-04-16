@@ -49,7 +49,8 @@ class BaseObjectView(ModelView):
       'instance_json':
         lambda: as_json({
             self.model._inflector.table_singular:
-              ggrc.builder.json.publish(obj, (), inclusion_filter)
+              ggrc.builder.json.publish_representation(
+                ggrc.builder.json.publish(obj, (), inclusion_filter))
           })
       }
 
