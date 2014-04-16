@@ -327,8 +327,6 @@ class ModelView(View):
         for j in joinlist:
           query = query.join(j)
         query = query.filter(filter)
-      if options:
-        query = query.options(*options)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       filter_expr = context_query_filter(self.model.context_id, contexts)
@@ -339,8 +337,6 @@ class ModelView(View):
         if j_contexts is not None:
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
-    if '__sort' not in request.args:
-      query = query.order_by(self.modified_attr.desc())
     order_properties = []
     if '__sort' in request.args:
       sort_attrs = request.args['__sort'].split(",")
@@ -358,8 +354,8 @@ class ModelView(View):
         else:
           # Possibly throw an exception instead, if sorting by invalid attribute?
           pass
-    if len(order_properties) == 0:
-      order_properties.append(self.modified_attr.desc())
+    order_properties.append(self.modified_attr.desc())
+    order_properties.append(self.model.id.desc())
     query = query.order_by(*order_properties)
     if '__limit' in request.args:
       try:

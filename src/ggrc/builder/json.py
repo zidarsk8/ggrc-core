@@ -333,22 +333,22 @@ class Builder(AttributeInfo):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
         return [self.generate_link_object_for_foreign_key(
-            getattr(o, target_name), getattr(o, target_type), o.context_id)
+            getattr(o, target_name), getattr(o, target_type), getattr(o, class_attr.value_attr).context_id)
               for o in join_objects]
       else:
         target_mapper = class_attr.remote_attr.property.mapper
         # Handle inheritance -- we must check the object itself for the type
-        if len(list(target_mapper.self_and_descendants)) > 1:
-          target_attr = class_attr.remote_attr.property.key
-          return [
-              self.generate_link_object_for(
-                getattr(o, target_attr), inclusions, include, inclusion_filter)
-              for o in join_objects]
-        else:
-          target_name = list(class_attr.remote_attr.property.local_columns)[0].key
-          target_type = class_attr.remote_attr.property.mapper.class_.__name__
-          return [self.generate_link_object_for_foreign_key(
-              getattr(o, target_name), target_type, o.context_id) for o in join_objects]
+        #if len(list(target_mapper.self_and_descendants)) > 1:
+        target_attr = class_attr.remote_attr.property.key
+        return [
+            self.generate_link_object_for(
+              getattr(o, target_attr), inclusions, include, inclusion_filter)
+            for o in join_objects]
+        #else:
+        #  target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+        #  target_type = class_attr.remote_attr.property.mapper.class_.__name__
+        #  return [self.generate_link_object_for_foreign_key(
+        #      getattr(o, target_name), target_type, getattr(o, target_name).context_id) for o in join_objects]
 
   def publish_relationship(
       self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
@@ -367,11 +367,15 @@ class Builder(AttributeInfo):
         target_type = target.__class__.__name__
       else:
         target_type = class_attr.property.mapper.class_.__name__
+      if getattr(obj, attr_name):
+        context_id = getattr(obj, attr_name).context_id
+      else:
+        context_id = None
       target_name = list(class_attr.property.local_columns)[0].key
       attr_value = getattr(obj, target_name)
       if attr_value is not None:
         return self.generate_link_object_for_foreign_key(
-            attr_value, target_type, obj.context_id)
+            attr_value, target_type, context_id)
       else:
         return None
 
@@ -390,7 +394,7 @@ class Builder(AttributeInfo):
         return self.generate_link_object_for_foreign_key(
             getattr(obj, '{0}_id'.format(attr_name)),
             getattr(obj, '{0}_type'.format(attr_name)),
-            obj.context_id)
+            getattr(obj, attr_name).context_id if getattr(obj, attr_name) else None)
       else:
         return self.publish_link(
             obj, attr_name, inclusions, include, inclusion_filter)
