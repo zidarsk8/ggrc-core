@@ -302,7 +302,7 @@ def build_type_query(type, result_spec):
   mapper = model._sa_class_manager.mapper
   columns = []
   columns_indexes = {}
-  if len(mapper.self_and_descendants) == 1:
+  if len(list(mapper.self_and_descendants)) == 1:
     type_column = sqlalchemy.literal(mapper.class_.__name__)
   else:
     # Handle polymorphic types with CASE
