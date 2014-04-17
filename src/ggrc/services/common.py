@@ -19,11 +19,11 @@ from exceptions import TypeError
 from flask import url_for, request, current_app, g, has_request_context
 from flask.ext.sqlalchemy import Pagination
 from flask.views import View
-from ggrc import db
+from ggrc import db, utils
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper, benchmark
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
-from ggrc.login import get_current_user_id
+from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.context import Context
 from ggrc.models.event import Event
@@ -714,9 +714,15 @@ class Resource(ModelView):
         current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
           model_plural + " in " + category + " category")
 
-    filter_collection = self.filter_collection(collection_name, model_plural, collection)
+    with benchmark("Filter collection resources"):
+      collection_name = model_plural + '_collection'
+      user_permissions = permissions.permissions_for(get_current_user())
+      collection[collection_name][model_plural] = self.filter_resource(
+          collection[collection_name][model_plural],
+          user_permissions=user_permissions)
+
     return self.json_success_response(
-      filter_collection, self.collection_last_modified(), cache_op='Miss')
+      collection, self.collection_last_modified(), cache_op='Miss')
 
   def is_caching_in_progress(self, category, resource):
     """Check the current state of cache and in progress
@@ -755,121 +761,45 @@ class Resource(ModelView):
 
     return False
 
-  def filter_collection(self, name, resource, collection_data):
-    """ Filter JSON collection that have read permission
+  def filter_resource(self, resource, depth=0, user_permissions=None):
+    if user_permissions is None:
+      user_permissions = permissions.permissions_for(get_current_user())
 
-    The collection GET gets all items with inclusion_filter set to True. The colleciton items are filtered
-    with read permission checks on the the items 
-
-    Args:
-       name: collection name such as regulations_collection
-       resource: regulations
-       collection_data : GET collection JSON response
-
-    Returns:
-     filter_data : Filtered collection data after adding only 
-    """
-    cacheobjids = request.args.get('id__in', False)
-    if not (cacheobjids and hasattr(self.model, 'eager_query')):
-      return collection_data
-
-    data = collection_data[name][resource]
-    filter_data = {name: {resource: []}}
-    for attrs in data:
-      context_id = self.get_context_id_from_json(attrs)
-      if not permissions.is_allowed_read(self.model.__name__, context_id):
-        current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
-        continue
-      filter_attrs=self.filter_relationship_attrs(None, attrs)
-      filter_data[name][resource].append(filter_attrs)
-    filter_data[name]['selfLink'] = collection_data[name]['selfLink']
-    return filter_data
-
-  def filter_relationship_attrs(self, id, attrs):
-    """ Filter relationship that have read permission
-
-    Traverse through JSON representation in cache and find attributes with "RelationshipProperty"
-    The relationship property value dictionary keys 'type' and 'context' are extracted.
-    If context is not None, RBAC permission allowed_for_read permission is performed and filtered if needed. 
-    
-    Args:
-       id: Resource ID
-       attrs: dictionary containing JSON representation in cache
-
-    Returns:
-      filter_attrs: Dictionary that filters out relationship items that pass RBAC permission checks
-    """
-
-    filter_attrs={}
-    for key, val in attrs.items():
-      filter_attrs[key] = val
-      if hasattr(self.model, key):
-        class_attr = getattr(self.model, key)
-        if (isinstance(class_attr, InstrumentedAttribute) and \
-            isinstance(class_attr.property, RelationshipProperty)) or \
-            isinstance(class_attr, AssociationProxy):
-          if type(val) is list:
-            updated_val=[]
-            for item in val:
-              if self.is_read_allowed_for_item(key, item):
-                if type(item) is dict:
-                  for sub_key, sub_val in item.items():
-                    if not self.is_read_allowed_for_item(sub_key, sub_val):
-                      item[sub_key] = None
-                updated_val.append(item)
-              #if self.is_read_allowed_for_item(key, item):
-              #  updated_val.append(item)
-            filter_attrs[key] = updated_val
-          else:
-            if not self.is_read_allowed_for_item(key, val):
-              filter_attrs[key] = None
-    return filter_attrs
-
-  def is_read_allowed_for_item(self, key, item):
-    """  Check allowed for each item of type dictionary
-
-    Get context_id for given dictionary item and check if there are permissions to read for the item
-    dictionary with keys type and context (or context_id)
-    
-    Args:
-       key:  name of the resource item
-       item: dictionary with keys type, context (or context_id)
-
-    Returns:
-      True if read permissions allowed or item is not a dictionary, type for the item is not found,
-            context or context-id is not set in the item to check
-      False otherwise
-    """
-    if type(item) is not dict:
-      return True
-    type_found    = item.has_key('type')
-    context_found = item.has_key('context')
-    context_id = None
-    if type_found:
-      item_type = item['type']
-      if context_found:
-        if item['context'] is not None and item['context'].has_key('id'):
-          context_id = item['context']['id']
-        elif item['context'] is not None and item.has_key('context_id'):
-          context_id = item['context_id']
-        elif item['context'] is None:
+    if type(resource) in (list, tuple):
+      filtered = []
+      for sub_resource in resource:
+        filtered_sub_resource = self.filter_resource(
+            sub_resource, depth=depth+1, user_permissions=user_permissions)
+        if filtered_sub_resource is not None:
+          filtered.append(filtered_sub_resource)
+      return filtered
+    elif type(resource) is dict and 'type' in resource:
+      # First check current level
+      context_id = False
+      if 'context' in resource:
+        if resource['context'] is None:
           context_id = None
         else:
-          current_app.logger.warn("CACHE: context-1 is not available for key: " + key + " item: " + str(item))
-          return True
+          context_id = resource['context']['id']
+      elif 'context_id' in resource:
+        context_id = resource['context_id']
+      assert context_id is not False, "No context found for object"
+
+      if not user_permissions.is_allowed_read(resource['type'], context_id):
+        return None
       else:
-        if item.has_key('context_id'):
-          context_id = item['context_id']
-        else:
-          current_app.logger.warn("CACHE: context-2 is not available for key: " + key + " item: " + str(item))
-          return True
-      if not permissions.is_allowed_read(item_type, context_id):
-        current_app.logger.warn("CACHE: Read Permission not allowed key: " + str(key) + " value: " + str(item))
-        return False
-      else:
-        return True
+        # Then, filter any typed keys
+        for key, value in resource.items():
+          if key == 'context':
+            # Explicitly allow `context` objects to pass through
+            pass
+          else:
+            if type(value) is dict and 'type' in value:
+              resource[key] = self.filter_resource(
+                  value, depth=depth+1, user_permissions=user_permissions)
+      return resource
     else:
-      return True
+      assert False, "Non-object passed to filter_resource"
 
   def get_collection_from_cache(self, category, resource, x_category, x_resource):
     """Get collection (objects or stubs) from cache
@@ -907,7 +837,7 @@ class Resource(ModelView):
           context_id = self.get_context_id_from_json(attrs)
           if not permissions.is_allowed_read(self.model.__name__, context_id):
             continue
-          filter_attrs=self.filter_relationship_attrs(id, attrs)
+          filter_attrs=self.filter_resource(attrs)
           converted_data[x_category][x_resource].append(filter_attrs)
         selfLink = self.url_for_preserving_querystring(),
         converted_data[x_category]['selfLink'] = selfLink
