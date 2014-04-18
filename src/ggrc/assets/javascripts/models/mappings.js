@@ -540,7 +540,8 @@
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
-                    if (relationship.source.reify() === page_instance || relationship.destination.reify() === page_instance) {
+                    if (relationship.source && relationship.source.reify() === page_instance 
+                        || relationship.destination && relationship.destination.reify() === page_instance) {
                       return true;
                     }
                   }
@@ -549,7 +550,7 @@
               }
             ;
 
-          if (instance instanceof CMS.Models.Request)
+          if (instance instanceof CMS.Models.Request && instance.responses)
             return is_mapped(instance.responses.reify());
           else if (instance instanceof CMS.Models.Response)
             return is_mapped([instance]);
