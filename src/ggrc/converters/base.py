@@ -248,7 +248,12 @@ class BaseConverter(object):
       for key in row_header_map.keys():
         field = row_header_map[key]
         field_val = row.get(field, '')
-        field_val = field_val if isinstance(field_val, basestring) else ''
+        # Ensure non-basestrings are rendered on export
+        if not isinstance(field_val, basestring):
+          if field_val is None:
+            field_val = ''
+          else:
+            field_val = str(field_val)
         csv_row.append(field_val)
       csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 
