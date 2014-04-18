@@ -178,7 +178,7 @@
     </div>
   </div>
   <input type="hidden" name="slug" value="{{slug}}">
-  <input type="hidden" name="modified_by_id" value="{{#with_current_user_as 'current_user'}}{{current_user.id}}{{/with_current_user_as}}">
+  {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 </form>
 {{/instance}}
 {{!/div}}

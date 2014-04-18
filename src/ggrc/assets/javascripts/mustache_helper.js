@@ -595,7 +595,6 @@ function defer_render(tag_prefix, funcs, deferred) {
   if(typeof funcs === "function") {
     funcs = { done : funcs };
   }
-  funcs.done();  //pre-hook up things below.
 
   function hookup(element, parent, view_id) {
     var $element = $(element)
@@ -787,13 +786,17 @@ Mustache.registerHelper("all", function(type, params, options) {
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
-can.each(["page_object", "current_user"], function(fname) {
-  Mustache.registerHelper("with_" + fname + "_as", function(name, options) {
+can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
+  Mustache.registerHelper(fname, function(name, options) {
     if(!options) {
       options = name;
-      name = fname;
+      name = fname.replace(/with_(.*)_as/, "$1");
     }
-    var page_object = (fname === "current_user" ? CMS.Models.Person.model(GGRC.current_user) : GGRC.page_instance());
+    var page_object = (fname === "with_current_user_as"
+                       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
+                          || CMS.Models.Person.model(GGRC.current_user))
+                       : GGRC.page_instance()
+                       );
     if(page_object) {
       var p = {};
       p[name] = page_object;
