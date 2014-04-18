@@ -166,9 +166,11 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
     var that = this;
     this.element.trigger("updateCount", 0)
 
-    return this.options.list_loader(this, this.options.extra_params || {}).done(function(list) {
+    this.options.list_loader(this, this.options.extra_params || {}).done(function(list) {
       that.element.trigger("updateCount", list.length)
     });
+
+    return $.when();
   }
 
   , fetch_list : function(params) {
