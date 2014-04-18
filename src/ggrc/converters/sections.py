@@ -45,7 +45,15 @@ class ClauseRowConverter(SectionRowConverter):
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
-    if directive_id:
+    if not directive_id:
+      return
+    # Make sure directive/clause aren't already connected before creating
+    clause_id = getattr(self.obj, 'id', None)
+    matching_relationship_count = DirectiveSection.query\
+      .filter(DirectiveSection.directive_id==directive_id)\
+      .filter(DirectiveSection.section_id==clause_id)\
+      .count()
+    if matching_relationship_count == 0:
       db_session.add(self.obj)
       ds = DirectiveSection(directive_id=directive_id, section=self.obj)
       db_session.add(ds)
