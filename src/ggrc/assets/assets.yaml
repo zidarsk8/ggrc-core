@@ -104,7 +104,7 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   #- d3.v2.js
-  - related_graph.js
+  #- related_graph.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
