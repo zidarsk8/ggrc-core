@@ -413,6 +413,18 @@ class ModelView(View):
         if j_contexts is not None:
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
+    if '__search' in request.args:
+      terms = request.args['__search']
+      types = self._get_matching_types(self.model)
+      indexer = get_indexer()
+      search_query = indexer._get_type_query(types, 'read', None)
+      search_query = and_(search_query, indexer._get_filter_query(terms))
+      search_query = db.session.query(indexer.record_type.key).filter(search_query)
+      if '__mywork' in request.args:
+        search_query = indexer._add_owner_query(
+            search_query, types, get_current_user_id())
+      search_subquery = search_query.subquery()
+      query = query.filter(self.model.id.in_(search_subquery))
     order_properties = []
     if '__sort' in request.args:
       sort_attrs = request.args['__sort'].split(",")
