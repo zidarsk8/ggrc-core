@@ -4,6 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 */
+//= require tree-view-controller.js
 
 (function(can, $) {
 
@@ -38,7 +39,7 @@ function model_list_loader(controller, extra_params) {
   });
 }
 
-can.Control("GGRC.Controllers.ListView", {
+CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
   defaults : {
     is_related : false
     , model : null
@@ -110,7 +111,7 @@ can.Control("GGRC.Controllers.ListView", {
     }
 
     if (this.options.list) {
-      this.draw_list(this.options.list);
+      this.element.trigger("updateCount", this.options.list.length);
     } else {
       if (!this.options.list_loader) {
         if (this.options.is_related) {
@@ -157,18 +158,34 @@ can.Control("GGRC.Controllers.ListView", {
           this.options.list_loader = model_list_loader;
         }
       }
-      this.fetch_list({});
+      //this.fetch_list({});
     }
+  }
+
+  , prepare : function() {
+    var that = this;
+    this.element.trigger("updateCount", 0)
+
+    this.options.list_loader(this, this.options.extra_params || {}).done(function(list) {
+      that.element.trigger("updateCount", list.length)
+    });
+
+    return $.when();
   }
 
   , fetch_list : function(params) {
     // Assemble extra search params
     var extra_params = this.options.extra_params || {}
       , search_params = this.options.search_params
+      , that = this
+      , page
       ;
 
     this.element.trigger("loading");
-    this.options.state.attr('loading', true);
+    this.reset_sticky_clone();
+
+    if(this.options.list)
+      this.options.list.replace([]);
 
     if (search_params.search_ids || search_params.user_role_ids) {
       var model = this.options.model
@@ -177,7 +194,7 @@ can.Control("GGRC.Controllers.ListView", {
         , pager
         ;
 
-      // If there is a search for both a query an user roles, 
+      // If there is a search for both a query an user roles,
       // only use the ids in both lists.
       if (search_params.search_ids && search_params.user_role_ids) {
         var found = {};
@@ -198,7 +215,7 @@ can.Control("GGRC.Controllers.ListView", {
         , total: ids.length
         , first: function(){
           pager.current = 0;
-          pager.fetch();
+          return pager.fetch();
         }
         , prev: function(){
           pager.current--;
@@ -223,11 +240,15 @@ can.Control("GGRC.Controllers.ListView", {
         , has_prev: function() { return pager.count*(pager.current) > 0; }
       };
       // Load the first page:
-      pager.first();
+      page = pager.first();
       this.options.pager = pager;
       this.context.attr('pager', this.options.pager);
+      this.element.trigger("updateCount", ids.length);
+      return page;
     } else {
-      this.options.list_loader(this, extra_params).then(this.proxy("draw_list"));
+      return this.options.list_loader(this, extra_params).done(function(list) {
+        that.element.trigger("updateCount", list.length);
+      });
     }
   }
 
@@ -238,18 +259,28 @@ can.Control("GGRC.Controllers.ListView", {
 
     var that = this;
     if(list) {
-      this.options.list = list;
+      if(!this.options.list){
+        this.options.list = new can.Observe.List();
+      }
+      else{
+        this.options.list.splice();
+      }
+      this.enqueue_items(list);
       this.on();
     }
 
     this.context.attr(this.options);
-    can.view(this.options.list_view, this.context, function(frag) {
+    this.update_count();
+  }
+
+  , init_view : function() {
+    var that = this;
+    return can.view(this.options.list_view, this.context, function(frag) {
       that.element.find('.spinner, .tree-structure').hide();
       that.element
         .append(frag)
         .trigger("loaded");
       that.options.state.attr('loading', false);
-      that.update_count();
     });
   }
 
@@ -266,7 +297,10 @@ can.Control("GGRC.Controllers.ListView", {
       this.options.search_params = {};
       this.options.search_query = '';
       this.element.find('.search-filters').find('input[name=search], select[name=user_role]').val('');
-      this.fetch_list();
+      this.fetch_list().then(this.proxy("draw_list"));
+  }
+  , insert_items : function(items){
+    this.options.list.push.apply(this.options.list, items);
   }
   , "{list} change": "update_count"
   , ".view-more-paging click" : function(el, ev) {
@@ -277,21 +311,23 @@ can.Control("GGRC.Controllers.ListView", {
         , load = is_next ? that.options.pager.next : that.options.pager.prev;
       that.options.list.replace([]);
       that.element.find('.spinner').show();
-      that.element.find('.sticky-clone').remove();
-      that.element.find('.advanced-filters').removeClass('sticky sticky-header').removeAttr('style');
-      that.element.find('.tree-footer').removeClass('sticky sticky-footer').removeAttr('style').hide();
       if (can_load) {
         load().done(function(data) {
           that.element.find('.spinner').hide();
           if(typeof data === 'undefined') return;
           if (data[collection_name] && data[collection_name].length > 0) {
-            that.options.list.replace(data[collection_name]);
+            that.enqueue_items(data[collection_name]);
           }
           that.options.pager = data.paging;
           that.context.attr("pager", data.paging);
-          that.element.find('.tree-footer').show();
         });
       }
+    }
+  , reset_sticky_clone : function(){
+      this.element.find('.sticky-clone').remove();
+      this.element.find('.advanced-filters').removeClass('sticky sticky-header').removeAttr('style');
+      this.element.find('.tree-footer').removeClass('sticky sticky-footer').removeAttr('style').hide();
+      this.element.find('.tree-footer').show();
     }
 
   , ".search-filters input[name=search] change" : function(el, ev) {

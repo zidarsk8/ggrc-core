@@ -23,11 +23,11 @@ dashboard-js-files:
   - bootstrap-typeahead.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
-  - can.jquery.js 
-  - can.construct.super.js 
-  - can.map.validations.js 
-  - can.control.plugin.js 
-  - can.construct.proxy.js 
+  - can.jquery.js
+  - can.construct.super.js
+  - can.map.validations.js
+  - can.control.plugin.js
+  - can.construct.proxy.js
   - can.map.attributes.js
   - bootstrap/modal-ajax.js
   - bootstrap/affix.js
@@ -61,7 +61,6 @@ dashboard-js-files:
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
-  - controllers/list_view_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
@@ -70,6 +69,7 @@ dashboard-js-files:
   - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
+  - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controls/control.js
