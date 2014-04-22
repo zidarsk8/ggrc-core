@@ -352,7 +352,7 @@ class ModelView(View):
 
   def _get_matching_types(self, model):
     mapper = model._sa_class_manager.mapper
-    if len(mapper.self_and_descendants) == 1:
+    if len(list(mapper.self_and_descendants)) == 1:
       return mapper.class_.__name__
     else:
       # FIXME: Actually needs to use 'self_and_descendants'
