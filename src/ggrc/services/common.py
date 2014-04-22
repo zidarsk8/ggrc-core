@@ -19,18 +19,18 @@ from exceptions import TypeError
 from flask import url_for, request, current_app, g, has_request_context
 from flask.ext.sqlalchemy import Pagination
 from flask.views import View
-from ggrc import db
+from ggrc import db, utils
 from ggrc.utils import as_json, UnicodeSafeJsonWrapper, benchmark
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
-from ggrc.login import get_current_user_id
+from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.context import Context
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from sqlalchemy.exc import IntegrityError
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
@@ -59,6 +59,10 @@ def _get_cache_manager():
 
 
 def get_cache_key(obj, type=None, id=None):
+  if isinstance(type, (str, unicode)):
+    model = ggrc.models.get_model(type)
+    assert model is not None, "Invalid model name: {}".format(type)
+    type = ggrc.models.get_model(type)._inflector.table_plural
   if type is None:
     type = obj._inflector.table_plural
   if id is None:
@@ -79,8 +83,8 @@ def get_related_keys_for_expiration(context, o):
       if polymorph:
         key = get_cache_key(
             None,
-            ggrc.models.get_model(getattr(o, '{0}_type'.format(attr)))._inflector.table_plural,
-            getattr(o, '{0}_id'.format(attr)))
+            type=getattr(o, '{0}_type'.format(attr)),
+            id=getattr(o, '{0}_id'.format(attr)))
         keys.append(key)
       else:
         obj = getattr(o, attr, None)
@@ -312,6 +316,74 @@ class ModelView(View):
   def modified_at(self, obj):
     return getattr(obj, self.modified_attr_name)
 
+  def _get_type_select_column(self, model):
+    mapper = model._sa_class_manager.mapper
+    if mapper.polymorphic_on is None:
+    #if len(mapper.self_and_descendants) == 1:
+      type_column = sqlalchemy.literal(mapper.class_.__name__)
+    else:
+      # Handle polymorphic types with CASE
+      type_column = sqlalchemy.case(
+          value=mapper.polymorphic_on,
+          whens={
+            val: m.class_.__name__
+              for val, m in mapper.polymorphic_map.items()
+            })
+    return type_column
+
+  def _get_type_where_clause(self, model):
+    mapper = model._sa_class_manager.mapper
+    if mapper.polymorphic_on is None:
+      return True
+    else:
+      mappers = list(mapper.self_and_descendants)
+      polymorphic_on_values = list(
+          val
+          for val, m in mapper.polymorphic_map.items()
+          if m in mappers)
+      return mapper.polymorphic_on.in_(polymorphic_on_values)
+
+  #def _get_polymorphic_column(self, model):
+  #  mapper = model._sa_class_manager.mapper
+  #  if len(mapper.self_and_descendants) > 1:
+  #    return mapper.polymorphic_on
+  #  else:
+  #    return sqlalchemy.literal(mapper.class_.__name__)
+
+  def _get_matching_types(self, model):
+    mapper = model._sa_class_manager.mapper
+    if len(mapper.self_and_descendants) == 1:
+      return mapper.class_.__name__
+    else:
+      # FIXME: Actually needs to use 'self_and_descendants'
+      return [m.class_.__name__ for m in mapper.self_and_descendants]
+
+  def get_match_columns(self, model):
+    mapper = model._sa_class_manager.mapper
+    columns = []
+    columns.append(mapper.primary_key[0].label('id'))
+    #columns.append(model.id.label('id'))
+    columns.append(self._get_type_select_column(model).label('type'))
+    columns.append(mapper.c.context_id.label('context_id'))
+    columns.append(mapper.c.updated_at.label('updated_at'))
+    #columns.append(self._get_polymorphic_column(model))
+    return columns
+
+  def get_collection_matches(self, model, filter_by_contexts=True):
+    columns = self.get_match_columns(self.model)
+    query = db.session.query(*columns).filter(
+        self._get_type_where_clause(model))
+    return self.filter_query_by_request(
+      query, filter_by_contexts=filter_by_contexts)
+
+  def get_resource_match_query(self, model, id):
+    columns = self.get_match_columns(model)
+    query = db.session.query(*columns).filter(
+        and_(
+          self._get_type_where_clause(model),
+          columns[0] == id))
+    return query
+
   # Default model/DB helpers
   def get_collection(self, filter_by_contexts=True):
     if '__stubs_only' not in request.args and \
@@ -319,6 +391,10 @@ class ModelView(View):
       query = self.model.eager_query()
     else:
       query = db.session.query(self.model)
+    return self.filter_query_by_request(
+        query, filter_by_contexts=filter_by_contexts)
+
+  def filter_query_by_request(self, query, filter_by_contexts=True):
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
@@ -337,6 +413,18 @@ class ModelView(View):
         if j_contexts is not None:
           query = query.filter(
               context_query_filter(j_class.context_id, j_contexts))
+    if '__search' in request.args:
+      terms = request.args['__search']
+      types = self._get_matching_types(self.model)
+      indexer = get_indexer()
+      search_query = indexer._get_type_query(types, 'read', None)
+      search_query = and_(search_query, indexer._get_filter_query(terms))
+      search_query = db.session.query(indexer.record_type.key).filter(search_query)
+      if '__mywork' in request.args:
+        search_query = indexer._add_owner_query(
+            search_query, types, get_current_user_id())
+      search_subquery = search_query.subquery()
+      query = query.filter(self.model.id.in_(search_subquery))
     order_properties = []
     if '__sort' in request.args:
       sort_attrs = request.args['__sort'].split(",")
@@ -662,314 +750,183 @@ class Resource(ModelView):
     return self.json_success_response(
       object_for_json, self.modified_at(obj))
 
+  def has_cache(self):
+    return getattr(settings, 'MEMCACHE_MECHANISM', False)
+
+  def apply_paging(self, matches_query):
+    page_number = int(request.args['__page'])
+    page_size = min(
+        int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
+        self.MAX_PAGE_SIZE)
+    matches = matches_query\
+        .limit(page_size)\
+        .offset((page_number-1)*page_size)\
+        .all()
+    if page_number == 1 and len(matches) < page_size:
+      total = len(matches)
+    else:
+      total = matches_query.distinct().count()
+      #total = matches_query.from_self(self.model.id).distinct().order_by(None).count()
+    page = Pagination(
+        matches_query, page_number, page_size, total, matches)
+    collection_extras = {
+        'paging': self.build_page_object_for_json(page)
+        }
+    return matches, collection_extras
+
+  def get_matched_resources(self, matches):
+    cache_objs = {}
+    if self.has_cache():
+      self.request.cache_manager = _get_cache_manager()
+      with benchmark("Query cache for resources"):
+        cache_objs = self.get_resources_from_cache(matches)
+      database_matches = [m for m in matches if m not in cache_objs]
+    else:
+      database_matches = matches
+
+    database_objs = {}
+    if len(database_matches) > 0:
+      with benchmark("Query database for resources"):
+        database_objs = self.get_resources_from_database(matches)
+      if self.has_cache():
+        with benchmark("Add resources to cache"):
+          self.add_resources_to_cache(database_objs)
+    return cache_objs, database_objs
+
   def collection_get(self):
     if 'Accept' in self.request.headers and \
         'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
         'application/json', 406, [('Content-Type', 'text/plain')]))
 
-    cache_supported = False
-    if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
-      stubs_in_args = '__stubs_only' in request.args
-      if stubs_in_args:
-        category = 'stubs'
-      else:
-        category = 'collection'
-      model_plural = self.model._inflector.table_plural
-      cache_response = None
-      collection_name = '{0}_collection'.format(model_plural)
-      self.request.cache_manager = _get_cache_manager()
-      cache_supported=self.request.cache_manager.is_caching_supported(category, model_plural)
-      if cache_supported:
-        with benchmark("Get resource collection from Memcache"):
-          cache_response = self.get_collection_from_cache(category, model_plural, collection_name, model_plural)
-        if cache_response is not None:
-          current_app.logger.info("CACHE: Successfully response from cache for resource collection: " + model_plural)
-          return cache_response
-      else:
-        current_app.logger.info("CACHE: Caching is not supported for " + \
-          model_plural + " in " + category + " category")
+    matches_query = self.get_collection_matches(self.model)
 
-    with benchmark("Query for collection"):
-      objs = self.get_collection()
+    matches = None
+    extras = None
+    if '__page' in request.args:
+      matches, extras = self.apply_paging(matches_query)
+    else:
+      matches = matches_query.all()
+      extras = {}
+
+    cache_op = None
+    if '__stubs_only' in request.args:
+      objs = [{
+          'id': m[0],
+          'type': m[1],
+          'href': utils.url_for(m[1], id=m[0]),
+          'context_id': m[2]
+          } for m in matches]
+
+    else:
+      cache_objs, database_objs = self.get_matched_resources(matches)
+
+      objs = {}
+      objs.update(cache_objs)
+      objs.update(database_objs)
+
+      objs = [objs[m] for m in matches if m in objs]
+
+      with benchmark("Filter resources"):
+        objs = self.filter_resource(objs)
+
+      cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
 
     with benchmark("Serialize collection"):
-      collection = self.collection_for_json(objs)
+      collection = self.build_collection_representation(
+          objs, extras=extras)
 
     if 'If-None-Match' in self.request.headers and \
         self.request.headers['If-None-Match'] == self.etag(collection):
       return current_app.make_response((
         '', 304, [('Etag', self.etag(collection))]))
 
-    # Write collection to cache, if caching is supported for the model
-    #
-    if cache_supported:
-      with benchmark("Check status entries in Memcache"):
-        cache_in_progress=self.is_caching_in_progress(category, model_plural)
-      if cache_in_progress is False:
-        with benchmark("Write resource collection to Memcache"):
-          cache_response = self.write_collection_to_cache(collection, category, model_plural,\
-                                collection_name, model_plural)
-      else:
-        current_app.logger.warn("CACHE: Cache operation in progress state, Unable to write collection to cache for resource: "  +\
-          model_plural + " in " + category + " category")
-
-    filter_collection = self.filter_collection(collection_name, model_plural, collection)
     return self.json_success_response(
-      filter_collection, self.collection_last_modified(), cache_op='Miss')
+      collection, self.collection_last_modified(), cache_op=cache_op)
 
-  def is_caching_in_progress(self, category, resource):
-    """Check the current state of cache and in progress
+  def filter_resource(self, resource, depth=0, user_permissions=None):
+    if user_permissions is None:
+      user_permissions = permissions.permissions_for(get_current_user())
 
-    Calls the cachemanager to do a bulk GET of status of any operation in cache for the resource 
-    The status entries for create, update and delete operation is maintained in memcache
-    
-    Args:
-       category: collection
-       resource: regulations, programs, controls, etc.
-
-    Returns:
-      True if any resource is question has operation in progress (All or None policy)
-      False otherwise
-    """
-    if self.request.cache_manager is None:
-      current_app.logger.warn("CACHE: CacheManager is not initialized")
-      return False
-
-    # Check in cache for collection and stubs to determine if cache needs to be invalidated
-    #
-    status_keys=[]
-    cacheobjids = request.args.get('id__in', False)
-    if cacheobjids and hasattr(self.model, 'eager_query'):
-      for id in cacheobjids:
-        status_keys.append('DeleteOp:' + category + ':' + resource + ':' + str(id))
-    else:
-      return False
-
-    result = self.request.cache_manager.bulk_get(status_keys)
-    if len(result) > 0:
-      for key, value in result:
-        status = value['status']
-        if status == 'InProgress':
-          return True
-
-    return False
-
-  def filter_collection(self, name, resource, collection_data):
-    """ Filter JSON collection that have read permission
-
-    The collection GET gets all items with inclusion_filter set to True. The colleciton items are filtered
-    with read permission checks on the the items 
-
-    Args:
-       name: collection name such as regulations_collection
-       resource: regulations
-       collection_data : GET collection JSON response
-
-    Returns:
-     filter_data : Filtered collection data after adding only 
-    """
-    cacheobjids = request.args.get('id__in', False)
-    if not (cacheobjids and hasattr(self.model, 'eager_query')):
-      return collection_data
-
-    data = collection_data[name][resource]
-    filter_data = {name: {resource: []}}
-    for attrs in data:
-      context_id = self.get_context_id_from_json(attrs)
-      if not permissions.is_allowed_read(self.model.__name__, context_id):
-        current_app.logger.warn("CACHE: Read permissions is not allowed for id: " + str(id))
-        continue
-      filter_attrs=self.filter_relationship_attrs(None, attrs)
-      filter_data[name][resource].append(filter_attrs)
-    filter_data[name]['selfLink'] = collection_data[name]['selfLink']
-    return filter_data
-
-  def filter_relationship_attrs(self, id, attrs):
-    """ Filter relationship that have read permission
-
-    Traverse through JSON representation in cache and find attributes with "RelationshipProperty"
-    The relationship property value dictionary keys 'type' and 'context' are extracted.
-    If context is not None, RBAC permission allowed_for_read permission is performed and filtered if needed. 
-    
-    Args:
-       id: Resource ID
-       attrs: dictionary containing JSON representation in cache
-
-    Returns:
-      filter_attrs: Dictionary that filters out relationship items that pass RBAC permission checks
-    """
-
-    filter_attrs={}
-    for key, val in attrs.items():
-      filter_attrs[key] = val
-      if hasattr(self.model, key):
-        class_attr = getattr(self.model, key)
-        if (isinstance(class_attr, InstrumentedAttribute) and \
-            isinstance(class_attr.property, RelationshipProperty)) or \
-            isinstance(class_attr, AssociationProxy):
-          if type(val) is list:
-            updated_val=[]
-            for item in val:
-              if self.is_read_allowed_for_item(key, item):
-                if type(item) is dict:
-                  for sub_key, sub_val in item.items():
-                    if not self.is_read_allowed_for_item(sub_key, sub_val):
-                      item[sub_key] = None
-                updated_val.append(item)
-              #if self.is_read_allowed_for_item(key, item):
-              #  updated_val.append(item)
-            filter_attrs[key] = updated_val
-          else:
-            if not self.is_read_allowed_for_item(key, val):
-              filter_attrs[key] = None
-    return filter_attrs
-
-  def is_read_allowed_for_item(self, key, item):
-    """  Check allowed for each item of type dictionary
-
-    Get context_id for given dictionary item and check if there are permissions to read for the item
-    dictionary with keys type and context (or context_id)
-    
-    Args:
-       key:  name of the resource item
-       item: dictionary with keys type, context (or context_id)
-
-    Returns:
-      True if read permissions allowed or item is not a dictionary, type for the item is not found,
-            context or context-id is not set in the item to check
-      False otherwise
-    """
-    if type(item) is not dict:
-      return True
-    type_found    = item.has_key('type')
-    context_found = item.has_key('context')
-    context_id = None
-    if type_found:
-      item_type = item['type']
-      if context_found:
-        if item['context'] is not None and item['context'].has_key('id'):
-          context_id = item['context']['id']
-        elif item['context'] is not None and item.has_key('context_id'):
-          context_id = item['context_id']
-        elif item['context'] is None:
+    if type(resource) in (list, tuple):
+      filtered = []
+      for sub_resource in resource:
+        filtered_sub_resource = self.filter_resource(
+            sub_resource, depth=depth+1, user_permissions=user_permissions)
+        if filtered_sub_resource is not None:
+          filtered.append(filtered_sub_resource)
+      return filtered
+    elif type(resource) is dict and 'type' in resource:
+      # First check current level
+      context_id = False
+      if 'context' in resource:
+        if resource['context'] is None:
           context_id = None
         else:
-          current_app.logger.warn("CACHE: context-1 is not available for key: " + key + " item: " + str(item))
-          return True
-      else:
-        if item.has_key('context_id'):
-          context_id = item['context_id']
-        else:
-          current_app.logger.warn("CACHE: context-2 is not available for key: " + key + " item: " + str(item))
-          return True
-      if not permissions.is_allowed_read(item_type, context_id):
-        current_app.logger.warn("CACHE: Read Permission not allowed key: " + str(key) + " value: " + str(item))
-        return False
-      else:
-        return True
-    else:
-      return True
+          context_id = resource['context']['id']
+      elif 'context_id' in resource:
+        context_id = resource['context_id']
+      assert context_id is not False, "No context found for object"
 
-  def get_collection_from_cache(self, category, resource, x_category, x_resource):
-    """Get collection (objects or stubs) from cache
-
-    Parse the request arguments and handles stubs and eager query related collection requests
-    Invokes cache manager interface to get collection from cache (e.g. memcache) 
-    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
-    
-    Args:
-       category: collection 
-       resource: regulations, programs, controls, etc.
-       x_category: Output category for the JSON response (resource_collection)
-       x_resource: Output resource for JSON response (resource)
-
-    Returns:
-      None if any one of the entries is not found in cache, caching is not supported for the resource, 
-           request is not a collection
-      JSON response on successfully retreiving entries from cache, caching is supported, and
-           request is an eager query and collection 
-    """
-    if self.request.cache_manager is None:
-      current_app.logger.warn("CACHE: CacheManager is not initialized")
-      return None
-
-    cacheobjids = request.args.get('id__in', False)
-    etag = request.args.get('_', False)
-    if cacheobjids and hasattr(self.model, 'eager_query'):
-      cacheobjidstr = cacheobjids.replace(',', '%2C')
-      ids = [long(i) for i in cacheobjids.split(',')]
-      filter={'ids':ids, 'attrs':None}
-      data = self.request.cache_manager.get_collection(category, resource, filter)
-      if data is not None and len(data) > 0:
-        converted_data = {x_category: {x_resource: []}}
-        for id, attrs in data.items():
-          context_id = self.get_context_id_from_json(attrs)
-          if not permissions.is_allowed_read(self.model.__name__, context_id):
-            continue
-          filter_attrs=self.filter_relationship_attrs(id, attrs)
-          converted_data[x_category][x_resource].append(filter_attrs)
-        selfLink = self.url_for_preserving_querystring(),
-        converted_data[x_category]['selfLink'] = selfLink
-        controls_data = converted_data[x_category][x_resource]
-        if len(controls_data) > 0:
-          return self.json_success_response(converted_data, datetime.datetime.now(), cache_op='Hit')
-        else:
-          return None
-      else:
+      if not user_permissions.is_allowed_read(resource['type'], context_id):
         return None
-    else:
-      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
-      return None
-
-  def write_collection_to_cache(self, collection, category, resource, x_category, x_resource):
-    """Write collection (objects) to cache
-
-    Parse the request arguments and handles eager query related collection requests
-    Invokes cache manager interface to write collection into cache (e.g. memcache) 
-    The collection entry key is collection.<resource>.<id> and value is JSON object (dictionary of attr names, values)
-    
-    Args:
-       collection: JSON object returned from SQLAlchemy data-ORM layer
-       category: collection, etc.
-       resource: regulations, programs, controls, etc.
-       x_category: Output category for the JSON response (resource_collection)
-       x_resource: Output resource for JSON response (resource)
-
-    Returns:
-      None Errors in writing to cache, caching is not supported for the resource, 
-           and request is not a collection
-      JSON response on successfully retreiving entries from cache, if caching is supported,
-           and request is an eager query and collection
-    """
-    if self.request.cache_manager is None:
-      current_app.logger.warn("CACHE: CacheManager is not initialized")
-      return None
-
-    cacheobjids=None
-    if category is 'collection':
-      cacheobjids = request.args.get('id__in', False)
-
-    if cacheobjids and hasattr(self.model, 'eager_query'):
-      if collection.has_key(x_category):
-        resource_collection= collection.get(x_category).get(x_resource)
-        cacheData={}
-        for aresource in resource_collection:
-          id = aresource['id']
-          cacheData[id] = deepcopy(aresource)
-        write_result = self.request.cache_manager.add_collection(category, resource, cacheData)
-        if write_result is None:
-          current_app.logger.warn("CACHE: Unable to write collection to cache")
-          return None
-        else:
-          current_app.logger.info("CACHE: Successfully written collection to cache")
-          return write_result
       else:
-        current_app.logger.error("CACHE: Unable to find data in source collection for model: " + resource)
-        return None
+        # Then, filter any typed keys
+        for key, value in resource.items():
+          if key == 'context':
+            # Explicitly allow `context` objects to pass through
+            pass
+          else:
+            if type(value) is dict and 'type' in value:
+              resource[key] = self.filter_resource(
+                  value, depth=depth+1, user_permissions=user_permissions)
+        return resource
     else:
-      current_app.logger.info("CACHE: Caching is only supported for collection for model: " + resource)
-      return None
+      assert False, "Non-object passed to filter_resource"
+
+  def get_resources_from_cache(self, matches):
+    """Get resources from cache for specified matches"""
+    resources = {}
+    # Skip right to memcache
+    memcache_client = self.request.cache_manager.cache_object.memcache_client
+    key_matches = {}
+    keys = []
+    for match in matches:
+      key = get_cache_key(None, id=match[0], type=match[1])
+      key_matches[key] = match
+      keys.append(key)
+    while len(keys) > 0:
+      slice_keys = keys[:32]
+      keys = keys[32:]
+      result = memcache_client.get_multi(slice_keys)
+      for key in result:
+        if 'selfLink' in result[key]:
+          resources[key_matches[key]] = result[key]
+    return resources
+
+  def add_resources_to_cache(self, match_obj_pairs):
+    """Add resources to cache if they are not blocked by DeleteOp entries"""
+    # Skip right to memcache
+    memcache_client = self.request.cache_manager.cache_object.memcache_client
+    key_objs = {}
+    key_blockers = {}
+    keys = []
+    for match, obj in match_obj_pairs.items():
+      key = get_cache_key(None, id=match[0], type=match[1])
+      delete_op_key = "DeleteOp:{}".format(key)
+      keys.append(key)
+      key_objs[key] = obj
+      key_blockers[key] = delete_op_key
+    while len(keys) > 0:
+      slice_keys = keys[:32]
+      keys = keys[32:]
+      blocker_keys = [key_blockers[key] for key in slice_keys]
+      result = memcache_client.get_multi(blocker_keys)
+      # Reduce `slice_keys` to only unblocked keys
+      slice_keys = [
+          key for key in slice_keys if key_blockers[key] not in result]
+      memcache_client.add_multi(
+          {key: key_objs[key] for key in slice_keys})
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
@@ -1077,13 +1034,6 @@ class Resource(ModelView):
   def as_json(cls, obj, **kwargs):
     return as_json(obj, **kwargs)
 
-  def object_for_json(self, obj, model_name=None, properties_to_include=None):
-    model_name = model_name or self.model._inflector.table_singular
-    json_obj = ggrc.builder.json.publish(
-        obj, properties_to_include or [], inclusion_filter)
-    json_obj = ggrc.builder.json.publish_representation(json_obj)
-    return { model_name: json_obj }
-
   def get_properties_to_include(self, inclusions):
     #FIXME This needs to be improved to deal with branching paths... if that's
     #desirable or needed.
@@ -1127,56 +1077,47 @@ class Resource(ModelView):
     paging_obj['total'] = paging.total
     return paging_obj
 
-  def build_collection_for_json(
-      self, objects, model_plural, collection_name, paging=None):
-    objects_json = []
-    stubs = '__stubs_only' in request.args
-    for obj in objects:
-      if not stubs:
-        object_for_json = ggrc.builder.json.publish(
-            obj,
-            self.get_properties_to_include(request.args.get('__include'))
-            )
-      else:
-        object_for_json = ggrc.builder.json.publish_stub(
-            obj, (), inclusion_filter)
-      objects_json.append(object_for_json)
-    objects_json = ggrc.builder.json.publish_representation(objects_json)
-    collection_json = {
+  def get_resources_from_database(self, matches):
+    # FIXME: This is cheating -- `matches` should be allowed to be any model
+    model = self.model
+    ids = { m[0]: m for m in matches }
+    query = model.eager_query()
+    objs = query.filter(model.id.in_(ids.keys()))
+    resources = {}
+    includes = self.get_properties_to_include(request.args.get('__include'))
+    for obj in objs:
+      resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
+    ggrc.builder.json.publish_representation(resources)
+    return resources
+
+  def build_collection_representation(self, objs, extras=None):
+    table_plural = self.model._inflector.table_plural
+    collection_name = '{0}_collection'.format(table_plural)
+    resource = {
         collection_name: {
           'selfLink': self.url_for_preserving_querystring(),
-          model_plural: objects_json,
+          table_plural: objs,
           }
         }
-    if paging:
-      collection_json[collection_name]['paging'] = \
-          self.build_page_object_for_json(paging)
-    return collection_json
+    if extras:
+      resource[collection_name].update(extras)
+    return resource
 
-  def paged_collection_for_json(
-      self, query, model_plural, collection_name):
-    page_number = int(request.args['__page'])
-    page_size = min(
-        int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
-        self.MAX_PAGE_SIZE)
-    items = query.limit(page_size).offset((page_number-1)*page_size).all()
-    if page_number == 1 and len(items) < page_size:
-      total = len(items)
-    else:
-      total = query.from_self().order_by(None).count()
-    page = Pagination(query, page_number, page_size, total, items)
-    return self.build_collection_for_json(
-        page.items, model_plural, collection_name, paging=page)
+  def object_for_json(self, obj, model_name=None, properties_to_include=None):
+    model_name = model_name or self.model._inflector.table_singular
+    json_obj = ggrc.builder.json.publish(
+        obj, properties_to_include or [], inclusion_filter)
+    ggrc.builder.json.publish_representation(json_obj)
+    return { model_name: json_obj }
 
-  def collection_for_json(
-      self, objects, model_plural=None, collection_name=None):
-    model_plural = model_plural or self.model._inflector.table_plural
-    collection_name = collection_name or '{0}_collection'.format(model_plural)
-    if '__page' in request.args:
-      return self.paged_collection_for_json(
-          objects, model_plural, collection_name)
-    return self.build_collection_for_json(
-        objects, model_plural, collection_name)
+  def build_resource_representation(self, obj, extras=None):
+    table_singular = self.model._inflector.table_singular
+    resource = {
+        table_singular: obj,
+        }
+    if extras:
+      resource.update(extras)
+    return resource
 
   def http_timestamp(self, timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
