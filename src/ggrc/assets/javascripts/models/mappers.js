@@ -250,10 +250,15 @@
     , refresh_list: function() {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
+          , self = this
           ;
 
         binding.name = this.name + "_instances";
-        return binding.refresh_instances(this);
+        //  FIXME: `refresh_instances` should not need to be called twice, but
+        //  it fixes pre-mature resolution of mapping deferreds in some cases
+        return binding.refresh_instances(this).then(function(){
+          return self.refresh_instances();
+        });
       }
 
     , refresh_instance: function() {
