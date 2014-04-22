@@ -254,6 +254,8 @@
           ;
 
         binding.name = this.name + "_instances";
+        //  FIXME: `refresh_instances` should not need to be called twice, but
+        //  it fixes pre-mature resolution of mapping deferreds in some cases
         return binding.refresh_instances(this).then(function(){
           return self.refresh_instances();
         });
