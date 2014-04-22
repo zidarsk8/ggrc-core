@@ -12,9 +12,7 @@ Feature: Collections can be paged
     And a new "<resource_type>" named "resource2"
     And a new "<resource_type>" named "resource3"
     And "resource1" is POSTed to its collection
-    And wait
     And "resource2" is POSTed to its collection
-    And wait
     And "resource3" is POSTed to its collection
     When Querying "<resource_type>" with "__page=1&__page_size=2"
     Then query result selfLink query string is "__page=1&__page_size=2"

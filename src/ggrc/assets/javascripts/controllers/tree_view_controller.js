@@ -283,7 +283,10 @@ can.Control("CMS.Controllers.TreeView", {
   }
 
   , display: function() {
-      var that = this;
+      var that = this
+        , tracker_stop = GGRC.Tracker.start(
+            "TreeView", "display", this.options.model.shortName)
+        ;
 
       if (this._display_deferred) {
         return this._display_deferred;
@@ -294,7 +297,7 @@ can.Control("CMS.Controllers.TreeView", {
       this._display_deferred.then(function() {
         return $.when(that.fetch_list(), that.init_view())
           .then(that.proxy("draw_list"));
-      });
+      }).done(tracker_stop);
 
       return this._display_deferred;
     }
