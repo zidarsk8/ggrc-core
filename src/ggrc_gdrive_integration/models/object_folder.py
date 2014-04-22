@@ -70,3 +70,11 @@ class Folderable(object):
   _publish_attrs = [
       'object_folders',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Folderable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('object_folders'))

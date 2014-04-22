@@ -146,3 +146,16 @@ class ContextImplication(Base, db.Model):
         source_context=source_context_display_name,
         context=context_display_name,
         )
+
+
+import ggrc.models.all_models
+
+ggrc.models.all_models.Role = Role
+ggrc.models.all_models.UserRole = UserRole
+ggrc.models.all_models.ContextImplication = ContextImplication
+ggrc.models.all_models.Role._inflector
+ggrc.models.all_models.UserRole._inflector
+ggrc.models.all_models.ContextImplication._inflector
+ggrc.models.all_models.all_models.extend([Role, UserRole, ContextImplication])
+ggrc.models.all_models.__all__.extend(
+    ["Role", "UserRole", "ContextImplication"])

@@ -11,6 +11,10 @@ from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
 from ggrc.services.common import get_modified_objects, update_index
+from ggrc.services.common import update_memcache_before_commit, update_memcache_after_commit
+from ggrc.utils import benchmark
+
+CACHE_EXPIRY_IMPORT=600
 
 class BaseConverter(object):
 
@@ -195,7 +199,11 @@ class BaseConverter(object):
       row_converter.run_after_save_hooks(db.session, **self.options)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session)
+    with benchmark("Update memcache before commit for import"):
+      update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
     db.session.commit()
+    with benchmark("Update memcache after commit for import"):
+      update_memcache_after_commit(self)
     update_index(db.session, modified_objects)
 
   def set_import_stats(self):
@@ -248,7 +256,12 @@ class BaseConverter(object):
       for key in row_header_map.keys():
         field = row_header_map[key]
         field_val = row.get(field, '')
-        field_val = field_val if isinstance(field_val, basestring) else ''
+        # Ensure non-basestrings are rendered on export
+        if not isinstance(field_val, basestring):
+          if field_val is None:
+            field_val = ''
+          else:
+            field_val = str(field_val)
         csv_row.append(field_val)
       csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 

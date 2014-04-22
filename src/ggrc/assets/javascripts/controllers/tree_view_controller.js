@@ -98,7 +98,10 @@ can.Control("CMS.Controllers.TreeLoader", {
     return this._prepare_deferred;
   }
   , display: function() {
-      var that = this;
+      var that = this
+        , tracker_stop = GGRC.Tracker.start(
+            "TreeView", "display", this.options.model.shortName)
+        ;
 
       if (this._display_deferred) {
         return this._display_deferred;
@@ -109,7 +112,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       this._display_deferred.then(function() {
         return $.when(that.fetch_list(), that.init_view())
           .then(that.proxy("draw_list"));
-      });
+      }).done(tracker_stop);
 
       return this._display_deferred;
     }
@@ -430,6 +433,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       return this.find_all_deferred;
     }
   }
+
   , display_path: function(path) {
       var that = this
         , rest = path.split("/")

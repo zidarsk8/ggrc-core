@@ -10,3 +10,4 @@ FULLTEXT_INDEXER = 'ggrc.fulltext.mysql.MysqlIndexer'
 # Cannot access filesystem on AppEngine or when using SDK
 AUTOBUILD_ASSETS = False
 SQLALCHEMY_RECORD_QUERIES = True
+MEMCACHE_MECHANISM = True
