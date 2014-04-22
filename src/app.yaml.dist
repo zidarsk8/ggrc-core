@@ -31,7 +31,7 @@ libraries:
     version: "2.6"
 
 builtins:
-- remote_api
+- remote_api: on
 
 # Don't upload some files
 #  - note the first 9 items are defaults, see:
