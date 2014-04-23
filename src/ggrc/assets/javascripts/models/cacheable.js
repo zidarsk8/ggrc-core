@@ -749,7 +749,7 @@ can.Model("can.Model.Cacheable", {
     if(!this._pending_refresh) {
       this._pending_refresh = {
         dfd : new $.Deferred()
-        , fn : $.debounce(1000, function() {
+        , fn : $.throttle(1000, function() {
           var dfd = that._pending_refresh.dfd;
           delete that._pending_refresh;
           $.ajax({
@@ -766,7 +766,7 @@ can.Model("can.Model.Cacheable", {
           .fail(function() {
             dfd.reject.apply(dfd, arguments);
           });
-        })
+        }, true)
       };
     }
     this._pending_refresh.fn();

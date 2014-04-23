@@ -27,6 +27,9 @@ function get_template_path(url) {
 
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
+
+var mustacheResolvers = {};
+
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
@@ -34,20 +37,32 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   if (template) {
     return {
       send: function(headers, completeCallback) {
-        function done() {
-          if (template)
+        if (options.async) {
+          if(!mustacheResolvers[template_path]) {
+            mustacheResolvers[template_path] = new $.Deferred();
+            function done() {
+              if (template) {
+                mustacheResolvers[template_path].resolve();
+                //delete mustacheResolvers[template_path];
+              }
+            }
+            //Use requestAnimationFrame where possible because we want
+            // these to run as quickly as possible but still release
+            // the thread.
+            (window.requestAnimationFrame || window.setTimeout)(done, 0);
+          }
+          mustacheResolvers[template_path].done(function(){
+              completeCallback(200, "success", { text: template });
+          });
+        } else {
             completeCallback(200, "success", { text: template });
         }
-        if (options.async)
-          setTimeout(done, 0);
-        else
-          done();
       },
 
       abort: function() {
         template = null;
       }
-    }
+    };
   }
 });
 
