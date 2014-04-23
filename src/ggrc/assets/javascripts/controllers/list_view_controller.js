@@ -261,6 +261,12 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
     if(list) {
       if(!this.options.list){
         this.options.list = new can.Observe.List();
+        list.on('add', function(list, item, index){
+          that.enqueue_items(item);
+        }).on('remove', function(list, item, index){
+          that.options.list.splice(index, 1);
+          that.element.find('ul.tree-open').removeClass('tree-open');
+        });
       }
       else{
         this.options.list.splice();

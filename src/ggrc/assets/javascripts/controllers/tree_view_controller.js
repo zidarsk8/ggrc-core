@@ -154,22 +154,6 @@ can.Control("CMS.Controllers.TreeLoader", {
     this._draw_list_deferred = this.enqueue_items(temp_list);
     return this._draw_list_deferred;
   }
-
-  , "{original_list} add" : function(list, ev, newVals, index) {
-    var that = this
-      , real_add = []
-      ;
-    can.each(newVals, function(newVal) {
-      var _newVal = newVal.instance ? newVal.instance : newVal;
-      if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
-        that.element && real_add.push(newVal);
-        //that.element.trigger("newChild", newVal);
-      }
-    });
-    delete that.oldList;
-    this.enqueue_items(real_add);
-  }
-
   , _loading_started: function() {
       if (!this._loading_deferred) {
         this._loading_deferred = new $.Deferred();
@@ -503,6 +487,20 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       return total_children;
     }));
     return v;
+  }
+  , "{original_list} add" : function(list, ev, newVals, index) {
+    var that = this
+      , real_add = []
+      ;
+    can.each(newVals, function(newVal) {
+      var _newVal = newVal.instance ? newVal.instance : newVal;
+      if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
+        that.element && real_add.push(newVal);
+        //that.element.trigger("newChild", newVal);
+      }
+    });
+    delete that.oldList;
+    this.enqueue_items(real_add);
   }
   , "{original_list} remove" : function(list, ev, oldVals, index) {
     var that = this;
