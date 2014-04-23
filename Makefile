@@ -10,9 +10,11 @@ PREFIX := $(shell pwd)
 DEV_PREFIX ?= $(PREFIX)
 DEV_PREFIX := $(shell cd $(DEV_PREFIX); pwd)
 
-APPENGINE_SDK_VERSION=1.8.4
+APPENGINE_SDK_VERSION=1.9.3
 APPENGINE_ZIP_NAME=google_appengine_$(APPENGINE_SDK_VERSION).zip
-APPENGINE_ZIP_HREF=http://googleappengine.googlecode.com/files/$(APPENGINE_ZIP_NAME)
+APPENGINE_ZIP_HREF=https://commondatastorage.googleapis.com/appengine-sdks/featured/$(APPENGINE_ZIP_NAME)
+# For App Engine SDK V.1.8.X, use this location:
+# APPENGINE_ZIP_HREF=http://googleappengine.googlecode.com/files/$(APPENGINE_ZIP_NAME)
 APPENGINE_ZIP_PATH=$(DEV_PREFIX)/opt/$(APPENGINE_ZIP_NAME)
 APPENGINE_SDK_PATH=$(DEV_PREFIX)/opt/google_appengine
 APPENGINE_SQLITE_PATCH_PATH=$(PREFIX)/extras/google_appengine__enable_sqlite3.diff
