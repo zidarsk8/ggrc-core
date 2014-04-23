@@ -742,7 +742,8 @@ can.Model("can.Model.Cacheable", {
   }
   , refresh : function(params) {
     var href = this.selfLink || this.href
-    , that = this;
+    , that = this
+    , pr;
 
     if (!href)
       return (new can.Deferred()).reject();
@@ -769,8 +770,9 @@ can.Model("can.Model.Cacheable", {
         }, true)
       };
     }
-    this._pending_refresh.fn();
-    return this._pending_refresh.dfd;
+    pr = this._pending_refresh; //might get deleted synchronously by fn()
+    pr.fn();
+    return pr.dfd;
   }
   , serialize : function() {
     var that = this, serial = {};
