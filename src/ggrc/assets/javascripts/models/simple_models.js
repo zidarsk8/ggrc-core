@@ -62,6 +62,11 @@ can.Model.Cacheable("CMS.Models.Program", {
   , init : function() {
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
+    this.validate(["title"], function(newVal, prop) {
+      if(newVal === "Invalid Title") {
+        return "That title is taken by another object; choose another.";
+      }
+    });
   }
 }, {
 });
