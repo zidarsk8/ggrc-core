@@ -536,6 +536,8 @@ can.Control("CMS.Controllers.LHN_Search", {
         , $ul = el.parent().find(selector)
         ;
 
+      // Needed because the `list_selector` selector matches the Recently Viewed
+      // list, which will cause errors
       if ($ul.length < 1) {
         return;
       }
