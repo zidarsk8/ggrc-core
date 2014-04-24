@@ -60,9 +60,20 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Market" : {}
   }
   , init : function() {
+    var that = this;
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
     this.validate(["title"], function(newVal, prop) {
+      var search_params = {
+        q: newVal
+      , counts_only: true
+      };
+      if (that.last_search === undefined || that.last_search !== newVal) {
+        that.last_search = newVal; // remember last search term
+        $.when($.get('/search', search_params)).done(function(data) {
+          console.log("search completed!");
+        });
+      }
       if(newVal === "Invalid Title") {
         return "That title is taken by another object; choose another.";
       }
