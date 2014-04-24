@@ -1150,6 +1150,8 @@ jQuery(function($){
 });
 
 jQuery(function($) {
+  // Trigger compilation of any remaining preloaded Mustache templates for
+  // faster can.view() response time.
 
   setTimeout(function() {
 

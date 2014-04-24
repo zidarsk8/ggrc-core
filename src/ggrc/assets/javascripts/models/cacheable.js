@@ -742,17 +742,15 @@ can.Model("can.Model.Cacheable", {
   }
   , refresh : function(params) {
     var href = this.selfLink || this.href
-    , that = this
-    , pr;
+    , that = this;
 
     if (!href)
       return (new can.Deferred()).reject();
     if(!this._pending_refresh) {
       this._pending_refresh = {
         dfd : new $.Deferred()
-        , fn : $.throttle(1000, function() {
+        , fn : $.throttle(1000, true, function() {
           var dfd = that._pending_refresh.dfd;
-          delete that._pending_refresh;
           $.ajax({
             url : href
             , params : params
@@ -766,13 +764,15 @@ can.Model("can.Model.Cacheable", {
           })
           .fail(function() {
             dfd.reject.apply(dfd, arguments);
+          })
+          .always(function() {
+            delete that._pending_refresh;
           });
-        }, true)
+        })
       };
     }
-    pr = this._pending_refresh; //might get deleted synchronously by fn()
-    pr.fn();
-    return pr.dfd;
+    this._pending_refresh.fn();
+    return this._pending_refresh.dfd;
   }
   , serialize : function() {
     var that = this, serial = {};
