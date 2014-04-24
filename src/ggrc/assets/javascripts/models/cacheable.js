@@ -757,6 +757,10 @@ can.Model("can.Model.Cacheable", {
             , type : "get"
             , dataType : "json"
           })
+          .then(function(resources) {
+            delete that._pending_refresh;
+            return resources;
+          })
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {
             d.updated();
@@ -764,9 +768,6 @@ can.Model("can.Model.Cacheable", {
           })
           .fail(function() {
             dfd.reject.apply(dfd, arguments);
-          })
-          .always(function() {
-            delete that._pending_refresh;
           });
         })
       };
