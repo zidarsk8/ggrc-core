@@ -374,8 +374,8 @@ can.Model("can.Model.Cacheable", {
   , newInstance : function(args) {
     var cache = can.getObject("cache", this, true);
     if(args && args[this.id] && cache[args[this.id]]) {
-      //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging 
-                                          // (merging -- adding properties from an object without removing existing ones 
+      //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
+                                          // (merging -- adding properties from an object without removing existing ones
                                           //  -- doesn't work in nested objects).  So we're just going to not merge properties.
       return cache[args[this.id]];
     } else {
@@ -613,6 +613,7 @@ can.Model("can.Model.Cacheable", {
 
   , get_list_counter: function(name) {
       var binding = this.get_binding(name);
+      if(!binding) return new $.Deferred().reject();
       return binding.refresh_count();
     }
 
@@ -630,7 +631,7 @@ can.Model("can.Model.Cacheable", {
   // This retrieves the potential orphan stats for a given instance
   // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
   , get_orphaned_count : function(){
-    
+
     if (!this.get_binding('orphaned_objects')) {
       return new $.Deferred().reject();
     }
