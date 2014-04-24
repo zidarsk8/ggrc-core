@@ -109,7 +109,7 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       this._display_deferred = $.when(this._attached_deferred, this.prepare());
 
-      this._display_deferred.then(function() {
+      this._display_deferred = this._display_deferred.then(function() {
         return $.when(that.fetch_list(), that.init_view())
           .then(that.proxy("draw_list"));
       }).done(tracker_stop);
