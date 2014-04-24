@@ -753,14 +753,17 @@ can.Model("can.Model.Cacheable", {
     if(!this._pending_refresh) {
       this._pending_refresh = {
         dfd : new $.Deferred()
-        , fn : $.debounce(1000, function() {
+        , fn : $.throttle(1000, true, function() {
           var dfd = that._pending_refresh.dfd;
-          delete that._pending_refresh;
           $.ajax({
             url : href
             , params : params
             , type : "get"
             , dataType : "json"
+          })
+          .then(function(resources) {
+            delete that._pending_refresh;
+            return resources;
           })
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {

@@ -27,6 +27,7 @@ function get_template_path(url) {
 
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
+
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
@@ -39,7 +40,10 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
             completeCallback(200, "success", { text: template });
         }
         if (options.async)
-          setTimeout(done, 0);
+          //Use requestAnimationFrame where possible because we want
+          // these to run as quickly as possible but still release
+          // the thread.
+          (window.requestAnimationFrame || window.setTimeout)(done, 0);
         else
           done();
       },
@@ -47,7 +51,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       abort: function() {
         template = null;
       }
-    }
+    };
   }
 });
 
