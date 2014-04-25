@@ -319,7 +319,7 @@ can.Control("CMS.Controllers.LHN", {
         prefs[0].setCollapsed(null, "lhs", $lhs.hasClass("lhs-closed"));
       })
     }
-  
+
   , min_lhn_size : 240
   , mousedown : false
   , dragged : false
@@ -334,13 +334,13 @@ can.Control("CMS.Controllers.LHN", {
     if(resize < this.min_lhn_size) return;
     if($lhs.hasClass("lhs-closed")) this.toggle_lhs();
     $lhsHolder.width(resize);
-    
+
     var a = (resize) + "px";
     var b = (resize+8) + "px"
     $area.css("margin-left",  b);
-    
+
     $bar.css("left", a)
-    
+
     $search.width(resize - 100);
     window.resize_areas();
     $(window).trigger('resize');
@@ -364,7 +364,7 @@ can.Control("CMS.Controllers.LHN", {
   , "{window} mouseup" : function(el, ev){
     var self = this;
     if(!this.mousedown) return;
-    
+
     this.mousedown = false;
     if(!this.dragged){
       this.toggle_lhs();
@@ -558,13 +558,13 @@ can.Control("CMS.Controllers.LHN_Search", {
         $siblings.slideUp().removeClass("in");
         // Expand this list
         $ul.slideDown().addClass("in");
-        
+
         // Remove active class from other lists
         holder.find('a.active').removeClass('active');
         // Add active class to this list
         el.addClass("active");
-        
-        // Compute the extra height to add to the expandable height, 
+
+        // Compute the extra height to add to the expandable height,
         // based on the size of the content that is sliding away.
         top = $content.offset().top;
         $siblings.filter(':visible').each(function() {
@@ -900,7 +900,9 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
       var offset = this.options.$extended.offset().top
         , height = this.options.$extended.height()
         // "- 24" compensates for the Chrome URL display when hovering a link
-        , window_height = $(window).height() - 24
+        // "348" should be the widht of the Chrome URL display when displaying javascript://
+        , window_height = $(window).height() + $(window).scrollTop() -
+            (this.options.$extended.offset().left > 348 ? 0 : 24)
         , new_offset
         ;
 
@@ -937,12 +939,12 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
       if (tooltip_view) {
         this.fade_in_timeout = null;
         can.view(tooltip_view, { instance: instance }, function(frag) {
-          
+
           var tooltip_width = self.options.$extended.outerWidth()
             , el_left = el.parent().offset().left
-            , offset_left = el_left - tooltip_width > 0 ? 
+            , offset_left = el_left - tooltip_width > 0 ?
                 el_left - tooltip_width : el_left + el.parent().width();
-          
+
           self.options.$extended
             .html(frag)
             .addClass('in')
