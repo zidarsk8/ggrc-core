@@ -1309,22 +1309,26 @@ Task = can.Model.extend({
 }, {});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
-  var model, params = {}, instance = null;
+  var model, params = {}, instance = null, href;
 
-  if(typeof object_type === "object") {
+  if(typeof object_type === "object" || object_type instanceof can.Stub) {
     //assume we only passed in params_or_object
     params_or_object = object_type;
     if (!params_or_object)
       return null;
-    object_type =
-      (params_or_object.constructor && params_or_object.constructor.shortName)
-      || (!params_or_object.selfLink && params_or_object.type)
-      || can.map(
-          window.cms_singularize(
-            /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
-          ).split("_")
-          , can.capitalize
+    if (params_or_object instanceof can.Model)
+      object_type = params_or_object.constructor.shortName;
+    else if (params_or_object instanceof can.Stub)
+      object_type = params_or_object.type;
+    else if (!params_or_object.selfLink && params_or_object.type)
+      object_type = params_or_object.type;
+    else {
+      href = params_or_object.selfLink || params_or_object.href;
+      object_type = can.map(
+          window.cms_singularize(/^\/api\/(\w+)\//.exec(href)[1]).split("_"),
+          can.capitalize
         ).join("");
+    }
     object_id = params_or_object.id;
   }
 

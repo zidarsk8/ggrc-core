@@ -20,23 +20,34 @@ can.Model.Cacheable("can.Model.Join", {
       //can.proxy(this, "reinit"));
 
         can.each(instance.constructor.join_keys, function(cls, key) {
+          var obj;
           if (instance[key].reify && instance[key].reify().refresh)
-            instance[key].reify().refresh();
-          else {
-            var obj =
-              cls.findInCacheById(instance[key].id);
-            obj && obj.refresh();
-          }
+            obj = instance[key].reify();
+          else
+            obj = cls.findInCacheById(instance[key].id);
+          if (obj)
+            obj.refresh();
         });
       }
     }
     if(this === can.Model.Join) {
       this.bind("created", reinit);
-      this.bind("destroyed", reinit);
+      //this.bind("destroyed", reinit);
     }
   }
 }, {
-    reinit : function() {//ev, data) {
+    init: function() {
+      this._super.apply(this, arguments);
+      var that = this;
+      can.each(this.constructor.join_keys, function(cls, key) {
+        that.bind(key + ".stub_destroyed", function() {
+          // Trigger `destroyed` on self, since it was destroyed on the server
+          that.destroyed();
+        });
+      });
+    }
+
+  , reinit : function() {//ev, data) {
       this.init_join_objects();
     }
   /* TODO: Dead code?
