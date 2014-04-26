@@ -520,9 +520,11 @@ can.Control("CMS.Controllers.LHN_Search", {
             prefs.save();
           }
         });
+      } else {
+        prefs_dfd = $.when(prefs);
       }
 
-      can.view(template_path, $.when(prefs_dfd).then(function() { return {}; })).done(function(frag, xhr) {
+      can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).done(function(frag, xhr) {
         var lhn_prefs = prefs.getLHNState();
 
         self.element.html(frag);
@@ -539,7 +541,9 @@ can.Control("CMS.Controllers.LHN_Search", {
             self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
           );
         }
-
+        if(lhn_prefs.search_text) {
+          self.run_search(lhn_prefs.search_text, self.current_params);
+        }
       });
     }
 
