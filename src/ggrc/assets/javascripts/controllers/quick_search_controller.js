@@ -211,6 +211,12 @@ can.Control("CMS.Controllers.LHN", {
       else {
         this.hide_lhn();
       }
+
+      self.lhs_holder_onscroll = $.debounce(250, function() {
+        self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
+      });
+      this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
+      
     }
 
   , should_show_lhn: function() {
@@ -251,11 +257,13 @@ can.Control("CMS.Controllers.LHN", {
           prefs[0].save();
         }
 
+        self.options.display_prefs = prefs[0];
+
         settings = prefs[0].getGlobal("lhs");
         checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
         self.obs.attr("my_work", checked);
 
-        $lhs.cms_controllers_lhn_search({ observer: self.obs });
+        $lhs.cms_controllers_lhn_search({ observer: self.obs, display_prefs: prefs[0] });
         $lhs.cms_controllers_lhn_tooltips();
 
         // Delay LHN initializations until after LHN is rendered
@@ -269,6 +277,16 @@ can.Control("CMS.Controllers.LHN", {
           if(!$lhs.hasClass("lhs-closed")) {
             $(".recent").ggrc_controllers_recently_viewed();
             self.size && self.resize_lhn(self.size);
+          }
+
+          function initial_scroll() {
+            self.element.find(".lhs-holder").scrollTop(self.options.display_prefs.getLHNState().panel_scroll || 0);
+          }
+
+          if(self.options.display_prefs.getLHNState().open_category) {
+            self.element.one("list_displayed", initial_scroll );
+          } else {
+            initial_scroll();
           }
         }, 200);
         self.size = prefs[0].getLHNavSize(null, "lhs") || self.min_lhn_size;
@@ -340,7 +358,7 @@ can.Control("CMS.Controllers.LHN", {
     $area.css("margin-left",  b);
     
     $bar.css("left", a)
-    
+
     $search.width(resize - 100);
     window.resize_areas();
     $(window).trigger('resize');
@@ -400,6 +418,11 @@ can.Control("CMS.Controllers.LHN", {
   , ".lhs-closed click": function(el, ev) {
       this.toggle_lhs();
     }
+
+  , destroy : function() {
+    this.element.find(".lhs-holder").off("scroll", self.lhs_holder_onscroll);
+    this._super && this._super.apply(this, arguments);
+  }
 });
 
 
@@ -482,13 +505,41 @@ can.Control("CMS.Controllers.LHN_Search", {
 }, {
     init: function() {
       var self = this
+        , prefs = this.options.display_prefs
+        , prefs_dfd
         , template_path = GGRC.mustache_path + this.element.data('template')
         ;
 
-      can.view(template_path, {}, function(frag, xhr) {
+
+      if(!prefs) {
+        prefs_dfd = CMS.Models.DisplayPrefs.findAll().then(function(d) {
+          if(d.length > 0) {
+            prefs = self.options.display_prefs = d[0];
+          } else {
+            prefs = self.options.display_prefs = new CMS.Models.DisplayPrefs();
+            prefs.save();
+          }
+        });
+      }
+
+      can.view(template_path, $.when(prefs_dfd).then(function() { return {}; })).done(function(frag, xhr) {
+        var lhn_prefs = prefs.getLHNState();
+
         self.element.html(frag);
         self.post_init();
-        self.element.find(".sub-level").cms_controllers_infinite_scroll();
+        self.element.find(".sub-level")
+          .cms_controllers_infinite_scroll()
+          .on("scroll", $.debounce(250, function() {
+            self.options.display_prefs.setLHNState("category_scroll", this.scrollTop);
+          }));
+
+        //["open_category", "panel_scroll", "category_scroll", "search_text", "my_work"]
+        if(lhn_prefs.open_category) {
+          self.toggle_list_visibility(
+            self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
+          );
+        }
+
       });
     }
 
@@ -545,6 +596,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       if ($ul.is(":visible")) {
         el.removeClass("active");
         $ul.slideUp().removeClass("in");
+        this.options.display_prefs.setLHNState({ "open_category" : null, category_scroll : 0 });
       } else {
         // Use a cached max-height if one exists
         var holder = el.closest('.lhs-holder')
@@ -581,9 +633,10 @@ can.Control("CMS.Controllers.LHN_Search", {
           , Math.max(160, (this._holder_height - holder.position().top + extra_height - top - 40)) + 'px'
         );
 
+        this.options.display_prefs.setLHNState({ "open_category" : el.attr("data-object-singular") });
         this.on_show_list($ul);
       }
-      ev.preventDefault();
+      ev && ev.preventDefault();
     }
 
   , " resize": function() {
@@ -602,6 +655,10 @@ can.Control("CMS.Controllers.LHN_Search", {
         );
       }
     }
+
+  , " scroll" : function() {
+
+  }
 
   , on_show_list: function(el, ev) {
       var $list = $(el).closest(this.get_lists())
@@ -693,6 +750,14 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
+
+          if(model_name === self.options.display_prefs.getLHNState().open_category) {
+            $list.one("list_displayed", function() {
+              $(this).find(self.options.list_content_selector).scrollTop(
+                self.options.display_prefs.getLHNState().category_scroll || 0
+              );
+            });
+          }
         });
         can.view($list.data("actions") || self.options.actions_view, context, function(frag, xhr) {
           $list.find(self.options.actions_content_selector).html(frag);
@@ -754,6 +819,7 @@ can.Control("CMS.Controllers.LHN_Search", {
           self.options.visible_lists[model_name].replace(initial_visible_list);
           // Stop spinner when request is complete
           $list.find(self.options.spinner_selector).html("");
+          $list.trigger("list_displayed", model_name);
         }));
       });
 

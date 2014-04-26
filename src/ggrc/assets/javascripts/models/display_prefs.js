@@ -17,6 +17,7 @@ var COLLAPSE = "collapse"
 , COLUMNS = "columns"
 , PBC_LISTS = "pbc_lists"
 , GLOBAL = "global"
+, LHN_STATE = "lhn_state"
 , path = window.location.pathname;
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -257,6 +258,27 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
     this.autoupdate && this.save();  
     return this;  
+  }
+
+  , getLHNState : function() {
+    return this.makeObject(LHN_STATE);
+  }
+
+  , setLHNState : function(new_prefs, val) {
+    var prefs = this.makeObject(LHN_STATE);
+    can.each(
+      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work"]
+      , function(token) {
+        if(typeof new_prefs[token] !== "undefined") {
+          prefs.attr(token, new_prefs[token]);
+        } else if(new_prefs === token && val) {
+          prefs.attr(token, val);
+        }
+      }
+    );
+
+    this.autoupdate && this.save();
+    return this;
   }
 
 });
