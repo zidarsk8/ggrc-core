@@ -9,6 +9,22 @@
 
 (function(can) {
 
+can.Model.Cacheable("CMS.Models.Context", {
+    root_object : "context"
+  , root_collection : "contexts"
+  , category : "contexts"
+  , findAll : "/api/contexts"
+  , findOne : "/api/contexts/{id}"
+  , create : "POST /api/contexts"
+  , update : "PUT /api/contexts/{id}"
+  , destroy : "DELETE /api/contexts/{id}"
+  , attributes : {
+      context : "CMS.Models.Context.stub"
+    , related_object: "CMS.Models.get_stub"
+    }
+}, {
+});
+
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
@@ -20,7 +36,8 @@ can.Model.Cacheable("CMS.Models.Program", {
   , destroy : "DELETE /api/programs/{id}"
   , mixins : ["contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -103,7 +120,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
 
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -160,7 +178,8 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -205,7 +224,8 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -250,7 +270,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -295,7 +316,8 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -329,7 +351,8 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , destroy : "DELETE /api/org_groups/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -411,7 +434,8 @@ can.Model.Cacheable("CMS.Models.Project", {
   , destroy : "DELETE /api/projects/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -477,7 +501,8 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , destroy : "DELETE /api/facilities/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -559,7 +584,8 @@ can.Model.Cacheable("CMS.Models.Product", {
   , destroy : "DELETE /api/products/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -664,7 +690,8 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , destroy : "DELETE /api/data_assets/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -746,7 +773,8 @@ can.Model.Cacheable("CMS.Models.Market", {
   , destroy : "DELETE /api/markets/{id}"
   , mixins : ["ownable", "contactable"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -861,7 +889,8 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -930,7 +959,8 @@ can.Model.Cacheable("CMS.Models.Objective", {
       "Section" : "SectionObjective"
   }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , section_objectives : "CMS.Models.SectionObjective.stubs"
@@ -1039,7 +1069,8 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , create : "POST /api/audits"
   , mixins : ["contactable"]
   , attributes : {
-    program: "CMS.Models.Program.stub"
+      context : "CMS.Models.Context.stub"
+    , program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , start_date : "date"
@@ -1185,7 +1216,8 @@ can.Model.Cacheable("CMS.Models.Request", {
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
   , attributes : {
-    audit : "CMS.Models.Audit.stub"
+      context : "CMS.Models.Context.stub"
+    , audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
     , requestor : "CMS.Models.Person.stub"
