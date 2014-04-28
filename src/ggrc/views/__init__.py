@@ -309,6 +309,13 @@ def assessments_my_work():
   """
   return render_template("mockups/v1.0/my-work.html")    
   
+@app.route("/mockups/v1.1/assessment.html")
+@login_required
+def workflow_assessment():
+  """The workflow assessment guide page
+  """
+  return render_template("mockups/v1.1/assessment.html")
+  
 @app.route("/mockups/assessments_grid")
 @login_required
 def assessments_grid():
