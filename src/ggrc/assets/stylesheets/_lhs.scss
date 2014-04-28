@@ -108,11 +108,16 @@
       }
       a {
         display:block;
-        padding-left:10px;
-        &.active,
+        padding-left:26px;
+        background: image-url('grcicons/not-open.png') no-repeat 10px center;
+        @include background-size(17px 12px);
         &:hover {
           text-decoration:none;
-          background:#fff image-url('grcicons/open.png') no-repeat right center;
+          background:#fff image-url('grcicons/not-open.png') no-repeat 10px center;
+          @include background-size(17px 12px);
+        }
+        &.active {
+          background:#fff image-url('grcicons/open.png') no-repeat 10px center;
           @include background-size(17px 12px);
         }
       }
