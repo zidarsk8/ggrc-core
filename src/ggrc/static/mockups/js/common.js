@@ -485,11 +485,29 @@ $(document).ready(function(){
     $('#TaskGroupItem').show();
     $('#addSingleObject').hide();
     $('#objectFooterUtility').show();
+    $('#TaskGroupCounter').html('1');
+    $('#objectsMainCounter4').html('1');
   });
   
   $('body').on('click', '#cancelTaskGroup', function() {
     $('#addSingleObject').hide();
     $('#objectFooterUtility').show();
+  });
+  
+  $('body').on('click', '#TaskDescription', function() {
+    $('#TaskHolder').show();
+    $('#TaskDescription').hide();
+  });
+  
+  $('body').on('click', '#descriptionCancel', function() {
+    $('#TaskHolder').hide();
+    $('#TaskDescription').show();
+  });
+  
+  $('body').on('click', '#descriptionSave', function() {
+    $('#TaskHolder').hide();
+    $('#TaskDescription').hide();
+    $('#TaskUpdated').show();
   });
 
 });

@@ -33,6 +33,12 @@ ul.new-tree {
       }
     }
   }
+  .task-edit-icon {
+    i {
+      margin-top: 0px;
+      margin-left: 3px;
+    }
+  }
   &.request-list,
   &.responses-list {
     .short-field {
