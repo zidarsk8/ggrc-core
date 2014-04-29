@@ -309,7 +309,10 @@
     cursor:e-resize;
   }
 }
-
+// Show object nav bar-v below title
+.bar-v.objnav {
+  z-index: 1;
+}
 
 // INNER NAV
 
