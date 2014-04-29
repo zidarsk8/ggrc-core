@@ -937,7 +937,7 @@
                 <div class="content">
                   <ul class="sub-level" style="max-height:252px;">
                     <li class="programs" data-model="true">
-                      <a href="/mockups/v1.0/program.html" class="show-extended">
+                      <a href="#" class="show-extended">
                         <div class="row-fluid">
                           <div class="span8 lhs-main-title">
                             <span class="lhs-item">
@@ -1182,6 +1182,11 @@
                 </div>
               </li>
               <!--<li class="content" id="assessments-lhn"></li>-->
+            </ul>
+          </div>
+          
+          <div class="lhs-nav">
+            <ul class="top-level">
               <li class="programs accordion-group">
                 <a class="programs" href="#">
                   <i class="grcicon-workflow-color"></i>
@@ -1192,7 +1197,7 @@
                 <div class="content">
                   <ul class="sub-level" style="max-height:225px;">
                     <li class="programs" data-model="true">
-                      <a href="#" class="show-extended">
+                      <a href="/mockups/v1.1/workflow.html" class="show-extended">
                         <div class="row-fluid">
                           <div class="span8 lhs-main-title">
                             <span class="lhs-item">
@@ -1221,6 +1226,51 @@
                   <ul class="sub-actions">
                     <li class="add-new">
                       <a data-modal-class="modal-wide" href="#newWorkflow" data-toggle="modal">
+                        + Create New
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="programs accordion-group">
+                <a class="programs" href="#">
+                  <i class="grcicon-task-color"></i>
+                  Tasks
+                  <small>(<span class="item-count">2</span>)</small>
+                </a>
+
+                <div class="content">
+                  <ul class="sub-level" style="max-height:225px;">
+                    <li class="programs" data-model="true">
+                      <a href="#" class="show-extended">
+                        <div class="row-fluid">
+                          <div class="span8 lhs-main-title">
+                            <span class="lhs-item">
+                              Peer Review
+                            </span>
+                          </div>
+                          <div class="span1 lhs-private"></div>
+                          <div class="span1 lhs-people"></div>
+                        </div>
+                      </a>
+                    </li>
+                    <li class="programs" data-model="true">
+                      <a href="#" class="show-extended">
+                        <div class="row-fluid">
+                          <div class="span8 lhs-main-title">
+                            <span class="lhs-item">
+                              Control checkup
+                            </span>
+                          </div>
+                          <div class="span1 lhs-private"></div>
+                          <div class="span1 lhs-people"></div>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="sub-actions">
+                    <li class="add-new">
+                      <a data-modal-class="modal-wide" href="#newTask" data-toggle="modal">
                         + Create New
                       </a>
                     </li>
@@ -3023,7 +3073,7 @@
       </div>
     </div>
   </div>
-
+  
   <div id="newWorkflow" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newWorkflow" aria-hidden="true">
     <div class="modal-header">
       <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
@@ -3101,6 +3151,69 @@
           </div>
         </div>
 
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span3">
+          <div class="confirm-buttons">
+            <a id="addAssessmentCreated" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="newTask" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newTask" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Create New Task</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <form action="#">
+        <div class="row-fluid">
+          <div class="span8">
+            <label>
+              Summary
+              <span class="required">*</span>
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="" tabindex="1">
+            <br>
+          </div>
+          <div class="span4">&nbsp;</div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span8">
+            <label>
+              Task Details
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <div class="wysiwyg-area">
+              <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2"></textarea>
+            </div>
+          </div>
+          <div class="span4">
+            <label>
+              Due on
+              <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+            </label>
+            <input tabindex="3" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="">
+          </div>
+        </div>
       </form>
     </div>
     <div class="modal-footer">

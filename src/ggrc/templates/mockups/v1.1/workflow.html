@@ -120,8 +120,8 @@
               <li>
                 <a href="#tasks_widget" class="tasks_widget">
                   <div class="oneline">
-                    <i class="grcicon-object-color"></i>
-                    Tasks (<span id="objectsMainCounter2">3</span>)
+                    <i class="grcicon-task-color"></i>
+                    Tasks (<span id="objectsMainCounter2">2</span>)
                   </div>
                 </a>
                 <div class="drag"></div>
@@ -138,7 +138,7 @@
               <li>
                 <a href="#task_groups_widget" class="task_groups_widget">
                   <div class="oneline">
-                    <i class="grcicon-person-color"></i>
+                    <i class="grcicon-task-group-color"></i>
                     Task Groups (<span id="objectsMainCounter4">0</span>)
                   </div>
                 </a>
@@ -922,7 +922,7 @@
                 <div class="content">
                   <ul class="sub-level" style="max-height:252px;">
                     <li class="programs" data-model="true">
-                      <a href="/mockups/v1.0/program.html" class="show-extended">
+                      <a href="#" class="show-extended">
                         <div class="row-fluid">
                           <div class="span8 lhs-main-title">
                             <span class="lhs-item">
@@ -1167,6 +1167,11 @@
                 </div>
               </li>
               <!--<li class="content" id="assessments-lhn"></li>-->
+            </ul>
+          </div>
+          
+          <div class="lhs-nav">
+            <ul class="top-level">
               <li class="programs accordion-group">
                 <a class="programs" href="#">
                   <i class="grcicon-workflow-color"></i>
@@ -1177,7 +1182,7 @@
                 <div class="content">
                   <ul class="sub-level" style="max-height:225px;">
                     <li class="programs" data-model="true">
-                      <a href="#" class="show-extended">
+                      <a href="/mockups/v1.1/workflow.html" class="show-extended">
                         <div class="row-fluid">
                           <div class="span8 lhs-main-title">
                             <span class="lhs-item">
@@ -1206,6 +1211,51 @@
                   <ul class="sub-actions">
                     <li class="add-new">
                       <a data-modal-class="modal-wide" href="#newWorkflow" data-toggle="modal">
+                        + Create New
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="programs accordion-group">
+                <a class="programs" href="#">
+                  <i class="grcicon-task-color"></i>
+                  Tasks
+                  <small>(<span class="item-count">2</span>)</small>
+                </a>
+
+                <div class="content">
+                  <ul class="sub-level" style="max-height:225px;">
+                    <li class="programs" data-model="true">
+                      <a href="#" class="show-extended">
+                        <div class="row-fluid">
+                          <div class="span8 lhs-main-title">
+                            <span class="lhs-item">
+                              Peer Review
+                            </span>
+                          </div>
+                          <div class="span1 lhs-private"></div>
+                          <div class="span1 lhs-people"></div>
+                        </div>
+                      </a>
+                    </li>
+                    <li class="programs" data-model="true">
+                      <a href="#" class="show-extended">
+                        <div class="row-fluid">
+                          <div class="span8 lhs-main-title">
+                            <span class="lhs-item">
+                              Control checkup
+                            </span>
+                          </div>
+                          <div class="span1 lhs-private"></div>
+                          <div class="span1 lhs-people"></div>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                  <ul class="sub-actions">
+                    <li class="add-new">
+                      <a data-modal-class="modal-wide" href="#newTask" data-toggle="modal">
                         + Create New
                       </a>
                     </li>
