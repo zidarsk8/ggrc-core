@@ -75,7 +75,7 @@
   &.emphasized { // special case for programs
    ul {
      margin-bottom:0;
-   } 
+   }
   }
   .accordion-group { // override bootstrap
     border:none;
@@ -309,15 +309,15 @@
     cursor:e-resize;
   }
 }
-
+// Show object nav bar-v below title
+.bar-v.objnav {
+  z-index: 1;
+}
 
 // INNER NAV
 
 .inner-nav {
   background:#fff;
-  .bar-v {
-    left: 448px;
-  }
   .object-nav {
     .add-nav-item {
       position:relative;

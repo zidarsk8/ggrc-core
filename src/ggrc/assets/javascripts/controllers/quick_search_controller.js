@@ -302,7 +302,7 @@ can.Control("CMS.Controllers.LHN", {
         , $lhsHolder = $(".lhs-holder")
         , $area = $(".area")
         , $bar = $("#lhn > .bar-v")
-        , $obj_bar = $(".inner-nav > .bar-v")
+        , $obj_bar = $(".objnav.bar-v")
         , $search = $('.widgetsearch')
         ;
       if($lhs.hasClass("lhs-closed")) {
@@ -337,7 +337,7 @@ can.Control("CMS.Controllers.LHN", {
     , $lhsHolder = $(".lhs-holder")
     , $area = $(".area")
     , $bar = $("#lhn>.bar-v")
-    , $obj_bar = $(".inner-nav>.bar-v")
+    , $obj_bar = $(".objnav.bar-v")
     , $search = $('.widgetsearch')
     ;
     if(resize < this.min_lhn_size/2 && !$lhs.hasClass("lhs-closed")) this.toggle_lhs();
@@ -360,7 +360,7 @@ can.Control("CMS.Controllers.LHN", {
 
     var $object_area = $(".object-area")
       , $object_nav = $(".inner-nav")
-      , $object_bar = $('.inner-nav > .bar-v')
+      , $object_bar = $('.objnav.bar-v')
       , collapsed = false
       , size = resize - this.lhn_width();
       ;
@@ -374,7 +374,7 @@ can.Control("CMS.Controllers.LHN", {
     var $target = $(ev.target);
     if(!$target.hasClass('bar-v'))
       return;
-    this.objnav = $target.parent().hasClass('inner-nav');
+    this.objnav = $target.hasClass('objnav');
     this.mousedown = true;
     this.dragged = false;
   }
