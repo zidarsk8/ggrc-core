@@ -568,6 +568,7 @@
 .grcicon-object-black { background-position:-6px -344px; }
 .grcicon-object { background-position:-6px -368px; }
 .grcicon-object-color { background-position:-6px -392px; }
+.grcicon-workflow-color { background-position:-294px -296px; }
 
 .grcicon-system { background-position:-126px -248px; }
 .grcicon-system-black { background-position:-126px -224px; }
@@ -677,6 +678,7 @@ i.short {
   .grcicon-response-color { background-position:-78px -392px; }
   .grcicon-assessment-color { background-position:-150px -392px; }
   .grcicon-object-color { background-position:-6px -344px; }
+  .grcicon-workflow-color { background-position:-6px -344px; }
 
   li {
     &.active,
@@ -716,6 +718,7 @@ i.short {
       .grcicon-response-color { background-position:-102px -392px; }
       .grcicon-assessment-color { background-position:-174px -392px; }
       .grcicon-object-color { background-position:-6px -368px; }
+      .grcicon-workflow-color { background-position:-6px -368px; }
     }
   }
 }
@@ -761,5 +764,6 @@ i.short {
     .grcicon-response-color { background-position:-102px -392px; }
     .grcicon-assessment-color { background-position:-174px -392px; }
     .grcicon-object-color { background-position:-6px -368px; }
+    .grcicon-workflow-color { background-position:-6px -368px; }
   }
 }
