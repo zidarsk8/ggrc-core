@@ -211,6 +211,9 @@ $(document).ready(function(){
     if($('ul.internav li.active a').attr('href') == '#objects_widget') {
       $('#objects_widget').addClass('widget-active').show();
     }
+    if($('ul.internav li.active a').attr('href') == '#task_groups_widget') {
+      $('#task_groups_widget').addClass('widget-active').show();
+    }
   });
 
   // New Assessment Created
@@ -476,6 +479,17 @@ $(document).ready(function(){
     $('#objectStep2').hide();
     $('#objectStep3').hide();
     $('#objectStep1').show();
+  });
+  
+  $('body').on('click', '#addTaskGroup', function() {
+    $('#TaskGroupItem').show();
+    $('#addSingleObject').hide();
+    $('#objectFooterUtility').show();
+  });
+  
+  $('body').on('click', '#cancelTaskGroup', function() {
+    $('#addSingleObject').hide();
+    $('#objectFooterUtility').show();
   });
 
 });

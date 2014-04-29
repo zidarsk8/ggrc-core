@@ -26,6 +26,13 @@ ul.new-tree {
     }
     
   }
+  .task-group-title {
+    h3 {
+      [class^="grcicon-"] {
+        margin-top: 4px;
+      }
+    }
+  }
   &.request-list,
   &.responses-list {
     .short-field {
