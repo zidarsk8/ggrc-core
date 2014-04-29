@@ -47,6 +47,7 @@ dashboard-js-files:
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
+  - models/local_list_cache.js
   - pbc/document.js
   - pbc/person.js
   - models/simple_models.js

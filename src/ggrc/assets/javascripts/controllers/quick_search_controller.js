@@ -30,6 +30,7 @@
     return attrval;
   }
 
+
 CMS.Controllers.Filterable("CMS.Controllers.QuickSearch", {
   defaults : {
     list_view : GGRC.mustache_path + "/dashboard/object_list.mustache"
@@ -660,10 +661,6 @@ can.Control("CMS.Controllers.LHN_Search", {
       }
     }
 
-  , " scroll" : function() {
-
-  }
-
   , on_show_list: function(el, ev) {
       var $list = $(el).closest(this.get_lists())
         , model_name = this.get_list_model($list)
@@ -797,14 +794,15 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     }
 
-  , display_lists: function(search_result) {
+  , display_lists: function(search_result, display_now) {
       var self = this
         , lists = this.get_visible_lists()
         , dfds = []
         ;
 
       can.each(lists, function(list) {
-        var $list = $(list)
+        var dfd
+          , $list = $(list)
           , model_name = self.get_list_model($list)
           , results = search_result.getResultsForType(model_name)
           , refresh_queue = new RefreshQueue()
@@ -819,12 +817,27 @@ can.Control("CMS.Controllers.LHN_Search", {
           refresh_queue.enqueue(obj);
         });
 
-        dfds.push(refresh_queue.trigger().then(function(_) {
+        function finish_display(_) {
           self.options.visible_lists[model_name].replace(initial_visible_list);
           // Stop spinner when request is complete
           $list.find(self.options.spinner_selector).html("");
           $list.trigger("list_displayed", model_name);
-        }));
+        }
+        dfd = refresh_queue.trigger().then(function(d) {
+          new CMS.Models.LocalListCache({
+            name : "search_" + model_name
+            , objects : d
+            , type : model_name
+            , keys : ["title", "contact", "is_private"]
+          }).save();
+          return d;
+        });
+        if(display_now) {
+          dfd = dfd.then(finish_display);
+        } else {
+          finish_display();
+        }
+        dfds.push(dfd);
       });
 
       return $.when.apply($, dfds);
@@ -861,6 +874,30 @@ can.Control("CMS.Controllers.LHN_Search", {
         can.each(lists, function(list) {
           var $list = $(list);
           $list.find('.spinner').html(self.make_spinner());
+        });
+
+        $.when.apply(
+          $
+          , models.map(function(model_name) {
+            return CMS.Models.LocalListCache.findAll({ "name" : "search_" + model_name});
+          })
+        ).then(function() {
+          var types = {};
+          can.each(can.makeArray(arguments), function(a) {
+            if(a.length > 0) {
+              types[a[0].name] = a[0].objects;
+            }
+          });
+
+          return {
+            getResultsForType : function(type) {
+              if(types["search_" + type]) {
+                result = types["search_" + type];
+              }
+            }
+          };
+        }).done(function(fake_search_result) {
+          self.display_lists(fake_search_result, true);
         });
 
         return GGRC.Models.Search.search_for_types(
