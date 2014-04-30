@@ -606,11 +606,32 @@ can.Model("can.Model.Cacheable", {
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
-    , id_key = this.constructor.id;
+      , id_key = this.constructor.id
+      , that = this
+      ;
+
     if (this[id_key])
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
+
+    // Listen for `stub_destroyed` change events and nullify or remove the
+    // corresponding property or list item.
+    this.bind("change", function(ev, path, how, newVal, oldVal) {
+      var m, n;
+      m = path.match(/(.*?)\.stub_destroyed$/);
+      if (m) {
+        n = m[1].match(/^([^.]+)\.(\d+)$/);
+        if (n) {
+          that.attr(n[1]).splice(parseInt(n[2], 10), 1);
+        }
+        else {
+          n = m[1].match(/^([^.]+)$/);
+          if (n)
+            that.removeAttr(n[1]);
+        }
+      }
+    });
   }
   , computed_errors : can.compute(function() { return this.errors(); })
 
@@ -903,28 +924,71 @@ can.Observe.prototype.attr = function(key, val) {
     return _old_attr.apply(this, arguments);
   }
 }
-can.Observe.prototype.stub = function() {
-  var type;
 
-  if (this.constructor.shortName)
+can.Observe.prototype.stub = function() {
+  if (!(this instanceof can.Model || this instanceof can.Stub))
+    console.debug(".stub() called on non-stub, non-instance object", this);
+
+  var type, id, stub;
+
+  if (this instanceof can.Stub)
+    return this;
+
+  if (this instanceof can.Model)
     type = this.constructor.shortName;
   else
     type = this.type;
 
-  if (!this.id)
+  if (this.constructor.id)
+    id = this[this.constructor.id];
+  else
+    id = this.id;
+
+  if (!id)
     return null;
 
-  var obj = {
-    id : this.id,
-    href : this.selfLink || this.href,
-    type : type
-  };
-  if(this.constructor.id && this.constructor.id !== "id") {
-    obj[this.constructor.id] = this[this.constructor.id];
-  }
-
-  return new can.Observe(obj);
+  return can.Stub.get_or_create({
+    id: id,
+    href: this.selfLink || this.href,
+    type: type
+  });
 };
+
+can.Observe("can.Stub", {
+  get_or_create: function(obj) {
+    var id = obj.id
+      , type = obj.type
+      ;
+
+    CMS.Models.stub_cache = CMS.Models.stub_cache || {};
+    CMS.Models.stub_cache[type] = CMS.Models.stub_cache[type] || {};
+    if (!CMS.Models.stub_cache[type][id]) {
+      stub = new can.Stub(obj);
+      CMS.Models.stub_cache[type][id] = stub;
+    }
+    return CMS.Models.stub_cache[type][id];
+  }
+}, {
+  init: function() {
+    var that = this;
+    this._super.apply(this, arguments);
+    this._instance().bind("destroyed", function(ev) {
+      // Trigger propagating `change` event to convey `stub-destroyed` message
+      can.trigger(that, "change", ["stub_destroyed", "stub_destroyed", that, null]);
+      delete CMS.Models.stub_cache[that.type][that.id];
+    });
+  },
+
+  _model: function() {
+    return CMS.Models[this.type] || GGRC.Models[this.type];
+  },
+
+  _instance: function() {
+    if (!this.__instance)
+      this.__instance = this._model().model(this);
+    return this.__instance;
+  }
+});
 
 can.Observe.List.prototype.stubs = function() {
   return new can.Observe.List(can.map(this, function(obj) {
@@ -933,21 +997,20 @@ can.Observe.List.prototype.stubs = function() {
 }
 
 can.Observe.prototype.reify = function() {
-  var type = this.constructor.shortName || this.type;
-  var model;
-  if (this.selfLink) {
+  var type, model;
+
+  if (this instanceof can.Model)
     return this;
-  } else if (model = (CMS.Models[type] || GGRC.Models[type])) {
-    if (model.cache
-        && model.cache[this[model.id]]) {
-        //&& CMS.Models[this.type].cache[this.id].selfLink) {
-      return model.cache[this[model.id]];
-    } else {
-      return null;
-    }
-  } else {
+  if (!(this instanceof can.Stub))
     console.debug("`reify()` called on non-stub, non-instance object", this);
-  }
+
+  type = this.type;
+  model = CMS.Models[type] || GGRC.Models[type];
+
+  if (!model)
+    console.debug("`reify()` called with unrecognized type", this);
+
+  return model.model(this);
 };
 
 can.Observe.List.prototype.reify = function() {

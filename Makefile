@@ -21,6 +21,7 @@ APPENGINE_SQLITE_PATCH_PATH=$(PREFIX)/extras/google_appengine__enable_sqlite3.di
 APPENGINE_NOAUTH_PATCH_PATH=$(PREFIX)/extras/google_appengine__force_noauth_local_webserver.diff
 
 APPENGINE_PACKAGES_ZIP=$(PREFIX)/src/packages.zip
+APPENGINE_PACKAGES_TEMP_ZIP=$(DEV_PREFIX)/opt/packages.zip
 APPENGINE_PACKAGES_DIR=$(DEV_PREFIX)/opt/gae_packages
 
 APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
@@ -48,6 +49,7 @@ $(APPENGINE_ZIP_PATH) :
 
 clean_appengine_packages :
 	rm -f -- "$(APPENGINE_PACKAGES_ZIP)"
+	rm -f -- "$(APPENGINE_PACKAGES_TEMP_ZIP)"
 	rm -rf -- "$(APPENGINE_PACKAGES_DIR)"
 	rm -rf -- "$(APPENGINE_ENV_DIR)"
 
@@ -70,16 +72,15 @@ $(APPENGINE_PACKAGES_DIR) : $(APPENGINE_ENV_DIR)
 
 appengine_packages : $(APPENGINE_PACKAGES_DIR)
 
-$(APPENGINE_PACKAGES_DIR)/../packages.zip : $(APPENGINE_PACKAGES_DIR)
+$(APPENGINE_PACKAGES_TEMP_ZIP) : $(APPENGINE_PACKAGES_DIR)
 	cd "$(APPENGINE_PACKAGES_DIR)"; \
 		find . -name "*.pyc" -delete; \
 		find . -name "*.egg-info" | xargs rm -rf; \
-		zip -9rv "../packages.zip" .; \
-		touch "../packages.zip"
+		zip -9rv "$(APPENGINE_PACKAGES_TEMP_ZIP)" .; \
+		touch "$(APPENGINE_PACKAGES_TEMP_ZIP)"
 
-$(APPENGINE_PACKAGES_ZIP) : $(APPENGINE_PACKAGES_DIR)/../packages.zip
-	cd "$(APPENGINE_PACKAGES_DIR)"; \
-		cp "../packages.zip" "$(APPENGINE_PACKAGES_ZIP)"
+$(APPENGINE_PACKAGES_ZIP) : $(APPENGINE_PACKAGES_TEMP_ZIP)
+	cp "$(APPENGINE_PACKAGES_TEMP_ZIP)" "$(APPENGINE_PACKAGES_ZIP)"
 
 appengine_packages_zip : $(APPENGINE_PACKAGES_ZIP)
 

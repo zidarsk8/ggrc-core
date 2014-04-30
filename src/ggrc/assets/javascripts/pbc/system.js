@@ -129,7 +129,8 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -186,7 +187,8 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

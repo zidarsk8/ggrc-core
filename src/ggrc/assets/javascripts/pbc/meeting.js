@@ -16,7 +16,8 @@ can.Model.Cacheable("CMS.Models.Meeting", {
   , update : "PUT /api/meetings/{id}"
   , destroy : "DELETE /api/meetings/{id}"
   , attributes : {
-    response : "CMS.Models.Response.stub"
+      context : "CMS.Models.Context.stub"
+    , response : "CMS.Models.Response.stub"
     , people : "CMS.Models.Person.stubs"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , start_at : "datetime"

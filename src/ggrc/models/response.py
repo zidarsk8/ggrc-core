@@ -27,6 +27,40 @@ class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
   status = deferred(db.Column(db.String, nullable=False),
     'Response')
 
+  population_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+  population_count = deferred(db.Column(db.Integer, nullable=True),
+    'Response')
+  sample_worksheet_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+  sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
+  sample_evidence_id = deferred(
+      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=True),
+      'Response')
+
+  population_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.population_worksheet_id"
+    )
+  sample_worksheet = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_worksheet_id"
+    )
+  sample_evidence = db.relationship(
+    "Document",
+    foreign_keys="PopulationSampleResponse.sample_evidence_id"
+    )
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('population_worksheet_document', 'population_worksheet_id'),
+        db.Index('sample_evidence_document', 'sample_evidence_id'),
+        db.Index('sample_worksheet_document', 'sample_worksheet_id'),
+        )
+
   _publish_attrs = [
       'request',
       'status',
@@ -102,32 +136,6 @@ class PopulationSampleResponse(
       'polymorphic_identity': 'population sample'
       }
   _table_plural = 'population_sample_responses'
-
-  population_worksheet_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-  population_count = deferred(db.Column(db.Integer, nullable=True),
-    'Response')
-  sample_worksheet_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-  sample_count = deferred(db.Column(db.Integer, nullable=True), 'Response')
-  sample_evidence_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('documents.id'), nullable=False),
-      'Response')
-
-  population_worksheet = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.population_worksheet_id"
-    )
-  sample_worksheet = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.sample_worksheet_id"
-    )
-  sample_evidence = db.relationship(
-    "Document",
-    foreign_keys="PopulationSampleResponse.sample_evidence_id"
-    )
 
   _publish_attrs = [
       'population_worksheet',

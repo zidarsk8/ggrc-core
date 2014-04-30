@@ -820,3 +820,9 @@ select.multiple-selector {
 .rtf-block {
   word-wrap: break-word;
 }
+
+.top-align-label {
+  input {
+    margin-bottom: 0;
+  }
+}

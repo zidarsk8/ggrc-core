@@ -32,9 +32,11 @@ class ObjectFile(Base, db.Model):
         else None
     return setattr(self, self.fileable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
+        )
 
   _publish_attrs = [
       'file_id',
