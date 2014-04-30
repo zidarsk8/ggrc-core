@@ -33,9 +33,12 @@ class ObjectObjective(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.objectiveable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('objective_id', 'objectiveable_id', 'objectiveable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('objective_id', 'objectiveable_id', 'objectiveable_type'),
+        db.Index('ix_objective_id', 'objective_id'),
+        )
 
   _publish_attrs = [
       'role',

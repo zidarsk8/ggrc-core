@@ -1106,6 +1106,9 @@ jQuery(function($){
             });
             queue.trigger().then(function(objs) {
               if(objs.length) {
+                // Envelope the object to not break model instance due to
+                // shallow copy done by jQuery in `response()`
+                objs = can.map(objs, function(obj) { return { item: obj }; });
                 response(objs);
               } else {
                 that._suggest( [] );
@@ -1138,7 +1141,11 @@ jQuery(function($){
 
         can.view.render(
           GGRC.mustache_path + template,
-          {model_class: model_class, items: items},
+          {
+            model_class: model_class,
+            // Reverse the enveloping we did 25 lines up
+            items: can.map(items, function(item) { return item.item; })
+          },
           function(frag) {
             $(ul).html(frag);
             $(ul).cms_controllers_lhn_tooltips()
@@ -1147,6 +1154,26 @@ jQuery(function($){
       };
     });
   }
+});
+
+jQuery(function($) {
+  // Trigger compilation of any remaining preloaded Mustache templates for
+  // faster can.view() response time.
+
+  setTimeout(function() {
+
+    GGRC.queue_event(
+      can.map(GGRC.Templates, function(template, id) {
+        var key = can.view.toId(GGRC.mustache_path + "/" + id + ".mustache");
+        if(!can.view.cachedRenderers[key]) {
+          return function() {
+            can.view.mustache(key, template);
+          };
+        }
+      })
+    );
+  }, 2000);
+
 });
 
 (function($) {

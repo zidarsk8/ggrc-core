@@ -18,6 +18,49 @@ function _firstElementChild(el) {
   }
 }
 
+
+function _display_tree_subpath(el, path) {
+  var rest = path.split("/")
+    , type = rest.shift()
+    , id = rest.shift()
+    , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
+    , $node
+    , $next_node
+    , node_controller;
+    ;
+
+  rest = rest.join("/");
+
+  if (type || id) {
+    $node = el.find(selector);
+    //  Try to scroll the element into view by scrolling the *next* element in,
+    //  then possibly backing up to scro
+    //  Find nearest next element,
+    $next_node = $node.closest(':has(+)').next();
+
+    if ($next_node[0] && $next_node[0].scrollIntoView) {
+      $next_node[0].scrollIntoView();
+    }
+
+    if ($node[0] && $node[0].scrollIntoView) {
+      $node[0].scrollIntoView();
+    }
+
+    node_controller = $node.control();
+    if (node_controller && node_controller.display_path) {
+      return node_controller.display_path(rest);
+    }
+    else {
+      //  TODO: `resolve` or `reject` if path isn't found?
+      return new $.Deferred().resolve();
+    }
+  }
+  else {
+    return new $.Deferred().resolve();
+  }
+}
+
+
 can.Observe("can.Observe.TreeOptions", {
   defaults : {
     instance : undefined
@@ -109,7 +152,7 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       this._display_deferred = $.when(this._attached_deferred, this.prepare());
 
-      this._display_deferred.then(function() {
+      this._display_deferred = this._display_deferred.then(function() {
         return $.when(that.fetch_list(), that.init_view())
           .then(that.proxy("draw_list"));
       }).done(tracker_stop);
@@ -419,36 +462,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , display_path: function(path) {
-      var that = this
-        , rest = path.split("/")
-        , step = rest.shift()
-        , type_id = step.split("-")
-        , type = type_id[0]
-        , id = type_id.length > 0 && type_id[1]
-        , $node
-        , node_controller
-        ;
-
+      var that = this;
       return this.display().then(function() {
-        if (id) {
-          //  FIXME: Make this trigger only direct children, *not* nodes of
-          //    sub-trees.
-          $node = that.element
-            .find("[data-object-type=" + type + "][data-object-id=" + id + "]");
-          node_controller = $node.control();
-          if (node_controller && node_controller.trigger_expand) {
-            return node_controller.trigger_expand().then(function() {
-              node_controller.display_path(rest.join("/"));
-            });
-          }
-          else {
-            //  TODO: `resolve` or `reject` if path isn't found?
-            return new $.Deferred().resolve();
-          }
-        }
-        else {
-          return new $.Deferred().resolve();
-        }
+        return _display_tree_subpath(that.element, path);
       });
     }
 
@@ -804,7 +820,15 @@ can.Control("CMS.Controllers.TreeViewNode", {
     this.on();
   }
 
+  , display: function() {
+      return this.trigger_expand();
+    }
+
   , display_path: function(path) {
+      var that = this;
+      return this.display().then(function() {
+        return _display_tree_subpath(that.element, path);
+      });
     }
 
   , display_subtrees: function() {

@@ -10,17 +10,13 @@ dashboard-js-files:
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
   - sha1.js
-  - bootstrap-transition.js
   - bootstrap-alert.js
-  - bootstrap-button.js
-  - bootstrap-carousel.js
   - bootstrap-collapse.js
   - bootstrap-dropdown.js
   - bootstrap-modal.js
   - bootstrap-tab.js
   - bootstrap-tooltip.js
   - bootstrap-popover.js
-  - bootstrap-typeahead.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
   - can.jquery.js
@@ -30,7 +26,6 @@ dashboard-js-files:
   - can.construct.proxy.js
   - can.map.attributes.js
   - bootstrap/modal-ajax.js
-  - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.4.0pre.js
   - bootstrap-wysihtml5-0.0.2.js
@@ -105,7 +100,7 @@ dashboard-js-files:
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   #- d3.v2.js
-  - related_graph.js
+  #- related_graph.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache

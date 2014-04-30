@@ -307,7 +307,7 @@ def assessments_object_final():
 def assessments_my_work():
   """The assessment my work guide page
   """
-  return render_template("mockups/v1.0/my-work.html")    
+  return render_template("mockups/v1.0/my-work.html")
   
 @app.route("/mockups/assessments_grid")
 @login_required
@@ -315,6 +315,20 @@ def assessments_grid():
   """The assessments grid guide page
   """
   return render_template("mockups/assessments-grid.html")
+
+@app.route("/mockups/v1.1/index.html")
+@login_required
+def workflow_assessment():
+  """The workflow assessment guide page
+  """
+  return render_template("mockups/v1.1/index.html")
+  
+@app.route("/mockups/v1.1/workflow.html")
+@login_required
+def workflow_info():
+  """The workflow info guide page
+  """
+  return render_template("mockups/v1.1/workflow.html")
 
 @app.route("/permissions")
 @login_required

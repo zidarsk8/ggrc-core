@@ -46,7 +46,8 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     }
 
   , attributes: {
-      contact: "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact: "CMS.Models.Person.stub"
     , owners: "CMS.Models.Person.stubs"
     , modified_by: "CMS.Models.Person.stub"
     , object_people: "CMS.Models.ObjectPerson.stubs"
@@ -93,7 +94,8 @@ CMS.Models.SectionBase("CMS.Models.Section", {
   , destroy : "DELETE /api/sections/{id}"
 
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -164,7 +166,8 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
   , destroy: "DELETE /api/clauses/{id}"
 
   , attributes: {
-      contact: "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact: "CMS.Models.Person.stub"
     , owners: "CMS.Models.Person.stubs"
     , modified_by: "CMS.Models.Person.stub"
     , object_people: "CMS.Models.ObjectPerson.stubs"
