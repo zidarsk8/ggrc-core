@@ -1,17 +1,17 @@
 $(document).ready(function(){
-  
+
   $('[rel=tooltip]').tooltip();
-  
+
   $('.lhs-holder').css('height', $(window).height() - 71 );
   $('.inner-nav').css('height', $(window).height() - 126 );
   $('.object-area').css('height', $(window).height() - 156 );
   $('.object-area').css('width', $(window).width() - 448 );
 
-  
+
   $('body').on('click', '.info-expand a', function() {
     var $this = $(this),
         $show_hide = $this.closest('.row-fluid').next('.hidden-fields-area');
-    
+
     if($this.hasClass("active")) {
       $show_hide.slideUp('fast');
       $this.removeClass("active");
@@ -19,15 +19,15 @@ $(document).ready(function(){
       $show_hide.slideDown('fast');
       $this.addClass("active");
     }
-    
+
     return false;
-    
+
   });
-  
+
   $('body').on('click', '.expand-link a', function() {
     var $this = $(this),
         $show_hide = $this.closest('.row-fluid').next('.hidden-fields-area');
-    
+
     if($this.hasClass("active")) {
       $show_hide.slideUp('fast');
       $this.removeClass("active");
@@ -35,11 +35,11 @@ $(document).ready(function(){
       $show_hide.slideDown('fast');
       $this.addClass("active");
     }
-    
+
     return false;
-    
+
   });
-  
+
   $('body').on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(e) {
     openclose.call(this);
     e.stopPropagation();
@@ -63,7 +63,7 @@ $(document).ready(function(){
       }
 
       if (cmd === "close") {
-        
+
         use_slide ? $content.slideUp('fast') : $content.css("display", "none");
         $icon.removeClass('active');
         $li.removeClass('item-open');
@@ -80,15 +80,15 @@ $(document).ready(function(){
     });
 
     return this;
-    
+
   }
-  
+
   $.fn.openclose = openclose;
-  
+
   $('body').on('click', '.advanced-filter-trigger', function() {
     var $this = $(this),
         $filters = $this.closest('.inner-tree').find('.advanced-filters');
-    
+
     if($this.hasClass("active")) {
       $filters.slideUp('fast');
       $this.removeClass("active");
@@ -98,20 +98,20 @@ $(document).ready(function(){
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    
+
     return false;
-    
+
   });
-  
+
   $('.autogenerate').change(function(){
     $('.autogenerate-result').toggleClass('active', $(this).val() == 'control');
   });
-  
+
   $('body').on('click', '.accordion-group > a', function() {
     var $this = $(this),
         $subNav = $this.closest('.accordion-group').find('.sub-level'),
         $subAction = $this.closest('.accordion-group').find('.sub-actions');
-    
+
     if($this.hasClass("active")) {
       $subNav.slideUp('fast');
       $subAction.slideUp('fast');
@@ -121,20 +121,20 @@ $(document).ready(function(){
       $subAction.slideDown('fast');
       $this.addClass("active");
     }
-    
+
     return false;
-    
+
   });
-  
-  
+
+
   $('.internav li:gt(7)').hide();
   $('.add-more-objects').click(function() {
     $('.internav li:gt(7)').slideDown('fast');
     $(this).hide();
   });
-  
+
   $( ".date" ).datepicker();
-  
+
   $(function() {
     var people = [
       "Vladan Mitevski",
@@ -166,24 +166,24 @@ $(document).ready(function(){
     $( ".objective-selector input[name='object.title']" ).autocomplete({
       source: object
     });
-    
-    
+
+
   });
-  
+
   $('body').on('click', 'ul.internav li a', function() {
     var $this = $(this),
         $innerNavItem = $this.closest('li'),
         $allWidgets = $('.widget');
-    
+
     $('ul.internav li.active').removeClass('active');
     $allWidgets.removeClass('widget-active').hide();
-    
+
     if($innerNavItem.hasClass("active")) {
       $innerNavItem.removeClass("active");
     } else {
       $innerNavItem.addClass("active");
     }
-    
+
     if($('ul.internav li.active a').attr('href') == '#info_widget') {
       $('#info_widget').addClass('widget-active').show();
     }
@@ -214,6 +214,12 @@ $(document).ready(function(){
     if($('ul.internav li.active a').attr('href') == '#task_groups_widget') {
       $('#task_groups_widget').addClass('widget-active').show();
     }
+    if($('ul.internav li.active a').attr('href') == '#tasks_widget') {
+      $('#tasks_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#people_widget') {
+      $('#people_widget').addClass('widget-active').show();
+    }
   });
 
   // New Assessment Created
@@ -224,7 +230,7 @@ $(document).ready(function(){
     $('#mainAssessmentsCountNew').html('2');
     $('#addAssessment').fadeIn();
     $('#mainAssessmentNew').fadeIn();
-    
+
   });
 
   // New Object under Assessment Created
@@ -232,7 +238,7 @@ $(document).ready(function(){
     $('#newObjectToAssessment').modal('hide');
     $('#objectUnderAssessmentCountObjectNav').html('5');
     $('#objectItemUnderAssessmentCountObjectNav').html('5');
-    $('#addObjectUnderAssessment').fadeIn();  
+    $('#addObjectUnderAssessment').fadeIn();
   });
 
   // Create New Task
@@ -242,24 +248,24 @@ $(document).ready(function(){
     $('#newlyCreatedTask').fadeIn();
     $('#taskCounter').html('1');
   });
-  
+
   // Create New File
   $('body').on('click', '#createNewFile', function() {
     $('#newFile').modal('hide');
     $('#newlyCreatedFile').fadeIn();
     $('#fileCounter').html('3');
   });
-  
+
   $('body').on('click', '.show-long', function() {
     var $this = $(this),
         $description = $this.closest('.show-description').find('.tree-description');
-    
+
     $this.hide();
     $description.removeClass('short');
-    
+
     return false;
   });
-  
+
   $('.workflow-accordion').on('show', function (e) {
     $(e.target).prev('.accordion-heading').find('.accordion-toggle').addClass('active');
   });
@@ -267,7 +273,7 @@ $(document).ready(function(){
   $('.workflow-accordion').on('hide', function (e) {
     $(this).find('.accordion-toggle').not($(e.target)).removeClass('active');
   });
-  
+
   $('#assessmentWorkflowChoose').on('change', function(){
     var id = $(this).val()
       , workflow = null;
@@ -306,7 +312,7 @@ $(document).ready(function(){
       $('#regularWorkflowLabel').show();
       $('#newWorkflowLabel').hide();
       $('#newWorkflowTitle').hide();
-      
+
       $('.workflow-accordion .accordion-group .accordion-body').each(function(){
         $(this).removeClass('in');
       });
@@ -316,7 +322,7 @@ $(document).ready(function(){
       $('#showReviewCount').html('0');
     }
   });
-  
+
   $('body').on('click', '#addWorkflow', function() {
     $('#setupWorkflow').modal('hide');
     $('#workflowNotSet').hide();
@@ -330,20 +336,20 @@ $(document).ready(function(){
     $('#workflowEdit').show();
     $('#noWorkflow').hide();
   });
-  
+
   $('body').on('mouseover', '.section-add', function() {
     var $this = $(this)
     ,   $sectionExpand = $this.closest('.section-expandable').find('.section-expander');
-    
+
     $this.hide();
     $sectionExpand.show();
   });
-  
+
   $('body').on('click', '#addSingleObjectTrigger', function() {
     $('#addSingleObject').show();
     $('#objectFooterUtility').hide();
   });
-  
+
   $('body').on('click', '#addSingleControl', function() {
     $('#addSingleObject').hide();
     $('#addedObject').show();
@@ -355,14 +361,14 @@ $(document).ready(function(){
     $('#noObjects').html('5 Objects selected').css('font-style','normal').css('color','#000');
     $('#startAssessment').removeClass('disabled');
   });
-  
+
   $('body').on('click', '#cancelSingleControl', function() {
     $('#objectFooterUtility').show();
     $('#addSingleObject').hide();
     $('.section-expander').hide();
     $('.section-add').show();
   });
-  
+
   $("#objectAll").click(function () {
     $(".object-check-single").prop('checked', $(this).prop('checked'));
     if($('#objectAll').attr('checked', true)) {
@@ -371,7 +377,7 @@ $(document).ready(function(){
       $('#objectAdd').hide();
     }
   });
-  
+
   $('body').on('click', '#objectAdd a', function() {
     $('#objectStep2').hide();
     $('#objectAdd').hide();
@@ -379,34 +385,34 @@ $(document).ready(function(){
     $('#objectsCounter').html('(4)');
     $('#objectsMainCounter').html('4');
   });
-  
+
   $('body').on('click', '#addRule', function() {
     $('#newRule').show();
   });
-  
+
   $('body').on('click', '#objectReview', function() {
     $('#objectStep1').hide();
     $('#objectStep2').show();
     $('#objectAdd').show();
   });
-  
+
   $('body').on('click', '#addEntryTrigger', function() {
     $('#entryText').show();
     $(this).hide();
   });
-  
+
   $('body').on('click', '#addEntryButton', function() {
     $('#newEntry').show();
     $('#addEntryTrigger').show();
     $('#entryText').hide();
     $('#entriesCount').html('2');
   });
-  
+
   $('body').on('click', '#startObject', function() {
     $('#finishObject').show();
     $(this).hide();
   });
-  
+
   $('body').on('click', '#startTask', function() {
     $(this).hide();
     $('#finishTask').show();
@@ -419,68 +425,68 @@ $(document).ready(function(){
     $(this).hide();
     $('#finishTask3').show();
   });
-  
+
   $('body').on('click', '#finishTask', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone').show();
   });
-  
+
   $('body').on('click', '#finishTask2', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone2').show();
   });
-  
+
   $('body').on('click', '#finishTask3', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone3').show();
   });
-  
+
   $('body').on('click', '#peerReviewActive', function() {
     $(this).hide();
     $('#peerReview').show();
   });
-  
+
   $('body').on('click', '#partyReviewActive', function() {
     $(this).hide();
     $('#partyReview').show();
   });
-  
+
   $('body').on('click', '#peerReviewComplete', function() {
     $(this).hide();
     $('#reviewNoteDone').show();
     $('#addNote').hide();
   });
-  
+
   $('body').on('click', '#partyReviewComplete', function() {
     $(this).hide();
     $('#reviewNoteDone2').show();
     $('#addNote2').hide();
     $('#finishObject').removeClass('disabled');
   });
-  
+
   $('body').on('click', '#finishObject', function() {
     $(this).closest('.tree-item').removeClass('rq-amended-request').addClass('rq-accepted');
     $(this).hide();
     $('#objectMessage').show();
   });
-  
+
   $('body').on('click', '#filterTrigger', function() {
     $('#objectStep2').hide();
     $('#objectStep1').show();
   });
-  
+
   $('body').on('click', '#filterTriggerFooter', function() {
     $('#objectStep2').hide();
     $('#objectStep3').hide();
     $('#objectStep1').show();
   });
-  
+
   $('body').on('click', '#addTaskGroup', function() {
     $('#TaskGroupItem').show();
     $('#addSingleObject').hide();
@@ -488,22 +494,22 @@ $(document).ready(function(){
     $('#TaskGroupCounter').html('1');
     $('#objectsMainCounter4').html('1');
   });
-  
+
   $('body').on('click', '#cancelTaskGroup', function() {
     $('#addSingleObject').hide();
     $('#objectFooterUtility').show();
   });
-  
+
   $('body').on('click', '#TaskDescription', function() {
     $('#TaskHolder').show();
     $('#TaskDescription').hide();
   });
-  
+
   $('body').on('click', '#descriptionCancel', function() {
     $('#TaskHolder').hide();
     $('#TaskDescription').show();
   });
-  
+
   $('body').on('click', '#descriptionSave', function() {
     $('#TaskHolder').hide();
     $('#TaskDescription').hide();
