@@ -32,9 +32,11 @@ class ObjectFolder(Base, db.Model):
         else None
     return setattr(self, self.folderable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('folder_id', 'folderable_id', 'folderable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('folder_id', 'folderable_id', 'folderable_type'),
+        )
 
   _publish_attrs = [
       'folder_id',

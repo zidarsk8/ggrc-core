@@ -158,6 +158,13 @@ class Control(
   #mapped_directives = association_proxy(
   #    'directive_controls', 'directive', 'DirectiveControl')
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_controls_principal_assessor', 'principal_assessor_id'),
+        db.Index('ix_controls_secondary_assessor', 'secondary_assessor_id'),
+        )
+
   # REST properties
   _publish_attrs = [
       'active',
