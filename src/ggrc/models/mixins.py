@@ -259,6 +259,12 @@ class ContextRBAC(object):
   def context(cls):
     return db.relationship('Context', uselist=False)
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contexts'.format(cls.__tablename__), 'context_id'),
+        )
+
   _publish_attrs = ['context']
 
   #@classmethod
@@ -369,6 +375,12 @@ class WithContact(object):
         'Person',
         uselist=False,
         foreign_keys='{}.contact_id'.format(cls.__name__))
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        )
 
   _publish_attrs = ['contact']
 
