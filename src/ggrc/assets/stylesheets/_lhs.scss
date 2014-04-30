@@ -365,6 +365,11 @@
         height:30px;
         cursor:move;
       }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+      }
     }
     a {
       padding-left:20px;

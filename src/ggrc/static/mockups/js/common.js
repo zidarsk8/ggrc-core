@@ -487,6 +487,7 @@ $(document).ready(function(){
     $('#objectFooterUtility').show();
     $('#TaskGroupCounter').html('1');
     $('#objectsMainCounter4').html('1');
+    $('#workflowStart').removeClass('disabled');
   });
   
   $('body').on('click', '#cancelTaskGroup', function() {

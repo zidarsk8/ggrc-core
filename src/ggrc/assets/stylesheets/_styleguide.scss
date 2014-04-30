@@ -174,14 +174,15 @@
   }
   .tree-item-add {
     .add-single-object {
+      padding-top: 4px;
       select,
       input {
         margin-bottom: 5px;
-        margin-top: 4px;
+        margin-top: 0;
       }
-      a {
-        i {
-          margin-top: 10px;
+      .btn {
+        &.btn-footer {
+          margin-top: -4px;
         }
       }
     }
