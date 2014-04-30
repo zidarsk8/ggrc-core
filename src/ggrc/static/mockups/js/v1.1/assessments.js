@@ -143,6 +143,9 @@ can.Component.extend({
         if(typeof assessment.objects === 'undefined'){
           assessment.attr('objects', []);
         }
+        if(typeof assessment.task_groups === 'undefined'){
+          assessment.attr('task_groups', []);
+        }
         assessment.save();
     },
     "a#objectReview click" : function(el, ev){
@@ -259,7 +262,9 @@ can.Component.extend({
     "#addTaskGroup click" : function(){
       var title = $("#new_object_name").val()
         , assessment = this.scope.assessment;
-
+      if(!assessment.task_groups){
+        assessment.attr('task_groups', []);
+      }
       assessment.task_groups.push({
         title: title,
         description: "",
