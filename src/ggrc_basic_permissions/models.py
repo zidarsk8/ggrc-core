@@ -68,6 +68,12 @@ class UserRole(Base, db.Model):
   person = db.relationship(
       'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_user_roles_person', 'person_id'),
+        )
+
   _publish_attrs = ['role', 'person']
 
   @classmethod
