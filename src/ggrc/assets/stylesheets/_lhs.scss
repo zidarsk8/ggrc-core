@@ -309,7 +309,10 @@
     cursor:e-resize;
   }
 }
-
+// Show object nav bar-v below title
+.bar-v.objnav {
+  z-index: 1;
+}
 
 // INNER NAV
 
@@ -361,6 +364,11 @@
         width:16px;
         height:30px;
         cursor:move;
+      }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
       }
     }
     a {
