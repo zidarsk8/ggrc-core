@@ -317,6 +317,12 @@ class Slugged(Base):
   def title(cls):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+        )
+
   # REST properties
   _publish_attrs = ['slug', 'title']
   _fulltext_attrs = ['slug', 'title']

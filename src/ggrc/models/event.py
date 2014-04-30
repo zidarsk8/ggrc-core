@@ -15,6 +15,12 @@ class Event(Base, db.Model):
 
   revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('events_modified_by', 'modified_by_id'),
+        )
+
   _publish_attrs = [
       'action',
       'resource_id',

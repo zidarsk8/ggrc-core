@@ -33,9 +33,12 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.personable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('person_id', 'personable_id', 'personable_type'),
+        db.Index('ix_person_id', 'person_id'),
+        )
 
   _publish_attrs = [
       'role',
