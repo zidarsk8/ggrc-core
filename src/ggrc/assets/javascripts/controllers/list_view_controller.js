@@ -110,9 +110,7 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
       });
     }
 
-    if (this.options.list) {
-      this.element.trigger("updateCount", this.options.list.length);
-    } else {
+    if (!this.options.list) {
       if (!this.options.list_loader) {
         if (this.options.is_related) {
           this.options.list_loader = related_model_list_loader;
@@ -164,11 +162,8 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
 
   , prepare : function() {
     var that = this;
-    this.element.trigger("updateCount", 0)
 
-    this.options.list_loader(this, this.options.extra_params || {}).done(function(list) {
-      that.element.trigger("updateCount", list.length)
-    });
+    this.options.list_loader(this, this.options.extra_params || {});
 
     return $.when();
   }
@@ -243,11 +238,9 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
       page = pager.first();
       this.options.pager = pager;
       this.context.attr('pager', this.options.pager);
-      this.element.trigger("updateCount", ids.length);
       return page;
     } else {
       return this.options.list_loader(this, extra_params).done(function(list) {
-        that.element.trigger("updateCount", list.length);
       });
     }
   }
@@ -294,8 +287,6 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
       if (this.element) {
         if (this.options.pager)
           this.element.trigger("updateCount", this.options.pager.total);
-        else
-          this.element.trigger("updateCount", this.options.list.length);
         this.element.trigger("widget_updated");
       }
     }
