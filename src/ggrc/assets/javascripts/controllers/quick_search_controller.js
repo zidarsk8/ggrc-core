@@ -836,7 +836,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         });
 
         function finish_display(_) {
+          can.Map.startBatch();
           self.options.visible_lists[model_name].replace(initial_visible_list);
+          can.Map.stopBatch();
           // Stop spinner when request is complete
           $list.find(self.options.spinner_selector).html("");
           $list.trigger("list_displayed", model_name);
@@ -846,14 +848,14 @@ can.Control("CMS.Controllers.LHN_Search", {
             name : "search_" + model_name
             , objects : d
             , type : model_name
-            , keys : ["title", "contact", "is_private"]
+            , keys : ["title", "contact", "private"]
           }).save();
           return d;
         });
         if(display_now) {
-          dfd = dfd.then(finish_display);
-        } else {
           finish_display();
+        } else {
+          dfd = dfd.then(finish_display);
         }
         dfds.push(dfd);
       });
@@ -900,22 +902,26 @@ can.Control("CMS.Controllers.LHN_Search", {
             return CMS.Models.LocalListCache.findAll({ "name" : "search_" + model_name});
           })
         ).then(function() {
-          var types = {};
+          var types = {}, fake_search_result;
           can.each(can.makeArray(arguments), function(a) {
             if(a.length > 0) {
               types[a[0].name] = a[0].objects;
             }
           });
 
-          return {
-            getResultsForType : function(type) {
-              if(types["search_" + type]) {
-                result = types["search_" + type];
+          if (Object.keys(types).length > 0) {
+            fake_search_result = {
+              getResultsForType : function(type) {
+                if(types["search_" + type]) {
+                  return types["search_" + type];
+                }
               }
-            }
-          };
+            };
+            return fake_search_result;
+          }
         }).done(function(fake_search_result) {
-          self.display_lists(fake_search_result, true);
+          if (fake_search_result)
+            self.display_lists(fake_search_result, true);
         });
 
         return GGRC.Models.Search.search_for_types(
