@@ -8,7 +8,8 @@ function create_seed(){
       end_date: "09/06/2014",
       status: "Future",
       workflow: 0,
-      objects: []
+      objects: [],
+      task_groups: [],
     }).save();
   }
   if(taskList.length === 0){

@@ -1,7 +1,7 @@
 var Assessment = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessments-v3";
+    this.name = "assessments-v4";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
@@ -253,6 +253,22 @@ can.Component.extend({
     ".show_review click" : function(el){
       $(el).parent().hide();
       $(el).parent().prev().show();
+    },
+
+    // Task groups:
+    "#addTaskGroup click" : function(){
+      var title = $("#new_object_name").val()
+        , assessment = this.scope.assessment;
+
+      assessment.task_groups.push({
+        title: title,
+        description: "",
+        assignee: assessment.lead_email,
+        objects: [],
+        tasks: [],
+        end_date: ""
+      });
+      assessment.save();
     }
   },
   helpers: {
