@@ -894,8 +894,10 @@ can.Control("CMS.Controllers.LHN_Search", {
           self.options.visible_lists[model_name].replace(initial_visible_list);
           can.Map.stopBatch();
           // Stop spinner when request is complete
-          $list.find(self.options.spinner_selector).html("");
-          $list.trigger("list_displayed", model_name);
+          setTimeout(function() {
+            $list.find(self.options.spinner_selector).html("");
+            $list.trigger("list_displayed", model_name);
+          });
         }
         dfd = refresh_queue.trigger().then(function(d) {
           new CMS.Models.LocalListCache({
