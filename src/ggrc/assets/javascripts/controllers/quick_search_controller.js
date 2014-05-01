@@ -306,7 +306,7 @@ can.Control("CMS.Controllers.LHN", {
           } else {
             initial_scroll();
           }
-        }, 200);
+        });
         self.size = prefs[0].getLHNavSize(null, "lhs") || self.min_lhn_size;
         self.objnav_size = prefs[0].getObjNavSize(null, "object-area") || 200;
         self.resize_lhn(self.size);
@@ -582,7 +582,10 @@ can.Control("CMS.Controllers.LHN_Search", {
       //  We also listen for this value in the controller
       //  to trigger the search.
       return can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).then(function(frag, xhr) {
-        var lhn_prefs = prefs.getLHNState();
+        var lhn_prefs = prefs.getLHNState()
+          , initial_term
+          , initial_params
+          ;
 
         self.element.html(frag);
         self.post_init();
@@ -592,6 +595,13 @@ can.Control("CMS.Controllers.LHN_Search", {
             self.options.display_prefs.setLHNState("category_scroll", this.scrollTop);
           }));
 
+        initial_term = self.options.display_prefs.getLHNState().search_text || "";
+        if (self.options.observer.my_work) {
+          initial_params = { "contact_id": GGRC.current_user.id };
+        }
+        self.options.loaded_lists = [];
+        self.run_search(initial_term, initial_params);
+
         // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
         //  open category is toggled open, and the search placed into the search box by display prefs is 
         //  sent to the search service.
@@ -600,10 +610,6 @@ can.Control("CMS.Controllers.LHN_Search", {
             self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
           );
         }
-        if (self.options.observer.my_work) {
-          self.current_params = { "contact_id": GGRC.current_user.id };
-        }
-        self.run_search(lhn_prefs.search_text || "", self.current_params);
       });
     }
 
@@ -898,7 +904,7 @@ can.Control("CMS.Controllers.LHN_Search", {
             , search_text : search_text
             , my_work : my_work
             , type : model_name
-            , keys : ["title", "contact", "private"]
+            , keys : ["title", "contact", "private", "viewLink"]
           }).save();
           return d;
         });
