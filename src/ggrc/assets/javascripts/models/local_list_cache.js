@@ -49,6 +49,8 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
       id : this.id
       , name : this.name
       , type : this.type
+      , search_text : this.search_text
+      , my_work : this.my_work
       , objects : can.map(this.objects || [], function(d) {
         if(that.type && d.constructor.shortName !== that.type)
           return;
@@ -63,7 +65,7 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
         });
         return obj;
       })
-      , keys : this.keys
+      , keys : this.keys.serialize ? this.keys.serialize() : this.keys
     };
   }
 });

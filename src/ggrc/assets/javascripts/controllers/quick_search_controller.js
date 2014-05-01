@@ -228,8 +228,12 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , "input.widgetsearch keypress": function(el, ev) {
-      if(ev.which === 13)
-        this.obs.attr("value", $(ev.target).val());
+      var value;
+      if(ev.which === 13) {
+        value = $(ev.target).val();
+        this.obs.attr("value", value);
+        this.options.display_prefs.setLHNState("search_text", value);
+      }
     }
 
   , "input.my-work click": function(el, ev) {
@@ -254,6 +258,7 @@ can.Control("CMS.Controllers.LHN", {
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
         var settings, checked
           , $lhs = $("#lhs")
+          , lhn_search_dfd
           ;
 
         if(prefs.length < 1) {
@@ -267,11 +272,17 @@ can.Control("CMS.Controllers.LHN", {
         checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
         self.obs.attr("my_work", checked);
 
-        $lhs.cms_controllers_lhn_search({ observer: self.obs, display_prefs: prefs[0] });
+        lhn_search_dfd = $lhs
+          .cms_controllers_lhn_search({
+            observer: self.obs,
+            display_prefs: prefs[0]
+          })
+          .control('lhn_search')
+          .display();
         $lhs.cms_controllers_lhn_tooltips();
 
         // Delay LHN initializations until after LHN is rendered
-        setTimeout(function() {
+        lhn_search_dfd.then(function() {
           var target = self.element.find('#lhs input.my-work')
             , checked = self.obs.attr('my_work')
             ;
@@ -545,7 +556,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , observer : null
     }
 }, {
-    init: function() {
+    display: function() {
       var self = this
         , prefs = this.options.display_prefs
         , prefs_dfd
@@ -570,7 +581,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       //  search box and the display prefs to save the search value between page loads. 
       //  We also listen for this value in the controller
       //  to trigger the search.
-      can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).done(function(frag, xhr) {
+      return can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).then(function(frag, xhr) {
         var lhn_prefs = prefs.getLHNState();
 
         self.element.html(frag);
@@ -589,9 +600,10 @@ can.Control("CMS.Controllers.LHN_Search", {
             self.element.find(self.options.list_selector + " > a[data-object-singular=" + lhn_prefs.open_category + "]")
           );
         }
-        if(lhn_prefs.search_text) {
-          self.run_search(lhn_prefs.search_text, self.current_params);
+        if (self.options.observer.my_work) {
+          self.current_params = { "contact_id": GGRC.current_user.id };
         }
+        self.run_search(lhn_prefs.search_text || "", self.current_params);
       });
     }
 
@@ -599,7 +611,6 @@ can.Control("CMS.Controllers.LHN_Search", {
       var self = this;
       this.init_object_lists();
       this.init_list_views();
-      this.run_search("", this.options.observer.my_work ? { "contact_id": GGRC.current_user.id } : null);
 
       can.Model.Cacheable.bind("created", function(ev, instance) {
         var visible_model_names =
@@ -851,6 +862,8 @@ can.Control("CMS.Controllers.LHN_Search", {
       var self = this
         , lists = this.get_visible_lists()
         , dfds = []
+        , search_text = this.current_term
+        , my_work = self.current_params && self.current_params.contact_id
         ;
 
       can.each(lists, function(list) {
@@ -882,6 +895,8 @@ can.Control("CMS.Controllers.LHN_Search", {
           new CMS.Models.LocalListCache({
             name : "search_" + model_name
             , objects : d
+            , search_text : search_text
+            , my_work : my_work
             , type : model_name
             , keys : ["title", "contact", "private"]
           }).save();
@@ -939,8 +954,11 @@ can.Control("CMS.Controllers.LHN_Search", {
         ).then(function() {
           var types = {}, fake_search_result;
           can.each(can.makeArray(arguments), function(a) {
-            if(a.length > 0) {
-              types[a[0].name] = a[0].objects;
+            var a = a[0];
+            if (a
+                && a.search_text == self.current_term
+                && a.my_work == (self.current_params && self.current_params.contact_id)) {
+              types[a.name] = a.objects;
             }
           });
 
