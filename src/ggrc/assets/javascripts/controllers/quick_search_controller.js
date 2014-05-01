@@ -897,7 +897,7 @@ can.Control("CMS.Controllers.LHN_Search", {
           setTimeout(function() {
             $list.find(self.options.spinner_selector).html("");
             $list.trigger("list_displayed", model_name);
-          });
+          }, 1);
         }
         dfd = refresh_queue.trigger().then(function(d) {
           new CMS.Models.LocalListCache({
