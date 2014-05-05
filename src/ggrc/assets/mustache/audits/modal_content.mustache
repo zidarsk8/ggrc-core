@@ -1,7 +1,9 @@
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
-  {{#if object_params.program}}
+  {{#if_helpers '\
+   #if' object_params.program '\
+   or ^if' new_object_form}}
     <div class="row-fluid hidden">
       <div class="span6">
         <div class="spacing-bottom">
@@ -29,7 +31,7 @@
         </div>
       </div>
     </div>
-  {{/if}}
+  {{/if_helpers}}
   
   <div class="row-fluid">
     <div class="span6">
@@ -176,7 +178,7 @@
     </div>
   </div>
   <input type="hidden" name="slug" value="{{slug}}">
-  <input type="hidden" name="modified_by_id" value="{{#with_current_user_as 'current_user'}}{{current_user.id}}{{/with_current_user_as}}">
+  {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 </form>
 {{/instance}}
 {{!/div}}

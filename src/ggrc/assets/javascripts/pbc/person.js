@@ -36,7 +36,8 @@ can.Model.Cacheable("CMS.Models.Person", {
         });
     }
     , attributes : {
-        modified_by : "CMS.Models.Person.stub"
+        context : "CMS.Models.Context.stub"
+      , modified_by : "CMS.Models.Person.stub"
       , object_people : "CMS.Models.ObjectPerson.stubs"
       , language : "CMS.Models.Option.stub"
       , user_roles : "CMS.Models.UserRole.stubs"

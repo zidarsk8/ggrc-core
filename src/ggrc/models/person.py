@@ -31,6 +31,12 @@ class Person(Base, db.Model):
       uselist=False,
       )
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('uq_people_email', 'email', unique=True),
+        )
+
   _fulltext_attrs = [
       'company',
       'email',
@@ -48,7 +54,7 @@ class Person(Base, db.Model):
       'name',
       ]
   _include_links = [
-      'object_people',
+      #'object_people',
       ]
 
   # Methods required by Flask-Login

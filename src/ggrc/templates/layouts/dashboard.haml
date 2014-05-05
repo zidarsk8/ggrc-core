@@ -64,6 +64,10 @@
                         %i.grcicon-desktop
                         Reset Layout to Default
                     %li
+                      %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
+                        %i.grcicon-desktop
+                        Set Layout as Default
+                    %li
                       -# FIXME: Fix link
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
@@ -99,6 +103,7 @@
                   %p=message
         -block main
           .clearfix
+            .objnav.bar-v
             .inner-nav
               .object-nav
                 %ul.nav{ 'class': "internav ={ model_display_class }" }

@@ -75,7 +75,7 @@
   &.emphasized { // special case for programs
    ul {
      margin-bottom:0;
-   } 
+   }
   }
   .accordion-group { // override bootstrap
     border:none;
@@ -108,11 +108,16 @@
       }
       a {
         display:block;
-        padding-left:10px;
-        &.active,
+        padding-left:26px;
+        background: image-url('grcicons/not-open.png') no-repeat 10px center;
+        @include background-size(17px 12px);
         &:hover {
           text-decoration:none;
-          background:#fff image-url('grcicons/open.png') no-repeat right center;
+          background:#fff image-url('grcicons/not-open.png') no-repeat 10px center;
+          @include background-size(17px 12px);
+        }
+        &.active {
+          background:#fff image-url('grcicons/open.png') no-repeat 10px center;
           @include background-size(17px 12px);
         }
       }
@@ -304,7 +309,10 @@
     cursor:e-resize;
   }
 }
-
+// Show object nav bar-v below title
+.bar-v.objnav {
+  z-index: 1;
+}
 
 // INNER NAV
 
@@ -356,6 +364,11 @@
         width:16px;
         height:30px;
         cursor:move;
+      }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
       }
     }
     a {

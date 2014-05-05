@@ -14,9 +14,13 @@ class ControlControl(Mapping, db.Model):
   implemented_control_id = db.Column(
       db.Integer, db.ForeignKey('controls.id'), nullable=False)
 
-  __table_args__ = (
-    db.UniqueConstraint('control_id', 'implemented_control_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('control_id', 'implemented_control_id'),
+        db.Index('ix_control_id', 'control_id'),
+        db.Index('ix_implemented_control_id', 'implemented_control_id'),
+        )
 
   _publish_attrs = [
     'control',

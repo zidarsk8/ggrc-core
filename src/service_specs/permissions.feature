@@ -38,7 +38,6 @@ Feature: RBAC Permissions enforcement for REST API
     And a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context1"
     And current user has create permissions on resource types that "<resource_type>" depends on in context "context1"
-    And current user has create permissions on resource types that "<resource_type>" depends on in context "context2"
     Then POST of "resource" to its collection is allowed
     Given a new "<resource_type>" named "resource"
     And "resource" link property "context" is "context2"

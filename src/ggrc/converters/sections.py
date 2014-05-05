@@ -5,7 +5,7 @@
 
 from .base import *
 
-from ggrc.models import Directive, DirectiveSection, Section
+from ggrc.models import Directive, DirectiveSection, Section, Clause
 from .base_row import *
 from collections import OrderedDict
 
@@ -36,15 +36,27 @@ class SectionRowConverter(BaseRowConverter):
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
     if directive_id:
-      # connect via DirectiveSection if clause, but directily if section
-      import_kind = options.get('import_kind')
-      if import_kind == 'Clause':
-        db_session.add(self.obj)
-        ds = DirectiveSection(directive_id=directive_id, section=self.obj)
-        db_session.add(ds)
-      elif import_kind == 'Section':
-        self.obj.directive_id = int(directive_id)
-        db_session.add(self.obj)
+      self.obj.directive_id = int(directive_id)
+      db_session.add(self.obj)
+
+
+class ClauseRowConverter(SectionRowConverter):
+  model_class = Clause
+
+  def save_object(self, db_session, **options):
+    directive_id = options.get('directive_id')
+    if not directive_id:
+      return
+    # Make sure directive/clause aren't already connected before creating
+    clause_id = getattr(self.obj, 'id', None)
+    matching_relationship_count = DirectiveSection.query\
+      .filter(DirectiveSection.directive_id==directive_id)\
+      .filter(DirectiveSection.section_id==clause_id)\
+      .count()
+    if matching_relationship_count == 0:
+      db_session.add(self.obj)
+      ds = DirectiveSection(directive_id=directive_id, section=self.obj)
+      db_session.add(ds)
 
 
 class SectionsConverter(BaseConverter):
@@ -77,9 +89,9 @@ class SectionsConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.directive_kind()))
+      self.errors.append(u'Missing {} Code heading'.format(self.directive_kind()))
     elif attrs['slug'] != self.directive().slug:
-      self.errors.append('{0} Code must be {1}'.format(
+      self.errors.append(u'{0} Code must be {1}'.format(
           self.directive_kind(),
           self.directive().slug
       ))
@@ -108,3 +120,6 @@ class SectionsConverter(BaseConverter):
     yield []
     yield self.object_map.keys()
 
+
+class ClausesConverter(SectionsConverter):
+  row_converter = ClauseRowConverter

@@ -5,23 +5,23 @@
 
 from behave import then, when
 from tests.ggrc.behave.utils import (
-    get_resource, get_service_endpoint_url, handle_get_resource_and_name_it,
+    get_resource, get_service_endpoint_url_for_type, handle_get_resource_and_name_it,
     check_for_resource_in_collection,
     )
 
 @when('Querying "{resource_type}" with "{querystring}"')
 def query_resource_collection(context, resource_type, querystring):
   url = '{0}?{1}'.format(
-      get_service_endpoint_url(context, resource_type),
+      get_service_endpoint_url_for_type(context, resource_type),
       querystring)
   handle_get_resource_and_name_it(context, url, 'queryresultcollection')
 
 @when('Querying "{resource_type}" with bad argument "{querystring}"')
 def query_with_bad_argument(context, resource_type, querystring):
   url = '{0}?{1}'.format(
-      get_service_endpoint_url(context, resource_type),
+      get_service_endpoint_url_for_type(context, resource_type),
       querystring)
-  context.response = get_resource(context, url)
+  context._response = get_resource(context, url)
 
 @when('Querying "{resource_type}" with expression "{property_path}" equals literal "{value}"')
 def query_resource_collection_with_literal(

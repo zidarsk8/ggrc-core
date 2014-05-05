@@ -14,9 +14,13 @@ class ControlSection(Mapping, db.Model):
   section_id = db.Column(
       db.Integer, db.ForeignKey('sections.id'), nullable=False)
 
-  __table_args__ = (
-    db.UniqueConstraint('control_id', 'section_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('control_id', 'section_id'),
+        db.Index('ix_control_id', 'control_id'),
+        db.Index('ix_section_id', 'section_id'),
+        )
 
   _publish_attrs = [
       'control',

@@ -116,8 +116,7 @@
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
-      , controls: Proxy(
-          "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
+      , controls: Multi(["implemented_controls", "implementing_controls"])
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , _sections_base: Proxy(
@@ -183,10 +182,16 @@
       , clauses: TypeFilter("_sections_base", "Clause")
       , orphaned_objects: Multi([
           "related_objects"
-        , "controls"
-        , "sections"
         , "clauses"
+        , "contracts"
+        , "controls"
+        , "objectives"
         , "people"
+        , "policies"
+        , "programs"
+        , "regulations"
+        , "sections"
+        , "standards"
         ])
       }
     , section_base: {
@@ -534,7 +539,8 @@
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
-                    if (relationship.source.reify() === page_instance || relationship.destination.reify() === page_instance) {
+                    if (relationship.source && relationship.source.reify() === page_instance
+                        || relationship.destination && relationship.destination.reify() === page_instance) {
                       return true;
                     }
                   }
@@ -543,7 +549,7 @@
               }
             ;
 
-          if (instance instanceof CMS.Models.Request)
+          if (instance instanceof CMS.Models.Request && instance.responses)
             return is_mapped(instance.responses.reify());
           else if (instance instanceof CMS.Models.Response)
             return is_mapped([instance]);

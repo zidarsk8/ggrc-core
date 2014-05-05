@@ -1048,7 +1048,7 @@
           return;
         }
         if (!join_instance) {
-          that.element.trigger("ajax:flash", {
+          $(document.body).trigger("ajax:flash", {
             error: "Select an object to map" });
         } else {
           join_instance.save()
@@ -1063,7 +1063,7 @@
               //that.element.trigger("ajax:flash", { error : xhr.responseText });
               if (that.element) {
                 var message = "That object is already mapped";
-                that.element.trigger("ajax:flash", { error: message });
+                $(document.body).trigger("ajax:flash", { error: message });
               }
             });
         }
@@ -1094,13 +1094,16 @@
           this.element.remove();
       }
 
-    , ".btn-add modal:success" : function(el, ev, data) {
+    , " modal:success" : function(el, ev, data, options) {
         var self = this;
         // Scroll so the top element (the one just added) is in view
         this.element.find(".option_column ul.new-tree").parent().scrollTop(0);
         this.search_reset().then(function() {
           // Move the just-created object to the top
           self.move_option_to_top_and_select(data);
+          if(options && options.map_and_save){
+            self.on_map(self.element.find('.map-button'));
+          }
         });
       }
 

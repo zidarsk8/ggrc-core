@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, validates
 from sqlalchemy.orm.session import Session
 from uuid import uuid1
 from .inflector import ModelInflectorDescriptor
-from .reflection import PublishOnly
+from .reflection import AttributeInfo, PublishOnly
 from .computed_property import computed_property
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -68,6 +68,28 @@ class Identifiable(object):
       options.append(orm.joinedload(include_link))
       options.append(orm.undefer_group(inclusion_class.__name__ + '_complete'))
     return query.options(*options)
+
+  @declared_attr
+  def __table_args__(cls):
+    extra_table_args = AttributeInfo.gather_attrs(cls, '_extra_table_args')
+    table_args = []
+    table_dict = {}
+    for table_arg in extra_table_args:
+      if callable(table_arg):
+        table_arg = table_arg()
+      if isinstance(table_arg, (list, tuple, set)):
+        if isinstance(table_arg[-1], (dict,)):
+          table_dict.update(table_arg[-1])
+          table_args.extend(table_arg[:-1])
+        else:
+          table_args.extend(table_arg)
+      elif isinstance(table_arg, (dict,)):
+        table_dict.update(table_arg)
+      else:
+        table_args.append(table_arg)
+    if len(table_dict) > 0:
+      table_args.append(table_dict)
+    return tuple(table_args,)
 
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
@@ -237,6 +259,12 @@ class ContextRBAC(object):
   def context(cls):
     return db.relationship('Context', uselist=False)
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contexts'.format(cls.__tablename__), 'context_id'),
+        )
+
   _publish_attrs = ['context']
 
   #@classmethod
@@ -288,6 +316,12 @@ class Slugged(Base):
   @declared_attr
   def title(cls):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+        )
 
   # REST properties
   _publish_attrs = ['slug', 'title']
@@ -347,6 +381,12 @@ class WithContact(object):
         'Person',
         uselist=False,
         foreign_keys='{}.contact_id'.format(cls.__name__))
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        )
 
   _publish_attrs = ['contact']
 

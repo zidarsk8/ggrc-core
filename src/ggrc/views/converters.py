@@ -622,7 +622,7 @@ def import_requests_template(audit_id):
 def import_sections(directive_id):
   from werkzeug import secure_filename
   from ggrc.converters.common import ImportException
-  from ggrc.converters.sections import SectionsConverter
+  from ggrc.converters.sections import SectionsConverter, ClausesConverter
   from ggrc.converters.import_helper import handle_csv_import
   from ggrc.models import Directive, Contract
   from ggrc.utils import view_url_for
@@ -630,10 +630,14 @@ def import_sections(directive_id):
   directive = Directive.query.get(directive_id)
   directive_url = view_url_for(directive)
   return_to = unicode(request.args.get('return_to', directive_url))
+  # TODO: Further separate clause vs section import handler when it's
+  # possible to import clauses to non-Contracts, sections to Contracts
+  # For now, just decide import type based on directive type
+  import_kind = "Sections"
+  object_converter = SectionsConverter
   if isinstance(directive, Contract):
     import_kind = "Clauses"
-  else:
-    import_kind = "Sections"
+    object_converter = ClausesConverter
 
   if request.method == 'POST':
 
@@ -649,7 +653,7 @@ def import_sections(directive_id):
     try:
       if csv_file and allowed_file(csv_file.filename):
         filename = secure_filename(csv_file.filename)
-        converter = handle_csv_import(SectionsConverter, csv_file, **options)
+        converter = handle_csv_import(object_converter, csv_file, **options)
         if dry_run:
           return render_template("directives/import_sections_result.haml",
               directive_id=directive_id, converter=converter,

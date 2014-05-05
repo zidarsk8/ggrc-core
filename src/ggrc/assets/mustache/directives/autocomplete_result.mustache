@@ -1,16 +1,9 @@
 {{#items}}
 <li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
-  <a href="javascript://">
+  <a href="javascript://" class='show-extended' {{data 'model'}}>
     <i class="grcicon-{{class.table_singular}}-color"></i>
     {{title}}
   </a>
-  <!--<div class="extended-content">
-    <div class="row-fluid">
-      <div class="span12">
-        {{title}}
-      </div>
-    </div>
-  </div>-->
 </li>
 {{/items}}
 {{^items}}

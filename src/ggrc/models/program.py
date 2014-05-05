@@ -51,8 +51,8 @@ class Program(
       ]
 
   _include_links = [
-      'program_controls',
-      'program_directives',
+      #'program_controls',
+      #'program_directives',
       ]
 
   @classmethod
@@ -62,5 +62,5 @@ class Program(
     query = super(Program, cls).eager_query()
     return cls.eager_inclusions(query, Program._include_links).options(
         orm.subqueryload_all('program_directives.directive'),
-        #orm.joinedload('program_controls'),
+        orm.subqueryload('program_controls'),
         orm.subqueryload('audits'))

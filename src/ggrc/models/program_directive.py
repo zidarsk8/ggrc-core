@@ -12,9 +12,13 @@ class ProgramDirective(Mapping, db.Model):
   program_id = db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False)
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=False)
 
-  __table_args__ = (
-    db.UniqueConstraint('program_id', 'directive_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('program_id', 'directive_id'),
+        db.Index('ix_program_id', 'program_id'),
+        db.Index('ix_directive_id', 'directive_id'),
+        )
 
   _publish_attrs = [
       'program',

@@ -33,9 +33,12 @@ class ObjectSection(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.sectionable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('section_id', 'sectionable_id', 'sectionable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('section_id', 'sectionable_id', 'sectionable_type'),
+        db.Index('ix_section_id', 'section_id'),
+        )
 
   _publish_attrs = [
       'role',
@@ -84,7 +87,7 @@ class Sectionable(object):
       ]
 
   _include_links = [
-      'object_sections',
+      #'object_sections',
       ]
 
   @classmethod

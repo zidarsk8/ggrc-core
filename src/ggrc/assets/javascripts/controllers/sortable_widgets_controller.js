@@ -69,10 +69,10 @@ can.Control("CMS.Controllers.SortableWidgets", {
           })
         );
       page_sorts.attr($(this.element).attr("id"), this.options.sort);
+      this.options.model.save();
       this_sort = this.options.sort;
     }
 
-    var that = this;
     var firstchild = null;
     can.each(this_sort, function(id) {
       firstchild || (firstchild = $("#" + id));

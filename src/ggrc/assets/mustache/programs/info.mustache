@@ -23,13 +23,7 @@
       <div class="rtf-block">
         {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
       </div>
-    </div>
-    <div class="span6">
-      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_program=true stacked=true}}}
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span6">
+      
       <div class="rtf-block">
         <strong>Notes</strong>
         <br>
@@ -37,6 +31,7 @@
       </div>
     </div>
     <div class="span6">
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance is_program=true stacked=true}}}
       <p>
         <strong>Program URL</strong>
         <br>

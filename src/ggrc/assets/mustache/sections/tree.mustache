@@ -26,52 +26,50 @@
                 </li>
               {{/infer_roles}}
               <li>
+                {{#with_page_object_as 'page_instance'}}
+                {{#if_helpers '\
+                  ^if_instance_of' page_instance 'Directive' '\
+                  or ^if_instance_of' instance 'Section'}}
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
+                {{/if_helpers}}
+                {{/with_page_object_as}}
               </li>
+              <li>
               {{#with_mapping_count instance 'related_objects'}}
                 {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                       <i class="grcicon-object-black"></i>
                         {{#if count}}
                           <span>{{count}}</span>
                         {{else}}
                           <strong class="error">0</strong>
                         {{/if}}
-                    </div>
-                  </li>
+                    </span>
                 {{/prune_context}}
               {{/with_mapping_count}}
-              
-              {{#pack list=instance.objectives}}
-                {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
+
+              {{#with_mapping_count instance 'objectives'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
                       <i class="grcicon-objective-black"></i>
-                        {{#if list.length}} 
-                          <span>{{list.length}}</span>
+                        {{#if count}}
+                          <span>{{count}}</span>
                         {{else}}
                           <strong class="error">0</strong>
                         {{/if}}
-                    </div>
-                  </li>
-                {{/prune_context}}
-              {{/pack}}
-              
-              {{#pack list=instance.controls}}
-                {{#prune_context}}
-                  <li>
-                    <div class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
+                    </span>
+              {{/with_mapping_count}}
+
+              {{#with_mapping_count instance 'controls'}}
+                    <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
                       <i class="grcicon-control-black"></i>
-                      {{#if list.length}} 
-                        <span>{{list.length}}</span>
+                      {{#if count}}
+                        <span>{{count}}</span>
                       {{else}}
                         <strong class="error">0</strong>
                       {{/if}}
-                    </div>
-                  </li>
-                {{/prune_context}}
-              {{/pack}}
+                    </span>
+              {{/with_mapping_count}}
+              </li>
             </ul>
             
             <div class="item-data">
@@ -92,14 +90,23 @@
 
         <div class="row-fluid">
 
-          <div class="span12">
+          <div class="span6">
+          {{#if instance.viewLink}}
+            <a href="{{instance.viewLink}}" class="info-action">
+              View {{instance.class.title_singular}}
+              <i class="grcicon-goto"></i>
+            </a>
+          {{/if}}
+          </div>
+
+          <div class="span6">
             {{#if_helpers '\
               if_instance_of' instance "Section" '\
               and if_instance_of' parent_instance "Directive"}}
             {{#is_allowed 'update' instance}}
-              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+              <a href="javascript://" class="info-action pull-right" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
                 <i class="grcicon-edit"></i>
-                Edit {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
+                Edit {{instance.class.model_singular}}
               </a>
             {{/is_allowed}}
             {{else}}
@@ -116,6 +123,7 @@
             {{/is_allowed_all}}
             {{/if}}
             {{/if}}
+            {{> /static/mustache/base_objects/edit_object_link.mustache}}
             {{/if_helpers}}
           </div>
 
@@ -134,6 +142,7 @@
           </div>
         {{/instance.description}}
 
+        {{#if_instance_of instance "Section"}}
         {{#using directive=instance.directive}}
           <div class="row-fluid">
             <div class="span12">
@@ -145,6 +154,7 @@
             </div>
           </div>
         {{/using}}
+        {{/if_instance_of}}
 
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 

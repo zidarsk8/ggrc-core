@@ -250,10 +250,15 @@
     , refresh_list: function() {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
+          , self = this
           ;
 
         binding.name = this.name + "_instances";
-        return binding.refresh_instances(this);
+        //  FIXME: `refresh_instances` should not need to be called twice, but
+        //  it fixes pre-mature resolution of mapping deferreds in some cases
+        return binding.refresh_instances(this).then(function(){
+          return self.refresh_instances();
+        });
       }
 
     , refresh_instance: function() {
@@ -1462,12 +1467,16 @@
 
   GGRC.all_local_results = function(instance) {
     // Returns directly-linked objects
-    var loaders = GGRC.Mappings[instance.constructor.shortName]
+    var loaders
       , local_loaders = []
       , multi_loader
       , multi_binding
       ;
 
+    if (instance._all_local_results_binding)
+      return instance._all_local_results_binding.refresh_stubs();
+
+    loaders = GGRC.Mappings[instance.constructor.shortName];
     can.each(loaders, function(loader, name) {
       if (loader instanceof GGRC.ListLoaders.DirectListLoader
           || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
@@ -1476,8 +1485,8 @@
     });
 
     multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders);
-    multi_binding = multi_loader.attach(instance);
-    return multi_binding.refresh_stubs();
+    instance._all_local_results_binding = multi_loader.attach(instance);
+    return instance._all_local_results_binding.refresh_stubs();
   };
 
 })(GGRC, can);
