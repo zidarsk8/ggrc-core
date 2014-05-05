@@ -129,7 +129,6 @@ var LHN = can.Control({
       $(window).trigger('resize');
       $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
     }
-
   , min_lhn_size : 240
   , min_objnav_size : 44
   , mousedown : false
@@ -155,7 +154,7 @@ var LHN = can.Control({
 
     $search.width(resize - 100);
     window.resize_areas();
-    $(window).trigger('resize');
+    //$(window).trigger('resize');
     $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
   }
   , resize_objnav : function(resize){
@@ -170,7 +169,11 @@ var LHN = can.Control({
     $object_nav.width(size);
     $object_bar.css('left', resize);
     window.resize_areas();
-    $(window).trigger('resize');
+    //$(window).trigger('resize');
+  }
+  , "{window} resize" : function(el, ev){
+    this.resize_lhn(this.lhn_width()-8);
+    this.resize_objnav(this.lhn_width() + this.objnav_size);
   }
   , "{window} mousedown" : function(el, ev) {
     var $target = $(ev.target);

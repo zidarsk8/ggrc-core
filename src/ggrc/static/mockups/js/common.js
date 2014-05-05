@@ -166,6 +166,9 @@ $(document).ready(function(){
     $( ".objective-selector input[name='object.title']" ).autocomplete({
       source: object
     });
+    $( ".people-autocomplete > input" ).autocomplete({
+      source: people
+    });
 
 
   });
