@@ -1,7 +1,39 @@
+Mustache.registerHelper("if_equals", function(val1, val2, options) {
+  var that = this, _val1, _val2;
+  function exec() {
+    if(_val1 == _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
+  }
+    if(typeof val1 === "function") { 
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+    if(typeof val2 === "function") { 
+      if(val2.isComputed) {
+        val2.bind("change", function(ev, newVal, oldVal) {
+          _val2 = newVal;
+          exec();
+        });
+      }
+      _val2 = val2.call(this);
+    } else {
+      _val2 = val2;
+    }
+
+  return exec();
+});
+
 var Assessment = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessments-v4";
+    this.name = "workflow";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
@@ -34,6 +66,15 @@ var Task = can.Model.LocalStorage.extend({
   }
 });
 
+
+var ProgramList = [{
+  name: 'program',
+  title: 'Google Fiber',
+  description: '<p><b>ISO/IEC 27001</b>, part of the growing&nbsp;<a href="http://en.wikipedia.org/wiki/ISO/IEC_27000-series">ISO/IEC 27000 family of standards</a>, is an&nbsp;<a href="http://en.wikipedia.org/wiki/Information_security_management_system">information security management system</a>&nbsp;(ISMS) standard published in October 2005 by the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Organization_for_Standardization">International Organization for Standardization</a>&nbsp;(ISO) and the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Electrotechnical_Commission">International Electrotechnical Commission</a>&nbsp;(IEC). Its full name is&nbsp;<i>ISO/IEC 27001:2005 – Information technology – Security techniques – Information security management systems – Requirements</i>.</p><p>ISO/IEC 27001 formally specifies a management system that is intended to bring information security under explicit management control. Being a formal specification means that it mandates specific requirements. Organizations that claim to have adopted ISO/IEC 27001 can therefore be formally audited and certified compliant with the standard (more below).</p>',
+  owner: 'liz@reciprocitylbas.com',
+  contact: 'ken@reciprocitylbas.com'
+}];
+
 var Objects = [
    {type: "control", name: "Secure Backups"},
    {type: "control", name: "Data Storage"},
@@ -46,19 +87,22 @@ var Objects = [
 var taskList = new Task.List({});
 var assessmentList = new Assessment.List({});
 create_seed();
+
+
+// LHN
 can.Component.extend({
-  tag: 'assessments-app',
+  tag: 'lhn-app',
   scope: {
     assessments: assessmentList,
+    programs: ProgramList,
     tasks: taskList,
-    select: function(assessment, el, ev){
+    select: function(object, el, ev){
       ev.preventDefault();
-      $("assessment-app").trigger("selected", assessment);
-      $("workflow-app").trigger("selected", assessment);
+      $("tree-app").trigger("selected", object);
+      //$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+      $("workflow").trigger("selected", object);
+      resize_areas();
     },
-    equals : function(v){
-      return false;
-    }
   },
   events: {
     '{Assessment} created' : function(Construct, ev, assessment){
@@ -70,9 +114,31 @@ can.Component.extend({
   }
 });
 
-
 can.Component.extend({
-  tag: 'assessment-app',
+  tag: 'tree-app',
+  scope: {
+    object: ProgramList[0]//assessmentList[0]
+  },
+  events: {
+    ' selected' : function(el, ev, object){
+      this.scope.attr('object', object);
+    }
+  },
+  helpers: {
+    
+    "hide_class": function(val, object, options) {
+      var name = object().name;
+      if(name === val) 
+        return '';
+      else
+        return 'hide';
+    }
+  }
+});
+
+// Workflow Tree
+can.Component.extend({
+  tag: 'workflow',
   scope: {
     assessments : assessmentList,
     assessment: assessmentList[0],
@@ -275,39 +341,6 @@ can.Component.extend({
       });
       assessment.save();
     }
-  },
-  helpers: {
-    "if_equals": function(val1, val2, options) {
-      var that = this, _val1, _val2;
-      function exec() {
-        if(_val1 == _val2) return options.fn(options.contexts);
-        else return options.inverse(options.contexts);
-      }
-        if(typeof val1 === "function") {
-          if(val1.isComputed) {
-            val1.bind("change", function(ev, newVal, oldVal) {
-              _val1 = newVal;
-              return exec();
-            });
-          }
-          _val1 = val1.call(this);
-        } else {
-          _val1 = val1;
-        }
-        if(typeof val2 === "function") {
-          if(val2.isComputed) {
-            val2.bind("change", function(ev, newVal, oldVal) {
-              _val2 = newVal;
-              exec();
-            });
-          }
-          _val2 = val2.call(this);
-        } else {
-          _val2 = val2;
-        }
-
-      return exec();
-    }
   }
 });
 
@@ -320,17 +353,6 @@ can.Component.extend({
         end_date: ""
       }).save();
       $("#newTask").modal('hide');
-    });
-    // Init autocomplete
-    var people = [
-      "Vladan Mitevski",
-      "Predrag Kanazir",
-      "Dan Ring",
-      "Silas Barta",
-      "Cassius Clay"
-    ];
-    $( ".people-autocomplete > input" ).autocomplete({
-      source: people
     });
   },
   tag: 'workflow-app',
@@ -389,7 +411,7 @@ can.Component.extend({
     },
     "a#addWorkflowNow click" : function(el, ev){
       var workflow = this.scope.workflow;
-      $("assessment-app").trigger("workflow_selected", this.scope.workflow);
+      $("tree-app").trigger("workflow_selected", this.scope.workflow);
       if(typeof workflow !== 'undefined' && workflow.attr('_new')){
         workflow.attr('_new', false);
         workflow.save();
@@ -413,45 +435,12 @@ can.Component.extend({
         workflow[model][index].attr(type, el.val());
       }
     },
-  },
-
-  helpers: {
-   "if_equals": function(val1, val2, options) {
-      var that = this, _val1, _val2;
-      function exec() {
-        if(_val1 == _val2) return options.fn(options.contexts);
-        else return options.inverse(options.contexts);
-      }
-        if(typeof val1 === "function") {
-          if(val1.isComputed) {
-            val1.bind("change", function(ev, newVal, oldVal) {
-              _val1 = newVal;
-              return exec();
-            });
-          }
-          _val1 = val1.call(this);
-        } else {
-          _val1 = val1;
-        }
-        if(typeof val2 === "function") {
-          if(val2.isComputed) {
-            val2.bind("change", function(ev, newVal, oldVal) {
-              _val2 = newVal;
-              exec();
-            });
-          }
-          _val2 = val2.call(this);
-        } else {
-          _val2 = val2;
-        }
-
-      return exec();
-    }
   }
 });
 $("#cancelChangeWorkflow").on('click', function(ev){
   $("workflow-app").trigger("select_previous", workflow);
 });
-$("#assessments-lhn").html(can.view("/static/mockups/mustache/v1.1/assessments.mustache", {}))
-$("#assessment-app").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}))
+$("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
+$("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
+$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));

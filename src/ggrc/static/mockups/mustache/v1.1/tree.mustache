@@ -1,0 +1,196 @@
+<tree-app>
+<div class="area program" class="{{hide_class 'program' object}}">
+  <div class="header-content">
+    <div class="row-fluid">
+      <div id="page-header" class="span9">
+        <h1 class="programs">
+          <div class="grcobject programs" rel="tooltip" data-placement="bottom" title="Program">
+            <i class="grcicon-program"></i>
+          </div>
+          <span>
+            <strong>Program:</strong>
+          </span>
+          {{object.title}}
+          <span class="private"></span>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="clearfix">
+      <div class="bar-v objnav"></div>
+      <div class="inner-nav">
+        <div class="object-nav">
+          <ul class="nav internav program cms_controllers_inner_nav ui-sortable">
+            <li class="active">
+              <a href="#info_widget">
+                <div class="oneline">
+                  <i class="grcicon-info"></i>
+                  Program Info
+                </div>
+              </a>
+              <div class="drag"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="object-area" style="margin-left: 200px;">
+        <div id="show_columns" class="column-set">
+          <div id="middle_column" class="widget-area ui-sortable">
+
+            <!-- Widget: Program Info -->
+            <section class="widget programs widget-active" id="info_widget">
+              <header class="header">
+                <div class="row-fluid">
+                  <div class="span9">
+                    <h2>
+                      <i class="grcicon-info"></i>
+                      Program Info
+                      <span class="object_count">
+                        </span>
+                      <span class="explanation"></span>
+                    </h2>
+                  </div>
+                  <div class="span3">
+                    <div class="widget-action pull-right widget-action-help">
+                      <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                        <i class="grcicon-help-black"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </header>
+              <section class="content">
+                <section class="info">
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <h3>{{object.title}}</h3>
+                    </div>
+                    <div class="span6">&nbsp;</div>
+                  </div>
+
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="rtf-block">
+                        {{{object.description}}}
+                      </div>
+                    </div>
+                    <div class="span6">
+                      <div class="row-fluid">
+                        <div>
+                          <p>
+                            <strong>Owner:</strong><br>
+                            <a href="/people/1">{{object.owner}}</a><br>
+                            <a href="/people/1">{{object.contact}}</a>
+                          </p>
+                        </div>
+                        <div>
+                          <p>
+                            <strong>Contact</strong>
+                            <br>
+                            <a href="/people/10">{{object.contact}}</a>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="rtf-block">
+                        <strong>Notes</strong>
+                        <br>
+                        <h4 class="no-data">No notes available</h4>
+                      </div>
+                    </div>
+                    <div class="span6">
+                      <p>
+                        <strong>Program URL</strong>
+                      </p>
+                      <p>
+                        <strong>Reference URL</strong>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="row-fluid">
+                    <div class="span12">
+                      <div class="info-expand">
+                        <a class="show-hidden-fields info-show-hide" href="#">
+                          <span class="out">
+                            <i class="grcicon-show"></i>
+                            Show
+                          </span>
+                          <span class="in">
+                            <i class="grcicon-hide"></i>
+                            Hide
+                          </span>
+                          Advanced
+                          <span class="hidden-fields out">
+                            Code, Effective Date, Stop Date, State
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="hidden-fields-area" style="display:none;">
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <p>
+                          <strong>Code</strong>
+                          <br>
+                          <span>ISO</span>
+                        </p>
+                      </div>
+                      <div class="span4">
+                        <p>
+                          <strong>Effective Date</strong>
+                        </p>
+                      </div>
+                      <div class="span4">
+                        <p>
+                          <strong>Stop Date</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="row-fluid">
+                      <div class="span4">
+                        <p>
+                          <strong>State</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="info-widget-footer">
+                    <p class="pull-right">
+                      <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="programs" data-object-singular="Program" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit " data-object-id="page">
+                        <i class="grcicon-edit"></i>
+                        <span>Edit </span>
+                      </a>
+                    </p>
+                    <p>
+                      <small>
+                        <em>
+                          Created at 11/04/2013 06:25:53pm PST
+                          <br>
+                          Modified by <a href="/people/13"><span class="person-tooltip-trigger" data-placement="top">jeff@reciprocitylabs.com</span></a> on 11/05/2013 02:34:41pm PST
+                        </em>
+                      </small>
+                    </p>
+                  </div>
+                </section>
+              </section>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="workflow" class="{{hide_class 'workflow' object}}"></div>
+</tree-app>

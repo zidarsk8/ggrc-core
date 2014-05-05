@@ -188,6 +188,10 @@ $(document).ready(function(){
       source: tasks
     });
 
+    $( ".people-autocomplete > input" ).autocomplete({
+      source: people
+    });
+
 
   });
 
