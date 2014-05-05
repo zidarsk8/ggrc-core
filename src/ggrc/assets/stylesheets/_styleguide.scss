@@ -475,6 +475,36 @@ ul.new-tree {
 // Mockups Workflow V1.1
 #TaskGroupItem,
 #TaskHolder,
-#TaskUpdated {
+#TaskUpdated,
+#taskList,
+#objectList,
+#lockTrigger {
   display: none;
+}
+
+.items-list {
+  @include reset-list();
+  li {
+    margin-bottom: 10px;
+    input {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.lock-wrap {
+  margin-right: 30%;
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.task-list {
+  .objective-selector {
+    a {
+      &.disabled {
+        @include opacity(0.2);
+      }
+    }
+  }
 }

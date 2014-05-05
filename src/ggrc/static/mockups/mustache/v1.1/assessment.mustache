@@ -276,17 +276,53 @@
                             <br>
                             <div class="row-fluid">
                               <div class="span6">
-                                <strong>Objects (0)</strong><br>
-                                <input tabindex="3" class="input-xlarge" placeholder="Add Object" type="text">
-                                <a href="#"><i class="grcicon-edit"></i></a>
-                                <a href="#"><i class="grcicon-deleted"></i></a>
+                                <strong>Objects (<span id="objectWorkflowCounter">0</span>)</strong><br>
+                                <ul id="objectList" class="items-list">
+                                  <li>
+                                    <div class="objective-selector">
+                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="CTRL - Access Control">
+                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div class="objective-selector">
+                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="POL - Universal Policy">
+                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                    </div>
+                                  </li>
+                                </ul>
+                                <a href="#" id="objectAddTrigger" class="btn">Add Object</a>
                               </div>
 
-                              <div class="span6">
-                                <strong>Tasks (0)</strong><br>
-                                <input tabindex="4" class="input-xlarge" placeholder="Add Task" type="text">
-                                <a href="#"><i class="grcicon-edit"></i></a>
-                                <a href="#"><i class="grcicon-deleted"></i></a>
+                              <div class="span6 task-list">
+                                <span class="pull-right lock-wrap" id="lockTrigger">
+                                  <label>
+                                    <input type="checkbox" id="taskLock">
+                                    Lock Task Order
+                                  </label>
+                                </span>
+                                <strong>Tasks (<span id="taskWorkflowCounter">0</span>)</strong><br>
+                                <ul id="taskList" class="items-list">
+                                  <li>
+                                    <div class="objective-selector">
+                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Proof Reading">
+                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div class="objective-selector">
+                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Validate Mappings">
+                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                    </div>
+                                  </li>
+                                  <li>
+                                    <div class="objective-selector">
+                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Peer Review">
+                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                    </div>
+                                  </li>
+                                </ul>
+                                <a href="#" id="taskAdd" class="btn">Add Task</a>
                               </div>
                             </div>
 

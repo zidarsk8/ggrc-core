@@ -157,6 +157,19 @@ $(document).ready(function(){
     var object = [
       "Stability and Perpetuability"
     ]
+    
+    var object2 = [
+      "CTRL - Access Control",
+      "CTRL - Non Critical Security",
+      "POL - User Policy",
+      "POL - Universal Policy"
+    ]
+    
+    var tasks = [
+      "Proof Reading",
+      "Validate Mappings",
+      "Peer Review"
+    ]
     $( ".objective-selector input[name='assessment_lead.email']" ).autocomplete({
       source: people
     });
@@ -165,6 +178,14 @@ $(document).ready(function(){
     });
     $( ".objective-selector input[name='object.title']" ).autocomplete({
       source: object
+    });
+    
+    
+    $( ".objective-selector input[name='object_title2']" ).autocomplete({
+      source: object2
+    });
+    $( ".objective-selector input[name='tasks_title']" ).autocomplete({
+      source: tasks
     });
 
 
@@ -515,6 +536,27 @@ $(document).ready(function(){
     $('#TaskHolder').hide();
     $('#TaskDescription').hide();
     $('#TaskUpdated').show();
+  });
+  
+  $('body').on('click', '#objectAddTrigger', function() {
+    $('#objectList').show();
+    $('#objectWorkflowCounter').html('2');
+  });
+  
+  $('body').on('click', '#taskAdd', function() {
+    $('#taskList').show();
+    $('#lockTrigger').show();
+    $('#taskWorkflowCounter').html('3');
+  });
+  
+  $("#taskLock").change(function () {
+    if($(this).is(':checked')) {
+      $('#taskAdd').addClass('disabled');
+      $('.task-list .objective-selector a').addClass('disabled');
+    } else {
+      $('#taskAdd').removeClass('disabled');
+      $('.task-list .objective-selector a').removeClass('disabled');
+    }
   });
 
 });
