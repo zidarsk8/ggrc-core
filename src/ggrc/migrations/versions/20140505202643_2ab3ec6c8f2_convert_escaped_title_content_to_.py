@@ -70,8 +70,6 @@ titled_table_names = [
     ('products', 'Product'),
     ('programs', 'Program'),
     ('projects', 'Project'),
-    ('threats', 'Threat'),
-    ('vulnerabilities', 'Vulnerability'),
     ('sections', 'Section'),
     ('systems', 'System'),
     ]
