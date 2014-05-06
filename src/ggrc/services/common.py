@@ -832,7 +832,7 @@ class Resource(ModelView):
       objs = [objs[m] for m in matches if m in objs]
 
       with benchmark("Filter resources"):
-        objs = self.filter_resource(objs)
+        objs = filter_resource(objs)
 
       cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
 
@@ -847,46 +847,6 @@ class Resource(ModelView):
 
     return self.json_success_response(
       collection, self.collection_last_modified(), cache_op=cache_op)
-
-  def filter_resource(self, resource, depth=0, user_permissions=None):
-    if user_permissions is None:
-      user_permissions = permissions.permissions_for(get_current_user())
-
-    if type(resource) in (list, tuple):
-      filtered = []
-      for sub_resource in resource:
-        filtered_sub_resource = self.filter_resource(
-            sub_resource, depth=depth+1, user_permissions=user_permissions)
-        if filtered_sub_resource is not None:
-          filtered.append(filtered_sub_resource)
-      return filtered
-    elif type(resource) is dict and 'type' in resource:
-      # First check current level
-      context_id = False
-      if 'context' in resource:
-        if resource['context'] is None:
-          context_id = None
-        else:
-          context_id = resource['context']['id']
-      elif 'context_id' in resource:
-        context_id = resource['context_id']
-      assert context_id is not False, "No context found for object"
-
-      if not user_permissions.is_allowed_read(resource['type'], context_id):
-        return None
-      else:
-        # Then, filter any typed keys
-        for key, value in resource.items():
-          if key == 'context':
-            # Explicitly allow `context` objects to pass through
-            pass
-          else:
-            if type(value) is dict and 'type' in value:
-              resource[key] = self.filter_resource(
-                  value, depth=depth+1, user_permissions=user_permissions)
-        return resource
-    else:
-      assert False, "Non-object passed to filter_resource"
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
@@ -1145,6 +1105,7 @@ class Resource(ModelView):
       return src.get(unicode(attr), *args)
     return src.get(unicode(attr))
 
+
 class ReadOnlyResource(Resource):
   def dispatch_request(self, *args, **kwargs):
     method = request.method
@@ -1153,3 +1114,44 @@ class ReadOnlyResource(Resource):
       return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
     else:
       raise NotImplementedError()
+
+
+def filter_resource(resource, depth=0, user_permissions=None):
+  if user_permissions is None:
+    user_permissions = permissions.permissions_for(get_current_user())
+
+  if type(resource) in (list, tuple):
+    filtered = []
+    for sub_resource in resource:
+      filtered_sub_resource = filter_resource(
+          sub_resource, depth=depth+1, user_permissions=user_permissions)
+      if filtered_sub_resource is not None:
+        filtered.append(filtered_sub_resource)
+    return filtered
+  elif type(resource) is dict and 'type' in resource:
+    # First check current level
+    context_id = False
+    if 'context' in resource:
+      if resource['context'] is None:
+        context_id = None
+      else:
+        context_id = resource['context']['id']
+    elif 'context_id' in resource:
+      context_id = resource['context_id']
+    assert context_id is not False, "No context found for object"
+
+    if not user_permissions.is_allowed_read(resource['type'], context_id):
+      return None
+    else:
+      # Then, filter any typed keys
+      for key, value in resource.items():
+        if key == 'context':
+          # Explicitly allow `context` objects to pass through
+          pass
+        else:
+          if type(value) is dict and 'type' in value:
+            resource[key] = filter_resource(
+                value, depth=depth+1, user_permissions=user_permissions)
+      return resource
+  else:
+    assert False, "Non-object passed to filter_resource"
