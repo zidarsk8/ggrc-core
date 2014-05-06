@@ -382,8 +382,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
 
       // Init the spinner if items need to be loaded:
-      if(this._count && this._count())
-        this._loading_started();
+      dfds.push(this.init_count().then(function(count) {
+        if (count())
+          that._loading_started();
+        else
+          that.element.trigger("loaded");
+      }));
 
       if(this.options.footer_view) {
         dfds.push(
@@ -401,8 +405,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var self = this
         ;
 
-      if (!this.get_count_deferred
-          && this.options.parent_instance && this.options.mapping) {
+      if (this.get_count_deferred)
+        return this.get_count_deferred;
+
+      if (this.options.parent_instance && this.options.mapping) {
         this.get_count_deferred =
           this.options.parent_instance.get_list_counter(this.options.mapping);
       } else if (this.options.list_loader) {
@@ -416,13 +422,17 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (this.get_count_deferred) {
         this.get_count_deferred.then(this._ifNotRemoved(function(count) {
-          self._count = count;
-          self.element.trigger("updateCount", count());
+          self.element && self.element.trigger("updateCount", count());
           count.bind("change", self._ifNotRemoved(function() {
             self.element.trigger("updateCount", count());
           }));
         }));
+      } else {
+        // FIXME: Does this ever happen?
+        this.get_count_deferred = new $.Deferred();
+        this.get_count_deferred.resolve(function() { return 0; });
       }
+      return this.get_count_deferred;
     }
 
   , fetch_list : function() {
