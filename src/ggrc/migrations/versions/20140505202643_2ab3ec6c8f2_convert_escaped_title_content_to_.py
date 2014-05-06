@@ -2,7 +2,7 @@
 """Convert escaped title content to unescaped
 
 Revision ID: 2ab3ec6c8f2
-Revises: 16d7c239e894
+Revises: 5719ca4edd3b
 Create Date: 2014-05-05 20:26:43.802693
 
 """
@@ -12,7 +12,7 @@ Create Date: 2014-05-05 20:26:43.802693
 
 # revision identifiers, used by Alembic.
 revision = '2ab3ec6c8f2'
-down_revision = '16d7c239e894'
+down_revision = '5719ca4edd3b'
 
 from alembic import op
 from sqlalchemy.sql import table, column, func
