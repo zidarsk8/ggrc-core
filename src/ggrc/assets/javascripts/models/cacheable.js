@@ -633,7 +633,14 @@ can.Model("can.Model.Cacheable", {
       }
     });
   }
-  , computed_errors : can.compute(function() { return this.errors(); })
+  , computed_errors : can.compute(function() {
+      var errors = this.errors();
+      if(this.attr("_suppress_errors")) {
+        return null;
+      } else {
+        return errors;
+      }
+    })
 
   , get_list_counter: function(name) {
       var binding = this.get_binding(name);
@@ -892,12 +899,15 @@ can.Model("can.Model.Cacheable", {
 
     xhr = this._super.apply(this, arguments).then(function(result) {
       if(isNew) {
-        this.after_create && this.after_create();
+        that.after_create && that.after_create();
       } else {
-        this.after_update && this.after_update();
+        that.after_update && that.after_update();
       }
-      this.after_save && this.after_save();
+      that.after_save && that.after_save();
       return result;
+    }, function(xhr, status, message) {
+      that.save_error && that.save_error(xhr.responseText);
+      return new $.Deferred().reject(xhr, status, message);
     });
 
     xhr.always(function() {

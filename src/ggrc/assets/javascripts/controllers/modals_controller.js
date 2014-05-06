@@ -210,7 +210,7 @@ can.Control("GGRC.Controllers.Modals", {
       dfd = this.options.instance.refresh();
     } else if (this.options.model) {
       dfd = this.options.new_object_form
-          ? $.when(this.options.attr("instance", new this.options.model(params)))
+          ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
           : this.options.model.findAll(params).then(function(data) {
             var h;
             if(data.length) {
@@ -233,6 +233,7 @@ can.Control("GGRC.Controllers.Modals", {
     }
     
     return dfd.done(function() {
+      that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
       that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
     });
   }
@@ -266,6 +267,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "input, textarea, select change" : function(el, ev) {
+      this.options.instance.removeAttr("_suppress_errors");
       this.set_value_from_element(el);
   }
 
@@ -420,12 +422,17 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
-    var that = this;
+    var that = this
+    , instance = this.options.instance
+    , ajd;
 
     // Normal saving process
     if (el.is(':not(.disabled)')) {
-      var instance = this.options.instance
-      , ajd;
+
+      if(instance.errors()) {
+        instance.removeAttr("_suppress_errors");
+        return;
+      }
 
       this.serialize_form();
 
@@ -450,15 +457,17 @@ can.Control("GGRC.Controllers.Modals", {
             , section: CMS.Models.Section.findInCacheById(params.section.id)
             , context: { id: null }
           }).save().done(function(){
-            $(document.body).trigger("ajax:flash", 
+            $(document.body).trigger("ajax:flash",
                 { success : "Objective mapped successfully." });
-            finish(); 
+            finish();
           });
         } else {
           finish();
         }
       }).fail(function(xhr, status) {
-        $(document.body).trigger("ajax:flash", { error : xhr.responseText });
+        if(!instance.errors()) {
+          $(document.body).trigger("ajax:flash", { error : xhr.responseText });
+        }
         delete that.disable_hide;
       });
       this.bindXHRToButton(ajd, el, "Saving, please wait...");

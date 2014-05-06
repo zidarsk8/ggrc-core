@@ -13,11 +13,17 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
   , convert : {
     modelize : function(serial) {
       var ml = this.type ? this.type.List : can.List;
-      return new ml(can.map(serial, function(s) {
+      var insts;
+      can.batch.start();
+      insts = new ml(can.map(serial, function(s) {
         var inst = CMS.Models.get_instance(s);
-        inst.attr(s); // Add any other attributes in the serial form, like title
+        if(!inst.selfLink) {
+          inst.attr(s); // Add any other attributes in the serial form, like title
+        }
         return inst;
       }));
+      can.batch.stop();
+      return insts;
     }
   }
   , init : function() {
