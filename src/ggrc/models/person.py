@@ -88,16 +88,7 @@ class Person(Base, db.Model):
     #query = super(Person, cls).eager_query()
     # Completely overriding eager_query to avoid eager loading of the
     # modified_by relationship
-    return db.session.query(cls).options(
-        orm.undefer('id'),
-        orm.undefer('modified_by_id'),
-        orm.undefer('created_at'),
-        orm.undefer('updated_at'),
-        orm.undefer('context_id'),
-        orm.undefer('email'),
-        orm.undefer('name'),
-        orm.undefer('language_id'),
-        orm.undefer('company'),
+    return super(Person, cls).eager_query().options(
         orm.joinedload('language'),
         orm.subqueryload('object_people'),
         )
