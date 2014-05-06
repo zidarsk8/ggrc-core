@@ -754,19 +754,23 @@ class Resource(ModelView):
     return getattr(settings, 'MEMCACHE_MECHANISM', False)
 
   def apply_paging(self, matches_query):
-    page_number = int(request.args['__page'])
     page_size = min(
         int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
         self.MAX_PAGE_SIZE)
-    matches = matches_query\
-        .limit(page_size)\
-        .offset((page_number-1)*page_size)\
-        .all()
-    if page_number == 1 and len(matches) < page_size:
-      total = len(matches)
-    else:
+    if '__page_only' in request.args:
+      page_number = int(request.args.get('__page', 0))
+      matches = []
       total = matches_query.distinct().count()
-      #total = matches_query.from_self(self.model.id).distinct().order_by(None).count()
+    else:
+      page_number = int(request.args.get('__page', 1))
+      matches = matches_query\
+          .limit(page_size)\
+          .offset((page_number-1)*page_size)\
+          .all()
+      if page_number == 1 and len(matches) < page_size:
+        total = len(matches)
+      else:
+        total = matches_query.distinct().count()
     page = Pagination(
         matches_query, page_number, page_size, total, matches)
     collection_extras = {
@@ -803,7 +807,7 @@ class Resource(ModelView):
 
     matches = None
     extras = None
-    if '__page' in request.args:
+    if '__page' in request.args or '__page_only' in request.args:
       matches, extras = self.apply_paging(matches_query)
     else:
       matches = matches_query.all()
