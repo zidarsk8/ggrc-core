@@ -25,6 +25,16 @@ from . import db
 db.app = app
 db.init_app(app)
 
+
+# Ensure `db.session` is correctly removed
+#   (Reason: Occasionally requests are terminated without calling the teardown
+#   methods, namely with DeadlineExceededError on App Engine).
+@app.before_request
+def _ensure_session_teardown(*args, **kwargs):
+  if db.session.registry.has():
+    db.session.remove()
+
+
 # Initialize models
 import ggrc.models
 ggrc.models.init_app(app)
