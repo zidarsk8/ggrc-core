@@ -34,7 +34,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
-  , mixins : ["contactable"]
+  , mixins : ["contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -77,6 +77,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Market" : {}
   }
   , init : function() {
+    var that = this;
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
@@ -95,7 +96,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -349,7 +350,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -432,7 +433,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -499,7 +500,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -582,7 +583,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -688,7 +689,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -771,7 +772,7 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , contact : "CMS.Models.Person.stub"
@@ -954,7 +955,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , links_to : {
       "Section" : "SectionObjective"
   }
@@ -1067,7 +1068,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
-  , mixins : ["contactable"]
+  , mixins : ["contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , program: "CMS.Models.Program.stub"
@@ -1215,6 +1216,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
+  , mixins : ["unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , audit : "CMS.Models.Audit.stub"

@@ -33,7 +33,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         }
       }
 
-    , mixins : ["ownable", "contactable"]
+    , mixins : ["ownable", "contactable", "unique_title"]
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"

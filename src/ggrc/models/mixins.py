@@ -321,6 +321,7 @@ class Slugged(Base):
   def _extra_table_args(cls):
     return (
         db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+        db.UniqueConstraint('title', name='uq_t_{}'.format(cls.__tablename__)),        
         )
 
   # REST properties

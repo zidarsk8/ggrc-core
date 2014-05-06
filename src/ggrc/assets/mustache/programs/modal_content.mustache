@@ -10,15 +10,17 @@
 <form action="javascript://">
   <input type="hidden" name="kind" value="Directive" />
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>
         Title
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
+      {{#instance.computed_errors.title}}<div class="help-inline warning">{{this}}</div>{{/instance.computed_errors.title}}
       </label>
       {{^if_null '1'}}
       <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
       {{/if_null}}
+      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
     <div class="span6">
       <label>
