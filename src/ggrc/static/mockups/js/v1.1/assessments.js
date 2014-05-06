@@ -338,7 +338,8 @@ can.Component.extend({
         assignee: assessment.lead_email,
         objects: [],
         tasks: [],
-        end_date: ""
+        end_date: "",
+        taskLock: false
       });
       assessment.save();
     },
@@ -371,7 +372,7 @@ can.Component.extend({
         , index = $el.data('index')
         , type = $el.data('type')
         ;
-
+      if($el.hasClass('disabled')) return;
       assessment.task_groups[index][type].push({title: ""});
       assessment.save();
     },
@@ -382,8 +383,29 @@ can.Component.extend({
         , workflowIndex = $el.closest('ul').data('index')
         , type = $el.data('type')
         ;
-
+      if($el.hasClass('disabled')) return;
       assessment.task_groups[workflowIndex][type].splice(index, 1);
+      assessment.save();
+    },
+    ".taskLock change" : function(el, ev){
+      var $el = $(el)
+        , index = $el.data('index')
+        , assessment = this.scope.assessment
+        , task_group = assessment.task_groups[index]
+        ;
+      task_group.attr('taskLock', $el.is(':checked'));
+      assessment.save();
+    },
+    ".editTitle change" : function(el, ev){
+      var $el = $(el)
+        , assessment = this.scope.assessment
+        , index = $el.data('index')
+        , workflowIndex = $el.closest('ul').data('index')
+        , type = $el.data('type')
+        ;
+      if($el.hasClass('disabled')) return;
+      console.log(workflowIndex,type,index)
+      assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
     }
   }

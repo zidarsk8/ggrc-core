@@ -276,7 +276,7 @@
                                   {{#each objects}}
                                   <li>
                                     <div class="objective-selector">
-                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="{{title}}">
+                                      <input tabindex="3" type="text" name="object_title2" class="editTitle input-xlarge search-icon" placeholder="Add Object" value="{{title}}" data-index="{{@index}}" data-type="objects">
                                       <a href="#" data-index="{{@index}}" data-type="objects" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -286,25 +286,27 @@
                               </div>
 
                               <div class="span6 task-list">
-                                <span class="pull-right lock-wrap" id="lockTrigger">
+                                {{#tasks.length}}
+                                <span class="pull-right lock-wrap">
                                   <label>
-                                    <input type="checkbox" id="taskLock">
+                                    <input type="checkbox" class="taskLock" data-index="{{@index}}" {{#taskLock}}checked="checked"{{/taskLock}}>
                                     Lock Task Order
                                   </label>
                                 </span>
+                                {{/tasks}}
                                 <strong>Tasks (<span>{{tasks.length}}</span>)</strong><br>
                                 <ul class="items-list" data-index="{{@index}}">
                                   {{#each tasks}}
                                   <li>
                                     <div class="objective-selector">
-                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="{{title}}">
-                                      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
+                                      <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
+                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle input-xlarge search-icon" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
+                                      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
                                   {{/each}}
                                 </ul>
-                                <a href="#" class="btn addTrigger" data-index="{{@index}}" data-type="tasks">Add Task</a>
+                                <a href="#" class="btn addTrigger {{#taskLock}}disabled{{/taskLock}}" data-index="{{@index}}" data-type="tasks">Add Task</a>
                               </div>
                             </div>
 
