@@ -10,7 +10,8 @@ from ggrc.models.all_models import (
     Audit, ControlCategory, ControlAssertion,
     Control, Document, Objective, ObjectControl, ObjectiveControl,
     ObjectObjective, ObjectOwner, ObjectPerson, Option, Person, Process, 
-    Relationship, Request, Section, SectionObjective, System, SystemOrProcess,
+    Relationship, Request, Section, SectionBase, SectionObjective,
+    System, SystemOrProcess,
 )
 from ggrc.models.exceptions import ValidationError
 
@@ -173,6 +174,9 @@ class BaseRowConverter(object):
   def handle_raw_attr(self, key, **options):
     return self.handle(key, ColumnHandler, **options)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
+
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
 
@@ -267,6 +271,7 @@ class ColumnHandler(object):
   def export(self):
     return getattr(self.importer.obj, self.key, '')
 
+
 class RequestTypeColumnHandler(ColumnHandler):
 
     def parse_item(self, value):
@@ -338,7 +343,7 @@ class ContactEmailHandler(ColumnHandler):
     elif person_must_exist:
       value = self.find_contact(value, is_required=is_required)
     elif value and not re.match(Person.EMAIL_RE_STRING, value, re.IGNORECASE):
-      message = "{} is not a valid email. \
+      message = u"{} is not a valid email. \
                 Please use following format: user@example.com".format(value)
       self.add_error(message) if is_required else self.add_warning(message)
     return value
@@ -430,8 +435,8 @@ class OptionColumnHandler(ColumnHandler):
       role = self.options.get('role') or self.key
       option = Option.query.filter_by(role=role.lower(), title=value.lower()).first()
       if not option and self.key != 'network_zone':
-        self.warnings.append(
-          'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
+        self.add_warning(
+          u'Unknown "{}" option "{}" -- create this option from the Admin Dashboard'.format(
             role, value.lower()))
       elif not option and self.key == "network_zone":
         self.warnings.append(
@@ -477,6 +482,20 @@ class BooleanColumnHandler(ColumnHandler):
       else:
         return str(self.value) # unknown value - shouldn't happen
 
+class TitleHandler(ColumnHandler):
+
+  def validate(self, data):
+    super(TitleHandler, self).validate(data)
+    # check for collisions in db
+    has_db_collision = self.importer.model_class.query.filter_by(title=data).first()
+    if has_db_collision:
+      self.add_error("An object with this title already exists.")
+      return
+    # ... and then in existing imports
+    has_import_collision = data in [x.obj.title for x in self.base_importer.created_objects()]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
+
 class DateColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
@@ -503,7 +522,7 @@ class DateColumnHandler(ColumnHandler):
       else:
         return ''
     except ValueError as e:
-      self.errors.append("{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
+      self.errors.append(u"{}, use YYYY-MM-DD or MM/DD/YYYY format".format(e.message))
 
   def display(self):
     if self.has_errors():
@@ -525,6 +544,7 @@ class LinksHandler(ColumnHandler):
     super(LinksHandler, self).__init__(importer, key, **options)
 
     self.pre_existing_links = None
+    self.processed_link_objs = set()  # to track duplicates
     self.link_status = {}
     self.link_objects = {}
     self.link_index = 0
@@ -539,12 +559,20 @@ class LinksHandler(ColumnHandler):
     self.link_warnings.setdefault(self.link_index, []).append(message)
 
   def add_created_link(self, obj):
-    self.link_status[self.link_index] = 'created'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'created'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def add_existing_link(self, obj):
-    self.link_status[self.link_index] = 'existing'
-    self.link_objects[self.link_index] = obj
+    if obj not in self.processed_link_objs:
+      self.link_status[self.link_index] = 'existing'
+      self.link_objects[self.link_index] = obj
+      self.processed_link_objs.add(obj)
+    else:
+      self.add_warning("This list has duplicates. Please check.")
 
   def has_errors(self):
     return any(self.errors) or any(self.link_errors.values())
@@ -560,7 +588,18 @@ class LinksHandler(ColumnHandler):
 
   def created_links(self):
     created_indices = [index for index in self.link_objects.keys() if self.link_status[index] == 'created']
-    return [self.link_objects[index] for index in created_indices]
+    output_links = []
+    output_set = set()  # to track uniques
+    # filter out duplicates while preserving order
+    for index in created_indices:
+      link_obj = self.link_objects[index]
+      if link_obj not in output_set:
+        output_links.append(link_obj)
+        output_set.add(link_obj)
+    # append a warning if there are duplicates
+    if len(output_links) != len(output_set):
+      self.add_warning("There are duplicates in this list of linked objects.")
+    return output_links
 
   def display(self):
     return "XXX"
@@ -647,7 +686,7 @@ class LinksHandler(ColumnHandler):
     return obj
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning("'{0}' will be created".format(data.get('slug')))
+    self.add_link_warning(u"'{0}' will be created".format(data.get('slug')))
 
   def get_existing_items(self):
     return getattr(self.importer.obj, self.options.get('association'), None)
@@ -727,7 +766,7 @@ class LinkControlsHandler(LinksHandler):
     return {'slug' : data}
 
   def create_item(self, data):
-    self.add_link_warning("Control with code {} doesn't exist".format(data.get('slug', '')))
+    self.add_link_warning(u"Control with code {} doesn't exist".format(data.get('slug', '')))
     return None
 
 
@@ -745,12 +784,12 @@ class LinkControlCategoriesHandler(LinksHandler):
     items = self.model_class.query.filter_by(**params).all()
 
     if len(items) > 1:
-      self.add_link_error('Multiple matches found for "{}"'.format(data.get('name')))
+      self.add_link_error(u'Multiple matches found for "{}"'.format(data.get('name')))
     else:
       return items[0] if items else None
 
   def create_item(self, data):
-    self.add_link_warning('Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
+    self.add_link_warning(u'Unknown category "{}" -- add this category from the Admin Dashboard'.format(data.get('name')))
 
   def render_item(self, item):
     return item.name
@@ -778,11 +817,11 @@ class LinkDocumentsHandler(LinksHandler):
       if result and self.is_valid_url(result.group(1)):
         data = { 'link': result.group(1), 'title': result.group(2), 'description': result.group(3)}
       else:
-        self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
+        self.add_link_error(u'Invalid format: use "[www.yoururl.com Title] Description"')
     elif self.is_valid_url(value):
       data = { 'link' : value.strip() }
     else:
-      self.add_link_error('Invalid format: use "[www.yoururl.com Title] Description"')
+      self.add_link_error(u'Invalid format: use "[www.yoururl.com Title] Description"')
 
     return data
 
@@ -790,7 +829,7 @@ class LinkDocumentsHandler(LinksHandler):
     return {'link' : data.get('link')}
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning('"{}" will be created'.format(data.get('title') or data.get('link')))
+    self.add_link_warning(u'"{}" will be created'.format(data.get('title') or data.get('link')))
 
   def render_item(self, item):
     return u"[{} {}] {}".format(item.link, item.title, item.description)
@@ -806,18 +845,18 @@ class LinkPeopleHandler(LinksHandler):
       if match:
         data = { 'email' : match.group(1), 'name' : match.group(3) }
       else:
-        self.add_link_error('Invalid format')
+        self.add_link_error(u'Invalid format')
     else:
       data = { 'email' : value }
 
     if data:
       if data.get('email') and not re.match(Person.EMAIL_RE_STRING, data['email'], re.IGNORECASE):
-        self.add_link_warning("This email address is invalid and will not be mapped")
+        self.add_link_warning(u"This email address is invalid and will not be mapped")
       else:
         return data
 
   def create_item(self, data):
-    self.add_link_warning("This email does not exist and will not be mapped.")
+    self.add_link_warning(u"This email does not exist and will not be mapped.")
 
   def get_where_params(self, data):
     return { 'email' : data.get('email') } if data else {}
@@ -826,7 +865,7 @@ class LinkPeopleHandler(LinksHandler):
     return {'email' : data.get('email'), 'name' : data.get('name', '') } if data else {}
 
   def create_item_warnings(self, obj, data):
-    self.add_link_warning('"{}" will be created'.format(data.get('email')))
+    self.add_link_warning(u'"{}" will be created'.format(data.get('email')))
 
   def get_existing_items(self):
     where_params = {}
@@ -870,12 +909,12 @@ class LinkSystemsHandler(LinksHandler):
 
     if not system:
       sys_type = "Process" if self.options.get('is_biz_process') else "System"
-      self.add_link_warning("{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
+      self.add_link_warning(u"{} with code {} doesn't exist".format(sys_type, data.get('slug', '')))
     else:
       if self.options.get('is_biz_process') and not (system.__class__ is Process):
-        self.add_link_warning("That code is used by a System, and will not be mapped")
+        self.add_link_warning(u"That code is used by a System, and will not be mapped")
       elif not self.options.get('is_biz_process') and system.__class__ is Process:
-        self.add_link_warning('That code is used by a Process, and will not be mapped')
+        self.add_link_warning(u'That code is used by a Process, and will not be mapped')
       else:
         return system
 
@@ -895,7 +934,7 @@ class LinkRelationshipsHandler(LinksHandler):
       if match and len(match.groups()) == 2 and not (match.group(1) is None):
         return { 'slug' : match.group(1) , 'title' : match.group(2) }
       else:
-        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+        self.add_link_error(u"Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
       return {'slug' : value}
 
@@ -922,7 +961,7 @@ class LinkRelationshipsHandler(LinksHandler):
     return self.options.get('model_human_name') or self.model_class.__name__
 
   def create_item(self, data):
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+    self.add_link_warning(u"{} with code '{}' doesn't exist.".format(
       self.model_human_name(), data.get('slug')))
 
   def after_save(self, obj):
@@ -952,13 +991,13 @@ class LinkObjectHandler(LinksHandler):
       if match and len(match.groups()) == 2 and not (match.group(1) is None):
         return { 'slug' : match.group(1) , 'title' : match.group(2) }
       else:
-        self.add_link_error("Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
+        self.add_link_error(u"Invalid format. Please use following format: '[EXAMPLE-0001] <descriptive text>'")
     else:
       return {'slug' : value}
 
   def create_item(self, data):
     model_class = self.options.get('model_class') or self.model_class
-    self.add_link_warning("{} with code '{}' doesn't exist.".format(
+    self.add_link_warning(u"{} with code '{}' doesn't exist.".format(
       model_class.__name__, data.get('slug')))
 
   def find_existing_item(self, data):
@@ -1029,7 +1068,7 @@ class LinkControlObjective(LinkObjectHandler):
 
 class LinkSectionObjective(LinkObjectHandler):
 
-  model_class = Section
+  model_class = SectionBase  # Needs to see clauses
 
   def get_existing_items(self):
     importer_cls_name = self.importer.obj.__class__.__name__
@@ -1039,14 +1078,15 @@ class LinkSectionObjective(LinkObjectHandler):
     return [sec_cont.section for sec_cont in section_objectives]
 
   def after_save(self, obj):
-    # Assumption: only one linked section, at most, at this point
-    # If it's present, overwrite ObjectiveRowImporter's options
-    # to have the section as a parent instead of directive
-    # so that it ONLY maps to that section, not the section's directive
-    section_list = [x for x in self.created_links() if type(x) == Section]
-    if len(section_list) >= 1:
-      section = section_list[0]
-      db.session.add(section)
-      self.importer.options['parent_id'] = section.id
-      self.importer.options['parent_type'] = Section
+    # connect any number of sections/clauses
+    section_list = [x for x in self.created_links() if isinstance(x, SectionBase)] # get the section or clause that was created
+    for sec in section_list:
+      db.session.add(sec)
+      matching_relationship_count = SectionObjective.query\
+        .filter(SectionObjective.objective_id==obj.id)\
+        .filter(SectionObjective.section_id==sec.id)\
+        .count()
+      if matching_relationship_count == 0:
+        db.session.add(SectionObjective(
+            section=sec, objective=obj))
 

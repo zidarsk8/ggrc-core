@@ -26,7 +26,7 @@ class ObjectiveRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
     self.handle_text_or_html('description')
     self.handle_raw_attr('url')
     self.handle_raw_attr('reference_url')
@@ -47,6 +47,8 @@ class ObjectiveRowConverter(BaseRowConverter):
     # with data about section instead of directive
     parent_type = self.options.get('parent_type')
     parent_id = self.options.get('parent_id')
+    # always connect to directive; if parent is section/clause,
+    # find the directive through it
     if parent_type in DIRECTIVE_CLASSES or parent_type == Program:
       parent_obj = parent_type.query.get(parent_id)
       parent_string = unicode(parent_obj.__class__.__name__)
@@ -65,17 +67,6 @@ class ObjectiveRowConverter(BaseRowConverter):
         if parent_type == Program:
           db_options["context_id"] = parent_id  # id of program
         db_session.add(ObjectObjective(**db_options))
-    elif parent_type == Section:
-      # if section given, connect to that rather than directive if
-      # no such mapping currently exists
-      parent_obj = parent_type.query.get(parent_id)
-      matching_relationship_count = SectionObjective.query\
-        .filter(SectionObjective.objective_id==self.obj.id)\
-        .filter(SectionObjective.section_id==parent_id)\
-        .count()
-      if matching_relationship_count == 0:
-        db_session.add(SectionObjective(
-            section=parent_obj, objective=self.obj))
 
 
 class ObjectivesConverter(BaseConverter):
@@ -104,9 +95,9 @@ class ObjectivesConverter(BaseConverter):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing {} Code heading'.format(self.parent_type_string()))
+      self.errors.append(u'Missing {} Code heading'.format(self.parent_type_string()))
     elif attrs['slug'] != self.parent_object().slug:
-      self.errors.append('{0} Code must be {1}'.format(
+      self.errors.append(u'{0} Code must be {1}'.format(
           self.parent_type_string(),
           self.parent_object().slug
       ))

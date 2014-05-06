@@ -32,9 +32,11 @@ class ObjectEvent(Base, db.Model):
         else None
     return setattr(self, self.eventable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('event_id', 'eventable_id', 'eventable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('event_id', 'eventable_id', 'eventable_type'),
+        )
 
   _publish_attrs = [
       'event_id',
@@ -70,3 +72,11 @@ class Eventable(object):
   _publish_attrs = [
       'object_events',
       ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(Eventable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('object_events'))

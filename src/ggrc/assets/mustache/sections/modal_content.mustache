@@ -25,9 +25,10 @@
         {{#using directive=instance.directive}}
         <label>
           Policy / Regulation / Standard
+          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="Policy / Regulation / Standard containing this Section"></i>
         </label>
-        <input tabindex="4" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-template="/directives/autocomplete_result.mustache" placeholder="Enter email address" type="text" value="{{firstexist directive.title ''}}" />
+        <input tabindex="4" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard" type="text" value="{{firstexist directive.title ''}}" />
         {{/using}}
       {{else}}
         &nbsp;
@@ -38,11 +39,11 @@
   <div class="row-fluid">
     <div class="span6">
       <label>
-        Text of {{#if_equals instance.directive.type 'Contract'}}Clause{{else}}Section{{/if_equals}}
-        <i class="grcicon-help-black" rel="tooltip" title="Enter text of section or clause"></i>
+        Text of Section
+        <i class="grcicon-help-black" rel="tooltip" title="Enter text of section"></i>
       </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="2" id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of {{#if_equals instance.directive.type 'Contract'}}clause{{else}}section{{/if_equals}}">{{{description}}}</textarea>
+        <textarea tabindex="2" id="section-description" class="span12 double wysihtml5" name="description" placeholder="Enter text of section">{{{description}}}</textarea>
       </div>
     </div>
     <div class="span6">
@@ -105,9 +106,9 @@
       <div class="span3">
         <label>
           Code
-          <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+          <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects. If you would like to override this feature you may manually enter a code of your choosing. You should have a specific reason for doing this."></i>
         </label>
-        <input tabindex="7" id="section-code" class="input-block-level" name="slug" placeholder="{{#if_equals instance.directive.type 'Contract'}}CLAUSE{{else}}SECTION{{/if_equals}}-XXX" type="text" value="{{slug}}">
+        <input tabindex="7" id="section-code" class="input-block-level" name="slug" placeholder="SECTION-XXX" type="text" value="{{slug}}">
       </div>
     </div>
   </div>

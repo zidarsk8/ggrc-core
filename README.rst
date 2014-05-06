@@ -41,7 +41,7 @@ have the prerequisite software installed. Here are the steps:
   vagrant ssh
   build_compass
   build_assets
-  db_reset
+  db_migrate
 
 If you see download errors during the ``vagrant up`` stage, or if any subsequent
 step fails, try running ``vagrant provision`` (See `Provision a running Vagrant 

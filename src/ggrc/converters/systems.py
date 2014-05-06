@@ -50,7 +50,7 @@ class SystemRowConverter(BaseRowConverter):
     self.handle_date('updated_at', no_import=True)
     self.handle_text_or_html('description')
     self.handle_boolean('infrastructure', truthy_values=['infrastructure'])
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)
@@ -136,10 +136,10 @@ class SystemsConverter(BaseConverter):
     # Check for parent slug if importing into another object
     if self.has_parent():
       if not attrs.get('slug'):
-        self.errors.append('Missing {} Code heading'.format(
+        self.errors.append(u'Missing {} Code heading'.format(
             self.parent_type_string()))
       elif attrs['slug'] != self.parent_object().slug:
-        self.errors.append('{0} Code must be {1}'.format(
+        self.errors.append(u'{0} Code must be {1}'.format(
             self.parent_type_string(), self.parent_object().slug))
 
   def has_parent(self):

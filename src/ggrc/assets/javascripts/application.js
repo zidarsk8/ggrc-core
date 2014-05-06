@@ -67,12 +67,7 @@ ModelError.prototype = Error.prototype;
 
 window.onerror = function(message, url, linenumber) {
   $(document.body).trigger("ajax:flash", {"error" : message});
-  $.ajax({
-    type : "post"
-    , url : "/api/log_events"
-    , dataType : "text"
-    , data : {log_event : {severity : "error", description : message + " (at " + url + ":" + linenumber + ")"}}
-  });
+  GGRC.Tracker.exception(message + " (at " + url + ":" + linenumber + ")");
 };
 
   window.cms_singularize = function(type) {
@@ -785,22 +780,38 @@ jQuery(function($) {
         , $content = $li.children('.item-content')
         , $icon = $main.find('.openclose')
         , $parentTree = $this.closest('ul.new-tree')
-        , cmd = command;
+        , cmd = command
+        , callback
+        ;
+
+      callback = function() {
+        //  Trigger update for sticky headers and footers
+        $this.trigger("updateSticky");
+      };
 
       if(typeof cmd !== "string" || cmd === "toggle") {
         cmd = $icon.hasClass("active") ? "close" : "open";
       }
 
       if (cmd === "close") {
-        
-        use_slide ? $content.slideUp('fast') : $content.css("display", "none");
+        if (use_slide) {
+          $content.slideUp('fast', callback);
+        } else {
+          $content.css("display", "none");
+          callback();
+        }
         $icon.removeClass('active');
         $li.removeClass('item-open');
         // Only remove tree open if there are no open siblings
         !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
         $content.removeClass('content-open');
       } else if(cmd === "open") {
-        use_slide ? $content.slideDown('fast') : $content.css("display", "block");
+        if (use_slide) {
+          $content.slideDown('fast', callback);
+        } else {
+          $content.css("display", "block");
+          callback();
+        }
         $icon.addClass('active');
         $li.addClass('item-open');
         $parentTree.addClass('tree-open');
@@ -1096,6 +1107,9 @@ jQuery(function($){
             });
             queue.trigger().then(function(objs) {
               if(objs.length) {
+                // Envelope the object to not break model instance due to
+                // shallow copy done by jQuery in `response()`
+                objs = can.map(objs, function(obj) { return { item: obj }; });
                 response(objs);
               } else {
                 that._suggest( [] );
@@ -1128,14 +1142,39 @@ jQuery(function($){
 
         can.view.render(
           GGRC.mustache_path + template,
-          {model_class: model_class, items: items},
+          {
+            model_class: model_class,
+            // Reverse the enveloping we did 25 lines up
+            items: can.map(items, function(item) { return item.item; })
+          },
           function(frag) {
             $(ul).html(frag);
+            $(ul).cms_controllers_lhn_tooltips()
             can.view.hookup(ul);
           });
       };
     });
   }
+});
+
+jQuery(function($) {
+  // Trigger compilation of any remaining preloaded Mustache templates for
+  // faster can.view() response time.
+
+  setTimeout(function() {
+
+    GGRC.queue_event(
+      can.map(GGRC.Templates, function(template, id) {
+        var key = can.view.toId(GGRC.mustache_path + "/" + id + ".mustache");
+        if(!can.view.cachedRenderers[key]) {
+          return function() {
+            can.view.mustache(key, template);
+          };
+        }
+      })
+    );
+  }, 2000);
+
 });
 
 (function($) {

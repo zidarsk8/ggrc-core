@@ -167,7 +167,7 @@
         this.walk_instances(function(instance, result, depth) {
           if (depth == 1) {
             if (instance === true)
-              mappings.push(self.instance);
+              mappings.push(result.binding.instance);
             else
               mappings.push(instance);
           }
@@ -250,10 +250,15 @@
     , refresh_list: function() {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
+          , self = this
           ;
 
         binding.name = this.name + "_instances";
-        return binding.refresh_instances(this);
+        //  FIXME: `refresh_instances` should not need to be called twice, but
+        //  it fixes pre-mature resolution of mapping deferreds in some cases
+        return binding.refresh_instances(this).then(function(){
+          return self.refresh_instances();
+        });
       }
 
     , refresh_instance: function() {
@@ -990,11 +995,12 @@
    */
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.DirectListLoader", {
   }, {
-      init: function(model_name, object_attr) {
+      init: function(model_name, object_attr, object_join_attr) {
         this._super();
 
         this.model_name = model_name;
         this.object_attr = object_attr;
+        this.object_join_attr = object_join_attr;
       }
 
     , init_listeners: function(binding) {
@@ -1091,8 +1097,8 @@
 
     , _refresh_stubs: function(binding) {
         var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
+          , object_join_attr = this.object_join_attr
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
           ;
 
         this.insert_instances_from_mappings(binding, mappings);
@@ -1462,12 +1468,16 @@
 
   GGRC.all_local_results = function(instance) {
     // Returns directly-linked objects
-    var loaders = GGRC.Mappings[instance.constructor.shortName]
+    var loaders
       , local_loaders = []
       , multi_loader
       , multi_binding
       ;
 
+    if (instance._all_local_results_binding)
+      return instance._all_local_results_binding.refresh_stubs();
+
+    loaders = GGRC.Mappings[instance.constructor.shortName];
     can.each(loaders, function(loader, name) {
       if (loader instanceof GGRC.ListLoaders.DirectListLoader
           || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
@@ -1476,8 +1486,8 @@
     });
 
     multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders);
-    multi_binding = multi_loader.attach(instance);
-    return multi_binding.refresh_stubs();
+    instance._all_local_results_binding = multi_loader.attach(instance);
+    return instance._all_local_results_binding.refresh_stubs();
   };
 
 })(GGRC, can);

@@ -9,6 +9,22 @@
 
 (function(can) {
 
+can.Model.Cacheable("CMS.Models.Context", {
+    root_object : "context"
+  , root_collection : "contexts"
+  , category : "contexts"
+  , findAll : "/api/contexts"
+  , findOne : "/api/contexts/{id}"
+  , create : "POST /api/contexts"
+  , update : "PUT /api/contexts/{id}"
+  , destroy : "DELETE /api/contexts/{id}"
+  , attributes : {
+      context : "CMS.Models.Context.stub"
+    , related_object: "CMS.Models.get_stub"
+    }
+}, {
+});
+
 can.Model.Cacheable("CMS.Models.Program", {
   root_object : "program"
   , root_collection : "programs"
@@ -18,9 +34,10 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
-  , mixins : ["contactable"]
+  , mixins : ["contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -60,6 +77,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Market" : {}
   }
   , init : function() {
+    var that = this;
     this.validatePresenceOf("title");
     this._super.apply(this, arguments);
   }
@@ -78,7 +96,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
 
   , model : function(params) {
       if (this.shortName !== 'Directive')
@@ -103,7 +121,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
     }
 
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -116,6 +135,8 @@ can.Model.Cacheable("CMS.Models.Directive", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -158,7 +179,8 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -172,6 +194,8 @@ CMS.Models.Directive("CMS.Models.Standard", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -201,7 +225,8 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -215,6 +240,8 @@ CMS.Models.Directive("CMS.Models.Regulation", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -244,7 +271,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -258,6 +286,8 @@ CMS.Models.Directive("CMS.Models.Policy", {
     , program_directives : "CMS.Models.ProgramDirective.stubs"
     , directive_controls : "CMS.Models.DirectiveControl.stubs"
     , programs : "CMS.Models.Program.stubs"
+    , directive_sections: "CMS.Models.DirectiveSection.stubs"
+    , joined_sections: "CMS.Models.get_stubs"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
   }
@@ -287,7 +317,8 @@ CMS.Models.Directive("CMS.Models.Contract", {
     , footer_view : GGRC.mustache_path + "/directives/tree_footer.mustache"
     }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -319,9 +350,10 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   , create : "POST /api/org_groups"
   , update : "PUT /api/org_groups/{id}"
   , destroy : "DELETE /api/org_groups/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -401,9 +433,10 @@ can.Model.Cacheable("CMS.Models.Project", {
   , create : "POST /api/projects"
   , update : "PUT /api/projects/{id}"
   , destroy : "DELETE /api/projects/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -467,9 +500,10 @@ can.Model.Cacheable("CMS.Models.Facility", {
   , create : "POST /api/facilities"
   , update : "PUT /api/facilities/{id}"
   , destroy : "DELETE /api/facilities/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -549,9 +583,10 @@ can.Model.Cacheable("CMS.Models.Product", {
   , create : "POST /api/products"
   , update : "PUT /api/products/{id}"
   , destroy : "DELETE /api/products/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -654,9 +689,10 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   , create : "POST /api/data_assets"
   , update : "PUT /api/data_assets/{id}"
   , destroy : "DELETE /api/data_assets/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -736,9 +772,10 @@ can.Model.Cacheable("CMS.Models.Market", {
   , create : "POST /api/markets"
   , update : "PUT /api/markets/{id}"
   , destroy : "DELETE /api/markets/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -853,7 +890,8 @@ can.Model.Cacheable("CMS.Models.Risk", {
     });
   }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
@@ -917,12 +955,13 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
-  , mixins : ["ownable", "contactable"]
+  , mixins : ["ownable", "contactable", "unique_title"]
   , links_to : {
       "Section" : "SectionObjective"
   }
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , section_objectives : "CMS.Models.SectionObjective.stubs"
@@ -977,8 +1016,11 @@ can.Model.Cacheable("CMS.Models.Help", {
 can.Model.Cacheable("CMS.Models.Event", {
   root_object : "event"
   , root_collection : "events"
-  , findAll : "GET /api/events?__include=revisions,modified_by"
-  , list_view_options : { find_function : "findPage" }
+  , findAll : "GET /api/events"
+  , list_view_options : { find_params: { __include: "revisions" } }
+  , attributes : {
+      modified_by : "CMS.Models.Person.stub"
+    }
 }, {});
 
 can.Model.Cacheable("CMS.Models.Role", {
@@ -1029,9 +1071,10 @@ can.Model.Cacheable("CMS.Models.Audit", {
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
   , create : "POST /api/audits"
-  , mixins : ["contactable"]
+  , mixins : ["contactable", "unique_title"]
   , attributes : {
-    program: "CMS.Models.Program.stub"
+      context : "CMS.Models.Context.stub"
+    , program: "CMS.Models.Program.stub"
     , requests : "CMS.Models.Request.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , start_date : "date"
@@ -1176,8 +1219,10 @@ can.Model.Cacheable("CMS.Models.Request", {
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
+  , mixins : ["unique_title"]
   , attributes : {
-    audit : "CMS.Models.Audit.stub"
+      context : "CMS.Models.Context.stub"
+    , audit : "CMS.Models.Audit.stub"
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
     , requestor : "CMS.Models.Person.stub"
@@ -1269,22 +1314,26 @@ Task = can.Model.extend({
 }, {});
 
 CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
-  var model, params = {}, instance = null;
+  var model, params = {}, instance = null, href;
 
-  if(typeof object_type === "object") {
+  if(typeof object_type === "object" || object_type instanceof can.Stub) {
     //assume we only passed in params_or_object
     params_or_object = object_type;
     if (!params_or_object)
       return null;
-    object_type =
-      (params_or_object.constructor && params_or_object.constructor.shortName)
-      || (!params_or_object.selfLink && params_or_object.type)
-      || can.map(
-          window.cms_singularize(
-            /^\/api\/(\w+)\//.exec(params_or_object.selfLink || params_or_object.href)[1]
-          ).split("_")
-          , can.capitalize
+    if (params_or_object instanceof can.Model)
+      object_type = params_or_object.constructor.shortName;
+    else if (params_or_object instanceof can.Stub)
+      object_type = params_or_object.type;
+    else if (!params_or_object.selfLink && params_or_object.type)
+      object_type = params_or_object.type;
+    else {
+      href = params_or_object.selfLink || params_or_object.href;
+      object_type = can.map(
+          window.cms_singularize(/^\/api\/(\w+)\//.exec(href)[1]).split("_"),
+          can.capitalize
         ).join("");
+    }
     object_id = params_or_object.id;
   }
 

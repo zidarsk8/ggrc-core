@@ -50,7 +50,15 @@
           &nbsp;
           {{#selected_option_type}}
           <div class="pull-right">
-            <a class="btn btn-add" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="{{related_model_singular}}" data-object-plural="{{related_table_plural}}" {{#if_equals related_model_singular "Objective"}}data-object-params='{ "description": "{{json_escape object_params.section.description}}" }'{{/if_equals}}>
+            {{#if_equals related_model_singular "Objective"}}
+            <a class="btn btn-add" 
+               href="javascript://" 
+               data-mapping="true" 
+               data-toggle="modal-ajax-form" 
+               data-modal-class="modal-wide" 
+               data-object-singular="{{related_model_singular}}" 
+               data-object-plural="{{related_table_plural}}" 
+               data-object-params='{ "description": "{{object_params.section.description}}" }'>
               <i class="grcicon-add"></i>
               {{#if_equals new_object_title 'Person'}}
                 Add 
@@ -59,6 +67,23 @@
               {{/#if_equals}}
               {{ new_object_title }}
             </a>
+            {{else}}
+            <a class="btn btn-add" 
+               href="javascript://" 
+               data-mapping="true" 
+               data-toggle="modal-ajax-form" 
+               data-modal-class="modal-wide" 
+               data-object-singular="{{related_model_singular}}" 
+               data-object-plural="{{related_table_plural}}">
+              <i class="grcicon-add"></i>
+              {{#if_equals new_object_title 'Person'}}
+                Add 
+              {{else}}
+                Create 
+              {{/#if_equals}}
+              {{ new_object_title }}
+            </a>
+            {{/if_equals}}
           </div>
           {{/selected_option_type}}
         </div>

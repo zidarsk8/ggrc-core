@@ -11,6 +11,10 @@ from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.services.common import log_event
 from flask import redirect, flash
 from ggrc.services.common import get_modified_objects, update_index
+from ggrc.services.common import update_memcache_before_commit, update_memcache_after_commit
+from ggrc.utils import benchmark
+
+CACHE_EXPIRY_IMPORT=600
 
 class BaseConverter(object):
 
@@ -86,7 +90,7 @@ class BaseConverter(object):
 
   def import_metadata(self):
     if len(self.rows) < 6:
-      self.errors.append("There is no data to import in this CSV file")
+      self.errors.append(u"There is no data to import in this CSV file")
       raise ImportException("", show_preview=True, converter=self)
 
     optional_metadata = []
@@ -147,13 +151,13 @@ class BaseConverter(object):
 
     for header in required_headers:
       if header in missing_columns:
-        self.errors.append("Missing required column: {}".format(self.get_header_for_column(import_map, header)))
+        self.errors.append(u"Missing required column: {}".format(self.get_header_for_column(import_map, header)))
         missing_columns.remove(header)
 
     if any(missing_columns):
       missing_headers = [ self.get_header_for_column(import_map, temp) for temp in missing_columns if temp ]
       missing_text = ", ".join([missing_header for missing_header in missing_headers if missing_header ])
-      self.warnings.append("Missing column{plural}: {missing}".format(
+      self.warnings.append(u"Missing column{plural}: {missing}".format(
         plural='s' if len(missing_columns) > 1 else '', missing = missing_text))
 
     return keys
@@ -183,7 +187,7 @@ class BaseConverter(object):
     self.set_import_stats()
     if not dry_run:
       if self.has_errors():
-        raise ImportException("Attempted import with errors")
+        raise ImportException(u"Attempted import with errors")
       self.save_import()
     return self
 
@@ -195,7 +199,11 @@ class BaseConverter(object):
       row_converter.run_after_save_hooks(db.session, **self.options)
     modified_objects = get_modified_objects(db.session)
     log_event(db.session)
+    with benchmark("Update memcache before commit for import"):
+      update_memcache_before_commit(self, modified_objects, CACHE_EXPIRY_IMPORT)
     db.session.commit()
+    with benchmark("Update memcache after commit for import"):
+      update_memcache_after_commit(self)
     update_index(db.session, modified_objects)
 
   def set_import_stats(self):
@@ -225,15 +233,15 @@ class BaseConverter(object):
 
   def validate_code(self, attrs):
     if not attrs.get('slug'):
-      self.errors.append('Missing "{}" Code heading'.format(self.directive().kind))
+      self.errors.append(u'Missing "{}" Code heading'.format(self.directive().kind))
     elif attrs['slug'] != self.directive().slug:
-      self.errors.append('{} Code must be {}'.format(self.directive().kind, self.directive().slug))
+      self.errors.append(u'{} Code must be {}'.format(self.directive().kind, self.directive().slug))
 
   def validate_metadata_type(self, attrs, required_type):
     if attrs.get('type') is None:
-      self.errors.append('Missing "Type" heading')
+      self.errors.append(u'Missing "Type" heading')
     elif attrs['type'] != required_type:
-      self.errors.append('Type must be "{}"'.format(required_type))
+      self.errors.append(u'Type must be "{}"'.format(required_type))
 
   def do_export(self, csv_writer):
     for i,obj in enumerate(self.objects):
@@ -248,7 +256,12 @@ class BaseConverter(object):
       for key in row_header_map.keys():
         field = row_header_map[key]
         field_val = row.get(field, '')
-        field_val = field_val if isinstance(field_val, basestring) else ''
+        # Ensure non-basestrings are rendered on export
+        if not isinstance(field_val, basestring):
+          if field_val is None:
+            field_val = ''
+          else:
+            field_val = str(field_val)
         csv_row.append(field_val)
       csv_writer.writerow([ele.encode("utf-8") if ele else ''.encode("utf-8") for ele in csv_row])
 

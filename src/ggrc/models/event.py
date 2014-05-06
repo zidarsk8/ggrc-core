@@ -15,6 +15,13 @@ class Event(Base, db.Model):
 
   revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('events_modified_by', 'modified_by_id'),
+        db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
+        )
+
   _publish_attrs = [
       'action',
       'resource_id',
@@ -22,11 +29,15 @@ class Event(Base, db.Model):
       'revisions',
   ]
 
+  _include_links = [
+      'revisions',
+  ]
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
 
-    query = super(Event, cls).eager_query().order_by(cls.id.desc())
+    query = super(Event, cls).eager_query()
     return query.options(
-        orm.undefer_group('Revision_complete'),
-        orm.subqueryload('revisions'))
+        orm.subqueryload('revisions').undefer_group('Revision_complete'),
+        )

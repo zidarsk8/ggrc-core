@@ -9,8 +9,6 @@ Feature: A Relationship models a relation between two resources. Relationships
 
   Background:
     Given service description
-    And a RelationshipType "test_asymmetric" forward phrase "test_forward"
-    And a symmetric RelationshipType "test_symmetric" forward phrase "test_forward" and backward phrase "test_backward"
 
   Scenario Outline: Asymmetric relations
     Given a new "<type_a>" named "resource_a"
@@ -29,12 +27,12 @@ Feature: A Relationship models a relation between two resources. Relationships
 
   Examples:
       | type_a            | type_b           |
-      | Control           | System           |
+      | Product           | System           |
       | DataAsset         | Process          |
       #| Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |
-      | OrgGroup          | Person           |
+      | OrgGroup          | Regulation       |
 
   Scenario Outline: Symmetric relations
     Given a new "<type_a>" named "resource_a"
@@ -53,10 +51,10 @@ Feature: A Relationship models a relation between two resources. Relationships
 
   Examples:
       | type_a            | type_b           |
-      | Control           | System           |
+      | Product           | System           |
       | DataAsset         | Process          |
       #| Document          | Request          |
       | Facility          | Project          |
       | Market            | Program          |
-      | OrgGroup          | Person           |
+      | OrgGroup          | Regulation       |
 

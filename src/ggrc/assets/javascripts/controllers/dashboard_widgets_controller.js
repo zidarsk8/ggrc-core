@@ -69,6 +69,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   , draw_widget : function(frag, prefs) {
 
     this.element.html(frag[0]);
+    this.element.trigger("widgets_updated", this.element);
 
     this.element.sticky_header();
 
@@ -146,17 +147,22 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
   }
 
   , display: function() {
+      var that = this
+       , tracker_stop = GGRC.Tracker.start(
+          "DashboardWidget", "display", this.options.model.shortName)
+       ;
+
       if (this._display_deferred)
         return this._display_deferred;
 
       this._display_deferred = this.prepare().then(function() {
-        if (this.content_controller && this.content_controller.display) {
-          return this.content_controller.display();
+        if (that.content_controller && that.content_controller.display) {
+          return that.content_controller.display();
         }
         else {
           return new $.Deferred().resolve();
         }
-      });
+      }).done(tracker_stop);
 
       return this._display_deferred;
     }

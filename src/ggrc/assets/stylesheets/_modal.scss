@@ -864,6 +864,27 @@
   }
 }
 
+.selector-info {
+  h4 {
+    .code-info {
+      font-style: italic;
+      font-size: $f-small;
+      display: block;
+    }
+  }
+}
+
+.selector-list {
+  .tree-title-area {
+    .code-info {
+      font-size: $f-small;
+      font-style: italic;
+      color: $tabTitle;
+      font-weight: bold;
+    }
+  }
+}
+
 .modal-controls {
   height:200px;
   overflow-y:scroll;
@@ -1049,4 +1070,9 @@ p.modal-value {
       margin-right: 4px; 
     }
   }
+}
+
+// Mockups Workflow V1.1
+.gdrive-select {
+  margin-left: 10px;
 }

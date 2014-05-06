@@ -68,7 +68,8 @@ can.Model.Cacheable("CMS.Models.Response", {
   }
 
   , attributes : {
-      object_documents : "CMS.Models.ObjectDocument.stubs"
+      context : "CMS.Models.Context.stub"
+    , object_documents : "CMS.Models.ObjectDocument.stubs"
     , documents : "CMS.Models.Document.stubs"
     , population_worksheet : "CMS.Models.Document.stub"
     , sample_worksheet : "CMS.Models.Document.stub"

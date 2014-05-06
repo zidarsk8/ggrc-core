@@ -15,8 +15,8 @@ Feature: Log events and revisions
     Given a new "Program" named "example_program"
     When "example_program" is POSTed to its collection
     And GET of "/api/events" as "events"
-    Then the value of the "events_collection.events.0.resource_type" property of the "events" is Program
-    And the value of the "events_collection.events.0.action" property of the "events" is POST
+    Then the value of the "events_collection.events.0.resource_type" property of the "events" is "Program"
+    And the value of the "events_collection.events.0.action" property of the "events" is "POST"
 
   Scenario: Event and revision on DELETE
     Given a new "Program" named "example_program"
@@ -40,5 +40,5 @@ Feature: Log events and revisions
     And "example_program" property "description" is "Some Description"
     And PUT "example_program"
     And GET of "/api/events" as "events"
-    Then the value of the "events_collection.events.0.resource_type" property of the "events" is Program
-    And the value of the "events_collection.events.0.action" property of the "events" is PUT
+    Then the value of the "events_collection.events.0.resource_type" property of the "events" is "Program"
+    And the value of the "events_collection.events.0.action" property of the "events" is "PUT"

@@ -234,21 +234,24 @@
       {{{render_hooks 'Audit.tree_view_info'}}}
       
       <ul class="info-audit">
-        {{#is_allowed 'view_object_page' '__GGRC_ALL__' context=''}}
-          {{#using program=instance.program}}
+        {{#using program=instance.program}}
+        {{#with_mapping 'authorizations' instance}}
+        {{#if_helpers '\
+            #is_allowed' 'view_object_page' '__GGRC_ALL__' '\
+            and ^if_auditor' instance '\
+            and ^is_page_instance' instance.program '\
+           ' _0_context='' _1_include_admin=false}}
             <li>
               <a href="{{program.viewLink}}#audit_widget" class="info-action">
                 View {{instance.class.title_singular}}
                 <i class="grcicon-goto"></i>
               </a>
             </li>
-          {{/using}}
-        {{/is_allowed}}
+        {{/if_helpers}}
+        {{/with_mapping}}
+        {{/using}}
         
-        {{#if_helpers '\
-          #if' allow_mapping_or_creating '\
-          and #is_allowed' 'update' instance '\
-        ' _1_context=instance.context.id}}
+        {{#is_allowed' 'update' instance context=instance.context.id}}
           <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
               <i class="grcicon-edit"></i>
@@ -260,26 +263,30 @@
             <a href="#"><i class="grcicon-edit"></i> {{model.title_singular}} Log</a>
           </li>
           -->
+        {{/is_allowed}}
+        {{#if_helpers '\
+          #is_page_instance' instance.program '\
+          or #is_profile'}}
+	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
+	          
+	          <li>
+	          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
+	          </li>
+	        {{/is_allowed}}
+	
+	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
+	          <li>
+	          {{! FIXME: Better way to get the Audit link }}
+	          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
+	          </li>
+	          
+	          <!--
+	          <li>
+	          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
+	          </li>
+	          -->
+	        {{/is_allowed}}
         {{/if_helpers}}
-
-        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-          <li>
-          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
-          </li>
-        {{/is_allowed}}
-
-        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-          <li>
-          {{! FIXME: Better way to get the Audit link }}
-          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
-          </li>
-          
-          <!--
-          <li>
-          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
-          </li>
-          -->
-        {{/is_allowed}}
       </ul>
     </div>
 
@@ -287,16 +294,16 @@
       {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
         {{#is_profile}}
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{child_options.1.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Requests ({{#if_null child_options.1.original_list}}...{{else}}{{child_options.1.original_list.length}}{{/if_null}})</h6>
             {{#child_options.1}}
-              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.1}}
           </div>
 
           <div class="inner-tree">
-            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{child_options.2.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+            <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
             {{#child_options.2}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
           </div>
         {{else}}
@@ -304,27 +311,27 @@
           {{#if_instance_of page_object 'Audit|Program|Person'}}
             <div class="inner-tree">
               <h6>
-                PBC Requests ({{child_options.0.list.length}})
+                PBC Requests ({{#if_null child_options.0.original_list}}...{{else}}{{child_options.0.original_list.length}}{{/if_null}})
                 {{#child_options.0.header_view}}
                 <a href="#" class="advanced-filter-trigger"><i class="grcicon-search"></i> Show Filters</a>
                 {{/child_options.0.header_view}}
               </h6>
               {{#child_options.0}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.0}}
             </div>
           {{else}}
             <div class="inner-tree">
-              <h6>PBC Requests which contain object ({{child_options.3.list.length}}{{#mapping_count instance 'requests'}}/{{.}}{{/mapping_count}})</h6>
+              <h6>PBC Requests which contain object ({{#if_null child_options.3.original_list}}...{{else}}{{child_options.3.original_list.length}}{{/if_null}})</h6>
               {{#child_options.3}}
-                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree request-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.3}}
             </div>
 
             <div class="inner-tree">
-              <h6>PBC Responses which contain object ({{child_options.4.list.length}}{{#mapping_count instance 'responses_via_requests'}}/{{.}}{{/mapping_count}})</h6>
+              <h6>PBC Responses which contain object ({{#if_null child_options.4.original_list}}...{{else}}{{child_options.4.original_list.length}}{{/if_null}})</h6>
               {{#child_options.4}}
-                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure responses-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.4}}
             </div>
           {{/if_instance_of}}

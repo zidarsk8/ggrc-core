@@ -27,6 +27,7 @@ function get_template_path(url) {
 
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
+
 $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
   var template_path = get_template_path(options.url),
       template = template_path && GGRC.Templates[template_path];
@@ -39,7 +40,10 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
             completeCallback(200, "success", { text: template });
         }
         if (options.async)
-          setTimeout(done, 0);
+          //Use requestAnimationFrame where possible because we want
+          // these to run as quickly as possible but still release
+          // the thread.
+          (window.requestAnimationFrame || window.setTimeout)(done, 0);
         else
           done();
       },
@@ -47,7 +51,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
       abort: function() {
         template = null;
       }
-    }
+    };
   }
 });
 
@@ -213,6 +217,45 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
     return "<div" 
     + can.view.hook(hookupfunc)
     + " data-replace='true'/>";
+  });
+
+  Mustache.registerHelper("addclass", function(prefix, compute, options) {
+    prefix = resolve_computed(prefix);
+    return function(el) {
+      var curClass = null
+        , wasAttached = false
+        , callback
+        ;
+
+      callback = function(_ev, newVal, _oldVal) {
+        var nowAttached = $(el).closest('body').length > 0
+          , newClass = null
+          ;
+
+        //  If we were once attached and now are not, unbind this callback.
+        if (wasAttached && !nowAttached) {
+          compute.unbind('change', callback);
+          return;
+        } else if (nowAttached && !wasAttached) {
+          wasAttached = true;
+        }
+
+        if (newVal && newVal.toLowerCase)
+          newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+
+        if (curClass) {
+          $(el).removeClass(curClass);
+          curClass = null;
+        }
+        if (newClass) {
+          $(el).addClass(newClass);
+          curClass = newClass;
+        }
+      };
+
+      compute.bind('change', callback);
+      callback(null, resolve_computed(compute));
+    };
   });
 
   /**
@@ -747,13 +790,17 @@ Mustache.registerHelper("all", function(type, params, options) {
   return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
 });
 
-can.each(["page_object", "current_user"], function(fname) {
-  Mustache.registerHelper("with_" + fname + "_as", function(name, options) {
+can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
+  Mustache.registerHelper(fname, function(name, options) {
     if(!options) {
       options = name;
-      name = fname;
+      name = fname.replace(/with_(.*)_as/, "$1");
     }
-    var page_object = (fname === "current_user" ? CMS.Models.Person.model(GGRC.current_user) : GGRC.page_instance());
+    var page_object = (fname === "with_current_user_as"
+                       ? (CMS.Models.Person.findInCacheById(GGRC.current_user.id)
+                          || CMS.Models.Person.model(GGRC.current_user))
+                       : GGRC.page_instance()
+                       );
     if(page_object) {
       var p = {};
       p[name] = page_object;
@@ -1268,6 +1315,10 @@ Mustache.registerHelper("is_allowed", function() {
     context_id = options.hash.context;
     if (typeof context_id === 'function' && context_id.isComputed)
       context_id = context_id();
+    if(context_id && typeof context_id === "object" && context_id.id) {
+      // Passed in the context object instead of the context ID, so use the ID
+      context_id = context_id.id;
+    }
     //  Using `context=null` in Mustache templates, when `null` is not defined,
     //  causes `context_id` to be `""`.
     if (context_id === "" || context_id === undefined)
@@ -1573,6 +1624,55 @@ Mustache.registerHelper("visibility_delay", function(delay, options) {
     return el;
   };
 });
+
+
+Mustache.registerHelper("with_program_roles_as", function(
+      var_name, result, options) {
+  var dfd = $.when()
+    , frame = new can.Observe()
+    , user_roles = []
+    , mappings
+    , refresh_queue = new RefreshQueue()
+    ;
+
+  result = resolve_computed(result);
+  mappings = resolve_computed(result.get_mappings_compute())
+
+  frame.attr("roles", []);
+
+  can.each(mappings, function(mapping) {
+    if (mapping instanceof CMS.Models.UserRole) {
+      refresh_queue.enqueue(mapping.role);
+    }
+  });
+
+  dfd = refresh_queue.trigger().then(function(roles) {
+    can.each(mappings, function(mapping) {
+      if (mapping instanceof CMS.Models.UserRole) {
+        frame.attr("roles").push({
+          user_role: mapping,
+          role: mapping.role.reify()
+        });
+      } else {
+        frame.attr("roles").push({
+          role: {
+            "permission_summary": "Mapped"
+          }
+        });
+      }
+    });
+  });
+
+  function finish(list) {
+    return options.fn(options.contexts.add(frame));
+  }
+  function fail(error) {
+    return options.inverse(options.contexts.add({error : error}));
+  }
+
+  return defer_render('span', { done : finish, fail : fail }, dfd);
+});
+
 
 // Determines and serializes the roles for a user
 var program_roles;
@@ -2159,7 +2259,7 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
     , page_instance = GGRC.page_instance()
     ;
   
-  if(instance.type === page_instance.type && instance.id === page_instance.id){
+  if(instance && instance.type === page_instance.type && instance.id === page_instance.id){
     return options.fn(options.contexts);
   }
   else{
@@ -2348,6 +2448,15 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
       "span",
       { done: finish, progress: progress },
       instance.get_list_counter(mapping_name))
+});
+
+Mustache.registerHelper("is_overdue", function(date, options){
+  if(+resolve_computed(date) < +new Date()){
+    return options.fn(options.contexts);
+  }
+  else{
+    return options.inverse(options.contexts);
+  }
 });
 
 })(this, jQuery, can);

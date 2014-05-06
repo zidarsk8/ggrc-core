@@ -27,10 +27,10 @@ class SectionBase(
   type = db.Column(db.String)
   directive_id = deferred(
       db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=True),
-      'Section')
+      'SectionBase')
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-      'Section')
-  notes = deferred(db.Column(db.Text), 'Section')
+      'SectionBase')
+  notes = deferred(db.Column(db.Text), 'SectionBase')
 
   control_sections = db.relationship(
       'ControlSection', backref='section', cascade='all, delete-orphan')
@@ -76,10 +76,10 @@ class SectionBase(
   #    ]
 
   _include_links = [
-      'control_sections',
-      'section_objectives',
-      'object_sections',
-      'directive_sections',
+      #'control_sections',
+      #'section_objectives',
+      #'object_sections',
+      #'directive_sections',
       ]
 
   @validates('type')

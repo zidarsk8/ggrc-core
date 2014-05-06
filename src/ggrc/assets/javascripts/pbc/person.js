@@ -36,7 +36,8 @@ can.Model.Cacheable("CMS.Models.Person", {
         });
     }
     , attributes : {
-        modified_by : "CMS.Models.Person.stub"
+        context : "CMS.Models.Context.stub"
+      , modified_by : "CMS.Models.Person.stub"
       , object_people : "CMS.Models.ObjectPerson.stubs"
       , language : "CMS.Models.Option.stub"
       , user_roles : "CMS.Models.UserRole.stubs"
@@ -74,9 +75,7 @@ can.Model.Cacheable("CMS.Models.Person", {
         , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }
   , list_view_options: {
-        find_function: "findPage"
-      , find_params: { "__sort": "name,email" }
-      , compare_fn: null
+        find_params: { "__sort": "name,email" }
     }
   , init : function() {
     this._super.apply(this, arguments);

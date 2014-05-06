@@ -69,6 +69,10 @@ def augment_program(programs):
 # Initialize views
 import ggrc_gdrive_integration.views
 
+def init_extra_views(app):
+  ggrc_gdrive_integration.views.init_extra_views(app)
+
+
 from ggrc.services.registry import service
 
 contributed_services = [

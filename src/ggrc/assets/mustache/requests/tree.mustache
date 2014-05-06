@@ -4,7 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 }}
-<li class="tree-item programs rq-{{to_class instance.status}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
@@ -91,7 +91,7 @@
           <div class="control-wrap">
             <div class="date">
               {{#if instance.due_on}}
-              <span rel="tooltip" data-placement="top" data-original-title="Due On"><span>{{localize_date instance.due_on}}</span></span>
+              <span rel="tooltip" data-placement="top" {{#is_overdue instance.due_on}}class="error"{{/is_overdue}} data-original-title="Due On"><span>{{localize_date instance.due_on}}</span></span>
               {{/if}}
             </div>
             <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
@@ -171,8 +171,8 @@
     {{#if draw_children}}
       {{#each child_options}}
           <div class="inner-tree">
-            <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}}{{/prune_context}} ({{child_count}})</h6>
-            <ul class="tree-structure new-tree responses-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            <h6>PBC {{#prune_context}}{{firstnonempty title_plural model.title_plural}} ({{#if_null original_list}}...{{else}}{{original_list.length}}{{/if_null}}{{/prune_context}})</h6>
+            <ul class="tree-structure new-tree responses-list colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
             </ul>
           </div>
       {{/each}}

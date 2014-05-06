@@ -23,13 +23,7 @@
       <div class="rtf-block">
         {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
       </div>
-    </div>
-    <div class="span6">
-      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance stacked=true}}}
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span6">
+      
       <div class="rtf-block">
         <strong>Notes</strong>
         <br>
@@ -37,6 +31,7 @@
       </div>
     </div>
     <div class="span6">
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance stacked=true}}}
       <p>
         <strong>{{model.title_singular}} URL</strong>
         <br>
@@ -105,8 +100,8 @@
         <p>
           <strong>Significance</strong>
           <br>
-          {{#if_equals key_control "0"}}<span>Key</span>{{/if}}
-          {{#if_equals key_control "1"}}<span>Non-Key</span>{{/if}}
+          {{#if_equals key_control "1"}}<span>Key</span>{{/if}}
+          {{#if_equals key_control "0"}}<span>Non-Key</span>{{/if}}
         </p>
       </div>
       <div class="span3">

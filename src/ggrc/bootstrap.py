@@ -11,7 +11,10 @@ import settings
 if getattr(settings, 'APP_ENGINE', False):
   import sys
   import os
-  sys.path.insert(0, os.path.join(settings.BASE_DIR, 'packages.zip'))
+  if os.path.exists(os.path.join(settings.BASE_DIR, 'packages')):
+    sys.path.insert(0, os.path.join(settings.BASE_DIR, 'packages'))
+  else:
+    sys.path.insert(0, os.path.join(settings.BASE_DIR, 'packages.zip'))
   del os
   del sys
 

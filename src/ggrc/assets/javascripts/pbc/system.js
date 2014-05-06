@@ -33,7 +33,7 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         }
       }
 
-    , mixins : ["ownable", "contactable"]
+    , mixins : ["ownable", "contactable", "unique_title"]
     , tree_view_options : {
       show_view : "/static/mustache/base_objects/tree.mustache"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
@@ -129,7 +129,8 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
 
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
@@ -186,7 +187,8 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , destroy : "DELETE /api/processes/{id}"
   , cache : can.getObject("cache", CMS.Models.SystemOrProcess, true)
   , attributes : {
-      contact : "CMS.Models.Person.stub"
+      context : "CMS.Models.Context.stub"
+    , contact : "CMS.Models.Person.stub"
     , owners : "CMS.Models.Person.stubs"
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"

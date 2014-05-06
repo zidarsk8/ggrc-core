@@ -321,7 +321,9 @@ jQuery(function($) {
         $("#results-container").html(task.result.content);
         $('form.import .btn').unbind().unbind().click(disableButton);
         if(msg === "Upload and Review"){
-          // Don't display "Upload and Review successful." message
+          // Don't display "Upload and Review successful." message;
+          // But kill progress message.
+          $('body').trigger('ajax:flash', {});
           return;
         }
         $('body').trigger(
@@ -702,9 +704,21 @@ jQuery(function($) {
 
 });*/
 
-//make buttons non-clickable when saving
 jQuery(function($) {
   can.extend(can.Control.prototype, {
+    // Returns a function which will be halted unless `this.element` exists
+    //   - useful for callbacks which depend on the controller's presence in
+    //     the DOM
+    _ifNotRemoved: function(fn) {
+      var that = this;
+      return function() {
+        if (!that.element)
+          return;
+        return fn.apply(this, arguments);
+      };
+    },
+
+    //make buttons non-clickable when saving
     bindXHRToButton : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
       var $el = $(el)
@@ -749,7 +763,7 @@ jQuery(function($) {
         d.unbind("change"); //forget about listening to changes.  we're going to refresh the page
         destroys.push(d.resetPagePrefs());
       });
-      $.when.apply($, destroys).done($.proxy(GGRC, 'navigate'));
+      $.when.apply($, destroys).done(function() { GGRC.navigate(); });
     });
   })
   .on('click', '.set-display-settings-default', function(e) {

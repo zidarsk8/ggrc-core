@@ -322,7 +322,6 @@ u {
   &.disabled {
     cursor: default;
     background-color: $btnActive;
-    background-image: none;
     @include opacity(0.65);
     @include box-shadow(none);
     text-shadow: none;
@@ -607,7 +606,7 @@ strong {
   left:0;
   width:50%;
   margin-left:25%;
-  z-index:1000;
+  z-index:9000;
   .notice {
     p {
       color:$green;
@@ -820,4 +819,10 @@ select.multiple-selector {
 
 .rtf-block {
   word-wrap: break-word;
+}
+
+.top-align-label {
+  input {
+    margin-bottom: 0;
+  }
 }
