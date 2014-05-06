@@ -112,6 +112,7 @@ def init_app(app):
       return value
 
     parser = HTMLParser()
+    value = unicode(value)
     lastvalue = value
     value = parser.unescape(value)
     while value != lastvalue:
