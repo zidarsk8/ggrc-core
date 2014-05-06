@@ -425,7 +425,7 @@
                     <div class="span9">
                       <h2>
                         <i class="grcicon-object-color"></i>
-                        Objects under Assessment
+                        Workflow Objects
                         <span class="object_count" id="objectsCounter">({{assessment.objects.length}})</span>
                         <span class="explanation"></span>
                       </h2>
@@ -441,119 +441,9 @@
                 </header>
                 <section class="content">
                   <div class="object-step" id="filters">
-                    {{#if filter}}
-                    <div class="choose-object-wrap">
-                      <div class="choose-object-content">
-                        <div class="row-fluid">
-                          <div class="span12">
-                            <div class="first-row">
-                              <label>
-                                <strong>Add all</strong>
-                              </label>
-                              <select class="input-medium">
-                                <option>Regulations</option>
-                                <option>Contracts</option>
-                                <option>Policies</option>
-                                <option>Standards</option>
-                                <option>Objectives</option>
-                                <option selected="selected">Controls</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="row-fluid">
-                          <div class="span12">
-                            {{#each filter_list}}
-                            <div class="indent-row">
-                              <label>
-                                <strong>{{#if @index}}AND&nbsp;{{/if}}Relevant to:</strong>
-                              </label>
-                              <select class="input-small">
-                                <option selected="selected">Program</option>
-                                <option>Process</option>
-                                <option>System</option>
-                                <option>Market</option>
-                              </select>
-                              <div class="objective-selector">
-                                <input type="text" name="program.title" class="input-large search-icon" value="{{value}}" placeholder="Enter text to search for Object">
-                              </div>
-                              <button type="submit" data-index="{{@index}}" class="remove_filter"><i class="grcicon-deleted"></i></button>
-                            </div>
-                            {{/each}}
-                            <div class="add-rule indent-row">
-                              <a href="#" id="addFilterRule">+ Add Rule</a>
-                            </div>
-                          </div>
-                        </div>
-                      <div class="choose-object-footer">
-                        <div class="row-fluid">
-                          <div class="span3">
-                            <div class="deny-buttons">
-                              <a class="btn reset_filter" href="#">Reset</a>
-                            </div>
-                          </div>
-                          <div class="span3">
-                            &nbsp;
-                          </div>
-                          <div class="span6">
-                            <div class="confirm-buttons">
-                              <span><strong>{{Objects.length}} controls found</strong></span>
-                              <a class="btn btn-primary" href="#" id="objectReview">Review</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {{/if}}
-                    <ul class="tree-structure new-tree mockup-tree">
-                      {{#if objects.length}}
-                      <li class="tree-item governance object-filter">
-                        <div class="item-main">
-                          <div class="row-fluid">
-                            <div class="span9">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  <span><strong>{{objects.length}} controls found</strong></span> &nbsp; <a href="#" id="filterTrigger"><strong>Show Filter</strong></a>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="span3">
-                              <div class="object-check all-check">
-                                <label>
-                                  select all
-                                  <input type="checkbox" checked="checked" id="objectAll">
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                      {{/if}}
-                      {{#each objects}}
-                      <li class="tree-item governance selected">
-                        <div class="item-main">
-                          <div class="row-fluid">
-                            <div class="span11">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  <i class="grcicon-control-color"></i>
-                                  {{name}}
-                                </div>
-                              </div>
-                            </div>
-                            <div class="span1">
-                              <div class="object-check">
-                                <input type="checkbox" value="{{@index}}" checked="checked" class="object-check-single">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                      {{/each}}
-                    </ul>
-                     {{#if assessment.started}}
-                     <ul class="tree-structure new-tree mockup-tree colored-list">
+                    
+                    {{#if assessment.started}}
+                    <ul class="tree-structure new-tree mockup-tree colored-list">
                      {{#each assessment.objects}}
                       <li class="tree-item {{status}} object-top" data-index="{{@index}}">
                         <div class="item-main">
@@ -830,52 +720,10 @@
                   <ul class="tree-structure new-tree mockup-tree">
                     <li class="tree-footer tree-item tree-item-add">
                       <div class="row-fluid">
-                        <div class="span10 section-expandable">
-                          <div id="objectFooterUtility">
-                            <a href="javascript://" class="section-add">
-                              Add object under assessment
-                            </a>
-                            <span class="section-expander">
-                              <a href="#" id="addSingleObjectTrigger">
-                                Add single object
-                              </a>
-                              &nbsp;
-                              &nbsp;
-                              <a href="#" class="section-import" id="filterTriggerFooter">
-                                Add multiple objects by filtering
-                              </a>
-                            </span>
-                          </div>
-                          <div class="add-single-object" id="addSingleObject">
-                            <div class="row-fluid">
-                              <div class="span2">
-                                <select class="input-block-level" id="new_object_type">
-                                  <option>Regulation</option>
-                                  <option>Contract</option>
-                                  <option>Policy</option>
-                                  <option>Standard</option>
-                                  <option>Objective</option>
-                                  <option selected="selected">Control</option>
-                                </select>
-                              </div>
-                              <div class="span4">
-                                <div class="objective-selector">
-                                  <input type="text" id="new_object_name" name="object.title" class="input-block-level search-icon" value="Stability and Perpetuability" placeholder="Enter text to search for Object">
-                                </div>
-                              </div>
-                              <div class="span2">
-                                <a href="#" class="btn btn-primary btn-footer" id="addSingleControlNow">Add</a>
-                                <a href="#" id="cancelSingleControl"><i class="grcicon-x-grey"></i></a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="span2">
-                          {{#if objects.length}}
-                          <div class="object-add">
-                            <a href="#" class="btn btn-primary btn-small" id="addSelected">Add selected</a>
-                          </div>
-                          {{/if}}
+                        <div class="span10">
+                          <a href="#objectSelector" data-toggle="modal">
+                            + Add Objects
+                          </a>
                         </div>
                       </div>
                     </li>
@@ -887,6 +735,147 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <div id="objectSelector" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="objectSelector" aria-hidden="true">
+    <div class="modal-header">
+      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+        <i class="grcicon-x-white"></i>
+      </a>
+      <h2>
+        <span>Add Objects to Workflow</span>
+      </h2>
+    </div>
+    <div class="modal-body">
+      <div class="object-step" id="filters">
+        {{#if filter}}
+        <div class="choose-object-wrap">
+          <div class="choose-object-content">
+            
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="first-row">
+                  <label>
+                    <strong>Show all</strong>
+                  </label>
+                  <select class="input-medium">
+                    <option>Regulations</option>
+                    <option>Contracts</option>
+                    <option>Policies</option>
+                    <option>Standards</option>
+                    <option>Objectives</option>
+                    <option selected="selected">Controls</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row-fluid">
+              <div class="span12">
+                {{#each filter_list}}
+                <div class="indent-row">
+                  <button type="submit" data-index="{{@index}}" class="remove_filter"><i class="grcicon-deleted"></i></button>
+                  <label>
+                    <strong>{{#if @index}}AND&nbsp;{{/if}}Relevant to:</strong>
+                  </label>
+                  <select class="input-small">
+                    <option selected="selected">Program</option>
+                    <option>Process</option>
+                    <option>System</option>
+                    <option>Market</option>
+                  </select>
+                  <div class="objective-selector">
+                    <input type="text" name="program.title" class="input-large search-icon" value="{{value}}" placeholder="Enter text to search for Object">
+                  </div>
+                </div>
+                {{/each}}
+                <div class="add-rule indent-row">
+                  <a href="#" id="addFilterRule">+ Add New Rule</a>
+                  <a class="btn pull-right" href="#" id="objectReview">Filter</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        {{/if}}
+      </div>
+    </div>
+    <div class="results">
+      <div class="bar-h"></div>
+      <div class="results-wrap">
+        <span class="info">Define search criteria above to start</span>
+        <ul class="tree-structure new-tree mockup-tree">
+          {{#if objects.length}}
+          <li class="tree-item governance object-filter">
+            <div class="item-main">
+              <div class="row-fluid">
+                <div class="span9">
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <span><strong>{{objects.length}} controls found</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="span3">
+                  <div class="object-check all-check">
+                    <label>
+                      select all
+                      <input type="checkbox" checked="checked" id="objectAll">
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          {{/if}}
+          
+          {{#each objects}}
+          <li class="tree-item governance selected">
+            <div class="item-main">
+              <div class="row-fluid">
+                <div class="span11">
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <i class="grcicon-control-color"></i>
+                      {{name}}
+                    </div>
+                  </div>
+                </div>
+                <div class="span1">
+                  <div class="object-check">
+                    <input type="checkbox" value="{{@index}}" checked="checked" class="object-check-single">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="deny-buttons">
+            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+          </div>
+        </div>
+        <div class="span5">
+          &nbsp;
+        </div>
+        <div class="span4">
+          <div class="confirm-buttons">
+            <div class="object-add">
+              {{#if objects.length}}
+                <span><strong>{{objects.length}} objects selected</strong></span>
+              {{/if}}
+              <a href="javascript://" class="btn btn-primary" data-dismiss="modal" id="addSelected" tabindex="24">Add selected</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="editAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">

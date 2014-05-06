@@ -508,6 +508,14 @@ ul.new-tree {
         color:$programs;
       }
     }
+    &.disabled {
+      .item-data {
+        color:$darkGray;
+        i {
+          @include opacity(0.4);
+        }
+      }
+    }
     .small {
       font-size:$f-small;
       display: inline-block;

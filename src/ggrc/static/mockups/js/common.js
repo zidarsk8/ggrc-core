@@ -563,6 +563,14 @@ $(document).ready(function(){
     }
   });
   
+  $("body").on('change', '.object-check-single', function() {
+    if($(this).is(':checked')) {
+      $(this).closest('.tree-item').removeClass('disabled');
+    } else {
+      $(this).closest('.tree-item').addClass('disabled');
+    }
+  });
+  
   $('body').on('click', '#titleChange', function() {
     $(this).closest('h3').hide();
     $('#taskGroupTitle').show();

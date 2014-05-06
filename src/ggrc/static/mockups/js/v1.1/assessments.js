@@ -215,8 +215,9 @@ can.Component.extend({
         assessment.save();
     },
     "a#objectReview click" : function(el, ev){
-      this.scope.attr('filter', false);
+      // this.scope.attr('filter', false); Temporary Removed
       this.scope.attr('objects', Objects);
+      $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
       this.scope.attr('filter', true);
