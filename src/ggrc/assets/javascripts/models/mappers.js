@@ -995,11 +995,12 @@
    */
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.DirectListLoader", {
   }, {
-      init: function(model_name, object_attr) {
+      init: function(model_name, object_attr, object_join_attr) {
         this._super();
 
         this.model_name = model_name;
         this.object_attr = object_attr;
+        this.object_join_attr = object_join_attr;
       }
 
     , init_listeners: function(binding) {
@@ -1096,8 +1097,8 @@
 
     , _refresh_stubs: function(binding) {
         var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
+          , object_join_attr = this.object_join_attr
+          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
           ;
 
         this.insert_instances_from_mappings(binding, mappings);
