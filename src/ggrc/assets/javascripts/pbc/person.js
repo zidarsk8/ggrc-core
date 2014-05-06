@@ -75,9 +75,7 @@ can.Model.Cacheable("CMS.Models.Person", {
         , footer_view : GGRC.mustache_path + "/people/tree_footer.mustache"
     }
   , list_view_options: {
-        find_function: "findPage"
-      , find_params: { "__sort": "name,email" }
-      , compare_fn: null
+        find_params: { "__sort": "name,email" }
     }
   , init : function() {
     this._super.apply(this, arguments);
