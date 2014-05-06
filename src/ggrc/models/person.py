@@ -34,6 +34,7 @@ class Person(Base, db.Model):
   @staticmethod
   def _extra_table_args(cls):
     return (
+        db.Index('ix_people_name_email', 'name', 'email'),
         db.Index('uq_people_email', 'email', unique=True),
         )
 

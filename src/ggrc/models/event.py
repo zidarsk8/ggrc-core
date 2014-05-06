@@ -19,6 +19,7 @@ class Event(Base, db.Model):
   def _extra_table_args(cls):
     return (
         db.Index('events_modified_by', 'modified_by_id'),
+        db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
         )
 
   _publish_attrs = [
