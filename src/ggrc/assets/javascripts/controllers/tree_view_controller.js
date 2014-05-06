@@ -152,10 +152,10 @@ can.Control("CMS.Controllers.TreeLoader", {
 
       this._display_deferred = $.when(this._attached_deferred, this.prepare());
 
-      this._display_deferred = this._display_deferred.then(function() {
+      this._display_deferred = this._display_deferred.then(this._ifNotRemoved(function() {
         return $.when(that.fetch_list(), that.init_view())
-          .then(that.proxy("draw_list"));
-      }).done(tracker_stop);
+          .then(that._ifNotRemoved(that.proxy("draw_list")));
+      })).done(tracker_stop);
 
       return this._display_deferred;
     }
@@ -217,7 +217,8 @@ can.Control("CMS.Controllers.TreeLoader", {
     }
 
   , enqueue_items: function(items) {
-      var that = this;
+      var that = this
+        , processChunk;
 
       if (!items || items.length == 0) {
         return new $.Deferred().resolve();
@@ -231,24 +232,26 @@ can.Control("CMS.Controllers.TreeLoader", {
       this._pending_items.push.apply(this._pending_items, items);
       this._pending_items_ms = Date.now();
 
-      setTimeout(function() {
+      processChunk = function() {
         if (!that._pending_items) {
           return;
         }
         var chunk = that._pending_items.splice(0, 5);
         that.insert_items(chunk);
         if (that._pending_items.length > 0) {
-          setTimeout(arguments.callee, 100);
+          setTimeout(that._ifNotRemoved(processChunk), 100);
         }
         else {
           that._pending_items = null;
-          setTimeout(function() {
+          setTimeout(that._ifNotRemoved(function() {
             if (!that._pending_items) {
               that._loading_finished();
             }
-          }, 200);
+          }), 200);
         }
-      }, 100);
+      };
+
+      setTimeout(this._ifNotRemoved(processChunk), 100);
 
       return this._loading_deferred;
     }
@@ -371,11 +374,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       if(this.options.header_view) {
         dfds.push(
-          can.view(this.options.header_view, $.when(this.options)).then(function(frag) {
-            if (that.element) {
+          can.view(this.options.header_view, $.when(this.options)).then(
+            this._ifNotRemoved(function(frag) {
               that.element.prepend(frag);
-            }
-          }));
+            })
+          ));
       }
 
       // Init the spinner if items need to be loaded:
@@ -388,11 +391,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
       if(this.options.footer_view) {
         dfds.push(
-          can.view(this.options.footer_view, this.options, function(frag) {
-            if (that.element) {
+          can.view(this.options.footer_view, this.options,
+            this._ifNotRemoved(function(frag) {
               that.element.append(frag);
-            }
-          }));
+            })
+          ));
       }
 
       return $.when.apply($.when, dfds);
@@ -418,12 +421,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             });
       }
       if (this.get_count_deferred) {
-        this.get_count_deferred.then(function(count) {
+        this.get_count_deferred.then(this._ifNotRemoved(function(count) {
           self.element && self.element.trigger("updateCount", count());
-          count.bind("change", function() {
-            self.element && self.element.trigger("updateCount", count());
-          });
-        });
+          count.bind("change", self._ifNotRemoved(function() {
+            self.element.trigger("updateCount", count());
+          }));
+        }));
       } else {
         // FIXME: Does this ever happen?
         this.get_count_deferred = new $.Deferred();
@@ -473,9 +476,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , display_path: function(path) {
       var that = this;
-      return this.display().then(function() {
+      return this.display().then(this._ifNotRemoved(function() {
         return _display_tree_subpath(that.element, path);
-      });
+      }));
     }
 
   , prepare_child_options: function(v) {
@@ -537,10 +540,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     //    `this.options.list`.
     //assume we are doing a replace
     this.oldList = can.map(oldVals, function(v) { return v.instance ? v.instance : v; });
-    GGRC.queue_event(function() {
+    GGRC.queue_event(this._ifNotRemoved(function() {
       if(that.oldList) {
         can.each(oldVals, function(v) {
-          that.element && that.element.trigger("removeChild", v);
+          that.element.trigger("removeChild", v);
         });
         delete that.oldList;
       } else {
@@ -548,11 +551,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         can.each(oldVals, function(v) {
           var _v = v.instance || v;
           if(!~can.inArray(_v, list)) {
-            that.element && that.element.trigger("removeChild", v);
+            that.element.trigger("removeChild", v);
           }
         });
       }
-    });
+    }));
   }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {
@@ -594,10 +597,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (list_window.length > 0)
       queue_window(list_window);
     final_dfd = $.when.apply($, all_draw_items_dfds);
-    final_dfd.done(function() {
+    final_dfd.done(this._ifNotRemoved(function() {
       //  Trigger update for sticky headers and footers
       that.element.trigger("updateSticky");
-    });
+    }));
     return final_dfd;
   }
 
@@ -719,17 +722,17 @@ can.Control("CMS.Controllers.TreeViewNode", {
         || GGRC.mustache_path + "/base_objects/tree.mustache";
     }
     this._draw_node_deferred = new $.Deferred();
-    setTimeout(this.proxy("draw_node"), 20);
+    setTimeout(this._ifNotRemoved(this.proxy("draw_node")), 20);
   }
 
   , draw_node: function() {
     this.add_child_lists_to_child();
     //setTimeout(function() {
       var that = this;
-      can.view(that.options.show_view, that.options, function(frag) {
+      can.view(that.options.show_view, that.options, this._ifNotRemoved(function(frag) {
         that.replace_element(frag);
         that._draw_node_deferred.resolve();
-      });
+      }));
     //}, 20);
   }
   , should_draw_children : function(){
@@ -836,9 +839,9 @@ can.Control("CMS.Controllers.TreeViewNode", {
 
   , display_path: function(path) {
       var that = this;
-      return this.display().then(function() {
+      return this.display().then(this._ifNotRemoved(function() {
         return _display_tree_subpath(that.element, path);
-      });
+      }));
     }
 
   , display_subtrees: function() {
@@ -877,13 +880,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
       this.options.attr("expanded", true);
 
       this._expand_deferred = new $.Deferred();
-      setTimeout(function() {
-        that.display_subtrees().then(function() {
+      setTimeout(this._ifNotRemoved(function() {
+        that.display_subtrees().then(that._ifNotRemoved(function() {
           that.element.trigger("subtree_loaded");
           that.element.trigger("loaded");
           that._expand_deferred.resolve();
-        });
-      }, 500);
+        }));
+      }), 500);
       return this._expand_deferred;
     }
 

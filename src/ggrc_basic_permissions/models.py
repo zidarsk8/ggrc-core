@@ -55,7 +55,19 @@ class Role(Base, Described, db.Model):
 
 from ggrc.models.person import Person
 Person._publish_attrs.extend(['user_roles'])
-#Person._include_links.extend(['user_roles'])
+Person._include_links.extend(['user_roles'])
+
+
+# Override `Person.eager_query` to ensure `user_roles` is loaded efficiently
+_orig_Person_eager_query = Person.eager_query
+def _Person_eager_query(cls):
+  from sqlalchemy import orm
+
+  return _orig_Person_eager_query().options(
+      orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
+      orm.subqueryload_all('user_roles.role')
+      )
+Person.eager_query = classmethod(_Person_eager_query)
 
 
 class UserRole(Base, db.Model):

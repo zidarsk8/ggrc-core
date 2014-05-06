@@ -219,159 +219,22 @@ can.Construct("RefreshQueue", {
 if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
-function authorizations_list_loader() {
-  var person_roles = new can.Observe.List()
-    , lists = []
-    , queues = []
-    , el = $('#person_widget')
-    ;
-
-  el.trigger("updateCount", person_roles.length)
-
-  function insert_user_role(user_role, refresh_queue) {
-    var found = false
-      , person = user_role.person.reify()
-      , role = user_role.role.reify ? user_role.role.reify() : user_role.role
-      , role_data = { user_role: user_role, role: role }
-      ;
-
-    can.each(person_roles, function(data, index) {
-      if (person.id == data.person.id) {
-        data.attr('roles').push(role_data);
-        refresh_queue && role.reify && refresh_queue.enqueue(role);
-        found = true;
-      }
-    });
-    if (!found) {
-      person_roles.push({
-        person: person,
-        roles: [role_data]
-      });
-      if (refresh_queue) {
-        refresh_queue.enqueue(person);
-        role.reify && refresh_queue.enqueue(role);
-      }
-    }
-  }
-
-  function remove_user_role(user_role) {
-    var roles, role_index
-      , person_index_to_remove = null
-      ;
-
-    can.each(person_roles, function(data, index) {
-      if (user_role.person.id == data.person.id) {
-        roles = data.attr('roles');
-        if (user_role.role.permission_summary === 'Mapped') {
-          role_index = $.map(roles, function(role) { return role.role.permission_summary; }).indexOf('Mapped');
-        }
-        else {
-          role_index = $.map(roles, function(role) { return role.role; }).indexOf(user_role.role.reify());
-        }
-        if (role_index > -1) {
-          roles.splice(role_index, 1);
-          if (roles.length == 0)
-            person_index_to_remove = index;
-        }
-      }
-    });
-    if (person_index_to_remove)
-      person_roles.splice(person_index_to_remove, 1);
-  }
-
-  // Only grab authorizations if the user has access
-  if (should_show_authorizations()) {
-    CMS.Models.UserRole.bind("created", function(ev, user_role) {
-      var refresh_queue = new RefreshQueue();
-      if (user_role.constructor == CMS.Models.UserRole)
-        insert_user_role(user_role, refresh_queue);
-      refresh_queue.trigger();
-    });
-
-    CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
-      if (user_role.constructor == CMS.Models.UserRole)
-        remove_user_role(user_role);
-    });
-
-    lists.push(GGRC.page_instance().get_list_loader('extended_authorizations').pipe(function(mappings) {
-      var refresh_queue = new RefreshQueue();
-      can.each(mappings, function(mapping) {
-        insert_user_role(mapping.instance, refresh_queue);
-      });
-      queues.push(refresh_queue.trigger());
-      return mappings;
-    }));
-  }
-
-  // Insert mapped people with a custom user role "Mapped"
-  lists.push(GGRC.page_instance().get_list_loader('people').pipe(function(mappings) {
-    var insert_mappings = function(mappings) {
-          var refresh_queue = new RefreshQueue()
-          can.each(mappings, function(mapping) {
-            insert_user_role({
-                person: mapping.instance
-              , role: { permission_summary: 'Mapped' }
-              , result: mapping
-            }, refresh_queue);
-          });
-          return refresh_queue.trigger();
-        };
-
-    mappings.bind('add', function(ev, mappings) {
-      insert_mappings(mappings);
-    });
-
-    mappings.bind('remove', function(ev, mappings) {
-      can.each(mappings, function(mapping) {
-        remove_user_role({
-            person: mapping.instance
-          , role: { permission_summary: 'Mapped' }
-        });
-      });
-    });
-
-    queues.push(insert_mappings(mappings));
-    return mappings;
-  }));
-
-  // Ensure queued objects are fully loaded
-  var loaded = new can.Deferred();
-  $.when.apply($, lists).then(function() {
-    $.when.apply($, queues).then(function() {
-      loaded.resolve();
-    });
-  });
-
-  return loaded.then(function() { return person_roles });
-}
-
-function should_show_authorizations() {
-  var instance = GGRC.page_instance()
-    , context_id = instance.context && instance.context.id
-    ;
-
-  return (context_id
-      && Permission.is_allowed('read', 'Role', null)
-      && Permission.is_allowed('read', 'UserRole', context_id));
-}
-
 $(function() {
   program_widget_descriptors = {
       person: {
           widget_id: "person"
         , widget_name: "People"
         , widget_icon: "person"
-        // , extra_widget_actions_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_modal_actions.mustache"
-        , content_controller: GGRC.Controllers.ListView
+        , content_controller: GGRC.Controllers.TreeView
         , content_controller_options: {
-              list_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_list.mustache"
-            , list_loader: authorizations_list_loader
+              show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache"
+            , footer_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache"
             , parent_instance: GGRC.page_instance()
             , allow_reading: true
             , allow_mapping: true
             , allow_creating: true
             , model: CMS.Models.Person
-            , mapping: "people"
+            , mapping: "mapped_and_or_authorized_people"
             }
         }
   };
