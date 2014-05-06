@@ -487,10 +487,14 @@ class TitleHandler(ColumnHandler):
   def validate(self, data):
     super(TitleHandler, self).validate(data)
     # check for collisions in db
-    has_db_collision = self.importer.model_class.query.filter_by(title=data).first()
-    if has_db_collision:
-      self.add_error("An object with this title already exists.")
-      return
+    object_class = self.importer.model_class
+    db_collisions = object_class.query.filter_by(title=data).all()
+    # Only add error for collision if it doesn't match one of the slugs
+    if db_collisions:
+      current_slug = self.importer.obj.slug
+      if not any(current_slug == x.slug for x in db_collisions):
+        self.add_error("An object with this title already exists.")
+        return
     # ... and then in existing imports
     has_import_collision = data in [x.obj.title for x in self.base_importer.created_objects()]
     if has_import_collision:
