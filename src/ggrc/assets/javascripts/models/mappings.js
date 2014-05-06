@@ -317,6 +317,9 @@
       , authorizations_via_audits: Cross("audits", "authorizations")
       , extended_authorizations: Multi([
           "authorizations", "authorizations_via_audits"])
+      , authorized_people: Cross("extended_authorizations", "person")
+      , mapped_and_or_authorized_people: Multi([
+          "people", "authorized_people"])
 
       , orphaned_objects: Multi([
           "related_objects"
