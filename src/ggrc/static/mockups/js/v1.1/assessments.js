@@ -364,6 +364,27 @@ can.Component.extend({
         , show = $el.parent().siblings()
       hide.hide();
       show.show();
+    },
+    ".addTrigger click" : function(el, ev){
+      var $el = $(el)
+        , assessment = this.scope.assessment
+        , index = $el.data('index')
+        , type = $el.data('type')
+        ;
+
+      assessment.task_groups[index][type].push({title: ""});
+      assessment.save();
+    },
+    ".deleteTrigger click" : function(el, ev){
+      var $el = $(el)
+        , assessment = this.scope.assessment
+        , index = $el.data('index')
+        , workflowIndex = $el.closest('ul').data('index')
+        , type = $el.data('type')
+        ;
+
+      assessment.task_groups[workflowIndex][type].splice(index, 1);
+      assessment.save();
     }
   }
 });

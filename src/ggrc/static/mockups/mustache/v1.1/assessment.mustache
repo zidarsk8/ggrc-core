@@ -271,22 +271,18 @@
                             <br>
                             <div class="row-fluid">
                               <div class="span6">
-                                <strong>Objects (<span id="objectWorkflowCounter">0</span>)</strong><br>
-                                <ul id="objectList" class="items-list">
+                                <strong>Objects (<span>{{objects.length}}</span>)</strong><br>
+                                <ul class="items-list" data-index="{{@index}}">
+                                  {{#each objects}}
                                   <li>
                                     <div class="objective-selector">
-                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="CTRL - Access Control">
-                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="{{title}}">
+                                      <a href="#" data-index="{{@index}}" data-type="objects" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
-                                  <li>
-                                    <div class="objective-selector">
-                                      <input tabindex="3" type="text" name="object_title2" class="input-xlarge search-icon" placeholder="Add Object" value="POL - Universal Policy">
-                                      <a href="#"><i class="grcicon-deleted"></i></a>
-                                    </div>
-                                  </li>
+                                  {{/each}}
                                 </ul>
-                                <a href="#" id="objectAddTrigger" class="btn">Add Object</a>
+                                <a href="#" class="btn addTrigger" data-index="{{@index}}" data-type="objects">Add Object</a>
                               </div>
 
                               <div class="span6 task-list">
@@ -296,31 +292,19 @@
                                     Lock Task Order
                                   </label>
                                 </span>
-                                <strong>Tasks (<span id="taskWorkflowCounter">0</span>)</strong><br>
-                                <ul id="taskList" class="items-list">
+                                <strong>Tasks (<span>{{tasks.length}}</span>)</strong><br>
+                                <ul class="items-list" data-index="{{@index}}">
+                                  {{#each tasks}}
                                   <li>
                                     <div class="objective-selector">
                                       <a class="drag" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Proof Reading">
-                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="{{title}}">
+                                      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
-                                  <li>
-                                    <div class="objective-selector">
-                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Validate Mappings">
-                                      <a href="#"><i class="grcicon-deleted"></i></a>
-                                    </div>
-                                  </li>
-                                  <li>
-                                    <div class="objective-selector">
-                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Peer Review">
-                                      <a href="#"><i class="grcicon-deleted"></i></a>
-                                    </div>
-                                  </li>
+                                  {{/each}}
                                 </ul>
-                                <a href="#" id="taskAdd" class="btn">Add Task</a>
+                                <a href="#" class="btn addTrigger" data-index="{{@index}}" data-type="tasks">Add Task</a>
                               </div>
                             </div>
 
