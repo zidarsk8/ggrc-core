@@ -106,6 +106,11 @@ def init_app(app):
   for tag in bleach_tags:
     bleach_attrs[tag] = attrs
   def cleaner(target, value, oldvalue, initiator):
+    # Some cases like Request don't use the title value
+    #  and it's nullable, so check for that
+    if value is None:
+      return value
+
     parser = HTMLParser()
     lastvalue = value
     value = parser.unescape(value)
