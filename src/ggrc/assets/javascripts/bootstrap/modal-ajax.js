@@ -56,37 +56,6 @@
       $target.modal(option).draggable({ handle: '.modal-header' });
     },
 
-    'listselect': function($target, $trigger, option) {
-      var list_target = $trigger.data('list-target');
-      $target.modal_single_selector(option, $trigger);
-
-      // Close the modal and rewrite the target list
-      $target.on('modal:select', function(e, data) {
-        $target.modal_single_selector('hide');
-        $trigger.trigger('modal:select', data);
-      });
-    },
-
-    'relationshipsform': function($target, $trigger, option) {
-      var list_target = $trigger.data('list-target');
-      $target.modal_relationship_selector(option, $trigger);
-
-      // Close the modal and rewrite the target list
-      $target.on('ajax:json', function(e, data, xhr) {
-        if (data.errors) {
-        } else {
-          $trigger.trigger('modal:success', [data]);
-          if (list_target == 'refresh') {
-            refresh_page();
-          } else if (list_target) {
-            $(list_target).tmpl_setitems(data);
-            $target.modal_relationship_selector('hide');
-          }
-        }
-
-      });
-    },
-
     'listform': function($target, $trigger, option) {
       var list_target = $trigger.data('list-target');
       $target.modal_relationship_selector(option, $trigger);
@@ -504,7 +473,7 @@
   };
 
   $(function() {
-    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-relationship-selector"], [data-toggle="modal-ajax-single-selector"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"], [data-toggle="modal-ajax-unmapform"]', function(e) {
+    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"], [data-toggle="modal-ajax-unmapform"]', function(e) {
 
       var $this = $(this)
         , toggle_type = $(this).data('toggle')
@@ -554,8 +523,6 @@
         if (toggle_type == 'modal-ajax-listnewform') modal_type = 'listnewform';
         if (toggle_type == 'modal-ajax-listeditform') modal_type = 'listeditform';
         if (toggle_type == 'modal-ajax') modal_type = 'modal';
-        if (toggle_type == 'modal-ajax-relationship-selector') modal_type = 'relationshipsform';
-        if (toggle_type == 'modal-ajax-single-selector') modal_type = 'listselect';
         if (toggle_type == 'modal-ajax-deleteform') modal_type = 'deleteform';
         if (toggle_type == 'modal-ajax-unmapform') modal_type = 'unmapform';
         if (!modal_type) modal_type = 'modal';
