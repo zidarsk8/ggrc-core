@@ -341,6 +341,15 @@ can.Component.extend({
         end_date: ""
       });
       assessment.save();
+    },
+    ".removeTaskGroup click" : function(el, ev){
+      var assessment = this.scope.assessment
+        , index = $(el).data('index');
+
+      console.log('index', index);
+
+      assessment.task_groups.splice(index, 1);
+      assessment.save();
     }
   }
 });
