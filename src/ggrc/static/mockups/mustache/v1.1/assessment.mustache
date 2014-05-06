@@ -234,48 +234,38 @@
                           <div class="show-description">
                             <div class="row-fluid">
                               <div class="span6 task-group-title">
-                                <h3>
+                                <h3 class=".taskGroupTitle">
                                   {{title}}
-                                  <a id="titleChange" href="#"><i class="grcicon-edit"></i></a>
+                                  <a href="#" class="toggleClosest"><i class="grcicon-edit"></i></a>
                                 </h3>
-                                <div id="taskGroupTitle" class="edit-field">
-                                  <input type="text" value="{{title}}" class="pull-left">
-                                  <a href="#" id="editFieldSave" class="btn btn-success pull-left">Save</a>
-                                  <a href="#" id="editFieldCancel" class="pull-left"><i class="grcicon-x-grey"></i></a>
+                                <div class="taskGroupTitleForm edit-field hide">
+                                  <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
+                                  <a href="#" id="editFieldSave" class="btn btn-success pull-left toggleClosest">Save</a>
+                                  <a href="#" id="editFieldCancel" class="pull-left toggleClosest"><i class="grcicon-x-grey"></i></a>
                                 </div>
                               </div>
 
                               <div class="span6">
                                 <label class="top-align-label">
                                   <strong>Due date:</strong>
-                                  <input tabindex="2" class="input-small date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text">
+                                  <input tabindex="2" class="input-small date saveTaskGroupField" data-index="{{@index}}" data-field="end_date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
                                 </label>
                               </div>
                             </div>
-
                             <div class="row-fluid">
                               <div class="span12">
                                 {{#if_equals description ""}}
-                                <a id="TaskDescription" href="#">+ Add Description</a>
+                                <a href="#" class="toggleClosest">+ Add Description</a>
                                 {{else}}
-                                {{description}}
+                                {{description}}<a class="task-edit-icon toggleClosest" href="#"><i class="grcicon-edit"></i></a>
                                 {{/if}}
-
-                                <div id="TaskHolder">
-                                  <div class="wysiwyg-area">
-                                    <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3"></textarea>
-                                  </div>
-                                  <a href="#" id="descriptionSave" class="btn btn-success">Save</a>
-                                  <a href="#" id="descriptionCancel"><i class="grcicon-x-grey"></i>Cancel</a>
+                              </div>
+                              <div class="hide">
+                                <div class="wysiwyg-area">
+                                  <textarea id="program_description" class="span12 double wysihtml5 saveTaskGroupField" data-index="{{@index}}" data-field="description" name="description" placeholder="Enter Description" tabindex="3">{{description}}</textarea>
                                 </div>
-
-                                <div id="TaskUpdated">
-                                  <div class="tree-description">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin laoreet fringilla massa, mollis aliquet massa pulvinar ut. Suspendisse congue varius nisi in rhoncus. Phasellus bibendum commodo ante. Etiam porta turpis nec magna suscipit malesuada.
-                                    <a class="task-edit-icon" href="#"><i class="grcicon-edit"></i></a>
-                                  </div>
-                                </div>
-
+                                <a href="#" class="btn btn-success toggleClosest">Save</a>
+                                <a href="#" class="toggleClosest"><i class="grcicon-x-grey"></i>Cancel</a>
                               </div>
                             </div>
                             <br>

@@ -117,7 +117,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: ProgramList[0]//assessmentList[0]
+    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -344,12 +344,26 @@ can.Component.extend({
     },
     ".removeTaskGroup click" : function(el, ev){
       var assessment = this.scope.assessment
-        , index = $(el).data('index');
-
-      console.log('index', index);
-
+        , index = $(el).data('index')
+        ;
       assessment.task_groups.splice(index, 1);
       assessment.save();
+    },
+    ".saveTaskGroupField change" : function(el, ev){
+      var assessment = this.scope.assessment
+        , $el = $(el)
+        , index = $el.data('index')
+        , field = $el.data('field')
+        ;
+      assessment.task_groups[index].attr(field, $el.val());
+      assessment.save();
+    },
+    ".toggleClosest click" : function(el, ev){
+      var $el = $(el)
+        , hide = $el.parent()
+        , show = $el.parent().siblings()
+      hide.hide();
+      show.show();
     }
   }
 });
