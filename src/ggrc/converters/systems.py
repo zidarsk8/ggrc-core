@@ -50,7 +50,7 @@ class SystemRowConverter(BaseRowConverter):
     self.handle_date('updated_at', no_import=True)
     self.handle_text_or_html('description')
     self.handle_boolean('infrastructure', truthy_values=['infrastructure'])
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
 
   def save_object(self, db_session, **options):
     db_session.add(self.obj)

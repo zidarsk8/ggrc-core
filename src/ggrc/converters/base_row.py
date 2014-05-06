@@ -174,6 +174,9 @@ class BaseRowConverter(object):
   def handle_raw_attr(self, key, **options):
     return self.handle(key, ColumnHandler, **options)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
+
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
 
@@ -267,6 +270,7 @@ class ColumnHandler(object):
 
   def export(self):
     return getattr(self.importer.obj, self.key, '')
+
 
 class RequestTypeColumnHandler(ColumnHandler):
 
@@ -477,6 +481,20 @@ class BooleanColumnHandler(ColumnHandler):
         return "No"
       else:
         return str(self.value) # unknown value - shouldn't happen
+
+class TitleHandler(ColumnHandler):
+
+  def validate(self, data):
+    super(TitleHandler, self).validate(data)
+    # check for collisions in db
+    has_db_collision = self.importer.model_class.query.filter_by(title=data).first()
+    if has_db_collision:
+      self.add_error("An object with this title already exists.")
+      return
+    # ... and then in existing imports
+    has_import_collision = data in [x.obj.title for x in self.base_importer.created_objects()]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
 
 class DateColumnHandler(ColumnHandler):
 
