@@ -562,6 +562,21 @@ $(document).ready(function(){
       $('.task-list .objective-selector a').removeClass('disabled');
     }
   });
+  
+  $('body').on('click', '#titleChange', function() {
+    $(this).closest('h3').hide();
+    $('#taskGroupTitle').show();
+  });
+  
+  $('body').on('click', '#editFieldSave', function() {
+    $('#titleChange').closest('h3').show();
+    $('#taskGroupTitle').hide();
+  });
+  
+  $('body').on('click', '#editFieldCancel', function() {
+    $('#titleChange').closest('h3').show();
+    $('#taskGroupTitle').hide();
+  });
 
 });
 

@@ -478,7 +478,8 @@ ul.new-tree {
 #TaskUpdated,
 #taskList,
 #objectList,
-#lockTrigger {
+#lockTrigger,
+#taskGroupTitle {
   display: none;
 }
 
@@ -506,5 +507,11 @@ ul.new-tree {
         @include opacity(0.2);
       }
     }
+  }
+}
+
+.edit-field {
+  .btn {
+    margin-left: 10px;
   }
 }

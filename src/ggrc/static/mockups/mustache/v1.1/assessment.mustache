@@ -236,8 +236,13 @@
                               <div class="span6 task-group-title">
                                 <h3>
                                   {{title}}
-                                  <a href="#"><i class="grcicon-edit"></i></a>
+                                  <a id="titleChange" href="#"><i class="grcicon-edit"></i></a>
                                 </h3>
+                                <div id="taskGroupTitle" class="edit-field">
+                                  <input type="text" value="{{title}}" class="pull-left">
+                                  <a href="#" id="editFieldSave" class="btn btn-success pull-left">Save</a>
+                                  <a href="#" id="editFieldCancel" class="pull-left"><i class="grcicon-x-grey"></i></a>
+                                </div>
                               </div>
 
                               <div class="span6">
@@ -305,18 +310,21 @@
                                 <ul id="taskList" class="items-list">
                                   <li>
                                     <div class="objective-selector">
+                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Proof Reading">
                                       <a href="#"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
                                   <li>
                                     <div class="objective-selector">
+                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Validate Mappings">
                                       <a href="#"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
                                   <li>
                                     <div class="objective-selector">
+                                      <a class="drag" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="input-xlarge search-icon" placeholder="Add Task" value="Peer Review">
                                       <a href="#"><i class="grcicon-deleted"></i></a>
                                     </div>
