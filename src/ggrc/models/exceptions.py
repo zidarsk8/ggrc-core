@@ -13,10 +13,14 @@ def translate_message(exception):
   message = exception.message
   if isinstance(exception, IntegrityError):
     # TODO: Handle not null, foreign key errors, uniqueness errors with compound keys
-    duplicate_entry_pattern = re.compile(r'\(1062, u?"(Duplicate entry \'[^\']*\')')
+    duplicate_entry_pattern = re.compile(r'\(1062, u?"Duplicate entry (\'.*\') for key \'([^\']*)\'')
     matches = duplicate_entry_pattern.search(message)
     if matches:
-      return matches.group(1)
+      return u'The value ' + \
+        matches.group(1) + \
+        u' is already used for a ' + \
+        ('title; title' if matches.group(2).startswith('uq_t_') else 'code; code') + \
+        u' values must be unique.'
     else:
       return message
   else:
