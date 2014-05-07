@@ -30,6 +30,9 @@ libraries:
   - name: jinja2
     version: "2.6"
 
+builtins:
+- remote_api: on
+
 # Don't upload some files
 #  - note the first 9 items are defaults, see:
 #    https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files
