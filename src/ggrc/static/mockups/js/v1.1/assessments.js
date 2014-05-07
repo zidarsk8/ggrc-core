@@ -4,7 +4,7 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
     if(_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
-    if(typeof val1 === "function") { 
+    if(typeof val1 === "function") {
       if(val1.isComputed) {
         val1.bind("change", function(ev, newVal, oldVal) {
           _val1 = newVal;
@@ -15,7 +15,7 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
     } else {
       _val1 = val1;
     }
-    if(typeof val2 === "function") { 
+    if(typeof val2 === "function") {
       if(val2.isComputed) {
         val2.bind("change", function(ev, newVal, oldVal) {
           _val2 = newVal;
@@ -117,7 +117,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
+    object: ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -125,10 +125,10 @@ can.Component.extend({
     }
   },
   helpers: {
-    
+
     "hide_class": function(val, object, options) {
       var name = object().name;
-      if(name === val) 
+      if(name === val)
         return '';
       else
         return 'hide';
@@ -328,6 +328,7 @@ can.Component.extend({
     // Task groups:
     "#addTaskGroup click" : function(){
       var title = $("#new_object_name").val()
+        , assignee = $("#new_task_assignee").val()
         , assessment = this.scope.assessment;
       if(!assessment.task_groups){
         assessment.attr('task_groups', []);
@@ -335,7 +336,7 @@ can.Component.extend({
       assessment.task_groups.push({
         title: title,
         description: "",
-        assignee: assessment.lead_email,
+        assignee: assignee,
         objects: [],
         tasks: [],
         end_date: "",
@@ -404,7 +405,6 @@ can.Component.extend({
         , type = $el.data('type')
         ;
       if($el.hasClass('disabled')) return;
-      console.log(workflowIndex,type,index)
       assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
     }
