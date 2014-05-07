@@ -75,13 +75,35 @@ var ProgramList = [{
   contact: 'ken@reciprocitylbas.com'
 }];
 
-var Objects = [
-   {type: "control", name: "Secure Backups"},
-   {type: "control", name: "Data Storage"},
-   {type: "control", name: "Password Security"},
-   {type: "control", name: "Access Control"},
-   {type: "control", name: "Stability and Perpetuability"}
-];
+var Objects = {
+  controls: [
+    {type: "control", name: "Secure Backups"},
+    {type: "control", name: "Data Storage"},
+    {type: "control", name: "Password Security"},
+    {type: "control", name: "Access Control"},
+    {type: "control", name: "Stability and Perpetuability"}
+  ],
+  objectives: [
+    {type: "objective", name: "Establish a schedule"}
+  ],
+  standards: [
+    {type: "standard", name: "ASHRAE 90.1"}
+  ],
+  policies: [
+    {type: "policy", name: "Probationary Terms"},
+    {type: "policy", name: "Medical Leave"}
+  ],
+  contracts: [
+    {type: "contract", name: "Master Service Agreement"},
+    {type: "contract", name: "SaaS Vendor Contract"},
+    {type: "contract", name: "Company X Contract"}
+  ],
+  regulations: [
+    {type: "regulation", name: "SOX"},
+    {type: "regulation", name: "PCI DSS v2.0"}
+  ]
+}
+
 
 
 var taskList = new Task.List({});
@@ -117,7 +139,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
+    object: ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -151,8 +173,6 @@ can.Component.extend({
     workflow: assessmentList[0].workflow,
     new_form: false,
     objects : [],
-    Objects : Objects,
-    filter : assessmentList[0].objects.length == 0,
     filter_list : [{value: assessmentList[0].program_title}],
     can_start : assessmentList[0].workflow && assessmentList[0].objects.length,
     set_fields : function(assessment){
@@ -253,7 +273,8 @@ can.Component.extend({
     },
     "a#objectReview click" : function(el, ev){
       // this.scope.attr('filter', false); Temporary Removed
-      this.scope.attr('objects', Objects);
+      var type = $("#objects_type").val().toLowerCase();
+      this.scope.attr('objects', Objects[type]);
       $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
@@ -268,9 +289,9 @@ can.Component.extend({
         , filtered = []
         , i;
       scope.objects.each(function(v,i){
-        if(selected[i]) filtered.push(v);
+        if(selected[i]) assessment.objects.push(v);
       });
-      assessment.attr('objects', filtered);
+
       if(assessment.attr('started')){
         this.scope.initObjects();
       }
@@ -290,18 +311,6 @@ can.Component.extend({
     },
     "#objectAll click": function(el){
       $('.object-check-single').prop('checked', $(el).prop('checked'));
-    },
-    "#addSingleControlNow click": function(){
-      this.scope.assessment.objects.push({name: $("#new_object_name").val(), type:$("new_object_type").val()});
-      if(this.scope.assessment.attr('started')){
-        this.scope.initObjects();
-      }
-      this.scope.assessment.save();
-      $('.add-single-object').hide();
-
-      $('.section-add').show();
-      $('.section-expander').hide();
-      $('#objectFooterUtility').show();
     },
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);

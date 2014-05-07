@@ -43,7 +43,7 @@
                   {{#assessment.objects}}
                   <li class="governance">
                     <a href="#">
-                      <i class="grcicon-control-color"></i>
+                      <i class="grcicon-{{type}}-color"></i>
                       {{name}}
                     </a>
                   </li>
@@ -826,7 +826,7 @@
                             <div class="span10">
                               <div class="item-data">
                                 <div class="tree-title-area">
-                                  <i class="grcicon-control-color"></i>
+                                  <i class="grcicon-{{type}}-color"></i>
                                   {{name}}
                                 </div>
                               </div>
@@ -1187,7 +1187,7 @@
                   <label>
                     <strong>Show all</strong>
                   </label>
-                  <select class="input-medium">
+                  <select class="input-medium" id="objects_type">
                     <option>Regulations</option>
                     <option>Contracts</option>
                     <option>Policies</option>
@@ -1264,7 +1264,7 @@
                 <div class="span11">
                   <div class="item-data">
                     <div class="tree-title-area">
-                      <i class="grcicon-control-color"></i>
+                      <i class="grcicon-{{type}}-color"></i>
                       {{name}}
                     </div>
                   </div>
