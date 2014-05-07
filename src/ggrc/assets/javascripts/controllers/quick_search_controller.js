@@ -242,13 +242,7 @@ can.Control("CMS.Controllers.LHN", {
         var checked = target.prop("checked");
         this.obs.attr("my_work", checked);
         target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
-        CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-          if(prefs.length < 1) {
-            prefs.push(new CMS.Models.DisplayPrefs());
-            prefs[0].save();
-          }
-          prefs[0].setGlobal("lhs", { my_work: checked });
-        });
+        this.options.display_prefs.setLHNState("my_work", checked);
       }
     }
 
@@ -256,7 +250,7 @@ can.Control("CMS.Controllers.LHN", {
       var self = this;
 
       CMS.Models.DisplayPrefs.findAll().done(function(prefs) {
-        var settings, checked
+        var checked
           , $lhs = $("#lhs")
           , lhn_search_dfd
           ;
@@ -268,8 +262,9 @@ can.Control("CMS.Controllers.LHN", {
 
         self.options.display_prefs = prefs[0];
 
-        settings = prefs[0].getGlobal("lhs");
-        checked = (settings && 'my_work' in settings) ? !!settings.my_work : true;
+        checked = true;
+        if (typeof prefs[0].getLHNState().my_work !== "undefined")
+          checked = !!prefs[0].getLHNState().my_work;
         self.obs.attr("my_work", checked);
 
         lhn_search_dfd = $lhs
