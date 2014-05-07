@@ -273,8 +273,18 @@ can.Component.extend({
     },
     "a#objectReview click" : function(el, ev){
       // this.scope.attr('filter', false); Temporary Removed
-      var type = $("#objects_type").val().toLowerCase();
-      this.scope.attr('objects', Objects[type]);
+      var type = $("#objects_type").val().toLowerCase()
+        , that = this
+        , objects = this.scope.assessment.objects;
+      this.scope.attr('objects', $.map(Objects[type], function(o){
+
+        for(var i = 0; i < objects.length; i++){
+          if(o.type === objects[i].type && o.name === objects[i].name){
+            return;
+          }
+        }
+        return o;
+      }));
       $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
