@@ -40,36 +40,14 @@
                 <div class="arrow"></div>
 
                 <ul class="sub-level">
+                  {{#assessment.objects}}
                   <li class="governance">
                     <a href="#">
                       <i class="grcicon-control-color"></i>
-                      Login Access
+                      {{name}}
                     </a>
                   </li>
-                  <li class="governance">
-                    <a href="#">
-                      <i class="grcicon-control-color"></i>
-                      Data Persistance
-                    </a>
-                  </li>
-                  <li class="governance">
-                    <a href="#">
-                      <i class="grcicon-market-color"></i>
-                      Kansas City
-                    </a>
-                  </li>
-                  <li class="governance">
-                    <a href="#">
-                      <i class="grcicon-policy-color"></i>
-                      EEO Regulation
-                    </a>
-                  </li>
-                  <li class="governance">
-                    <a href="#">
-                      <i class="grcicon-market-color"></i>
-                      San Jose
-                    </a>
-                  </li>
+                  {{/assessment.objects}}
                 </ul>
 
               </li>
@@ -567,7 +545,7 @@
                   </ul>
                 </section>
               </section>
-              
+
               <!-- Widget: Objects -->
               <section class="widget objectives" id="objects_widget" style="display:none;">
                 <header class="header">
@@ -880,7 +858,7 @@
                   </ul>
                 </section>
               </section>
-              
+
               <!-- Widget: Progress -->
               <section class="widget programs" id="progress_widget" style="display:none;">
                 <header class="header">
@@ -904,7 +882,7 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree">
-                    
+
                     <li class="tree-item program task-item">
                       <div class="item-main">
                         <a href="javascript://" class="openclose">
@@ -938,7 +916,7 @@
                         </a>
                       </div>
                       <div class="tier-2-info item-content" style="display: none;">
-                        
+
                         <div class="inner-tree">
                           <h6>Objects (3)</h6>
                           <ul class="tree-structure new-tree">
@@ -969,7 +947,7 @@
                                   </div>
                                 </a>
                               </div>
-                              
+
                               <div class="tier-2-info item-content" style="display: none;">
                                 <div class="tier-2-info-content">
                                   <div class="show-description">
@@ -999,11 +977,11 @@
                                     </div>
                                   </div>
                                 </div>
-                                
+
                                 <div class="inner-tree">
                                   <h6>Tasks (3)</h6>
                                   <ul class="tree-structure new-tree">
-                                    
+
                                     <li class="tree-item programs">
                                       <div class="item-main">
                                         <a href="javascript://" class="openclose">
@@ -1039,14 +1017,14 @@
                                         </a>
                                       </div>
                                     </li>
-                                    
+
                                   </ul>
                                 </div>
-                                
+
                               </div>
-                              
+
                             </li>
-                            
+
                             <li class="tree-item programs">
                               <div class="item-main">
                                 <a href="javascript://" class="openclose">
@@ -1075,7 +1053,7 @@
                                 </a>
                               </div>
                             </li>
-                            
+
                             <li class="tree-item programs">
                               <div class="item-main">
                                 <a href="javascript://" class="openclose">
@@ -1104,12 +1082,12 @@
                                 </a>
                               </div>
                             </li>
-                            
+
                           </ul>
                         </div>
                       </div>
                     </li>
-                    
+
                     <li class="tree-item program task-item">
                       <div class="item-main">
                         <a href="javascript://" class="openclose">
@@ -1143,7 +1121,7 @@
                         </a>
                       </div>
                     </li>
-                    
+
                     <li class="tree-item program task-item">
                       <div class="item-main">
                         <a href="javascript://" class="openclose">
@@ -1177,11 +1155,11 @@
                         </a>
                       </div>
                     </li>
-                    
+
                   </ul>
                 </section>
               </section>
-              
+
             </div>
           </div>
         </div>
@@ -1200,7 +1178,6 @@
     </div>
     <div class="modal-body">
       <div class="object-step" id="filters">
-        {{#if filter}}
         <div class="choose-object-wrap">
           <div class="choose-object-content">
 
@@ -1249,8 +1226,6 @@
             </div>
           </div>
         </div>
-
-        {{/if}}
       </div>
     </div>
     <div class="results">
