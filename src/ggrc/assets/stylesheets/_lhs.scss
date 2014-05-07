@@ -503,7 +503,75 @@
         }
       }
     }
-
+  }
+  ul.innernav-arrow {
+    a {
+      &.w-arrow {
+        padding-left: 48px;
+      }
+    }
+    .arrow {
+      background: image-url('grcicons/not-open.png') no-repeat 0 0;
+      @include background-size(17px 12px);
+      width: 17px;
+      height: 12px;
+      position: absolute;
+      top: 8px;
+      left: 24px;
+      padding: 0;
+      cursor: pointer;
+      &.active {
+        background: image-url('grcicons/open.png') no-repeat 0 0;
+        @include background-size(17px 12px);
+      }
+    }
+    li {
+      ul.sub-level {
+        @include reset-list();
+        li {
+          a {
+            border-bottom: 1px dotted #ddd;
+            font-size: 11px;
+            padding-left: 22px;
+            &:hover {
+              background-color: $rqAccepted;
+              background-image: none;
+              background-position: 0 0;
+              color: #777;
+            }
+            i {
+              @include opacity(1);
+            }
+          }
+          &:hover {
+            a {
+              background-color: $rqAccepted;
+              color:#777;
+            }
+          }
+          &:last-child {
+            a {
+              border-bottom: 1px solid #ddd;
+            }
+          }
+        }
+      }
+      &:hover {
+        ul.sub-level {
+          li {
+            a {
+              background-color:#fff;
+              color:#777;
+              background-image: none;
+              background-position: 0 0;
+              &:hover {
+                background-color: $rqAccepted;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -625,4 +693,11 @@
 // fix for redundant lhn scroll
 .accordion {
   margin-bottom:0;
+}
+
+
+.accordion-group-inner {
+  .sub-level {
+    display: none;
+  }
 }

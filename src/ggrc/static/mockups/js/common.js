@@ -126,11 +126,20 @@ $(document).ready(function(){
 
   });
 
+  $('body').on('click', '.accordion-group-inner > .arrow', function() {
+    var $this = $(this),
+        $subNav = $this.closest('.accordion-group-inner').find('.sub-level');
 
-  $('.internav li:gt(7)').hide();
-  $('.add-more-objects').click(function() {
-    $('.internav li:gt(7)').slideDown('fast');
-    $(this).hide();
+    if($this.hasClass("active")) {
+      $subNav.slideUp('fast');
+      $this.removeClass("active");
+    } else {
+      $subNav.slideDown('fast');
+      $this.addClass("active");
+    }
+
+    return false;
+
   });
 
   $( ".date" ).datepicker();
@@ -157,6 +166,19 @@ $(document).ready(function(){
     var object = [
       "Stability and Perpetuability"
     ]
+
+    var object2 = [
+      "CTRL - Access Control",
+      "CTRL - Non Critical Security",
+      "POL - User Policy",
+      "POL - Universal Policy"
+    ]
+
+    var tasks = [
+      "Proof Reading",
+      "Validate Mappings",
+      "Peer Review"
+    ]
     $( ".objective-selector input[name='assessment_lead.email']" ).autocomplete({
       source: people
     });
@@ -165,6 +187,18 @@ $(document).ready(function(){
     });
     $( ".objective-selector input[name='object.title']" ).autocomplete({
       source: object
+    });
+
+
+    $( ".objective-selector input[name='object_title2']" ).autocomplete({
+      source: object2
+    });
+    $( ".objective-selector input[name='tasks_title']" ).autocomplete({
+      source: tasks
+    });
+
+    $( ".people-autocomplete > input" ).autocomplete({
+      source: people
     });
 
 
@@ -186,6 +220,9 @@ $(document).ready(function(){
 
     if($('ul.internav li.active a').attr('href') == '#info_widget') {
       $('#info_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#workflow_info_widget') {
+      $('#workflow_info_widget').addClass('widget-active').show();
     }
     if($('ul.internav li.active a').attr('href') == '#market_widget') {
       $('#market_widget').addClass('widget-active').show();
@@ -219,6 +256,9 @@ $(document).ready(function(){
     }
     if($('ul.internav li.active a').attr('href') == '#people_widget') {
       $('#people_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#progress_widget') {
+      $('#progress_widget').addClass('widget-active').show();
     }
   });
 
@@ -515,6 +555,55 @@ $(document).ready(function(){
     $('#TaskHolder').hide();
     $('#TaskDescription').hide();
     $('#TaskUpdated').show();
+  });
+
+  $('body').on('click', '#objectAddTrigger', function() {
+    $('#objectList').show();
+    $('#objectWorkflowCounter').html('2');
+  });
+
+  $('body').on('click', '#taskAdd', function() {
+    $('#taskList').show();
+    $('#lockTrigger').show();
+    $('#taskWorkflowCounter').html('3');
+  });
+
+  $("#taskLock").change(function () {
+    if($(this).is(':checked')) {
+      $('#taskAdd').addClass('disabled');
+      $('.task-list .objective-selector a').addClass('disabled');
+    } else {
+      $('#taskAdd').removeClass('disabled');
+      $('.task-list .objective-selector a').removeClass('disabled');
+    }
+  });
+
+  $("body").on('change', '.object-check-single', function() {
+    if($(this).is(':checked')) {
+      $(this).closest('.tree-item').removeClass('disabled');
+    } else {
+      $(this).closest('.tree-item').addClass('disabled');
+    }
+  });
+
+  $('body').on('click', '#titleChange', function() {
+    $(this).closest('h3').hide();
+    $('#taskGroupTitle').show();
+  });
+
+  $('body').on('click', '#editFieldSave', function() {
+    $('#titleChange').closest('h3').show();
+    $('#taskGroupTitle').hide();
+  });
+
+  $('body').on('click', '#editFieldCancel', function() {
+    $('#titleChange').closest('h3').show();
+    $('#taskGroupTitle').hide();
+  });
+  
+  $('body').on('click', '#confirmStartWorkflow', function() {
+    $('#startWorkflowTrigger').html('End Workflow');
+    $('#progressWidgetTrigger').show();
   });
 
 });

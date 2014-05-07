@@ -826,3 +826,25 @@ select.multiple-selector {
     margin-bottom: 0;
   }
 }
+
+.drag { 
+  i {
+    @include opacity(0.5);
+  }
+}
+
+.field-wrap {
+  @include clearfix;
+  input {
+    width: 60%;
+    float: left;
+  }
+  a {
+    float: left;
+    width: 15%;
+    &.drag {
+      float: left;
+      width: 23px;
+    }
+  }
+}

@@ -23,8 +23,24 @@ ul.new-tree {
       .row-fluid {
         background:$white;
       }
+      .tier-trigger {
+        background: image-url('grcicons/open.png') no-repeat 20px center;
+        @include background-size(17px 12px);
+      }
     }
-    
+    .tier-trigger {
+      float: left;
+      background: image-url('grcicons/not-open.png') no-repeat 20px center;
+      @include background-size(17px 12px);
+      width: 17px;
+      height: 30px;
+      padding-left: 20px;
+    }
+  }
+  .task-item {
+    .item-data {
+      padding-left: 0;
+    }
   }
   .task-group-title {
     h3 {
@@ -506,6 +522,14 @@ ul.new-tree {
     &.program {
       .item-data {
         color:$programs;
+      }
+    }
+    &.disabled {
+      .item-data {
+        color:$darkGray;
+        i {
+          @include opacity(0.4);
+        }
       }
     }
     .small {
