@@ -66,6 +66,19 @@ can.Control("GGRC.Controllers.TreeFilter", {
     });
   }
 
+  , 'button[data-toggle="filter-reset"] click' : function(el, ev) {
+    var that = this
+    , filter_reset_target = 'input, select';
+
+    this.element.find(filter_reset_target).each(function(i, elem) {
+      var $elem = $(elem)
+      ;
+
+      that.options.states.removeAttr($elem.attr("name").replace(/\./g, '__'));
+    });
+    can.trigger(this.options.states, "change", "*");
+  }
+
   , resolve_object : function(obj, path) {
     path = path.split(".");
     can.each(path, function(prop) {

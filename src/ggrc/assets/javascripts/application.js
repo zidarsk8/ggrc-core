@@ -5,31 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-/*
- *= require jquery
- *= require rails
- *= require jquery-ui
- *= require bootstrap
- *= require bootstrap/sticky-popover
- *= require bootstrap/modal-form
- *= require bootstrap/modal-ajax
- *= require bootstrap/scrollspy
- *= require bootstrap/affix
- *= require wysihtml5_parser_rules/advanced
- *= require wysihtml5-0.3.0_rc2
- *= require bootstrap-wysihtml5-0.0.2
- *= require_self
- */
-
-/* Unused?
-jQuery(document).ready(function($) {
-  $('.collapsible .head').click(function(e) {
-      $(this).toggleClass('toggle');
-      $(this).next().toggle();
-      e.preventDefault();
-  }).next().hide();
-});*/
-
 var GGRC = window.GGRC || {};
 GGRC.mustache_path = '/static/mustache';
 
@@ -573,24 +548,6 @@ jQuery(document).ready(function($) {
     }
   });
 
-  /*
-  // Remove widgets
-  $('body').on('click', '.widget .header .remove', function(e) {
-    e.preventDefault();
-    var $this = $(this),
-        $widget = $this.closest(".widget");
-    $widget.fadeOut();  
-  });
-
-  // Contract/Expand widget
-  $('body').on('click', '.widget .header .showhide', function(e) {
-
-    if($(this).is(".widget-showhide"))
-      e.preventDefault();
-
-      showhide(".widget", ".content, .filter").call(this);
-  });*/
-
   function showhide(upsel, downsel) {
     return function(command) {
       $(this).each(function() {
@@ -662,65 +619,6 @@ jQuery(document).ready(function($) {
   }
 
   $.fn.oneline = oneline;
-
-  /* Deprecated quick search functionality
-   *
-  // Open quick find
-  $('body').on('focus', '.quick-search-holder input', function() {
-    var $this = $(this)
-      , $quick_search = $this.closest('.quick-search')
-      ;
-
-    $quick_search.find('.quick-search-results').fadeIn();
-    $quick_search.find('.quick-search-holder').addClass('open');
-  });
-
-  $('.quick-search').on('close', function() {
-    var $this = $(this)
-      ;
-
-    $this.find('.quick-search-results').hide();
-    $this.find('.quick-search-holder').removeClass('open');
-    $this.find('.quick-search-holder input').blur();
-  });
-
-  // Remove quick find
-  $('body').on('click', '.quick-search-results .remove', function(e) {
-    e.preventDefault();
-
-    $(this).closest('.quick-search').trigger('close');
-  });
-
-  // Close quick find popover when clicked outside the box
-  $('body').on('click', function(e) {
-    var $quick_search = $('.quick-search');
-
-    // Bail early if it's not open
-    if (!$quick_search.find('.quick-search-holder').hasClass('open'))
-      return;
-
-    // Don't close if clicking inside a modal
-    if ($(e.target).closest('.modal').length > 0)
-      return;
-
-    // Don't close if clicking on modal backdrop
-    if ($(e.target).closest('.modal-backdrop').length > 0)
-      return;
-
-    // Don't close if click is within the quick search area
-    if ($quick_search.find(e.target).length > 0)
-      return;
-
-    $quick_search.trigger('close');
-  });
-
-  // Close quick find popover when user presses Escape key
-  $('body').on('keyup', function(e) {
-    if (e.keyCode == 27) {
-      $('.quick-search').trigger('close');
-    }
-  });
-  */
 
   // Close other popovers when one is shown
   $('body').on('show.popover', function(e) {
@@ -874,7 +772,7 @@ $(window).load(function(){
   $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
     if($(this).width() > $('.new-tree .tree-info').width()) {
       $(this).addClass('shrink-it');
-    } 
+    }
   });
   
   // Popover trigger for person tooltip in styleguide
@@ -987,12 +885,12 @@ $(window).load(function(){
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
     
-    this.wysihtml5({ 
-        link: true, 
-        image: false, 
-        html: true, 
-        'font-styles': false, 
-        parserRules: wysihtml5ParserRules })
+    this.wysihtml5({
+        link: true,
+        image: false,
+        html: true,
+        'font-styles': false,
+        parserRules: wysihtml5ParserRules });
     
     this.each(function() {
       var $that = $(this)
@@ -1016,7 +914,7 @@ jQuery(function($){
         $that.css({"display" : "block", "height" : $that.height() + 20}); //10px offset between reported height and styled height.
         $textarea.css('width', $textarea.width()+20);
         editor.composer.style();// re-copy new size of textarea to composer
-        editor.fire('change_view', editor.currentView.name)
+        editor.fire('change_view', editor.currentView.name);
       });
       var $sandbox = $wysiarea.find(".wysihtml5-sandbox");
 
@@ -1025,21 +923,21 @@ jQuery(function($){
         var e = new $.Event(ev.type === "mouseup" ? "mouseup" : "mousemove"); //jQUI resize listens on this.
         e.pageX = $sandbox.offset().left + ev.pageX;
         e.pageY = $sandbox.offset().top + ev.pageY;
-        $sandbox.trigger(e); 
+        $sandbox.trigger(e);
       });
 
       $that.data("cms_events_bound", true);
-    })
+    });
 
     return this;
-  }
+  };
 
   $(document.body).on("shown", ".bootstrap-wysihtml5-insert-link-modal", function(e) {
     $(this).draggable({ handle : ".modal-header"})
     .find(".modal-header [data-dismiss='modal']").css("opacity", 1);
   });
 
-  $(document.body).on("change", ".rotate_control_assessment", function(ev) { 
+  $(document.body).on("change", ".rotate_control_assessment", function(ev) {
     ev.currentTarget.click(function() {
       ev.currentTarget.toggle();
     });
