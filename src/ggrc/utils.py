@@ -55,7 +55,7 @@ def url_for(obj, id=None):
   service = service_for(obj)
   if service is None:
     return None
-  if id:
+  if id is not None:
     return service.url_for(id=id)
   return service.url_for(obj)
 
@@ -71,7 +71,7 @@ def view_url_for(obj, id=None):
   service = view_service_for(obj)
   if service is None:
     return None
-  if id:
+  if id is not None:
     return service.url_for(id=id)
   return service.url_for(obj)
 

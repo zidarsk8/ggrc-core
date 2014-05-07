@@ -1093,7 +1093,7 @@ class Resource(ModelView):
         ('Etag', self.etag(response_object)),
         ('Content-Type', 'application/json'),
         ]
-    if id:
+    if id is not None:
       headers.append(('Location', self.url_for(id=id)))
     if cache_op:
       headers.append(('X-GGRC-Cache', cache_op))
