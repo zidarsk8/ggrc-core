@@ -1143,7 +1143,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     
     var that = this;
     // Make sure the context is always set to the parent program
-    if(!this.context.id){
+    if(this.context == null || this.context.id == null){
       this.context = this.program.reify().context;
     }
     
