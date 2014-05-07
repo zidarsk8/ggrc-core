@@ -254,6 +254,9 @@ $(document).ready(function(){
     if($('ul.internav li.active a').attr('href') == '#people_widget') {
       $('#people_widget').addClass('widget-active').show();
     }
+    if($('ul.internav li.active a').attr('href') == '#progress_widget') {
+      $('#progress_widget').addClass('widget-active').show();
+    }
   });
 
   // New Assessment Created
@@ -593,6 +596,11 @@ $(document).ready(function(){
   $('body').on('click', '#editFieldCancel', function() {
     $('#titleChange').closest('h3').show();
     $('#taskGroupTitle').hide();
+  });
+  
+  $('body').on('click', '#confirmStartWorkflow', function() {
+    $('#startWorkflowTrigger').html('End Workflow');
+    $('#progressWidgetTrigger').show();
   });
 
 });

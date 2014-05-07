@@ -413,6 +413,8 @@
 
 .grcicon-drag { background-position:-318px -80px; }
 
+.grcicon-progress-color { background-position: -318px -104px; }
+
 // Large icons
 .grciconlarge-dashboard {
   background-position:-8px -8px;
@@ -687,6 +689,7 @@ i.short {
   .grcicon-workflow-color { background-position:-6px -344px; }
   .grcicon-task-color { background-position:-294px -392px; }
   .grcicon-task-group-color { background-position:-318px -56px; }
+  .grcicon-progress-color { background-position: -318px -104px; }
 
   li {
     &.active,
@@ -729,6 +732,7 @@ i.short {
       .grcicon-workflow-color { background-position:-6px -368px; }
       .grcicon-task-color { background-position:-294px -344px; }
       .grcicon-task-group-color { background-position:-318px -32px; }
+      .grcicon-progress-color { background-position: -318px -128px; }
     }
   }
   &.innernav-arrow {
@@ -812,6 +816,7 @@ i.short {
     .grcicon-workflow-color { background-position:-6px -368px; }
     .grcicon-task-color { background-position:-294px -344px; }
     .grcicon-task-group-color { background-position:-318px -32px; }
+    .grcicon-progress-color { background-position: -318px -128px; }
   }
 }
 
