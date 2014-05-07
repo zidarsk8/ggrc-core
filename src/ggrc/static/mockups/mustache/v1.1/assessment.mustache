@@ -313,8 +313,8 @@
                                 <ul class="items-list" data-index="{{@index}}">
                                   {{#each objects}}
                                   <li>
-                                    <div class="objective-selector">
-                                      <input tabindex="3" type="text" name="object_title2" class="editTitle input-xlarge search-icon" placeholder="Add Object" value="{{title}}" data-index="{{@index}}" data-type="objects">
+                                    <div class="objective-selector field-wrap">
+                                      <input tabindex="3" type="text" name="object_title2" class="editTitle search-icon" placeholder="Add Object" value="{{title}}" data-index="{{@index}}" data-type="objects">
                                       <a href="#" data-index="{{@index}}" data-type="objects" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -336,9 +336,9 @@
                                 <ul class="items-list" data-index="{{@index}}">
                                   {{#each tasks}}
                                   <li>
-                                    <div class="objective-selector">
+                                    <div class="objective-selector field-wrap">
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle input-xlarge search-icon" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
+                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
                                       <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
