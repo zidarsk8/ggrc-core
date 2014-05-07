@@ -39,7 +39,7 @@ var Assessment = can.Model.LocalStorage.extend({
         ev.target.save();
       }
     });
-  }
+  },
 });
 
 var Workflow = can.Model.LocalStorage.extend({
@@ -117,7 +117,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: ProgramList[0]//assessmentList[0]
+    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -139,6 +139,12 @@ can.Component.extend({
 // Workflow Tree
 can.Component.extend({
   tag: 'workflow',
+  init: function(){
+    var that = this;
+    $(function(){
+      that.scope.initAutocomplete();
+    })
+  },
   scope: {
     assessments : assessmentList,
     assessment: assessmentList[0],
@@ -166,6 +172,34 @@ can.Component.extend({
         v.attr('status', "rq-amended-request")
       });
     },
+    initAutocomplete : function(){
+      $( ".date" ).datepicker();
+      var lists = {
+        objects : $.map(this.assessment.objects, function(o){
+          return o.name;
+        }),
+        people : [
+          "Vladan Mitevski",
+          "Predrag Kanazir",
+          "Dan Ring",
+          "Silas Barta",
+          "Cassius Clay"
+        ],
+        tasks: [
+          "Proof Reading",
+          "Validate Mappings",
+          "Peer Review"
+        ]
+      }
+      $('.autocomplete').each(function(i,el){
+        var $el = $(el)
+          , type = $el.data('type')
+        $el.autocomplete({
+          source : lists[type],
+          close: function( event, ui ) {$el.trigger('change')}
+        })
+      });
+    },
     "new" : function(val){
       if(this.attr('new_form')) return "";
       return val();
@@ -173,6 +207,9 @@ can.Component.extend({
   },
   events: {
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
+    '{Assessment} updated' : function(){
+      this.scope.initAutocomplete();
+    },
     ' selected' : function(){this.scope.set_fields(arguments[2])},
     '{window} click' : function(el, ev){
 

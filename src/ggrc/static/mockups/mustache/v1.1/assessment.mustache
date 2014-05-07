@@ -247,7 +247,7 @@
                                 <li>
                                   <i class="grcicon-person-green pull-left icon-field"></i>
                                   <div class="objective-selector">
-                                    <input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field" placeholder="Enter text to search for Workflow Owner" value="{{assignee}}" data-index="{{@index}}" data-field="assignee">
+                                    <input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-type="people" placeholder="Enter text to search for Workflow Owner" value="{{assignee}}" data-index="{{@index}}" data-field="assignee">
                                   </div>
                                 </li>
                                 <li>
@@ -324,7 +324,7 @@
                                   {{#each objects}}
                                   <li>
                                     <div class="objective-selector field-wrap">
-                                      <input tabindex="3" type="text" name="object_title2" class="editTitle search-icon" placeholder="Add Object" value="{{title}}" data-index="{{@index}}" data-type="objects">
+                                      <input tabindex="3" type="text" name="object_title2" class="editTitle search-icon autocomplete" placeholder="Add Object" value="{{title}}" data-index="{{@index}}" data-type="objects">
                                       <a href="#" data-index="{{@index}}" data-type="objects" class="deleteTrigger"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -348,7 +348,7 @@
                                   <li>
                                     <div class="objective-selector field-wrap">
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
+                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
                                       <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -381,7 +381,7 @@
                               <div class="span4">
                                 <i class="grcicon-person-green pull-left icon-field"></i>
                                 <div class="objective-selector">
-                                  <input tabindex="1" type="text" id="new_task_assignee" name="lead_email" class="span10 search-icon" placeholder="Enter text to search for Workflow Owner" value="{{assessment.lead_email}}">
+                                  <input tabindex="1" type="text" id="new_task_assignee" name="lead_email" class="span10 search-icon autocomplete" data-type="people" placeholder="Enter text to search for Workflow Owner" value="{{assessment.lead_email}}">
                                 </div>
                               </div>
                               <div class="span3">
