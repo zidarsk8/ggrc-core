@@ -19,7 +19,7 @@
         <div class="bar-v objnav"></div>
         <div class="inner-nav">
           <div class="object-nav">
-            <ul class="nav internav program cms_controllers_inner_nav ui-sortable">
+            <ul class="nav internav innernav-arrow program cms_controllers_inner_nav ui-sortable">
               <li class="active">
                 <a href="#info_widget">
                   <div class="oneline">
@@ -29,41 +29,79 @@
                 </a>
                 <div class="drag"></div>
               </li>
-              <li>
-                <a href="#objects_widget" class="objects_widget">
+              <li class="accordion-group-inner">
+                <a href="#objects_widget" class="objects_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-object-color"></i>
                     Objects (<span id="objectsMainCounter">{{assessment.objects.length}}</span>)
                   </div>
                 </a>
                 <div class="drag"></div>
+                <div class="arrow"></div>
+
+                <ul class="sub-level">
+                  <li class="governance">
+                    <a href="#">
+                      <i class="grcicon-control-color"></i>
+                      Login Access
+                    </a>
+                  </li>
+                  <li class="governance">
+                    <a href="#">
+                      <i class="grcicon-control-color"></i>
+                      Data Persistance
+                    </a>
+                  </li>
+                  <li class="governance">
+                    <a href="#">
+                      <i class="grcicon-market-color"></i>
+                      Kansas City
+                    </a>
+                  </li>
+                  <li class="governance">
+                    <a href="#">
+                      <i class="grcicon-policy-color"></i>
+                      EEO Regulation
+                    </a>
+                  </li>
+                  <li class="governance">
+                    <a href="#">
+                      <i class="grcicon-market-color"></i>
+                      San Jose
+                    </a>
+                  </li>
+                </ul>
+                
               </li>
               <li>
-                <a href="#tasks_widget" class="task_groups_widget">
+                <a href="#tasks_widget" class="task_groups_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-task-color"></i>
                     Tasks (<span id="objectsMainCounter2">2</span>)
                   </div>
                 </a>
                 <div class="drag"></div>
+                <div class="arrow"></div>
               </li>
               <li>
-                <a href="#people_widget" class="people_widget">
+                <a href="#people_widget" class="people_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-person-color"></i>
                     People (<span id="objectsMainCounter3">3</span>)
                   </div>
                 </a>
                 <div class="drag"></div>
+                <div class="arrow"></div>
               </li>
               <li>
-                <a href="#task_groups_widget" class="task_groups_widget">
+                <a href="#task_groups_widget" class="task_groups_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-task-group-color"></i>
                     Task Groups ({{assessment.task_groups.length}})
                   </div>
                 </a>
                 <div class="drag"></div>
+                <div class="arrow"></div>
               </li>
               <li class="inner-nav-button">
                 <button type="submit" class="btn {{^assessment.task_groups.length}}disabled{{/task_groups}}">

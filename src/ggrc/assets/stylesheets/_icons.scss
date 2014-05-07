@@ -731,6 +731,41 @@ i.short {
       .grcicon-task-group-color { background-position:-318px -32px; }
     }
   }
+  &.innernav-arrow {
+    li.accordion-group-inner {
+      .sub-level {
+        li,
+        li.active,
+        li:hover {
+          .grcicon-program-color { background-position:-6px -296px; }
+          .grcicon-assessment-color { background-position:-126px -392px; }
+          .grcicon-contract-color { background-position:-30px -296px; }
+          .grcicon-policy-color { background-position:-54px -296px; }
+          .grcicon-regulation-color { background-position:-78px -296px; }
+          .grcicon-standard-color { background-position:-246px -368px; }
+          .grcicon-event-color { background-position:-102px -176px; }
+          .grcicon-directive-color { background-position:-198px -296px; }
+          .grcicon-objective-color { background-position:-54px -128px; }
+          .grcicon-section-color { background-position:-102px -296px; }
+          .grcicon-clause-color { background-position:-294px -56px; }
+          .grcicon-facility-color { background-position:-126px -296px; }
+          .grcicon-market-color { background-position:-150px -296px; }
+          .grcicon-product-color { background-position:-174px -296px; }
+          .grcicon-project-color { background-position:-222px -296px; }
+          .grcicon-org_group-color { background-position:-246px -296px; }
+          .grcicon-data_asset-color { background-position:-54px -320px; }
+          .grcicon-object-color { background-position:-6px -392px; }
+          .grcicon-workflow-color { background-position:-294px -296px; }
+          .grcicon-task-color { background-position:-294px -320px; }
+          .grcicon-task-group-color { background-position:-318px -8px; }
+          .grcicon-system-color { background-position:-6px -320px; }
+          .grcicon-process-color { background-position:-270px -296px; }
+          .grcicon-control-color { background-position:-30px -320px; }
+          .grcicon-risk-color { background-position:-78px -320px; }
+        }
+      }
+    }
+  }
 }
 
 // icons for active widget state

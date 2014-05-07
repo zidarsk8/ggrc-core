@@ -125,12 +125,21 @@ $(document).ready(function(){
     return false;
 
   });
+  
+  $('body').on('click', '.accordion-group-inner > .arrow', function() {
+    var $this = $(this),
+        $subNav = $this.closest('.accordion-group-inner').find('.sub-level');
 
+    if($this.hasClass("active")) {
+      $subNav.slideUp('fast');
+      $this.removeClass("active");
+    } else {
+      $subNav.slideDown('fast');
+      $this.addClass("active");
+    }
 
-  $('.internav li:gt(7)').hide();
-  $('.add-more-objects').click(function() {
-    $('.internav li:gt(7)').slideDown('fast');
-    $(this).hide();
+    return false;
+
   });
 
   $( ".date" ).datepicker();

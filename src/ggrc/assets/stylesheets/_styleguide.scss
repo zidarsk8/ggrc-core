@@ -509,17 +509,3 @@ ul.new-tree {
     margin-left: 10px;
   }
 }
-
-.results-wrap {
-  height: 240px;
-  background: lighten($lightGray,3%);
-  overflow-y: auto;
-  .info {
-    display: block;
-    text-align: center;
-    padding-top: 95px;
-    color: $gray;
-    font-size: $f-medium;
-    font-weight: bold;
-  }
-}
