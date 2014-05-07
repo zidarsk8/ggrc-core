@@ -239,7 +239,7 @@ can.Model("can.Model.Cacheable", {
     var id_key = this.id;
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
-      if(new_obj[id_key]) {
+      if(new_obj[id_key] || new_obj[id_key] === 0) {
         cache[new_obj[id_key]] = new_obj;
         if(cache[undefined] === new_obj)
           delete cache[undefined];
@@ -610,7 +610,7 @@ can.Model("can.Model.Cacheable", {
       , that = this
       ;
 
-    if (this[id_key])
+    if (this[id_key] || this[id_key] === 0)
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
@@ -954,7 +954,7 @@ can.Observe.prototype.stub = function() {
   else
     id = this.id;
 
-  if (!id)
+  if (!id && id !== 0)
     return null;
 
   return can.Stub.get_or_create({
