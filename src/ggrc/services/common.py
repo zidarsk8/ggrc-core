@@ -1021,14 +1021,15 @@ class Resource(ModelView):
   def build_page_object_for_json(self, paging):
     def page_args(next_num, per_page):
       # coerce the values to be plain strings, rather than unicode
-      ret = dict([(k,str(v)) for k,v in request.args.items()])
+      ret = dict([(k,unicode(v)) for k,v in request.args.items()])
       ret['__page'] = next_num
       if '__page_size' in ret:
         ret['__page_size'] = per_page
       return ret
     paging_obj = {}
     base_url = self.url_for()
-    page_url = lambda params: base_url + '?' + urlencode(params)
+    page_url = lambda params:\
+      base_url + '?' + urlencode(utils.encoded_dict(params))
     if paging.has_next:
       paging_obj['next'] = page_url(
           page_args(paging.next_num, paging.per_page))
