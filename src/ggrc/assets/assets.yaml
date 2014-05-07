@@ -45,11 +45,14 @@ dashboard-js-files:
   - models/local_storage.js
   - models/display_prefs.js
   - models/local_list_cache.js
-  - pbc/document.js
-  - pbc/person.js
+  - models/document.js
+  - models/person.js
   - models/simple_models.js
+  - models/business_object_models.js
+  - models/directive_models.js
   - models/recently_viewed_object.js
   - models/search.js
+  - models/audit_models.js
   - controllers/add_widgets.js
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
@@ -67,13 +70,11 @@ dashboard-js-files:
   - controls/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
-  - sections/section.js
-  - pbc/system.js
+  - models/section.js
+  - models/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
   - mapping/mapping_controller.js
-  - pbc/meeting.js
-  - pbc/response.js
   - pbc/workflow_controller.js
   - controls/category.js
   - apps/quick_search.js

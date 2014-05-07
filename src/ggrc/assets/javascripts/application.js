@@ -65,11 +65,6 @@ function ModelError(message, data) {
 }
 ModelError.prototype = Error.prototype;
 
-window.onerror = function(message, url, linenumber) {
-  $(document.body).trigger("ajax:flash", {"error" : message});
-  GGRC.Tracker.exception(message + " (at " + url + ":" + linenumber + ")");
-};
-
   window.cms_singularize = function(type) {
     type = type.trim();
     var _type = type.toLowerCase();

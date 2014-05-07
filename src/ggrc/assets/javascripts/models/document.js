@@ -5,9 +5,6 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require can.jquery-all
-//= require models/cacheable
-
 (function(ns, can) {
 
 can.Model.Cacheable("CMS.Models.Document", {
