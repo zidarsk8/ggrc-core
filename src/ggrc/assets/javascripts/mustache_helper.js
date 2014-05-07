@@ -2008,6 +2008,7 @@ Mustache.registerHelper("if_helpers", function() {
     , statement
     , match
     , disjunctions = []
+    , index = 0
     ;
   can.each(args, function(arg, i) {
     if (i < args.length - 1) {
@@ -2018,6 +2019,7 @@ Mustache.registerHelper("if_helpers", function() {
             statements = []
           }
           statements.push(statement);
+          index = index + 1;
         }
         if (match = arg.match(/^\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
@@ -2030,7 +2032,7 @@ Mustache.registerHelper("if_helpers", function() {
           // Add hash arguments
           if (options.hash) {
             var hash = {}
-              , prefix = '_' + statements.length + '_'
+              , prefix = '_' + index + '_'
               , prop
               ;
             for (prop in options.hash) {
