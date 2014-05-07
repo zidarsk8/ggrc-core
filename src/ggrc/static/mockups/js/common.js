@@ -125,7 +125,7 @@ $(document).ready(function(){
     return false;
 
   });
-  
+
   $('body').on('click', '.accordion-group-inner > .arrow', function() {
     var $this = $(this),
         $subNav = $this.closest('.accordion-group-inner').find('.sub-level');
@@ -166,14 +166,14 @@ $(document).ready(function(){
     var object = [
       "Stability and Perpetuability"
     ]
-    
+
     var object2 = [
       "CTRL - Access Control",
       "CTRL - Non Critical Security",
       "POL - User Policy",
       "POL - Universal Policy"
     ]
-    
+
     var tasks = [
       "Proof Reading",
       "Validate Mappings",
@@ -188,8 +188,8 @@ $(document).ready(function(){
     $( ".objective-selector input[name='object.title']" ).autocomplete({
       source: object
     });
-    
-    
+
+
     $( ".objective-selector input[name='object_title2']" ).autocomplete({
       source: object2
     });
@@ -220,6 +220,9 @@ $(document).ready(function(){
 
     if($('ul.internav li.active a').attr('href') == '#info_widget') {
       $('#info_widget').addClass('widget-active').show();
+    }
+    if($('ul.internav li.active a').attr('href') == '#workflow_info_widget') {
+      $('#workflow_info_widget').addClass('widget-active').show();
     }
     if($('ul.internav li.active a').attr('href') == '#market_widget') {
       $('#market_widget').addClass('widget-active').show();
@@ -553,18 +556,18 @@ $(document).ready(function(){
     $('#TaskDescription').hide();
     $('#TaskUpdated').show();
   });
-  
+
   $('body').on('click', '#objectAddTrigger', function() {
     $('#objectList').show();
     $('#objectWorkflowCounter').html('2');
   });
-  
+
   $('body').on('click', '#taskAdd', function() {
     $('#taskList').show();
     $('#lockTrigger').show();
     $('#taskWorkflowCounter').html('3');
   });
-  
+
   $("#taskLock").change(function () {
     if($(this).is(':checked')) {
       $('#taskAdd').addClass('disabled');
@@ -574,7 +577,7 @@ $(document).ready(function(){
       $('.task-list .objective-selector a').removeClass('disabled');
     }
   });
-  
+
   $("body").on('change', '.object-check-single', function() {
     if($(this).is(':checked')) {
       $(this).closest('.tree-item').removeClass('disabled');
@@ -582,17 +585,17 @@ $(document).ready(function(){
       $(this).closest('.tree-item').addClass('disabled');
     }
   });
-  
+
   $('body').on('click', '#titleChange', function() {
     $(this).closest('h3').hide();
     $('#taskGroupTitle').show();
   });
-  
+
   $('body').on('click', '#editFieldSave', function() {
     $('#titleChange').closest('h3').show();
     $('#taskGroupTitle').hide();
   });
-  
+
   $('body').on('click', '#editFieldCancel', function() {
     $('#titleChange').closest('h3').show();
     $('#taskGroupTitle').hide();
