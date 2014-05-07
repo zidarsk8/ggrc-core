@@ -11,8 +11,8 @@ from ggrc.extensions import get_extension_modules
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
-from ggrc.utils import as_json
-from ggrc.builder.json import publish
+from ggrc.services.common import as_json, inclusion_filter, filter_resource
+from ggrc.builder.json import publish, publish_representation
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
@@ -75,8 +75,12 @@ def get_config_json():
   return json.dumps(public_config)
 
 def get_current_user_json():
+  from ggrc.models.person import Person
   current_user = get_current_user()
-  return as_json(current_user.log_json())
+  person = Person.eager_query().get(current_user.id)
+  return as_json(
+      filter_resource(
+        publish_representation(publish(person, (), inclusion_filter))))
 
 @app.context_processor
 def base_context():
