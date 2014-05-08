@@ -418,10 +418,28 @@ can.Component.extend({
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
       this.attr('assessment', assessment);
+      this.validateForm();
     },
     "new" : function(val, val_old){
+      this.validateForm();
       if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
       return val();
+    },
+    validateForm : function(){
+      var $modal = $("#editAssessmentStandAlone")
+        , required_fields = $modal.find('input.required')
+        , $save_button = $("#saveAssessment")
+        , empty_fields = $.map(required_fields, function(f){
+            if($(f).val()){
+              return f;
+            }
+          })
+      if(required_fields.length === empty_fields.length){
+        $save_button.removeClass('disabled');
+      }
+      else{
+        $save_button.addClass('disabled');
+      }
     }
   },
   events:{
@@ -433,6 +451,7 @@ can.Component.extend({
       var $modal = $('#editAssessmentStandAlone')
         , assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment');
 
+      if($(el).hasClass('disabled'))return;
       $modal.find('input').each(function(_, e){
         assessment.attr(e.name, e.value);
       });
@@ -456,6 +475,12 @@ can.Component.extend({
     ' selected' : function(){
       this.scope.attr('assessment', arguments[2]);
     },
+    'input,textarea change' : function(){
+      this.scope.validateForm();
+    },
+    'input,textarea keyup' : function(){
+      this.scope.validateForm();
+    }
   }
 });
 
@@ -468,17 +493,36 @@ var modal = can.Component.extend({
     "new" : function(val, val_old){
       if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
       return val();
+      this.validateForm();
+    },
+    validateForm : function(){
+      var $modal = $("#newTask")
+        , required_fields = $modal.find('input.required')
+        , $save_button = $("#addTask")
+        , empty_fields = $.map(required_fields, function(f){
+            if($(f).val()){
+              return f;
+            }
+          })
+      if(required_fields.length === empty_fields.length){
+        $save_button.removeClass('disabled');
+      }
+      else{
+        $save_button.addClass('disabled');
+      }
     }
   },
   events:{
     '{window} click' : function(el, ev){
+      this.scope.validateForm();
       if(!$(ev.target).hasClass('show-task-modal')) return;
       this.scope.attr('new_form', $(ev.target).data('new'));
     },
     'a#addTask click' : function(el, ev){
-      var $modal = $('#editAssessmentStandAlone')
+      var $modal = $('#newTask')
         , task = this.scope.attr('new_form') ? new Task({}) : this.scope.attr('task');
 
+      if($(el).hasClass('disabled'))return;
       $modal.find('input').each(function(_, e){
         task.attr(e.name, e.value);
       });
@@ -495,7 +539,14 @@ var modal = can.Component.extend({
     },
     ' selected' : function(){
       this.scope.attr('task', arguments[2]);
+      this.scope.validateForm();
     },
+    'input,textarea change' : function(){
+      this.scope.validateForm();
+    },
+    'input,textarea keyup' : function(){
+      this.scope.validateForm();
+    }
   }
 });
 

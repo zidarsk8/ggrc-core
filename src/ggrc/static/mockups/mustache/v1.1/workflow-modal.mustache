@@ -17,7 +17,7 @@
             <span class="required">*</span>
             <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
           </label>
-          <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{new assessment.title}}" tabindex="1">
+          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="{{new assessment.title}}" tabindex="1">
           <br>
         </div>
         <div class="span4">
@@ -28,7 +28,7 @@
           </label>
           <i class="grcicon-person-green pull-left icon-field"></i>
           <div class="people-autocomplete">
-            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon" value="{{new assessment.lead_email currentUser}}" placeholder="Enter text to search for Workflow Owner">
+            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required" value="{{new assessment.lead_email currentUser}}" placeholder="Enter text to search for Workflow Owner">
           </div>
         </div>
       </div>
@@ -49,7 +49,7 @@
             <span class="required">*</span>
             <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
           </label>
-          <input tabindex="4" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{new assessment.end_date}}">
+          <input tabindex="4" class="input-block-level date required" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{new assessment.end_date}}">
 
           <label>
             Frequency
