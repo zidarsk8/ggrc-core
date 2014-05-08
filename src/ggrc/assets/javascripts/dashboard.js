@@ -387,6 +387,28 @@ jQuery(function($) {
       }
     });
   });
+
+  // handler to initialize import upload button as disabled
+  var submit_import = 'form.import div.import-interface input[type=submit]';
+  $(submit_import).ready(disableButton);
+
+  // change button to disabled when no file selected, and vice versa
+  var file_select_elem = 'form.import div.import-interface input[type=file]';
+  $(file_select_elem).change(function(ev) {
+    if (this.value === "") {
+      $(submit_import).each(disableButton);
+    } else {
+      $(submit_import).removeClass('disabled');
+    }
+  });
+
+  // Prevent attempted submissions with no file from going through;
+  // uses click instead of submit because the latter doesn't trigger
+  $(submit_import).on('click', function (ev) {
+    if ($(file_select_elem).val() === "") {
+      ev.preventDefault();
+    }
+  });
 });
 
 jQuery(function($) {
