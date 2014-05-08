@@ -283,7 +283,6 @@
 .header-content {
   background: $white;
   z-index:3;
-  @include box-shadow(0 4px 4px -2px #bbb);
   h1 {
     line-height: 36px;
     padding-left:20px;
