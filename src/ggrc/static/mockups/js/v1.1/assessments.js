@@ -459,6 +459,46 @@ can.Component.extend({
   }
 });
 
+var modal = can.Component.extend({
+  tag: 'task-modal',
+  scope: {
+    task: taskList[0],
+    new_form: false,
+    currentUser : 'user@example.com',
+    "new" : function(val, val_old){
+      if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
+      return val();
+    }
+  },
+  events:{
+    '{window} click' : function(el, ev){
+      if(!$(ev.target).hasClass('show-task-modal')) return;
+      this.scope.attr('new_form', $(ev.target).data('new'));
+    },
+    'a#addTask click' : function(el, ev){
+      var $modal = $('#editAssessmentStandAlone')
+        , task = this.scope.attr('new_form') ? new Task({}) : this.scope.attr('task');
+
+      $modal.find('input').each(function(_, e){
+        task.attr(e.name, e.value);
+      });
+      $modal.find('textarea').each(function(_, e){
+        task.attr(e.name, $(e).val());
+      });
+      $modal.modal('hide');
+      task.save();
+      $("tree-app").trigger("selected", this.scope.task);
+
+    },
+    '{Task} created' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+    ' selected' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+  }
+});
+
 can.Component.extend({
   init: function() {
     $("#addTask").on('click', function(){
