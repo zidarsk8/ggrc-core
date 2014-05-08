@@ -372,7 +372,10 @@ class ContactEmailHandler(ColumnHandler):
     return attr
 
   def validate(self, data):
-    pass
+    if self.options.get('prevent_duplicates') and data not in ("", None):
+      has_import_collision = any(data == x.obj.email for x in self.base_importer.objects)
+      if has_import_collision:
+        self.add_error("This email is already used for another person within this import.")
 
 
 class AssigneeHandler(ContactEmailHandler):
