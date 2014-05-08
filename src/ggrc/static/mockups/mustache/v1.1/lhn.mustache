@@ -155,7 +155,7 @@
 
 <div class="lhs-nav">
 <ul class="top-level">
-  
+
 <li class="programs accordion-group">
 <a class="programs" href="#">
   <i class="grcicon-workflow-color"></i>
@@ -199,7 +199,7 @@
     <ul class="sub-level" style="max-height:225px;">
       {{#each tasks}}
       <li class="programs" data-model="true">
-        <a href="#" class="show-extended">
+        <a href="#" class="show-extended" can-click="select">
           <div class="row-fluid">
             <div class="span8 lhs-main-title">
               <span class="lhs-item">
@@ -215,7 +215,8 @@
     </ul>
     <ul class="sub-actions">
       <li class="add-new">
-        <a data-modal-class="modal-wide" href="#newTask" data-toggle="modal">
+        <a data-modal-class="modal-wide" class="show-task-modal" class="newTask" href="#newTask" data-new="true" data-toggle="modal">
+        <!--<a data-modal-class="modal-wide" href="#newTask" data-toggle="modal">-->
           + Create New
         </a>
       </li>

@@ -57,7 +57,7 @@ var Workflow = can.Model.LocalStorage.extend({
 var Task = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessmentTasks-v3";
+    this.name = "task";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
@@ -74,7 +74,6 @@ var ProgramList = [{
   owner: 'liz@reciprocitylbas.com',
   contact: 'ken@reciprocitylbas.com'
 }];
-
 var Objects = {
   controls: [
     {type: "control", name: "Secure Backups"},
@@ -121,8 +120,9 @@ can.Component.extend({
     select: function(object, el, ev){
       ev.preventDefault();
       $("tree-app").trigger("selected", object);
-      //$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+      $("workflow-modal").trigger("selected", object);
       $("workflow").trigger("selected", object);
+      $("task").trigger("selected", object);
       resize_areas();
     },
   },
@@ -170,27 +170,12 @@ can.Component.extend({
   scope: {
     assessments : assessmentList,
     assessment: assessmentList[0],
-    workflow: assessmentList[0].workflow,
-    new_form: false,
     objects : [],
+    selected_num : 0,
     filter_list : [{value: assessmentList[0].program_title}],
-    can_start : assessmentList[0].workflow && assessmentList[0].objects.length,
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
       this.attr('assessment', assessment);
-      this.attr('workflow', assessment.workflow);
-      this.attr('can_start', this.assessment.workflow && this.assessment.objects.length)
-    },
-    initObjects : function(){
-      var assessment = this.assessment
-        , workflow = this.workflow;
-
-      $.map(assessment.objects, function(v){
-        if(typeof v.attr('status') !== 'undefined') return;
-        v.attr('tasks', $.map(workflow.tasks, function(v){return {task_title: v, details: "", task_lead: assessment.lead_email, entries: [], task_state: "rq-amended-request"}}));
-        v.attr('reviews', $.map(workflow.reviews, function(v){return {review_title: v.title, review_reviewer: v.reviewer, notes: [], review_state: "rq-amended-request"}}));
-        v.attr('status', "rq-amended-request")
-      });
     },
     initAutocomplete : function(){
       $( ".date" ).datepicker();
@@ -205,6 +190,11 @@ can.Component.extend({
           "Silas Barta",
           "Cassius Clay"
         ],
+        mapped_people : [
+          "Cassius Clay",
+          "Dan Ring",
+          "Predrag Kanazir",
+        ],
         tasks: [
           "Proof Reading",
           "Validate Mappings",
@@ -213,17 +203,14 @@ can.Component.extend({
       }
       $('.autocomplete').each(function(i,el){
         var $el = $(el)
-          , type = $el.data('type')
+          , autocomplete_type = $el.data('autocomplete-type')
+          , type = autocomplete_type || $el.data('type')
         $el.autocomplete({
           source : lists[type],
           close: function( event, ui ) {$el.trigger('change')}
         })
       });
     },
-    "new" : function(val){
-      if(this.attr('new_form')) return "";
-      return val();
-    }
   },
   events: {
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
@@ -231,48 +218,7 @@ can.Component.extend({
       this.scope.initAutocomplete();
     },
     ' selected' : function(){this.scope.set_fields(arguments[2])},
-    '{window} click' : function(el, ev){
-
-      if(!$(ev.target).hasClass('show-workflow-modal')) return;
-      this.scope.attr('new_form', $(ev.target).data('new'));
-    },
-    ' workflow_selected' : function(el, ev, workflow){
-      var assessment = this.scope.assessment;
-
-      if(typeof workflow !== "undefined"){
-        workflow.tasks.each(function(v,i){
-          if(v === "") workflow.tasks.splice(i, 1);
-        });
-        workflow.reviews.each(function(v,i){
-          if(v.title === "") workflow.reviews.splice(i, 1);
-        });
-      }
-      assessment.attr('workflow', workflow).save();
-      assessment.workflow.attr('tasks', workflow.tasks.splice(0));
-      assessment.workflow.attr('reviews', workflow.reviews.splice(0));
-      this.scope.set_fields(this.scope.assessment);
-    },
-    'a#saveAssessment click' : function(el, ev){
-      var $modal = $('#editAssessmentStandAlone')
-        , assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment');
-
-        $modal.find('input').each(function(_, e){
-          assessment.attr(e.name, e.value);
-        });
-        $modal.find('textarea').each(function(_, e){
-          assessment.attr(e.name, $(e).val());
-        });
-        $modal.modal('hide');
-        if(typeof assessment.objects === 'undefined'){
-          assessment.attr('objects', []);
-        }
-        if(typeof assessment.task_groups === 'undefined'){
-          assessment.attr('task_groups', []);
-        }
-        assessment.save();
-    },
     "a#objectReview click" : function(el, ev){
-      // this.scope.attr('filter', false); Temporary Removed
       var type = $("#objects_type").val().toLowerCase()
         , that = this
         , objects = this.scope.assessment.objects;
@@ -285,6 +231,7 @@ can.Component.extend({
         }
         return o;
       }));
+      this.scope.attr('selected_num', this.scope.attr('objects').length);
       $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
@@ -309,25 +256,36 @@ can.Component.extend({
       scope.attr('objects', []);
       this.scope.set_fields(assessment);
     },
-    "a#startAssessment click":  function(){
-      var assessment = this.scope.assessment
-        ;
-
-      assessment.attr('started', true);
-      this.scope.initObjects();
-      this.scope.assessment.save();
-      $("a.objects_widget").trigger('click');
-      $("#assessmentStart").modal('hide');
-    },
     "#objectAll click": function(el){
-      $('.object-check-single').prop('checked', $(el).prop('checked'));
+      var $el = $(el)
+        , $check = $(this.element).find('.object-check-single');
+      $check.prop('checked', $el.prop('checked'));
+      if($el.prop('checked')){
+        this.scope.attr('selected_num', this.scope.attr('objects').length);
+      }
+      else{
+        this.scope.attr('selected_num', 0);
+      }
+      $check.each(function(i, c){
+        if($el.is(':checked')) {
+          $(c).closest('.tree-item').removeClass('disabled');
+        } else {
+          $(c).closest('.tree-item').addClass('disabled');
+        }
+      })
+    },
+    '.object-check-single click' : function(el, ev){
+      var $modal = $("#objectSelector")
+        , num_checked = $modal.find('.object-check-single').map(function(_,c){
+        if($(c).is(':checked')){
+          return c;
+        }
+      }).length;
+      ev.stopPropagation();
+      this.scope.attr('selected_num', num_checked);
     },
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
-    },
-    "#workflowSetup click" : function(){
-      this.scope.assessment.workflow.confirmed = true;
-      $("workflow-app").trigger("workflow_selected", this.scope.assessment.workflow);
     },
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
@@ -468,6 +426,164 @@ can.Component.extend({
 });
 
 can.Component.extend({
+  tag: 'task',
+  scope: {
+    task: taskList[0],
+  },
+  events: {
+    '{Task} created' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+    '{Task} updated' : function(){
+    },
+    ' selected' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+  }
+})
+
+can.Component.extend({
+  tag: 'workflow-modal',
+  scope: {
+    assessment: assessmentList[0],
+    new_form: false,
+    currentUser : 'user@example.com',
+    set_fields : function(assessment){
+      this.attr('filter_list', [{value: assessment.program_title}]);
+      this.attr('assessment', assessment);
+      this.validateForm();
+    },
+    "new" : function(val, val_old){
+      this.validateForm();
+      if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
+      return val();
+    },
+    validateForm : function(){
+      var $modal = $("#editAssessmentStandAlone")
+        , required_fields = $modal.find('input.required')
+        , $save_button = $("#saveAssessment")
+        , empty_fields = $.map(required_fields, function(f){
+            if($(f).val()){
+              return f;
+            }
+          })
+      if(required_fields.length === empty_fields.length){
+        $save_button.removeClass('disabled');
+      }
+      else{
+        $save_button.addClass('disabled');
+      }
+    }
+  },
+  events:{
+    '{window} click' : function(el, ev){
+      if(!$(ev.target).hasClass('show-workflow-modal')) return;
+      this.scope.attr('new_form', $(ev.target).data('new'));
+    },
+    'a#saveAssessment click' : function(el, ev){
+      var $modal = $('#editAssessmentStandAlone')
+        , assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment');
+
+      if($(el).hasClass('disabled'))return;
+      $modal.find('input').each(function(_, e){
+        assessment.attr(e.name, e.value);
+      });
+      $modal.find('textarea').each(function(_, e){
+        assessment.attr(e.name, $(e).val());
+      });
+      $modal.modal('hide');
+      if(typeof assessment.objects === 'undefined'){
+        assessment.attr('objects', []);
+      }
+      if(typeof assessment.task_groups === 'undefined'){
+        assessment.attr('task_groups', []);
+      }
+      assessment.save();
+      $("tree-app").trigger("selected", this.scope.assessment);
+
+    },
+    '{Assessment} created' : function(){
+      this.scope.attr('assessment', arguments[2]);
+    },
+    ' selected' : function(){
+      this.scope.attr('assessment', arguments[2]);
+    },
+    'input,textarea change' : function(){
+      this.scope.validateForm();
+    },
+    'input,textarea keyup' : function(){
+      this.scope.validateForm();
+    }
+  }
+});
+
+var modal = can.Component.extend({
+  tag: 'task-modal',
+  scope: {
+    task: taskList[0],
+    new_form: false,
+    currentUser : 'user@example.com',
+    "new" : function(val, val_old){
+      if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
+      return val();
+      this.validateForm();
+    },
+    validateForm : function(){
+      var $modal = $("#newTask")
+        , required_fields = $modal.find('input.required')
+        , $save_button = $("#addTask")
+        , empty_fields = $.map(required_fields, function(f){
+            if($(f).val()){
+              return f;
+            }
+          })
+      if(required_fields.length === empty_fields.length){
+        $save_button.removeClass('disabled');
+      }
+      else{
+        $save_button.addClass('disabled');
+      }
+    }
+  },
+  events:{
+    '{window} click' : function(el, ev){
+      this.scope.validateForm();
+      if(!$(ev.target).hasClass('show-task-modal')) return;
+      this.scope.attr('new_form', $(ev.target).data('new'));
+    },
+    'a#addTask click' : function(el, ev){
+      var $modal = $('#newTask')
+        , task = this.scope.attr('new_form') ? new Task({}) : this.scope.attr('task');
+
+      if($(el).hasClass('disabled'))return;
+      $modal.find('input').each(function(_, e){
+        task.attr(e.name, e.value);
+      });
+      $modal.find('textarea').each(function(_, e){
+        task.attr(e.name, $(e).val());
+      });
+      $modal.modal('hide');
+      task.save();
+      $("tree-app").trigger("selected", this.scope.task);
+
+    },
+    '{Task} created' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+    ' selected' : function(){
+      this.scope.attr('task', arguments[2]);
+      this.scope.validateForm();
+    },
+    'input,textarea change' : function(){
+      this.scope.validateForm();
+    },
+    'input,textarea keyup' : function(){
+      this.scope.validateForm();
+    }
+  }
+});
+
+can.Component.extend({
   init: function() {
     $("#addTask").on('click', function(){
       new Task({
@@ -567,3 +683,6 @@ $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache",
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+$("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
+$("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
+$("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));

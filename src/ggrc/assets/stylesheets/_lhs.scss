@@ -559,7 +559,8 @@
           }
         }
       }
-      &:hover {
+      &:hover,
+      &.active {
         ul.sub-level {
           li {
             a {

@@ -405,6 +405,12 @@ input.date {
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -268px -364px;
+  &.short-field {
+    height: 16px !important;
+    line-height: 16px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
 //Making input 100% width of his parent element
