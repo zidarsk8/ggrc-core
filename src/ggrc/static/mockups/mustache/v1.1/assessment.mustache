@@ -227,7 +227,7 @@
                                 <li>
                                   <i class="grcicon-person-green pull-left icon-field"></i>
                                   <div class="objective-selector">
-                                    <input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-type="people" placeholder="Enter text to search for Workflow Owner" value="{{assignee}}" data-index="{{@index}}" data-field="assignee">
+                                    <input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-autocomplete-type="mapped_people" data-type="people" placeholder="Enter text to search for Workflow Owner" value="{{assignee}}" data-index="{{@index}}" data-field="assignee">
                                   </div>
                                 </li>
                                 <li>
@@ -359,7 +359,7 @@
                               <div class="span4">
                                 <i class="grcicon-person-green pull-left icon-field"></i>
                                 <div class="objective-selector">
-                                  <input tabindex="1" type="text" id="new_task_assignee" name="lead_email" class="span10 search-icon autocomplete" data-type="people" placeholder="Enter text to search for people" value="{{assessment.lead_email}}">
+                                  <input tabindex="1" type="text" id="new_task_assignee" name="lead_email" class="span10 search-icon autocomplete" data-type="people" data-autocomplete-type="mapped_people" placeholder="Enter text to search for people" value="{{assessment.lead_email}}">
                                 </div>
                               </div>
                               <div class="span3">

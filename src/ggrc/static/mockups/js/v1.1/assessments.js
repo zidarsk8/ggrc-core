@@ -189,6 +189,11 @@ can.Component.extend({
           "Silas Barta",
           "Cassius Clay"
         ],
+        mapped_people : [
+          "Cassius Clay",
+          "Dan Ring",
+          "Predrag Kanazir",
+        ],
         tasks: [
           "Proof Reading",
           "Validate Mappings",
@@ -197,7 +202,8 @@ can.Component.extend({
       }
       $('.autocomplete').each(function(i,el){
         var $el = $(el)
-          , type = $el.data('type')
+          , autocomplete_type = $el.data('autocomplete-type')
+          , type = autocomplete_type || $el.data('type')
         $el.autocomplete({
           source : lists[type],
           close: function( event, ui ) {$el.trigger('change')}
@@ -249,7 +255,17 @@ can.Component.extend({
       this.scope.set_fields(assessment);
     },
     "#objectAll click": function(el){
-      $('.object-check-single').prop('checked', $(el).prop('checked'));
+      var $el = $(el)
+        , $check = $(this.element).find('.object-check-single');
+      $check.prop('checked', $el.prop('checked'));
+      $check.each(function(i, c){
+        if($el.is(':checked')) {
+          $(c).closest('.tree-item').removeClass('disabled');
+        } else {
+          $(c).closest('.tree-item').addClass('disabled');
+        }
+      })
+
     },
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
