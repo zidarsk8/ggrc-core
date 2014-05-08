@@ -1,0 +1,100 @@
+<workflow-modal>
+<div id="editAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">
+  <div class="modal-header">
+    <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+      <i class="grcicon-x-white"></i>
+    </a>
+    <h2>
+      <span>{{#new_form}}Create New Workflow{{/new_form}}{{^new_form}}Edit Workflow{{/new_form}}</span>
+    </h2>
+  </div>
+  <div class="modal-body">
+    <form action="#">
+      <div class="row-fluid">
+        <div class="span8">
+          <label>
+            Title
+            <span class="required">*</span>
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <input class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{new assessment.title}}" tabindex="1">
+          <br>
+        </div>
+        <div class="span4">
+          <label>
+            Workflow Owner
+            <span class="required">*</span>
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <i class="grcicon-person-green pull-left icon-field"></i>
+          <div class="people-autocomplete">
+            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon" value="{{new assessment.lead_email currentUser}}" placeholder="Enter text to search for Workflow Owner">
+          </div>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span8">
+          <label>
+            Description
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <div class="wysiwyg-area">
+            <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{new assessment.description}}</textarea>
+          </div>
+        </div>
+        <div class="span4">
+          <label>
+            Due on
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <input tabindex="4" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{new assessment.end_date}}">
+
+          <label>
+            Frequency
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <select tabindex="5" class="input-block-level" name="frequency">
+            <option selected="selected">One time</option>
+            <option>Monthly</option>
+            <option>Every 3 months</option>
+            <option>Every 6 months</option>
+            <option>Annually</option>
+            <option>Biannually</option>
+            <option>Ongoing</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <label>
+            gGRC Folder
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <a href="#">gGRC Workflows/{{new assessment.title}}</a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="deny-buttons">
+          <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+        </div>
+      </div>
+      <div class="span6">
+        &nbsp;
+      </div>
+      <div class="span3">
+        <div class="confirm-buttons">
+          <a id="saveAssessment" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</workflow-modal>
