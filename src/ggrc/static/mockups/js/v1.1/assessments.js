@@ -57,7 +57,7 @@ var Workflow = can.Model.LocalStorage.extend({
 var Task = can.Model.LocalStorage.extend({
 },{
   init: function(){
-    this.name = "assessmentTasks-v3";
+    this.name = "task";
     this.on('change', function(ev, prop){
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
@@ -122,6 +122,7 @@ can.Component.extend({
       $("tree-app").trigger("selected", object);
       $("workflow-modal").trigger("selected", object);
       $("workflow").trigger("selected", object);
+      $("task").trigger("selected", object);
       resize_areas();
     },
   },
@@ -169,9 +170,7 @@ can.Component.extend({
   scope: {
     assessments : assessmentList,
     assessment: assessmentList[0],
-    new_form: false,
     objects : [],
-    currentUser : 'user@example.com',
     filter_list : [{value: assessmentList[0].program_title}],
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
@@ -394,6 +393,23 @@ can.Component.extend({
 });
 
 can.Component.extend({
+  tag: 'task',
+  scope: {
+    task: taskList[0],
+  },
+  events: {
+    '{Task} created' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+    '{Task} updated' : function(){
+    },
+    ' selected' : function(){
+      this.scope.attr('task', arguments[2]);
+    },
+  }
+})
+
+can.Component.extend({
   tag: 'workflow-modal',
   scope: {
     assessment: assessmentList[0],
@@ -543,4 +559,6 @@ $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache",
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+$("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
+$("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
