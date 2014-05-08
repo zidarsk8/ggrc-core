@@ -67,7 +67,7 @@ dashboard-js-files:
   - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
-  - controls/control.js
+  - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
   - models/section.js
@@ -76,7 +76,7 @@ dashboard-js-files:
   - controllers/modal_selector_controller.js
   - mapping/mapping_controller.js
   - pbc/workflow_controller.js
-  - controls/category.js
+  - models/category.js
   - apps/quick_search.js
   - apps/programs.js
   - apps/business_objects.js
