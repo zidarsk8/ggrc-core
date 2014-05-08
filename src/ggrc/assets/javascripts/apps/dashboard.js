@@ -406,23 +406,6 @@ $(function() {
       $area.cms_controllers_dashboard({ model_descriptors: [] });
     }
 
-    /*$(".widget-add-placeholder").cms_controllers_add_widget({
-        parent_controller : dashboard_controller
-      , widget_descriptors : widget_descriptors
-      , menu_tree : (/dashboard/.test(window.location) ? dashboard_menu : null)
-      , minimum_widget_height : 100
-    });*/
-
-    /*function bindSortable(ev) {
-        can.getObject("Instances", CMS.Controllers.SortableWidgets, true)[this.id] = 
-         $(this)
-          .cms_controllers_sortable_widgets({
-            model : data[0]
-          }).control(CMS.Controllers.SortableWidgets);
-    }
-    $(".widget-area").each(bindSortable);//get anything that exists on the page already.
-    //we will need to consider whether to look for late-added ones later.
-    */
   });
 
 

@@ -28,8 +28,6 @@ can.Control("CMS.Controllers.Dashboard", {
       if (!this.inner_nav_controller)
         this.init_inner_nav();
       this.update_inner_nav();
-      if (!this.add_widget_controller)
-        this.init_add_widget();
 
       // Before initializing widgets, hide the container to not show
       // loading state of multiple widgets before reducing to one.
@@ -93,15 +91,6 @@ can.Control("CMS.Controllers.Dashboard", {
             });
       }
     }
-
-  , init_add_widget: function() {
-      this.add_widget_controller = new CMS.Controllers.AddWidget(
-          this.element.find('.add-nav-item'), {
-              dashboard_controller : this
-            //, widget_descriptors : this.options.widget_descriptors
-            , menu_tree : this.options.menu_tree
-          });
-      }
 
   , init_widget_descriptors: function() {
       var that = this;
