@@ -74,7 +74,6 @@ var ProgramList = [{
   owner: 'liz@reciprocitylbas.com',
   contact: 'ken@reciprocitylbas.com'
 }];
-
 var Objects = {
   controls: [
     {type: "control", name: "Secure Backups"},
@@ -173,6 +172,7 @@ can.Component.extend({
     workflow: assessmentList[0].workflow,
     new_form: false,
     objects : [],
+    currentUser : 'user@example.com',
     filter_list : [{value: assessmentList[0].program_title}],
     can_start : assessmentList[0].workflow && assessmentList[0].objects.length,
     set_fields : function(assessment){
@@ -220,8 +220,8 @@ can.Component.extend({
         })
       });
     },
-    "new" : function(val){
-      if(this.attr('new_form')) return "";
+    "new" : function(val, val_old){
+      if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
       return val();
     }
   },
