@@ -171,6 +171,7 @@ can.Component.extend({
     assessments : assessmentList,
     assessment: assessmentList[0],
     objects : [],
+    selected_num : 0,
     filter_list : [{value: assessmentList[0].program_title}],
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
@@ -230,6 +231,7 @@ can.Component.extend({
         }
         return o;
       }));
+      this.scope.attr('selected_num', this.scope.attr('objects').length);
       $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
@@ -258,6 +260,12 @@ can.Component.extend({
       var $el = $(el)
         , $check = $(this.element).find('.object-check-single');
       $check.prop('checked', $el.prop('checked'));
+      if($el.prop('checked')){
+        this.scope.attr('selected_num', this.scope.attr('objects').length);
+      }
+      else{
+        this.scope.attr('selected_num', 0);
+      }
       $check.each(function(i, c){
         if($el.is(':checked')) {
           $(c).closest('.tree-item').removeClass('disabled');
@@ -265,7 +273,16 @@ can.Component.extend({
           $(c).closest('.tree-item').addClass('disabled');
         }
       })
-
+    },
+    '.object-check-single click' : function(el, ev){
+      var $modal = $("#objectSelector")
+        , num_checked = $modal.find('.object-check-single').map(function(_,c){
+        if($(c).is(':checked')){
+          return c;
+        }
+      }).length;
+      ev.stopPropagation();
+      this.scope.attr('selected_num', num_checked);
     },
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
