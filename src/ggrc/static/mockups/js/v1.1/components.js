@@ -216,9 +216,12 @@ can.Component.extend({
     },
     initAutocomplete : function(){
       $( ".date" ).datepicker();
-      $(".sortable").sortable({update: function(event, ui){
-        $("workflow").trigger("sorted");
-      }});
+      $(".sortable").sortable({
+        update: function(event, ui){
+          $("workflow").trigger("sorted", event.target);
+        },
+
+      });
       var lists = {
         objects : $.map(this.assessment.objects, function(o){
           return o.name;
@@ -253,16 +256,19 @@ can.Component.extend({
     '{Assessment} updated' : function(){
       this.scope.initAutocomplete();
     },
-    ' sorted' : function(){
-      var $ul = $('.sortable')
+    ' sorted' : function(_,_,ul){
+      console.log(arguments);
+      var $ul = $(ul)
         , list = $ul.find('input')
         , index = $ul.data('index')
         , workflow = this.scope.assessment
         , tg = workflow.task_groups[index]
         , tasks = tg.tasks.slice()
         , i = 0;
-
-
+      if($($ul[0]).find('.disabled').length){
+        $( ".sortable" ).sortable( "cancel" );
+        return;
+      }
       var a = list.map(function(i,e){
         return $(e).val();
       });
