@@ -9,7 +9,6 @@ dashboard-js-files:
   - rails.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
-  - sha1.js
   - bootstrap-alert.js
   - bootstrap-collapse.js
   - bootstrap-dropdown.js
