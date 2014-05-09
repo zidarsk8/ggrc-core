@@ -55,7 +55,7 @@ def url_for(obj, id=None):
   service = service_for(obj)
   if service is None:
     return None
-  if id:
+  if id is not None:
     return service.url_for(id=id)
   return service.url_for(obj)
 
@@ -71,9 +71,22 @@ def view_url_for(obj, id=None):
   service = view_service_for(obj)
   if service is None:
     return None
-  if id:
+  if id is not None:
     return service.url_for(id=id)
   return service.url_for(obj)
+
+
+def encoded_dict(in_dict):
+  # http://stackoverflow.com/questions/6480723/urllib-urlencode-doesnt-like-unicode-values-how-about-this-workaround
+  out_dict = {}
+  for k, v in in_dict.iteritems():
+    if isinstance(v, unicode):
+      v = v.encode('utf8')
+    elif isinstance(v, str):
+      # Must be encoded in UTF-8
+      v.decode('utf8')
+    out_dict[k] = v
+  return out_dict
 
 
 class BenchmarkContextManager(object):

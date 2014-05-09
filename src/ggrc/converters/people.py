@@ -28,7 +28,7 @@ class PeopleRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle_text_or_html('name')
-    self.handle('email', ContactEmailHandler, is_required=True)
+    self.handle('email', ContactEmailHandler, is_required=True, prevent_duplicates=True)
     self.handle_text_or_html('company')
 
   def save_object(self, db_session, **options):

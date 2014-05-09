@@ -30,86 +30,6 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
   return exec();
 });
 
-var Assessment = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "workflow";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  },
-});
-
-var Workflow = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "assessmentWorkflows-v3";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  }
-});
-
-var Task = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "task";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  }
-});
-
-
-var ProgramList = [{
-  name: 'program',
-  title: 'Google Fiber',
-  description: '<p><b>ISO/IEC 27001</b>, part of the growing&nbsp;<a href="http://en.wikipedia.org/wiki/ISO/IEC_27000-series">ISO/IEC 27000 family of standards</a>, is an&nbsp;<a href="http://en.wikipedia.org/wiki/Information_security_management_system">information security management system</a>&nbsp;(ISMS) standard published in October 2005 by the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Organization_for_Standardization">International Organization for Standardization</a>&nbsp;(ISO) and the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Electrotechnical_Commission">International Electrotechnical Commission</a>&nbsp;(IEC). Its full name is&nbsp;<i>ISO/IEC 27001:2005 – Information technology – Security techniques – Information security management systems – Requirements</i>.</p><p>ISO/IEC 27001 formally specifies a management system that is intended to bring information security under explicit management control. Being a formal specification means that it mandates specific requirements. Organizations that claim to have adopted ISO/IEC 27001 can therefore be formally audited and certified compliant with the standard (more below).</p>',
-  owner: 'liz@reciprocitylbas.com',
-  contact: 'ken@reciprocitylbas.com'
-}];
-var Objects = {
-  controls: [
-    {type: "control", name: "Secure Backups"},
-    {type: "control", name: "Data Storage"},
-    {type: "control", name: "Password Security"},
-    {type: "control", name: "Access Control"},
-    {type: "control", name: "Stability and Perpetuability"}
-  ],
-  objectives: [
-    {type: "objective", name: "Establish a schedule"}
-  ],
-  standards: [
-    {type: "standard", name: "ASHRAE 90.1"}
-  ],
-  policies: [
-    {type: "policy", name: "Probationary Terms"},
-    {type: "policy", name: "Medical Leave"}
-  ],
-  contracts: [
-    {type: "contract", name: "Master Service Agreement"},
-    {type: "contract", name: "SaaS Vendor Contract"},
-    {type: "contract", name: "Company X Contract"}
-  ],
-  regulations: [
-    {type: "regulation", name: "SOX"},
-    {type: "regulation", name: "PCI DSS v2.0"}
-  ]
-}
-
-
-
-var taskList = new Task.List({});
-var assessmentList = new Assessment.List({});
-create_seed();
-
-
 // LHN
 can.Component.extend({
   tag: 'lhn-app',
@@ -121,6 +41,7 @@ can.Component.extend({
       ev.preventDefault();
       $("tree-app").trigger("selected", object);
       $("workflow-modal").trigger("selected", object);
+      $("task-modal").trigger("selected", object);
       $("workflow").trigger("selected", object);
       $("task").trigger("selected", object);
       resize_areas();
@@ -139,7 +60,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: ProgramList[0]//assessmentList[0]
+    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -442,6 +363,7 @@ can.Component.extend({
   }
 })
 
+// TODO: seperate common modal functionality
 can.Component.extend({
   tag: 'workflow-modal',
   scope: {
@@ -523,7 +445,7 @@ var modal = can.Component.extend({
     task: taskList[0],
     new_form: false,
     currentUser : 'user@example.com',
-    "new" : function(val, val_old){
+    new : function(val, val_old){
       if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
       return val();
       this.validateForm();
@@ -583,106 +505,9 @@ var modal = can.Component.extend({
   }
 });
 
-can.Component.extend({
-  init: function() {
-    $("#addTask").on('click', function(){
-      new Task({
-        title: $("#task-title").val(),
-        description: "",
-        end_date: ""
-      }).save();
-      $("#newTask").modal('hide');
-    });
-  },
-  tag: 'workflow-app',
-  name: 'workflow-app',
-  edited: false,
-  scope: {
-    assessments : assessmentList,
-    assessment: assessmentList[0],
-    workflows : new Workflow.List({}),
-    workflow : null,
-    objectsFilter : false,
-    //workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
-  },
-  events: {
-    '{Assessment} created' : function(Custruct, ev, assessment){
-      this.scope.attr('assessment', assessment);
-    },
-    ' selected' : function(el, ev, assessment){
-      this.scope.attr('assessment', assessment);
-      this.scope.attr('objectsFilter', false);
-      this.scope.attr('workflow_id', 'workflow' in assessment ? assessment.workflow : 0)
-    },
-    ' workflow_selected' : function(el, ev, workflow){
-      var show_modal = this.edited;
-      this.edited = false;
-      if(show_modal && !workflow.confirmed){
-        $('#workflowConfirm').modal('show');
-        return;
-      }
-      this.scope.attr('workflow_id', typeof workflow !== "undefined" ? workflow.id : 0);
-      this.scope.attr('workflow', workflow);
-    },
-    ' select_previous' : function(){
-      this.edited = true;
-      $("#assessmentWorkflowChoose > option[value='"+this.scope.workflow_id+"']").attr('selected', 'selected');
-    },
-    'input change' : function(el){
-      this.edited = true;
-    },
-    '.add click' : function(el){
-      var type = el.data('type')
-        , workflow = this.scope.attr('workflow');
-      workflow[type].push(type == "tasks" ? "" : {title: "", reviewer: ""});
-      this.edited = true;
-      //workflow.save();
-    },
-    '.delete click' : function(el, ev){
-      ev.preventDefault();
-      var type = el.data('type')
-        , index = el.data('index')
-        , workflow = this.scope.attr('workflow');
-
-      workflow[type].splice(index, 1);
-      this.edited = true;
-      //workflow.save()
-    },
-    "a#addWorkflowNow click" : function(el, ev){
-      var workflow = this.scope.workflow;
-      $("tree-app").trigger("workflow_selected", this.scope.workflow);
-      if(typeof workflow !== 'undefined' && workflow.attr('_new')){
-        workflow.attr('_new', false);
-        workflow.save();
-      }
-
-      $("#setupWorkflow").modal('hide');
-    },
-    '.update change' : function(el, ev){
-      var model = el.data('model')
-        , type = el.data('type')
-        , index = el.data('index')
-        , workflow = this.scope.attr('workflow');
-      if(model === "tasks"){
-        workflow[model][index] = el.val();
-      }
-      else if(model === "title"){
-
-        workflow.attr(model, el.val());
-      }
-      else{
-        workflow[model][index].attr(type, el.val());
-      }
-    },
-  }
-});
-$("#cancelChangeWorkflow").on('click', function(ev){
-  $("workflow-app").trigger("select_previous", workflow);
-});
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
-$("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
-$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+$("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));

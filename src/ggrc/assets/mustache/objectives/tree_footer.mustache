@@ -7,6 +7,12 @@
 
 {{#if allow_mapping_or_creating}}
 {{#if_instance_of parent_instance 'Program|Directive|Regulation|Policy|Standard|Contract'}}
+{{#if_helpers '\
+  #if' allow_mapping '\
+  and #is_allowed_to_map' parent_instance model.shortName '\
+  or #if' allow_creating '\
+  and #is_allowed' 'create' model.shortName _3_context=null '\
+  or #if' list.length}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12 section-expandable">
@@ -52,6 +58,7 @@
     </div>
   </div>
 </li>
+{{/if_helpers}}
 
 {{else}}
 

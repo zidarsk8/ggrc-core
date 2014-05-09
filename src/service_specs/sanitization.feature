@@ -12,7 +12,7 @@ Feature: String and Text column HTML sanitization
     Given "<resource_type>" named "resource" with sanitized properties "<properties>"
     And "resource" is POSTed to its collection
     When GET of the resource "resource"
-    Then "resource" has sanitized properties "<properties>"
+    Then "<resource_type>" "resource" has sanitized properties "<properties>"
 
   Examples:
       | resource_type     | properties |

@@ -18,6 +18,10 @@ class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
       'polymorphic_on': 'response_type',
       }
 
+  # Override `Slugged.title` to provide default=""
+  title = deferred(
+      db.Column(db.String, nullable=False, default=""), 'Response')
+
   VALID_STATES = (u'Assigned', u'Submitted', u'Accepted', u'Rejected')
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   request_id = deferred(

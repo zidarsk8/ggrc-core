@@ -287,7 +287,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
       , function(token) {
         if(typeof new_prefs[token] !== "undefined") {
           prefs.attr(token, new_prefs[token]);
-        } else if(new_prefs === token && val) {
+        } else if(new_prefs === token && typeof val !== "undefined") {
           prefs.attr(token, val);
         }
       }

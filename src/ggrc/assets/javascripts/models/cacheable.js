@@ -239,7 +239,7 @@ can.Model("can.Model.Cacheable", {
     var id_key = this.id;
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
-      if(new_obj[id_key]) {
+      if(new_obj[id_key] || new_obj[id_key] === 0) {
         cache[new_obj[id_key]] = new_obj;
         if(cache[undefined] === new_obj)
           delete cache[undefined];
@@ -588,7 +588,7 @@ can.Model("can.Model.Cacheable", {
           params.__page = 1;
         }
         if (!params.__page_size) {
-          params.__page_size = 100;
+          params.__page_size = 50;
         }
         return findPageFunc(collection_url, params);
       };
@@ -610,7 +610,7 @@ can.Model("can.Model.Cacheable", {
       , that = this
       ;
 
-    if (this[id_key])
+    if (this[id_key] || this[id_key] === 0)
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
@@ -633,7 +633,14 @@ can.Model("can.Model.Cacheable", {
       }
     });
   }
-  , computed_errors : can.compute(function() { return this.errors(); })
+  , computed_errors : can.compute(function() {
+      var errors = this.errors();
+      if(this.attr("_suppress_errors")) {
+        return null;
+      } else {
+        return errors;
+      }
+    })
 
   , get_list_counter: function(name) {
       var binding = this.get_binding(name);
@@ -892,12 +899,15 @@ can.Model("can.Model.Cacheable", {
 
     xhr = this._super.apply(this, arguments).then(function(result) {
       if(isNew) {
-        this.after_create && this.after_create();
+        that.after_create && that.after_create();
       } else {
-        this.after_update && this.after_update();
+        that.after_update && that.after_update();
       }
-      this.after_save && this.after_save();
+      that.after_save && that.after_save();
       return result;
+    }, function(xhr, status, message) {
+      that.save_error && that.save_error(xhr.responseText);
+      return new $.Deferred().reject(xhr, status, message);
     });
 
     xhr.always(function() {
@@ -944,7 +954,7 @@ can.Observe.prototype.stub = function() {
   else
     id = this.id;
 
-  if (!id)
+  if (!id && id !== 0)
     return null;
 
   return can.Stub.get_or_create({
