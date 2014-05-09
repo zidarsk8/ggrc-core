@@ -485,7 +485,11 @@ ul.new-tree {
 #verifyTask,
 #verifyTask2,
 #verifyTask3,
-#verifyTaskSpecial {
+#verifyTaskSpecial,
+#endWorkflowTrigger,
+.internav .inner-nav-button span.message,
+.header-message,
+.finished-number {
   display: none;
 }
 

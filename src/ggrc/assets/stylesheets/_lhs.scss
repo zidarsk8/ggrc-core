@@ -126,6 +126,18 @@
           color:$programs;
         }
       }
+      &.finished {
+        a {
+          background-color: $rqAccepted;
+        }
+        .finished-number {
+          margin-right: 10px;
+          &.error {
+            font-weight: normal;
+            color: #ce3e3e;
+          }
+        }
+      }
     }
     li {
       &.governance {
@@ -372,6 +384,12 @@
         text-align: center;
         border-bottom: 1px solid #ddd;
         padding: 10px;
+        .message {
+          color: $green;
+        }
+      }
+      &.finished {
+        background: $rqAccepted;
       }
     }
     a {

@@ -623,8 +623,18 @@ $(document).ready(function(){
   });
   
   $('body').on('click', '#confirmStartWorkflow', function() {
-    $('#startWorkflowTrigger').html('End Workflow');
+    $('#startWorkflowTrigger').hide();
     $('#progressWidgetTrigger').show();
+    $('#endWorkflowTrigger').show();
+  });
+  
+  $('body').on('click', '#endWorkflowTrigger', function() {
+    $('.internav .progress-object').addClass('finished');
+    $('#endWorkflowTrigger').hide();
+    $('.internav .inner-nav-button span.message').show();
+    $('.header-message').show();
+    $('.workflow-group').addClass('finished');
+    $('.finished-number').show();
   });
   
   $('body').on('click', '#cancelEntry', function() {

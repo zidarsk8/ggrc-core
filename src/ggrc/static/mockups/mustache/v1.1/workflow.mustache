@@ -2,7 +2,7 @@
 <div class="area program">
     <div class="header-content">
       <div class="row-fluid">
-        <div id="page-header" class="span9">
+        <div id="page-header" class="span7">
           <h1 class="programs">
             <div class="grcobject programs" rel="tooltip" data-placement="bottom" title="Assessment">
               <i class="grcicon-assessment-white"></i>
@@ -10,6 +10,13 @@
             {{assessment.title}}
             <span class="private"></span>
           </h1>
+        </div>
+        <div class="span5">
+          <div class="header-message">
+            <p class="object-header-notification object-approved">
+              Completed on 05/01/14
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -83,7 +90,7 @@
                 <div class="drag"></div>
                 <div class="arrow"></div>
               </li>
-              <li id="progressWidgetTrigger">
+              <li id="progressWidgetTrigger" class="progress-object">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-progress-color"></i>
@@ -97,6 +104,10 @@
                 <button id="startWorkflowTrigger" type="submit" href="#workflowStart" data-toggle="modal" class="btn {{^assessment.task_groups.length}}disabled{{/task_groups}}">
                   Start Workflow
                 </button>
+                <button id="endWorkflowTrigger" type="submit" class="btn">
+                  End Workflow
+                </button>
+                <span class="message"><em>Workflow finished</em></span>
               </li>
             </ul>
           </div>
