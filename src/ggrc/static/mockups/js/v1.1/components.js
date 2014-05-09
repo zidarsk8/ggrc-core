@@ -130,15 +130,7 @@ can.Component.extend({
         , objects = this.scope.model[this.scope.mapping.toLowerCase()]
         ;
 
-      this.scope.attr('objects', $.map(this.scope.source[type], function(o){
-
-        for(var i = 0; i < objects.length; i++){
-          if(o.type === objects[i].type && o.name === objects[i].name){
-            return;
-          }
-        }
-        return o;
-      }));
+      this.scope.attr('objects', this.scope.source[type]);
       this.scope.attr('selected_num', this.scope.attr('objects').length);
       $('.results .info').css('display', 'none');
     },
@@ -150,11 +142,22 @@ can.Component.extend({
     "a#addSelected click" : function(el, ev){
       var scope = this.scope
         , model = scope.model
+        , mapping = scope.mapping.toLowerCase()
         , selected = $('.object-check-single').map(function(_, v){ return v.checked; })
         , filtered = []
         , i;
+      if(!scope.objects.length) return;
+      if(mapping == 'objects'){
+        var type = scope.objects[0].type;
+        model.attr(mapping, $.map(model[mapping], function(o){
+          if(o.type !== type) return o;
+        }));
+      }
+      else{
+        model.attr(mapping, []);
+      }
       scope.objects.each(function(v,i){
-        if(selected[i]) model[scope.mapping.toLowerCase()].push(v);
+        if(selected[i]) model[mapping].push(v);
       });
       model.save();
       scope.attr('objects', []);
