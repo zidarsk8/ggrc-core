@@ -4,6 +4,8 @@
     Created By: dan@reciprocitylabs.com
     Maintained By: dan@reciprocitylabs.com
 */
+console.log("js parsing started", Date.now() - st, "ms after tag reached");
+window.st = Date.now();
 
 GGRC = window.GGRC || {};
 

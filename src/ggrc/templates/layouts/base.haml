@@ -17,21 +17,29 @@
       -block title
         Governance, Risk and Compliance
 
-    %script{ 'type': 'text/javascript' }
-      GGRC = window.GGRC || {};
-      -block extra_javascript
-
     -assets "dashboard-css"
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
+
+    %script{ 'type': 'text/javascript' }
+      GGRC = window.GGRC || {};
+      -block extra_javascript
+      window.st=Date.now();
 
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    :javascript
+      console.log("js parsing finished in", Date.now() - st, "ms");
+      window.st=Date.now();
+
     -assets "dashboard-js-templates"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
+
+    :javascript
+      console.log("template loading and parsing finished in", Date.now() - st, "ms");
 
     -#FIXME: (?) HTML5 shim?
 
