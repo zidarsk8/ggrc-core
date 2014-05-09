@@ -16,7 +16,7 @@ function create_seed(){
     new Task({
       title: "Peer Review",
       description: "",
-      end_date: ""
+      end_date: "",
     }).save();
     new Task({
       title: "Control Checkup",
@@ -27,4 +27,11 @@ function create_seed(){
   var workflowList = new Workflow.List({});
   assessmentList = new Assessment.List({});
   taskList = new Task.List({});
+
+  for(var i = 0; i < assessmentList.length; i++){
+    var assessment = assessmentList[i];
+    if(!assessment.people) assessment.attr('people', []);
+    if(!assessment.tasks) assessment.attr('tasks', []);
+    assessment.save();
+  }
 }

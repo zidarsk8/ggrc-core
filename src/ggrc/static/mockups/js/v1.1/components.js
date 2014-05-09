@@ -30,86 +30,6 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
   return exec();
 });
 
-var Assessment = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "workflow";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  },
-});
-
-var Workflow = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "assessmentWorkflows-v3";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  }
-});
-
-var Task = can.Model.LocalStorage.extend({
-},{
-  init: function(){
-    this.name = "task";
-    this.on('change', function(ev, prop){
-      if(prop === 'text' || prop === 'complete'){
-        ev.target.save();
-      }
-    });
-  }
-});
-
-
-var ProgramList = [{
-  name: 'program',
-  title: 'Google Fiber',
-  description: '<p><b>ISO/IEC 27001</b>, part of the growing&nbsp;<a href="http://en.wikipedia.org/wiki/ISO/IEC_27000-series">ISO/IEC 27000 family of standards</a>, is an&nbsp;<a href="http://en.wikipedia.org/wiki/Information_security_management_system">information security management system</a>&nbsp;(ISMS) standard published in October 2005 by the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Organization_for_Standardization">International Organization for Standardization</a>&nbsp;(ISO) and the&nbsp;<a href="http://en.wikipedia.org/wiki/International_Electrotechnical_Commission">International Electrotechnical Commission</a>&nbsp;(IEC). Its full name is&nbsp;<i>ISO/IEC 27001:2005 – Information technology – Security techniques – Information security management systems – Requirements</i>.</p><p>ISO/IEC 27001 formally specifies a management system that is intended to bring information security under explicit management control. Being a formal specification means that it mandates specific requirements. Organizations that claim to have adopted ISO/IEC 27001 can therefore be formally audited and certified compliant with the standard (more below).</p>',
-  owner: 'liz@reciprocitylbas.com',
-  contact: 'ken@reciprocitylbas.com'
-}];
-var Objects = {
-  controls: [
-    {type: "control", name: "Secure Backups"},
-    {type: "control", name: "Data Storage"},
-    {type: "control", name: "Password Security"},
-    {type: "control", name: "Access Control"},
-    {type: "control", name: "Stability and Perpetuability"}
-  ],
-  objectives: [
-    {type: "objective", name: "Establish a schedule"}
-  ],
-  standards: [
-    {type: "standard", name: "ASHRAE 90.1"}
-  ],
-  policies: [
-    {type: "policy", name: "Probationary Terms"},
-    {type: "policy", name: "Medical Leave"}
-  ],
-  contracts: [
-    {type: "contract", name: "Master Service Agreement"},
-    {type: "contract", name: "SaaS Vendor Contract"},
-    {type: "contract", name: "Company X Contract"}
-  ],
-  regulations: [
-    {type: "regulation", name: "SOX"},
-    {type: "regulation", name: "PCI DSS v2.0"}
-  ]
-}
-
-
-
-var taskList = new Task.List({});
-var assessmentList = new Assessment.List({});
-create_seed();
-
-
 // LHN
 can.Component.extend({
   tag: 'lhn-app',
@@ -121,6 +41,8 @@ can.Component.extend({
       ev.preventDefault();
       $("tree-app").trigger("selected", object);
       $("workflow-modal").trigger("selected", object);
+      $("selector-modal").trigger("selected", object);
+      $("task-modal").trigger("selected", object);
       $("workflow").trigger("selected", object);
       $("task").trigger("selected", object);
       resize_areas();
@@ -139,7 +61,7 @@ can.Component.extend({
 can.Component.extend({
   tag: 'tree-app',
   scope: {
-    object: ProgramList[0]//assessmentList[0]
+    object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
     ' selected' : function(el, ev, object){
@@ -155,106 +77,90 @@ can.Component.extend({
       else
         return 'hide';
     }
+  },
+  events: {
+    // TODO: send event for changing inner nav
   }
 });
 
-// Workflow Tree
 can.Component.extend({
-  tag: 'workflow',
-  init: function(){
-    var that = this;
-    $(function(){
-      that.scope.initAutocomplete();
-    })
-  },
+  tag: 'selector-modal',
   scope: {
-    assessments : assessmentList,
-    assessment: assessmentList[0],
-    objects : [],
-    selected_num : 0,
     filter_list : [{value: assessmentList[0].program_title}],
-    set_fields : function(assessment){
-      this.attr('filter_list', [{value: assessment.program_title}]);
-      this.attr('assessment', assessment);
-    },
-    initAutocomplete : function(){
-      $( ".date" ).datepicker();
-      var lists = {
-        objects : $.map(this.assessment.objects, function(o){
-          return o.name;
-        }),
-        people : [
-          "Vladan Mitevski",
-          "Predrag Kanazir",
-          "Dan Ring",
-          "Silas Barta",
-          "Cassius Clay"
-        ],
-        mapped_people : [
-          "Cassius Clay",
-          "Dan Ring",
-          "Predrag Kanazir",
-        ],
-        tasks: [
-          "Proof Reading",
-          "Validate Mappings",
-          "Peer Review"
-        ]
-      }
-      $('.autocomplete').each(function(i,el){
-        var $el = $(el)
-          , autocomplete_type = $el.data('autocomplete-type')
-          , type = autocomplete_type || $el.data('type')
-        $el.autocomplete({
-          source : lists[type],
-          close: function( event, ui ) {$el.trigger('change')}
-        })
-      });
-    },
+    filter : true,
+    objects: [],
+    model: assessmentList[0],
+    source: Objects,
+    mapping: 'Objects',
+
   },
   events: {
-    '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
-    '{Assessment} updated' : function(){
-      this.scope.initAutocomplete();
+    " selected" : function(el, ev, object){
+      this.scope.attr('model', object);
     },
-    ' selected' : function(){this.scope.set_fields(arguments[2])},
+    '{Assessment} updated' : function(){this.scope.attr('model', arguments[2])},
+    '{Assessment} created' : function(){this.scope.attr('model', arguments[2])},
+    '{window} click' : function(el, ev){
+      var $el = $(ev.target);
+      if(!$el.hasClass('selector-modal')) return;
+
+      var mapping = $el.data('mapping');
+      this.scope.attr('mapping', mapping.charAt(0).toUpperCase() + mapping.slice(1));
+      this.scope.attr('objects', []);
+      if(mapping === 'objects'){
+        this.scope.attr('source', Objects);
+        this.scope.attr('filter', true);
+        this.scope.attr('objects', []);
+      }
+      else if(mapping === 'people'){
+        this.scope.attr('source', People);
+        this.scope.attr('filter', false);
+        this.scope.attr('objects', People);
+      }
+      else if(mapping === 'tasks'){
+        this.scope.attr('source', taskList);
+        this.scope.attr('filter', false);
+        this.scope.attr('objects', taskList);
+      }
+      this.scope.attr('selected_num', this.scope.attr('objects').length);
+    },
     "a#objectReview click" : function(el, ev){
       var type = $("#objects_type").val().toLowerCase()
         , that = this
-        , objects = this.scope.assessment.objects;
-      this.scope.attr('objects', $.map(Objects[type], function(o){
+        , objects = this.scope.model[this.scope.mapping.toLowerCase()]
+        ;
 
-        for(var i = 0; i < objects.length; i++){
-          if(o.type === objects[i].type && o.name === objects[i].name){
-            return;
-          }
-        }
-        return o;
-      }));
+      this.scope.attr('objects', this.scope.source[type]);
       this.scope.attr('selected_num', this.scope.attr('objects').length);
       $('.results .info').css('display', 'none');
     },
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
       this.scope.attr('filter', true);
       this.scope.attr('objects', []);
-      this.scope.assessment.attr('objects', []);
+      this.scope.model.attr('objects', []);
     },
     "a#addSelected click" : function(el, ev){
       var scope = this.scope
-        , assessment = scope.assessment
-        , selected = $('.object-check-single').map(function(_, v){return v.checked;})
+        , model = scope.model
+        , mapping = scope.mapping.toLowerCase()
+        , selected = $('.object-check-single').map(function(_, v){ return v.checked; })
         , filtered = []
         , i;
-      scope.objects.each(function(v,i){
-        if(selected[i]) assessment.objects.push(v);
-      });
-
-      if(assessment.attr('started')){
-        this.scope.initObjects();
+      if(!scope.objects.length) return;
+      if(mapping == 'objects'){
+        var type = scope.objects[0].type;
+        model.attr(mapping, $.map(model[mapping], function(o){
+          if(o.type !== type) return o;
+        }));
       }
-      assessment.save();
+      else{
+        model.attr(mapping, []);
+      }
+      scope.objects.each(function(v,i){
+        if(selected[i]) model[mapping].push(v);
+      });
+      model.save();
       scope.attr('objects', []);
-      this.scope.set_fields(assessment);
     },
     "#objectAll click": function(el){
       var $el = $(el)
@@ -287,6 +193,93 @@ can.Component.extend({
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
     },
+  }
+})
+
+// Workflow Tree
+can.Component.extend({
+  tag: 'workflow',
+  init: function(){
+    var that = this;
+    $(function(){
+      that.scope.initAutocomplete();
+    })
+  },
+  scope: {
+    assessments : assessmentList,
+    assessment: assessmentList[0],
+    objects : [],
+    selected_num : 0,
+    set_fields : function(assessment){
+      this.attr('filter_list', [{value: assessment.program_title}]);
+      this.attr('assessment', assessment);
+    },
+    initAutocomplete : function(){
+      $( ".date" ).datepicker();
+      $(".sortable").sortable({
+        update: function(event, ui){
+          $("workflow").trigger("sorted", event.target);
+        },
+
+      });
+      var lists = {
+        objects : $.map(this.assessment.objects, function(o){
+          return o.name;
+        }),
+        people : [
+          "Vladan Mitevski",
+          "Predrag Kanazir",
+          "Dan Ring",
+          "Silas Barta",
+          "Cassius Clay"
+        ],
+        mapped_people : $.map(this.assessment.people, function(o){
+          return o.name;
+        }),
+        tasks: $.map(this.assessment.tasks, function(o){
+          return o.title;
+        }),
+      }
+      $('.autocomplete').each(function(i,el){
+        var $el = $(el)
+          , autocomplete_type = $el.data('autocomplete-type')
+          , type = autocomplete_type || $el.data('type')
+        $el.autocomplete({
+          source : lists[type],
+          close: function( event, ui ) {$el.trigger('change')}
+        })
+      });
+    },
+  },
+  events: {
+    '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
+    '{Assessment} updated' : function(){
+      this.scope.initAutocomplete();
+    },
+    ' sorted' : function(_,_,ul){
+      console.log(arguments);
+      var $ul = $(ul)
+        , list = $ul.find('input')
+        , index = $ul.data('index')
+        , workflow = this.scope.assessment
+        , tg = workflow.task_groups[index]
+        , tasks = tg.tasks.slice()
+        , i = 0;
+      if($($ul[0]).find('.disabled').length){
+        $( ".sortable" ).sortable( "cancel" );
+        return;
+      }
+      var a = list.map(function(i,e){
+        return $(e).val();
+      });
+      for(i=0; i < tasks.length; i++){
+        tasks[i].attr('title', a[i]);
+      }
+      // Now that the list is sorted cancel the sortable event
+      $( ".sortable" ).sortable( "cancel" );
+      workflow.save();
+    },
+    ' selected' : function(){this.scope.set_fields(arguments[2])},
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
@@ -442,6 +435,7 @@ can.Component.extend({
   }
 })
 
+// TODO: seperate common modal functionality
 can.Component.extend({
   tag: 'workflow-modal',
   scope: {
@@ -494,6 +488,8 @@ can.Component.extend({
       $modal.modal('hide');
       if(typeof assessment.objects === 'undefined'){
         assessment.attr('objects', []);
+        assessment.attr('people', []);
+        assessment.attr('tasks', []);
       }
       if(typeof assessment.task_groups === 'undefined'){
         assessment.attr('task_groups', []);
@@ -523,7 +519,7 @@ var modal = can.Component.extend({
     task: taskList[0],
     new_form: false,
     currentUser : 'user@example.com',
-    "new" : function(val, val_old){
+    new : function(val, val_old){
       if(this.attr('new_form')) return arguments.length === 3 ? val_old() : '';
       return val();
       this.validateForm();
@@ -583,106 +579,10 @@ var modal = can.Component.extend({
   }
 });
 
-can.Component.extend({
-  init: function() {
-    $("#addTask").on('click', function(){
-      new Task({
-        title: $("#task-title").val(),
-        description: "",
-        end_date: ""
-      }).save();
-      $("#newTask").modal('hide');
-    });
-  },
-  tag: 'workflow-app',
-  name: 'workflow-app',
-  edited: false,
-  scope: {
-    assessments : assessmentList,
-    assessment: assessmentList[0],
-    workflows : new Workflow.List({}),
-    workflow : null,
-    objectsFilter : false,
-    //workflow_id : 'workflow' in assessment ? assessment.workflow : 0,
-  },
-  events: {
-    '{Assessment} created' : function(Custruct, ev, assessment){
-      this.scope.attr('assessment', assessment);
-    },
-    ' selected' : function(el, ev, assessment){
-      this.scope.attr('assessment', assessment);
-      this.scope.attr('objectsFilter', false);
-      this.scope.attr('workflow_id', 'workflow' in assessment ? assessment.workflow : 0)
-    },
-    ' workflow_selected' : function(el, ev, workflow){
-      var show_modal = this.edited;
-      this.edited = false;
-      if(show_modal && !workflow.confirmed){
-        $('#workflowConfirm').modal('show');
-        return;
-      }
-      this.scope.attr('workflow_id', typeof workflow !== "undefined" ? workflow.id : 0);
-      this.scope.attr('workflow', workflow);
-    },
-    ' select_previous' : function(){
-      this.edited = true;
-      $("#assessmentWorkflowChoose > option[value='"+this.scope.workflow_id+"']").attr('selected', 'selected');
-    },
-    'input change' : function(el){
-      this.edited = true;
-    },
-    '.add click' : function(el){
-      var type = el.data('type')
-        , workflow = this.scope.attr('workflow');
-      workflow[type].push(type == "tasks" ? "" : {title: "", reviewer: ""});
-      this.edited = true;
-      //workflow.save();
-    },
-    '.delete click' : function(el, ev){
-      ev.preventDefault();
-      var type = el.data('type')
-        , index = el.data('index')
-        , workflow = this.scope.attr('workflow');
-
-      workflow[type].splice(index, 1);
-      this.edited = true;
-      //workflow.save()
-    },
-    "a#addWorkflowNow click" : function(el, ev){
-      var workflow = this.scope.workflow;
-      $("tree-app").trigger("workflow_selected", this.scope.workflow);
-      if(typeof workflow !== 'undefined' && workflow.attr('_new')){
-        workflow.attr('_new', false);
-        workflow.save();
-      }
-
-      $("#setupWorkflow").modal('hide');
-    },
-    '.update change' : function(el, ev){
-      var model = el.data('model')
-        , type = el.data('type')
-        , index = el.data('index')
-        , workflow = this.scope.attr('workflow');
-      if(model === "tasks"){
-        workflow[model][index] = el.val();
-      }
-      else if(model === "title"){
-
-        workflow.attr(model, el.val());
-      }
-      else{
-        workflow[model][index].attr(type, el.val());
-      }
-    },
-  }
-});
-$("#cancelChangeWorkflow").on('click', function(ev){
-  $("workflow-app").trigger("select_previous", workflow);
-});
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
-$("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
-$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+$("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
+$("#selector-modal").html(can.view("/static/mockups/mustache/v1.1/selector-modal.mustache", {}));
