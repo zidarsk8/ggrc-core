@@ -41,6 +41,7 @@ can.Component.extend({
       ev.preventDefault();
       $("tree-app").trigger("selected", object);
       $("workflow-modal").trigger("selected", object);
+      $("selector-modal").trigger("selected", object);
       $("task-modal").trigger("selected", object);
       $("workflow").trigger("selected", object);
       $("task").trigger("selected", object);
@@ -76,74 +77,60 @@ can.Component.extend({
       else
         return 'hide';
     }
+  },
+  events: {
+    // TODO: send event for changing inner nav
   }
 });
 
-// Workflow Tree
 can.Component.extend({
-  tag: 'workflow',
-  init: function(){
-    var that = this;
-    $(function(){
-      that.scope.initAutocomplete();
-    })
-  },
+  tag: 'selector-modal',
   scope: {
-    assessments : assessmentList,
-    assessment: assessmentList[0],
-    objects : [],
-    selected_num : 0,
     filter_list : [{value: assessmentList[0].program_title}],
-    set_fields : function(assessment){
-      this.attr('filter_list', [{value: assessment.program_title}]);
-      this.attr('assessment', assessment);
-    },
-    initAutocomplete : function(){
-      $( ".date" ).datepicker();
-      var lists = {
-        objects : $.map(this.assessment.objects, function(o){
-          return o.name;
-        }),
-        people : [
-          "Vladan Mitevski",
-          "Predrag Kanazir",
-          "Dan Ring",
-          "Silas Barta",
-          "Cassius Clay"
-        ],
-        mapped_people : [
-          "Cassius Clay",
-          "Dan Ring",
-          "Predrag Kanazir",
-        ],
-        tasks: [
-          "Proof Reading",
-          "Validate Mappings",
-          "Peer Review"
-        ]
-      }
-      $('.autocomplete').each(function(i,el){
-        var $el = $(el)
-          , autocomplete_type = $el.data('autocomplete-type')
-          , type = autocomplete_type || $el.data('type')
-        $el.autocomplete({
-          source : lists[type],
-          close: function( event, ui ) {$el.trigger('change')}
-        })
-      });
-    },
+    filter : true,
+    objects: [],
+    model: assessmentList[0],
+    source: Objects,
+    mapping: 'Objects',
+
   },
   events: {
-    '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
-    '{Assessment} updated' : function(){
-      this.scope.initAutocomplete();
+    " selected" : function(el, ev, object){
+      this.scope.attr('model', object);
     },
-    ' selected' : function(){this.scope.set_fields(arguments[2])},
+    '{Assessment} updated' : function(){this.scope.attr('model', arguments[2])},
+    '{Assessment} created' : function(){this.scope.attr('model', arguments[2])},
+    '{window} click' : function(el, ev){
+      var $el = $(ev.target);
+      if(!$el.hasClass('selector-modal')) return;
+
+      var mapping = $el.data('mapping');
+      this.scope.attr('mapping', mapping.charAt(0).toUpperCase() + mapping.slice(1));
+      this.scope.attr('objects', []);
+      if(mapping === 'objects'){
+        this.scope.attr('source', Objects);
+        this.scope.attr('filter', true);
+        this.scope.attr('objects', []);
+      }
+      else if(mapping === 'people'){
+        this.scope.attr('source', People);
+        this.scope.attr('filter', false);
+        this.scope.attr('objects', People);
+      }
+      else if(mapping === 'tasks'){
+        this.scope.attr('source', taskList);
+        this.scope.attr('filter', false);
+        this.scope.attr('objects', taskList);
+      }
+      this.scope.attr('selected_num', this.scope.attr('objects').length);
+    },
     "a#objectReview click" : function(el, ev){
       var type = $("#objects_type").val().toLowerCase()
         , that = this
-        , objects = this.scope.assessment.objects;
-      this.scope.attr('objects', $.map(Objects[type], function(o){
+        , objects = this.scope.model[this.scope.mapping.toLowerCase()]
+        ;
+
+      this.scope.attr('objects', $.map(this.scope.source[type], function(o){
 
         for(var i = 0; i < objects.length; i++){
           if(o.type === objects[i].type && o.name === objects[i].name){
@@ -158,24 +145,19 @@ can.Component.extend({
     "a#filterTrigger,a#filterTriggerFooter click" : function(el, ev){
       this.scope.attr('filter', true);
       this.scope.attr('objects', []);
-      this.scope.assessment.attr('objects', []);
+      this.scope.model.attr('objects', []);
     },
     "a#addSelected click" : function(el, ev){
       var scope = this.scope
-        , assessment = scope.assessment
-        , selected = $('.object-check-single').map(function(_, v){return v.checked;})
+        , model = scope.model
+        , selected = $('.object-check-single').map(function(_, v){ return v.checked; })
         , filtered = []
         , i;
       scope.objects.each(function(v,i){
-        if(selected[i]) assessment.objects.push(v);
+        if(selected[i]) model[scope.mapping.toLowerCase()].push(v);
       });
-
-      if(assessment.attr('started')){
-        this.scope.initObjects();
-      }
-      assessment.save();
+      model.save();
       scope.attr('objects', []);
-      this.scope.set_fields(assessment);
     },
     "#objectAll click": function(el){
       var $el = $(el)
@@ -208,6 +190,64 @@ can.Component.extend({
     "#addFilterRule click": function(){
       this.scope.filter_list.push([{value: ""}]);
     },
+  }
+})
+
+// Workflow Tree
+can.Component.extend({
+  tag: 'workflow',
+  init: function(){
+    var that = this;
+    $(function(){
+      that.scope.initAutocomplete();
+    })
+  },
+  scope: {
+    assessments : assessmentList,
+    assessment: assessmentList[0],
+    objects : [],
+    selected_num : 0,
+    set_fields : function(assessment){
+      this.attr('filter_list', [{value: assessment.program_title}]);
+      this.attr('assessment', assessment);
+    },
+    initAutocomplete : function(){
+      $( ".date" ).datepicker();
+      var lists = {
+        objects : $.map(this.assessment.objects, function(o){
+          return o.name;
+        }),
+        people : [
+          "Vladan Mitevski",
+          "Predrag Kanazir",
+          "Dan Ring",
+          "Silas Barta",
+          "Cassius Clay"
+        ],
+        mapped_people : $.map(this.assessment.people, function(o){
+          return o.name;
+        }),
+        tasks: $.map(this.assessment.tasks, function(o){
+          return o.title;
+        }),
+      }
+      $('.autocomplete').each(function(i,el){
+        var $el = $(el)
+          , autocomplete_type = $el.data('autocomplete-type')
+          , type = autocomplete_type || $el.data('type')
+        $el.autocomplete({
+          source : lists[type],
+          close: function( event, ui ) {$el.trigger('change')}
+        })
+      });
+    },
+  },
+  events: {
+    '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
+    '{Assessment} updated' : function(){
+      this.scope.initAutocomplete();
+    },
+    ' selected' : function(){this.scope.set_fields(arguments[2])},
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
@@ -416,6 +456,8 @@ can.Component.extend({
       $modal.modal('hide');
       if(typeof assessment.objects === 'undefined'){
         assessment.attr('objects', []);
+        assessment.attr('people', []);
+        assessment.attr('tasks', []);
       }
       if(typeof assessment.task_groups === 'undefined'){
         assessment.attr('task_groups', []);
@@ -511,3 +553,4 @@ $("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", 
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
+$("#selector-modal").html(can.view("/static/mockups/mustache/v1.1/selector-modal.mustache", {}));
