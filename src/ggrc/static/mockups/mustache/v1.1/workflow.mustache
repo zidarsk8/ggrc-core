@@ -57,7 +57,7 @@
                 <a href="#tasks_widget" class="task_groups_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-task-color"></i>
-                    Tasks (<span id="objectsMainCounter2">3</span>)
+                    Tasks ({{assessment.tasks.length}})
                   </div>
                 </a>
                 <div class="drag"></div>
@@ -67,7 +67,7 @@
                 <a href="#people_widget" class="people_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-person-color"></i>
-                    People (<span id="objectsMainCounter3">3</span>)
+                    People ({{assessment.people.length}})
                   </div>
                 </a>
                 <div class="drag"></div>
@@ -383,7 +383,7 @@
                       <h2>
                         <i class="grcicon-task-color"></i>
                         Tasks
-                        <span class="object_count" id="objectsCounter">(2)</span>
+                        <span class="object_count">({{assessment.tasks.length}})</span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -398,6 +398,7 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree">
+                    {{#assessment.tasks}}
                     <li class="tree-item program">
                       <div class="item-main">
                         <a href="javascript://" class="openclose">
@@ -405,7 +406,7 @@
                             <div class="span12">
                               <div class="item-data">
                                 <div class="tree-title-area">
-                                  Proof Reading
+                                  {{title}}
                                 </div>
                               </div>
                             </div>
@@ -413,40 +414,11 @@
                         </a>
                       </div>
                     </li>
-                    <li class="tree-item program">
-                      <div class="item-main">
-                        <a href="javascript://" class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  Validate Mappings
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </li>
-                    <li class="tree-item program">
-                      <div class="item-main">
-                        <a href="javascript://" class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  Peer Review
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </li>
+                    {{/assessment.tasks}}
                     <li class="tree-footer tree-item tree-item-add">
                       <div class="row-fluid">
                         <div class="span10">
-                          <a href="#addTaskSelector" id="addTaskTrigger" data-toggle="modal">
+                          <a href="#objectSelector" data-toggle="modal" class="selector-modal" data-mapping="tasks">
                             + Add Task
                           </a>
                         </div>
@@ -464,7 +436,7 @@
                       <h2>
                         <i class="grcicon-person-color"></i>
                         People
-                        <span class="object_count" id="objectsCounter">(3)</span>
+                        <span class="object_count">({{assessment.people.length}})</span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -479,6 +451,7 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree">
+                    {{#assessment.people}}
                     <li class="tree-item person">
                       <div class="item-main">
                         <div class="openclose">
@@ -487,9 +460,9 @@
                               <div class="item-data">
                                 <div class="tree-title-area">
                                   <span class="person-holder">
-                                    <a href="#">Cassius Clay</a>
+                                    <a href="#">{{name}}</a>
                                   </span>
-                                  <span class="email">cclay@google.com</span>
+                                  <span class="email">{{email}}</span>
                                 </div>
                               </div>
                             </div>
@@ -497,46 +470,11 @@
                         </div>
                       </div>
                     </li>
-                    <li class="tree-item person">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  <span class="person-holder">
-                                    <a href="#">Dan Ring</a>
-                                  </span>
-                                  <span class="email">dring@google.com</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="tree-item person">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  <span class="person-holder">
-                                    <a href="#">Predrag Kanazir</a>
-                                  </span>
-                                  <span class="email">pkanazir@google.com</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
+                    {{/assessment.people}}
                     <li class="tree-footer tree-item tree-item-add">
                       <div class="row-fluid">
                         <div class="span10">
-                          <a href="#addPeopleSelector" id="addPersonTrigger" data-toggle="modal">
+                          <a href="#objectSelector" data-toggle="modal" class="selector-modal" data-mapping="people">
                             + Add Person
                           </a>
                         </div>
@@ -637,7 +575,7 @@
                     <li class="tree-footer tree-item tree-item-add">
                       <div class="row-fluid">
                         <div class="span10">
-                          <a href="#objectSelector" data-toggle="modal">
+                          <a href="#objectSelector" data-toggle="modal" class="selector-modal" data-mapping="objects">
                             + Add Objects
                           </a>
                         </div>
@@ -1291,643 +1229,6 @@
     </section>
   </div>
 
-  <div id="objectSelector" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="objectSelector" aria-hidden="true">
-    <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
-        <i class="grcicon-x-white"></i>
-      </a>
-      <h2>
-        <span>Add Objects to Workflow</span>
-      </h2>
-    </div>
-    <div class="modal-body">
-      <div class="object-step" id="filters">
-        <div class="choose-object-wrap">
-          <div class="choose-object-content">
-
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="first-row">
-                  <label>
-                    <strong>Show all</strong>
-                  </label>
-                  <select class="input-medium" id="objects_type">
-                    <option>Regulations</option>
-                    <option>Contracts</option>
-                    <option>Policies</option>
-                    <option>Standards</option>
-                    <option>Objectives</option>
-                    <option selected="selected">Controls</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="row-fluid">
-              <div class="span12">
-                {{#each filter_list}}
-                <div class="indent-row">
-                  <button type="submit" data-index="{{@index}}" class="remove_filter"><i class="grcicon-deleted"></i></button>
-                  <label>
-                    <strong>{{#if @index}}AND&nbsp;{{/if}}Relevant to:</strong>
-                  </label>
-                  <select class="input-small">
-                    <option selected="selected">Program</option>
-                    <option>Process</option>
-                    <option>System</option>
-                    <option>Market</option>
-                  </select>
-                  <div class="objective-selector">
-                    <input type="text" name="program.title" class="input-large search-icon" value="{{value}}" placeholder="Enter text to search for Object">
-                  </div>
-                </div>
-                {{/each}}
-                <div class="add-rule indent-row">
-                  <a href="#" id="addFilterRule">+ Add New Rule</a>
-                  <a class="btn pull-right" href="#" id="objectReview">Filter</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="results">
-      <div class="bar-h"></div>
-      <div class="results-wrap">
-        <span class="info">Define search criteria above to start</span>
-        <ul class="tree-structure new-tree mockup-tree">
-          {{#if objects.length}}
-          <li class="tree-item governance object-filter">
-            <div class="item-main">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      <span><strong>{{objects.length}} controls found</strong></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="object-check all-check">
-                    <label>
-                      select all
-                      <input type="checkbox" checked="checked" id="objectAll">
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-          {{/if}}
-
-          {{#each objects}}
-
-          <li class="tree-item governance task-item selected">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        <i class="grcicon-{{type}}-color"></i>
-                        {{name}}
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" value="{{@index}}" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>{{name}}</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed lacinia tortor, quis mattis sapien. Nullam fermentum, justo sed condimentum semper, tortor purus scelerisque lacus, sed congue lorem lectus in sem. Aenean faucibus est metus, feugiat tristique ligula mattis vitae.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="deny-buttons">
-            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
-          </div>
-        </div>
-        <div class="span5">
-          &nbsp;
-        </div>
-        <div class="span4">
-          <div class="confirm-buttons">
-            <div class="object-add">
-              {{#if objects.length}}
-                <span><strong>{{selected_num}} objects selected</strong></span>
-              {{/if}}
-              <a href="javascript://" class="btn btn-primary" data-dismiss="modal" id="addSelected" tabindex="24">Add selected</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="addTaskSelector" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="addTaskSelector" aria-hidden="true">
-    <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
-        <i class="grcicon-x-white"></i>
-      </a>
-      <h2>
-        <span>Add Tasks to Workflow</span>
-      </h2>
-    </div>
-    <div class="results">
-      <div class="results-wrap">
-        <ul class="tree-structure new-tree mockup-tree">
-          <li class="tree-item governance object-filter">
-            <div class="item-main">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      <span><strong>5 tasks found</strong></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="object-check all-check">
-                    <label>
-                      select all
-                      <input type="checkbox" id="objectAll">
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Look for evidence, Peer confirmation, Researching Google Infrastructure
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Look for evidence, Peer confirmation, Researching Google Infrastructure</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Peer Review
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Peer Review</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Research Infrastructure
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Research Infrastructure</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Proof Reading
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Proof Reading</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Calendar checkup
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Calendar checkup</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Manager Review
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p><strong>Manager Review</strong></p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nec nisi nec arcu convallis molestie tincidunt ac elit. Sed eu magna non turpis varius tristique. Aenean mattis lorem ut tellus posuere ultricies a non nisl.</p>
-                    <p>Ut facilisis ac velit sed interdum. Integer quis augue eget lectus adipiscing cursus. Curabitur volutpat eu lacus a viverra. In hac habitasse platea dictumst. Aenean scelerisque tellus in dignissim tincidunt.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-        </ul>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="deny-buttons">
-            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
-          </div>
-        </div>
-        <div class="span5">
-          &nbsp;
-        </div>
-        <div class="span4">
-          <div class="confirm-buttons">
-            <div class="object-add">
-              <span><strong>3 tasks selected</strong></span>
-              <a href="javascript://" class="btn btn-primary" data-dismiss="modal" id="addSelectedTasks" tabindex="24">Add selected</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="addPeopleSelector" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="addPeopleSelector" aria-hidden="true">
-    <div class="modal-header">
-      <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
-        <i class="grcicon-x-white"></i>
-      </a>
-      <h2>
-        <span>Add People to Workflow</span>
-      </h2>
-    </div>
-    <div class="results">
-      <div class="results-wrap">
-        <ul class="tree-structure new-tree mockup-tree">
-          <li class="tree-item governance object-filter">
-            <div class="item-main">
-              <div class="row-fluid">
-                <div class="span9">
-                  <div class="item-data">
-                    <div class="tree-title-area">
-                      <span><strong>5 persons found</strong></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="span3">
-                  <div class="object-check all-check">
-                    <label>
-                      select all
-                      <input type="checkbox" id="objectAll">
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Aaron Manning
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p>
-                      <a href="#">aaron@google.com</a>
-                    </p>
-                    <p>Google, Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Cassius Clay
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p>
-                      <a href="#">cassius@google.com</a>
-                    </p>
-                    <p>Google, Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Robert Dawson
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p>
-                      <a href="#">robert@google.com</a>
-                    </p>
-                    <p>Google, Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Chris Mizera
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" checked="checked" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p>
-                      <a href="#">chris@google.com</a>
-                    </p>
-                    <p>Google, Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-          <li class="tree-item governance task-item">
-            <div class="item-main">
-              <a href="javascript://" class="openclose">
-                <div class="row-fluid">
-                  <div class="span11">
-                    <span class="tier-trigger"></span>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        Marton Sziraczki
-                      </div>
-                    </div>
-                  </div>
-                  <div class="span1">
-                    <div class="object-check">
-                      <input type="checkbox" class="object-check-single">
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="tier-2-info item-content">
-              <div class="tier-2-info-content">
-                <div class="show-description">
-                  <div class="tree-description">
-                    <p>
-                      <a href="#">marton@google.com</a>
-                    </p>
-                    <p>Google, Inc.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </li>
-
-        </ul>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="deny-buttons">
-            <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
-          </div>
-        </div>
-        <div class="span5">
-          &nbsp;
-        </div>
-        <div class="span4">
-          <div class="confirm-buttons">
-            <div class="object-add">
-              <span><strong>2 persons selected</strong></span>
-              <a href="javascript://" class="btn btn-primary" data-dismiss="modal" id="addSelectedPerson" tabindex="24">Add selected</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 <div id="workflowStart" style="z-index:9999;" class="modal hide fade ui-draggable" tabindex="-1" role="dialog" aria-labelledby="assessmentStartLabel" aria-hidden="false">
   <div class="modal-header">
     <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">

@@ -68,8 +68,15 @@ var Objects = {
   regulations: [
     {type: "regulation", name: "SOX"},
     {type: "regulation", name: "PCI DSS v2.0"}
-  ]
-}
+  ],
+};
+var People = [
+  {type: "person", name: "Vladan Mitevski"},
+  {type: "person", name: "Predrag Kanazir"},
+  {type: "person", name: "Dan Ring"},
+  {type: "person", name: "Silas Barta"},
+  {type: "person", name: "Cassius Clay"},
+];
 
 
 
