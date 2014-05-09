@@ -216,6 +216,9 @@ can.Component.extend({
     },
     initAutocomplete : function(){
       $( ".date" ).datepicker();
+      $(".sortable").sortable({update: function(event, ui){
+        $("workflow").trigger("sorted");
+      }});
       var lists = {
         objects : $.map(this.assessment.objects, function(o){
           return o.name;
@@ -249,6 +252,26 @@ can.Component.extend({
     '{Assessment} created' : function(){this.scope.set_fields(arguments[2])},
     '{Assessment} updated' : function(){
       this.scope.initAutocomplete();
+    },
+    ' sorted' : function(){
+      var $ul = $('.sortable')
+        , list = $ul.find('input')
+        , index = $ul.data('index')
+        , workflow = this.scope.assessment
+        , tg = workflow.task_groups[index]
+        , tasks = tg.tasks.slice()
+        , i = 0;
+
+
+      var a = list.map(function(i,e){
+        return $(e).val();
+      });
+      for(i=0; i < tasks.length; i++){
+        tasks[i].attr('title', a[i]);
+      }
+      // Now that the list is sorted cancel the sortable event
+      $( ".sortable" ).sortable( "cancel" );
+      workflow.save();
     },
     ' selected' : function(){this.scope.set_fields(arguments[2])},
     ".addEntry click" : function(el){
