@@ -446,6 +446,7 @@ $(document).ready(function(){
     $('#addEntryTrigger').show();
     $('#entryText').hide();
     $('#entriesCount').html('2');
+    $('#taskEntryCounterMain').html('1');
   });
 
   $('body').on('click', '#startObject', function() {
@@ -467,20 +468,40 @@ $(document).ready(function(){
   });
 
   $('body').on('click', '#finishTask', function() {
+    $('#verifyTask').show();
+    $(this).hide();
+  });
+
+  $('body').on('click', '#finishTask2', function() {
+    $(this).hide();
+    $('#verifyTask2').show();
+  });
+  
+  $('body').on('click', '#finishTaskSpecial', function() {
+    $(this).hide();
+    $('#verifyTaskSpecial').show();
+  });
+
+  $('body').on('click', '#finishTask3', function() {
+    $(this).hide();
+    $('#verifyTask3').show();
+  });
+  
+  $('body').on('click', '#verifyTask', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone').show();
   });
-
-  $('body').on('click', '#finishTask2', function() {
+  
+  $('body').on('click', '#verifyTask2', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone2').show();
   });
-
-  $('body').on('click', '#finishTask3', function() {
+  
+  $('body').on('click', '#verifyTask3', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
@@ -604,6 +625,26 @@ $(document).ready(function(){
   $('body').on('click', '#confirmStartWorkflow', function() {
     $('#startWorkflowTrigger').html('End Workflow');
     $('#progressWidgetTrigger').show();
+  });
+  
+  $('body').on('click', '#cancelEntry', function() {
+    $('#entryText').hide();
+    $('#addEntryTrigger').show();
+  });
+  
+  $('body').on('click', '#editEntryTrigger', function() {
+    $('#firstEntry').hide();
+    $('#editEntry').show();
+  });
+  
+  $('body').on('click', '#editEntrySave', function() {
+    $('#firstEntry').show();
+    $('#editEntry').hide();
+  });
+  
+  $('body').on('click', '#editEntryCancel', function() {
+    $('#firstEntry').show();
+    $('#editEntry').hide();
   });
 
 });
