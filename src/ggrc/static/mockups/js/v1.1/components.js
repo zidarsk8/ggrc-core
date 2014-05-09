@@ -78,9 +78,6 @@ can.Component.extend({
         return 'hide';
     }
   },
-  events: {
-    // TODO: send event for changing inner nav
-  }
 });
 
 can.Component.extend({
