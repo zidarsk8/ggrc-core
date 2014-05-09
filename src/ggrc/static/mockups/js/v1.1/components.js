@@ -681,8 +681,7 @@ $("#cancelChangeWorkflow").on('click', function(ev){
 });
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
-$("#workflow-app").html(can.view("/static/mockups/mustache/workflow.mustache", {}))
-$("#workflow").html(can.view("/static/mockups/mustache/v1.1/assessment.mustache", {}));
+$("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
