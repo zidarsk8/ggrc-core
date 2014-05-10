@@ -1135,8 +1135,6 @@ can.Model.Cacheable("CMS.Models.Audit", {
         return "No valid org group selected for firm";
       }
     });
-    // Preload auditor role:
-    CMS.Models.Role.findAll({name__in: "Auditor"});
   }
 }, {
   save : function() {
@@ -1200,16 +1198,25 @@ can.Model.Cacheable("CMS.Models.Audit", {
     });
   }, findAuditors : function(){
     var loader = this.get_binding('authorizations');
-    
-    return $.map(loader.list, function(binding) {
+    var auditors_list = new can.List();
+
+    $.map(loader.list, function(binding) {
       var role = binding.instance.role.reify();
-      if (role.attr('name') === 'Auditor') {
-        return {
-          person: binding.instance.person.reify()
-          , binding: binding.instance
-        };
+      function checkRole() {
+        if (role.attr('name') === 'Auditor') {
+          auditors_list.push({
+            person: binding.instance.person.reify()
+            , binding: binding.instance
+          });
+        }
+      }
+      if(role.selfLink) {
+        checkRole();
+      } else {
+        role.refresh().then(checkRole);
       }
     });
+    return auditors_list;
   }
 });
 

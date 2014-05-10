@@ -2151,7 +2151,7 @@ Mustache.registerHelper("with_auditors", function(instance, options) {
     return "";
 
   auditors = resolve_computed(instance).findAuditors();
-  if(auditors.length > 0){
+  if(auditors.attr("length") > 0){
     return options.fn(options.contexts.add({"auditors": auditors}));
   }
   else{
