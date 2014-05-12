@@ -167,7 +167,7 @@
         this.walk_instances(function(instance, result, depth) {
           if (depth == 1) {
             if (instance === true)
-              mappings.push(result.binding.instance);
+              mappings.push(self.instance);
             else
               mappings.push(instance);
           }
