@@ -158,6 +158,9 @@ u {
 
 .cancel-text {
   color: $black;
+  &:hover {
+    color: $black;
+  }
 }
 
 .gray {
