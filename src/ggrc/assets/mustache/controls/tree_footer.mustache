@@ -36,8 +36,6 @@
         </a>
         &nbsp;
         &nbsp;
-        {{/is_allowed_to_map}}
-        {{/if}}
         {{#if allow_creating}}
         {{#is_allowed 'create' model.shortName context=null}}
         <a href="{{parent_instance.viewLink}}/import_controls?return_to={{param_current_location}}" class="section-import">
@@ -47,6 +45,8 @@
         &nbsp;
         &nbsp;
         {{/is_allowed}}
+        {{/if}}
+        {{/is_allowed_to_map}}
         {{/if}}
         {{#if list.length}}
         <a href="{{parent_instance.viewLink}}/export_controls?ids={{instance_ids list}}" class="section-import">
