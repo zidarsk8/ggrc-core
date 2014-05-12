@@ -39,12 +39,7 @@ can.Component.extend({
     tasks: taskList,
     select: function(object, el, ev){
       ev.preventDefault();
-      $("tree-app").trigger("selected", object);
-      $("workflow-modal").trigger("selected", object);
-      $("selector-modal").trigger("selected", object);
-      $("task-modal").trigger("selected", object);
-      $("workflow").trigger("selected", object);
-      $("task").trigger("selected", object);
+      $("tree-app").trigger('selected', object);
       resize_areas();
     },
   },
@@ -64,9 +59,9 @@ can.Component.extend({
     object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
-    ' selected' : function(el, ev, object){
+    '{window} selected' : function(el, ev, object){
       this.scope.attr('object', object);
-    }
+    },
   },
   helpers: {
 
@@ -92,7 +87,7 @@ can.Component.extend({
 
   },
   events: {
-    " selected" : function(el, ev, object){
+    "{window} selected" : function(el, ev, object){
       this.scope.attr('model', object);
     },
     '{Assessment} updated' : function(){this.scope.attr('model', arguments[2])},
@@ -254,7 +249,6 @@ can.Component.extend({
       this.scope.initAutocomplete();
     },
     ' sorted' : function(_,_,ul){
-      console.log(arguments);
       var $ul = $(ul)
         , list = $ul.find('input')
         , index = $ul.data('index')
@@ -276,7 +270,7 @@ can.Component.extend({
       $( ".sortable" ).sortable( "cancel" );
       workflow.save();
     },
-    ' selected' : function(){this.scope.set_fields(arguments[2])},
+    '{window} selected' : function(){this.scope.set_fields(arguments[2])},
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
@@ -426,7 +420,7 @@ can.Component.extend({
     },
     '{Task} updated' : function(){
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('task', arguments[2]);
     },
   }
@@ -498,7 +492,7 @@ can.Component.extend({
     '{Assessment} created' : function(){
       this.scope.attr('assessment', arguments[2]);
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('assessment', arguments[2]);
     },
     'input,textarea change' : function(){
@@ -541,8 +535,9 @@ var modal = can.Component.extend({
   events:{
     '{window} click' : function(el, ev){
       this.scope.validateForm();
-      if(!$(ev.target).hasClass('show-task-modal')) return;
-      this.scope.attr('new_form', $(ev.target).data('new'));
+      var $el = $(ev.target).hasClass('show-task-modal') ? $(ev.target) : $(ev.target).parent()
+      if(!$el.hasClass('show-task-modal')) return;
+      this.scope.attr('new_form', $el.data('new'));
     },
     'a#addTask click' : function(el, ev){
       var $modal = $('#newTask')
@@ -563,7 +558,7 @@ var modal = can.Component.extend({
     '{Task} created' : function(){
       this.scope.attr('task', arguments[2]);
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('task', arguments[2]);
       this.scope.validateForm();
     },
