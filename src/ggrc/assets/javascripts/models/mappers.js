@@ -884,7 +884,8 @@
                     || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
                 && (!option_model
-                    || mapping[this.option_attr].reify() instanceof option_model));
+                    || (mapping[this.option_attr]
+                        && mapping[this.option_attr].reify() instanceof option_model)));
       }
 
     , filter_and_insert_instances_from_mappings: function(binding, mappings) {
