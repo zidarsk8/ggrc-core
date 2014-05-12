@@ -39,12 +39,7 @@ can.Component.extend({
     tasks: taskList,
     select: function(object, el, ev){
       ev.preventDefault();
-      $("tree-app").trigger("selected", object);
-      $("workflow-modal").trigger("selected", object);
-      $("selector-modal").trigger("selected", object);
-      $("task-modal").trigger("selected", object);
-      $("workflow").trigger("selected", object);
-      $("task").trigger("selected", object);
+      $("tree-app").trigger('selected', object);
       resize_areas();
     },
   },
@@ -64,9 +59,9 @@ can.Component.extend({
     object: assessmentList[0]//ProgramList[0]//assessmentList[0]
   },
   events: {
-    ' selected' : function(el, ev, object){
+    '{window} selected' : function(el, ev, object){
       this.scope.attr('object', object);
-    }
+    },
   },
   helpers: {
 
@@ -92,7 +87,7 @@ can.Component.extend({
 
   },
   events: {
-    " selected" : function(el, ev, object){
+    "{window} selected" : function(el, ev, object){
       this.scope.attr('model', object);
     },
     '{Assessment} updated' : function(){this.scope.attr('model', arguments[2])},
@@ -254,7 +249,6 @@ can.Component.extend({
       this.scope.initAutocomplete();
     },
     ' sorted' : function(_,_,ul){
-      console.log(arguments);
       var $ul = $(ul)
         , list = $ul.find('input')
         , index = $ul.data('index')
@@ -276,7 +270,14 @@ can.Component.extend({
       $( ".sortable" ).sortable( "cancel" );
       workflow.save();
     },
-    ' selected' : function(){this.scope.set_fields(arguments[2])},
+    '{window} selected' : function(){
+      this.scope.set_fields(arguments[2]);
+      $('.widget').hide();
+      $('.active').removeClass('active');
+      $('ul.workflow-nav > li').first().addClass('active');
+      $('.workflow-info-widget').show();
+
+    },
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
@@ -411,6 +412,83 @@ can.Component.extend({
       if($el.hasClass('disabled')) return;
       assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
+    },
+    "#confirmStartWorkflow click" : function(el, ev){
+      var assessment = this.scope.assessment
+        , task_groups = this.scope.assessment.task_groups
+
+      for(var i = 0; i < task_groups.length; i++){
+        var tg = task_groups[i]
+          , objects = tg.objects
+          , tasks = tg.tasks
+        for(var j =0; j < objects.length; j++){
+          objects[j].attr('obj_tasks', new can.List());
+          for(var k = 0; k < tasks.length; k++){
+            for(var l = 0; l < taskList.length; l++){
+              if(taskList[l].title === tasks[k].title){
+                objects[j].obj_tasks.push(new can.Observe({
+                  title: taskList[l].title,
+                  description: taskList[l].description,
+                  id: taskList[l].id,
+                  status: 'assigned',
+                  entries: can.List(),
+                }));
+              }
+            }
+          }
+        }
+      }
+      assessment.attr('started', true);
+      assessment.save();
+    },
+    ".change-task-status click" : function(el){
+
+      var task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , status = obj_task.attr('status')
+        ;
+
+      if(status === 'assigned'){
+        assessment.task_groups[task_group].attr('status', 'started');
+        assessment.task_groups[task_group].objects[object].attr('status', 'started');
+        obj_task.attr('status', 'started')
+      } else if(status === 'started'){
+        obj_task.attr('status', 'finished')
+      } else if(status === 'finished'){
+        obj_task.attr('status', 'verified')
+      }
+
+      assessment.save();
+
+
+    },
+    '.add-entry-btn click' : function(el){
+      var task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , value = $(el.siblings()[0]).val()
+        ;
+      $(el.siblings()[0]).val('');
+      obj_task.entries.push({description: value});
+      assessment.save();
+    },
+    '.delete-entry-btn click' : function(el){
+      var entry = $(el).data('index')
+        , task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , value = $(el.siblings()[0]).val()
+        ;
+
+      obj_task.entries.splice(entry, 1);
+      assessment.save();
     }
   }
 });
@@ -426,8 +504,9 @@ can.Component.extend({
     },
     '{Task} updated' : function(){
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('task', arguments[2]);
+      $('.task_info_widget').show();
     },
   }
 })
@@ -498,7 +577,7 @@ can.Component.extend({
     '{Assessment} created' : function(){
       this.scope.attr('assessment', arguments[2]);
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('assessment', arguments[2]);
     },
     'input,textarea change' : function(){
@@ -541,8 +620,9 @@ var modal = can.Component.extend({
   events:{
     '{window} click' : function(el, ev){
       this.scope.validateForm();
-      if(!$(ev.target).hasClass('show-task-modal')) return;
-      this.scope.attr('new_form', $(ev.target).data('new'));
+      var $el = $(ev.target).hasClass('show-task-modal') ? $(ev.target) : $(ev.target).parent()
+      if(!$el.hasClass('show-task-modal')) return;
+      this.scope.attr('new_form', $el.data('new'));
     },
     'a#addTask click' : function(el, ev){
       var $modal = $('#newTask')
@@ -563,7 +643,7 @@ var modal = can.Component.extend({
     '{Task} created' : function(){
       this.scope.attr('task', arguments[2]);
     },
-    ' selected' : function(){
+    '{window} selected' : function(){
       this.scope.attr('task', arguments[2]);
       this.scope.validateForm();
     },

@@ -158,6 +158,9 @@ u {
 
 .cancel-text {
   color: $black;
+  &:hover {
+    color: $black;
+  }
 }
 
 .gray {
@@ -837,7 +840,10 @@ select.multiple-selector {
   }
 }
 
-.drag { 
+.drag {
+  &:hover {
+    cursor: move;
+  }
   i {
     @include opacity(0.5);
   }

@@ -476,7 +476,7 @@ $(document).ready(function(){
     $(this).hide();
     $('#verifyTask2').show();
   });
-  
+
   $('body').on('click', '#finishTaskSpecial', function() {
     $(this).hide();
     $('#verifyTaskSpecial').show();
@@ -486,21 +486,21 @@ $(document).ready(function(){
     $(this).hide();
     $('#verifyTask3').show();
   });
-  
+
   $('body').on('click', '#verifyTask', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone').show();
   });
-  
+
   $('body').on('click', '#verifyTask2', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
     $(this).hide();
     $('#taskDone2').show();
   });
-  
+
   $('body').on('click', '#verifyTask3', function() {
     $(this).closest('.tree-item').removeClass('rq-draft');
     $(this).closest('.tree-item').addClass('rq-accepted');
@@ -621,13 +621,7 @@ $(document).ready(function(){
     $('#titleChange').closest('h3').show();
     $('#taskGroupTitle').hide();
   });
-  
-  $('body').on('click', '#confirmStartWorkflow', function() {
-    $('#startWorkflowTrigger').hide();
-    $('#progressWidgetTrigger').show();
-    $('#endWorkflowTrigger').show();
-  });
-  
+
   $('body').on('click', '#endWorkflowTrigger', function() {
     $('.internav .progress-object').addClass('finished');
     $('#endWorkflowTrigger').hide();
@@ -636,22 +630,22 @@ $(document).ready(function(){
     $('.workflow-group').addClass('finished');
     $('.finished-number').show();
   });
-  
+
   $('body').on('click', '#cancelEntry', function() {
     $('#entryText').hide();
     $('#addEntryTrigger').show();
   });
-  
+
   $('body').on('click', '#editEntryTrigger', function() {
     $('#firstEntry').hide();
     $('#editEntry').show();
   });
-  
+
   $('body').on('click', '#editEntrySave', function() {
     $('#firstEntry').show();
     $('#editEntry').hide();
   });
-  
+
   $('body').on('click', '#editEntryCancel', function() {
     $('#firstEntry').show();
     $('#editEntry').hide();
