@@ -1097,12 +1097,20 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+        var that = this
+          , refresh_queue = new RefreshQueue()
           ;
 
-        this.insert_instances_from_mappings(binding, mappings);
+        refresh_queue.enqueue(binding.instance);
+
+        return refresh_queue.trigger().then(function() {
+          var model = CMS.Models[that.model_name]
+            , object_join_attr = that.object_join_attr
+            , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+            ;
+
+          that.insert_instances_from_mappings(binding, mappings);
+        });
       }
   });
 
