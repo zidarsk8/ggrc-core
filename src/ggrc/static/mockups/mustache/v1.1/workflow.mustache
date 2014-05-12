@@ -101,13 +101,21 @@
                 <div class="arrow"></div>
               </li>
               <li class="inner-nav-button">
-                <button id="startWorkflowTrigger" type="submit" href="#workflowStart" data-toggle="modal" class="btn" {{^assessment.task_groups.length}}disabled="disabled"{{/task_groups}}>
+                {{^assessment.started}}
+                <button type="submit" href="#workflowStart" data-toggle="modal" class="btn" {{^assessment.task_groups.length}}disabled="disabled"{{/task_groups}}>
                   Start Workflow
                 </button>
-                <button id="endWorkflowTrigger" type="submit" class="btn">
-                  End Workflow
-                </button>
-                <span class="message"><em>Workflow finished</em></span>
+                {{/assessment.started}}
+                {{#assessment.started}}
+                  {{^assessment.finished}}
+                  <button type="submit" class="btn">
+                    End Workflow
+                  </button>
+                  {{/finished}}
+                  {{#assessment.finished}}
+                  <span class="message"><em>Workflow finished</em></span>
+                  {{/finished}}
+                {{/started}}
               </li>
             </ul>
           </div>
@@ -1282,7 +1290,7 @@
     </h2>
   </div>
   <div class="modal-body">
-    <p>By clicking "Proceed", 3 task groups will be started and tasks will be assigned to selected assignees, against defined objects. Are you sure you want to proceed?</p>
+    <p>By clicking "Proceed", {{assessment.task_groups.length}} task group{{^if_equals assessment.task_groups.length 1}}s{{/if_equals}} will be started and tasks will be assigned to selected assignees, against defined objects. Are you sure you want to proceed?</p>
     <p>This process is not reversible.</p>
     <a id="confirmStartWorkflow" class="btn btn-primary btn-large" data-dismiss="modal" href="#">Proceed</a>
     <a id="cancelStartWorkflow" class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>

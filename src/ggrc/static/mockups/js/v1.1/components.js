@@ -405,6 +405,11 @@ can.Component.extend({
       if($el.hasClass('disabled')) return;
       assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
+    },
+    "#confirmStartWorkflow click" : function(el, ev){
+      var assessment = this.scope.assessment;
+      assessment.attr('started', true);
+      assessment.save();
     }
   }
 });
