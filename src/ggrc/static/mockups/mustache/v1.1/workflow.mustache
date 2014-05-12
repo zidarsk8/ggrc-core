@@ -231,7 +231,7 @@
                     {{#each assessment.task_groups}}
                     <li class="tree-item program">
                       <div class="item-main">
-                        <a href="javascript://" class="openclose">
+                        <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <ul class="tree-action-list">
@@ -271,7 +271,7 @@
                               </div>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       </div>
                       <div class="tier-2-info item-content" style="display: none;">
                         <div class="tier-2-info-content">
@@ -412,7 +412,7 @@
                     {{#assessment.tasks}}
                     <li class="tree-item program">
                       <div class="item-main">
-                        <a href="javascript://" class="openclose">
+                        <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <div class="item-data">
@@ -422,7 +422,21 @@
                               </div>
                             </div>
                           </div>
-                        </a>
+                        </div>
+                      </div>
+                      <div class="tier-2-info item-content">
+                        <div class="tier-2-info-content">
+                          <div class="show-description">
+                            <div class="row-fluid">
+                              <div class="span12">
+                                <div class="tree-description">
+                                  <h5>{{title}}</h5>
+                                  <p>{{description}}{{^description}}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed lacinia tortor, quis mattis sapien. Nullam fermentum, justo sed condimentum semper, tortor purus scelerisque lacus, sed congue lorem lectus in sem. Aenean faucibus est metus, feugiat tristique ligula mattis vitae.{{/description}}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </li>
                     {{/assessment.tasks}}
@@ -480,6 +494,24 @@
                           </div>
                         </div>
                       </div>
+                      <div class="tier-2-info item-content">
+                        <div class="tier-2-info-content">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <div class="profile-info">
+                                <ul>
+                                  <li>
+                                    <span class="name"><strong>{{name}}</strong></span>
+                                  </li>
+                                  <li>
+                                    <span class="email"><strong>Email: </strong>{{email}}</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </li>
                     {{/assessment.people}}
                     <li class="tree-footer tree-item tree-item-add">
@@ -523,7 +555,7 @@
                      {{#each assessment.objects}}
                       <li class="tree-item object-top" data-index="{{@index}}">
                         <div class="item-main">
-                          <a href="javascript://" class="openclose">
+                          <div class="openclose">
                             <div class="row-fluid">
                               <div class="span10">
                                 <div class="item-data">
@@ -542,7 +574,7 @@
                                 </div>
                               </div>
                             </div>
-                          </a>
+                          </div>
                         </div>
                         <div class="tier-2-info item-content">
                           <div class="tier-2-info-content">
@@ -622,7 +654,7 @@
 
                     <li class="tree-item program task-item">
                       <div class="item-main">
-                        <a href="javascript://" class="openclose">
+                        <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <ul class="tree-action-list">
@@ -650,7 +682,7 @@
                               </div>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       </div>
                       <div class="tier-2-info item-content" style="display: none;">
 
@@ -659,7 +691,7 @@
                           <ul class="tree-structure new-tree">
                             <li class="tree-item programs">
                               <div class="item-main">
-                                <a href="javascript://" class="openclose">
+                                <div class="openclose">
                                   <div class="row-fluid">
                                     <div class="span12">
                                       <ul class="tree-action-list">
@@ -682,7 +714,7 @@
                                       </div>
                                     </div>
                                   </div>
-                                </a>
+                                </div>
                               </div>
 
                               <div class="tier-2-info item-content" style="display: none;">
@@ -721,7 +753,7 @@
 
                                     <li class="tree-item rq-draft">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -756,7 +788,7 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
 
                                       <div class="tier-2-info item-content" style="display: none;">
@@ -867,7 +899,7 @@
 
                                     <li class="tree-item rq-draft">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -902,13 +934,13 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
                                     </li>
 
                                     <li class="tree-item rq-draft">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -943,7 +975,7 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
                                     </li>
 
@@ -966,7 +998,7 @@
 
                                     <li class="tree-item rq-accepted">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -998,13 +1030,13 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
                                     </li>
 
                                     <li class="tree-item rq-rejected">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -1036,13 +1068,13 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
                                     </li>
 
                                     <li class="tree-item rq-draft">
                                       <div class="item-main">
-                                        <a href="javascript://" class="openclose">
+                                        <div class="openclose">
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
@@ -1077,7 +1109,7 @@
                                               </div>
                                             </div>
                                           </div>
-                                        </a>
+                                        </div>
                                       </div>
                                     </li>
 
@@ -1100,7 +1132,7 @@
 
                             <li class="tree-item programs">
                               <div class="item-main">
-                                <a href="javascript://" class="openclose">
+                                <div class="openclose">
                                   <div class="row-fluid">
                                     <div class="span12">
                                       <ul class="tree-action-list">
@@ -1123,13 +1155,13 @@
                                       </div>
                                     </div>
                                   </div>
-                                </a>
+                                </div>
                               </div>
                             </li>
 
                             <li class="tree-item programs">
                               <div class="item-main">
-                                <a href="javascript://" class="openclose">
+                                <div class="openclose">
                                   <div class="row-fluid">
                                     <div class="span12">
                                       <ul class="tree-action-list">
@@ -1152,7 +1184,7 @@
                                       </div>
                                     </div>
                                   </div>
-                                </a>
+                                </div>
                               </div>
                             </li>
 
@@ -1163,7 +1195,7 @@
 
                     <li class="tree-item program task-item">
                       <div class="item-main">
-                        <a href="javascript://" class="openclose">
+                        <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <ul class="tree-action-list">
@@ -1191,13 +1223,13 @@
                               </div>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       </div>
                     </li>
 
                     <li class="tree-item program task-item">
                       <div class="item-main">
-                        <a href="javascript://" class="openclose">
+                        <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <ul class="tree-action-list">
@@ -1225,7 +1257,7 @@
                               </div>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       </div>
                     </li>
 
