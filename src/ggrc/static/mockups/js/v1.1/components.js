@@ -414,8 +414,80 @@ can.Component.extend({
       assessment.save();
     },
     "#confirmStartWorkflow click" : function(el, ev){
-      var assessment = this.scope.assessment;
+      var assessment = this.scope.assessment
+        , task_groups = this.scope.assessment.task_groups
+
+      for(var i = 0; i < task_groups.length; i++){
+        var tg = task_groups[i]
+          , objects = tg.objects
+          , tasks = tg.tasks
+        for(var j =0; j < objects.length; j++){
+          objects[j].attr('obj_tasks', new can.List());
+          for(var k = 0; k < tasks.length; k++){
+            for(var l = 0; l < taskList.length; l++){
+              if(taskList[l].title === tasks[k].title){
+                objects[j].obj_tasks.push(new can.Observe({
+                  title: taskList[l].title,
+                  description: taskList[l].description,
+                  id: taskList[l].id,
+                  status: 'assigned',
+                  entries: can.List(),
+                }));
+              }
+            }
+          }
+        }
+      }
       assessment.attr('started', true);
+      assessment.save();
+    },
+    ".change-task-status click" : function(el){
+
+      var task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , status = obj_task.attr('status')
+        ;
+
+      if(status === 'assigned'){
+        assessment.task_groups[task_group].attr('status', 'started');
+        assessment.task_groups[task_group].objects[object].attr('status', 'started');
+        obj_task.attr('status', 'started')
+      } else if(status === 'started'){
+        obj_task.attr('status', 'finished')
+      } else if(status === 'finished'){
+        obj_task.attr('status', 'verified')
+      }
+
+      assessment.save();
+
+
+    },
+    '.add-entry-btn click' : function(el){
+      var task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , value = $(el.siblings()[0]).val()
+        ;
+      $(el.siblings()[0]).val('');
+      obj_task.entries.push({description: value});
+      assessment.save();
+    },
+    '.delete-entry-btn click' : function(el){
+      var entry = $(el).data('index')
+        , task = $(el.closest('.obj_task')).data('index')
+        , object = $(el.closest('.tg_object')).data('index')
+        , task_group = $(el.closest('.task_group')).data('index')
+        , assessment = this.scope.assessment
+        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
+        , value = $(el.siblings()[0]).val()
+        ;
+
+      obj_task.entries.splice(entry, 1);
       assessment.save();
     }
   }

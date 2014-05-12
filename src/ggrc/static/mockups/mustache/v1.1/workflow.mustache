@@ -646,7 +646,7 @@
                       <h2>
                         <i class="grcicon-person-color"></i>
                         Task Groups
-                        <span class="object_count" id="objectsCounter">(3)</span>
+                        <span class="object_count" id="objectsCounter">({{assessment.task_groups.length}})</span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -661,33 +661,41 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree">
-
-                    <li class="tree-item program task-item">
+                    {{#each assessment.task_groups}}
+                    <li class="tree-item program task-item task_group" data-index="{{@index}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
                             <div class="span12">
                               <ul class="tree-action-list">
                                 <li>
+                                  {{^status}}
                                   <span class="gray"><em>Assigned</em></span>
+                                  {{/status}}
+                                  {{#if_equals status 'started'}}
+                                  <span class="gray"><em>In progress</em></span>
+                                  {{/if}}
+                                  {{#if_equals status 'finished'}}
+                                  <span class="gray"><em>Finished</em><button class="btn change-task-status">Finish</button></span>
+                                  {{/if}}
                                 </li>
                                 <li>
                                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                                     <i class="grcicon-object-black"></i>
-                                    <strong class="error">3</strong>
+                                    <strong class="error">{{objects.length}}</strong>
                                   </span>
                                 </li>
                                 <li>
                                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                                     <i class="grcicon-task-black"></i>
-                                    <strong class="error">3</strong>
+                                    <strong class="error">{{tasks.length}}</strong>
                                   </span>
                                 </li>
                               </ul>
                               <span class="tier-trigger"></span>
                               <div class="item-data">
                                 <div class="tree-title-area">
-                                  Control Verification Setup
+                                  {{title}}
                                 </div>
                               </div>
                             </div>
@@ -697,21 +705,30 @@
                       <div class="tier-2-info item-content" style="display: none;">
 
                         <div class="inner-tree">
-                          <h6>Objects (3)</h6>
+                          <h6>Objects ({{objects.length}})</h6>
                           <ul class="tree-structure new-tree">
-                            <li class="tree-item programs">
+                            {{#each objects}}
+                            <li class="tree-item programs tg_object" data-index="{{@index}}">
                               <div class="item-main">
                                 <div class="openclose">
                                   <div class="row-fluid">
                                     <div class="span12">
                                       <ul class="tree-action-list">
                                         <li>
+                                          {{^status}}
                                           <span class="gray"><em>Assigned</em></span>
+                                          {{/status}}
+                                          {{#if_equals status 'started'}}
+                                          <span class="gray"><em>In progress</em></span>
+                                          {{/if}}
+                                          {{#if_equals status 'finished'}}
+                                          <span class="task-done"><em>Finished</em></span>
+                                          {{/if}}
                                         </li>
                                         <li>
                                           <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                                             <i class="grcicon-task-black"></i>
-                                            <strong class="error">3</strong>
+                                            <strong class="error">{{tasks.length}}</strong>
                                           </span>
                                         </li>
                                       </ul>
@@ -719,7 +736,7 @@
                                       <div class="item-data">
                                         <div class="tree-title-area">
                                           <i class="grcicon-control-color"></i>
-                                          Asset Management Control
+                                          {{title}}
                                         </div>
                                       </div>
                                     </div>
@@ -733,10 +750,10 @@
                                     <div class="row-fluid">
                                       <div class="span12">
                                         <div class="tree-description">
-                                          <h5>Asset Management Control</h5>
+                                          <h5>{{title}}</h5>
                                           <div class="row-fluid">
                                             <div class="span8">
-                                              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus in luctus tellus. Aliquam libero elit, facilisis nec fermentum at, accumsan vitae eros. Proin egestas risus a malesuada faucibus. Vivamus lacus eros, sagittis sit amet interdum lobortis, blandit quis ante. Nullam blandit felis in odio mattis, nec luctus ante convallis. Nunc at dictum risus. Vivamus vel massa mi. Nunc sem dui, dapibus eget lorem a, pharetra congue est.</p>
+                                              <p>{{#description}}{{description}}{{/description}}{{^desription}}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus in luctus tellus. Aliquam libero elit, facilisis nec fermentum at, accumsan vitae eros. Proin egestas risus a malesuada faucibus. Vivamus lacus eros, sagittis sit amet interdum lobortis, blandit quis ante. Nullam blandit felis in odio mattis, nec luctus ante convallis. Nunc at dictum risus. Vivamus vel massa mi. Nunc sem dui, dapibus eget lorem a, pharetra congue est.{{/description}}</p>
                                             </div>
                                             <div class="span4">
                                               <p>
@@ -758,10 +775,10 @@
                                 </div>
 
                                 <div class="inner-tree">
-                                  <h6>Tasks (3)</h6>
+                                  <h6>Tasks ({{obj_tasks.length}})</h6>
                                   <ul class="tree-structure new-tree colored-list">
-
-                                    <li class="tree-item rq-draft">
+                                    {{#each obj_tasks}}
+                                    <li class="tree-item rq-draft obj_task {{#if_equals status 'verified'}}rq-accepted{{/if}} {{#is_overdue}}rq-rejected{{/is_overdue}}" data-index="{{@index}}">
                                       <div class="item-main">
                                         <div class="openclose">
                                           <div class="row-fluid">
@@ -770,30 +787,39 @@
                                                 <li>
                                                   <i class="grcicon-person-green pull-left icon-field"></i>
                                                   <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
+                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Assignee" value="{{assignee}}" data-autocomplete-type="mapped_people" data-type="people">
                                                   </div>
                                                 </li>
                                                 <li>
                                                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                                                     <i class="grcicon-directive-black"></i>
-                                                    <strong class="error" id="taskEntryCounterMain">0</strong>
+                                                    <strong class="error">{{entries.length}}</strong>
                                                   </span>
                                                 </li>
                                                 <li>
                                                   <div class="request-control">
-                                                    <button id="startTask" class="btn btn-primary">Start</button>
-                                                    <button id="finishTask" class="btn">Finish</button>
-                                                    <button id="verifyTask" class="btn btn-success">Verify</button>
-                                                    <span class="task-done" id="taskDone">
+                                                    {{#is_overdue}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}
+                                                    {{#if_equals status 'assigned'}}
+                                                    <button class="btn btn-primary change-task-status" data-control='{{@index}}_{{context}}'>Start</button>
+                                                    {{/if}}
+                                                    {{#if_equals status 'started'}}
+                                                    <button class="btn change-task-status">Finish</button>
+                                                    {{/if}}
+                                                    {{#if_equals status 'finished'}}
+                                                    <button class="btn btn-success change-task-status">Verify</button>
+                                                    {{/if}}
+                                                    {{#if_equals status 'verified'}}
+                                                    <span class="task-done">
                                                       <em>Verified</em>
                                                     </span>
+                                                    {{/if}}
                                                   </div>
                                                 </li>
                                               </ul>
                                               <span class="tier-trigger"></span>
                                               <div class="item-data">
                                                 <div class="tree-title-area">
-                                                  Proof Reading
+                                                  {{title}}
                                                 </div>
                                               </div>
                                             </div>
@@ -807,14 +833,9 @@
                                             <div class="row-fluid">
                                               <div class="span12">
                                                 <div class="tree-description">
-                                                  <h5>Proof Reading</h5>
+                                                  <h5>{{title}}</h5>
                                                   <strong>Task Details:</strong>
-                                                  <p>Make sure you carefully read entire control.</p>
-                                                  <ol>
-                                                    <li>Check Context</li>
-                                                    <li>Check spelling errors</li>
-                                                    <li>Make sure it has proper mappings</li>
-                                                  </ol>
+                                                  {{description}}
                                                 </div>
                                               </div>
                                             </div>
@@ -823,172 +844,59 @@
                                           <div class="row-fluid">
                                             <div class="span11">
                                               <div class="inner-row">
-                                                <strong>Entries (<span id="entriesCount">1</span>)</strong>
+                                                <strong>Entries (<span>{{entries.length}}</span>)</strong>
                                                 <ul class="entry-list">
-                                                  <li id="firstEntry">
-                                                    <div class="pull-right">
-                                                      <a href="#" id="editEntryTrigger"><i class="grcicon-edit"></i></a>
-                                                      <a href="#"><i class="grcicon-deleted"></i></a>
-                                                    </div>
-                                                    Curabitur fringilla sagittis elit eget hendrerit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id quam euismod, gravida nunc eget, malesuada enim. Cras ullamcorper vulputate quam, lacinia pulvinar ligula mollis venenatis.
-                                                    <ul class="attachment-list">
-                                                      <li>
-                                                        <a href="#">
-                                                          <i class="grcicon-attach"></i>
-                                                          <span>supportingwalkthroughevidence.pdf</span>
-                                                        </a>
-                                                      </li>
-                                                      <li>
-                                                        <a href="#">
-                                                          <i class="grcicon-attach"></i>
-                                                          <span>screenshot.pdf</span>
-                                                        </a>
-                                                      </li>
-                                                    </ul>
-                                                    <span class="entry-author">By <a href="#">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
-                                                  </li>
-                                                  <li id="editEntry" class="add-entry">
-                                                    <textarea class="span10" placeholder="Entry">Curabitur fringilla sagittis elit eget hendrerit. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id quam euismod, gravida nunc eget, malesuada enim. Cras ullamcorper vulputate quam, lacinia pulvinar ligula mollis venenatis.</textarea>
-                                                    <ul class="attachment-list">
-                                                      <li>
-                                                        <a href="#">
-                                                          <i class="grcicon-attach"></i>
-                                                          <span>supportingwalkthroughevidence.pdf</span>
-                                                          <i class="grcicon-deleted"></i>
-                                                        </a>
-                                                      </li>
-                                                      <li>
-                                                        <a href="#">
-                                                          <i class="grcicon-attach"></i>
-                                                          <span>screenshot.pdf</span>
-                                                          <i class="grcicon-deleted"></i>
-                                                        </a>
-                                                      </li>
-                                                    </ul>
-                                                    <a href="#" class="entry-attachment">
-                                                      <i class="grcicon-attach-color"></i> Attach supporting file
-                                                    </a>
-                                                    <br>
-                                                    <a href="#" id="editEntrySave" class="btn btn-small btn-primary">
-                                                      <strong>Add Entry</strong>
-                                                    </a>
-                                                    <a href="#" id="editEntryCancel" class="cancel-text">
-                                                      <i class="grcicon-x-grey"></i>Cancel
-                                                    </a>
-                                                  </li>
-                                                  <li id="newEntry">
+                                                  {{#each entries}}
+                                                  <li>
                                                     <div class="pull-right">
                                                       <a href="#"><i class="grcicon-edit"></i></a>
-                                                      <a href="#"><i class="grcicon-deleted"></i></a>
+                                                      <a href="#" class="delete-entry-btn" data-index="{{@index}}"><i class="grcicon-deleted"></i></a>
                                                     </div>
-                                                    Looking for answers
-                                                    <span class="entry-author">By <a href="#">Cassius Clay</a> on 2014-01-27 7:45am UTC</span>
+                                                    {{description}}
+                                                    <ul class="attachment-list">
+                                                      <li>
+                                                        <a href="#">
+                                                          <i class="grcicon-attach"></i>
+                                                          <span>supportingwalkthroughevidence.pdf</span>
+                                                        </a>
+                                                      </li>
+                                                      <li>
+                                                        <a href="#">
+                                                          <i class="grcicon-attach"></i>
+                                                          <span>screenshot.pdf</span>
+                                                        </a>
+                                                      </li>
+                                                    </ul>
+                                                    <span class="entry-author">By <a href="#">{{assignee}}</a> on 2014-01-27 7:45am UTC</span>
                                                   </li>
-                                                  <li id="entryText" class="add-entry">
-                                                    <textarea class="span10" placeholder="Entry">Looking for answers</textarea>
-                                                    <a href="#" class="entry-attachment">
-                                                      <i class="grcicon-attach-color"></i> Attach supporting file
-                                                    </a>
-                                                    <br>
-                                                    <a href="#" id="addEntryButton" class="btn btn-small btn-primary">
-                                                      <strong>Add Entry</strong>
-                                                    </a>
-                                                    <a href="#" id="cancelEntry" class="cancel-text">
-                                                      <i class="grcicon-x-grey"></i>Cancel
-                                                    </a>
-                                                  </li>
+                                                  {{/each entries}}
                                                 </ul>
-                                                <a href="#" id="addEntryTrigger"><strong>Add Entry</strong></a>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                    <li class="tree-item rq-draft">
-                                      <div class="item-main">
-                                        <div class="openclose">
-                                          <div class="row-fluid">
-                                            <div class="span12">
-                                              <ul class="tree-action-list">
-                                                <li>
-                                                  <i class="grcicon-person-green pull-left icon-field"></i>
-                                                  <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
-                                                  </div>
-                                                </li>
-                                                <li>
-                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                                    <i class="grcicon-directive-black"></i>
-                                                    <strong class="error">0</strong>
-                                                  </span>
-                                                </li>
-                                                <li>
-                                                  <div class="request-control">
-                                                    <button id="startTask2" class="btn btn-primary">Start</button>
-                                                    <button id="finishTask2" class="btn">Finish</button>
-                                                    <button id="verifyTask2" class="btn btn-success">Verify</button>
-                                                    <span class="task-done" id="taskDone2">
-                                                      <em>Verified</em>
-                                                    </span>
-                                                  </div>
-                                                </li>
-                                              </ul>
-                                              <span class="tier-trigger"></span>
-                                              <div class="item-data">
-                                                <div class="tree-title-area">
-                                                  Validate Mapping
+                                              <div>
+                                                <div>
+                                                  <a href="#" class="toggleClosest"><strong>Add Entry</strong></a>
+                                                </div>
+                                                <div class="add-entry hide">
+                                                  <textarea class="span10" placeholder="Entry"></textarea>
+                                                  <a href="#" class="entry-attachment">
+                                                    <i class="grcicon-attach-color"></i> Attach supporting file
+                                                  </a>
+                                                  <br>
+                                                  <a href="#" class="btn btn-small add-entry-btn btn-primary toggleClosest">
+                                                    <strong>Add Entry</strong>
+                                                  </a>
+                                                  <a href="#" class="cancel-text toggleClosest">
+                                                    <i class="grcicon-x-grey"></i>Cancel
+                                                  </a>
                                                 </div>
                                               </div>
                                             </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                    <li class="tree-item rq-draft">
-                                      <div class="item-main">
-                                        <div class="openclose">
-                                          <div class="row-fluid">
-                                            <div class="span12">
-                                              <ul class="tree-action-list">
-                                                <li>
-                                                  <i class="grcicon-person-green pull-left icon-field"></i>
-                                                  <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
-                                                  </div>
-                                                </li>
-                                                <li>
-                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                                    <i class="grcicon-directive-black"></i>
-                                                    <strong class="error">0</strong>
-                                                  </span>
-                                                </li>
-                                                <li>
-                                                  <div class="request-control">
-                                                    <button id="startTask3" class="btn btn-primary">Start</button>
-                                                    <button id="finishTask3" class="btn">Finish</button>
-                                                    <button id="verifyTask3" class="btn btn-success">Verify</button>
-                                                    <span class="task-done" id="taskDone3">
-                                                      <em>Verified</em>
-                                                    </span>
-                                                  </div>
-                                                </li>
-                                              </ul>
-                                              <span class="tier-trigger"></span>
-                                              <div class="item-data">
-                                                <div class="tree-title-area">
-                                                  Peer Review
-                                                </div>
-                                              </div>
                                             </div>
                                           </div>
+
                                         </div>
                                       </div>
                                     </li>
-
+                                    {{/each}}
                                     <li class="tree-footer tree-item tree-item-add">
                                       <div class="row-fluid">
                                         <div class="span10">
@@ -998,279 +906,17 @@
                                         </div>
                                       </div>
                                     </li>
-
                                   </ul>
                                 </div>
-
-                                <div class="inner-tree">
-                                  <h6>Tasks (3) - Just example of states. Once it's coded in JS this should be deleted</h6>
-                                  <ul class="tree-structure new-tree colored-list">
-
-                                    <li class="tree-item rq-accepted">
-                                      <div class="item-main">
-                                        <div class="openclose">
-                                          <div class="row-fluid">
-                                            <div class="span12">
-                                              <ul class="tree-action-list">
-                                                <li>
-                                                  <i class="grcicon-person-green pull-left icon-field"></i>
-                                                  <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
-                                                  </div>
-                                                </li>
-                                                <li>
-                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                                    <i class="grcicon-directive-black"></i>
-                                                    <strong class="error" id="taskEntryCounterMain">0</strong>
-                                                  </span>
-                                                </li>
-                                                <li>
-                                                  <div class="request-control">
-                                                    <span class="task-done">
-                                                      <em>Verified</em>
-                                                    </span>
-                                                  </div>
-                                                </li>
-                                              </ul>
-                                              <span class="tier-trigger"></span>
-                                              <div class="item-data">
-                                                <div class="tree-title-area">
-                                                  Proof Reading
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                    <li class="tree-item rq-rejected">
-                                      <div class="item-main">
-                                        <div class="openclose">
-                                          <div class="row-fluid">
-                                            <div class="span12">
-                                              <ul class="tree-action-list">
-                                                <li>
-                                                  <i class="grcicon-person-green pull-left icon-field"></i>
-                                                  <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
-                                                  </div>
-                                                </li>
-                                                <li>
-                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                                    <i class="grcicon-directive-black"></i>
-                                                    <strong class="error">0</strong>
-                                                  </span>
-                                                </li>
-                                                <li>
-                                                  <div class="request-control">
-                                                    <span class="error"><em>Overdue</em></span>
-                                                    <button id="finishTaskSpecial" class="btn">Finish</button>
-                                                    <button id="verifyTaskSpecial" class="btn btn-success">Verify</button>
-                                                  </div>
-                                                </li>
-                                              </ul>
-                                              <span class="tier-trigger"></span>
-                                              <div class="item-data">
-                                                <div class="tree-title-area">
-                                                  Validate Mapping
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                    <li class="tree-item rq-draft">
-                                      <div class="item-main">
-                                        <div class="openclose">
-                                          <div class="row-fluid">
-                                            <div class="span12">
-                                              <ul class="tree-action-list">
-                                                <li>
-                                                  <i class="grcicon-person-green pull-left icon-field"></i>
-                                                  <div class="objective-selector">
-                                                    <input tabindex="1" type="text" name="lead_email" class="span10 search-icon short-field autocomplete" placeholder="Enter text to search for Workflow Owner" value="Cassius Clay" data-autocomplete-type="mapped_people" data-type="people">
-                                                  </div>
-                                                </li>
-                                                <li>
-                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                                    <i class="grcicon-directive-black"></i>
-                                                    <strong class="error">0</strong>
-                                                  </span>
-                                                </li>
-                                                <li>
-                                                  <div class="request-control">
-                                                    <button id="startTask3" class="btn btn-primary">Start</button>
-                                                    <button id="finishTask3" class="btn">Finish</button>
-                                                    <button id="verifyTask3" class="btn btn-success">Verify</button>
-                                                    <span class="task-done" id="taskDone3">
-                                                      <em>Verified</em>
-                                                    </span>
-                                                  </div>
-                                                </li>
-                                              </ul>
-                                              <span class="tier-trigger"></span>
-                                              <div class="item-data">
-                                                <div class="tree-title-area">
-                                                  Peer Review
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                    <li class="tree-footer tree-item tree-item-add">
-                                      <div class="row-fluid">
-                                        <div class="span10">
-                                          <a href="#" data-toggle="modal">
-                                            + Add Task
-                                          </a>
-                                        </div>
-                                      </div>
-                                    </li>
-
-                                  </ul>
-                                </div>
-
                               </div>
 
                             </li>
-
-                            <li class="tree-item programs">
-                              <div class="item-main">
-                                <div class="openclose">
-                                  <div class="row-fluid">
-                                    <div class="span12">
-                                      <ul class="tree-action-list">
-                                        <li>
-                                          <span class="gray"><em>Assigned</em></span>
-                                        </li>
-                                        <li>
-                                          <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                            <i class="grcicon-task-black"></i>
-                                            <strong class="error">3</strong>
-                                          </span>
-                                        </li>
-                                      </ul>
-                                      <span class="tier-trigger"></span>
-                                      <div class="item-data">
-                                        <div class="tree-title-area">
-                                          <i class="grcicon-control-color"></i>
-                                          Access Control
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-
-                            <li class="tree-item programs">
-                              <div class="item-main">
-                                <div class="openclose">
-                                  <div class="row-fluid">
-                                    <div class="span12">
-                                      <ul class="tree-action-list">
-                                        <li>
-                                          <span class="gray"><em>Assigned</em></span>
-                                        </li>
-                                        <li>
-                                          <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                            <i class="grcicon-task-black"></i>
-                                            <strong class="error">3</strong>
-                                          </span>
-                                        </li>
-                                      </ul>
-                                      <span class="tier-trigger"></span>
-                                      <div class="item-data">
-                                        <div class="tree-title-area">
-                                          <i class="grcicon-control-color"></i>
-                                          Data Security Control
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-
+                            {{/each}}
                           </ul>
                         </div>
                       </div>
                     </li>
-
-                    <li class="tree-item program task-item">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <ul class="tree-action-list">
-                                <li>
-                                  <span class="gray"><em>Assigned</em></span>
-                                </li>
-                                <li>
-                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                                    <i class="grcicon-object-black"></i>
-                                    <strong class="error">2</strong>
-                                  </span>
-                                </li>
-                                <li>
-                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                    <i class="grcicon-task-black"></i>
-                                    <strong class="error">2</strong>
-                                  </span>
-                                </li>
-                              </ul>
-                              <span class="tier-trigger"></span>
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  Report Generation
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="tree-item program task-item">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span12">
-                              <ul class="tree-action-list">
-                                <li>
-                                  <span class="gray"><em>Assigned</em></span>
-                                </li>
-                                <li>
-                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                                    <i class="grcicon-object-black"></i>
-                                    <strong class="error">1</strong>
-                                  </span>
-                                </li>
-                                <li>
-                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                                    <i class="grcicon-task-black"></i>
-                                    <strong class="error">2</strong>
-                                  </span>
-                                </li>
-                              </ul>
-                              <span class="tier-trigger"></span>
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  Final Market Overview
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
+                    {{/each}}
                   </ul>
                 </section>
               </section>
