@@ -715,13 +715,13 @@
                                     <div class="span12">
                                       <ul class="tree-action-list">
                                         <li>
-                                          {{^status}}
+                                          {{^obj_status}}
                                           <span class="gray"><em>Assigned</em></span>
-                                          {{/status}}
-                                          {{#if_equals status 'started'}}
+                                          {{/obj_status}}
+                                          {{#if_equals obj_status 'started'}}
                                           <span class="gray"><em>In progress</em></span>
                                           {{/if}}
-                                          {{#if_equals status 'finished'}}
+                                          {{#if_equals obj_status 'finished'}}
                                           <span class="task-done"><em>Finished</em></span>
                                           {{/if}}
                                         </li>
