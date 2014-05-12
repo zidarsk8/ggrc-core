@@ -48,7 +48,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
         , test = that.resolve_object(model, key.replace(/__/g, '.'));
         
         if(val && val.isAfter) {
-          if(!test || !moment(test).isAfter(val)) {
+          if(!test || moment(test).isBefore(val)) {
             return false;
           } else {
             return st;
