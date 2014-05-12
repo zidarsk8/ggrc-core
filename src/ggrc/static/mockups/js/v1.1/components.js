@@ -453,12 +453,27 @@ can.Component.extend({
 
       if(status === 'assigned'){
         assessment.task_groups[task_group].attr('status', 'started');
-        assessment.task_groups[task_group].objects[object].attr('status', 'started');
+        assessment.task_groups[task_group].objects[object].attr('obj_status', 'started');
         obj_task.attr('status', 'started')
       } else if(status === 'started'){
         obj_task.attr('status', 'finished')
       } else if(status === 'finished'){
         obj_task.attr('status', 'verified')
+        var tasks = assessment.task_groups[task_group].objects[object].obj_tasks
+          , all_done = true;
+        for(var i=0; i < tasks.length; i++){
+          if(tasks[i].status !== 'verified'){
+            all_done = false;
+          }
+        }
+        assessment.task_groups[task_group].objects[object].attr('obj_status', all_done ? 'finished' : assessment.task_groups[task_group].objects[object].attr('obj_status'));
+        all_done = false;
+        for(var i=0; i < assessment.task_groups[task_group].objects.length; i++){
+          if(assessment.task_groups[task_group].objects[i].status !== 'finished'){
+            all_done = false;
+          }
+        }
+        assessment.task_groups[task_group].attr('status', all_done ? 'finished' : assessment.task_groups[task_group].attr('status'));
       }
 
       assessment.save();
