@@ -846,7 +846,8 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          self._refresh_stubs(binding);
+          if (binding._refresh_stubs_deferred)
+            self._refresh_stubs(binding);
         });
 
         if (object_join_value) {
