@@ -427,6 +427,7 @@ can.Component.extend({
     },
     '{window} selected' : function(){
       this.scope.attr('task', arguments[2]);
+      $('.task_info_widget').show();
     },
   }
 })
