@@ -26,7 +26,7 @@
         <div class="bar-v objnav"></div>
         <div class="inner-nav">
           <div class="object-nav">
-            <ul class="nav internav innernav-arrow program cms_controllers_inner_nav ui-sortable">
+            <ul class="nav internav innernav-arrow program cms_controllers_inner_nav ui-sortable workflow-nav">
               <li class="active">
                 <a href="#workflow_info_widget">
                   <div class="oneline">
@@ -90,7 +90,8 @@
                 <div class="drag"></div>
                 <div class="arrow"></div>
               </li>
-              <li id="progressWidgetTrigger" class="progress-object">
+              {{#assessment.started}}
+              <li class="progress-object">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-progress-color"></i>
@@ -100,6 +101,7 @@
                 <div class="drag"></div>
                 <div class="arrow"></div>
               </li>
+              {{/assessment.started}}
               <li class="inner-nav-button">
                 {{^assessment.started}}
                 <button type="submit" href="#workflowStart" data-toggle="modal" class="btn" {{^assessment.task_groups.length}}disabled="disabled"{{/task_groups}}>
@@ -127,7 +129,7 @@
             <div id="middle_column" class="widget-area ui-sortable">
 
               <!-- Widget: Workflow Info -->
-              <section class="widget programs widget-active" id="workflow_info_widget">
+              <section class="widget programs widget-active workflow-info-widget" id="workflow_info_widget">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">

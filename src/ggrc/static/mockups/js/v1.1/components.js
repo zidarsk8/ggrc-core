@@ -270,7 +270,14 @@ can.Component.extend({
       $( ".sortable" ).sortable( "cancel" );
       workflow.save();
     },
-    '{window} selected' : function(){this.scope.set_fields(arguments[2])},
+    '{window} selected' : function(){
+      this.scope.set_fields(arguments[2]);
+      $('.widget').hide();
+      $('.active').removeClass('active');
+      $('ul.workflow-nav > li').first().addClass('active');
+      $('.workflow-info-widget').show();
+
+    },
     ".addEntry click" : function(el){
       var object_id = el.closest('.object-top').data('index')
         , task_id = el.data('index')
