@@ -63,11 +63,12 @@ can.Component.extend({
       this.scope.attr('object', object);
     },
     '{window} click' : function(el, ev){
-      if(!$(ev.target).hasClass('to-my-work')) return;
-      $("tree-app").trigger('selected', {name: 'my-work'});
+      if(!$(ev.target).hasClass('to-my-work') && !$(ev.target).hasClass('to-control')) return;
+      var type = $(ev.target).hasClass('to-my-work') ? 'my-work' : 'control';
+      $("tree-app").trigger('selected', {name: type});
       $(".active").removeClass('active');
-      $('.my-work-widget').show();
-    }
+      $('.'+type+'-widget').show();
+    },
   },
   helpers: {
 
@@ -688,6 +689,7 @@ $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache",
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
 $("#my-work").html(can.view("/static/mockups/mustache/v1.1/my-work.mustache", {}));
+$("#control").html(can.view("/static/mockups/mustache/v1.1/control.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
