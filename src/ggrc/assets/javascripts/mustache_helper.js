@@ -1759,6 +1759,10 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
           }
         }).then(function() {
           instance.reify().get_mapping('authorizations').bind("change", function() { 
+            state.attr('roles', can.map(state.attr('roles'), function(role) {
+              if (role != 'Auditor')
+                return role;
+            }));
             if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
               state.attr('roles').push('Auditor');
             }
