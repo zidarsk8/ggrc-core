@@ -47,7 +47,7 @@
         data-join-object-type="{{parent_instance.class.shortName}}"
         data-exclude-option-types="{{exclude_option_types}}"
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-        data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{parent_instance.description}}" } }'
+        data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
         >
         Map Object
       </a>
@@ -83,7 +83,7 @@
           data-object-singular="Objective" 
           data-object-plural="objectives"
           data-original-title="Create new {{firstnonempty title_singular model.title_singular 'Objective'}} from this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-          data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{parent_instance.description}}" }'>
+          data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}" }, "description": "{{json_escape parent_instance.description}}" }'>
           <i class="grcicon-add-black"></i>
           Create Objective
         </a>
