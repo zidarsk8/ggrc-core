@@ -62,6 +62,12 @@ can.Component.extend({
     '{window} selected' : function(el, ev, object){
       this.scope.attr('object', object);
     },
+    '{window} click' : function(el, ev){
+      if(!$(ev.target).hasClass('to-my-work')) return;
+      $("tree-app").trigger('selected', {name: 'my-work'});
+      $(".active").removeClass('active');
+      $('.my-work-widget').show();
+    }
   },
   helpers: {
 
@@ -443,42 +449,49 @@ can.Component.extend({
     },
     ".change-task-status click" : function(el){
 
-      var task = $(el.closest('.obj_task')).data('index')
-        , object = $(el.closest('.tg_object')).data('index')
-        , task_group = $(el.closest('.task_group')).data('index')
+      var t = $(el.closest('.obj_task')).data('index')
+        , o = $(el.closest('.tg_object')).data('index')
+        , tg = $(el.closest('.task_group')).data('index')
         , assessment = this.scope.assessment
-        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
-        , status = obj_task.attr('status')
+        , task_groups = assessment.task_groups
+        , task_group = task_groups[tg]
+        , objects = task_group.objects
+        , object = objects[o]
+        , tasks = object.obj_tasks
+        , task = tasks[t]
+        , all_done = true
+        , status = task.attr('status')
         ;
 
-      if(status === 'assigned'){
-        assessment.task_groups[task_group].attr('status', 'started');
-        assessment.task_groups[task_group].objects[object].attr('obj_status', 'started');
-        obj_task.attr('status', 'started')
-      } else if(status === 'started'){
-        obj_task.attr('status', 'finished')
-      } else if(status === 'finished'){
-        obj_task.attr('status', 'verified')
-        var tasks = assessment.task_groups[task_group].objects[object].obj_tasks
-          , all_done = true;
-        for(var i=0; i < tasks.length; i++){
-          if(tasks[i].status !== 'verified'){
-            all_done = false;
+      switch(status){
+        case "assigned":
+          task_group.attr('status', 'started');
+          object.attr('obj_status', 'started');
+          task.attr('status', 'started');
+          break;
+        case "started":
+          task.attr('status', 'finished');
+          break;
+        case "finished":
+          task.attr('status', 'verified')
+          // Check if all tasks are done:
+          for(var i=0; i < tasks.length; i++){
+            if(tasks[i].status !== 'verified'){
+              all_done = false;
+            }
           }
-        }
-        assessment.task_groups[task_group].objects[object].attr('obj_status', all_done ? 'finished' : assessment.task_groups[task_group].objects[object].attr('obj_status'));
-        all_done = false;
-        for(var i=0; i < assessment.task_groups[task_group].objects.length; i++){
-          if(assessment.task_groups[task_group].objects[i].status !== 'finished'){
-            all_done = false;
+          object.attr('obj_status', all_done ? 'finished' : object.attr('obj_status'));
+          // Check if all objects are done:
+          all_done = true;
+          for(var i=0; i < objects.length; i++){
+            if(objects[i].obj_status !== 'finished'){
+              all_done = false;
+            }
           }
-        }
-        assessment.task_groups[task_group].attr('status', all_done ? 'finished' : assessment.task_groups[task_group].attr('status'));
+          task_group.attr('status', all_done ? 'finished' : task_group.attr('status'));
+          break;
       }
-
       assessment.save();
-
-
     },
     '.add-entry-btn click' : function(el){
       var task = $(el.closest('.obj_task')).data('index')
@@ -674,6 +687,7 @@ var modal = can.Component.extend({
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
+$("#my-work").html(can.view("/static/mockups/mustache/v1.1/my-work.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));
