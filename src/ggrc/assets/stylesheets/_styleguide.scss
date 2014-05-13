@@ -118,7 +118,7 @@
 // high fidelity mockup styles
 
 #newlyCreatedTask,
-#addAssessment, 
+#addAssessment,
 #addObjectUnderAssessment,
 #newlyCreatedObject,
 #newlyCreatedFile {
@@ -164,7 +164,7 @@
   display: none;
 }
 
-.mockup-tree { 
+.mockup-tree {
   .tree-item {
     .tree-title-area {
       [class^="grcicon-"] {
@@ -264,7 +264,7 @@ ul.new-tree {
       }
     }
   }
-  
+
 }
 
 .choose-object-wrap {
@@ -487,8 +487,6 @@ ul.new-tree {
 #verifyTask3,
 #verifyTaskSpecial,
 #endWorkflowTrigger,
-.internav .inner-nav-button span.message,
-.header-message,
 .finished-number {
   display: none;
 }

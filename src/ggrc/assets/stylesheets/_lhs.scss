@@ -391,6 +391,9 @@
       &.finished {
         background: $rqAccepted;
       }
+      &.started {
+        background: $rqStarted;
+      }
       &.overdue {
         background: $red;
         a {

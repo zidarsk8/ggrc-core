@@ -13,9 +13,11 @@
         </div>
         <div class="span5">
           <div class="header-message">
+            {{#assessment.finished}}
             <p class="object-header-notification object-approved">
               Completed on 05/01/14
             </p>
+            {{/assessment}}
           </div>
         </div>
       </div>
@@ -91,7 +93,7 @@
                 <div class="arrow"></div>
               </li>
               {{#assessment.started}}
-              <li class="progress-object">
+              <li class="progress-object {{#if_equals assessment.status 'In progress'}}started{{/if}} {{#if_equals assessment.status 'Finished'}}finished{{/if}}">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-progress-color"></i>
@@ -110,7 +112,7 @@
                 {{/assessment.started}}
                 {{#assessment.started}}
                   {{^assessment.finished}}
-                  <button type="submit" class="btn">
+                  <button type="submit" class="btn end-workflow">
                     End Workflow
                   </button>
                   {{/finished}}
@@ -385,7 +387,7 @@
                               </div>
                               <div class="span3">
                                 <a href="#" class="btn btn-success btn-footer" id="addTaskGroup">Save</a>
-                                <a href="#" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
+                                <a href="#" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>&nbsp;Cancel</a>
                               </div>
                             </div>
                           </div>

@@ -488,6 +488,7 @@ can.Component.extend({
           }
         }
       }
+      assessment.attr('status', 'Started');
       assessment.attr('started', true);
       assessment.save();
     },
@@ -512,6 +513,7 @@ can.Component.extend({
           task_group.attr('status', 'started');
           object.attr('obj_status', 'started');
           task.attr('status', 'started');
+          assessment.attr('status', 'In progress');
           break;
         case "started":
           task.attr('status', 'finished');
@@ -561,6 +563,15 @@ can.Component.extend({
 
       obj_task.entries.splice(entry, 1);
       assessment.save();
+    },
+    '.end-workflow click' : function(){
+      $('.workflow-group').addClass('finished');
+      setTimeout(function(){
+        $('.workflow-group').removeClass('finished');
+      }, 500);
+      this.scope.assessment.attr('finished', true);
+      this.scope.assessment.attr('status', 'Finished');
+      this.scope.assessment.save();
     }
   }
 });
