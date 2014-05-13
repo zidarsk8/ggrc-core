@@ -391,6 +391,15 @@
       &.finished {
         background: $rqAccepted;
       }
+      &.overdue {
+        background: $red;
+        a {
+          color: $white;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
     }
     a {
       padding-left:20px;
@@ -424,6 +433,12 @@
         color:#fff;
         i {
           @include opacity(1);
+        }
+      }
+      &.overdue {
+        a {
+          background-color: $red;
+          color: $white;
         }
       }
     }

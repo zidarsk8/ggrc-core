@@ -695,7 +695,8 @@ i.short {
 
   li {
     &.active,
-    &:hover {
+    &:hover,
+    &.overdue {
       // turned icons to white
       .grcicon-info { background-position:-198px -80px; }
       .grcicon-role-color { background-position:-102px -32px; }
