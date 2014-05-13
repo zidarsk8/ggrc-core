@@ -74,10 +74,6 @@ can.Model("GGRC.Models.Search", {
         var inst;
         if(v.type === type) {
           inst = new _class({id : v.id});
-          // if(!inst.selfLink) {
-          //   inst.attr("selfLink", v.href);
-          //   inst.refresh();
-          // }
           return inst;
         }
     });

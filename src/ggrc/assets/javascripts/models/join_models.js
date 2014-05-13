@@ -47,28 +47,9 @@ can.Model.Cacheable("can.Model.Join", {
       });
     }
 
-  , reinit : function() {//ev, data) {
+  , reinit : function() {
       this.init_join_objects();
     }
-  /* TODO: Dead code?
-  , getOtherSide : function(obj) {
-    var that = this;
-    var keys = $.extend({}, this.constructor.join_keys);
-    can.each(keys, function(cls, key) {
-      if((that[key] && that[key] === obj)
-        || (that[key] ? that[key].id : that[key + "_id"]) === obj.id
-            && (obj instanceof cls || obj.type === cls.model_singular)
-      ) {
-        delete keys[key];
-      }
-    });
-    keys = Object.keys(keys);
-    if(keys.length === 1) {
-      return this[keys[0]];
-    } else {
-      return null;
-    }
-  }*/
 
   , init_join_object_with_type: function(attr) {
       if(this[attr] instanceof can.Model) {
@@ -112,31 +93,6 @@ can.Model.Cacheable("can.Model.Join", {
           that.init_join_object(attr, model.shortName);
       });
     }
-/*
-  , init_object: function() {
-      var that = this;
-      this.init_join_objects();
-
-      this.each(function(value, name) {
-        if (value === null)
-          that.removeAttr(name);
-      });
-    }
-
-  , setup_reinit: function(init_super) {
-      function reinit() {
-        typeof init_super === "function" && init_super.call(this);
-        this.init_object();
-      }
-
-      this.bind("created", can.proxy(reinit, this));
-      reinit.call(this);
-      this.bind("destroyed", function(ev) {
-        can.each(ev.target.constructor.join_keys, function(cls, key) {
-          ev.target[key].refresh();
-        });
-      });
-    }*/
 });
 
 can.Model.Join("CMS.Models.Relationship", {
@@ -163,7 +119,6 @@ can.Model.Join("CMS.Models.Relationship", {
   reinit: function() {
     var that = this;
 
-    //typeof this._super_init === "function" && this._super_init.call(this);
     this.attr("source", CMS.Models.get_instance(
       this.source_type
         || (this.source
@@ -200,9 +155,6 @@ can.Model.Join("CMS.Models.ObjectSection", {
   , create: "POST /api/object_sections"
   , destroy: "DELETE /api/object_sections/{id}"
 }, {
-/*    init: function() {
-      this.setup_reinit(this._super);
-    }*/
 });
 
 can.Model.Join("CMS.Models.ObjectControl", {
@@ -222,9 +174,6 @@ can.Model.Join("CMS.Models.ObjectControl", {
   , create: "POST /api/object_controls"
   , destroy: "DELETE /api/object_controls/{id}"
 }, {
-/*    init: function() {
-      this.setup_reinit(this._super);
-    }*/
 });
 
 can.Model.Join("CMS.Models.ObjectObjective", {
@@ -244,9 +193,6 @@ can.Model.Join("CMS.Models.ObjectObjective", {
   , create: "POST /api/object_objectives"
   , destroy: "DELETE /api/object_objectives/{id}"
 }, {
-/*    init: function() {
-      this.setup_reinit(this._super);
-    }*/
 });
 
 can.Model.Join("CMS.Models.ProgramDirective", {

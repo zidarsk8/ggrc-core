@@ -36,12 +36,7 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
       if (!params.selfLink) {
         if (params.type !== 'SectionBase')
           return CMS.Models[params.type].model(params);
-      }/* else {
-        if (CMS.Models.Contract.meta_kinds.indexOf(params.kind) > -1)
-          return CMS.Models.Contract.model(params);
-        else if (CMS.Models.Regulation.meta_kinds.indexOf(params.kind) > -1)
-          return CMS.Models.Regulation.model(params);
-      }*/
+      }
       console.debug("Invalid SectionBase:", params);
     }
 
@@ -57,10 +52,8 @@ can.Model.Cacheable("CMS.Models.SectionBase", {
     , object_controls: "CMS.Models.ObjectControl.stubs"
     , controls: "CMS.Models.Control.stubs"
     , directive: "CMS.Models.get_stub"
-    //, parent: "CMS.Models.get_stub"
     , children: "CMS.Models.get_stubs"
     , control_sections: "CMS.Models.ControlSection.stubs"
-    , controls: "CMS.Models.Control.stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , directives: "CMS.Models.get_stubs"
     , section_objectives: "CMS.Models.SectionObjective.stubs"
@@ -105,10 +98,8 @@ CMS.Models.SectionBase("CMS.Models.Section", {
     , object_controls : "CMS.Models.ObjectControl.stubs"
     , controls : "CMS.Models.Control.stubs"
     , directive : "CMS.Models.get_stub"
-    //, parent : "CMS.Models.get_stub"
     , children : "CMS.Models.get_stubs"
     , control_sections : "CMS.Models.ControlSection.stubs"
-    , controls : "CMS.Models.Control.stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , directives: "CMS.Models.get_stubs"
     , section_objectives : "CMS.Models.SectionObjective.stubs"
@@ -130,7 +121,7 @@ CMS.Models.SectionBase("CMS.Models.Section", {
       , mapping : "related_and_able_objects"
       , title_plural : "Business Objects"
       , draw_children : function(){
-          return this.instance.type === "Objective"
+          return this.instance.type === "Objective";
         }
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , child_options : [{
@@ -177,10 +168,8 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
     , object_controls: "CMS.Models.ObjectControl.stubs"
     , controls: "CMS.Models.Control.stubs"
     , directive: "CMS.Models.get_stub"
-    //, parent: "CMS.Models.get_stub"
     , children: "CMS.Models.get_stubs"
     , control_sections: "CMS.Models.ControlSection.stubs"
-    , controls: "CMS.Models.Control.stubs"
     , directive_sections: "CMS.Models.DirectiveSection.stubs"
     , directives: "CMS.Models.get_stubs"
     , section_objectives: "CMS.Models.SectionObjective.stubs"
@@ -196,7 +185,7 @@ CMS.Models.SectionBase("CMS.Models.Clause", {
       , mapping: "related_and_able_objects"
       , title_plural: "Business Objects"
       , draw_children: function(){
-          return this.instance.type === "Objective"
+          return this.instance.type === "Objective";
         }
       , footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , child_options: [{

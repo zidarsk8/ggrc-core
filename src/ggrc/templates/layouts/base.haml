@@ -58,6 +58,14 @@
     -#NOTE: This resource occasionally hangs and prevents page from rendering, so loaded after the fact via jquery
     :javascript
       jQuery(function($) { $('head').append("<link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'></link>"); });
+      window.onerror = function(message, url, linenumber) {
+        if(window.$) {
+          $(document.body).trigger("ajax:flash", {"error" : message});
+        }
+        if(window.GGRC && window.GGRC.Tracker) {
+          GGRC.Tracker.exception(message + " (at " + url + ":" + linenumber + ")");
+        }
+      };
 
     -if config.get("GOOGLE_ANALYTICS_ID")
       :javascript

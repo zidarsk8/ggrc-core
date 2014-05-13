@@ -16,7 +16,7 @@ from ggrc.builder.json import publish, publish_representation
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
-from .registry import object_view, tooltip_view
+from .registry import object_view
 from ggrc.models.task import Task, queued_task, create_task, make_task_response
 
 """ggrc.views
@@ -201,44 +201,6 @@ def all_object_views():
   return views
 
 
-def contributed_tooltip_views():
-  from ggrc import models
-  return [
-      tooltip_view(models.Audit),
-      tooltip_view(models.Program),
-      tooltip_view(models.Contract),
-      tooltip_view(models.Policy),
-      tooltip_view(models.Regulation),
-      tooltip_view(models.Standard),
-      tooltip_view(models.Control),
-      tooltip_view(models.Objective),
-      tooltip_view(models.System),
-      tooltip_view(models.Process),
-      tooltip_view(models.Product),
-      tooltip_view(models.Request),
-      tooltip_view(models.OrgGroup),
-      tooltip_view(models.Facility),
-      tooltip_view(models.Market),
-      tooltip_view(models.Project),
-      tooltip_view(models.DataAsset),
-      tooltip_view(models.Person),
-      tooltip_view(models.Event),
-      ]
-
-
-def all_tooltip_views():
-  views = contributed_tooltip_views()
-
-  for extension_module in get_extension_modules():
-    contributions = getattr(extension_module, "contributed_tooltip_views", None)
-    if contributions:
-      if callable(contributions):
-        contributions = contributions()
-      views.extend(contributions)
-
-  return views
-
-
 def init_extra_views(app):
   pass
 
@@ -248,14 +210,6 @@ def init_all_views(app):
   from ggrc import settings
 
   for entry in all_object_views():
-    entry.service_class.add_to(
-      app,
-      '/{0}'.format(entry.url),
-      entry.model_class,
-      decorators=(login_required,)
-      )
-
-  for entry in all_tooltip_views():
     entry.service_class.add_to(
       app,
       '/{0}'.format(entry.url),
