@@ -1486,7 +1486,10 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+(resolve_computed(obj) || ""))
+  var s = JSON.stringify("" + (resolve_computed(obj) || ""));
+  return s.substr(1, s.length - 2);
+  /*return (""+(resolve_computed(obj) || ""))
+    .replace(/\\/g, '\\')
     .replace(/"/g, '\\"')
     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
     //    thus does not allow backslash-escaped single quotes within strings.
@@ -1500,9 +1503,10 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     .replace(/\u2028/g, "\\u2028") // Line separator
     .replace(/\u2029/g, "\\u2029") // Paragraph separator
     .replace(/\t/g, "\\t")
-    .replace(/\b/g, "\\b")
+    .replace(/[\b]/g, "\\b")
     .replace(/\f/g, "\\f")
     .replace(/\v/g, "\\v");
+  */
 });
 
 can.each({
