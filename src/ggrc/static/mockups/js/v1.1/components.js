@@ -212,6 +212,7 @@ can.Component.extend({
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
       this.attr('assessment', assessment);
+      this.initAutocomplete();
     },
     initAutocomplete : function(){
       $( ".date" ).datepicker();
@@ -221,7 +222,8 @@ can.Component.extend({
         },
 
       });
-      var lists = {
+      var that = this
+        , lists = {
         objects : $.map(this.assessment.objects, function(o){
           return o.name;
         }),
@@ -230,7 +232,7 @@ can.Component.extend({
           "Predrag Kanazir",
           "Dan Ring",
           "Silas Barta",
-          "Cassius Clay"
+          "Cassius Clay",
         ],
         mapped_people : $.map(this.assessment.people, function(o){
           return o.name;
@@ -244,9 +246,43 @@ can.Component.extend({
           , autocomplete_type = $el.data('autocomplete-type')
           , type = autocomplete_type || $el.data('type')
         $el.autocomplete({
-          source : lists[type],
-          close: function( event, ui ) {$el.trigger('change')}
-        })
+          source : function(request, response){
+            var list = $.map(lists[type], function(v){
+              if(v.indexOf(request.term) > -1){
+                return v;
+              }
+            });
+            list.push("+ Create New");
+            response(list);
+          },
+          close: function( event, ui ) {
+            if($el.val() !== '+ Create New'){
+              $el.trigger('change')
+              return;
+            }
+            $el.val('');
+            if(type === 'tasks'){
+              $modal = $('#newTask');
+              $('.show-task-modal').trigger('click');
+              $modal.data('autocomplete', true);
+              var num_tasks = taskList.length;
+              $modal.on('hide.bs.modal', function(){
+                $modal.unbind('hide.bs.modal');
+                $modal.data('autocomplete', false);
+                if(taskList.length > num_tasks){
+                  that.assessment.tasks.push(taskList[0]);
+                  that.assessment.save();
+                  $el.val(taskList[0].title);
+                  $el.trigger('change');
+                }
+              })
+            }
+          },
+          minLength: 0
+        }).focus(function(){
+          //Use the below line instead of triggering keydown
+          $(this).data("uiAutocomplete").search($(this).val());
+      }).data('ui-autocomplete');
       });
     },
   },
@@ -664,11 +700,13 @@ var modal = can.Component.extend({
       $modal.find('textarea').each(function(_, e){
         task.attr(e.name, $(e).val());
       });
-      $modal.modal('hide');
       task.save();
-      $("tree-app").trigger("selected", this.scope.task);
+      if(!$modal.data('autocomplete'))
+        $("tree-app").trigger("selected", this.scope.task);
+      $modal.modal('hide');
 
     },
+
     '{Task} created' : function(){
       this.scope.attr('task', arguments[2]);
     },
