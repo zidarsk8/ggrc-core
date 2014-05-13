@@ -1,20 +1,7 @@
 {{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
-  {{^if new_object_form}}
-    <div class="row-fluid hidden">
-      <div class="span6">
-        <div class="spacing-bottom">
-          <label>
-            Program
-          </label>
-          <select class="input-block-level" name="program.id">
-            <option value="{{program.id}}">{{program.title}}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  {{else}}
+  {{#if new_object_form}}
   {{#if object_params.program}}
     <div class="row-fluid hidden">
       <div class="span6">
@@ -44,6 +31,19 @@
       </div>
     </div>
   {{/if}}
+  {{else}}
+    <div class="row-fluid hidden">
+      <div class="span6">
+        <div class="spacing-bottom">
+          <label>
+            Program
+          </label>
+          <select class="input-block-level" name="program.id">
+            <option value="{{program.id}}">{{program.title}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
   {{/if}}
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
