@@ -1281,30 +1281,7 @@
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model) {
-            var model_type = mapping.constructor.model_singular || mapping.constructor.shortName
-              , types = $.grep(that.types, function(type) { return type === model_type; })
-              ;
-
-            // Ensure that this model exists in the list of types
-            if (types.length) {
-              GGRC.Models.Search.search_for_types(
-                  that.term
-                , types
-                , that.get_params(binding)
-              ).pipe(function(mappings) {
-                // Check for the new mapping existing in the search
-                var entries = $.map(mappings.entries, function(entry) {
-                  if (entry.type === model_type && entry.id === mapping.id) {
-                    return entry;
-                  }
-                });
-
-                // If we found one, insert the mapping
-                entries.length && that.filter_and_insert_instances_from_mappings(binding, [mapping]);
-                
-                return mappings.entries;
-              });
-            }
+            that._refresh_stubs(binding);
           }
         });
 
