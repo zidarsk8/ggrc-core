@@ -407,7 +407,9 @@
 .grcicon-checked {
   background-position: -294px -32px;
 }
-
+.grcicon-in-progress {
+  background-position: -342px -8px;
+}
 .grcicon-watermark { background-position:-150px -368px; }
 .grcicon-watermark-green { background-position:-174px -368px; }
 
@@ -695,7 +697,8 @@ i.short {
 
   li {
     &.active,
-    &:hover {
+    &:hover,
+    &.overdue {
       // turned icons to white
       .grcicon-info { background-position:-198px -80px; }
       .grcicon-role-color { background-position:-102px -32px; }

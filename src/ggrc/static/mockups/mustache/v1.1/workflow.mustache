@@ -13,9 +13,11 @@
         </div>
         <div class="span5">
           <div class="header-message">
+            {{#assessment.finished}}
             <p class="object-header-notification object-approved">
               Completed on 05/01/14
             </p>
+            {{/assessment}}
           </div>
         </div>
       </div>
@@ -91,7 +93,7 @@
                 <div class="arrow"></div>
               </li>
               {{#assessment.started}}
-              <li class="progress-object">
+              <li class="progress-object {{#if_equals assessment.status 'In progress'}}started{{/if}} {{#if_equals assessment.status 'Finished'}}finished{{/if}}">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-progress-color"></i>
@@ -110,7 +112,7 @@
                 {{/assessment.started}}
                 {{#assessment.started}}
                   {{^assessment.finished}}
-                  <button type="submit" class="btn">
+                  <button type="submit" class="btn end-workflow">
                     End Workflow
                   </button>
                   {{/finished}}
@@ -239,7 +241,7 @@
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree">
                     {{#each assessment.task_groups}}
-                    <li class="tree-item program">
+                    <li class="tree-item program task-group-index" data-index="{{@index}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
@@ -385,7 +387,7 @@
                               </div>
                               <div class="span3">
                                 <a href="#" class="btn btn-success btn-footer" id="addTaskGroup">Save</a>
-                                <a href="#" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
+                                <a href="#" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>&nbsp;Cancel</a>
                               </div>
                             </div>
                           </div>
@@ -660,9 +662,11 @@
                   </div>
                 </header>
                 <section class="content">
-                  <ul class="tree-structure new-tree mockup-tree">
+                  <ul class="tree-structure new-tree mockup-tree colored-list">
                     {{#each assessment.task_groups}}
-                    <li class="tree-item program task-item task_group" data-index="{{@index}}">
+                    <li class="tree-item program task-item task_group
+                      {{#if_equals status 'started'}}rq-requested{{/if}}
+                      {{#if_equals status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
@@ -676,7 +680,7 @@
                                   <span class="gray"><em>In progress</em></span>
                                   {{/if}}
                                   {{#if_equals status 'finished'}}
-                                  <span class="gray"><em>Finished</em><button class="btn change-task-status">Finish</button></span>
+                                  <span class="task-done"><em>Finished</em></span>
                                   {{/if}}
                                 </li>
                                 <li>
@@ -706,9 +710,11 @@
 
                         <div class="inner-tree">
                           <h6>Objects ({{objects.length}})</h6>
-                          <ul class="tree-structure new-tree">
+                          <ul class="tree-structure new-tree colored-list">
                             {{#each objects}}
-                            <li class="tree-item programs tg_object" data-index="{{@index}}">
+                            <li class="tree-item programs tg_object
+                              {{#if_equals obj_status 'started'}}rq-requested{{/if}}
+                              {{#if_equals obj_status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
                               <div class="item-main">
                                 <div class="openclose">
                                   <div class="row-fluid">
@@ -735,8 +741,8 @@
                                       <span class="tier-trigger"></span>
                                       <div class="item-data">
                                         <div class="tree-title-area">
-                                          <i class="grcicon-control-color"></i>
-                                          {{title}}
+                                          <i class="grcicon-{{type}}-color"></i>
+                                          {{title}} {{type}}
                                         </div>
                                       </div>
                                     </div>
@@ -778,7 +784,11 @@
                                   <h6>Tasks ({{obj_tasks.length}})</h6>
                                   <ul class="tree-structure new-tree colored-list">
                                     {{#each obj_tasks}}
-                                    <li class="tree-item rq-draft obj_task {{#if_equals status 'verified'}}rq-accepted{{/if}} {{#is_overdue}}rq-rejected{{/is_overdue}}" data-index="{{@index}}">
+                                    <li class="tree-item rq-draft obj_task
+                                      {{#if_equals status 'finished'}}rq-accepted{{/if}}
+                                      {{#if_equals status 'verified'}}rq-accepted{{/if}}
+                                      {{#if_equals status 'started'}}rq-requested{{/if}}
+                                      {{#is_overdue}}rq-rejected{{/is_overdue}}" data-index="{{@index}}">
                                       <div class="item-main">
                                         <div class="openclose">
                                           <div class="row-fluid">

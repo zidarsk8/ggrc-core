@@ -452,6 +452,38 @@ ul.new-tree {
         }
       }
     }
+    &.progress-color {
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            background:darken($rqStarted,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqStarted;
+          border-bottom: 1px solid #f0f076;
+          .tree-title-area {
+            color: $darkText;
+          }
+        }
+      }
+    }
+    &.overdue-color {
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            background:darken($rqWarning,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqWarning;
+          border-bottom: 1px solid #f1977a;
+          .tree-title-area {
+            color: #c73535;
+          }
+        }
+      }
+    }
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;

@@ -62,6 +62,13 @@ can.Component.extend({
     '{window} selected' : function(el, ev, object){
       this.scope.attr('object', object);
     },
+    '{window} click' : function(el, ev){
+      if(!$(ev.target).hasClass('to-my-work') && !$(ev.target).hasClass('to-control')) return;
+      var type = $(ev.target).hasClass('to-my-work') ? 'my-work' : 'control';
+      $("tree-app").trigger('selected', {name: type});
+      $(".active").removeClass('active');
+      $('.'+type+'-widget').show();
+    },
   },
   helpers: {
 
@@ -205,6 +212,7 @@ can.Component.extend({
     set_fields : function(assessment){
       this.attr('filter_list', [{value: assessment.program_title}]);
       this.attr('assessment', assessment);
+      this.initAutocomplete();
     },
     initAutocomplete : function(){
       $( ".date" ).datepicker();
@@ -214,7 +222,8 @@ can.Component.extend({
         },
 
       });
-      var lists = {
+      var that = this
+        , lists = {
         objects : $.map(this.assessment.objects, function(o){
           return o.name;
         }),
@@ -223,7 +232,7 @@ can.Component.extend({
           "Predrag Kanazir",
           "Dan Ring",
           "Silas Barta",
-          "Cassius Clay"
+          "Cassius Clay",
         ],
         mapped_people : $.map(this.assessment.people, function(o){
           return o.name;
@@ -237,9 +246,43 @@ can.Component.extend({
           , autocomplete_type = $el.data('autocomplete-type')
           , type = autocomplete_type || $el.data('type')
         $el.autocomplete({
-          source : lists[type],
-          close: function( event, ui ) {$el.trigger('change')}
-        })
+          source : function(request, response){
+            var list = $.map(lists[type], function(v){
+              if(v.indexOf(request.term) > -1){
+                return v;
+              }
+            });
+            list.push("+ Create New");
+            response(list);
+          },
+          close: function( event, ui ) {
+            if($el.val() !== '+ Create New'){
+              $el.trigger('change')
+              return;
+            }
+            $el.val('');
+            if(type === 'tasks'){
+              $modal = $('#newTask');
+              $('.show-task-modal').trigger('click');
+              $modal.data('autocomplete', true);
+              var num_tasks = taskList.length;
+              $modal.on('hide.bs.modal', function(){
+                $modal.unbind('hide.bs.modal');
+                $modal.data('autocomplete', false);
+                if(taskList.length > num_tasks){
+                  that.assessment.tasks.push(taskList[0]);
+                  that.assessment.save();
+                  $el.val(taskList[0].title);
+                  $el.trigger('change');
+                }
+              })
+            }
+          },
+          minLength: 0
+        }).focus(function(){
+          //Use the below line instead of triggering keydown
+          $(this).data("uiAutocomplete").search($(this).val());
+      }).data('ui-autocomplete');
       });
     },
   },
@@ -422,6 +465,13 @@ can.Component.extend({
           , objects = tg.objects
           , tasks = tg.tasks
         for(var j =0; j < objects.length; j++){
+          var original_objects = $.map(assessment.objects, function(o){
+            if(o.name === objects[j].title){
+              return o;
+            }
+          });
+          if(original_objects.length === 0) continue;
+          objects[j].attr('type', original_objects[0].type);
           objects[j].attr('obj_tasks', new can.List());
           for(var k = 0; k < tasks.length; k++){
             for(var l = 0; l < taskList.length; l++){
@@ -438,47 +488,56 @@ can.Component.extend({
           }
         }
       }
+      assessment.attr('status', 'Started');
       assessment.attr('started', true);
       assessment.save();
     },
     ".change-task-status click" : function(el){
 
-      var task = $(el.closest('.obj_task')).data('index')
-        , object = $(el.closest('.tg_object')).data('index')
-        , task_group = $(el.closest('.task_group')).data('index')
+      var t = $(el.closest('.obj_task')).data('index')
+        , o = $(el.closest('.tg_object')).data('index')
+        , tg = $(el.closest('.task_group')).data('index')
         , assessment = this.scope.assessment
-        , obj_task = assessment.task_groups[task_group].objects[object].obj_tasks[task]
-        , status = obj_task.attr('status')
+        , task_groups = assessment.task_groups
+        , task_group = task_groups[tg]
+        , objects = task_group.objects
+        , object = objects[o]
+        , tasks = object.obj_tasks
+        , task = tasks[t]
+        , all_done = true
+        , status = task.attr('status')
         ;
 
-      if(status === 'assigned'){
-        assessment.task_groups[task_group].attr('status', 'started');
-        assessment.task_groups[task_group].objects[object].attr('obj_status', 'started');
-        obj_task.attr('status', 'started')
-      } else if(status === 'started'){
-        obj_task.attr('status', 'finished')
-      } else if(status === 'finished'){
-        obj_task.attr('status', 'verified')
-        var tasks = assessment.task_groups[task_group].objects[object].obj_tasks
-          , all_done = true;
-        for(var i=0; i < tasks.length; i++){
-          if(tasks[i].status !== 'verified'){
-            all_done = false;
+      switch(status){
+        case "assigned":
+          task_group.attr('status', 'started');
+          object.attr('obj_status', 'started');
+          task.attr('status', 'started');
+          assessment.attr('status', 'In progress');
+          break;
+        case "started":
+          task.attr('status', 'finished');
+          break;
+        case "finished":
+          task.attr('status', 'verified')
+          // Check if all tasks are done:
+          for(var i=0; i < tasks.length; i++){
+            if(tasks[i].status !== 'verified'){
+              all_done = false;
+            }
           }
-        }
-        assessment.task_groups[task_group].objects[object].attr('obj_status', all_done ? 'finished' : assessment.task_groups[task_group].objects[object].attr('obj_status'));
-        all_done = false;
-        for(var i=0; i < assessment.task_groups[task_group].objects.length; i++){
-          if(assessment.task_groups[task_group].objects[i].status !== 'finished'){
-            all_done = false;
+          object.attr('obj_status', all_done ? 'finished' : object.attr('obj_status'));
+          // Check if all objects are done:
+          all_done = true;
+          for(var i=0; i < objects.length; i++){
+            if(objects[i].obj_status !== 'finished'){
+              all_done = false;
+            }
           }
-        }
-        assessment.task_groups[task_group].attr('status', all_done ? 'finished' : assessment.task_groups[task_group].attr('status'));
+          task_group.attr('status', all_done ? 'finished' : task_group.attr('status'));
+          break;
       }
-
       assessment.save();
-
-
     },
     '.add-entry-btn click' : function(el){
       var task = $(el.closest('.obj_task')).data('index')
@@ -504,6 +563,15 @@ can.Component.extend({
 
       obj_task.entries.splice(entry, 1);
       assessment.save();
+    },
+    '.end-workflow click' : function(){
+      $('.workflow-group').addClass('finished');
+      setTimeout(function(){
+        $('.workflow-group').removeClass('finished');
+      }, 500);
+      this.scope.assessment.attr('finished', true);
+      this.scope.assessment.attr('status', 'Finished');
+      this.scope.assessment.save();
     }
   }
 });
@@ -650,11 +718,13 @@ var modal = can.Component.extend({
       $modal.find('textarea').each(function(_, e){
         task.attr(e.name, $(e).val());
       });
-      $modal.modal('hide');
       task.save();
-      $("tree-app").trigger("selected", this.scope.task);
+      if(!$modal.data('autocomplete'))
+        $("tree-app").trigger("selected", this.scope.task);
+      $modal.modal('hide');
 
     },
+
     '{Task} created' : function(){
       this.scope.attr('task', arguments[2]);
     },
@@ -674,6 +744,8 @@ var modal = can.Component.extend({
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));
+$("#my-work").html(can.view("/static/mockups/mustache/v1.1/my-work.mustache", {}));
+$("#control").html(can.view("/static/mockups/mustache/v1.1/control.mustache", {}));
 $("#task").html(can.view("/static/mockups/mustache/v1.1/task.mustache", {}));
 $("#workflow-modal").html(can.view("/static/mockups/mustache/v1.1/workflow-modal.mustache", {}));
 $("#task-modal").html(can.view("/static/mockups/mustache/v1.1/task-modal.mustache", {}));

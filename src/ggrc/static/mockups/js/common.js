@@ -179,29 +179,6 @@ $(document).ready(function(){
       "Validate Mappings",
       "Peer Review"
     ]
-    $( ".objective-selector input[name='assessment_lead.email']" ).autocomplete({
-      source: people
-    });
-    $( ".objective-selector input[name='program_title'],input[name='program.title']" ).autocomplete({
-      source: program
-    });
-    $( ".objective-selector input[name='object.title']" ).autocomplete({
-      source: object
-    });
-
-
-    $( ".objective-selector input[name='object_title2']" ).autocomplete({
-      source: object2
-    });
-    $( ".objective-selector input[name='tasks_title']" ).autocomplete({
-      source: tasks
-    });
-
-    $( ".people-autocomplete > input" ).autocomplete({
-      source: people
-    });
-
-
   });
 
   $('body').on('click', 'ul.internav li a', function() {
