@@ -20,6 +20,7 @@ permissions = {
         "Document",
         "Meeting",
         "UserRole",
+        "Context",
     ],
     "create": [],
     "view_object_page": [

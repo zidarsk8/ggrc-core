@@ -56,7 +56,7 @@ class ObjectPerson(Timeboxed, Mapping, db.Model):
 
     query = super(ObjectPerson, cls).eager_query()
     return query.options(
-        orm.subqueryload_all('person'))
+        orm.subqueryload('person'))
 
   def _display_name(self):
     return self.personable.display_name + '<->' + self.person.display_name

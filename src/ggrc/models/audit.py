@@ -59,4 +59,4 @@ class Audit(
     return query.options(
       orm.joinedload('program'),
       orm.subqueryload('requests'),
-      orm.subqueryload_all('object_people.person'))
+      orm.subqueryload('object_people').joinedload('person'))

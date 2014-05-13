@@ -56,7 +56,7 @@ class Identifiable(object):
   def eager_query(cls):
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
-        db.undefer_group(mapper_class.__name__+'_complete'),
+        db.Load(mapper_class).undefer_group(mapper_class.__name__+'_complete'),
         )
 
   @classmethod
@@ -65,8 +65,9 @@ class Identifiable(object):
     options = []
     for include_link in include_links:
       inclusion_class = getattr(cls, include_link).property.mapper.class_
-      options.append(orm.joinedload(include_link))
-      options.append(orm.undefer_group(inclusion_class.__name__ + '_complete'))
+      options.append(
+          orm.subqueryload(include_link)\
+              .undefer_group(inclusion_class.__name__ + '_complete'))
     return query.options(*options)
 
   @declared_attr
