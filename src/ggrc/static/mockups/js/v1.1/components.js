@@ -465,6 +465,13 @@ can.Component.extend({
           , objects = tg.objects
           , tasks = tg.tasks
         for(var j =0; j < objects.length; j++){
+          var original_objects = $.map(assessment.objects, function(o){
+            if(o.name === objects[j].title){
+              return o;
+            }
+          });
+          if(original_objects.length === 0) continue;
+          objects[j].attr('type', original_objects[0].type);
           objects[j].attr('obj_tasks', new can.List());
           for(var k = 0; k < tasks.length; k++){
             for(var l = 0; l < taskList.length; l++){
