@@ -313,11 +313,14 @@
       , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
       //, related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
-      , authorizations: Indirect("UserRole", "context")
+      , authorizations: Direct("UserRole", "context", "user_roles")
       , authorizations_via_audits: Cross("audits", "authorizations")
-      , extended_authorizations: Multi([
-          "authorizations", "authorizations_via_audits"])
-      , authorized_people: Cross("extended_authorizations", "person")
+      , context: Direct("Context", "related_object", "context")
+      , contexts_via_audits: Cross("audits", "context")
+      , authorization_contexts: Multi(["context", "contexts_via_audits"])
+      , authorizations_via_contexts: Cross("authorization_contexts", "user_roles")
+      , authorizations: Cross("authorization_contexts", "user_roles")
+      , authorized_people: Cross("authorization_contexts", "authorized_people")
       , mapped_and_or_authorized_people: Multi([
           "people", "authorized_people"])
 
@@ -500,6 +503,11 @@
       , extended_related_audits_via_search:      TypeFilter("related_objects_via_search", "Audit")
     }
 
+    , Context: {
+        user_roles: Direct("UserRole", "context", "user_roles")
+      , authorized_people: Proxy("Person", "person", "UserRole", "context", "user_roles")
+    }
+
     , UserRole : {
         // FIXME: These should not need to be `Indirect` --
         //   `context.related_object` *should* point to the right object.
@@ -515,7 +523,8 @@
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
-      , authorizations: Indirect("UserRole", "context")
+      , context: Direct("Context", "related_object", "context")
+      , authorizations: Cross("context", "user_roles")
 
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();

@@ -52,7 +52,8 @@
                   {{objective.title}}
                 </div>
               {{else}}
-                
+                {{#using audit=instance.audit}}
+                {{#with_mapping "authorizations" audit}}
                 {{#if_helpers "\
                   ^if_equals" instance.status "Accepted" "\
 			            and ^if_auditor" instance _1_include_admin=false}}
@@ -62,7 +63,9 @@
   			              Map Objective
   			            </a>
                   </div>
-                {{/if_auditor}}
+                {{/if_helpers}}
+                {{/with_mapping}}
+                {{/using}}
               {{/if}}
             {{/using}}
           </div>

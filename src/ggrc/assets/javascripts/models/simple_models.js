@@ -21,6 +21,7 @@ can.Model.Cacheable("CMS.Models.Context", {
   , attributes : {
       context : "CMS.Models.Context.stub"
     , related_object: "CMS.Models.get_stub"
+    , user_roles: "CMS.Models.UserRole.stubs"
     }
 }, {
 });

@@ -16,7 +16,8 @@ permissions = {
         "ProgramDirective",
         "Relationship",
         "ObjectFolder",
-        "UserRole"
+        "UserRole",
+        "Context",
     ],
     "create": [
         "ObjectDocument",

@@ -167,7 +167,7 @@
         this.walk_instances(function(instance, result, depth) {
           if (depth == 1) {
             if (instance === true)
-              mappings.push(result.binding.instance);
+              mappings.push(self.instance);
             else
               mappings.push(instance);
           }
@@ -846,7 +846,8 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          self._refresh_stubs(binding);
+          if (binding._refresh_stubs_deferred)
+            self._refresh_stubs(binding);
         });
 
         if (object_join_value) {
@@ -884,7 +885,8 @@
                     || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
                 && (!option_model
-                    || mapping[this.option_attr].reify() instanceof option_model));
+                    || (mapping[this.option_attr]
+                        && mapping[this.option_attr].reify() instanceof option_model)));
       }
 
     , filter_and_insert_instances_from_mappings: function(binding, mappings) {
@@ -1096,12 +1098,20 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+        var that = this
+          , refresh_queue = new RefreshQueue()
           ;
 
-        this.insert_instances_from_mappings(binding, mappings);
+        refresh_queue.enqueue(binding.instance);
+
+        return refresh_queue.trigger().then(function() {
+          var model = CMS.Models[that.model_name]
+            , object_join_attr = that.object_join_attr
+            , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+            ;
+
+          that.insert_instances_from_mappings(binding, mappings);
+        });
       }
   });
 

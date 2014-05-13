@@ -72,10 +72,12 @@
 
           <div class="span6">
           {{#if instance.viewLink}}
+          {{#is_allowed 'view_object_page' 'Program' context=instance.context}}
             <a href="{{instance.viewLink}}" class="info-action">
               View {{instance.class.title_singular}}
               <i class="grcicon-goto"></i>
             </a>
+          {{/is_allowed}}
           {{/if}}
           </div>
 

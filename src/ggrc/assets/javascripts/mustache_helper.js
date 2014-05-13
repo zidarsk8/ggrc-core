@@ -1486,7 +1486,10 @@ Mustache.registerHelper("determine_context", function(page_object, target) {
 });
 
 Mustache.registerHelper("json_escape", function(obj, options) {
-  return (""+(resolve_computed(obj) || ""))
+  var s = JSON.stringify("" + (resolve_computed(obj) || ""));
+  return s.substr(1, s.length - 2);
+  /*return (""+(resolve_computed(obj) || ""))
+    .replace(/\\/g, '\\')
     .replace(/"/g, '\\"')
     //  FUNFACT: JSON does not allow wrapping strings with single quotes, and
     //    thus does not allow backslash-escaped single quotes within strings.
@@ -1500,9 +1503,10 @@ Mustache.registerHelper("json_escape", function(obj, options) {
     .replace(/\u2028/g, "\\u2028") // Line separator
     .replace(/\u2029/g, "\\u2029") // Paragraph separator
     .replace(/\t/g, "\\t")
-    .replace(/\b/g, "\\b")
+    .replace(/[\b]/g, "\\b")
     .replace(/\f/g, "\\f")
     .replace(/\v/g, "\\v");
+  */
 });
 
 can.each({
@@ -1748,22 +1752,23 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
         state.attr('roles').push('Mapped');
       }
 
-      // Check for ownership
-      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {
-        // If this is and audit the owner could be an auditor
-        if (instance instanceof CMS.Models.Audit) {
+      if (instance instanceof CMS.Models.Audit) {
+        instance.reify().get_binding('authorizations').refresh_list().then(function() {
+          if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
+            state.attr('roles').push('Auditor');
+          }
+        }).then(function() {
           instance.reify().get_mapping('authorizations').bind("change", function() { 
             if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
               state.attr('roles').push('Auditor');
             }
-            else{
-              state.attr('roles').push('Owner');
-            }
           });
-        }
-        else{
-          state.attr('roles').push('Owner');
-        }
+        });
+      }
+
+      // Check for ownership
+      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function(person) { return person.id; }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
+        state.attr('roles').push('Owner');
       }
 
       // Check for authorizations

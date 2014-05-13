@@ -65,13 +65,29 @@ def _Person_eager_query(cls):
 
   return _orig_Person_eager_query().options(
       orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
-      orm.subqueryload_all('user_roles.role')
+      orm.subqueryload('user_roles').joinedload('context'),
+      orm.subqueryload('user_roles').joinedload('role'),
       )
 Person.eager_query = classmethod(_Person_eager_query)
 
 
+from ggrc.models.context import Context
+Context._publish_attrs.extend(['user_roles'])
+_orig_Context_eager_query = Context.eager_query
+def _Context_eager_query(cls):
+  from sqlalchemy import orm
+
+  return _orig_Context_eager_query().options(
+      orm.subqueryload('user_roles')
+      )
+Context.eager_query = classmethod(_Context_eager_query)
+
+
 class UserRole(Base, db.Model):
   __tablename__ = 'user_roles'
+
+  # Override default from `ContextRBAC` to provide backref
+  context = db.relationship('Context', backref='user_roles')
 
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
   role = db.relationship(
@@ -106,7 +122,8 @@ class UserRole(Base, db.Model):
     query = super(UserRole, cls).eager_query()
     return query.options(
         orm.subqueryload('role'),
-        orm.subqueryload('person'))
+        orm.subqueryload('person'),
+        orm.subqueryload('context'))
 
   def _display_name(self):
     if self.context and self.context.related_object:
