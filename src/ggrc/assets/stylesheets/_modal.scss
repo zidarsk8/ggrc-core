@@ -1090,3 +1090,23 @@ p.modal-value {
     font-weight: bold;
   }
 }
+
+.frequency-wrap {
+  label {
+    font-size: 14px !important;
+    i {
+      margin-top: 6px;
+    }
+  }
+  padding-top: 23px;
+  span {
+    display: inline-block;
+    padding: 0 5px;
+    &.start-text {
+      padding: 0 5px 0 0;
+    }
+  }
+  select {
+    margin-bottom: 0;
+  }
+}
