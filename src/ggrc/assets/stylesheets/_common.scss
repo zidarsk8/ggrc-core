@@ -852,8 +852,13 @@ select.multiple-selector {
 .field-wrap {
   @include clearfix;
   input {
-    width: 60%;
+    width: 40%;
     float: left;
+    margin-right: 4px;
+    &.date {
+      width: 18%;
+      margin-right: 0;
+    }
   }
   a {
     float: left;

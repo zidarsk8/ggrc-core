@@ -364,9 +364,9 @@
                                   <li>
                                     <div class="objective-selector field-wrap">
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
-                                      <input tabindex="4" type="text" name="tasks_title" style="width:30%" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
-                                      <input tabindex="2" class="date editDate" style="width:20%;" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
-                                      <a href="#" data-index="{{@index}}" data-type="tasks" style="width:auto;" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
+                                      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
+                                      <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
+                                      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
                                   {{/each}}
