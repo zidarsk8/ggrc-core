@@ -687,6 +687,12 @@
                                   {{/if}}
                                 </li>
                                 <li>
+                                  <span class="counter">
+                                    due
+                                    <strong class="error">{{end_date}}</strong>
+                                  </span>
+                                </li>
+                                <li>
                                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                                     <i class="grcicon-object-black"></i>
                                     <strong class="error">{{objects.length}}</strong>
@@ -787,7 +793,7 @@
                                   <h6>Tasks ({{obj_tasks.length}})</h6>
                                   <ul class="tree-structure new-tree colored-list">
                                     {{#each obj_tasks}}
-                                    <li class="tree-item rq-draft obj_task rq-draft
+                                    <li class="tree-item rq-draft obj_task
                                       {{#if_equals status 'finished'}}rq-accepted{{/if}}
                                       {{#if_equals status 'verified'}}rq-accepted{{/if}}
                                       {{#if_equals status 'started'}}rq-requested{{/if}}
@@ -797,6 +803,12 @@
                                           <div class="row-fluid">
                                             <div class="span12">
                                               <ul class="tree-action-list">
+                                                <li>
+                                                  <span class="counter">
+                                                    due
+                                                    <strong class="error">{{end_date}}</strong>
+                                                  </span>
+                                                </li>
                                                 <li>
                                                   <i class="grcicon-person-green pull-left icon-field"></i>
                                                   <div class="objective-selector">
