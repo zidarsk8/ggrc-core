@@ -212,6 +212,18 @@
                             <i class="grcicon-edit"></i>
                             Edit Workflow Info
                           </a>
+                          <div class="dropdown pull-right">
+                            <a class="dropdown-toggle info-edit" href="#" data-toggle="dropdown" role="button">
+                              More<i class="grcicon-carot"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+                              <li>
+                                <a href="#cloneWorkflow" data-toggle="modal">
+                                  Clone Workflow...
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -967,6 +979,82 @@
     <p>This process is not reversible.</p>
     <a id="confirmStartWorkflow" class="btn btn-primary btn-large" data-dismiss="modal" href="#">Proceed</a>
     <a id="cancelStartWorkflow" class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
+  </div>
+</div>
+
+<div id="cloneWorkflow" style="z-index:9999;" class="modal modal-wide hide fade ui-draggable" tabindex="-1" role="dialog" aria-labelledby="cloneWorkflow" aria-hidden="false">
+  <div class="modal-header">
+    <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
+      <i class="grcicon-x-white"></i>
+    </a>
+    <h2>
+      <span>Clone Workflow</span>
+    </h2>
+  </div>
+  <div class="modal-body">
+    <form action="#">
+      <div class="row-fluid">
+        <div class="span8">
+          <label>
+            Title
+            <span class="required">*</span>
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="Copy of 2014 Google Fiber Assessment" tabindex="1">
+          <br>
+        </div>
+        <div class="span4">
+          <label>
+            Workflow Owner
+            <span class="required">*</span>
+            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+          </label>
+          <i class="grcicon-person-green pull-left icon-field"></i>
+          <div class="people-autocomplete">
+            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required autocomplete" value="Cassius Clay" placeholder="Enter text to search for Workflow Owner">
+          </div>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <label>
+            <input type="checkbox" checked="checked">
+            Copy tasks (18)
+          </label>
+          <label>
+            <input type="checkbox" checked="checked">
+            Copy people (3)
+          </label>
+          <label>
+            <input type="checkbox" checked="checked">
+            Copy objects (5)
+          </label>
+          <label>
+            <input type="checkbox" checked="checked">
+            Copy task groups (10)
+          </label>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="deny-buttons">
+          <a tabindex="22" class="btn" data-dismiss="modal" href="#">Cancel</a>
+        </div>
+      </div>
+      <div class="span6">
+        &nbsp;
+      </div>
+      <div class="span3">
+        <div class="confirm-buttons">
+          <a id="cloneWorkflowSave" tabindex="24" class="btn btn-primary" href="javascript://">Save</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
