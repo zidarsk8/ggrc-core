@@ -61,6 +61,27 @@ Mustache.registerHelper("if_grater", function(val1, val2, options) {
   return exec();
 });
 
+Mustache.registerHelper("is_overdue", function(val1, options) {
+  var that = this, _val1;
+  function exec() {
+    if(+new Date() > +new Date(_val1)) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
+  }
+    if(typeof val1 === "function") {
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+
+  return exec();
+});
+
 // LHN
 can.Component.extend({
   tag: 'lhn-app',

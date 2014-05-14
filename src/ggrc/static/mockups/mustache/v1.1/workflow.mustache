@@ -685,7 +685,8 @@
                     {{#each assessment.task_groups}}
                     <li class="tree-item program task-item task_group rq-draft
                       {{#if_equals status 'started'}}rq-requested{{/if}}
-                      {{#if_equals status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
+                      {{#if_equals status 'finished'}}rq-accepted{{/if}}
+                      {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
@@ -707,6 +708,7 @@
                                     due
                                     <strong class="error">{{end_date}}</strong>
                                   </span>
+                                  {{^if_equals status 'finished'}}{{#is_overdue end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
                                 </li>
                                 <li>
                                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
@@ -813,7 +815,7 @@
                                       {{#if_equals status 'finished'}}rq-accepted{{/if}}
                                       {{#if_equals status 'verified'}}rq-accepted{{/if}}
                                       {{#if_equals status 'started'}}rq-requested{{/if}}
-                                      {{#is_overdue}}rq-rejected{{/is_overdue}}" data-index="{{@index}}">
+                                      {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
                                       <div class="item-main">
                                         <div class="openclose">
                                           <div class="row-fluid">
@@ -839,7 +841,7 @@
                                                 </li>
                                                 <li>
                                                   <div class="request-control">
-                                                    {{#is_overdue}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}
+                                                    {{^if_equals status 'verified'}}{{#is_overdue end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
                                                     {{#if_equals status 'assigned'}}
                                                     <button class="btn btn-primary change-task-status" data-control='{{@index}}_{{context}}'>Start</button>
                                                     {{/if}}
