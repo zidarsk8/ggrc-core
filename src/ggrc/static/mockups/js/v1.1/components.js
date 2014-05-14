@@ -391,12 +391,14 @@ can.Component.extend({
       var a = list.map(function(i,e){
         return $(e).val();
       });
-      for(i=0; i < tasks.length; i++){
-        tasks[i].attr('title', a[i]);
+      for(i=0; i < a.length; i+=2){
+        tasks[Math.floor(i/2)].attr('title', a[i]);
+        tasks[Math.floor(i/2)].attr('end_date', a[i+1]);
       }
       // Now that the list is sorted cancel the sortable event
-      $( ".sortable" ).sortable( "cancel" );
       workflow.save();
+      $( ".sortable" ).sortable( "cancel" );
+
     },
     '{window} selected' : function(){
       this.scope.set_fields(arguments[2]);
