@@ -300,6 +300,10 @@ can.Component.extend({
             });
             list.push("+ Create New");
             response(list);
+            $('.ui-autocomplete.ui-menu').each(function(_, el){
+              if($(el).children().length > 0)
+              console.log($($(el).children().last().find('a')).css({'text-decoration': 'underline', 'color': '#0088cc ! important'}));
+            })
           },
           close: function( event, ui ) {
             if($el.val() !== '+ Create New'){
@@ -345,6 +349,8 @@ can.Component.extend({
           $(this).data("uiAutocomplete").search($(this).val());
       }).data('ui-autocomplete');
       });
+      console.log($('.ui-autocomplete.ui-menu li').last());
+
     },
   },
   events: {
