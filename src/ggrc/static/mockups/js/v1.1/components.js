@@ -515,7 +515,13 @@ can.Component.extend({
         , type = $el.data('type')
         ;
       if($el.hasClass('disabled')) return;
-      assessment.task_groups[index][type].push({title: ""});
+      if(type === 'tasks'){
+        assessment.task_groups[index][type].push({title: "", end_date: assessment.task_groups[index].end_date});
+      }
+      else{
+        assessment.task_groups[index][type].push({title: ""});
+      }
+
       assessment.save();
     },
     ".deleteTrigger click" : function(el, ev){
