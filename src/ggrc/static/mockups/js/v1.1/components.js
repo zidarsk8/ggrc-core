@@ -272,13 +272,28 @@ can.Component.extend({
           return o.title;
         }),
       }
+      $('.item-main input').on('click', function(ev){
+        ev.stopPropagation();
+      });
       $('.autocomplete').each(function(i,el){
         var $el = $(el)
           , autocomplete_type = $el.data('autocomplete-type')
           , type = autocomplete_type || $el.data('type')
+        if(type === 'mapped_people'){
+          $el.on('focus', function(){
+            $el.attr('placeholder', 'Search for Assignee');
+          })
+          $el.on('blur', function(){
+            $el.attr('placeholder', 'Choose Assignee');
+          })
+        }
         $el.autocomplete({
           source : function(request, response){
-            var list = $.map(lists[type], function(v){
+            var search = type;
+            if(type === 'mapped_people' && $el.val() !== ''){
+              search = 'people';
+            }
+            var list = $.map(lists[search], function(v){
               if(v.indexOf(request.term) > -1){
                 return v;
               }
@@ -288,7 +303,22 @@ can.Component.extend({
           },
           close: function( event, ui ) {
             if($el.val() !== '+ Create New'){
-              $el.trigger('change')
+              $el.trigger('change');
+              if(type === 'mapped_people'){
+                var people = that.assessment.people
+                  , should_add = true
+                for(var i=0; i < people.length; i++){
+                  if($el.val() === people[i].name){
+                    should_add = false;
+                  }
+                }
+                if(should_add){
+                  that.assessment.people.push({
+                    name: $el.val(),
+                    type: 'person',
+                  });
+                }
+              }
               return;
             }
             $el.val('');
