@@ -55,7 +55,9 @@ class Role(Base, Described, db.Model):
 
 from ggrc.models.person import Person
 Person._publish_attrs.extend(['user_roles'])
-Person._include_links.extend(['user_roles'])
+# FIXME: Cannot use `include_links`, because Memcache expiry doesn't handle
+#   sub-resources correctly
+#Person._include_links.extend(['user_roles'])
 
 
 # Override `Person.eager_query` to ensure `user_roles` is loaded efficiently
@@ -64,9 +66,10 @@ def _Person_eager_query(cls):
   from sqlalchemy import orm
 
   return _orig_Person_eager_query().options(
-      orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
-      orm.subqueryload('user_roles').joinedload('context'),
-      orm.subqueryload('user_roles').joinedload('role'),
+      orm.subqueryload('user_roles'),
+      #orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
+      #orm.subqueryload('user_roles').joinedload('context'),
+      #orm.subqueryload('user_roles').joinedload('role'),
       )
 Person.eager_query = classmethod(_Person_eager_query)
 

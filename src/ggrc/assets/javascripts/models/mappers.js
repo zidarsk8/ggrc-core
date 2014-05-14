@@ -1010,6 +1010,13 @@
           , model = CMS.Models[this.model_name]
           ;
 
+        binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
+          if (binding._refresh_stubs_deferred) {
+            binding.list.splice(0, binding.list.length);
+            self._refresh_stubs(binding);
+          }
+        });
+
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model)
             self.filter_and_insert_instances_from_mappings(binding, [mapping]);

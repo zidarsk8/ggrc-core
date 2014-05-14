@@ -413,7 +413,7 @@ can.Model.Join("CMS.Models.ObjectPerson", {
 can.Model.Join("CMS.Models.ObjectDocument", {
   root_object : "object_document"
   , root_collection : "object_documents"
-  , findAll: "GET /api/object_documents?__include=document"
+  , findAll: "GET /api/object_documents"
   , create: "POST /api/object_documents"
   , destroy : "DELETE /api/object_documents/{id}"
   , join_keys : {
