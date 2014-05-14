@@ -295,6 +295,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       //  permission based on the most recent one.
 
       can.each(instance.get_mapping("authorizations"), function(authmapping) {
+        // FIXME: This will cause missing authorizations, but this function
+        //   needs to be reworked to ensure required paths are loaded before
+        //   use (.person and .role).
+        if (!authmapping.instance.selfLink)
+          return;
         var auth = authmapping.instance;
         if(!auths[auth.person.reify().email]
            || auth.created_at.getTime() > auths[auth.person.reify().email].created_at.getTime()
