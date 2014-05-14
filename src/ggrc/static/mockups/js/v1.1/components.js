@@ -29,6 +29,37 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
 
   return exec();
 });
+Mustache.registerHelper("if_grater", function(val1, val2, options) {
+  var that = this, _val1, _val2;
+  function exec() {
+    if(_val1 > _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
+  }
+    if(typeof val1 === "function") {
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+    if(typeof val2 === "function") {
+      if(val2.isComputed) {
+        val2.bind("change", function(ev, newVal, oldVal) {
+          _val2 = newVal;
+          exec();
+        });
+      }
+      _val2 = val2.call(this);
+    } else {
+      _val2 = val2;
+    }
+
+  return exec();
+});
 
 // LHN
 can.Component.extend({
@@ -456,6 +487,17 @@ can.Component.extend({
       assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
     },
+    ".editDate change" : function(el, ev){
+      var $el = $(el)
+        , assessment = this.scope.assessment
+        , index = $el.data('index')
+        , workflowIndex = $el.closest('ul').data('index')
+        , type = $el.data('type')
+        ;
+      if($el.hasClass('disabled')) return;
+      assessment.task_groups[workflowIndex][type][index].attr('end_date', $el.val());
+      assessment.save();
+    },
     "#confirmStartWorkflow click" : function(el, ev){
       var assessment = this.scope.assessment
         , task_groups = this.scope.assessment.task_groups
@@ -481,6 +523,7 @@ can.Component.extend({
                   description: taskList[l].description,
                   id: taskList[l].id,
                   status: 'assigned',
+                  end_date: tasks[k].end_date,
                   entries: can.List(),
                 }));
               }
