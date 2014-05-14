@@ -667,7 +667,7 @@
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree colored-list">
                     {{#each assessment.task_groups}}
-                    <li class="tree-item program task-item task_group
+                    <li class="tree-item program task-item task_group rq-draft
                       {{#if_equals status 'started'}}rq-requested{{/if}}
                       {{#if_equals status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
                       <div class="item-main">
@@ -715,7 +715,7 @@
                           <h6>Objects ({{objects.length}})</h6>
                           <ul class="tree-structure new-tree colored-list">
                             {{#each objects}}
-                            <li class="tree-item programs tg_object
+                            <li class="tree-item programs tg_object rq-draft
                               {{#if_equals obj_status 'started'}}rq-requested{{/if}}
                               {{#if_equals obj_status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
                               <div class="item-main">
@@ -787,7 +787,7 @@
                                   <h6>Tasks ({{obj_tasks.length}})</h6>
                                   <ul class="tree-structure new-tree colored-list">
                                     {{#each obj_tasks}}
-                                    <li class="tree-item rq-draft obj_task
+                                    <li class="tree-item rq-draft obj_task rq-draft
                                       {{#if_equals status 'finished'}}rq-accepted{{/if}}
                                       {{#if_equals status 'verified'}}rq-accepted{{/if}}
                                       {{#if_equals status 'started'}}rq-requested{{/if}}
