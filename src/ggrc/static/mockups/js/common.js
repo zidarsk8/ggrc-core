@@ -527,8 +527,6 @@ $(document).ready(function(){
 
   $('body').on('click', '#addTaskGroup', function() {
     $('#TaskGroupItem').show();
-    $('#addSingleObject').hide();
-    $('#objectFooterUtility').show();
     $('#TaskGroupCounter').html('1');
     $('#objectsMainCounter4').html('1');
     $('#workflowStart').removeClass('disabled');
@@ -627,7 +625,7 @@ $(document).ready(function(){
     $('#firstEntry').show();
     $('#editEntry').hide();
   });
-  
+
   $('#frequency').on('change', function(){
     if($(this).val() == 'one_time') {
       $('.frequency-wrap').hide();

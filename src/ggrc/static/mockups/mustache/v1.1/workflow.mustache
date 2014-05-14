@@ -382,7 +382,7 @@
                     {{/each}}
                     <li class="tree-footer tree-item tree-item-add">
                       <div class="row-fluid">
-                        <div class="span10 section-expandable">
+                        <div class="span12 section-expandable">
                           <div id="objectFooterUtility">
                             <a href="#" id="addSingleObjectTrigger">
                               + Add Task Group
@@ -390,16 +390,19 @@
                           </div>
                           <div class="add-single-object" id="addSingleObject">
                             <div class="row-fluid">
-                              <div class="span5">
+                              <div class="span3">
                                 <div class="objective-selector">
                                   <input type="text" id="new_object_name" name="object.title" class="input-block-level" placeholder="Enter Task Group Name">
                                 </div>
                               </div>
-                              <div class="span4">
+                              <div class="span3">
                                 <i class="grcicon-person-green pull-left icon-field"></i>
                                 <div class="objective-selector">
                                   <input tabindex="1" type="text" id="new_task_assignee" name="lead_email" class="span10 search-icon autocomplete" data-type="people" data-autocomplete-type="mapped_people" placeholder="Enter text to search for people" value="{{assessment.lead_email}}">
                                 </div>
+                              </div>
+                              <div class="span3">
+                                <input tabindex="2" id="tg_end_date" class="date" style="width:50%" data-index="{{@index}}" data-field="end_date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="">
                               </div>
                               <div class="span3">
                                 <a href="#" class="btn btn-success btn-footer" id="addTaskGroup">Save</a>

@@ -301,14 +301,13 @@ can.Component.extend({
             list.push("+ Create New");
             response(list);
             $('.ui-autocomplete.ui-menu').each(function(_, el){
-              if($(el).children().length > 0)
-              console.log($($(el).children().last().find('a')).css({'text-decoration': 'underline', 'color': '#0088cc ! important'}));
+              $(el).children().last().find('a').css({'text-decoration': 'underline', 'color': '#0088cc ! important'});
             })
           },
           close: function( event, ui ) {
             if($el.val() !== '+ Create New'){
               $el.trigger('change');
-              if(type === 'mapped_people'){
+              if(type === 'mapped_people' && $el.val() !== ''){
                 var people = that.assessment.people
                   , should_add = true
                 for(var i=0; i < people.length; i++){
@@ -349,8 +348,6 @@ can.Component.extend({
           $(this).data("uiAutocomplete").search($(this).val());
       }).data('ui-autocomplete');
       });
-      console.log($('.ui-autocomplete.ui-menu li').last());
-
     },
   },
   events: {
@@ -444,17 +441,23 @@ can.Component.extend({
     "#addTaskGroup click" : function(){
       var title = $("#new_object_name").val()
         , assignee = $("#new_task_assignee").val()
+        , end_date = $("#tg_end_date").val()
         , assessment = this.scope.assessment;
       if(!assessment.task_groups){
         assessment.attr('task_groups', []);
       }
+      if(title === '' || assignee === '' || end_date === '') return;
+      $('#addSingleObject').hide();
+      $('#objectFooterUtility').show();
+      $("#new_object_name").val('')
+      $("#tg_end_date").val('')
       assessment.task_groups.push({
         title: title,
         description: "",
         assignee: assignee,
         objects: [],
         tasks: [],
-        end_date: "",
+        end_date: end_date,
         taskLock: false
       });
       assessment.save();
