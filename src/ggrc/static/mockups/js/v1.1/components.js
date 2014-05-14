@@ -29,6 +29,58 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
 
   return exec();
 });
+Mustache.registerHelper("if_grater", function(val1, val2, options) {
+  var that = this, _val1, _val2;
+  function exec() {
+    if(_val1 > _val2) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
+  }
+    if(typeof val1 === "function") {
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+    if(typeof val2 === "function") {
+      if(val2.isComputed) {
+        val2.bind("change", function(ev, newVal, oldVal) {
+          _val2 = newVal;
+          exec();
+        });
+      }
+      _val2 = val2.call(this);
+    } else {
+      _val2 = val2;
+    }
+
+  return exec();
+});
+
+Mustache.registerHelper("is_overdue", function(val1, options) {
+  var that = this, _val1;
+  function exec() {
+    if(+new Date() > +new Date(_val1)) return options.fn(options.contexts);
+    else return options.inverse(options.contexts);
+  }
+    if(typeof val1 === "function") {
+      if(val1.isComputed) {
+        val1.bind("change", function(ev, newVal, oldVal) {
+          _val1 = newVal;
+          return exec();
+        });
+      }
+      _val1 = val1.call(this);
+    } else {
+      _val1 = val1;
+    }
+
+  return exec();
+});
 
 // LHN
 can.Component.extend({
@@ -241,23 +293,56 @@ can.Component.extend({
           return o.title;
         }),
       }
+      $('.item-main input').on('click', function(ev){
+        ev.stopPropagation();
+      });
       $('.autocomplete').each(function(i,el){
         var $el = $(el)
           , autocomplete_type = $el.data('autocomplete-type')
           , type = autocomplete_type || $el.data('type')
+        if(type === 'mapped_people'){
+          $el.on('focus', function(){
+            $el.attr('placeholder', 'Search for Assignee');
+          })
+          $el.on('blur', function(){
+            $el.attr('placeholder', 'Choose Assignee');
+          })
+        }
         $el.autocomplete({
           source : function(request, response){
-            var list = $.map(lists[type], function(v){
+            var search = type;
+            if(type === 'mapped_people' && $el.val() !== ''){
+              search = 'people';
+            }
+            var list = $.map(lists[search], function(v){
               if(v.indexOf(request.term) > -1){
                 return v;
               }
             });
             list.push("+ Create New");
             response(list);
+            $('.ui-autocomplete.ui-menu').each(function(_, el){
+              $(el).children().last().find('a').css({'text-decoration': 'underline', 'color': '#0088cc ! important'});
+            })
           },
           close: function( event, ui ) {
             if($el.val() !== '+ Create New'){
-              $el.trigger('change')
+              $el.trigger('change');
+              if(type === 'mapped_people' && $el.val() !== ''){
+                var people = that.assessment.people
+                  , should_add = true
+                for(var i=0; i < people.length; i++){
+                  if($el.val() === people[i].name){
+                    should_add = false;
+                  }
+                }
+                if(should_add){
+                  that.assessment.people.push({
+                    name: $el.val(),
+                    type: 'person',
+                  });
+                }
+              }
               return;
             }
             $el.val('');
@@ -377,17 +462,23 @@ can.Component.extend({
     "#addTaskGroup click" : function(){
       var title = $("#new_object_name").val()
         , assignee = $("#new_task_assignee").val()
+        , end_date = $("#tg_end_date").val()
         , assessment = this.scope.assessment;
       if(!assessment.task_groups){
         assessment.attr('task_groups', []);
       }
+      if(title === '' || assignee === '' || end_date === '') return;
+      $('#addSingleObject').hide();
+      $('#objectFooterUtility').show();
+      $("#new_object_name").val('')
+      $("#tg_end_date").val('')
       assessment.task_groups.push({
         title: title,
         description: "",
         assignee: assignee,
         objects: [],
         tasks: [],
-        end_date: "",
+        end_date: end_date,
         taskLock: false
       });
       assessment.save();
@@ -456,6 +547,17 @@ can.Component.extend({
       assessment.task_groups[workflowIndex][type][index].attr('title', $el.val());
       assessment.save();
     },
+    ".editDate change" : function(el, ev){
+      var $el = $(el)
+        , assessment = this.scope.assessment
+        , index = $el.data('index')
+        , workflowIndex = $el.closest('ul').data('index')
+        , type = $el.data('type')
+        ;
+      if($el.hasClass('disabled')) return;
+      assessment.task_groups[workflowIndex][type][index].attr('end_date', $el.val());
+      assessment.save();
+    },
     "#confirmStartWorkflow click" : function(el, ev){
       var assessment = this.scope.assessment
         , task_groups = this.scope.assessment.task_groups
@@ -481,6 +583,7 @@ can.Component.extend({
                   description: taskList[l].description,
                   id: taskList[l].id,
                   status: 'assigned',
+                  end_date: tasks[k].end_date,
                   entries: can.List(),
                 }));
               }

@@ -487,7 +487,13 @@ ul.new-tree {
 #verifyTask3,
 #verifyTaskSpecial,
 #endWorkflowTrigger,
-.finished-number {
+.finished-number,
+#one-time,
+#weekly,
+#monthly,
+#quarterly,
+#annually,
+#continuos {
   display: none;
 }
 

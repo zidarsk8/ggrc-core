@@ -527,8 +527,6 @@ $(document).ready(function(){
 
   $('body').on('click', '#addTaskGroup', function() {
     $('#TaskGroupItem').show();
-    $('#addSingleObject').hide();
-    $('#objectFooterUtility').show();
     $('#TaskGroupCounter').html('1');
     $('#objectsMainCounter4').html('1');
     $('#workflowStart').removeClass('disabled');
@@ -626,6 +624,28 @@ $(document).ready(function(){
   $('body').on('click', '#editEntryCancel', function() {
     $('#firstEntry').show();
     $('#editEntry').hide();
+  });
+
+  $('#frequency').on('change', function(){
+    if($(this).val() == 'one_time') {
+      $('.frequency-wrap').hide();
+      $('#one-time').show();
+    } else if ($(this).val() == 'weekly') {
+      $('.frequency-wrap').hide();
+      $('#weekly').show();
+    } else if ($(this).val() == 'monthly') {
+      $('.frequency-wrap').hide();
+      $('#monthly').show();
+    } else if ($(this).val() == 'quarterly') {
+      $('.frequency-wrap').hide();
+      $('#quarterly').show();
+    } else if ($(this).val() == 'annually') {
+      $('.frequency-wrap').hide();
+      $('#annually').show();
+    } else if ($(this).val() == 'continuos') {
+      $('.frequency-wrap').hide();
+      $('#continuos').show();
+    }
   });
 
 });
