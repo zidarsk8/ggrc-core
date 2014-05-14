@@ -1203,6 +1203,9 @@ can.Model.Cacheable("CMS.Models.Audit", {
     var loader = this.get_binding('authorizations');
     
     return $.map(loader.list, function(binding) {
+      // FIXME: This works for now, but is sad.
+      if (!binding.instance.selfLink)
+        return;
       var role = binding.instance.role.reify();
       if (role.attr('name') === 'Auditor') {
         return {
