@@ -366,6 +366,7 @@
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
                                       <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
+                                      <span class="required">*</span>
                                       <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -779,6 +780,14 @@
 
                               <div class="tier-2-info item-content" style="display: none;">
                                 <div class="tier-2-info-content">
+                                  <div class="row-fluid">
+                                    <div class="span6">
+                                      <a href="#" class="info-action">
+                                        View Object
+                                        <i class="grcicon-goto"></i>
+                                      </a>
+                                    </div>
+                                  </div>
                                   <div class="show-description">
                                     <div class="row-fluid">
                                       <div class="span12">
@@ -877,6 +886,14 @@
 
                                       <div class="tier-2-info item-content" style="display: none;">
                                         <div class="tier-2-info-content">
+                                          <div class="row-fluid">
+                                            <div class="span6">
+                                              <a href="#" class="info-action">
+                                                View Task
+                                                <i class="grcicon-goto"></i>
+                                              </a>
+                                            </div>
+                                          </div>
                                           <div class="show-description">
                                             <div class="row-fluid">
                                               <div class="span12">
@@ -987,7 +1004,8 @@
   </div>
   <div class="modal-body">
     <p>By clicking "Proceed", {{assessment.task_groups.length}} task group{{^if_equals assessment.task_groups.length 1}}s{{/if_equals}} will be started and tasks will be assigned to selected assignees, against defined objects. Are you sure you want to proceed?</p>
-    <p>This process is not reversible.</p>
+    <br>
+    <br>
     <a id="confirmStartWorkflow" class="btn btn-primary btn-large" data-dismiss="modal" href="#">Proceed</a>
     <a id="cancelStartWorkflow" class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
   </div>

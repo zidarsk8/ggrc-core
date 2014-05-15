@@ -860,6 +860,13 @@ select.multiple-selector {
       margin-right: 0;
     }
   }
+  .required {
+    float: left;
+    width: 8px;
+    font-weight: bold;
+    color: $red;
+    margin: 6px 8px 0 3px;
+  }
   a {
     float: left;
     width: 15%;
