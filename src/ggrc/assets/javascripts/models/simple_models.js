@@ -1217,13 +1217,28 @@ can.Model.Cacheable("CMS.Models.Audit", {
   }
 });
 
+can.Model.Mixin("requestorable", {
+  before_create : function() {
+    if(!this.requestor) {
+      this.attr('requestor', { id: GGRC.current_user.id, type : "Person" });
+    }
+  }
+  , form_preload : function(new_object_form) {
+    if(new_object_form) {
+      if(!this.requestor) {
+        this.attr('requestor', { id: GGRC.current_user.id, type : "Person" });
+      }
+    }
+  }
+});
+
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request"
   , root_collection : "requests"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
-  , mixins : ["unique_title"]
+  , mixins : ["unique_title", "requestorable"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , audit : "CMS.Models.Audit.stub"
@@ -1238,7 +1253,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     status : "Draft"
     , requested_on : new Date()
     , due_on : null
-    , requestor : GGRC.current_user
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
