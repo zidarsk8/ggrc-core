@@ -366,6 +366,7 @@
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
                                       <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
+                                      <span class="required">*</span>
                                       <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
                                     </div>
                                   </li>
@@ -460,6 +461,18 @@
                           <div class="show-description">
                             <div class="row-fluid">
                               <div class="span12">
+                                <div class="span6">
+                                <a href="#" class="info-action">
+                                  View Task
+                                  <i class="grcicon-goto"></i>
+                                </a>
+                                </div>
+                                <div class="span6">
+                                <a href="#" class="info-action unmap pull-right" data-type="tasks" data-index="{{@index}}">
+                                  <i class="grcicon-remove"></i>
+                                  Unmap
+                                </a>
+                                </div>
                                 <div class="tree-description">
                                   <h5>{{title}}</h5>
                                   <p>{{description}}{{^description}}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed lacinia tortor, quis mattis sapien. Nullam fermentum, justo sed condimentum semper, tortor purus scelerisque lacus, sed congue lorem lectus in sem. Aenean faucibus est metus, feugiat tristique ligula mattis vitae.{{/description}}</p>
@@ -529,6 +542,18 @@
                         <div class="tier-2-info-content">
                           <div class="row-fluid">
                             <div class="span12">
+                              <div class="span6">
+                              <a href="#" class="info-action">
+                                View Task
+                                <i class="grcicon-goto"></i>
+                              </a>
+                              </div>
+                              <div class="span6">
+                              <a href="#" class="info-action unmap pull-right" data-type="people" data-index="{{@index}}">
+                                <i class="grcicon-remove"></i>
+                                Unmap
+                              </a>
+                              </div>
                               <div class="profile-info">
                                 <ul>
                                   <li>
@@ -617,7 +642,7 @@
                                 </a>
                               </div>
                               <div class="span6">
-                                <a href="#" class="info-action unmap pull-right">
+                                <a href="#" class="info-action unmap pull-right"  data-type="objects" data-index="{{@index}}">
                                   <i class="grcicon-remove"></i>
                                   Unmap
                                 </a>
@@ -779,6 +804,14 @@
 
                               <div class="tier-2-info item-content" style="display: none;">
                                 <div class="tier-2-info-content">
+                                  <div class="row-fluid">
+                                    <div class="span6">
+                                      <a href="#" class="info-action">
+                                        View Object
+                                        <i class="grcicon-goto"></i>
+                                      </a>
+                                    </div>
+                                  </div>
                                   <div class="show-description">
                                     <div class="row-fluid">
                                       <div class="span12">
@@ -877,6 +910,14 @@
 
                                       <div class="tier-2-info item-content" style="display: none;">
                                         <div class="tier-2-info-content">
+                                          <div class="row-fluid">
+                                            <div class="span6">
+                                              <a href="#" class="info-action">
+                                                View Task
+                                                <i class="grcicon-goto"></i>
+                                              </a>
+                                            </div>
+                                          </div>
                                           <div class="show-description">
                                             <div class="row-fluid">
                                               <div class="span12">
@@ -987,7 +1028,8 @@
   </div>
   <div class="modal-body">
     <p>By clicking "Proceed", {{assessment.task_groups.length}} task group{{^if_equals assessment.task_groups.length 1}}s{{/if_equals}} will be started and tasks will be assigned to selected assignees, against defined objects. Are you sure you want to proceed?</p>
-    <p>This process is not reversible.</p>
+    <br>
+    <br>
     <a id="confirmStartWorkflow" class="btn btn-primary btn-large" data-dismiss="modal" href="#">Proceed</a>
     <a id="cancelStartWorkflow" class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
   </div>
@@ -1011,7 +1053,7 @@
             <span class="required">*</span>
             <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
           </label>
-          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="Copy of 2014 Google Fiber Assessment" tabindex="1">
+          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="Copy of {{assessment.title}}" tabindex="1">
           <br>
         </div>
         <div class="span4">
@@ -1022,7 +1064,7 @@
           </label>
           <i class="grcicon-person-green pull-left icon-field"></i>
           <div class="people-autocomplete">
-            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required autocomplete" value="Cassius Clay" placeholder="Enter text to search for Workflow Owner">
+            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required autocomplete" value="{{assessment.lead_email}}" placeholder="Enter text to search for Workflow Owner">
           </div>
         </div>
       </div>
@@ -1030,20 +1072,20 @@
       <div class="row-fluid">
         <div class="span12">
           <label>
-            <input type="checkbox" checked="checked">
-            Copy tasks (18)
+            <input type="checkbox" checked="checked" data-type="tasks">
+            Copy tasks ({{assessment.tasks.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy people (3)
+            <input type="checkbox" checked="checked" data-type="people">
+            Copy people ({{assessment.people.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy objects (5)
+            <input type="checkbox" checked="checked" data-type="objects">
+            Copy objects ({{assessment.objects.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy task groups (10)
+            <input type="checkbox" checked="checked" data-type='task_groups'>
+            Copy task groups ({{assessment.task_groups.length}})
           </label>
         </div>
       </div>

@@ -1,87 +1,3 @@
-Mustache.registerHelper("if_equals", function(val1, val2, options) {
-  var that = this, _val1, _val2;
-  function exec() {
-    if(_val1 == _val2) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-    if(typeof val1 === "function") {
-      if(val1.isComputed) {
-        val1.bind("change", function(ev, newVal, oldVal) {
-          _val1 = newVal;
-          return exec();
-        });
-      }
-      _val1 = val1.call(this);
-    } else {
-      _val1 = val1;
-    }
-    if(typeof val2 === "function") {
-      if(val2.isComputed) {
-        val2.bind("change", function(ev, newVal, oldVal) {
-          _val2 = newVal;
-          exec();
-        });
-      }
-      _val2 = val2.call(this);
-    } else {
-      _val2 = val2;
-    }
-
-  return exec();
-});
-Mustache.registerHelper("if_grater", function(val1, val2, options) {
-  var that = this, _val1, _val2;
-  function exec() {
-    if(_val1 > _val2) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-    if(typeof val1 === "function") {
-      if(val1.isComputed) {
-        val1.bind("change", function(ev, newVal, oldVal) {
-          _val1 = newVal;
-          return exec();
-        });
-      }
-      _val1 = val1.call(this);
-    } else {
-      _val1 = val1;
-    }
-    if(typeof val2 === "function") {
-      if(val2.isComputed) {
-        val2.bind("change", function(ev, newVal, oldVal) {
-          _val2 = newVal;
-          exec();
-        });
-      }
-      _val2 = val2.call(this);
-    } else {
-      _val2 = val2;
-    }
-
-  return exec();
-});
-
-Mustache.registerHelper("is_overdue", function(val1, options) {
-  var that = this, _val1;
-  function exec() {
-    if(+new Date() > +new Date(_val1)) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-    if(typeof val1 === "function") {
-      if(val1.isComputed) {
-        val1.bind("change", function(ev, newVal, oldVal) {
-          _val1 = newVal;
-          return exec();
-        });
-      }
-      _val1 = val1.call(this);
-    } else {
-      _val1 = val1;
-    }
-
-  return exec();
-});
-
 // LHN
 can.Component.extend({
   tag: 'lhn-app',
@@ -683,7 +599,60 @@ can.Component.extend({
       this.scope.assessment.attr('finished', true);
       this.scope.assessment.attr('status', 'Finished');
       this.scope.assessment.save();
-    }
+    },
+    ".unmap click" : function(el){
+      var $el = $(el)
+        , index = $el.data('index')
+        , type = $el.data('type')
+        , $ul = $el.closest('ul')
+        ;
+      this.scope.assessment[type].splice(index, 1);
+      this.scope.assessment.save();
+      if($ul.find('.item-open').length === 0){
+        $ul.removeClass('tree-open');
+      }
+    },
+    "#cloneWorkflowSave click": function(el, ev){
+      var $modal = $("#cloneWorkflow")
+        , title = $modal.find('input[name=title]').first().val()
+        , owner = $modal.find('input[name=lead_email]').first().val()
+        , checkboxes = $modal.find('input[type=checkbox]')
+        , workflow = this.scope.assessment
+        , clone = new Assessment();
+
+      clone.attr('title', title);
+      clone.attr('lead_email', owner);
+      clone.attr('end_date', workflow.attr('end_date'));
+      clone.attr('status', 'Future');
+      checkboxes.each(function(_, el){
+        var $el = $(el)
+          , checked = $el.is(':checked')
+          , type = $el.data('type')
+          ;
+        if(!checked) return;
+        if(type !== 'task_groups'){
+          clone.attr(type, workflow.attr(type).slice());
+          return;
+        }
+
+        clone.attr('task_groups', new can.List());
+        var tgs = workflow.attr(type);
+        for(var i = 0; i < tgs.length; i++){
+          clone.task_groups.push({
+            objects: $.map(tgs[0].objects, function(e){ return {title: e.title}; }),
+            tasks: $.map(tgs[0].tasks, function(e){ return {title: e.title, end_date: e.end_date}; }),
+            assignee: tgs[0].assignee,
+            description: tgs[0].description,
+            end_date: tgs[0].end_date,
+            title: tgs[0].title
+          })
+        }
+      });
+      $("tree-app").trigger('selected', clone);
+      $modal.modal('hide');
+      clone.save();
+      return;
+    },
   }
 });
 
