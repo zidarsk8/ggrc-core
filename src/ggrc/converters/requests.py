@@ -6,6 +6,7 @@
 
 from .base import *
 from ggrc import db
+from ggrc.login import get_current_user
 from ggrc.models import Audit, Program, Request
 from .base_row import *
 
@@ -41,6 +42,7 @@ class RequestRowConverter(BaseRowConverter):
     audit_id = options.get('audit_id')
     if audit_id:
       audit = Audit.query.get(audit_id)
+      self.obj.requestor = get_current_user()
       self.obj.audit = audit
       self.obj.context = audit.context
       db_session.add(self.obj)
