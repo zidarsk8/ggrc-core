@@ -517,45 +517,51 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }));
     return v;
   }
+
   , "{original_list} add" : function(list, ev, newVals, index) {
     var that = this
       , real_add = []
       ;
+
     can.each(newVals, function(newVal) {
       var _newVal = newVal.instance ? newVal.instance : newVal;
-      if(!that.oldList || !~can.inArray(_newVal, that.oldList)) {
+      if (that.oldList && ~can.inArray(_newVal, that.oldList)) {
+        that.oldList.splice(can.inArray(_newVal, that.oldList), 1);
+      }
+      else {
         that.element && real_add.push(newVal);
-        //that.element.trigger("newChild", newVal);
       }
     });
-    delete that.oldList;
     this.enqueue_items(real_add);
   }
+
   , "{original_list} remove" : function(list, ev, oldVals, index) {
-    var that = this;
+    var that = this
+      , remove_marker = {} // Empty object used as unique marker
+      ;
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
     //    changed to support exact mirroring of the order of
     //    `this.options.list`.
-    //assume we are doing a replace
-    this.oldList = can.map(oldVals, function(v) { return v.instance ? v.instance : v; });
-    GGRC.queue_event(this._ifNotRemoved(function() {
-      if(that.oldList) {
-        can.each(oldVals, function(v) {
+    if (!this.oldList)
+      this.oldList = [];
+    this.oldList.push.apply(
+        this.oldList,
+        can.map(oldVals, function(v) { return v.instance ? v.instance : v; }));
+
+    // `remove_marker` is to ensure that removals are not attempted until 20ms
+    //   after the *last* removal (e.g. for a series of removals)
+    this._remove_marker = remove_marker;
+    setTimeout(this._ifNotRemoved(function() {
+      if (that._remove_marker === remove_marker) {
+        can.each(that.oldList, function(v) {
           that.element.trigger("removeChild", v);
         });
         delete that.oldList;
-      } else {
-        list = can.map(list, function(l) { return l.instance || l});
-        can.each(oldVals, function(v) {
-          var _v = v.instance || v;
-          if(!~can.inArray(_v, list)) {
-            that.element.trigger("removeChild", v);
-          }
-        });
+        delete that._remove_marker;
       }
-    }));
+    }), 20);
   }
 
   , ".tree-structure subtree_loaded" : function(el, ev) {
