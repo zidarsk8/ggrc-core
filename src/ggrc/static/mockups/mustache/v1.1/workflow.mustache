@@ -461,6 +461,18 @@
                           <div class="show-description">
                             <div class="row-fluid">
                               <div class="span12">
+                                <div class="span6">
+                                <a href="#" class="info-action">
+                                  View Task
+                                  <i class="grcicon-goto"></i>
+                                </a>
+                                </div>
+                                <div class="span6">
+                                <a href="#" class="info-action unmap pull-right" data-type="tasks" data-index="{{@index}}">
+                                  <i class="grcicon-remove"></i>
+                                  Unmap
+                                </a>
+                                </div>
                                 <div class="tree-description">
                                   <h5>{{title}}</h5>
                                   <p>{{description}}{{^description}}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed lacinia tortor, quis mattis sapien. Nullam fermentum, justo sed condimentum semper, tortor purus scelerisque lacus, sed congue lorem lectus in sem. Aenean faucibus est metus, feugiat tristique ligula mattis vitae.{{/description}}</p>
@@ -530,6 +542,18 @@
                         <div class="tier-2-info-content">
                           <div class="row-fluid">
                             <div class="span12">
+                              <div class="span6">
+                              <a href="#" class="info-action">
+                                View Task
+                                <i class="grcicon-goto"></i>
+                              </a>
+                              </div>
+                              <div class="span6">
+                              <a href="#" class="info-action unmap pull-right" data-type="people" data-index="{{@index}}">
+                                <i class="grcicon-remove"></i>
+                                Unmap
+                              </a>
+                              </div>
                               <div class="profile-info">
                                 <ul>
                                   <li>
@@ -618,7 +642,7 @@
                                 </a>
                               </div>
                               <div class="span6">
-                                <a href="#" class="info-action unmap pull-right">
+                                <a href="#" class="info-action unmap pull-right"  data-type="objects" data-index="{{@index}}">
                                   <i class="grcicon-remove"></i>
                                   Unmap
                                 </a>
@@ -1029,7 +1053,7 @@
             <span class="required">*</span>
             <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
           </label>
-          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="Copy of 2014 Google Fiber Assessment" tabindex="1">
+          <input class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="Copy of {{assessment.title}}" tabindex="1">
           <br>
         </div>
         <div class="span4">
@@ -1040,7 +1064,7 @@
           </label>
           <i class="grcicon-person-green pull-left icon-field"></i>
           <div class="people-autocomplete">
-            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required autocomplete" value="Cassius Clay" placeholder="Enter text to search for Workflow Owner">
+            <input tabindex="2" type="text" name="lead_email" class="span11 search-icon required autocomplete" value="{{assessment.lead_email}}" placeholder="Enter text to search for Workflow Owner">
           </div>
         </div>
       </div>
@@ -1048,20 +1072,20 @@
       <div class="row-fluid">
         <div class="span12">
           <label>
-            <input type="checkbox" checked="checked">
-            Copy tasks (18)
+            <input type="checkbox" checked="checked" data-type="tasks">
+            Copy tasks ({{assessment.tasks.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy people (3)
+            <input type="checkbox" checked="checked" data-type="people">
+            Copy people ({{assessment.people.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy objects (5)
+            <input type="checkbox" checked="checked" data-type="objects">
+            Copy objects ({{assessment.objects.length}})
           </label>
           <label>
-            <input type="checkbox" checked="checked">
-            Copy task groups (10)
+            <input type="checkbox" checked="checked" data-type='task_groups'>
+            Copy task groups ({{assessment.task_groups.length}})
           </label>
         </div>
       </div>
