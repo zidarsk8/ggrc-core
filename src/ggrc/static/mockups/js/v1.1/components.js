@@ -400,6 +400,7 @@ can.Component.extend({
         taskLock: false
       });
       assessment.save();
+      $('.task-group-index').last().find('.openclose').trigger('click');
     },
     ".removeTaskGroup click" : function(el, ev){
       var assessment = this.scope.assessment
