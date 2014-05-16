@@ -525,6 +525,7 @@ can.Component.extend({
       var t = $(el.closest('.obj_task')).data('index')
         , o = $(el.closest('.tg_object')).data('index')
         , tg = $(el.closest('.task_group')).data('index')
+        , oc = $(el.closest('.obj_task')).find('.openclose')
         , assessment = this.scope.assessment
         , task_groups = assessment.task_groups
         , task_group = task_groups[tg]
@@ -542,12 +543,13 @@ can.Component.extend({
           object.attr('obj_status', 'started');
           task.attr('status', 'started');
           assessment.attr('status', 'In progress');
+          oc.openclose('open');
           break;
         case "started":
           task.attr('status', 'finished');
           break;
         case "finished":
-          task.attr('status', 'verified')
+          task.attr('status', 'verified');
           // Check if all tasks are done:
           for(var i=0; i < tasks.length; i++){
             if(tasks[i].status !== 'verified'){
