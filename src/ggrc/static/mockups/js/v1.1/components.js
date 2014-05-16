@@ -317,6 +317,7 @@ can.Component.extend({
 
     },
     '{window} selected' : function(){
+      if(arguments[2].name !== 'workflow') return;
       this.scope.set_fields(arguments[2]);
       $('.widget').hide();
       $('.active').removeClass('active');
@@ -805,7 +806,6 @@ var modal = can.Component.extend({
       if(!$modal.data('autocomplete'))
         $("tree-app").trigger("selected", this.scope.task);
       $modal.modal('hide');
-
     },
 
     '{Task} created' : function(){
