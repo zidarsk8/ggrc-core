@@ -41,3 +41,4 @@ class Context(Described, Base, db.Model):
 
   _publish_attrs = ['name', 'related_object',]
   _sanitize_html = ['name',]
+  _include_links = []

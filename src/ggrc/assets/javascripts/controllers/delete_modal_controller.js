@@ -26,7 +26,8 @@ GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
         parent_controller.options.skip_refresh = true;
 
       $(document.body).trigger("ajax:flash", { success : instance.display_name() +  ' deleted successfully'});
-      that.element.trigger("modal:success", that.options.instance);
+      if (that.element)
+        that.element.trigger("modal:success", that.options.instance);
     }), el);
   }
 

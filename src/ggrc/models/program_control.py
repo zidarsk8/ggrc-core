@@ -8,9 +8,14 @@ from .mixins import Mapping
 
 class ProgramControl(Mapping, db.Model):
   __tablename__ = 'program_controls'
-  __table_args__ = (
-      db.UniqueConstraint('program_id', 'control_id'),
-      )
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('program_id', 'control_id'),
+        db.Index('ix_program_id', 'program_id'),
+        db.Index('ix_control_id', 'control_id'),
+        )
 
   program_id = db.Column(
       db.Integer, db.ForeignKey('programs.id'), nullable=False)

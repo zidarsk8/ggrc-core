@@ -53,6 +53,8 @@ permissions = {
         "Person",
         "Program",
         "Role",
+        "UserRole",
+        "Context",
         {
             "type": "Task",
             "terms": {

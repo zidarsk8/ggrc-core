@@ -9,9 +9,13 @@ from .mixins import Mapping
 class ObjectiveControl(Mapping, db.Model):
   __tablename__ = 'objective_controls'
 
-  __table_args__ = (
-    db.UniqueConstraint('objective_id', 'control_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('objective_id', 'control_id'),
+        db.Index('ix_control_id', 'control_id'),
+        db.Index('ix_objective_id', 'objective_id'),
+        )
 
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable = False)
   control_id = db.Column(db.Integer, db.ForeignKey('controls.id'), nullable = False)

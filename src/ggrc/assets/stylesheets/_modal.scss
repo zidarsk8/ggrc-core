@@ -1071,3 +1071,42 @@ p.modal-value {
     }
   }
 }
+
+// Mockups Workflow V1.1
+.gdrive-select {
+  margin-left: 10px;
+}
+
+.results-wrap {
+  height: 240px;
+  background: lighten($lightGray,3%);
+  overflow-y: auto;
+  .info {
+    display: block;
+    text-align: center;
+    padding-top: 95px;
+    color: $gray;
+    font-size: $f-medium;
+    font-weight: bold;
+  }
+}
+
+.frequency-wrap {
+  label {
+    font-size: 14px !important;
+    i {
+      margin-top: 6px;
+    }
+  }
+  padding-top: 23px;
+  span {
+    display: inline-block;
+    padding: 0 5px;
+    &.start-text {
+      padding: 0 5px 0 0;
+    }
+  }
+  select {
+    margin-bottom: 0;
+  }
+}

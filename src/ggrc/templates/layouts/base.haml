@@ -17,21 +17,36 @@
       -block title
         Governance, Risk and Compliance
 
-    %script{ 'type': 'text/javascript' }
-      GGRC = window.GGRC || {};
-      -block extra_javascript
-
     -assets "dashboard-css"
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
+
+    %script
+      GGRC = window.GGRC || {};
+      -include "scripts/tracker-prefix.js"
+      window.st=Date.now();
+      -block extra_javascript
 
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    :javascript
+      GGRC.Tracker.timing("dashboard", "exec_scripts", Date.now() - st, "dashboard.js finished executing");
+      window.st=Date.now();
+
     -assets "dashboard-js-templates"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
+
+    :javascript
+      GGRC.Tracker.timing("dashboard", "load_templates", Date.now() - st, "dashboard-templates.js finished loading and executing");
+      $(function() {
+        $(function() {
+          GGRC.Tracker.timing("dashboard", "exec_ready_handlers", Date.now() - st, "last document.ready handler fired");
+        });
+      })
+      
 
     -#FIXME: (?) HTML5 shim?
 
@@ -43,6 +58,14 @@
     -#NOTE: This resource occasionally hangs and prevents page from rendering, so loaded after the fact via jquery
     :javascript
       jQuery(function($) { $('head').append("<link href='https://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'></link>"); });
+      window.onerror = function(message, url, linenumber) {
+        if(window.$) {
+          $(document.body).trigger("ajax:flash", {"error" : message});
+        }
+        if(window.GGRC && window.GGRC.Tracker) {
+          GGRC.Tracker.exception(message + " (at " + url + ":" + linenumber + ")");
+        }
+      };
 
     -if config.get("GOOGLE_ANALYTICS_ID")
       :javascript

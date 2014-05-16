@@ -111,26 +111,11 @@ can.Control("CMS.Controllers.SortableWidgets", {
   , " sortremove" : "update_event"
   , " sortupdate" : "update_event"
   , " sortreceive": "update_event"
-/*
-  , " sortupdate" : "force_add_widget_bottom"
-  , " sortreceive" : "force_add_widget_bottom"
-  , force_add_widget_bottom : function(el, ev, data) {
-      // This doesn't seem necessary...
-      if(this.is_initialized) {
-        var $add_box = this.element.find(".cms_controllers_add_widget")
-          , $parent = $add_box.parent();
-        if($add_box.is(":not(:last-child)")) {
-          $add_box.detach().appendTo($parent);
-        }
-      }
-      this.update_event(el, ev, data);
-    }*/
-
   , update_event : function(el, ev, data) {
       if(this.is_initialized) {
         this.sortable().sortable("refresh");
         this.options.sort.replace(this.element.sortable("toArray"));
-        this.options.model.save()
+        this.options.model.save();
         this.element.trigger("widgets_updated");
       }
     }

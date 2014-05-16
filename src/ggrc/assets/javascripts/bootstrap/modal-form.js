@@ -24,7 +24,7 @@
   /* NOTE: MODAL_FORM EXTENDS BOOTSTRAP-MODAL.js
    * ========================================== */
 
-  ModalForm.prototype = new $.fn.modal.Constructor(); 
+  ModalForm.prototype = new $.fn.modal.Constructor(null, { remote : false }); 
 
   $.extend(ModalForm.prototype, {
 

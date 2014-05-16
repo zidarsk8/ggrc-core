@@ -11,9 +11,13 @@ from .mixins import Mapping
 class DirectiveSection(Mapping, db.Model):
   __tablename__ = 'directive_sections'
 
-  __table_args__ = (
-    db.UniqueConstraint('directive_id', 'section_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('directive_id', 'section_id'),
+        #db.Index('ix_directive_id', 'directive_id'),
+        #db.Index('ix_section_id', 'section_id'),
+        )
 
   directive_id = db.Column(db.Integer, db.ForeignKey('directives.id'), nullable = False)
   section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable = False)

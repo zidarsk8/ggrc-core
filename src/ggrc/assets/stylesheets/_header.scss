@@ -128,7 +128,7 @@
           }
         }
         .dropdown-menu {
-          z-index: 1005;
+          z-index: 9999;
         }
       }
       .dropdown-menu {
@@ -302,11 +302,12 @@
     }
   }
   .object-header-notification {
-    text-transform: uppercase;
     font-size: 14px;
     line-height: 18px;
     font-weight: bold;
-    margin: 18px 20px 0 103px;
+    font-style: italic;
+    margin: 18px 20px 0 0;
+    text-align: right;
     i {
       margin-top: 1px;
       &.grcicon-attribute-color {
@@ -315,8 +316,10 @@
       }
     }
     &.object-approved {
-      margin: 18px 20px 0 223px;
       color: $green;
+    }
+    &.object-error {
+      color: $red;
     }
   }
   .btn-group {

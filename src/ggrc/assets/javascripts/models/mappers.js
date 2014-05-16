@@ -846,7 +846,8 @@
           ;
 
         binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
-          self._refresh_stubs(binding);
+          if (binding._refresh_stubs_deferred)
+            self._refresh_stubs(binding);
         });
 
         if (object_join_value) {
@@ -884,7 +885,8 @@
                     || (mapping[this.object_attr].reify().constructor == object_model &&
                         mapping[this.object_attr].id == binding.instance.id))
                 && (!option_model
-                    || mapping[this.option_attr].reify() instanceof option_model));
+                    || (mapping[this.option_attr]
+                        && mapping[this.option_attr].reify() instanceof option_model)));
       }
 
     , filter_and_insert_instances_from_mappings: function(binding, mappings) {
@@ -995,17 +997,25 @@
    */
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.DirectListLoader", {
   }, {
-      init: function(model_name, object_attr) {
+      init: function(model_name, object_attr, object_join_attr) {
         this._super();
 
         this.model_name = model_name;
         this.object_attr = object_attr;
+        this.object_join_attr = object_join_attr;
       }
 
     , init_listeners: function(binding) {
         var self = this
           , model = CMS.Models[this.model_name]
           ;
+
+        binding.instance.bind(this.object_join_attr, function(ev, _new, _old) {
+          if (binding._refresh_stubs_deferred) {
+            binding.list.splice(0, binding.list.length);
+            self._refresh_stubs(binding);
+          }
+        });
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model)
@@ -1095,12 +1105,20 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var model = CMS.Models[this.model_name]
-          , object_join_attr = this.object_join_attr || model.table_plural
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify();
+        var that = this
+          , refresh_queue = new RefreshQueue()
           ;
 
-        this.insert_instances_from_mappings(binding, mappings);
+        refresh_queue.enqueue(binding.instance);
+
+        return refresh_queue.trigger().then(function() {
+          var model = CMS.Models[that.model_name]
+            , object_join_attr = that.object_join_attr
+            , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
+            ;
+
+          that.insert_instances_from_mappings(binding, mappings);
+        });
       }
   });
 
@@ -1270,30 +1288,7 @@
 
         model.bind("created", function(ev, mapping) {
           if (mapping instanceof model) {
-            var model_type = mapping.constructor.model_singular || mapping.constructor.shortName
-              , types = $.grep(that.types, function(type) { return type === model_type; })
-              ;
-
-            // Ensure that this model exists in the list of types
-            if (types.length) {
-              GGRC.Models.Search.search_for_types(
-                  that.term
-                , types
-                , that.get_params(binding)
-              ).pipe(function(mappings) {
-                // Check for the new mapping existing in the search
-                var entries = $.map(mappings.entries, function(entry) {
-                  if (entry.type === model_type && entry.id === mapping.id) {
-                    return entry;
-                  }
-                });
-
-                // If we found one, insert the mapping
-                entries.length && that.filter_and_insert_instances_from_mappings(binding, [mapping]);
-                
-                return mappings.entries;
-              });
-            }
+            that._refresh_stubs(binding);
           }
         });
 

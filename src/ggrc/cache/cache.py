@@ -127,6 +127,7 @@ def all_mapping_entries():
     mapping('Section', 'directive'),
     mapping('Relationship', 'source', True),
     mapping('Relationship', 'destination', True),
+    mapping('UserRole', 'context'),
     mapping('UserRole', 'person'),
     mapping('UserRole', 'role'),
     mapping('ObjectEvent', 'eventable', True),

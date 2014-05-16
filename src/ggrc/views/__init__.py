@@ -11,12 +11,12 @@ from ggrc.extensions import get_extension_modules
 from ggrc.app import app
 from ggrc.rbac import permissions
 from ggrc.login import get_current_user
-from ggrc.utils import as_json
-from ggrc.builder.json import publish
+from ggrc.services.common import as_json, inclusion_filter, filter_resource
+from ggrc.builder.json import publish, publish_representation
 from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
-from .registry import object_view, tooltip_view
+from .registry import object_view
 from ggrc.models.task import Task, queued_task, create_task, make_task_response
 
 """ggrc.views
@@ -75,8 +75,12 @@ def get_config_json():
   return json.dumps(public_config)
 
 def get_current_user_json():
+  from ggrc.models.person import Person
   current_user = get_current_user()
-  return as_json(current_user.log_json())
+  person = Person.eager_query().filter_by(id=current_user.id).one()
+  return as_json(
+      filter_resource(
+        publish_representation(publish(person, (), inclusion_filter))))
 
 @app.context_processor
 def base_context():
@@ -197,44 +201,6 @@ def all_object_views():
   return views
 
 
-def contributed_tooltip_views():
-  from ggrc import models
-  return [
-      tooltip_view(models.Audit),
-      tooltip_view(models.Program),
-      tooltip_view(models.Contract),
-      tooltip_view(models.Policy),
-      tooltip_view(models.Regulation),
-      tooltip_view(models.Standard),
-      tooltip_view(models.Control),
-      tooltip_view(models.Objective),
-      tooltip_view(models.System),
-      tooltip_view(models.Process),
-      tooltip_view(models.Product),
-      tooltip_view(models.Request),
-      tooltip_view(models.OrgGroup),
-      tooltip_view(models.Facility),
-      tooltip_view(models.Market),
-      tooltip_view(models.Project),
-      tooltip_view(models.DataAsset),
-      tooltip_view(models.Person),
-      tooltip_view(models.Event),
-      ]
-
-
-def all_tooltip_views():
-  views = contributed_tooltip_views()
-
-  for extension_module in get_extension_modules():
-    contributions = getattr(extension_module, "contributed_tooltip_views", None)
-    if contributions:
-      if callable(contributions):
-        contributions = contributions()
-      views.extend(contributions)
-
-  return views
-
-
 def init_extra_views(app):
   pass
 
@@ -244,14 +210,6 @@ def init_all_views(app):
   from ggrc import settings
 
   for entry in all_object_views():
-    entry.service_class.add_to(
-      app,
-      '/{0}'.format(entry.url),
-      entry.model_class,
-      decorators=(login_required,)
-      )
-
-  for entry in all_tooltip_views():
     entry.service_class.add_to(
       app,
       '/{0}'.format(entry.url),
@@ -307,7 +265,7 @@ def assessments_object_final():
 def assessments_my_work():
   """The assessment my work guide page
   """
-  return render_template("mockups/v1.0/my-work.html")    
+  return render_template("mockups/v1.0/my-work.html")
   
 @app.route("/mockups/assessments_grid")
 @login_required
@@ -315,6 +273,20 @@ def assessments_grid():
   """The assessments grid guide page
   """
   return render_template("mockups/assessments-grid.html")
+
+@app.route("/mockups/v1.1/index.html")
+@login_required
+def workflow_assessment():
+  """The workflow assessment guide page
+  """
+  return render_template("mockups/v1.1/index.html")
+  
+@app.route("/mockups/v1.1/workflow.html")
+@login_required
+def workflow_info():
+  """The workflow info guide page
+  """
+  return render_template("mockups/v1.1/workflow.html")
 
 @app.route("/permissions")
 @login_required

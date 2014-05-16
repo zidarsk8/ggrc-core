@@ -26,7 +26,7 @@ class ObjectiveRowConverter(BaseRowConverter):
 
   def reify(self):
     self.handle('slug', SlugColumnHandler)
-    self.handle_raw_attr('title', is_required=True)
+    self.handle_title('title', is_required=True)
     self.handle_text_or_html('description')
     self.handle_raw_attr('url')
     self.handle_raw_attr('reference_url')

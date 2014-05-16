@@ -7,7 +7,10 @@
 
 GGRC = window.GGRC || {};
 
-GGRC.Tracker = {};
+GGRC.Tracker = GGRC.Tracker || {};
+
+GGRC.Tracker.timing("dashboard", "load_scripts", Date.now() - st, "dashboard.js script tag to exec start");
+window.st = Date.now();
 
 GGRC.Tracker.init = function() {
   GGRC.Tracker.ga = this._ga;
@@ -156,9 +159,14 @@ GGRC.Tracker.api_timing_transport = function(options, _originalOptions, _jqXHR) 
           statusText,
           { json: data },
           jqXHR.getAllResponseHeaders());
-      }).fail(function(xhr, message, statusText) {
+      }).fail(function(jqXHR, message, statusText) {
         GGRC.Tracker.exception(
           ["AJAX request failed", statusText, options.type, url].join(": "));
+        completeCallback(
+          jqXHR.status,
+          statusText,
+          { text: jqXHR.responseText},
+          jqXHR.getAllResponseHeaders());
       });
     },
     abort: function() {

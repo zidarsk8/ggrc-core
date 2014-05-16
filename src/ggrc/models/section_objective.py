@@ -9,9 +9,13 @@ from .mixins import Mapping
 class SectionObjective(Mapping, db.Model):
   __tablename__ = 'section_objectives'
 
-  __table_args__ = (
-    db.UniqueConstraint('section_id', 'objective_id'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('section_id', 'objective_id'),
+        db.Index('ix_section_id', 'section_id'),
+        db.Index('ix_objective_id', 'objective_id'),
+        )
 
   section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), nullable = False)
   objective_id = db.Column(db.Integer, db.ForeignKey('objectives.id'), nullable = False)

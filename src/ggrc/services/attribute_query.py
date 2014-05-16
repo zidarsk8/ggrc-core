@@ -9,7 +9,7 @@ from collections import namedtuple
 from sqlalchemy import and_, cast
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm import joinedload_all
-from sqlalchemy.types import AbstractType, Boolean, Date, DateTime, Integer
+from sqlalchemy.types import TypeEngine, Boolean, Date, DateTime, Integer
 from werkzeug.exceptions import BadRequest
 
 AttributeQuery = namedtuple('AttributeQuery', 'filter joinlist options')
@@ -61,7 +61,7 @@ class AttributeQueryBuilder(object):
 
   def check_valid_property(self, attr, attrname):
     if not hasattr(attr, 'type') or \
-        not isinstance(attr.type, AbstractType):
+        not isinstance(attr.type, TypeEngine):
       raise self.bad_query_parameter(attrname)
 
   def process_property_path(self, arg, value):

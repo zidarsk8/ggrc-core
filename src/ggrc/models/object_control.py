@@ -34,9 +34,13 @@ class ObjectControl(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.controllable_attr, value)
 
-  __table_args__ = (
-    db.UniqueConstraint('control_id', 'controllable_id', 'controllable_type'),
-  )
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint(
+          'control_id', 'controllable_id', 'controllable_type'),
+        db.Index('ix_control_id', 'control_id'),
+        )
 
   _publish_attrs = [
       'role',

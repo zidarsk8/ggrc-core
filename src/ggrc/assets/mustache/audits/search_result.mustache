@@ -1,7 +1,7 @@
 {{#list}}
 <li class="{{class.category}}" data-model="true" {{data 'model'}}>
   {{#using program=program}}
-  <a href="{{program.viewLink}}#audit_widget" class="show-extended">
+  <a href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{program.viewLink}}{{else}}/dashboard{{/is_allowed}}#audit_widget/audit/{{id}}" class="show-extended">
     <div>
       <div>
         <span class="lhs-item">

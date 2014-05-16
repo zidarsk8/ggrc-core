@@ -11,6 +11,7 @@ permissions = {
         "Option",
         "Role",
         "Person",
+        "Context",
         {
             "type": "Task",
             "terms": {

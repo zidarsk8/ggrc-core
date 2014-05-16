@@ -13,7 +13,7 @@ can.Construct("can.Model.Mixin", {
     if(typeof fullName === "string") {
       // Mixins do not go into the global namespace.
       tempname = fullName;
-      fullName = null;
+      fullName = "";
     }
     var Constructor = this._super.call(this, fullName, klass, proto);
 
@@ -42,6 +42,8 @@ can.Construct("can.Model.Mixin", {
     var setupfns = function(obj) {
       return function(fn, key) {
         var blockedKeys = ["fullName", "defaults", "_super", "constructor"];
+        var aspect = ~key.indexOf(":") ? key.substr(0, key.indexOf(":")) : "after";
+        key = ~key.indexOf(":") ? key.substr(key.indexOf(":") + 1) : key;
         if(fn !== can.Model.Mixin[key] && !~can.inArray(key, blockedKeys)) {
           var oldfn = obj[key];
           // TODO support other ways of adding functions.
@@ -54,10 +56,20 @@ can.Construct("can.Model.Mixin", {
           // Defaults will always be "after" for functions
           //  and "override" for non-function values
           if(oldfn && typeof oldfn === "function") {
-            obj[key] = function() {
-              oldfn.apply(this, arguments);
-              return fn.apply(this, arguments);
-            };
+            switch(aspect) {
+              case "before":
+              obj[key] = function() {
+                fn.apply(this, arguments);
+                return oldfn.apply(this, arguments);
+              };
+              break;
+              case "after":
+              obj[key] = function() {
+                oldfn.apply(this, arguments);
+                return fn.apply(this, arguments);
+              };
+              break;
+            }
           } else {
             obj[key] = fn;
           }
@@ -91,7 +103,7 @@ can.Model.Mixin("ownable", {
   }
 });
 
-can.Model.Mixin("contactable" ,{
+can.Model.Mixin("contactable", {
   before_create : function() {
     if(!this.contact) {
       this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
@@ -102,6 +114,61 @@ can.Model.Mixin("contactable" ,{
       if(!this.contact) {
         this.attr('contact', { id: GGRC.current_user.id, type : "Person" });
       }
+    }
+  }
+});
+
+can.Model.Mixin("unique_title", {
+  "after:init" : function() {
+    this.validate(["title", "_transient:title"], function(newVal, prop) {
+      if(prop === "title") {
+        return this.attr("_transient:title");
+      } else if(prop === "_transient:title") {
+        return newVal; //the title error is the error
+      }
+    });
+  }
+}, {
+  save_error : function(e) {
+    if(/title values must be unique\.$/.test(e)) {
+      this.attr("_transient:title", e );
+    }
+  }
+  , after_save : function() {
+    // Currently we do not have a way of searching for similarly
+    //  titled objects through the search API or the declarative 
+    //  model layer, but it's recommended that we show users when
+    //  a name for an object is too similar to ones already in the
+    //  system.  --BM 5/2/2014
+
+    // var that = this
+    // , search_params = {
+    //   q: this.title
+    // , counts_only: true
+    // };
+    // if (this._last_search === undefined || this._last_search !== this.title) {
+    //   this._last_search = this.title; // remember last search term
+    //   $.get('/search', search_params).done(function(data) {
+    //     var count = data.results.counts[that.constructor.model_singular] - 1;
+    //     if(count > 0) {
+    //       $(document.body).trigger("ajax:flash", {
+    //         warning : "Warning: your "
+    //           + that.constructor.title_singular
+    //           + " title '"
+    //           + that.title
+    //           + "' is similar to "
+    //           + count
+    //           + " other title"
+    //           + (count === 1 ? "" : "s")
+    //       });
+    //     }
+    //   });
+    // }
+    this.removeAttr("_transient:title");
+  }
+  , "before:attr" : function(key, val) {
+    if(key === "title" && arguments.length > 1) {
+      this.attr("_transient:title", null);
     }
   }
 });

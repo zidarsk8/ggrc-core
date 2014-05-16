@@ -3,84 +3,35 @@ function create_seed(){
     new Assessment({
       title: "2014 Google Fiber Assessment",
       program_title: "Google Fiber",
+      description: "Initial control setup confirmation.",
       lead_email: "Cassius Clay",
-      start_date: "03/11/2014",
-      end_date: "",
-      status: "Pending",
+      end_date: "09/06/2014",
+      status: "Future",
       workflow: 0,
-      objects: []
+      objects: [],
+      task_groups: [],
+    }).save();
+  }
+  if(taskList.length === 0){
+    new Task({
+      title: "Peer Review",
+      description: "",
+      end_date: "",
+    }).save();
+    new Task({
+      title: "Control Checkup",
+      description: "",
+      end_date: ""
     }).save();
   }
   var workflowList = new Workflow.List({});
-  if(workflowList.length === 0){
-    new Workflow({
-      title : "FIBER - Control Testing",
-      tasks : [
-        "Proof reading",
-        "Validate mappings",
-        "Validate supporting documents"
-      ],
-      reviews : [
-        {title: "Peer Review", reviewer: "Jonathan Myers"},
-        {title: "3rd party review", reviewer: "Cindy Rella"},
-        
-      ],
-      frequency : {
-        type: "Annually",
-        repeat_day: 24,
-        repeat_month: 4
-      }
-    }).save();
-    new Workflow({
-      title : "General Walkthrough",
-      tasks : [
-        "Proof reading",
-      ],
-      reviews : [
-        {title: "Peer Review", reviewer: "Jonathan Myers"},
-      ],
-      frequency : {
-        type: "Annually",
-        repeat_day: 24,
-        repeat_month: 4
-      }
-    }).save();
-    new Workflow({
-      title : "General Testing",
-      tasks : [
-      ],
-      reviews : [
-      ],
-      frequency : {
-        type: "Annually",
-        repeat_day: 24,
-        repeat_month: 4
-      }
-    }).save();
-    new Workflow({
-      title : "General Walkthrough",
-      tasks : [
-      ],
-      reviews : [
-      ],
-      frequency : {
-        type: "Annually",
-        repeat_day: 24,
-        repeat_month: 4
-      }
-    }).save();
-    new Workflow({
-      title : "FED Contract Validation",
-      tasks : [
-      ],
-      reviews : [
-      ],
-      frequency : {
-        type: "Annually",
-        repeat_day: 24,
-        repeat_month: 4
-      }
-    }).save();
-  }
   assessmentList = new Assessment.List({});
+  taskList = new Task.List({});
+
+  for(var i = 0; i < assessmentList.length; i++){
+    var assessment = assessmentList[i];
+    if(!assessment.people) assessment.attr('people', []);
+    if(!assessment.tasks) assessment.attr('tasks', []);
+    assessment.save();
+  }
 }

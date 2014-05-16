@@ -174,6 +174,9 @@ class BaseRowConverter(object):
   def handle_raw_attr(self, key, **options):
     return self.handle(key, ColumnHandler, **options)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
+
   def handle_date(self, key, **options):
     self.handle(key, DateColumnHandler, **options)
 
@@ -267,6 +270,7 @@ class ColumnHandler(object):
 
   def export(self):
     return getattr(self.importer.obj, self.key, '')
+
 
 class RequestTypeColumnHandler(ColumnHandler):
 
@@ -368,7 +372,10 @@ class ContactEmailHandler(ColumnHandler):
     return attr
 
   def validate(self, data):
-    pass
+    if self.options.get('prevent_duplicates') and data not in ("", None):
+      has_import_collision = any(data == x.obj.email for x in self.base_importer.objects)
+      if has_import_collision:
+        self.add_error("This email is already used for another person within this import.")
 
 
 class AssigneeHandler(ContactEmailHandler):
@@ -477,6 +484,24 @@ class BooleanColumnHandler(ColumnHandler):
         return "No"
       else:
         return str(self.value) # unknown value - shouldn't happen
+
+class TitleHandler(ColumnHandler):
+
+  def validate(self, data):
+    super(TitleHandler, self).validate(data)
+    # check for collisions in db
+    object_class = self.importer.model_class
+    db_collisions = object_class.query.filter_by(title=data).all()
+    # Only add error for collision if it doesn't match one of the slugs
+    if db_collisions:
+      current_slug = self.importer.obj.slug
+      if not any(current_slug == x.slug for x in db_collisions):
+        self.add_error("An object with this title already exists.")
+        return
+    # ... and then in existing imports
+    has_import_collision = data in [x.obj.title for x in self.base_importer.created_objects()]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
 
 class DateColumnHandler(ColumnHandler):
 

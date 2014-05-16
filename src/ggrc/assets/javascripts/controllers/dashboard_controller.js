@@ -28,8 +28,6 @@ can.Control("CMS.Controllers.Dashboard", {
       if (!this.inner_nav_controller)
         this.init_inner_nav();
       this.update_inner_nav();
-      if (!this.add_widget_controller)
-        this.init_add_widget();
 
       // Before initializing widgets, hide the container to not show
       // loading state of multiple widgets before reducing to one.
@@ -93,15 +91,6 @@ can.Control("CMS.Controllers.Dashboard", {
             });
       }
     }
-
-  , init_add_widget: function() {
-      this.add_widget_controller = new CMS.Controllers.AddWidget(
-          this.element.find('.add-nav-item'), {
-              dashboard_controller : this
-            //, widget_descriptors : this.options.widget_descriptors
-            , menu_tree : this.options.menu_tree
-          });
-      }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -378,34 +367,18 @@ can.Control("CMS.Controllers.InnerNav", {
 
       this.sortable();
 
-      can.route.ready();
-
       if (!(this.options.contexts instanceof can.Observe))
         this.options.contexts = new can.Observe(this.options.contexts);
 
       // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-      can.route(":path", {});
-
-      can.route.bind("change", function(ev, attr, how, newVal, oldVal) {
-        if (attr === "path") {
-          if (newVal) {
-            that.display_path(newVal);
-          }
-          else {
-            that.display_path('info_widget');
-          }
-        }
+      can.bind.call(window, 'hashchange', function() {
+        that.route(window.location.hash);
       });
 
       can.view(this.options.internav_view, this.options, function(frag) {
         function fn() {
           that.element.append(frag);
-          if (window.location.hash.substr(0,2) === "#!") {
-            can.route.attr('path', window.location.hash.substr(2));
-          }
-          else {
-            can.route.attr('path', window.location.hash.substr(1));
-          }
+          that.route(window.location.hash);
           delete that.delayed_display;
         }
         that.delayed_display = {
@@ -415,6 +388,22 @@ can.Control("CMS.Controllers.InnerNav", {
       });
 
       this.on();
+    }
+
+  , route: function(path) {
+      if (path.substr(0, 2) === "#!") {
+        path = path.substr(2);
+      } else if (path.substr(0, 1) === "#") {
+        path = path.substr(1);
+      }
+
+      window.location.hash = path;
+
+      if (path.length > 0) {
+        this.display_path(path);
+      } else {
+        this.display_path('info_widget');
+      }
     }
 
   , display_path: function(path) {

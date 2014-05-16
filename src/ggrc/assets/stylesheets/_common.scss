@@ -156,6 +156,13 @@ u {
   overflow: visible;
 }
 
+.cancel-text {
+  color: $black;
+  &:hover {
+    color: $black;
+  }
+}
+
 .gray {
   color: $gray;
 }
@@ -405,6 +412,12 @@ input.date {
   background-image: image-url("grcicons/icons.png");
   background-repeat: no-repeat;
   background-position: -268px -364px;
+  &.short-field {
+    height: 16px !important;
+    line-height: 16px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
 //Making input 100% width of his parent element
@@ -819,4 +832,47 @@ select.multiple-selector {
 
 .rtf-block {
   word-wrap: break-word;
+}
+
+.top-align-label {
+  input {
+    margin-bottom: 0;
+  }
+}
+
+.drag {
+  &:hover {
+    cursor: move;
+  }
+  i {
+    @include opacity(0.5);
+  }
+}
+
+.field-wrap {
+  @include clearfix;
+  input {
+    width: 40%;
+    float: left;
+    margin-right: 4px;
+    &.date {
+      width: 18%;
+      margin-right: 0;
+    }
+  }
+  .required {
+    float: left;
+    width: 8px;
+    font-weight: bold;
+    color: $red;
+    margin: 6px 8px 0 3px;
+  }
+  a {
+    float: left;
+    width: 15%;
+    &.drag {
+      float: left;
+      width: 23px;
+    }
+  }
 }

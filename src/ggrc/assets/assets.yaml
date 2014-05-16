@@ -9,18 +9,13 @@ dashboard-js-files:
   - rails.js
   - jquery-ui.js
   - jquery.ba-throttle-debounce.js
-  - sha1.js
-  - bootstrap-transition.js
   - bootstrap-alert.js
-  - bootstrap-button.js
-  - bootstrap-carousel.js
   - bootstrap-collapse.js
   - bootstrap-dropdown.js
   - bootstrap-modal.js
   - bootstrap-tab.js
   - bootstrap-tooltip.js
   - bootstrap-popover.js
-  - bootstrap-typeahead.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-form.js
   - can.jquery.js
@@ -30,7 +25,6 @@ dashboard-js-files:
   - can.construct.proxy.js
   - can.map.attributes.js
   - bootstrap/modal-ajax.js
-  - bootstrap/affix.js
   - wysihtml5_parser_rules/advanced.js
   - wysihtml5-0.4.0pre.js
   - bootstrap-wysihtml5-0.0.2.js
@@ -39,10 +33,7 @@ dashboard-js-files:
   - permission.js
   - application.js
   - jquerypp.custom.js
-  - related_selector.js
-  - single_selector.js
   - spin.min.js
-  - tmpl.js
   - client_record_replay.js
   - mustache_helper.js
   - sticky_header.js
@@ -52,12 +43,15 @@ dashboard-js-files:
   - models/cacheable.js
   - models/local_storage.js
   - models/display_prefs.js
-  - pbc/document.js
-  - pbc/person.js
+  - models/local_list_cache.js
+  - models/document.js
+  - models/person.js
   - models/simple_models.js
+  - models/business_object_models.js
+  - models/directive_models.js
   - models/recently_viewed_object.js
   - models/search.js
-  - controllers/add_widgets.js
+  - models/audit_models.js
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
@@ -66,46 +60,30 @@ dashboard-js-files:
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
   - controllers/recently_viewed_controller.js
-  - controllers/resize_widgets_controller.js
   - controllers/sortable_widgets_controller.js
   - controllers/tree_view_controller.js
   - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
-  - controls/control.js
-  - controls/controls_controller.js
+  - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
-  - apps/controls.js
-  - sections/section.js
-  - pbc/system.js
+  - models/section.js
+  - models/system.js
   - models/join_models.js
   - controllers/modal_selector_controller.js
-  - directives/routes_controller.js
-  - mapping/mapping_controller.js
-  - sections/sections_controller.js
-  - apps/mapping.js
-  - pbc/meeting.js
-  - pbc/response.js
-  - pbc/responses_controller.js
-  - pbc/modals_controller.js
   - pbc/workflow_controller.js
-  - apps/pbc.js
-  - products/routes_controller.js
-  - apps/products.js
-  - controls/category.js
+  - models/category.js
   - apps/quick_search.js
-  - apps/systems.js
   - apps/programs.js
   - apps/business_objects.js
   - apps/dashboard.js
-  - sections/notes_controller.js
   - roles/roles_modal_controller.js
   - dashboard.js
   - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   #- d3.v2.js
-  - related_graph.js
+  #- related_graph.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
@@ -165,6 +143,7 @@ dashboard-js-template-files:
   - objectives/modal_content.mustache
   - objectives/tree.mustache
   - org_groups/modal_content.mustache
+  - pbc/iframe_tooltip.mustache
   - people/active_column.mustache
   - people/filters.mustache
   - people/info.mustache
@@ -250,7 +229,6 @@ dashboard-css-files:
   - jquery-ui.css
 
 dashboard-js-spec-files:
-  - controllers/resize_widgets_spec.js
   - models/local_storage_spec.js
   - models/recently_viewed_object_spec.js
   - models/display_prefs_spec.js

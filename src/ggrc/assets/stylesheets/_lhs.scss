@@ -75,7 +75,7 @@
   &.emphasized { // special case for programs
    ul {
      margin-bottom:0;
-   } 
+   }
   }
   .accordion-group { // override bootstrap
     border:none;
@@ -108,17 +108,34 @@
       }
       a {
         display:block;
-        padding-left:10px;
-        &.active,
+        padding-left:26px;
+        background: image-url('grcicons/not-open.png') no-repeat 10px center;
+        @include background-size(17px 12px);
         &:hover {
           text-decoration:none;
-          background:#fff image-url('grcicons/open.png') no-repeat right center;
+          background:#fff image-url('grcicons/not-open.png') no-repeat 10px center;
+          @include background-size(17px 12px);
+        }
+        &.active {
+          background:#fff image-url('grcicons/open.png') no-repeat 10px center;
           @include background-size(17px 12px);
         }
       }
       &.programs {
         a {
           color:$programs;
+        }
+      }
+      &.finished {
+        a {
+          background-color: $rqAccepted;
+        }
+        .finished-number {
+          margin-right: 10px;
+          &.error {
+            font-weight: normal;
+            color: #ce3e3e;
+          }
         }
       }
     }
@@ -252,6 +269,9 @@
       a {
         font-size:12px;
         color:#333;
+        
+        padding-left: 10px;
+        background: none;
         &:hover {
          background:#fff;
          text-decoration:underline;
@@ -304,7 +324,10 @@
     cursor:e-resize;
   }
 }
-
+// Show object nav bar-v below title
+.bar-v.objnav {
+  z-index: 1;
+}
 
 // INNER NAV
 
@@ -357,6 +380,29 @@
         height:30px;
         cursor:move;
       }
+      &.inner-nav-button {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        .message {
+          color: $green;
+        }
+      }
+      &.finished {
+        background: $rqAccepted;
+      }
+      &.started {
+        background: $rqStarted;
+      }
+      &.overdue {
+        background: $red;
+        a {
+          color: $white;
+          i {
+            @include opacity(1);
+          }
+        }
+      }
     }
     a {
       padding-left:20px;
@@ -390,6 +436,12 @@
         color:#fff;
         i {
           @include opacity(1);
+        }
+      }
+      &.overdue {
+        a {
+          background-color: $red;
+          color: $white;
         }
       }
     }
@@ -490,7 +542,76 @@
         }
       }
     }
-
+  }
+  ul.innernav-arrow {
+    a {
+      &.w-arrow {
+        padding-left: 48px;
+      }
+    }
+    .arrow {
+      background: image-url('grcicons/not-open.png') no-repeat 0 0;
+      @include background-size(17px 12px);
+      width: 17px;
+      height: 12px;
+      position: absolute;
+      top: 8px;
+      left: 24px;
+      padding: 0;
+      cursor: pointer;
+      &.active {
+        background: image-url('grcicons/open.png') no-repeat 0 0;
+        @include background-size(17px 12px);
+      }
+    }
+    li {
+      ul.sub-level {
+        @include reset-list();
+        li {
+          a {
+            border-bottom: 1px dotted #ddd;
+            font-size: 11px;
+            padding-left: 22px;
+            &:hover {
+              background-color: $rqAccepted;
+              background-image: none;
+              background-position: 0 0;
+              color: #777;
+            }
+            i {
+              @include opacity(1);
+            }
+          }
+          &:hover {
+            a {
+              background-color: $rqAccepted;
+              color:#777;
+            }
+          }
+          &:last-child {
+            a {
+              border-bottom: 1px solid #ddd;
+            }
+          }
+        }
+      }
+      &:hover,
+      &.active {
+        ul.sub-level {
+          li {
+            a {
+              background-color:#fff;
+              color:#777;
+              background-image: none;
+              background-position: 0 0;
+              &:hover {
+                background-color: $rqAccepted;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -612,4 +733,11 @@
 // fix for redundant lhn scroll
 .accordion {
   margin-bottom:0;
+}
+
+
+.accordion-group-inner {
+  .sub-level {
+    display: none;
+  }
 }

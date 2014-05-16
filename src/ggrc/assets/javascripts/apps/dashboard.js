@@ -249,72 +249,6 @@ var admin_list_descriptors = {
   }
 };
 
-function collated_user_roles_by_person(user_roles) {
-  var person_roles = new can.Observe.List([])
-    , refresh_queue = new RefreshQueue()
-    ;
-
-  function insert_user_role(user_role) {
-    var found = false;
-    can.each(person_roles, function(data, index) {
-      if (user_role.person.id == data.person.id) {
-        person_roles.attr(index).attr('roles').push(user_role.role.reify());
-        refresh_queue.enqueue(user_role.role);
-        found = true;
-      }
-    });
-    if (!found) {
-      person_roles.push({
-        person: user_role.person.reify(),
-        roles: [user_role.role.reify()]
-      });
-      refresh_queue.enqueue(user_role.person);
-      refresh_queue.enqueue(user_role.role);
-    }
-  }
-
-  function remove_user_role(user_role) {
-    var roles, role_index
-      , person_index_to_remove = null
-      ;
-
-    can.each(person_roles, function(data, index) {
-      if (user_role.person.id == data.person.id) {
-        roles = person_roles.attr(index).attr('roles');
-        role_index = roles.indexOf(user_role.role.reify());
-        if (role_index > -1) {
-          roles.splice(role_index, 1);
-          if (roles.length == 0)
-            person_index_to_remove = index;
-        }
-      }
-    });
-    if (person_index_to_remove)
-      person_roles.splice(person_index_to_remove, 1);
-  }
-
-  CMS.Models.UserRole.bind("created", function(ev, user_role) {
-    if (user_role.constructor == CMS.Models.UserRole)
-      insert_user_role(user_role);
-  });
-  CMS.Models.UserRole.bind("destroyed", function(ev, user_role) {
-    if (user_role.constructor == CMS.Models.UserRole)
-      remove_user_role(user_role);
-  });
-
-  can.each(user_roles.reverse(), function(user_role) {
-    insert_user_role(user_role);
-  });
-
-  return refresh_queue.trigger().then(function() { return person_roles });
-}
-
-function authorizations_list_loader() {
-  return CMS.Models.UserRole
-    .findAll({ context_id__in: [null,0] })
-    .then(collated_user_roles_by_person);
-}
-
 GGRC.admin_widget_descriptors = {
   "people" : {
       "model" : CMS.Models.Person
@@ -472,23 +406,6 @@ $(function() {
       $area.cms_controllers_dashboard({ model_descriptors: [] });
     }
 
-    /*$(".widget-add-placeholder").cms_controllers_add_widget({
-        parent_controller : dashboard_controller
-      , widget_descriptors : widget_descriptors
-      , menu_tree : (/dashboard/.test(window.location) ? dashboard_menu : null)
-      , minimum_widget_height : 100
-    });*/
-
-    /*function bindSortable(ev) {
-        can.getObject("Instances", CMS.Controllers.SortableWidgets, true)[this.id] = 
-         $(this)
-          .cms_controllers_sortable_widgets({
-            model : data[0]
-          }).control(CMS.Controllers.SortableWidgets);
-    }
-    $(".widget-area").each(bindSortable);//get anything that exists on the page already.
-    //we will need to consider whether to look for late-added ones later.
-    */
   });
 
 

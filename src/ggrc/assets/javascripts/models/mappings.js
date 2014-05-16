@@ -15,8 +15,9 @@
         instance_join_attr, option_model_name);
   }
 
-  function Direct(option_model_name, instance_join_attr) {
-    return new GGRC.ListLoaders.DirectListLoader(option_model_name, instance_join_attr);
+  function Direct(option_model_name, instance_join_attr, remote_join_attr) {
+    return new GGRC.ListLoaders.DirectListLoader(
+      option_model_name, instance_join_attr, remote_join_attr);
   }
 
   function Indirect(instance_model_name, option_join_attr) {
@@ -116,8 +117,7 @@
       , related_audits_via_related_responses:   Cross("related_responses", "audit_via_request")
       , programs: Proxy(
           "Program", "program", "ProgramControl", "control", "program_controls")
-      , controls: Proxy(
-          "Control", "control", "ObjectControl", "controllable", "object_controls", "ControlControl", "control_controls")
+      , controls: Multi(["implemented_controls", "implementing_controls"])
       , objectives: Proxy(
           "Objective", "objective", "ObjectiveControl", "control", "objective_controls")
       , _sections_base: Proxy(
@@ -308,15 +308,21 @@
       , standards: TypeFilter("directives", "Standard")
       , regulations: TypeFilter("directives", "Regulation")
 
-      , audits: Direct("Audit", "program")
+      , audits: Direct("Audit", "program", "audits")
       //, related_objects_via_audits: Cross("audits", "extended_related_objects")
       , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
       //, related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
-      , authorizations: Indirect("UserRole", "context")
+      , authorizations: Direct("UserRole", "context", "user_roles")
       , authorizations_via_audits: Cross("audits", "authorizations")
-      , extended_authorizations: Multi([
-          "authorizations", "authorizations_via_audits"])
+      , context: Direct("Context", "related_object", "context")
+      , contexts_via_audits: Cross("audits", "context")
+      , authorization_contexts: Multi(["context", "contexts_via_audits"])
+      , authorizations_via_contexts: Cross("authorization_contexts", "user_roles")
+      , authorizations: Cross("authorization_contexts", "user_roles")
+      , authorized_people: Cross("authorization_contexts", "authorized_people")
+      , mapped_and_or_authorized_people: Multi([
+          "people", "authorized_people"])
 
       , orphaned_objects: Multi([
           "related_objects"
@@ -330,14 +336,14 @@
         _mixins: [
           "related_object", "personable", "objectiveable"
           ]
-      , sections: Direct("Section", "directive")
+      , sections: Direct("Section", "directive", "sections")
       , joined_sections: Proxy(
           "Section", "section", "DirectiveSection", "directive", "directive_sections")
       , clauses: Proxy(
           "Clause", "section", "DirectiveSection", "directive", "directive_sections")
       //, extended_related_sections: Multi(["sections"])
 
-      , direct_controls: Direct("Control", "directive")
+      , direct_controls: Direct("Control", "directive", "controls")
       , joined_controls: Proxy(
           "Control", "control", "DirectiveControl", "directive", "directive_controls")
       , controls: Multi(["direct_controls", "joined_controls"])
@@ -450,7 +456,7 @@
       , related_projects:    TypeFilter("related_objects", "Project")
       , related_systems:     TypeFilter("related_objects", "System")
 
-      , authorizations: Indirect("UserRole", "person")
+      , authorizations: Direct("UserRole", "person", "user_roles")
       , programs_via_authorizations: Cross("authorizations", "program_via_context")
 
       , extended_related_programs:    Multi(["related_programs", "owned_programs", "programs_via_authorizations"])
@@ -497,18 +503,28 @@
       , extended_related_audits_via_search:      TypeFilter("related_objects_via_search", "Audit")
     }
 
+    , Context: {
+        user_roles: Direct("UserRole", "context", "user_roles")
+      , authorized_people: Proxy("Person", "person", "UserRole", "context", "user_roles")
+    }
+
     , UserRole : {
+        // FIXME: These should not need to be `Indirect` --
+        //   `context.related_object` *should* point to the right object.
         program_via_context: Indirect("Program", "context")
       , audit_via_context: Indirect("Audit", "context")
+      , person: Direct("Person", "user_roles", "person")
+      , role: Direct("Role", "user_roles", "role")
     }
 
     , Audit : {
-      requests: Direct("Request", "audit")
-      , _program: Indirect("Program", "audit")
+        requests: Direct("Request", "audit", "requests")
+      , _program: Direct("Program", "audits", "program")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
-      , authorizations: Indirect("UserRole", "context")
+      , context: Direct("Context", "related_object", "context")
+      , authorizations: Cross("context", "user_roles")
 
       , related_owned_objects: CustomFilter("related_objects", function(result) {
           var person = GGRC.page_instance() instanceof CMS.Models.Person && GGRC.page_instance();
@@ -540,7 +556,7 @@
                   if(!('related_sources' in response)) continue;
                   relationships = new can.Observe.List().concat(response.related_sources.reify(), response.related_destinations.reify());
                   for (j = 0; relationship = relationships[j]; j++) {
-                    if (relationship.source && relationship.source.reify() === page_instance 
+                    if (relationship.source && relationship.source.reify() === page_instance
                         || relationship.destination && relationship.destination.reify() === page_instance) {
                       return true;
                     }
@@ -568,8 +584,8 @@
       , extended_related_objects: Cross("requests", "extended_related_objects")
     }
     , Request : {
-      responses: Direct("Response", "request")
-      , _audit: Indirect("Audit", "requests")
+        responses: Direct("Response", "request", "responses")
+      , _audit: Direct("Audit", "requests", "audit")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
@@ -581,7 +597,7 @@
 
     , response : {
       _mixins : ["business_object", "documentable"]
-      , _request : Indirect("Request", "responses")
+      , _request : Direct("Request", "responses", "request")
       , audit_via_request : Cross("_request", "_audit")
     }
     , Response : {
@@ -593,13 +609,13 @@
     }
     , InterviewResponse : {
       _mixins : ["response"]
-      , meetings: Direct("Meeting", "response")
+      , meetings: Direct("Meeting", "response", "meetings")
       , business_objects : Multi(["related_objects", "controls", "documents"])
     }
     , PopulationSampleResponse : {
       _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people", "documents"])
-      , population_samples : Direct("PopulationSample", "response")
+      , population_samples : Direct("PopulationSample", "response", "population_samples")
     }
     , Meeting : {
       _mixins : ["personable"]

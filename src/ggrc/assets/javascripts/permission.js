@@ -36,6 +36,11 @@ can.Construct("Permission", {
       ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
   }
 
+  , _all_resource_permission : function(permission) {
+    return new Permission(
+      permission.action, ADMIN_PERMISSION.resource_type, permission.context_id);
+  }
+
   , _permission_match : function(permissions, permission) {
     var resource_types = permissions[permission.action] || {}
       , resource_type = resource_types[permission.resource_type] || {}
@@ -49,6 +54,9 @@ can.Construct("Permission", {
     if (!permissions)
       return false; //?
     if (this._permission_match(permissions, permission))
+      return true;
+    if (this._permission_match(permissions,
+          this._all_resource_permission(permission)))
       return true;
     if (this._permission_match(permissions, ADMIN_PERMISSION))
       return true;

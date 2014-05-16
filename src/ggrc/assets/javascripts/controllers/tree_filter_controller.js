@@ -48,7 +48,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
         , test = that.resolve_object(model, key.replace(/__/g, '.'));
         
         if(val && val.isAfter) {
-          if(!test || !moment(test).isAfter(val)) {
+          if(!test || moment(test).isBefore(val)) {
             return false;
           } else {
             return st;
@@ -64,6 +64,19 @@ can.Control("GGRC.Controllers.TreeFilter", {
         $(el).hide();
       }
     });
+  }
+
+  , 'button[data-toggle="filter-reset"] click' : function(el, ev) {
+    var that = this
+    , filter_reset_target = 'input, select';
+
+    this.element.find(filter_reset_target).each(function(i, elem) {
+      var $elem = $(elem)
+      ;
+
+      that.options.states.removeAttr($elem.attr("name").replace(/\./g, '__'));
+    });
+    can.trigger(this.options.states, "change", "*");
   }
 
   , resolve_object : function(obj, path) {

@@ -51,9 +51,9 @@ class ControlCategorized(Categorizable):
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
-    query = super(AssertionCategorized, cls).eager_query()
+    query = super(ControlCategorized, cls).eager_query()
     return query.options(
-        orm.subqueryload_all('categorizations.category'),
+        orm.subqueryload('categorizations').joinedload('category'),
         )
 
 
@@ -77,7 +77,7 @@ class AssertionCategorized(Categorizable):
     from sqlalchemy import orm
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
-        orm.subqueryload_all('assertations.category'),
+        orm.subqueryload('assertations').joinedload('category'),
         )
 
 
@@ -158,6 +158,13 @@ class Control(
   #mapped_directives = association_proxy(
   #    'directive_controls', 'directive', 'DirectiveControl')
 
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.Index('ix_controls_principal_assessor', 'principal_assessor_id'),
+        db.Index('ix_controls_secondary_assessor', 'secondary_assessor_id'),
+        )
+
   # REST properties
   _publish_attrs = [
       'active',
@@ -216,7 +223,7 @@ class Control(
         orm.subqueryload('implementing_control_controls'),
         orm.subqueryload('control_sections'),
         orm.subqueryload('objective_controls'),
-        orm.subqueryload_all('directive_controls.directive'),
+        orm.subqueryload('directive_controls').joinedload('directive'),
         orm.subqueryload('program_controls'),
         orm.subqueryload('object_controls'),
         )

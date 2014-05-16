@@ -118,7 +118,7 @@
 // high fidelity mockup styles
 
 #newlyCreatedTask,
-#addAssessment, 
+#addAssessment,
 #addObjectUnderAssessment,
 #newlyCreatedObject,
 #newlyCreatedFile {
@@ -164,7 +164,7 @@
   display: none;
 }
 
-.mockup-tree { 
+.mockup-tree {
   .tree-item {
     .tree-title-area {
       [class^="grcicon-"] {
@@ -174,14 +174,15 @@
   }
   .tree-item-add {
     .add-single-object {
+      padding-top: 4px;
       select,
       input {
         margin-bottom: 5px;
-        margin-top: 4px;
+        margin-top: 0;
       }
-      a {
-        i {
-          margin-top: 10px;
+      .btn {
+        &.btn-footer {
+          margin-top: -4px;
         }
       }
     }
@@ -263,16 +264,10 @@ ul.new-tree {
       }
     }
   }
-  
+
 }
 
 .choose-object-wrap {
-  background: $lightGray;
-  padding: 8px 0;
-  .choose-object-content {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
   label {
     line-height: 28px;
     margin-bottom: 0;
@@ -325,6 +320,8 @@ ul.new-tree {
 }
 .entry-list {
   @include reset-list();
+  border-top: 1px solid $footerBorder;
+  padding-top: 6px;
   li {
     border-bottom: 1px solid $footerBorder;
     padding-bottom: 6px;
@@ -338,6 +335,10 @@ ul.new-tree {
     &.add-entry {
       border-bottom: none;
       margin-top: 12px;
+      .cancel-text {
+        line-height: 30px;
+        display: inline-block;
+      }
       textarea {
         margin-bottom: 4px;
       }
@@ -468,5 +469,63 @@ ul.new-tree {
   .add-entry {
     padding-top: 16px;
     padding-bottom: 16px;
+  }
+}
+
+// Mockups Workflow V1.1
+#TaskGroupItem,
+#TaskHolder,
+#TaskUpdated,
+#taskList,
+#objectList,
+#lockTrigger,
+#taskGroupTitle,
+#progressWidgetTrigger,
+#editEntry,
+#verifyTask,
+#verifyTask2,
+#verifyTask3,
+#verifyTaskSpecial,
+#endWorkflowTrigger,
+.finished-number,
+#one-time,
+#weekly,
+#monthly,
+#quarterly,
+#annually,
+#continuos {
+  display: none;
+}
+
+.items-list {
+  @include reset-list();
+  li {
+    margin-bottom: 10px;
+    input {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.lock-wrap {
+  margin-right: 30%;
+  label {
+    margin-bottom: 0;
+  }
+}
+
+.task-list {
+  .objective-selector {
+    a {
+      &.disabled {
+        @include opacity(0.2);
+      }
+    }
+  }
+}
+
+.edit-field {
+  .btn {
+    margin-left: 10px;
   }
 }

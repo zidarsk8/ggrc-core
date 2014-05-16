@@ -25,6 +25,16 @@ from . import db
 db.app = app
 db.init_app(app)
 
+
+# Ensure `db.session` is correctly removed
+#   (Reason: Occasionally requests are terminated without calling the teardown
+#   methods, namely with DeadlineExceededError on App Engine).
+@app.before_request
+def _ensure_session_teardown(*args, **kwargs):
+  if db.session.registry.has():
+    db.session.remove()
+
+
 # Initialize models
 import ggrc.models
 ggrc.models.init_app(app)
@@ -87,9 +97,11 @@ if hasattr(settings, 'SQLALCHEMY_RECORD_QUERIES')\
   @app.after_request
   def display_queries(response):
     from flask.ext.sqlalchemy import get_debug_queries
-    for query in get_debug_queries():
+    queries = get_debug_queries()
+    for query in queries:
       app.logger.info("{:.8f} {}\n{}".format(
         query.duration,
         query.context,
         with_prefix(query.statement, "       ")))
+    app.logger.info("Total queries: {}".format(len(queries)))
     return response
