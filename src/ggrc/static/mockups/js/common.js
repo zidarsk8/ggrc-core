@@ -44,7 +44,7 @@ $(document).ready(function(){
     openclose.call(this);
     e.stopPropagation();
   });
-
+  $.fn.openclose = openclose;
   function openclose(command) {
     var $that = $(this)
     , use_slide = $that.length < 100
