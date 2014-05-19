@@ -3,16 +3,6 @@ var Assessment = can.Model.LocalStorage.extend({
   init: function(){
     this.name = "workflow";
     this.on('change', function(ev, prop){
-      var that = this;
-      $.map(this.attr('task_groups'), function(e){
-        var tasks = e.tasks || []
-          , objects = e.objects || []
-          , objects_disable = objects.length > 0 && objects[objects.length-1].title === ''
-          , tasks_disable = e.taskLock || tasks.length > 0 && tasks[tasks.length-1].title === ''
-          ;
-        e.attr('tasks_disable', tasks_disable);
-        e.attr('objects_disable', objects_disable);
-      });
       if(prop === 'text' || prop === 'complete'){
         ev.target.save();
       }
