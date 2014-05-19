@@ -742,6 +742,7 @@ can.Component.extend({
         , assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment');
 
       if($(el).hasClass('disabled'))return;
+      if(!assessment.attr('task_groups')) assessment.attr('task_groups', []);
       $modal.find('input').each(function(_, e){
         assessment.attr(e.name, e.value);
       });
