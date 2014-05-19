@@ -433,7 +433,7 @@ can.Component.extend({
         , type = $el.data('type')
         , $title = $el.parent().find('.autocomplete').first()
         , title = $title.val()
-        , $date = $el.parent().find('.editDate').first()
+        , $date = $el.parent().find('.date').first()
         , date = $date.val()
         ;
 
