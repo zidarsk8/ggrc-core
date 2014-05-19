@@ -431,17 +431,37 @@ can.Component.extend({
         , assessment = this.scope.assessment
         , index = $el.data('index')
         , type = $el.data('type')
+        , $title = $el.parent().find('.autocomplete').first()
+        , title = $title.val()
+        , $date = $el.parent().find('.editDate').first()
+        , date = $date.val()
         ;
-      if($el.hasClass('disabled')) return;
+
+      if($el.hasClass('disabled') || title === "") return;
       if(type === 'tasks'){
-        assessment.task_groups[index][type].push({title: "", end_date: assessment.task_groups[index].end_date});
+        assessment.task_groups[index][type].push({title: title, end_date: date});
       }
       else{
-        assessment.task_groups[index][type].push({title: ""});
+        assessment.task_groups[index][type].push({title: title});
       }
-
+      this.scope.initAutocomplete();
+      $title.val('');
+      el.addClass('disabled');
+      $date.val(assessment.task_groups[index].end_date);
       assessment.save();
     },
+    checkIfEmpty : function(el){
+      var input = el.parent().find('.addTrigger').first();
+      if(el.val() !== ''){
+        input.removeClass('disabled');
+      }
+      else{
+        input.addClass('disabled');
+      }
+
+    },
+    ".addEnable keyup" : function(el){this.checkIfEmpty(el)},
+    ".addEnable change" : function(el){this.checkIfEmpty(el)},
     ".deleteTrigger click" : function(el, ev){
       var $el = $(el)
         , assessment = this.scope.assessment
