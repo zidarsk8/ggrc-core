@@ -43,16 +43,8 @@
             <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{new assessment.description}}</textarea>
           </div>
         </div>
-        <div class="span4">
-          <label>
-            Due on
-            <span class="required">*</span>
-            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
-          </label>
-          <input tabindex="4" class="input-block-level date required" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{new assessment.end_date}}">
-        </div>
       </div>
-      
+
       <div class="row-fluid">
         <div class="span4">
           <label>
@@ -69,7 +61,14 @@
           </select>
         </div>
         <div class="span8">
-          <div id="one-time" class="frequency-wrap"></div>
+          <div id="one-time" class="frequency-wrap">
+            <label>
+              <span class="start-text">Start date</span>
+              <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="">
+              <span class="start-text">End Date</span>
+              <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="">
+            </label>
+          </div>
           <div id="weekly" class="frequency-wrap">
             <label>
               <span class="start-text">starts every</span>
