@@ -245,6 +245,11 @@ $(function() {
         , governance_objects: {
               Regulation: {
                   mapping: "regulations"
+                , draw_children: true
+                , child_options: [section_child_options]
+                , fetch_post_process: sort_sections
+                , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
                 }
             , Contract: {
                   mapping: "contracts"
