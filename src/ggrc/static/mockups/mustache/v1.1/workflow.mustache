@@ -30,7 +30,7 @@
           <div class="object-nav">
             <ul class="nav internav innernav-arrow program cms_controllers_inner_nav ui-sortable workflow-nav">
               <li class="active">
-                <a href="#workflow_info_widget">
+                <a href="#info_widget">
                   <div class="oneline">
                     <i class="grcicon-info"></i>
                     Workflow Info
@@ -131,7 +131,7 @@
             <div id="middle_column" class="widget-area ui-sortable">
 
               <!-- Widget: Workflow Info -->
-              <section class="widget programs widget-active workflow-info-widget" id="workflow_info_widget">
+              <section class="widget programs widget-active workflow-info-widget info_widget">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
@@ -233,7 +233,7 @@
               </section>
 
               <!-- Widget: Task Goups -->
-              <section class="widget programs" id="task_groups_widget" style="display:none;">
+              <section class="widget programs task_groups_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
@@ -405,7 +405,7 @@
                       <div class="row-fluid">
                         <div class="span12 section-expandable">
                           <div id="objectFooterUtility">
-                            <a href="#" id="addSingleObjectTrigger">
+                            <a href="#task_groups_widget" id="addSingleObjectTrigger">
                               + Add Task Group
                             </a>
                           </div>
@@ -426,8 +426,8 @@
                                 <input tabindex="2" id="tg_end_date" class="date input-block-level" data-index="{{@index}}" data-field="end_date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="">
                               </div>
                               <div class="span4">
-                                <a href="#" class="btn btn-success btn-footer" id="addTaskGroup">Save</a>
-                                <a href="#" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>&nbsp;Cancel</a>
+                                <a href="#task_groups_widget" class="btn btn-success btn-footer" id="addTaskGroup">Save</a>
+                                <a href="#task_groups_widget" id="cancelTaskGroup" class="cancel-text"><i class="grcicon-x-grey"></i>&nbsp;Cancel</a>
                               </div>
                             </div>
                           </div>
@@ -439,7 +439,7 @@
               </section>
 
               <!-- Widget: Tasks -->
-              <section class="widget programs" id="tasks_widget" style="display:none;">
+              <section class="widget programs tasks_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
@@ -518,7 +518,7 @@
               </section>
 
               <!-- Widget: People -->
-              <section class="widget entities" id="people_widget" style="display:none;">
+              <section class="widget entities people_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
@@ -564,7 +564,7 @@
                             <div class="span12">
                               <div class="span6">
                               <a href="#" class="info-action">
-                                View Task
+                                View Person
                                 <i class="grcicon-goto"></i>
                               </a>
                               </div>
@@ -604,7 +604,7 @@
               </section>
 
               <!-- Widget: Objects -->
-              <section class="widget objectives" id="objects_widget" style="display:none;">
+              <section class="widget objectives objects_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
@@ -705,7 +705,7 @@
               </section>
 
               <!-- Widget: Progress -->
-              <section class="widget programs" id="progress_widget" style="display:none;">
+              <section class="widget programs progress_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
