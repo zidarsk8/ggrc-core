@@ -1,3 +1,4 @@
+<control>
 <div class="area program">
     <div class="header-content">
       <div class="row-fluid">
@@ -88,14 +89,14 @@
             <div id="middle_column" class="widget-area ui-sortable">
 
               <!-- Widget: Workflow -->
-              <section class="widget widget-active programs control-widget" id="workflow_widget">
+              <section class="widget programs workflow_widget">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
                       <h2>
                         <i class="grcicon-workflow-color"></i>
-                        My Workflows
-                        <span class="object_count">(4)</span>
+                        Workflows
+                        <span class="object_count">({{workflows.length}})</span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -110,93 +111,105 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree colored-list mockup-tree">
-                    <li class="tree-item programs rq-requested">
+                    {{#each workflows}}
+                    <li class="tree-item programs progress-object
+                      {{#if_equals status 'In progress'}}rq-requested{{/if}}
+                      {{#if_equals status 'Started'}}rq-requested{{/if}}
+                      {{#if_equals status 'Future'}}rq-draft{{/if}}
+                      {{#if_equals status 'Finished'}}rq-accepted{{/if}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
                             <div class="span8">
                               <div class="item-data">
                                 <div class="tree-title-area">
-                                  Google Fiber Control Assessment
+                                  {{title}}
                                 </div>
                               </div>
                             </div>
                             <div class="span4">
                               <div class="control-wrap">
                                 <div class="request-control">
-                                  <span><em>In Progress</em></span>
-                                  <button class="btn">Finish</button>
+                                  <span><em>{{status}}</em></span>
+                                  <!--<button class="btn">Finish</button>-->
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </li>
-                    <li class="tree-item programs rq-requested">
-                      <div class="item-main">
-                        <div class="openclose">
+                      <div class="tier-2-info item-content">
+                        <div class="tier-2-info-content">
                           <div class="row-fluid">
-                            <div class="span8">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  ISO Cleanup
-                                </div>
-                              </div>
-                            </div>
-                            <div class="span4">
-                              <div class="control-wrap">
-                                <div class="request-control">
-                                  <span><em>In Progress</em></span>
-                                </div>
-                              </div>
+                            <div class="span6">
+                              <a href="#" class="info-action" data-index={{@index}}>
+                                View Workflow
+                                <i class="grcicon-goto"></i>
+                              </a>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li class="tree-item programs rq-draft">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span8">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  Control Consolidation (2015)
+                          <section class="info content">
+                            <div class="row-fluid">
+                              <div class="span6">
+                                <h3>{{title}}</h3>
+                              </div>
+                              <div class="span6">&nbsp;</div>
+                            </div>
+
+                            <div class="row-fluid">
+                              <div class="span6">
+                                <div class="rtf-block">
+                                  <p>{{{description}}}</p>
+                                </div>
+                              </div>
+                              <div class="span6">
+                                <div class="row-fluid">
+                                  <div>
+                                    <p>
+                                      <strong>Status:</strong><br>
+                                      {{status}}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <div class="span4">
-                              <div class="control-wrap">
-                                <div class="request-control">
-                                  <span><em>Planned</em></span>
-                                  <button class="btn btn-primary">Start</button>
+
+                            <div class="row-fluid">
+                              <div class="span12">
+                                <div class="rtf-block">
+                                  <strong>Workflow Owner:</strong>
+                                  {{lead_email}}
                                 </div>
                               </div>
                             </div>
+
+                            <div class="row-fluid">
+                              <div class="span12">
+                                <p>
+                                  <strong>Due on:</strong>
+                                  {{#if end_date}}{{end_date}}{{else}}<em>not defined</em>{{/if}}
+                                </p>
+                                <p>
+                                  <strong>Frequency:</strong>
+                                  <strong>Monthly</strong> - starts every <strong>7th</strong> due on every <strong>25th</strong>
+                                </p>
+                                <p>
+                                  <strong>gGRC Folder:</strong>
+                                  <a href="#">/gGRC Workflows/{{title}}/</a>
+                                </p>
+                              </div>
+                            </div>
+                            <div class="row-fluid">
                           </div>
-                        </div>
-                      </div>
+                        </section>
                     </li>
-                    <li class="tree-item programs rq-accepted">
-                      <div class="item-main">
-                        <div class="openclose">
-                          <div class="row-fluid">
-                            <div class="span8">
-                              <div class="item-data">
-                                <div class="tree-title-area">
-                                  General Control Setup
-                                </div>
-                              </div>
-                            </div>
-                            <div class="span4">
-                              <div class="control-wrap">
-                                <div class="request-control">
-                                  <span class="accepted"><em>Finished</em></span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                    {{/each}}
+                    <li class="tree-footer tree-item tree-item-add">
+                      <div class="row-fluid">
+                        <div class="span12">
+                          <a data-modal-class="modal-wide" class="show-workflow-modal" id="newWorkflow" href="#editAssessmentStandAlone" data-new="true" data-toggle="modal">
+                            Create new workflow
+                          </a>
                         </div>
                       </div>
                     </li>
@@ -210,3 +223,4 @@
       </div>
     </section>
   </div>
+</control>
