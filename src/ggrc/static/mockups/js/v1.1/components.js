@@ -482,6 +482,10 @@ can.Component.extend({
       var $el = $(el)
         , hide = $el.parent()
         , show = $el.parent().siblings()
+        ;
+      if(el.hasClass('disabled')){
+        return;
+      }
       hide.hide();
       show.show();
     },
@@ -510,8 +514,19 @@ can.Component.extend({
       assessment.save();
     },
     checkIfEmpty : function(el) {
-      var input = el.parent().find('.addTrigger').first();
-      if(el.val() !== '') {
+      var input = el.parent().find('.addTrigger').first(),
+          type = el.data('type')
+          enable = el.val() !== ''
+          ;
+
+      if(type === 'objects'){
+        var num_equal = el.parent().parent().find('.editTitle').map(function(_,e){
+          if(e.value === el.val()) return el;
+        }).length;
+        enable = num_equal === 0 && enable;
+      }
+
+      if(enable) {
         input.removeClass('disabled');
       }
       else{
