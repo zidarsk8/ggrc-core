@@ -2243,7 +2243,9 @@ Mustache.registerHelper("is_overdue", function(date, options){
 
 Mustache.registerHelper("with_mappable_instances_as", function(name, list, options) {
   var ctx = new can.Observe()
-    , page_inst = GGRC.page_instance();
+    , page_inst = GGRC.page_instance()
+    , page_context = page_inst.context ? page_inst.context.id : null
+    ;
 
   list = Mustache.resolve(list);
 
@@ -2254,7 +2256,7 @@ Mustache.registerHelper("with_mappable_instances_as", function(name, list, optio
       var jds = GGRC.JoinDescriptor.by_object_option_models[page_inst.constructor.shortName][inst.constructor.shortName];
       if(inst !== page_inst
          && jds && jds.length > 0
-         && Permission.is_allowed("create", jds[0].options.join_model_name, page_inst.context.id)
+         && Permission.is_allowed("create", jds[0].options.join_model_name, page_context)
       ) {
         return inst;
       }
