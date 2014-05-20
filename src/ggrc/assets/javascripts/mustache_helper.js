@@ -911,19 +911,15 @@ Mustache.registerHelper("with_direct_mappings_as",
   parent_instance = Mustache.resolve(parent_instance);
   instance = Mustache.resolve(instance);
 
-  switch(true) {
-    case !instance:
+  if(!instance) {
       instance = [];
-      break;
-    case typeof instance.length === "number":
+  } else if(typeof instance.length === "number") {
       instance = can.map(instance, function(inst) {
         return inst.instance ? inst.instance : inst;
       });
-      break;
-    case !!instance.instance:
+  } else if(instance.instance) {
       instance = [instance.instance];
-      break;
-    default:
+  } else {
       instance = [instance];
   }
 
