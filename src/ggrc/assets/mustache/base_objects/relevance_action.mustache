@@ -8,13 +8,14 @@
       {{#with_mapping_instances_as 'mapped_instances' mappings}}
       {{#with_subtracted_list_as 'unmapped_instances' processed_list mapped_instances}}
         {{#if_equals unmapped_instances.length 0}}
-
           {{#with_allowed_as 'deletable_mappings' 'delete' mappings}}
-            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
-              {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
-              <i class="grcicon-checked"></i>
-              Make All Relevant
-            </a>
+            {{#if deletable_mappings.length}}
+              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
+                {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
+                <i class="grcicon-checked"></i>
+                Make All Relevant
+              </a>
+            {{/if}}
           {{/with_allowed_as}}
         {{else}}
           {{! we permission checked for create up in with_mappable_instances_as}}

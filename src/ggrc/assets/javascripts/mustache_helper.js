@@ -2243,11 +2243,11 @@ Mustache.registerHelper("is_overdue", function(date, options){
 
 Mustache.registerHelper("with_mappable_instances_as", function(name, list, options) {
   var ctx = new can.Observe()
-  , page_inst = GGRC.page_instance();
-  
+    , page_inst = GGRC.page_instance();
+
   list = Mustache.resolve(list);
 
-  if(list) {
+  if (list) {
     list.attr("length"); //setup live.
     list = can.map(list, function(item, key) {
       var inst = item.instance || item;
@@ -2268,11 +2268,11 @@ Mustache.registerHelper("with_mappable_instances_as", function(name, list, optio
 
 Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, needles, options) {
   var ctx = new can.Observe();
-  
+
   haystack = Mustache.resolve(haystack);
   needles = Mustache.resolve(needles);
 
-  if(haystack) {
+  if (haystack) {
     haystack.attr("length"); //setup live.
     needles.attr("length");
     haystack = can.map(haystack, function(item, key) {
@@ -2287,12 +2287,16 @@ Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, need
 
 Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, options) {
   var ctx = new can.Observe();
-  
+
   mappings = Mustache.resolve(mappings);
 
+  if (!(mappings instanceof can.List || can.isArray(mappings))) {
+    mappings = [mappings];
+  }
 
-  if(mappings) {
-    mappings.attr("length") || (mappings = [mappings]); //setup live.
+  if (mappings) {
+    //  Setup decoy for live binding
+    mappings.attr && mappings.attr("length");
     mappings = can.map(mappings, function(item, key) {
       return item.instance;
     });
@@ -2305,14 +2309,23 @@ Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, op
 
 Mustache.registerHelper("with_allowed_as", function(name, action, mappings, options) {
   var ctx = new can.Observe();
-  
+
   mappings = Mustache.resolve(mappings);
 
-  if(mappings) {
-    mappings.attr("length") || (mappings = [mappings]); //setup live.
+  if (!(mappings instanceof can.List || can.isArray(mappings))) {
+    mappings = [mappings];
+  }
+
+  if (mappings) {
+    //  Setup decoy for live binding
+    mappings.attr && mappings.attr("length");
     mappings = can.map(mappings, function(item, key) {
-      var mp = item.get_mappings()[0];
-      return Permission.is_allowed(action, mp.constructor.shortName, mp.context.id) ? item : undefined;
+      var mp = item.get_mappings()[0]
+        , context_id = mp.context ? mp.context.id : null
+        ;
+      if (Permission.is_allowed(action, mp.constructor.shortName, context_id)) {
+        return item;
+      }
     });
   }
   ctx.attr(name, mappings);
