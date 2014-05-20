@@ -68,22 +68,10 @@ class Revision(Base, db.Model):
         else:
           result = u"{0} {1}".format(display_name, self.action)
       else:
-        user_role_context = ""
-        if self.resource_type == 'UserRole':
-          from ggrc.models.event import Event
-          from ggrc.fulltext.mysql import MysqlRecordProperty
-          join = db.session.query(Event.id, MysqlRecordProperty.type, MysqlRecordProperty.content)\
-               .join(MysqlRecordProperty, MysqlRecordProperty.context_id == Event.context_id)\
-               .filter(Event.id == self.event_id, MysqlRecordProperty.property == 'title')\
-               .first()
-          if join:
-            _, context_type, context_title = join
-            user_role_context = u"for {0} {1}".format(context_type, context_title)
-
         if self.action == 'created':
-          result = u"{1} mapped to {0} {2}".format(source, destination, user_role_context)
+          result = u"{1} mapped to {0}".format(source, destination)
         elif self.action == 'deleted':
-          result = u"{1} unmapped from {0} {2}".format(source, destination, user_role_context)
+          result = u"{1} unmapped from {0}".format(source, destination)
         else:
           result = u"{0} {1}".format(display_name, self.action)
     else:
