@@ -222,21 +222,8 @@ def load_permissions_for(user):
       collect_permissions(
           implied_role.permissions, implied_context_id, permissions)
 
-  #grab personal context
-  personal_context = db.session.query(Context).filter(
-      Context.related_object_id == user.id,
-      Context.related_object_type == 'Person',
-      ).first()
-  if not personal_context:
-    personal_context = Context(
-        name='Personal Context for {0}'.format(user.id),
-        description='',
-        context_id=1,
-        related_object_id=user.id,
-        related_object_type='Person',
-        )
-    db.session.add(personal_context)
-    db.session.commit()
+  personal_context = _get_or_create_personal_context(user)
+
   permissions.setdefault('__GGRC_ADMIN__',{})\
       .setdefault('__GGRC_ALL__', dict())\
       .setdefault('contexts', list())\
@@ -244,22 +231,39 @@ def load_permissions_for(user):
   return permissions
 
 
+def _get_or_create_personal_context(user):
+  personal_context = user.get_or_create_object_context(
+      context=1,
+      name='Personal Context for {0}'.format(user.id),
+      description='',
+      # FIXME: Do we need to set modified_by manually?
+      modified_by=get_current_user(),
+      )
+  db.session.add(personal_context)
+  db.session.flush()
+  return personal_context
+
+
 @Resource.model_posted.connect_via(Program)
 def handle_program_post(sender, obj=None, src=None, service=None):
   db.session.flush()
   # get the personal context for this logged in user
-  personal_context = service.personal_context()
-
-  # create a context specific to the program
-  context = Context(
+  user = get_current_user()
+  personal_context = _get_or_create_personal_context(user)
+  context = obj.build_object_context(
       context=personal_context,
       name='{object_type} Context {timestamp}'.format(
         object_type=service.model.__name__,
         timestamp=datetime.datetime.now()),
       description='',
+      modified_by=get_current_user(),
       )
-  context.related_object = obj
+
+  db.session.add(obj)
+  db.session.flush()
   db.session.add(context)
+  db.session.flush()
+  obj.contexts.append(context)
   obj.context = context
 
   # add a user_roles mapping assigning the user creating the program
@@ -269,6 +273,7 @@ def handle_program_post(sender, obj=None, src=None, service=None):
       person=get_current_user(),
       role=program_owner_role,
       context=context,
+      modified_by=get_current_user(),
       )
   #pass along a temporary attribute for logging the events.
   user_role._display_related_title = obj.title
@@ -328,14 +333,14 @@ def handle_program_put(sender, obj=None, src=None, service=None):
 def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.flush()
   #Create an audit context
-  context = Context(
+  context = obj.build_object_context(
       context=obj.context,
       name='Audit Context {timestamp}'.format(
         timestamp=datetime.datetime.now()),
       description='',
       modified_by=get_current_user(),
       )
-  context.related_object = obj
+  #context.related_object = obj
   db.session.add(context)
   db.session.flush()
 
@@ -356,6 +361,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
     context_scope='Program',
     modified_by=get_current_user(),
     ))
+
+  db.session.add(obj)
 
   #Create the role implication for Auditor from Audit for default context
   db.session.add(ContextImplication(

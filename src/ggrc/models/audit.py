@@ -8,9 +8,11 @@ from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged,
     )
 from .object_person import Personable
+from .context import HasOwnContext
+
 
 class Audit(
-    Personable,
+    Personable, HasOwnContext,
     Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
   __tablename__ = 'audits'
 
