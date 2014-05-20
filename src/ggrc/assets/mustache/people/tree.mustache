@@ -79,14 +79,14 @@
       {{#if draw_children}}
         {{#if child_options.length}}
           {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-            <div class="inner-tree">
-              <h6>Mapped Objects ({{child_count}})
-                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
-              </h6>
-              {{#child_options}}
+            {{#child_options}}
+              <div class="inner-tree">
+                <h6>Mapped Objects ({{child_count}})
+                  {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
+                </h6>
                 <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              {{/child_options}}
-            </div>
+              </div>
+            {{/child_options}}
           {{/prune_context}}
         {{/if}}
       {{/if}}
