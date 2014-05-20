@@ -420,10 +420,6 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   }
 
   if(options.hash) {
-    can.each(options.hash, function(v, k) {
-      options.hash[k] = resolve_computed(v);
-    });
-
     options.contexts = options.contexts.add(options.hash);
   }
 
@@ -926,9 +922,10 @@ Mustache.registerHelper("with_direct_mappings_as",
   var frame = new can.Observe();
   frame.attr(var_name, []);
   GGRC.all_local_results(parent_instance).then(function(results) {
+    var instance_only = options.hash && options.hash.instances_only;
     can.each(results, function(result) {
       if (~can.inArray(result.instance, instance)) {
-        frame.attr(var_name).push(result);
+        frame.attr(var_name).push(instance_only ? result.instance : result);
       }
     });
   });
@@ -2244,17 +2241,22 @@ Mustache.registerHelper("is_overdue", function(date, options){
   }
 });
 
-Mustache.registerHelper("remove_page_instance_from", function(name, list, options) {
+Mustache.registerHelper("with_mappable_instances_as", function(name, list, options) {
   var ctx = new can.Observe()
-  , inst = GGRC.page_instance();
+  , page_inst = GGRC.page_instance();
   
-  list = resolve_computed(list);
+  list = Mustache.resolve(list);
 
   if(list) {
     list.attr("length"); //setup live.
-    list = can.map(list || [], function(item, key) {
-      if(item !== inst && (!item.instance || item.instance !== inst)) {
-        return item;
+    list = can.map(list, function(item, key) {
+      var inst = item.instance || item;
+      var jds = GGRC.JoinDescriptor.by_object_option_models[page_inst.constructor.shortName][inst.constructor.shortName];
+      if(inst !== page_inst
+         && jds && jds.length > 0
+         && Permission.is_allowed("create", jds[0].options.join_model_name, page_inst.context.id)
+      ) {
+        return inst;
       }
     });
   }
@@ -2263,5 +2265,60 @@ Mustache.registerHelper("remove_page_instance_from", function(name, list, option
 
   return options.fn(options.contexts.add(ctx));
 });
+
+Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, needles, options) {
+  var ctx = new can.Observe();
+  
+  haystack = Mustache.resolve(haystack);
+  needles = Mustache.resolve(needles);
+
+  if(haystack) {
+    haystack.attr("length"); //setup live.
+    needles.attr("length");
+    haystack = can.map(haystack, function(item, key) {
+      return ~can.inArray(item, needles) ? undefined : item;
+    });
+  }
+
+  ctx.attr(name, haystack);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
+Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, options) {
+  var ctx = new can.Observe();
+  
+  mappings = Mustache.resolve(mappings);
+
+
+  if(mappings) {
+    mappings.attr("length") || (mappings = [mappings]); //setup live.
+    mappings = can.map(mappings, function(item, key) {
+      return item.instance;
+    });
+  }
+  ctx.attr(name, mappings);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
+
+Mustache.registerHelper("with_allowed_as", function(name, action, mappings, options) {
+  var ctx = new can.Observe();
+  
+  mappings = Mustache.resolve(mappings);
+
+  if(mappings) {
+    mappings.attr("length") || (mappings = [mappings]); //setup live.
+    mappings = can.map(mappings, function(item, key) {
+      var mp = item.get_mappings()[0];
+      return Permission.is_allowed(action, mp.constructor.shortName, mp.context.id) ? item : undefined;
+    });
+  }
+  ctx.attr(name, mappings);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
 
 })(this, jQuery, can);
