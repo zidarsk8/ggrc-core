@@ -16,7 +16,7 @@ class SectionRowConverter(BaseRowConverter):
     self.obj = self.setup_object_by_slug(self.attrs)
     if self.obj.directive \
         and self.obj.directive is not self.importer.options.get('directive'):
-          self.importer.errors.append('Section code is already used.')
+          self.importer.errors.append('Section code is already used elsewhere.')
     else:
       self.obj.directive = self.importer.options.get('directive')
       if self.obj.id is not None:
@@ -42,6 +42,14 @@ class SectionRowConverter(BaseRowConverter):
 
 class ClauseRowConverter(SectionRowConverter):
   model_class = Clause
+
+  def setup_object(self):
+    # Unlike Section, does not need to check for whether it
+    # exists elsewhere
+    self.obj = self.setup_object_by_slug(self.attrs)
+    self.obj.directive = self.importer.options.get('directive')
+    if self.obj.id is not None:
+      self.add_warning('slug', "Clause already exists and will be updated")
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
