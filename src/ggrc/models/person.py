@@ -9,9 +9,11 @@ from .mixins import deferred, Base
 from .reflection import PublishOnly
 from .utils import validate_option
 from .exceptions import ValidationError
+from .context import HasOwnContext
 import re
 
-class Person(Base, db.Model):
+
+class Person(HasOwnContext, Base, db.Model):
   __tablename__ = 'people'
   EMAIL_RE_STRING = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])\Z"
 

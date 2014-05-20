@@ -110,7 +110,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     modified_objects:  objects in cache maintained prior to commiting to DB
     expiry_time: Expiry time specified for memcache ADD and DELETE
   Returns:
-    None 
+    None
 
   """
   if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
@@ -171,7 +171,7 @@ def update_memcache_after_commit(context):
     context: POST/PUT/DELETE HTTP request or import Converter contextual object
     modified_objects:  objects in cache maintained prior to commiting to DB
   Returns:
-    None 
+    None
 
   """
   if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
@@ -212,7 +212,7 @@ def build_cache_status(data, key, expiry_timeout, status):
     expiry_timeout: timeout for expiry cache
     status: Update status entry, e.g.InProgress
   Returns:
-    None 
+    None
   """
   data[key] = {'expiry': expiry_timeout, 'status': status}
 
@@ -272,16 +272,19 @@ def log_event(session, obj=None, current_user_id=None):
     resource_id = 0
     resource_type = None
     action = 'IMPORT'
+    context_id = 0
   else:
     resource_id = obj.id
     resource_type = str(obj.__class__.__name__)
     action = request.method
+    context_id = obj.context_id
   if revisions:
     event = Event(
       modified_by_id=current_user_id,
       action=action,
       resource_id=resource_id,
-      resource_type=resource_type)
+      resource_type=resource_type,
+      context_id=context_id)
     event.revisions = revisions
     session.add(event)
 
@@ -567,7 +570,7 @@ class Resource(ModelView):
 
       :obj: The model instance created from the POSTed JSON.
       :src: The original POSTed JSON dictionary.
-      :service: The instance of Resource handling the POST request.  
+      :service: The instance of Resource handling the POST request.
     """,
     )
   model_put = signals.signal('Model PUT',
@@ -904,24 +907,6 @@ class Resource(ModelView):
       except (ValueError, TypeError):
         return None
     return None
-
-  def personal_context(self):
-    current_user_id = get_current_user_id()
-    context = db.session.query(Context).filter(
-        Context.related_object_id == current_user_id,
-        Context.related_object_type == 'Person',
-        ).first()
-    if not context:
-      context = Context(
-          name='Personal Context for {0}'.format(current_user_id),
-          description='',
-          context_id=1,
-          related_object_id=current_user_id,
-          related_object_type='Person',
-          )
-      db.session.add(context)
-      db.session.commit()
-    return context
 
   def handle_create(self, obj, src):
     """Do NOTHING by default"""

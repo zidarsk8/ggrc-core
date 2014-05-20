@@ -12,9 +12,11 @@ from .object_owner import Ownable
 from .object_person import Personable
 from .reflection import PublishOnly
 from .relationship import Relatable
+from .context import HasOwnContext
+
 
 class Program(
-    Documentable, Personable, Objectiveable, Relatable,
+    Documentable, Personable, Objectiveable, Relatable, HasOwnContext,
     Timeboxed, Ownable, BusinessObject, db.Model):
   __tablename__ = 'programs'
 
