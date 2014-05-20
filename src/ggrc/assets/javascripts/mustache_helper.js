@@ -418,7 +418,10 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(typeof template === "function") {
     template = template();
   }
-  options.hash && (options.contexts = options.contexts.add(options.hash));
+
+  if(options.hash) {
+    options.contexts = options.contexts.add(options.hash);
+  }
 
   return can.view.render(template, options.contexts);
 });
@@ -904,12 +907,25 @@ Mustache.registerHelper("with_direct_mappings_as",
   parent_instance = Mustache.resolve(parent_instance);
   instance = Mustache.resolve(instance);
 
+  if(!instance) {
+      instance = [];
+  } else if(typeof instance.length === "number") {
+      instance = can.map(instance, function(inst) {
+        return inst.instance ? inst.instance : inst;
+      });
+  } else if(instance.instance) {
+      instance = [instance.instance];
+  } else {
+      instance = [instance];
+  }
+
   var frame = new can.Observe();
   frame.attr(var_name, []);
   GGRC.all_local_results(parent_instance).then(function(results) {
+    var instance_only = options.hash && options.hash.instances_only;
     can.each(results, function(result) {
-      if (result.instance === instance) {
-        frame.attr(var_name).push(result);
+      if (~can.inArray(result.instance, instance)) {
+        frame.attr(var_name).push(instance_only ? result.instance : result);
       }
     });
   });
@@ -2224,5 +2240,100 @@ Mustache.registerHelper("is_overdue", function(date, options){
     return options.inverse(options.contexts);
   }
 });
+
+Mustache.registerHelper("with_mappable_instances_as", function(name, list, options) {
+  var ctx = new can.Observe()
+    , page_inst = GGRC.page_instance()
+    , page_context = page_inst.context ? page_inst.context.id : null
+    ;
+
+  list = Mustache.resolve(list);
+
+  if (list) {
+    list.attr("length"); //setup live.
+    list = can.map(list, function(item, key) {
+      var inst = item.instance || item;
+      var jds = GGRC.JoinDescriptor.by_object_option_models[page_inst.constructor.shortName][inst.constructor.shortName];
+      if(inst !== page_inst
+         && jds && jds.length > 0
+         && Permission.is_allowed("create", jds[0].options.join_model_name, page_context)
+      ) {
+        return inst;
+      }
+    });
+  }
+
+  ctx.attr(name, list);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
+Mustache.registerHelper("with_subtracted_list_as", function(name, haystack, needles, options) {
+  var ctx = new can.Observe();
+
+  haystack = Mustache.resolve(haystack);
+  needles = Mustache.resolve(needles);
+
+  if (haystack) {
+    haystack.attr("length"); //setup live.
+    needles.attr("length");
+    haystack = can.map(haystack, function(item, key) {
+      return ~can.inArray(item, needles) ? undefined : item;
+    });
+  }
+
+  ctx.attr(name, haystack);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
+Mustache.registerHelper("with_mapping_instances_as", function(name, mappings, options) {
+  var ctx = new can.Observe();
+
+  mappings = Mustache.resolve(mappings);
+
+  if (!(mappings instanceof can.List || can.isArray(mappings))) {
+    mappings = [mappings];
+  }
+
+  if (mappings) {
+    //  Setup decoy for live binding
+    mappings.attr && mappings.attr("length");
+    mappings = can.map(mappings, function(item, key) {
+      return item.instance;
+    });
+  }
+  ctx.attr(name, mappings);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
+
+Mustache.registerHelper("with_allowed_as", function(name, action, mappings, options) {
+  var ctx = new can.Observe();
+
+  mappings = Mustache.resolve(mappings);
+
+  if (!(mappings instanceof can.List || can.isArray(mappings))) {
+    mappings = [mappings];
+  }
+
+  if (mappings) {
+    //  Setup decoy for live binding
+    mappings.attr && mappings.attr("length");
+    mappings = can.map(mappings, function(item, key) {
+      var mp = item.get_mappings()[0]
+        , context_id = mp.context ? mp.context.id : null
+        ;
+      if (Permission.is_allowed(action, mp.constructor.shortName, context_id)) {
+        return item;
+      }
+    });
+  }
+  ctx.attr(name, mappings);
+
+  return options.fn(options.contexts.add(ctx));
+});
+
 
 })(this, jQuery, can);
