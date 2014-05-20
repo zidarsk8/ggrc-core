@@ -189,6 +189,14 @@ $(function() {
         , draw_children : true
       }
 
+    , clause_child_options = {
+          model: CMS.Models.Clause
+        , mapping: "clauses"
+        , show_view: GGRC.mustache_path + "/sections/tree.mustache"
+        , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
+        , draw_children: true
+        }
+
     , extra_content_controller_options = apply_mixins({
           objectives: {
               Objective: {
@@ -245,15 +253,35 @@ $(function() {
         , governance_objects: {
               Regulation: {
                   mapping: "regulations"
+                , draw_children: true
+                , child_options: [section_child_options]
+                , fetch_post_process: sort_sections
+                , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
                 }
             , Contract: {
                   mapping: "contracts"
+                , draw_children: true
+                , child_options: [clause_child_options]
+                , fetch_post_process: sort_sections
+                , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
                 }
             , Policy: {
                   mapping: "policies"
+                , draw_children: true
+                , child_options: [section_child_options]
+                , fetch_post_process: sort_sections
+                , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
                 }
             , Standard: {
                   mapping: "standards"
+                , draw_children: true
+                , child_options: [section_child_options]
+                , fetch_post_process: sort_sections
+                , show_view: GGRC.mustache_path + "/directives/tree.mustache"
+                , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
                 }
             , Control: {
                   mapping: "controls"
@@ -265,50 +293,12 @@ $(function() {
 
         , Program: {
               _mixins: [
-                  "objectives"
+                  "governance_objects"
+                , "objectives"
                 , "controls"
                 , "business_objects"
                 ]
 
-            , Regulation: {
-                mapping: "regulations"
-              , draw_children: true
-              , child_options: [section_child_options]
-              , fetch_post_process: sort_sections
-              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
-              }
-            , Contract: {
-                mapping: "contracts"
-              , draw_children: true
-              , child_options: [
-                  {
-                    model: CMS.Models.Clause
-                  , mapping: "clauses"
-                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
-                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
-                  , draw_children: true
-                  }]
-              , fetch_post_process: sort_sections
-              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
-              }
-            , Standard: {
-                mapping: "standards"
-              , draw_children: true
-              , child_options: [section_child_options]
-              , fetch_post_process: sort_sections
-              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
-              }
-            , Policy: {
-                mapping: "policies"
-              , draw_children: true
-              , child_options: [section_child_options]
-              , fetch_post_process: sort_sections
-              , show_view: GGRC.mustache_path + "/directives/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/directives/tree_footer.mustache"
-              }
             , Audit: {
               mapping: "audits"
               , allow_mapping : true
@@ -340,13 +330,7 @@ $(function() {
             }
         , Contract: {
               _mixins: ["directive"]
-            , Clause: {
-                model: CMS.Models.Clause
-              , mapping: "clauses"
-              , show_view: GGRC.mustache_path + "/sections/tree.mustache"
-              , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
-              , draw_children: true
-              }
+            , Clause: clause_child_options
             }
 
         , extended_audits: {
@@ -413,14 +397,7 @@ $(function() {
             , Contract: {
                 mapping: "extended_related_contracts_via_search"
               , draw_children: true
-              , child_options: [
-                  {
-                    model: CMS.Models.Clause
-                  , mapping: "clauses"
-                  , show_view: GGRC.mustache_path + "/sections/tree.mustache"
-                  , footer_view: GGRC.mustache_path + "/sections/tree_footer.mustache"
-                  , draw_children: true
-                  }]
+              , child_options: [clause_child_options]
               , fetch_post_process: sort_sections
               , show_view: GGRC.mustache_path + "/directives/tree.mustache"
               }
