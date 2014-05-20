@@ -181,64 +181,6 @@ $(document).ready(function(){
     ]
   });
 
-  $('body').on('click', 'ul.internav li a', function() {
-    var $this = $(this),
-        $innerNavItem = $this.closest('li'),
-        $allWidgets = $('.widget');
-
-    $('ul.internav li.active').removeClass('active');
-    $allWidgets.removeClass('widget-active').hide();
-
-    if($innerNavItem.hasClass("active")) {
-      $innerNavItem.removeClass("active");
-    } else {
-      $innerNavItem.addClass("active");
-    }
-
-    if($('ul.internav li.active a').attr('href') == '#info_widget') {
-      $('#info_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#workflow_info_widget') {
-      $('#workflow_info_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#market_widget') {
-      $('#market_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#control_widget') {
-      $('#control_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#assessment_widget') {
-      $('#assessment_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#process_widget') {
-      $('#process_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#facility_widget') {
-      $('#facility_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#authorization_widget') {
-      $('#authorization_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#regulation_widget') {
-      $('#regulation_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#objects_widget') {
-      $('#objects_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#task_groups_widget') {
-      $('#task_groups_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#tasks_widget') {
-      $('#tasks_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#people_widget') {
-      $('#people_widget').addClass('widget-active').show();
-    }
-    if($('ul.internav li.active a').attr('href') == '#progress_widget') {
-      $('#progress_widget').addClass('widget-active').show();
-    }
-  });
-
   // New Assessment Created
   $('body').on('click', '#addAssessmentCreated', function() {
     $('#newAssessment').modal('hide');
