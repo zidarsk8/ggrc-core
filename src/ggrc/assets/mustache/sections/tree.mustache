@@ -198,8 +198,10 @@
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
-            <h6>Objectives, Controls, and Business Objects ({{child_count}})<!-- {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}--></h6>
             {{#child_options}}
+              <h6>Objectives, Controls, and Business Objects ({{child_count}})
+                {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
+              </h6>
               <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>

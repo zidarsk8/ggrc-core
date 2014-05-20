@@ -517,14 +517,35 @@ $(function() {
     //  Prevent toggling `openclose` state in trees
     ev.stopPropagation();
 
-    var $target = $(ev.currentTarget)
+    var i, v, $target = $(ev.currentTarget)
     , follow = $target.data("follow")
-    , inst = $target.data("instance")
+    , inst = Mustache.resolve($target.data("instance"))
     , page_model = GGRC.infer_object_type(GGRC.page_object)
     , page_instance = GGRC.page_instance()
-    , join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0]
+    , join_descriptor
     //, link = page_model.links_to[inst.constructor.model_singular]
-    , params = {};
+    , params = {}
+    , mappings = Mustache.resolve($target.data("existing_mappings"));
+
+    if(can.isArray(inst) || inst instanceof can.List) {
+      if(mappings) {
+        mappings = can.map(mappings, function(m) {
+          return m.instance || m;
+        });
+      }
+
+      for(i = 0; i < inst.length; i++) {
+        v = inst[i].instance || inst[i];
+        if(page_instance !== v && (!mappings || !~can.inArray(v, mappings))) {
+          $target.data("instance", v);
+          arguments.callee.call(this, ev);
+        }
+      }
+      $target.data("instance", inst);
+      return;
+    }
+
+    join_descriptor = GGRC.JoinDescriptor.by_object_option_models[page_model.shortName][inst.constructor.shortName][0];
 
     if(typeof link === "string") {
       link = GGRC.Models[link] || CMS.Models[link];

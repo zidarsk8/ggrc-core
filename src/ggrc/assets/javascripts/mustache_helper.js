@@ -418,7 +418,14 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   if(typeof template === "function") {
     template = template();
   }
-  options.hash && (options.contexts = options.contexts.add(options.hash));
+
+  if(options.hash) {
+    can.each(options.hash, function(v, k) {
+      options.hash[k] = resolve_computed(v);
+    });
+
+    options.contexts = options.contexts.add(options.hash);
+  }
 
   return can.view.render(template, options.contexts);
 });
@@ -904,11 +911,27 @@ Mustache.registerHelper("with_direct_mappings_as",
   parent_instance = Mustache.resolve(parent_instance);
   instance = Mustache.resolve(instance);
 
+  switch(true) {
+    case !instance:
+      instance = [];
+      break;
+    case typeof instance.length === "number":
+      instance = can.map(instance, function(inst) {
+        return inst.instance ? inst.instance : inst;
+      });
+      break;
+    case !!instance.instance:
+      instance = [instance.instance];
+      break;
+    default:
+      instance = [instance];
+  }
+
   var frame = new can.Observe();
   frame.attr(var_name, []);
   GGRC.all_local_results(parent_instance).then(function(results) {
     can.each(results, function(result) {
-      if (result.instance === instance) {
+      if (~can.inArray(result.instance, instance)) {
         frame.attr(var_name).push(result);
       }
     });
@@ -2223,6 +2246,26 @@ Mustache.registerHelper("is_overdue", function(date, options){
   else{
     return options.inverse(options.contexts);
   }
+});
+
+Mustache.registerHelper("remove_page_instance_from", function(name, list, options) {
+  var ctx = new can.Observe()
+  , inst = GGRC.page_instance();
+  
+  list = resolve_computed(list);
+
+  if(list) {
+    list.attr("length"); //setup live.
+    list = can.map(list || [], function(item, key) {
+      if(item !== inst && (!item.instance || item.instance !== inst)) {
+        return item;
+      }
+    });
+  }
+
+  ctx.attr(name, list);
+
+  return options.fn(options.contexts.add(ctx));
 });
 
 })(this, jQuery, can);

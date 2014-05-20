@@ -1,6 +1,32 @@
+{{!  multiple instances case }}
 {{^is_dashboard}}
   {{#with_page_object_as 'page_instance'}}
     {{^if_equals parent_instance page_instance}}
+      {{#if multiple_mapping_case}}
+      {{#with_direct_mappings_as 'mappings' page_instance list}}
+      {{#remove_page_instance_from 'processed_list' list}}
+      {{#if processed_list.length}}
+        {{#if_equals mappings.length processed_list.length}}
+
+          {{#is_allowed_all 'delete' mappings}}
+            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
+              {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
+              <i class="grcicon-checked"></i>
+              Make All Relevant
+            </a>
+          {{/is_allowed_all}}
+        {{else}}
+          {{#is_allowed_to_map page_instance model.shortName join=true}}
+          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}}>
+            <i class="grcicon-check"></i>
+            Make All Relevant
+          </a>
+          {{/is_allowed_to_map}}
+        {{/if}}
+      {{/if}}
+      {{/remove_page_instance_from}}
+      {{/with_direct_mapping_as}}
+      {{else}}
       {{#with_direct_mappings_as 'mappings' page_instance instance}}
         {{#if mappings.length}}
           {{#is_allowed_all 'delete' mappings}}
@@ -19,6 +45,7 @@
           {{/is_allowed_to_map}}
         {{/if}}
       {{/with_direct_mapping_as}}
+      {{/if}}
     {{/if_equals}}
   {{/with_page_object_as}}
 {{/is_dashboard}}
