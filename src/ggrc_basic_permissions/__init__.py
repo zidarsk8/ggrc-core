@@ -236,9 +236,8 @@ def _get_or_create_personal_context(user):
       context=1,
       name='Personal Context for {0}'.format(user.id),
       description='',
-      # FIXME: Do we need to set modified_by manually?
-      modified_by=get_current_user(),
       )
+  personal_context.modified_by = get_current_user()
   db.session.add(personal_context)
   db.session.flush()
   return personal_context
@@ -256,8 +255,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
         object_type=service.model.__name__,
         timestamp=datetime.datetime.now()),
       description='',
-      modified_by=get_current_user(),
       )
+  context.modified_by = get_current_user()
 
   db.session.add(obj)
   db.session.flush()
@@ -338,9 +337,8 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       name='Audit Context {timestamp}'.format(
         timestamp=datetime.datetime.now()),
       description='',
-      modified_by=get_current_user(),
       )
-  #context.related_object = obj
+  context.modified_by = get_current_user()
   db.session.add(context)
   db.session.flush()
 
