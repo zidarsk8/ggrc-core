@@ -18,11 +18,13 @@
             {{/if}}
           {{/with_allowed_as}}
         {{else}}
-          {{! we permission checked for create up in with_mappable_instances_as}}
-          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}}>
-            <i class="grcicon-check"></i>
-            Make All Relevant
-          </a>
+          {{#if unmapped_instances.length}}
+            {{! we permission checked for create up in with_mappable_instances_as}}
+            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}}>
+              <i class="grcicon-check"></i>
+              Make All Relevant
+            </a>
+          {{/if}}
         {{/if_equals}}
       {{/with_subtracted_list_as}}
       {{/with_mapping_instances_as}}
