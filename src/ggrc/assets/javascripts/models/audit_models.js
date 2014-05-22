@@ -247,6 +247,16 @@ can.Model.Cacheable("CMS.Models.Request", {
     }, this));
   }
 
+  , display_name : function() {
+      var desc = this.description
+        , max_len = 20;
+      out_name = desc;
+      // Truncate if greater than max_len chars
+      if (desc.length > max_len) {
+        out_name = desc.slice(0, max_len) + " ...";
+      }
+      return 'Request "' + out_name + '"';
+    }
   , before_create : function() {
     var audit, that = this;
     if(!this.assignee) {
@@ -388,7 +398,17 @@ can.Model.Cacheable("CMS.Models.Response", {
     }]
   }
 }, {
-  before_create : function() {
+    display_name : function() {
+      var desc = this.description
+        , max_len = 20;
+      out_name = desc;
+      // Truncate if greater than max_len chars
+      if (desc.length > max_len) {
+        out_name = desc.slice(0, max_len) + " ...";
+      }
+      return 'Response "' + out_name + '"';
+    }
+  , before_create : function() {
     if(!this.contact) {
       this.attr("contact", this.request.reify().assignee);
     }
