@@ -902,6 +902,7 @@
                                                     <button class="btn change-task-status">Finish</button>
                                                     {{/if}}
                                                     {{#if_equals status 'finished'}}
+                                                    <button class="btn btn-danger change-task-status">Decline</button>
                                                     <button class="btn btn-success change-task-status">Verify</button>
                                                     {{/if}}
                                                     {{#if_equals status 'verified'}}
@@ -909,6 +910,7 @@
                                                       <em>Verified</em>
                                                     </span>
                                                     {{/if}}
+                                                    <a href="javascript://" data-name="status" data-value="Requested" data-undo="true" class="undo ">Undo</a>
                                                   </div>
                                                 </li>
                                               </ul>

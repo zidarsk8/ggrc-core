@@ -644,7 +644,12 @@ can.Component.extend({
           task.attr('status', 'finished');
           break;
         case "finished":
-          task.attr('status', 'verified');
+          if(el.text() === 'Decline'){
+            task.attr('status', 'started');
+          }
+          else{
+            task.attr('status', 'verified');
+          }
           // Check if all tasks are done:
           for(var i=0; i < tasks.length; i++) {
             if(tasks[i].status !== 'verified') {
