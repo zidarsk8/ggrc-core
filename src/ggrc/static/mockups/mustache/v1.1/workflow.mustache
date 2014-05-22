@@ -96,7 +96,7 @@
               <li class="history-object">
                 <a href="#history_widget" class="history w-arrow">
                   <div class="oneline">
-                    <i class="grcicon-progress-color"></i>
+                    <i class="grcicon-history-color"></i>
                     History (0)
                   </div>
                 </a>
@@ -106,7 +106,7 @@
               <li class="progress-object {{#if_equals assessment.status 'In progress'}}started{{/if}} {{#if_equals assessment.status 'Finished'}}finished{{/if}}">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
-                    <i class="grcicon-progress-color"></i>
+                    <i class="grcicon-cycle-color"></i>
                     Current Cycle
                   </div>
                 </a>
@@ -720,7 +720,7 @@
                   <div class="row-fluid">
                     <div class="span9">
                       <h2>
-                        <i class="grcicon-person-color"></i>
+                        <i class="grcicon-cycle-color"></i>
                         Current Cycle
                         <span class="object_count" id="objectsCounter">({{assessment.task_groups.length}})</span>
                         <span class="explanation"></span>
@@ -1048,7 +1048,7 @@
                   <div class="row-fluid">
                     <div class="span9">
                       <h2>
-                        <i class="grcicon-person-color"></i>
+                        <i class="grcicon-history-color"></i>
                         Previous Cycles
                         <span class="object_count" id="objectsCounter">(0)</span>
                         <span class="explanation"></span>
