@@ -201,12 +201,14 @@
                     <div class="row-fluid">
                       <div class="span12">
                         <p>
+                          <!--
                           <strong>Due on:</strong>
                           {{#if assessment.end_date}}{{assessment.end_date}}{{else}}<em>not defined</em>{{/if}}
+                        -->
                         </p>
                         <p>
                           <strong>Frequency:</strong>
-                          <strong>Monthly</strong> - starts every <strong>7th</strong> due on every <strong>25th</strong>
+                          <span style="text-transform:capitalize;">{{{assessment.frequency}}}</span><!--<strong>Monthly</strong> - starts every <strong>7th</strong> due on every <strong>25th</strong>-->
                         </p>
                         <p>
                           <strong>gGRC Folder:</strong>
@@ -1041,7 +1043,7 @@
                   </ul>
                 </section>
               </section>
-              
+
               <!-- Widget: History -->
               <section class="widget programs" id="history_widget" style="display:none;">
                 <header class="header">
