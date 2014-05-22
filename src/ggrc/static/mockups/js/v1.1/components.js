@@ -644,7 +644,12 @@ can.Component.extend({
           task.attr('status', 'finished');
           break;
         case "finished":
-          task.attr('status', 'verified');
+          if(el.text() === 'Decline'){
+            task.attr('status', 'started');
+          }
+          else{
+            task.attr('status', 'verified');
+          }
           // Check if all tasks are done:
           for(var i=0; i < tasks.length; i++) {
             if(tasks[i].status !== 'verified') {
@@ -812,8 +817,9 @@ can.Component.extend({
       this.scope.attr('new_form', $(ev.target).data('new'));
     },
     'a#saveAssessment click' : function(el, ev) {
-      var $modal = $('#editAssessmentStandAlone')
-        , assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment');
+      var $modal = $('#editAssessmentStandAlone'),
+          assessment = this.scope.attr('new_form') ? new Assessment({}) : this.scope.attr('assessment'),
+          frequency = '<strong>' + $("#frequency").val().replace('_', ' ') + '</strong> - ';
 
       if($(el).hasClass('disabled'))
         return;
@@ -830,7 +836,7 @@ can.Component.extend({
       $modal.find('textarea').each(function(_, e) {
         assessment.attr(e.name, $(e).val());
       });
-      $modal.modal('hide');
+
       if(typeof assessment.objects === 'undefined') {
         assessment.attr('objects', []);
         assessment.attr('people', []);
@@ -839,8 +845,27 @@ can.Component.extend({
       if(typeof assessment.task_groups === 'undefined') {
         assessment.attr('task_groups', []);
       }
+
+      $.map($("#frequency-div").children(), function(el){
+        var $el = $(el),
+            $elements = $el.find('label').children();
+        if(!$(el).is(":visible")){
+          return;
+        }
+        $.map($elements, function(freqSegment){
+          var $freqSegment = $(freqSegment);
+          if($freqSegment.is('input,select')){
+            frequency += '<strong>' + $freqSegment.val() + '</strong> ';
+          }
+          else{
+            frequency += $freqSegment.text() + ' ';
+          }
+        });
+      });
+      assessment.attr('frequency', frequency);
       assessment.save();
       $("tree-app").trigger("selected", this.scope.assessment);
+      $modal.modal('hide');
 
     },
     '{Assessment} created' : function() {
