@@ -8,8 +8,47 @@
       <span>Add {{mapping}} to Workflow</span>
     </h2>
   </div>
+  {{#if_equals mapping 'Tasks'}}
+    <div class="modal-filter workflow-filter">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="objective-selector item-data">
+            <input type="text" class="input-large search-icon" value="{{value}}" placeholder="Enter text to search for Tasks">
+          </div>
+        </div>
+        <div class="span6">
+          <div class="pull-right">
+            <a class="btn btn-add" href="#">
+              <i class="grcicon-add"></i>
+              Create Task
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{/if_equals}}
+  
+  {{#if_equals mapping 'People'}}
+    <div class="modal-filter workflow-filter">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="objective-selector item-data">
+            <input type="text" class="input-large search-icon" value="{{value}}" placeholder="Enter text to search for People">
+          </div>
+        </div>
+        <div class="span6">
+          <div class="pull-right">
+            <a class="btn btn-add" href="#">
+              <i class="grcicon-add"></i>
+              Add Person
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{/if_equals}}
+  {{#filter}}
   <div class="modal-body">
-    {{#filter}}
     <div class="object-step" id="filters">
       <div class="choose-object-wrap">
         <div class="choose-object-content">
@@ -72,8 +111,8 @@
         </div>
       </div>
     </div>
-    {{/filter}}
   </div>
+  {{/filter}}
   <div class="results">
     <div class="bar-h"></div>
     <div class="results-wrap">

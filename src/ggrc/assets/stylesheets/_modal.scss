@@ -461,6 +461,14 @@
         padding-right: 2px;
       }
     }
+    &.workflow-filter {
+      input {
+        margin-bottom: 0;
+      }
+      .btn-add {
+        margin-right: 20px;
+      }
+    }
   }
   .modal-search {
     position:relative;

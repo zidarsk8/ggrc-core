@@ -93,11 +93,21 @@
                 <div class="arrow"></div>
               </li>
               {{#assessment.started}}
+              <li class="history-object">
+                <a href="#history_widget" class="history w-arrow">
+                  <div class="oneline">
+                    <i class="grcicon-progress-color"></i>
+                    History (0)
+                  </div>
+                </a>
+                <div class="drag"></div>
+                <div class="arrow"></div>
+              </li>
               <li class="progress-object {{#if_equals assessment.status 'In progress'}}started{{/if}} {{#if_equals assessment.status 'Finished'}}finished{{/if}}">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
                     <i class="grcicon-progress-color"></i>
-                    View Progress
+                    Current Cycle
                   </div>
                 </a>
                 <div class="drag"></div>
@@ -711,7 +721,7 @@
                     <div class="span9">
                       <h2>
                         <i class="grcicon-person-color"></i>
-                        Task Groups
+                        Current Cycle
                         <span class="object_count" id="objectsCounter">({{assessment.task_groups.length}})</span>
                         <span class="explanation"></span>
                       </h2>
@@ -1030,6 +1040,29 @@
                     {{/each}}
                   </ul>
                 </section>
+              </section>
+              
+              <!-- Widget: History -->
+              <section class="widget programs" id="history_widget" style="display:none;">
+                <header class="header">
+                  <div class="row-fluid">
+                    <div class="span9">
+                      <h2>
+                        <i class="grcicon-person-color"></i>
+                        Previous Cycles
+                        <span class="object_count" id="objectsCounter">(0)</span>
+                        <span class="explanation"></span>
+                      </h2>
+                    </div>
+                    <div class="span3">
+                      <div class="widget-action pull-right widget-action-help">
+                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                          <i class="grcicon-help-black"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </header>
               </section>
 
             </div>
