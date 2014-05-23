@@ -219,6 +219,21 @@ can.Component.extend({
     "#addFilterRule click": function() {
       this.scope.filter_list.push([{value: ""}]);
     },
+    ".remove_filter click": function(el) {
+      var index = el.data('index');
+      this.scope.filter_list.splice(index, 1);
+    },
+    '.addTaskModal click' : function() {
+      $modal = $('#newTask');
+      $modal.data('autocomplete', true);
+      $modal.zIndex(10000)
+      $modal.on('hide.bs.modal', function() {
+        $modal.unbind('hide.bs.modal');
+        $modal.data('autocomplete', false);
+      });
+      $('.show-task-modal').trigger('click');
+
+    }
   }
 })
 
@@ -236,6 +251,7 @@ can.Component.extend({
     assessment: assessmentList[0],
     objects : [],
     selected_num : 0,
+    actions : [],
     set_fields : function(assessment) {
       this.attr('filter_list', [{value: assessment.program_title}]);
       this.attr('assessment', assessment);
@@ -604,7 +620,8 @@ can.Component.extend({
                   id: taskList[l].id,
                   status: 'assigned',
                   end_date: tasks[k].end_date,
-                  entries: can.List(),
+                  entries: new can.List(),
+                  actions: new can.List()
                 }));
               }
             }
@@ -622,6 +639,7 @@ can.Component.extend({
         , tg = $(el.closest('.task_group')).data('index')
         , oc = $(el.closest('.obj_task')).find('.openclose')
         , assessment = this.scope.assessment
+        , actions = this.scope.actions
         , task_groups = assessment.task_groups
         , task_group = task_groups[tg]
         , objects = task_group.objects
@@ -630,8 +648,43 @@ can.Component.extend({
         , task = tasks[t]
         , all_done = true
         , status = task.attr('status')
+        , undo = el.data('undo')
+        , undo_status
         ;
 
+      function allObjectsDone(){
+        // Check if all objects are done:
+        for(var i=0; i < objects.length; i++) {
+          if(objects[i].obj_status !== 'finished') {
+            return false;
+          }
+        }
+        return true;
+      }
+      function allTasksDone(){
+        // Check if all tasks are done:
+        for(var i=0; i < tasks.length; i++) {
+          if(tasks[i].status !== 'verified') {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      if(undo){
+        undo_status = task.actions.pop();
+        if(status === 'verified'){
+          task_group.attr('status', allObjectsDone() ? 'started' : task_group.attr('status'));
+          object.attr('obj_status', allTasksDone() ? 'started' : object.attr('obj_status'));
+        }
+        task.attr('status', undo_status);
+        assessment.save();
+        return;
+      }
+      if(!task.actions){
+        task.actions = new can.List();
+      }
+      task.actions.push(status);
       switch(status) {
         case "assigned":
           task_group.attr('status', 'started');
@@ -650,21 +703,8 @@ can.Component.extend({
           else{
             task.attr('status', 'verified');
           }
-          // Check if all tasks are done:
-          for(var i=0; i < tasks.length; i++) {
-            if(tasks[i].status !== 'verified') {
-              all_done = false;
-            }
-          }
-          object.attr('obj_status', all_done ? 'finished' : object.attr('obj_status'));
-          // Check if all objects are done:
-          all_done = true;
-          for(var i=0; i < objects.length; i++) {
-            if(objects[i].obj_status !== 'finished') {
-              all_done = false;
-            }
-          }
-          task_group.attr('status', all_done ? 'finished' : task_group.attr('status'));
+          object.attr('obj_status', allTasksDone() ? 'finished' : object.attr('obj_status'));
+          task_group.attr('status', allObjectsDone() ? 'finished' : task_group.attr('status'));
           break;
       }
       assessment.save();

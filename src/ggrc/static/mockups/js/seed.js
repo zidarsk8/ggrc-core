@@ -28,10 +28,22 @@ function create_seed(){
   assessmentList = new Assessment.List({});
   taskList = new Task.List({});
 
+
+  var task_group, object, task;
   for(var i = 0; i < assessmentList.length; i++){
     var assessment = assessmentList[i];
     if(!assessment.people) assessment.attr('people', []);
     if(!assessment.tasks) assessment.attr('tasks', []);
+    for(var tg = 0; tg < assessment.task_groups.length; tg++){
+      task_group = assessment.task_groups[tg];
+      for(var o = 0; o < task_group.objects.length; o++){
+        object = task_group.objects[o];
+        for(var t = 0; t < object.obj_tasks.length; t++){
+          task = object.obj_tasks[t];
+          task.attr('actions', new can.List());
+        }
+      }
+    }
     assessment.save();
   }
 }
