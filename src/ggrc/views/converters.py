@@ -12,7 +12,7 @@ from ggrc.app import app
 from ggrc.converters.common import ImportException
 from ggrc.converters.import_helper import handle_csv_import, handle_converter_csv_export
 from ggrc.login import get_current_user, login_required
-from ggrc.models.task import create_task, queued_task
+from ggrc.models.background_task import create_task, queued_task
 from ggrc.rbac import permissions
 
 
@@ -107,7 +107,7 @@ def system_program_import_template(program_id):
       "No such program.", 404, []))
 
 
-@app.route("/tasks/import_people", methods=['POST'])
+@app.route("/_background_tasks/import_people", methods=['POST'])
 @queued_task
 def import_people_task(task):
   from ggrc.converters.people import PeopleConverter
@@ -141,7 +141,7 @@ def help_redirect(count):
   flash(u'Successfully imported {} help page{}'.format(count, 's' if count > 1 else ''), 'notice')
   return redirect("/admin")
 
-@app.route("/tasks/import_help", methods=['POST'])
+@app.route("/_background_tasks/import_help", methods=['POST'])
 @queued_task
 def import_help_task(task):
   from ggrc.converters.help import HelpConverter
@@ -284,7 +284,7 @@ def import_objectives_to_program(program_id):
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
-@app.route("/tasks/import_objective_directive", methods=['POST'])
+@app.route("/_background_tasks/import_objective_directive", methods=['POST'])
 @queued_task
 def import_objective_directive_task(task):
   from ggrc.converters.objectives import ObjectivesConverter
@@ -362,7 +362,7 @@ def import_controls(directive_id):
       parameters)
   return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
 
-@app.route('/tasks/import_control_directive', methods=['POST'])
+@app.route("/_background_tasks/import_control_directive", methods=['POST'])
 @queued_task
 def import_control_directive_task(task):
   from ggrc.converters.controls import ControlsConverter
@@ -397,7 +397,7 @@ def import_control_directive_task(task):
     return render_template("directives/import_errors.haml",
        directive_id=directive_id, exception_message=str(e))
 
-@app.route("/tasks/import_control_program", methods=['POST'])
+@app.route("/_background_tasks/import_control_program", methods=['POST'])
 @queued_task
 def import_control_program_task(task):
   from ggrc.converters.controls import ControlsConverter
@@ -434,7 +434,7 @@ def import_control_program_task(task):
     return render_template("programs/import_errors.haml",
         program_id=program.id, exception_message=str(e))
 
-@app.route("/tasks/import_objective_program", methods=['POST'])
+@app.route("/_background_tasks/import_objective_program", methods=['POST'])
 @queued_task
 def import_objective_program_task(task):
   from ggrc.converters.objectives import ObjectivesConverter
@@ -471,8 +471,8 @@ def import_objective_program_task(task):
     return render_template("programs/import_errors.haml",
         program_id=program.id, exception_message=str(e))
 
-@app.route("/tasks/import_system", methods=["POST"])
-@app.route("/tasks/import_process", methods=["POST"])
+@app.route("/_background_tasks/import_system", methods=["POST"])
+@app.route("/_background_tasks/import_process", methods=["POST"])
 @queued_task
 def import_system_task(task):
   from ggrc.converters.systems import SystemsConverter
@@ -499,7 +499,7 @@ def import_system_task(task):
       return render_template("systems/import_result.haml", exception_message=e, converter=converter, results=converter.objects, heading_map=converter.object_map)
     return render_template("directives/import_errors.haml", exception_message=e)
 
-@app.route("/tasks/export_people", methods=['POST'])
+@app.route("/_background_tasks/export_people", methods=['POST'])
 @queued_task
 def export_people_task(task):
   from ggrc.converters.people import PeopleConverter
@@ -510,7 +510,7 @@ def export_people_task(task):
   filename = "PEOPLE.csv"
   return handle_converter_csv_export(filename, people, PeopleConverter, **options)
 
-@app.route("/tasks/export_help", methods=['POST'])
+@app.route("/_background_tasks/export_help", methods=['POST'])
 @queued_task
 def export_help_task(task):
   from ggrc.converters.help import HelpConverter
@@ -521,7 +521,7 @@ def export_help_task(task):
   filename = "HELP.csv"
   return handle_converter_csv_export(filename, people, HelpConverter, **options)
 
-@app.route("/tasks/export_process", methods=['POST'])
+@app.route("/_background_tasks/export_process", methods=['POST'])
 @queued_task
 def export_process_task(task):
   from ggrc.converters.systems import SystemsConverter
@@ -535,7 +535,7 @@ def export_process_task(task):
   filename = "PROCESSES.csv"
   return handle_converter_csv_export(filename, procs, SystemsConverter, **options)
 
-@app.route("/tasks/export_system", methods=['POST'])
+@app.route("/_background_tasks/export_system", methods=['POST'])
 @queued_task
 def export_system_task(task):
   from ggrc.converters.systems import SystemsConverter

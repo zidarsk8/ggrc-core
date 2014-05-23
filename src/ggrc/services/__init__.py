@@ -17,7 +17,7 @@ def contributed_services():
   import ggrc.models.all_models as models
 
   return [
-    service('tasks', models.Task),
+    service('background_tasks', models.BackgroundTask),
     service('audits', models.Audit),
     service('categorizations', models.Categorization),
     service('category_bases', models.CategoryBase),
