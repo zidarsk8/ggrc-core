@@ -26,7 +26,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 # Needs to be secured as we are removing @login_required
-@app.route("/tasks/reindex", methods=["POST"])
+@app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
 def reindex(task):
   """
