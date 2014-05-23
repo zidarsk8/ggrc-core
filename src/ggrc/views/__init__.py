@@ -17,7 +17,9 @@ from ggrc.views.converters import *  # necessary for import endpoints
 from werkzeug.exceptions import Forbidden
 from . import filters
 from .registry import object_view
-from ggrc.models.task import Task, queued_task, create_task, make_task_response
+from ggrc.models.background_task import (
+    BackgroundTask, queued_task, create_task, make_task_response
+    )
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -155,7 +157,7 @@ def styleguide():
   """
   return render_template("styleguide/styleguide.haml")
 
-@app.route("/task/<id_task>", methods=['GET'])
+@app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   return make_task_response(id_task)
 
@@ -164,7 +166,7 @@ def contributed_object_views():
   from .common import RedirectedPolymorphView
 
   return [
-      object_view(models.Task),
+      object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),

@@ -10,8 +10,8 @@ from flask import request
 from flask.wrappers import Response
 from ggrc.models.types import CompressedType
 
-class Task(Base, Stateful, db.Model):
-  __tablename__ = 'tasks'
+class BackgroundTask(Base, Stateful, db.Model):
+  __tablename__ = 'background_tasks'
 
   VALID_STATES = [
     "Pending",
@@ -19,9 +19,9 @@ class Task(Base, Stateful, db.Model):
     "Success",
     "Failure"
   ]
-  name = deferred(db.Column(db.String), 'Task')
-  parameters = deferred(db.Column(CompressedType), 'Task')
-  result = deferred(db.Column(CompressedType), 'Task')
+  name = deferred(db.Column(db.String), 'BackgroundTask')
+  parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
+  result = deferred(db.Column(CompressedType), 'BackgroundTask')
 
   _publish_attrs = [
       'name',
@@ -58,7 +58,7 @@ class Task(Base, Stateful, db.Model):
 
 def create_task(user, name, queued_task, parameters={}):
   from time import time
-  task = Task(name=name + str(int(time()))) # task name must be unique
+  task = BackgroundTask(name=name + str(int(time()))) # task name must be unique
   task.parameters = parameters
   task.modified_by = user
   from ggrc.app import db
@@ -80,7 +80,7 @@ def create_task(user, name, queued_task, parameters={}):
   return task
 
 def make_task_response(id):
-  task = Task.query.get(id)
+  task = BackgroundTask.query.get(id)
   return task.make_response()
 
 def queued_task(func):
@@ -88,10 +88,10 @@ def queued_task(func):
 
   @wraps(func)
   def decorated_view(*args, **kwargs):
-    if len(args) > 0 and isinstance(args[0], Task):
+    if len(args) > 0 and isinstance(args[0], BackgroundTask):
       task = args[0]
     else:
-      task = Task.query.get(request.form.get("task_id"))
+      task = BackgroundTask.query.get(request.form.get("task_id"))
     task.start()
     try:
       result = func(task)

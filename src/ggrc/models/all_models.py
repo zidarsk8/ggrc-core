@@ -42,7 +42,7 @@ from .relationship import Relationship, RelationshipType
 from .request import Request
 from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .meeting import Meeting
-from .task import Task
+from .background_task import BackgroundTask
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -107,7 +107,7 @@ all_models = [
     Process,
   Revision,
   Event,
-  Task,
+  BackgroundTask,
   ]
 
 __all__ = [model.__name__ for model in all_models]

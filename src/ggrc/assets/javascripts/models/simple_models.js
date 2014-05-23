@@ -335,14 +335,14 @@ can.Model.Cacheable("CMS.Models.Role", {
 
 });
 
-Task = can.Model.extend({
-  root_object : "task"
-  , root_collection : "tasks"
-  , findAll : "GET /api/tasks"
-  , findOne : "GET /api/tasks/{id}"
-  , update : "PUT /api/tasks/{id}"
-  , destroy : "DELETE /api/tasks/{id}"
-  , create : "POST /api/tasks"
+BackgroundTask = can.Model.extend({
+  root_object : "background_task"
+  , root_collection : "background_tasks"
+  , findAll : "GET /api/background_tasks"
+  , findOne : "GET /api/background_tasks/{id}"
+  , update : "PUT /api/background_tasks/{id}"
+  , destroy : "DELETE /api/background_tasks/{id}"
+  , create : "POST /api/background_tasks"
   , scopes : []
   , defaults : {}
 }, {});

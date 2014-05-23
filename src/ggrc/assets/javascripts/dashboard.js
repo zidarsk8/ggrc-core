@@ -102,7 +102,7 @@ jQuery(function($) {
     $(this).addClass("disabled");
   }
   function checkStatus(result, type, $btn){
-    Task.findOne({id: result.id}, function(task){
+    BackgroundTask.findOne({id: result.id}, function(task){
       task = task.task;
       var msg = ($btn && $btn.val() == "Upload and Review") ? $btn.val() : type;
       if(task.status == "Pending" || task.status == "Running"){
@@ -129,7 +129,7 @@ jQuery(function($) {
           var headers = task.result.headers;
           for(var i = 0; i < headers.length; i++){
             if(headers[i][0] == "Content-Type" && headers[i][1] == "text/csv"){
-              window.location.assign("/task/"+task.id);
+              window.location.assign("/background_task/"+task.id);
             }
           }
         }

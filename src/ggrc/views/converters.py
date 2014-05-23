@@ -12,7 +12,7 @@ from ggrc.app import app
 from ggrc.converters.common import ImportException
 from ggrc.converters.import_helper import handle_csv_import, handle_converter_csv_export
 from ggrc.login import get_current_user, login_required
-from ggrc.models.task import create_task, queued_task
+from ggrc.models.background_task import create_task, queued_task
 from ggrc.rbac import permissions
 
 
