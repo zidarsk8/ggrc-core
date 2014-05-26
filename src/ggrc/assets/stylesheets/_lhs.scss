@@ -659,10 +659,12 @@
     }
   }
   .extended-info-contact {
+    @include oneline();
     p {
       font-size:12px;
       span {
         line-height:16px;
+        display: block;
       }
     }
   }
