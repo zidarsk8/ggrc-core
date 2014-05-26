@@ -148,6 +148,7 @@ ul.new-tree {
     .item-data {
       padding-left: 5px;
       @include clearfix();
+      overflow: visible;
       .type {
         float: left;
         width: 23%;
