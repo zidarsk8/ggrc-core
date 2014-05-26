@@ -610,6 +610,7 @@ can.Component.extend({
           });
           if(original_objects.length === 0) continue;
           objects[j].attr('type', original_objects[0].type);
+          objects[j].attr('obj_status', 'Assigned');
           objects[j].attr('obj_tasks', new can.List());
           for(var k = 0; k < tasks.length; k++) {
             for(var l = 0; l < taskList.length; l++) {
@@ -796,6 +797,33 @@ can.Component.extend({
       clone.save();
       return;
     },
+    ".end-cycle click": function(){
+      var assessment = this.scope.assessment,
+          task_groups = assessment.task_groups,
+          task_group, cycles, i
+
+      if(!assessment.attr('cycles')){
+        assessment.attr('cycles', new can.List());
+      }
+      cycles = assessment.cycles;
+      cycles.push({task_groups: new can.List()});
+      for(i = 0; i < task_groups.length; i++){
+        task_group = task_groups[i];
+        cycles[cycles.length-1].task_groups.push({
+          status: task_group.attr('status'),
+          assignee: task_group.attr('assignee'),
+          description: task_group.attr('description'),
+          end_date: task_group.attr('end_date'),
+          title: task_group.attr('title'),
+          objects: $.map(task_group.objects, function(o){
+            return $.extend(true, {}, o);
+          })
+        });
+        task_group.attr('status', 'Assigned');
+      }
+      $("#confirmStartWorkflow").trigger('click');
+      assessment.save();
+    }
   }
 });
 
@@ -820,6 +848,12 @@ can.Component.extend({
 // TODO: seperate common modal functionality
 can.Component.extend({
   tag: 'workflow-modal',
+  init: function(){
+    var _this = this;
+    $(function(){
+      _this.scope.setWorkflow(assessmentList[0]);
+    })
+  },
   scope: {
     assessment: assessmentList[0],
     new_form: false,
@@ -848,6 +882,27 @@ can.Component.extend({
       }
       else{
         $save_button.addClass('disabled');
+      }
+    },
+    setWorkflow: function(workflow){
+      var frequency = workflow.frequency,
+          regex = /<strong>(.*?)<\/strong>/g,
+          match = regex.exec(frequency),
+          frequencyType,
+          i = 0,
+          selected, $elements;
+      this.attr('assessment', workflow);
+      if(!match){
+        return;
+      }
+      frequencyType = match[1].replace(' ', '_');
+      $("#frequency").val(frequencyType);
+      $('.frequency-wrap').hide();
+      $('#'+frequencyType.replace('_', '-')).show();
+      $elements = $('#'+frequencyType.replace('_', '-')).find('input,select');
+
+      while(match = regex.exec(frequency)){
+        $($elements[i++]).val(match[1]);
       }
     }
   },
@@ -909,10 +964,10 @@ can.Component.extend({
 
     },
     '{Assessment} created' : function() {
-      this.scope.attr('assessment', arguments[2]);
+      this.scope.setWorkflow(arguments[2]);
     },
     '{window} selected' : function() {
-      this.scope.attr('assessment', arguments[2]);
+      this.scope.setWorkflow(arguments[2]);
     },
     'input,textarea change' : function() {
       this.scope.validateForm();
@@ -990,7 +1045,6 @@ var modal = can.Component.extend({
     }
   }
 });
-
 $("#lhn-automation").html(can.view("/static/mockups/mustache/v1.1/lhn.mustache", {}))
 $("#tree-app").html(can.view("/static/mockups/mustache/v1.1/tree.mustache", {}))
 $("#workflow").html(can.view("/static/mockups/mustache/v1.1/workflow.mustache", {}));

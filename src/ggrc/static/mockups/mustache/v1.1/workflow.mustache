@@ -97,7 +97,7 @@
                 <a href="#history_widget" class="history w-arrow">
                   <div class="oneline">
                     <i class="grcicon-history-color"></i>
-                    History (0)
+                    History ({{assessment.cycles.length}})
                   </div>
                 </a>
                 <div class="drag"></div>
@@ -739,6 +739,11 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree colored-list">
+                    <li class="tree-item cycle-control-wrap">
+                      <div class="request-control">
+                        <button class="btn end-cycle">End Cycle</button>
+                      </div>
+                    </li>
                     {{#each assessment.task_groups}}
                     <li class="tree-item program task-item task_group rq-draft
                       {{#if_equals status 'started'}}rq-requested{{/if}}
@@ -1045,14 +1050,14 @@
               </section>
 
               <!-- Widget: History -->
-              <section class="widget programs" id="history_widget" style="display:none;">
+              <section class="widget programs history_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
                     <div class="span9">
                       <h2>
                         <i class="grcicon-history-color"></i>
                         Previous Cycles
-                        <span class="object_count" id="objectsCounter">(0)</span>
+                        <span class="object_count" id="objectsCounter">({{assessment.cycles.length}})</span>
                         <span class="explanation"></span>
                       </h2>
                     </div>
@@ -1065,6 +1070,302 @@
                     </div>
                   </div>
                 </header>
+                <section class="content">
+                  <ul class="tree-structure new-tree mockup-tree colored-list">
+                    {{#each assessment.cycles}}
+                    <li class="tree-item program task-item task_group rq-draft">
+                      <div class="item-main">
+                        <div class="openclose">
+                          <div class="row-fluid">
+                            <div class="span12">
+                              <span class="tier-trigger"></span>
+                              <div class="item-data">
+                                <div class="tree-title-area">
+                                  Cycle {{@index}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="tier-2-info item-content" style="display: none;">
+                        <div class="inner-tree">
+                          <h6>Task Groups ({{task_groups.length}})</h6>
+                          <ul class="tree-structure new-tree colored-list">
+                            {{#each task_groups}}
+                            <li class="tree-item program task-item task_group rq-draft
+                              {{#if_equals status 'started'}}rq-requested{{/if}}
+                              {{#if_equals status 'finished'}}rq-accepted{{/if}}
+                              {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
+                              <div class="item-main">
+                                <div class="openclose">
+                                  <div class="row-fluid">
+                                    <div class="span12">
+                                      <ul class="tree-action-list">
+                                        <li>
+                                          {{^status}}
+                                          <span class="gray"><em>Assigned</em></span>
+                                          {{/status}}
+                                          {{#if_equals status 'started'}}
+                                          <span class="gray"><em>In progress</em></span>
+                                          {{/if}}
+                                          {{#if_equals status 'finished'}}
+                                          <span class="task-done"><em>Finished</em></span>
+                                          {{/if}}
+                                        </li>
+                                        <li>
+                                          <span class="counter">
+                                            due
+                                            <strong class="error">{{end_date}}</strong>
+                                          </span>
+                                          {{^if_equals status 'finished'}}{{#is_overdue end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
+                                        </li>
+                                        <li>
+                                          <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                                            <i class="grcicon-object-black"></i>
+                                            <strong class="error">{{objects.length}}</strong>
+                                          </span>
+                                        </li>
+                                        <li>
+                                          <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                                            <i class="grcicon-task-black"></i>
+                                            <strong class="error">{{tasks.length}}</strong>
+                                          </span>
+                                        </li>
+                                      </ul>
+                                      <span class="tier-trigger"></span>
+                                      <div class="item-data">
+                                        <div class="tree-title-area">
+                                          {{title}}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="tier-2-info item-content" style="display: none;">
+
+                                <div class="inner-tree">
+                                  <h6>Objects ({{objects.length}})</h6>
+                                  <ul class="tree-structure new-tree colored-list">
+                                    {{#each objects}}
+                                    <li class="tree-item programs tg_object rq-draft
+                                      {{#if_equals obj_status 'started'}}rq-requested{{/if}}
+                                      {{#if_equals obj_status 'finished'}}rq-accepted{{/if}}" data-index="{{@index}}">
+                                      <div class="item-main">
+                                        <div class="openclose">
+                                          <div class="row-fluid">
+                                            <div class="span12">
+                                              <ul class="tree-action-list">
+                                                <li>
+                                                  {{^obj_status}}
+                                                  <span class="gray"><em>Assigned</em></span>
+                                                  {{/obj_status}}
+                                                  {{#if_equals obj_status 'started'}}
+                                                  <span class="gray"><em>In progress</em></span>
+                                                  {{/if}}
+                                                  {{#if_equals obj_status 'finished'}}
+                                                  <span class="task-done"><em>Finished</em></span>
+                                                  {{/if}}
+                                                </li>
+                                                <li>
+                                                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                                                    <i class="grcicon-task-black"></i>
+                                                    <strong class="error">{{tasks.length}}</strong>
+                                                  </span>
+                                                </li>
+                                              </ul>
+                                              <span class="tier-trigger"></span>
+                                              <div class="item-data">
+                                                <div class="tree-title-area">
+                                                  <i class="grcicon-{{type}}-color"></i>
+                                                  {{title}} {{type}}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div class="tier-2-info item-content" style="display: none;">
+                                        <div class="tier-2-info-content">
+                                          <div class="row-fluid">
+                                            <div class="span6">
+                                              <a href="#" class="info-action">
+                                                View Object
+                                                <i class="grcicon-goto"></i>
+                                              </a>
+                                            </div>
+                                          </div>
+                                          <div class="show-description">
+                                            <div class="row-fluid">
+                                              <div class="span12">
+                                                <div class="tree-description">
+                                                  <h5>{{title}}</h5>
+                                                  <div class="row-fluid">
+                                                    <div class="span8">
+                                                      <p>{{#description}}{{description}}{{/description}}{{^desription}}Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus in luctus tellus. Aliquam libero elit, facilisis nec fermentum at, accumsan vitae eros. Proin egestas risus a malesuada faucibus. Vivamus lacus eros, sagittis sit amet interdum lobortis, blandit quis ante. Nullam blandit felis in odio mattis, nec luctus ante convallis. Nunc at dictum risus. Vivamus vel massa mi. Nunc sem dui, dapibus eget lorem a, pharetra congue est.{{/description}}</p>
+                                                    </div>
+                                                    <div class="span4">
+                                                      <p>
+                                                        <strong>Owner</strong>
+                                                        <br>
+                                                        <a href="#">anajsharma@google.com</a>
+                                                      </p>
+                                                      <p>
+                                                        <strong>Contact</strong>
+                                                        <br>
+                                                        <a href="#">iwu@google.com</a>
+                                                      </p>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div class="inner-tree">
+                                          <h6>Tasks ({{obj_tasks.length}})</h6>
+                                          <ul class="tree-structure new-tree colored-list">
+                                            {{#each obj_tasks}}
+                                            <li class="tree-item rq-draft obj_task
+                                              {{#if_equals status 'finished'}}rq-accepted{{/if}}
+                                              {{#if_equals status 'verified'}}rq-accepted{{/if}}
+                                              {{#if_equals status 'started'}}rq-requested{{/if}}
+                                              {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
+                                              <div class="item-main">
+                                                <div class="openclose">
+                                                  <div class="row-fluid">
+                                                    <div class="span12">
+                                                      <ul class="tree-action-list">
+                                                        <li>
+                                                          <span class="counter">
+                                                            due
+                                                            <strong class="error">{{end_date}}</strong>
+                                                          </span>
+                                                        </li>
+                                                        <li>
+                                                          <i class="grcicon-person-green pull-left icon-field"></i>
+                                                          <div class="objective-selector">
+                                                            {{assignee}}
+                                                          </div>
+                                                        </li>
+                                                        <li>
+                                                          <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                                                            <i class="grcicon-directive-black"></i>
+                                                            <strong class="error">{{entries.length}}</strong>
+                                                          </span>
+                                                        </li>
+                                                        <li>
+                                                          <div class="request-control">
+                                                            {{^if_equals status 'verified'}}{{#is_overdue end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
+                                                            {{#if_equals status 'assigned'}}
+                                                            {{/if}}
+                                                            {{#if_equals status 'started'}}
+                                                            {{/if}}
+                                                            {{#if_equals status 'finished'}}
+                                                            {{/if}}
+                                                            {{#if_equals status 'verified'}}
+                                                            <span class="task-done">
+                                                              <em>Verified</em>
+                                                            </span>
+                                                            {{/if}}
+                                                          </div>
+                                                        </li>
+                                                      </ul>
+                                                      <span class="tier-trigger"></span>
+                                                      <div class="item-data">
+                                                        <div class="tree-title-area">
+                                                          {{title}}
+                                                        </div>
+                                                      </div>
+                                                      <div class="item-data">
+                                                        <div class="tree-title-area">
+
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              <div class="tier-2-info item-content" style="display: none;">
+                                                <div class="tier-2-info-content">
+                                                  <div class="row-fluid">
+                                                    <div class="span6">
+                                                      <a href="#" class="info-action">
+                                                        View Task
+                                                        <i class="grcicon-goto"></i>
+                                                      </a>
+                                                    </div>
+                                                  </div>
+                                                  <div class="show-description">
+                                                    <div class="row-fluid">
+                                                      <div class="span12">
+                                                        <div class="tree-description">
+                                                          <h5>{{title}}</h5>
+                                                          <strong>Task Details:</strong>
+                                                          {{description}}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                  <div class="row-fluid">
+                                                    <div class="span11">
+                                                      <div class="inner-row">
+                                                        <strong>Entries (<span>{{entries.length}}</span>)</strong>
+                                                        <ul class="entry-list">
+                                                          {{#each entries}}
+                                                          <li>
+                                                            <div class="pull-right">
+                                                            </div>
+                                                            {{description}}
+                                                            <ul class="attachment-list">
+                                                              <li>
+                                                                <a href="#">
+                                                                  <i class="grcicon-attach"></i>
+                                                                  <span>supportingwalkthroughevidence.pdf</span>
+                                                                </a>
+                                                              </li>
+                                                              <li>
+                                                                <a href="#">
+                                                                  <i class="grcicon-attach"></i>
+                                                                  <span>screenshot.pdf</span>
+                                                                </a>
+                                                              </li>
+                                                            </ul>
+                                                            <span class="entry-author">By <a href="#">{{assignee}}</a> on 2014-01-27 7:45am UTC</span>
+                                                          </li>
+                                                          {{/each entries}}
+                                                        </ul>
+                                                    </div>
+                                                    </div>
+                                                  </div>
+
+                                                </div>
+                                              </div>
+                                            </li>
+                                            {{/each}}
+                                          </ul>
+                                        </div>
+                                      </div>
+
+                                    </li>
+                                    {{/each}}
+                                  </ul>
+                                </div>
+                              </div>
+                            </li>
+                            {{/each}}
+                          </ul>
+                        </div>
+                      </div>
+                    </li>
+                    {{/each}}
+                  </ul>
+                </section>
               </section>
 
             </div>
