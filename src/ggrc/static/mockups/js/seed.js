@@ -44,6 +44,9 @@ function create_seed(){
         }
       }
     }
+    if(!assessment.cycles){
+      assessment.attr('cycles', new can.List());
+    }
     assessment.save();
   }
 }
