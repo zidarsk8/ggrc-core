@@ -876,3 +876,30 @@ select.multiple-selector {
     }
   }
 }
+
+// media
+.media {
+  margin-bottom: 20px;
+  .pull-left {
+    margin-right: 10px;
+    line-height: 14px;
+    [class^="grcicon-"] {
+      margin-top: 1px;
+    }
+  }
+  .media-body {
+    overflow: hidden;
+    zoom: 1;
+    a {
+      &.object-title {
+        color: $darkText;
+      }
+    }
+  }
+}
+
+a {
+  &.object-title {
+    color: $text;
+  }
+}
