@@ -820,6 +820,12 @@ can.Component.extend({
 // TODO: seperate common modal functionality
 can.Component.extend({
   tag: 'workflow-modal',
+  init: function(){
+    var _this = this;
+    $(function(){
+      _this.scope.setWorkflow(assessmentList[0]);
+    })
+  },
   scope: {
     assessment: assessmentList[0],
     new_form: false,
@@ -849,6 +855,24 @@ can.Component.extend({
       else{
         $save_button.addClass('disabled');
       }
+    },
+    setWorkflow: function(workflow){
+      var frequency = workflow.frequency,
+          regex = /<strong>(.*?)<\/strong>/g,
+          match = regex.exec(frequency),
+          frequencyType = match[1].replace(' ', '_'),
+          i = 0,
+          selected, $elements;
+
+      $("#frequency").val(frequencyType);
+      $('.frequency-wrap').hide();
+      $('#'+frequencyType.replace('_', '-')).show();
+      $elements = $('#'+frequencyType.replace('_', '-')).find('input,select');
+
+      while(match = regex.exec(frequency)){
+        $($elements[i++]).val(match[1]);
+      }
+      this.attr('assessment', workflow);
     }
   },
   events:{
@@ -909,10 +933,10 @@ can.Component.extend({
 
     },
     '{Assessment} created' : function() {
-      this.scope.attr('assessment', arguments[2]);
+      this.scope.setWorkflow(arguments[2]);
     },
     '{window} selected' : function() {
-      this.scope.attr('assessment', arguments[2]);
+      this.scope.setWorkflow(arguments[2]);
     },
     'input,textarea change' : function() {
       this.scope.validateForm();

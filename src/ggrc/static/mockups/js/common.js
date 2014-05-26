@@ -589,7 +589,6 @@ $(document).ready(function(){
       $('#continuos').show();
     }
   });
-  $('#one-time').show();
 });
 
 // Grid View Example
