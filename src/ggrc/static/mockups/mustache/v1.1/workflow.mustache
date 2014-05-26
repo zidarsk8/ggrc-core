@@ -739,6 +739,11 @@
                 </header>
                 <section class="content">
                   <ul class="tree-structure new-tree mockup-tree colored-list">
+                    <li class="tree-item cycle-control-wrap">
+                      <div class="request-control">
+                        <button class="btn">End Cycle</button>
+                      </div>
+                    </li>
                     {{#each assessment.task_groups}}
                     <li class="tree-item program task-item task_group rq-draft
                       {{#if_equals status 'started'}}rq-requested{{/if}}

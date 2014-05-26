@@ -452,6 +452,14 @@ ul.new-tree {
         }
       }
     }
+    &.cycle-control-wrap {
+      background: $lightGray !important;
+      padding-right: 20px !important;
+      padding-left: 20px !important;
+      .request-control {
+        text-align: right;
+      } 
+    }
     &.progress-color {
       > .item-main {
         &:hover {
