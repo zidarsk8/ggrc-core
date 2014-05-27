@@ -17,6 +17,113 @@ $(function() {
     , object_table = object_class.table_plural
     , object = GGRC.page_instance();
 
+  if (!GGRC.widget_descriptors)
+    GGRC.widget_descriptors = {};
+  if (!GGRC.default_widgets)
+    GGRC.default_widgets = [];
+
+
+  //A widget descriptor has the minimum five properties:
+  // widget_id:  the unique ID string for the widget
+  // widget_name: the display title for the widget in the UI
+  // widget_icon: the CSS class for the widget in the UI
+  // content_controller: The controller class for the widget's content section
+  // content_controller_options: options passed directly to the content controller; the
+  //   precise options depend on the controller itself.  They usually require instance
+  //   and/or model and some view.
+  can.Construct("GGRC.WidgetDescriptor", {
+    make_info_widget : function(instance, widget_view) {
+      var default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
+      return new this({
+        widget_id: "info",
+        widget_name: function() {
+          if (instance.constructor.title_singular === 'Person')
+            return 'Info';
+          else
+            return instance.constructor.title_singular + " Info";
+        },
+        widget_icon: "grcicon-info",
+        content_controller : GGRC.Controllers.InfoWidget,
+        content_controller_options : {
+          instance: instance,
+          model: instance.constructor,
+          widget_view: widget_view || default_info_widget_view
+        }
+      });
+    },
+    make_tree_view : function(instance, far_model, mapping, extenders) {
+      var descriptor = {
+        content_controller: CMS.Controllers.TreeView,
+        content_controller_selector: "ul",
+        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+        widget_id: far_model.table_singular,
+        widget_guard: function(){
+          if (far_model.title_plural === "Audits"
+              && instance instanceof CMS.Models.Program){
+            return "context" in instance && !!(instance.context.id);
+          }
+          return true;
+        },
+        widget_name: function() {
+            var $objectArea = $(".object-area");
+            if ( $objectArea.hasClass("dashboard-area") || instance.constructor.title_singular === "Person" ) {
+              if (/dashboard/.test(window.location)) {
+                return "My " + far_model.title_plural;
+              } else {
+                return far_model.title_plural;
+              }
+            } else if (far_model.title_plural === "Audits") {
+              return "Mapped Audits";
+            } else {
+              return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
+            }
+          }
+        , widget_icon: far_model.table_singular
+        , object_category: far_model.category || 'default'
+        , model: far_model
+        , content_controller_options: {
+              child_options: []
+            , draw_children: false
+            , parent_instance: instance
+            , model: far_model
+            , list_loader: $.proxy(mapping, "refresh_list")
+          }
+      };
+
+      $.extend.apply($, [true, descriptor].concat(extenders || []));
+
+      return new this(descriptor);
+    },
+    newInstance : function(opts) {
+      var ret;
+      if(GGRC.widget_descriptors[opts.widget_id]) {
+        if(GGRC.widget_descriptors[opts.widget_id] instanceof this) {
+          $.extend(GGRC.widget_descriptors[opts.widget_id], opts);
+        } else {
+          ret = this._super.apply(this);
+          $.extend(ret, GGRC.widget_descriptors[opts.widget_id], opts);
+          GGRC.widget_descriptors[opts.widget_id] = ret;
+        }
+        return GGRC.widget_descriptors[opts.widget_id];
+      } else {
+        ret = this._super.apply(this, arguments);
+        $.extend(ret, opts);
+        GGRC.widget_descriptors[ret.widget_id] = ret;
+        return ret;
+      }
+    }
+  }, {
+    register_as_default : function() {
+      if(!~can.inArray(this.widget_id, GGRC.default_widgets)) {
+        GGRC.default_widgets.push(this.widget_id);
+      }
+      return this;
+    }
+  });
+
+
+  // Info widgets display the object information instead of listing connected 
+  //  objects.
   var info_widget_views = {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
     , 'people': GGRC.mustache_path + "/people/info.mustache"
@@ -27,35 +134,8 @@ $(function() {
     , 'systems': GGRC.mustache_path + "/systems/info.mustache"
     , 'processes': GGRC.mustache_path + "/processes/info.mustache"
     , 'products': GGRC.mustache_path + "/products/info.mustache"
-  }
-  default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
-
-  var info_widget_descriptors = {
-      info: {
-          widget_id: "info"
-        , widget_name: function() {
-            if (object_class.title_singular === 'Person')
-              return 'Info';
-            else
-              return object_class.title_singular + " Info";
-          }
-        , widget_icon: "grcicon-info"
-        , content_controller: GGRC.Controllers.InfoWidget
-        , content_controller_options: {
-              instance: object
-            , model: object_class
-            , widget_view: info_widget_views[object_table] || default_info_widget_view
-          }
-      }
-  }
-
-  if (!GGRC.extra_widget_descriptors)
-    GGRC.extra_widget_descriptors = {};
-  if (!GGRC.extra_default_widgets)
-    GGRC.extra_default_widgets = [];
-
-  GGRC.extra_widget_descriptors.info = info_widget_descriptors.info;
-  GGRC.extra_default_widgets.splice(0, 0, 'info');
+  };
+  GGRC.WidgetDescriptor.make_info_widget(object, info_widget_views[object_table]).register_as_default();
 
   function sort_sections(sections) {
     return can.makeArray(sections).sort(window.natural_comparator);
@@ -102,6 +182,10 @@ $(function() {
         .by_object_option_models[object.constructor.shortName]
     , model_widget_descriptors = {}
     , model_default_widgets = []
+
+    // here we are going to define extra descriptor options, meaning that
+    //  these will be used as extra options to create widgets on top of 
+
     , extra_descriptor_options = {
           all: {
               Person: {
@@ -476,91 +560,43 @@ $(function() {
       new GGRC.ListLoaders.MultiListLoader(sources), [model_name]);
     list_loader = list_loader.attach(object);
 
-    var far_model = join_descriptor.get_model(model_name)
-      , descriptor = {
-            content_controller: CMS.Controllers.TreeView
-          , content_controller_selector: "ul"
-          , widget_initial_content: '<ul class="tree-structure new-tree"></ul>'
-          , widget_id: far_model.table_singular
-          , widget_guard: function(){
-              if (far_model.title_plural === "Audits"
-                  && GGRC.page_instance() instanceof CMS.Models.Program){
-                return "context" in GGRC.page_instance() && !!(GGRC.page_instance().context.id);
-              }
-              return true;
-            }
-          , widget_name: function() {
-              var $objectArea = $(".object-area");
-              if ( $objectArea.hasClass("dashboard-area") || object_class.title_singular === "Person" ) {
-                if (/dashboard/.test(window.location)) {
-                  return "My " + far_model.title_plural;
-                } else {
-                  return far_model.title_plural;
-                }
-              } else if (far_model.title_plural === "Audits") {
-                return "Mapped Audits";
-              } else {
-                return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
-              }
-            }
-          , widget_icon: far_model.table_singular
-          , object_category: far_model.category || 'default'
-          , model: far_model
-          , content_controller_options: {
-                child_options: []
-              , draw_children: false
-              , parent_instance: object
-              , model: model_name
-              , list_loader: $.proxy(list_loader, "refresh_list")
-            }
-        }
-      ;
+    var far_model = join_descriptor.get_model(model_name);
+    var extenders = [];
 
     // Custom overrides
     if (extra_descriptor_options.all
-        && extra_descriptor_options.all[model_name]) {
-      can.extend(
-          descriptor,
-          extra_descriptor_options.all[model_name]);
+        && extra_descriptor_options.all[model_name]
+    ) {
+      extenders.push(extra_descriptor_options.all[model_name]);
     }
 
     if (extra_descriptor_options[object.constructor.shortName]
         && extra_descriptor_options[object.constructor.shortName][model_name]) {
-      can.extend(
-          descriptor,
-          extra_descriptor_options[object.constructor.shortName][model_name]);
+      extenders.push(extra_descriptor_options[object.constructor.shortName][model_name]);
     }
 
     if (extra_content_controller_options.all
         && extra_content_controller_options.all[model_name]) {
-      can.extend(
-          descriptor.content_controller_options,
-          extra_content_controller_options.all[model_name]);
+      extenders.push({ content_controller_options : extra_content_controller_options.all[model_name] });
     }
 
     if (extra_content_controller_options[object.constructor.shortName]
         && extra_content_controller_options[object.constructor.shortName][model_name]) {
-      can.extend(
-          descriptor.content_controller_options,
-          extra_content_controller_options[object.constructor.shortName][model_name]);
+      extenders.push({ content_controller_options : extra_content_controller_options[object.constructor.shortName][model_name] });
     }
 
     if (!list_loader)
       return;
 
-    // This overrides the merged Person/Authorizations widget
     if (GGRC.page_instance() instanceof CMS.Models.Program && model_name === 'Person') {
-      model_widget_descriptors[far_model.table_singular] = can.extend(descriptor, GGRC.extra_widget_descriptors[far_model.table_singular]);
+      extenders.push(GGRC.widget_descriptors[far_model.table_singular]);
     }
-    else {
-      model_widget_descriptors[far_model.table_singular] = descriptor;
-    }
-    model_default_widgets.push(far_model.table_singular);
+    
+    var wd= GGRC.WidgetDescriptor.make_tree_view(GGRC.page_instance(), far_model, list_loader, extenders);
+    wd.register_as_default();
+
   });
 
-  can.extend(GGRC.extra_widget_descriptors, model_widget_descriptors);
-  GGRC.extra_default_widgets.push.apply(
-      GGRC.extra_default_widgets, model_default_widgets);
 });
 
 })(window.can, window.can.$);

@@ -9,8 +9,7 @@
 
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
-        model_descriptors: null
-      , menu_tree_spec: null
+        menu_tree_spec: null
       , widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
@@ -96,11 +95,6 @@ can.Control("CMS.Controllers.Dashboard", {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-
-      can.each(this.options.model_descriptors, function(descriptor, key) {
-        that.options.widget_descriptors[key] =
-          that.make_list_view_descriptor_from_model_descriptor(descriptor);
-      });
     }
 
   , init_menu_tree: function() {

@@ -220,7 +220,7 @@ if(!/^\/programs\/\d+/.test(window.location.pathname))
  return;
 
 $(function() {
-  program_widget_descriptors = {
+  var program_widget_descriptors = {
       person: {
           widget_id: "person"
         , widget_name: "People"
@@ -240,9 +240,9 @@ $(function() {
   };
 
   if (/programs\/\d+/.test(window.location)) {
-    if (!GGRC.extra_widget_descriptors)
-      GGRC.extra_widget_descriptors = {};
-    $.extend(GGRC.extra_widget_descriptors, program_widget_descriptors);
+    if (!GGRC.widget_descriptors)
+      GGRC.widget_descriptors = {};
+    $.extend(GGRC.widget_descriptors, program_widget_descriptors);
   }
 
 });

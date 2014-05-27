@@ -9,6 +9,11 @@
 //= require controllers/quick_search_controller
 (function(namespace, $) {
 
+// Defined here are the joins between objects that are effected through the Relationship type.
+//  For historical reasons, some relationships show one or more "type IDs" that represented how
+//  these objects related to each other in an earlier GGRC system.  This graph is used to create
+//  join descriptors below and serves as part of the basis for the multitype modal selector to 
+//  properly join up objects of various types.
 var RELATIONSHIP_TYPES = {
   "DataAsset":  {
     "Process": ["data_asset_has_process"]
@@ -172,6 +177,12 @@ var RELATIONSHIP_TYPES = {
 
 GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
+  // A join descriptor describes how two objects of given types can be joined together through
+  //  a join object or setting of a join property.  This is similar to mappings,
+  //  but mappings cover how objects might be distantly as well as directly
+  //  related, and are meant to be sources for *reading*.  Join descriptors only cover 
+  //  direct mappings, and cover *creation* and *destruction* of joins between
+  //  objects.
   GGRC.JoinDescriptor = can.Construct({
       defaults: {
           object_model_name: null

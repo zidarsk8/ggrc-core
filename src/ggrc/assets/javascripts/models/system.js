@@ -8,6 +8,7 @@
 can.Model.Cacheable("CMS.Models.SystemOrProcess", {
     root_object : "system_or_process"
     , root_collection : "systems_or_processes"
+    , title_plural : "Systems/Processes"
     , category : "business"
     , findAll : "GET /api/systems_or_processes"
 
