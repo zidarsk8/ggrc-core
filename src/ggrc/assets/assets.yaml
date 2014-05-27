@@ -74,8 +74,8 @@ dashboard-js-files:
   - controllers/modal_selector_controller.js
   - pbc/workflow_controller.js
   - models/category.js
+  - models/refresh_queue.js
   - apps/quick_search.js
-  - apps/programs.js
   - apps/business_objects.js
   - apps/dashboard.js
   - roles/roles_modal_controller.js

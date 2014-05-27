@@ -207,6 +207,14 @@ $(function() {
               }
             }
           }
+        , Program : {
+          Person: {
+              widget_id: "person"
+            , widget_name: "People"
+            , widget_icon: "person"
+            , content_controller: GGRC.Controllers.TreeView
+          }
+        }
       }
     // Prevent widget creation with <model_name>: false
     // e.g. to prevent ever creating People widget:
@@ -354,6 +362,16 @@ $(function() {
               , draw_children : true
               , show_view : GGRC.mustache_path + "/audits/tree.mustache"
               , footer_view : GGRC.mustache_path + "/audits/tree_footer.mustache"
+            }
+            , Person : {
+                show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache"
+              , footer_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache"
+              , parent_instance: GGRC.page_instance()
+              , allow_reading: true
+              , allow_mapping: true
+              , allow_creating: true
+              , model: CMS.Models.Person
+              , mapping: "mapped_and_or_authorized_people"
             }
           }
 
@@ -587,10 +605,6 @@ $(function() {
 
     if (!list_loader)
       return;
-
-    if (GGRC.page_instance() instanceof CMS.Models.Program && model_name === 'Person') {
-      extenders.push(GGRC.widget_descriptors[far_model.table_singular]);
-    }
     
     var wd= GGRC.WidgetDescriptor.make_tree_view(GGRC.page_instance(), far_model, list_loader, extenders);
     wd.register_as_default();

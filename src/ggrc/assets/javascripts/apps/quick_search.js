@@ -601,59 +601,29 @@ $(function() {
       }
     }
 
-    /*if(can.isPlainObject(link)) {
-
-      $("<div id='relationship_type_modal' class='modal hide'>").appendTo(document.body)
-        .modal_form({}, ev.target)
-        .ggrc_controllers_modals({
-          new_object_form : true
-          , button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
-          , model : CMS.Models.Relationship
-          , page_object : page_instance
-          , related_object : inst
-          , relationships : can.map(RELATIONSHIP_TYPES[page_model.model_singular][inst.constructor.model_singular], function(v) {
-            return {id : v, name : v.replace(/_/g, " ") };
-          })
-          , find_params : {
-            source : page_instance
-            , destination : inst
-            , context : page_instance.context || { id : null }
-          }
-          , modal_title : "Select Relationship Type"
-          , content_view : GGRC.mustache_path + "/base_objects/map_related_modal_content.mustache"
-        })
-        .one("modal:success", triggerFlash);
-    } else {*/
-      // Mappings to/from a program should be in the context of the program.
-      // Otherwise, default to the page_instance context then default context.
-      var join_context;
-      if (inst instanceof CMS.Models.Program && inst.context) {
-        join_context = { id : inst.context.id };
-      } else {
-        join_context = page_instance.context || { id : null };
-      }
-      join_object = join_descriptor.make_join_object(
-          page_instance, inst, { context : join_context });
-      // Map the object if we're able to
-      if (join_object) {
-        join_object.save()
-          .done(triggerFlash)
-          .fail(function(xhr) {
-            // Currently, the only error we encounter here is uniqueness
-            // constraint violations.  Let's use a nicer message!
-            var message = "That object is already mapped";
-            $(document.body).trigger("ajax:flash", { error: message });
-          });
-      }
-      // Otherwise throw a warning
-      else {
-        triggerFlash("error");
-      }
-      //params[page_model.root_object] = { id : page_instance.id };
-      //params[inst.constructor.root_object] = { id : inst.id };
-      //params.context = page_instance.context || { id : null };
-      //new link(params).save().done(triggerFlash);
-    //}
+    var join_context;
+    if (inst instanceof CMS.Models.Program && inst.context) {
+      join_context = { id : inst.context.id };
+    } else {
+      join_context = page_instance.context || { id : null };
+    }
+    join_object = join_descriptor.make_join_object(
+        page_instance, inst, { context : join_context });
+    // Map the object if we're able to
+    if (join_object) {
+      join_object.save()
+        .done(triggerFlash)
+        .fail(function(xhr) {
+          // Currently, the only error we encounter here is uniqueness
+          // constraint violations.  Let's use a nicer message!
+          var message = "That object is already mapped";
+          $(document.body).trigger("ajax:flash", { error: message });
+        });
+    }
+    // Otherwise throw a warning
+    else {
+      triggerFlash("error");
+    }
 
   });
 
