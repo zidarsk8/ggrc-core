@@ -31,7 +31,6 @@
   }
   width:96%;
   margin:0 2% 4% 2%;
-  overflow-y:hidden;
   border:1px solid #aaa;
   @include transition(box-shadow 0.2s,border-color 0.2s);
   &.workflow-info-widget {
