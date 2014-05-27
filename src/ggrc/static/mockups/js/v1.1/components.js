@@ -936,6 +936,7 @@ can.Component.extend({
         assessment.attr('objects', []);
         assessment.attr('people', []);
         assessment.attr('tasks', []);
+        assessment.attr('cycles', []);
       }
       if(typeof assessment.task_groups === 'undefined') {
         assessment.attr('task_groups', []);
