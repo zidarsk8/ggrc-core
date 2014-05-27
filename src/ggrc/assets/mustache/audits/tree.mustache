@@ -305,7 +305,7 @@
             <div class="inner-tree">
               <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
               {{#child_options.2}}
-                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+                <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               {{/child_options.2}}
             </div>
           {{else}}
@@ -319,7 +319,7 @@
           <div class="inner-tree">
             <h6>{{#is_dashboard}}My {{/is_dashboard}}PBC Responses ({{#if_null child_options.2.original_list}}...{{else}}{{child_options.2.original_list.length}}{{/if_null}})</h6>
             {{#child_options.2}}
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
+              <ul class="tree-structure new-tree responses-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
             {{/child_options.2}}
           </div>
           {{/if_auditor}}

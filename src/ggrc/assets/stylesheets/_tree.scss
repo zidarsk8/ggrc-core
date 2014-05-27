@@ -104,6 +104,13 @@ ul.new-tree {
     }
   }
   &.responses-list {
+    .objective-selector {
+      .read-only {
+        &.oneline {
+          width: 84%;
+        }
+      }
+    }
     .response-control {
       text-align: right;
       padding-right: 5px;

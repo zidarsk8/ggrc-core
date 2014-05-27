@@ -29,7 +29,7 @@
                   or #is_allowed' '__GGRC_ADMIN__' model.shortName _2_context=instance.context.id}}
                   <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
                 {{else}}
-                <span class="read-only">
+                <span class="read-only oneline">
                   {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
                 </span>
                 {{/if_can_edit_request}}
