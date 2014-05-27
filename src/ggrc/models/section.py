@@ -10,7 +10,7 @@ from .associationproxy import association_proxy
 from .exceptions import ValidationError
 from .mixins import (
     deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
-    Slugged,
+    Titled, Slugged,
     )
 from .object_document import Documentable
 from .object_owner import Ownable
@@ -19,7 +19,7 @@ from .reflection import PublishOnly
 
 
 class SectionBase(
-    Hierarchical, Noted, Described, Hyperlinked, WithContact, Slugged,
+    Hierarchical, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     db.Model):
   _table_plural = 'section_bases'
   __tablename__ = 'sections'

@@ -145,6 +145,25 @@ class ChangeTracked(object):
       ]
   _update_attrs = []
 
+
+class Titled(object):
+
+  @declared_attr
+  def title(cls):
+    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('title', name='uq_t_{}'.format(cls.__tablename__)),
+        )
+
+  # REST properties
+  _publish_attrs = ['title']
+  _fulltext_attrs = ['title']
+  _sanitize_html = ['title']
+
+
 class Described(object):
   @declared_attr
   def description(cls):
@@ -310,25 +329,21 @@ class Slugged(Base):
   "slugged" and have additional fields related to their publishing in the
   system.
   """
-  @declared_attr
-  def slug(cls):
-    return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
   @declared_attr
-  def title(cls):
+  def slug(cls):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
-        db.UniqueConstraint('title', name='uq_t_{}'.format(cls.__tablename__)),        
         )
 
   # REST properties
-  _publish_attrs = ['slug', 'title']
-  _fulltext_attrs = ['slug', 'title']
-  _sanitize_html = ['slug', 'title']
+  _publish_attrs = ['slug']
+  _fulltext_attrs = ['slug']
+  _sanitize_html = ['slug']
 
   @classmethod
   def generate_slug_for(cls, obj):
@@ -394,7 +409,7 @@ class WithContact(object):
 
 
 class BusinessObject(
-    Stateful, Noted, Described, Hyperlinked, WithContact, Slugged):
+    Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
   VALID_STATES = [
       'Draft',
       'Final',

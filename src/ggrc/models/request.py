@@ -5,9 +5,9 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred, Base, Described, Slugged
+from .mixins import deferred, Base, Described, Titled, Slugged
 
-class Request(Slugged, Described, Base, db.Model):
+class Request(Titled, Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
 
   VALID_TYPES = (u'documentation', u'interview', u'population sample')

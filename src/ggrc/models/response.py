@@ -5,20 +5,21 @@
 
 from ggrc import db
 from .mixins import (
-    deferred, Noted, Described, Hyperlinked, WithContact, Slugged,
+    deferred, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     )
 from .relationship import Relatable
 from .object_document import Documentable
 from .object_person import Personable
 from .object_control import Controllable
 
-class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
+class Response(
+    Noted, Described, Hyperlinked, WithContact, Titled, Slugged, db.Model):
   __tablename__ = 'responses'
   __mapper_args__ = {
       'polymorphic_on': 'response_type',
       }
 
-  # Override `Slugged.title` to provide default=""
+  # Override `Titled.title` to provide default=""
   title = deferred(
       db.Column(db.String, nullable=False, default=""), 'Response')
 
