@@ -199,6 +199,9 @@ u {
     background-position: right center;
     padding-right: 28px;
   }
+  &.pull-left {
+    margin-left: 4px;
+  }
 }
 
 .tooltip {
@@ -873,6 +876,19 @@ select.multiple-selector {
     &.drag {
       float: left;
       width: 23px;
+    }
+  }
+  &.task-wrap {
+    span.empty {
+      float: left;
+      width: 23px;
+      height: 23px;
+    }
+    input {
+      width: 37%;
+      &.date {
+        width: 18%;
+      }
     }
   }
 }

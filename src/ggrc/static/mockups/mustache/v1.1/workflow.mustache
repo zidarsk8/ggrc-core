@@ -359,7 +359,7 @@
                                   {{/each}}
                                 </ul>
 
-                                <div class="span12">
+                                <div>
                                   <a href="#" class="toggleClosest btn">Add Object</a>
                                 </div>
                                 <div class="hide objective-selector field-wrap">
@@ -383,7 +383,7 @@
                                 <ul class="items-list sortable" data-index="{{@index}}">
                                   {{#each tasks}}
                                   <li>
-                                    <div class="objective-selector field-wrap">
+                                    <div class="objective-selector field-wrap task-wrap">
                                       <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
                                       <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
                                       <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
@@ -394,10 +394,11 @@
                                   {{/each}}
                                 </ul>
 
-                                <div class="span12">
+                                <div>
                                   <a href="#" class="toggleClosest btn">Add Task</a>
                                 </div>
-                                <div class="hide objective-selector field-wrap">
+                                <div class="hide objective-selector field-wrap task-wrap">
+                                  <span class="empty"></span>
                                   <input tabindex="3" type="text" name="object_title2" class="search-icon autocomplete addEnable" placeholder="Add Task" data-index="{{@index}}" data-type="tasks">
                                   <input tabindex="2" class="date" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{end_date}}">
                                   <span class="required">*</span>
@@ -716,7 +717,7 @@
                 </section>
               </section>
 
-              <!-- Widget: Progress -->
+              <!-- Widget: Current Cycle -->
               <section class="widget programs progress_widget" style="display:none;">
                 <header class="header">
                   <div class="row-fluid">
@@ -1247,8 +1248,10 @@
                                                         </li>
                                                         <li>
                                                           <i class="grcicon-person-green pull-left icon-field"></i>
-                                                          <div class="objective-selector">
-                                                            {{assignee}}
+                                                          <div class="objective-selector pull-left">
+                                                            <div class="oneline">
+                                                              {{assignee}}
+                                                            </div>
                                                           </div>
                                                         </li>
                                                         <li>
