@@ -885,7 +885,7 @@ can.Component.extend({
       }
     },
     setWorkflow: function(workflow){
-      var frequency = workflow.frequency,
+      var frequency = workflow.frequency || 'one-time',
           regex = /<strong>(.*?)<\/strong>/g,
           match = regex.exec(frequency),
           frequencyType,
@@ -893,8 +893,11 @@ can.Component.extend({
           selected, $elements;
       this.attr('assessment', workflow);
       if(!match){
+        $('.frequency-wrap').hide();
+        $('#one-time').show()
         return;
       }
+
       frequencyType = match[1].replace(' ', '_');
       $("#frequency").val(frequencyType);
       $('.frequency-wrap').hide();
