@@ -114,7 +114,6 @@
 
   WorkflowExtension.init_widgets_for_other_pages =
       function init_widgets_for_other_pages() {
-    console.debug("init_widgets_for_other_pages");
     var index;
 
     // Explicitly remove `task_group` widget on other pages
@@ -138,7 +137,6 @@
 
   WorkflowExtension.init_widgets_for_workflow_page =
       function init_widgets_for_workflow_page() {
-    console.debug("init_widgets_for_workflow_page");
     var new_widget_descriptors = {},
         new_default_widgets = [
           "info",
