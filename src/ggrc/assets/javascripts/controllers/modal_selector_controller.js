@@ -959,7 +959,7 @@
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
 
-        var join_model = GGRC.JoinDescriptor.join_model_name_for(
+        var join_model = GGRC.Mappings.join_model_name_for(
               this.options.object_model, current_option_model_name);
         var permission_parms = { __permission_type: 'read' };
         if (current_option_model_name == 'Program') {
@@ -1255,10 +1255,6 @@
     }
   }
 
-  function get_join_descriptors_for_model(model_name) {
-    return GGRC.JoinDescriptor.by_object_model[model_name];
-  }
-
   function get_multitype_option_set(object_model_name, option_model_name, data) {
     var join_descriptors = null
       , option_descriptors = {}
@@ -1270,14 +1266,14 @@
 
     if (!option_model_name) {
       join_descriptors =
-        GGRC.JoinDescriptor.by_object_model[object_model_name];
+        GGRC.Mappings.get_canonical_mappings_for(object_model_name);
     } else {
       join_descriptors =
-        GGRC.JoinDescriptor.by_object_option_models[object_model_name][option_model_name];
+        [GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name)];
     }
 
     can.each(join_descriptors, function(descriptor) {
-      var option_model_name = descriptor.options.option_model_name
+      var option_model_name = descriptor.option_model_name
         , extra_options = modal_descriptor_view_options[option_model_name]
         ;
 
@@ -1289,7 +1285,7 @@
           || ~can.inArray(option_model_name, exclude_option_types)
           //  For some recently-added join settings, there is no join model, so
           //  short-circuit
-          || !descriptor.options.join_model_name)
+          || !descriptor.model_name)
         return;
 
       if (!option_set.default_option_descriptor)
@@ -1304,8 +1300,8 @@
 
       option_descriptors[option_model_name] =
         ModalOptionDescriptor.from_join_model(
-            descriptor.options.join_model_name
-          , descriptor.options.join_option_attr
+            descriptor.model_name
+          , descriptor.option_attr
           , option_model_name
           , extra_options);
     });

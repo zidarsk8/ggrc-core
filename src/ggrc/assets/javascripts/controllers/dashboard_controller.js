@@ -9,8 +9,7 @@
 
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
-        menu_tree_spec: null
-      , widget_descriptors: null
+      widget_descriptors: null
       //, widget_listeners: null
       //, widget_containers: null
       //
@@ -22,8 +21,6 @@ can.Control("CMS.Controllers.Dashboard", {
       this.init_page_help();
       this.init_page_header();
       this.init_widget_descriptors();
-      if (!this.options.menu_tree)
-        this.init_menu_tree();
       if (!this.inner_nav_controller)
         this.init_inner_nav();
       this.update_inner_nav();
@@ -95,24 +92,6 @@ can.Control("CMS.Controllers.Dashboard", {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-    }
-
-  , init_menu_tree: function() {
-      var that = this
-        , menu_tree = { categories: [] };
-
-      can.each(this.options.menu_tree_spec, function(category) {
-        var objects = can.map(category.objects, function(widget_name) {
-          return that.options.widget_descriptors[widget_name];
-        });
-
-        menu_tree.categories.push({
-            title: category.title
-          , objects: objects
-        });
-      });
-
-      this.options.menu_tree = menu_tree;
     }
 
   , init_default_widgets: function() {
@@ -309,37 +288,6 @@ CMS.Controllers.Dashboard("CMS.Controllers.PageObject", {
       var that = this;
 
       this.options.widget_descriptors = this.options.widget_descriptors || {};
-    }
-
-  , init_menu_tree: function() {
-      var that = this
-        , widget_descriptors = this.options.widget_descriptors
-        , model_name = this.options.instance.constructor.shortName
-        , categories_index = {}
-        , menu_tree = { categories : [] }
-        ;
-
-      can.each(GGRC.RELATIONSHIP_TYPES[model_name], function(value, key) {
-        var related_model = CMS.Models[key]
-          , descriptor = widget_descriptors[related_model.table_singular]
-          , category = null
-          ;
-
-        if (descriptor) {
-          category = descriptor.object_category;
-
-          if (!categories_index[category]) {
-            categories_index[category] = {
-                title : can.map(category.split(" "), can.capitalize).join(" ")
-              , objects : []
-              };
-            menu_tree.categories.push(categories_index[category]);
-          }
-          categories_index[category].objects.push(descriptor);
-        }
-      });
-
-      this.options.menu_tree = menu_tree;
     }
 });
 

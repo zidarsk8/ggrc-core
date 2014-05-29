@@ -99,6 +99,32 @@
         }
       });
       return mappings;
+    },
+    join_model_name_for: function (model_name_a, model_name_b) {
+      var join_descriptor = this.get_canonical_mapping(model_name_a, model_name_b);
+      if (join_descriptor instanceof GGRC.ListLoaders.ProxyListLoader) {
+        return join_descriptor.model_name;
+      } else {
+       return null;
+      }
+    },
+    make_join_object: function(object, option, join_attrs) {
+      var join_model
+        , join_mapping = this.get_canonical_mapping(object.constructor.shortName, option.constructor.shortName)
+        , object_attrs = { id: object.id, type: object.constructor.shortName }
+        , option_attrs = { id: option.id, type: option.constructor.shortName }
+        ;
+
+      if(join_mapping) {
+        join_model = CMS.Models[join_mapping.model_name];
+        join_attrs = $.extend({}, join_attrs || {});
+        join_attrs[join_model.option_attr] = option_attrs;
+        join_attrs[join_model.object_attr] = object_attrs;
+
+        return new join_model(join_attrs);
+      } else {
+        return null;
+      }
     }
   }, {
     init : function(name, opts) {
