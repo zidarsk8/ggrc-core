@@ -1,0 +1,14 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+}}
+
+{{#is_allowed 'create' model.shortName context='any'}}
+<li class="add-new" data-ui-autocomplete-item="">
+<a href="{{ggrc_config_value "RISK_ASSESSMENT_URL"}}/riskForm" target="_blank">
+    + Create New
+</a>
+</li>
+{{/is_allowed}}
