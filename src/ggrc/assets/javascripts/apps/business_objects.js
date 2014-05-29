@@ -28,6 +28,12 @@
   //   precise options depend on the controller itself.  They usually require instance
   //   and/or model and some view.
   can.Construct("GGRC.WidgetDescriptor", {
+    /*
+      make an info widget descriptor for a GGRC object
+      You must provide:
+      instance - an instance that is a subclass of can.Model.Cacheable
+      widget_view [optional] - a template for rendering the info.
+    */
     make_info_widget : function(instance, widget_view) {
       var default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
       return new this({
@@ -47,6 +53,14 @@
         }
       });
     },
+    /*
+      make a tree view widget descriptor with mostly default-for-GGRC settings.
+      You must provide:
+      instance - an instance that is a subclass of can.Model.Cacheable
+      far_model - a can.Model.Cacheable class
+      mapping - a mapping object taken from the instance
+      extenders [optional] - an array of objects that will extend the default widget config.
+    */
     make_tree_view : function(instance, far_model, mapping, extenders) {
       var descriptor = {
         content_controller: CMS.Controllers.TreeView,
@@ -111,8 +125,29 @@
   }, {
   });
 
+  /*
+    WidgetList - an extensions-ready repository for widget descriptor configs.
+    Create a new widget list with new GGRC.WidgetList(list_name, widget_descriptions)
+      where widget_descriptions is an object with the structure:
+      { <page_name> : 
+        { <widget_id> : 
+          { <widget descriptor-ready properties> }, 
+        ...}, 
+      ...}
+
+    See the comments for GGRC.WidgetDescriptor for details in what is necessary to define
+    a widget descriptor.
+  */
   can.Construct("GGRC.WidgetList", {
     modules : {},
+    /*
+      get_widget_list_for: return a keyed object of widget descriptors for the specified page type.
+
+      page_type - one of a GGRC object model's shortName, or "admin"
+
+      The widget descriptors are built on the first call of this function; subsequently they are retrieved from the
+       widget descriptor cache.
+    */
     get_widget_list_for : function(page_type) {
       var widgets = {};
       can.each(this.modules, function(module) {
@@ -147,6 +182,9 @@
       });
       return descriptors;
     },
+    /*
+      returns a keyed object of widget descriptors that represents the current page.
+    */
     get_current_page_widgets : function() {
       return this.get_widget_list_for(GGRC.page_instance().constructor.shortName);
     }
@@ -155,6 +193,15 @@
       this.constructor.modules[name] = this;
       can.extend(this, opts);
     },
+    /*
+      Here instead of using the object format described in the class comments, you may instead
+      add widgets to the WidgetList by using add_widget.
+
+      page_type - the shortName of a GGRC object class, or "admin"
+      id - the desired widget's id.
+      descriptor - a widget descriptor appropriate for the widget type. FIXME - the descriptor's
+        widget_id value must match the value passed as "id"
+    */
     add_widget : function(page_type, id, descriptor) {
       this[page_type] = this[page_type] || {};
       if(this[page_type][id]) {

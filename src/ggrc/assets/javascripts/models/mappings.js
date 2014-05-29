@@ -44,7 +44,27 @@
     return new GGRC.ListLoaders.CrossListLoader(local_mapping, remote_mapping);
   }
 
+  /*
+    class GGRC.Mappings
+    represents everything known about how GGRC objects connect to each other.
+
+    a Mappings instance contains the set of known mappings for a module, such as "ggrc_core"
+    or "ggrc_gdrive_integration".  The set of all Mappings instances is used throughout the
+    system to build widgets, map and unmap objects, etc.
+
+    To configure a new Mappings instance, use the following format :
+    { <mixin name or source object type> : { 
+        _mixins : [ <mixin name>, ... ],
+        _canonical : { <option type> : <name of mapping in parent object>, ... }
+        <mapping name> : GGRC.Mappings.Proxy(...) | GGRC.Mappings.Direct(...) | GGRC.Mappings.Indirect(...) 
+                        | GGRC.Mappings.Multi(...) | GGRC.Mappings.TypeFilter(...) | GGRC.Mappings.Cross(...)
+                        | GGRC.Mappings.CustomFilter(...),
+        ...
+      } 
+    }
+  */
   can.Construct("GGRC.Mappings", {
+    // Convenience properties for building mappings types.
     Proxy : Proxy,
     Direct : Direct,
     Indirect : Indirect,
@@ -55,17 +75,12 @@
     Cross : Cross,
     modules : {},
 
-    get_group : function(groupname) {
-      return can.reduce(this.modules, function(group, mod, name) {
-        if (typeof mod === "function")
-          mod = mod();
-        return group.concat(
-          can.map(mod.groups && mod.groups[groupname] || [], function(cls) {
-            return ~can.inArray(cls, group) ? undefined : cls;
-          })
-        );
-      }, []);
-    },
+    /*
+      return all mappings from all modules for an object type.
+      object - a string representing the object type's shortName
+
+      return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
+    */
     get_mappings_for : function(object) {
       var mappings = {};
       can.each(this.modules, function(mod, name) {
@@ -79,6 +94,13 @@
       });
       return mappings;
     },
+    /*
+      return the canonical mapping (suitable for joining) between two objects.
+      object - the string type (shortName) of the "from" object's class
+      option - the string type (shortName) of the "to" object's class
+
+      return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
+    */
     get_canonical_mapping : function(object, option) {
       var mapping = null;
       can.each(this.modules, function(mod, name) {
@@ -89,6 +111,12 @@
       });
       return mapping;
     },
+    /*
+      return all canonical mappings (suitable for joining) from all modules for an object type.
+      object - a string representing the object type's shortName
+
+      return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by option type
+    */
     get_canonical_mappings_for : function(object) {
       var mappings = {};
       can.each(this.modules, function(mod, name) {
@@ -100,6 +128,13 @@
       });
       return mappings;
     },
+    /*
+      return the join model for the canonical mapping between two objects if and only if the canonical mapping is a Proxy.
+      model_name_a - the string type (shortName) of the "from" object's class
+      model_name_b - the string type (shortName) of the "to" object's class
+
+      return: an string of the shortName of the join model (subclass of can.Model.Join) or null
+    */
     join_model_name_for: function (model_name_a, model_name_b) {
       var join_descriptor = this.get_canonical_mapping(model_name_a, model_name_b);
       if (join_descriptor instanceof GGRC.ListLoaders.ProxyListLoader) {
@@ -108,6 +143,15 @@
        return null;
       }
     },
+    /*
+      make a new instance of the join model for the canonical mapping between two objects
+       if and only if the canonical mapping is a Proxy.
+      object - the string type (shortName) of the "from" object's class
+      option - the string type (shortName) of the "to" object's class
+      join_attrs - any other attributes to add to the new instance
+
+      return: an instance of the join model (subclass of can.Model.Join) or null
+    */
     make_join_object: function(object, option, join_attrs) {
       var join_model
         , join_mapping = this.get_canonical_mapping(object.constructor.shortName, option.constructor.shortName)
@@ -127,6 +171,10 @@
       }
     }
   }, {
+    /*
+      On init:
+      kick off the application of mixins to the mappings and resolve canonical mappings
+    */
     init : function(name, opts) {
       var created_mappings, that = this;
       this.constructor.modules[name] = this;
@@ -158,28 +206,7 @@
       });
       $.extend(this, created_mappings);
     },
-    //We don't check this, but "canonical" mappings (those we can use to make
-    //  a join) should always be Direct, Indirect, or Proxy types.
-    register_canonical_mapping : function(objects, options, mapping_name) {
-      var that = this;
-      objects = typeof objects === "function" ? objects() : objects;
-      options = typeof options === "function" ? options() : options;
-
-
-      objects = can.isArray(objects) ? objects : [objects];
-      options = can.isArray(options) ? options : [options];
-
-      can.each(objects, function(object) {
-        can.each(options, function(option) {
-          object = object.model_singular || object;
-          option = option.model_singular || option;
-
-          that._canonical_mappings[object] = that._canonical_mappings[object] || {};
-          that._canonical_mappings[object][option] = mapping_name;
-        });
-      });
-    },
-    // Recursively handle mixins
+    // Recursively handle mixins -- this function should not be called directly.
     reify_mixins : function(definition, definitions) {
       var that = this,
         final_definition = {};
@@ -220,6 +247,7 @@
       return final_definition;
     },
 
+    // create mappings for definitions -- this function should not be called directly/
     create_mappings : function(definitions) {
       var that = this,
         mappings = {};
