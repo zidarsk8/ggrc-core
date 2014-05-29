@@ -63,9 +63,9 @@
         <div class="span8" id="frequency-div">
           <div id="one-time" class="frequency-wrap">
             <label>
-              <span class="start-text">Start Date</span>
+              <span class="start-text">start date</span>
               <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="">
-              <span class="start-text">End Date</span>
+              <span>end date</span>
               <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="">
             </label>
           </div>
@@ -350,16 +350,6 @@
       </div>
 
       <div class="row-fluid">
-        <div class="span12">
-          <label>
-            gGRC Folder
-            <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
-          </label>
-          <a href="#">gGRC Workflows/{{new assessment.title}}</a>
-        </div>
-      </div>
-
-      <div class="row-fluid">
           <div class="span12">
             <div class="expand-link">
               <a class="show-hidden-fields" href="javascript://">
@@ -383,6 +373,7 @@
         <div class="hidden-fields-area" style="display:none">
           <div class="row-fluid">
             <div class="span6">
+              <br>
               <label>
                 Email preferences
                 <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
@@ -390,6 +381,18 @@
                 <br>
                 <input type="checkbox"> Notify user on every change
               </label>
+              <br>
+              <br>
+            </div>
+          </div>
+          
+          <div class="row-fluid">
+            <div class="span12">
+              <label>
+                gGRC Folder
+                <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+              </label>
+              <a href="#">gGRC Workflows/{{new assessment.title}}</a>
             </div>
           </div>
         </div>
