@@ -365,43 +365,51 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
 
   });
 
-  business_minus_system_object_types = [
-    "DataAsset", "Facility", "Market", "OrgGroup",
-    "Process", "Product", "Project"
-    ];
 
-  business_object_types =
-    business_minus_system_object_types.concat(["System"]);
+  var groups = {
+      business_object_types : [
+        "DataAsset", "Facility", "Market", "OrgGroup",
+        "Process", "Product", "Project", "System"
+        ],
+      business_plus_program_object_types :
+        function() {
+          return this.business_object_types.concat(["Program"]);
+        },
+      
+      directive_object_types : ["Regulation", "Policy", "Standard", "Contract"],
+      section_object_types : ["Section", "Clause"],
+      response_object_types : ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
+      business_plus_program_and_directive_object_types :
+        function() {
+          return this.business_plus_program_object_types().concat(this.directive_object_types);
+        },
+      governance_object_types : function() {
+        return this.directive_object_types
+          .concat(this.section_object_types)
+          .concat(["Control", "Objective"]);
+      },
+      person_object_types : function() {
+        return this.governance_object_types()
+          .concat(this.business_plus_program_object_types())
+          .concat(["Audit"]);
+      },
+      all_object_types : function() {
+        return this.governance_object_types()
+          .concat(this.business_plus_program_object_types())
+          .concat(this.response_object_types);
+      }
+    };
 
-  business_plus_program_object_types =
-    business_object_types.concat(["Program"]);
 
-  directive_object_types = ["Regulation", "Policy", "Standard", "Contract"];
-
-  section_object_types = ["Section", "Clause"]
-  response_object_types = ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"];
-
-  business_plus_program_and_directive_object_types =
-    business_plus_program_object_types.concat(directive_object_types);
-
-  governance_object_types =
-    directive_object_types
-      .concat(section_object_types)
-      .concat(["Control", "Objective"]);
-
-  person_object_types = governance_object_types.concat(business_plus_program_object_types).concat(["Audit"])
-
-  all_object_types =
-    governance_object_types.concat(business_plus_program_object_types).concat(response_object_types);
 
   join_descriptor_arguments = [
-        [business_object_types,
+        [groups.business_object_types,
           "Control", "ObjectControl", "control", "controllable"]
-      , ["Control", business_object_types,
+      , ["Control", groups.business_object_types,
           "ObjectControl", "controllable", "control"]
-      , [business_plus_program_and_directive_object_types,
+      , [groups.business_plus_program_and_directive_object_types(),
           "Objective", "ObjectObjective", "objective", "objectiveable", "object_objectives"]
-      , ["Objective", business_plus_program_and_directive_object_types,
+      , ["Objective", groups.business_plus_program_and_directive_object_types(),
           "ObjectObjective", "objectiveable", "objective", "objective_objects"]
       , ["Objective", "Objective",
           "ObjectObjective", "objective", "objectiveable", "object_objectives"]
@@ -411,17 +419,17 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
           "ControlControl", "implemented_control", "control", "control_controls"]
       , ["Control", "Control",
           "ControlControl", "control", "implemented_control", "implementing_control_controls"]
-      , [all_object_types,
+      , [groups.all_object_types(),
           "Person", "ObjectPerson", "person", "personable"]
-      , ["Person", person_object_types,
+      , ["Person", groups.person_object_types,
           "ObjectPerson", "personable", "person", "object_people"]
-      , [business_object_types,
+      , [groups.business_object_types,
           "Clause", "ObjectSection", "section", "sectionable"]
-      , [business_object_types,
+      , [groups.business_object_types,
           "Section", "ObjectSection", "section", "sectionable"]
-      , ["Clause", business_object_types,
+      , ["Clause", groups.business_object_types,
           "ObjectSection", "sectionable", "section"]
-      , ["Section", business_object_types,
+      , ["Section", groups.business_object_types,
           "ObjectSection", "sectionable", "section"]
       , ["Control", "Program", "ProgramControl", "program", "control"]
       , ["Program", "Control", "ProgramControl", "control", "program"]
@@ -431,15 +439,15 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       , ["Clause", "Control", "ControlSection", "control", "section"]
       , ["Control", "Objective", "ObjectiveControl", "objective", "control"]
       , ["Objective", "Control", "ObjectiveControl", "control", "objective"]
-      , ["Program", directive_object_types, "ProgramDirective", "directive", "program"]
+      , ["Program", groups.directive_object_types, "ProgramDirective", "directive", "program"]
       , ["Program", "Audit", null, null, "program"]
-      , [directive_object_types, "Program", "ProgramDirective", "program", "directive"]
+      , [groups.directive_object_types, "Program", "ProgramDirective", "program", "directive"]
       , [["Regulation", "Standard", "Policy"], "Section", null, null, "directive"]
       , ["Contract", "Clause", "DirectiveSection", "section", "directive"]
       , ["Clause", "Contract", "DirectiveSection", "directive", "section"]
-      , ["Control", directive_object_types, "DirectiveControl", "directive", "control"]
-      , [directive_object_types, "Control", "DirectiveControl", "control", "directive"]
-      , [directive_object_types, "Control", null, null, "directive"]
+      , ["Control", groups.directive_object_types, "DirectiveControl", "directive", "control"]
+      , [groups.directive_object_types, "Control", "DirectiveControl", "control", "directive"]
+      , [groups.directive_object_types, "Control", null, null, "directive"]
       , ["Section", "Objective", "SectionObjective", "objective", "section"]
       , ["Clause", "Objective", "SectionObjective", "objective", "section"]
       , ["Objective", "Section", "SectionObjective", "section", "objective"]
@@ -448,10 +456,10 @@ GGRC.RELATIONSHIP_TYPES = RELATIONSHIP_TYPES;
       //, ["Control", "Risk", "RiskControl", "risk", "control"]
       , ["Audit", "Request", null, null, "audit"]
       , ["Request", "Objective", null, null, "objective"]
-      , ["Request", response_object_types, null, null, "request"]
+      , ["Request", groups.response_object_types, null, null, "request"]
       // , ["Person", "Request", null, null, "assignee"]
-      , [response_object_types, "Control", "ObjectControl", "control", "controllable"]
-      , [business_object_types.concat(["Control"]),
+      , [groups.response_object_types, "Control", "ObjectControl", "control", "controllable"]
+      , [groups.business_object_types.concat(["Control"]),
           "Audit", null, null, null]
       ];
 

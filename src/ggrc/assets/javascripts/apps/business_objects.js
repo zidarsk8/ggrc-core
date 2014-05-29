@@ -113,14 +113,59 @@ $(function() {
       }
     }
   }, {
-    register_as_default : function() {
-      if(!~can.inArray(this.widget_id, GGRC.default_widgets)) {
-        GGRC.default_widgets.push(this.widget_id);
+  });
+
+  can.Construct("GGRC.WidgetList", {
+    modules : {},
+    get_widget_list_for : function(page_type) {
+      var widgets = {};
+      can.each(this.modules, function(module) {
+        can.each(module, function(descriptor, id) {
+          if(!widgets[id]) {
+            widgets[id] = descriptor;
+          } else {
+            can.extend(true, widgets[id], descriptor);
+          }
+        });
+      });
+      return can.map(widgets[page_type], function(widget, widget_id) {
+        switch(widget.content_controller) {
+        case GGRC.Controllers.InfoWidget:
+          return GGRC.WidgetDescriptor.make_info_widget(
+            widget.content_controller_options && widget.content_controller_options.instance || widget.instance,
+            widget.content_controller_options && widget.content_controller_options.widget_view || widget.widget_view
+            );
+        case GGRC.Controllers.TreeView:
+          return GGRC.WidgetDescriptor.make_tree_view(
+            widget.content_controller_options && widget.content_controller_options.instance || widget.instance,
+            widget.content_controller_options && widget.content_controller_options.model || widget.far_model || widget.model,
+            widget.content_controller_options && widget.content_controller_options.mapping || widget.mapping,
+            widget
+            );
+        default:
+          return new GGRC.WidgetDescriptor(widget);
+        }
+      });
+    },
+    get_current_page_widgets : function() {
+      return this.get_widget_list_for(GGRC.page_instance().constructor.shortName);
+    }
+  }, {
+    init : function(name, opts) {
+      this.constructor.modules[name] = this;
+      can.extend(this, opts);
+    },
+    add_widget : function(page_type, id, descriptor) {
+      this[page_type] = this[page_type] || {};
+      if(this[page_type][id]) {
+        can.extend(true, this[page_type][id], descriptor);
+      } else {
+        this[page_type][id] = descriptor;
       }
-      return this;
     }
   });
 
+  var widget_list = new GGRC.WidgetList("ggrc_core");
 
   // Info widgets display the object information instead of listing connected 
   //  objects.
@@ -135,7 +180,33 @@ $(function() {
     , 'processes': GGRC.mustache_path + "/processes/info.mustache"
     , 'products': GGRC.mustache_path + "/products/info.mustache"
   };
-  GGRC.WidgetDescriptor.make_info_widget(object, info_widget_views[object_table]).register_as_default();
+  widget_list.add_widget(object.constructor.shortName, "info", {
+    widget_id : "info",
+    content_controller : GGRC.Controllers.InfoWidget,
+    instance : object,
+    widget_view : info_widget_views[object_table]
+  });
+
+  var base_widgets_by_type = {
+    "Program": ["Regulation", "Contract", "Policy", "Standard", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Regulation" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Policy" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Standard" : ["Program", "Section", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Contract" : ["Program", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Clause" : ["Contract", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Section" : ["Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Objective" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person"],
+    "Control" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Person" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Audit"],
+    "OrgGroup" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "System" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Process" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "DataAsset" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Product" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Project" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Facility" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"],
+    "Market" : ["Program", "Regulation", "Contract", "Policy", "Standard", "Section", "Clause", "Objective", "Control", "System", "Process", "DataAsset", "Product", "Project", "Facility", "Market", "OrgGroup", "Person", "Audit"]
+  };
 
   function sort_sections(sections) {
     return can.makeArray(sections).sort(window.natural_comparator);
@@ -178,8 +249,7 @@ $(function() {
     return mappings;
   }
 
-  var far_models = GGRC.JoinDescriptor
-        .by_object_option_models[object.constructor.shortName]
+  var far_models = base_widgets_by_type[object.constructor.shortName]
     , model_widget_descriptors = {}
     , model_default_widgets = []
 
@@ -557,7 +627,7 @@ $(function() {
     });
   }
 
-  can.each(far_models, function(join_descriptors, model_name) {
+  can.each(far_models, function(model_name) {
     if ((overridden_models.all
           && overridden_models.all.hasOwnProperty(model_name)
           && !overridden_models[model_name])
@@ -568,49 +638,51 @@ $(function() {
 
     var sources = []
       , list_loader
-      , join_descriptor = join_descriptors[0]
       ;
 
-    can.each(join_descriptors, function(join_descriptor) {
-      sources.push(join_descriptor.get_loader());
-    });
+    //can.each(join_descriptors, function(join_descriptor) {
+    //  sources.push(join_descriptor.get_loader());
+    //});
     list_loader = new GGRC.ListLoaders.TypeFilteredListLoader(
       new GGRC.ListLoaders.MultiListLoader(sources), [model_name]);
     list_loader = list_loader.attach(object);
 
-    var far_model = join_descriptor.get_model(model_name);
-    var extenders = [];
+    var far_model = CMS.Models[model_name];
+    var descriptor = {
+      instance : object,
+      far_model : far_model,
+      mapping : GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName)
+    };
 
     // Custom overrides
     if (extra_descriptor_options.all
         && extra_descriptor_options.all[model_name]
     ) {
-      extenders.push(extra_descriptor_options.all[model_name]);
+      $.extend(descriptor, extra_descriptor_options.all[model_name]);
     }
 
     if (extra_descriptor_options[object.constructor.shortName]
         && extra_descriptor_options[object.constructor.shortName][model_name]) {
-      extenders.push(extra_descriptor_options[object.constructor.shortName][model_name]);
+      $.extend(descriptor, extra_descriptor_options[object.constructor.shortName][model_name]);
     }
 
     if (extra_content_controller_options.all
         && extra_content_controller_options.all[model_name]) {
-      extenders.push({ content_controller_options : extra_content_controller_options.all[model_name] });
+      $.extend(true, descriptor, { content_controller_options : extra_content_controller_options.all[model_name] });
     }
 
     if (extra_content_controller_options[object.constructor.shortName]
         && extra_content_controller_options[object.constructor.shortName][model_name]) {
-      extenders.push({ content_controller_options : extra_content_controller_options[object.constructor.shortName][model_name] });
+      $.extend(true, descriptor, { content_controller_options : extra_content_controller_options[object.constructor.shortName][model_name] });
     }
 
     if (!list_loader)
       return;
     
-    var wd= GGRC.WidgetDescriptor.make_tree_view(GGRC.page_instance(), far_model, list_loader, extenders);
-    wd.register_as_default();
-
+    widget_list.add_widget(object.constructor.shortName, far_model.table_singular, descriptor);
   });
 
+    
 });
 
 })(window.can, window.can.$);

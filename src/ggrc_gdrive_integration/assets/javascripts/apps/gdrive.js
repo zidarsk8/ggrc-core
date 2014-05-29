@@ -9,6 +9,72 @@
 
   var scopes = new can.Observe.List(['https://www.googleapis.com/auth/userinfo.email']);
 
+
+  new GGRC.Mappings("ggrc_gdrive_integration", {
+    folderable : {
+      _canonical : {
+        folders : "GDriveFolder"
+      },
+      folders : new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder")
+    },
+
+    fileable : {
+      _canonical : {
+        files : "GDriveFile"
+      },
+      files : new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile")
+    },
+
+    revisionable : {
+      _canonical : {
+        revisions : "GDriveFileRevision"
+      },
+      revisions : new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id")
+    },
+
+    Program : {
+      _mixins : ["folderable"]
+    },
+    Audit : {
+      _mixins : ["folderable"]
+    },
+    Request : {
+      _mixins : ["folderable"]
+    },
+    DocumentationResponse : {
+      _mixins : ["fileable"]
+    },
+    InterviewResponse : {
+      _mixins : ["fileable"]
+    },
+    PopulationSampleResponse : {
+      _mixins : ["fileable"]
+    },
+    Document : {
+      _mixins : ["fileable"]
+    },
+    Meeting : {
+      _canonical : {
+        "events" : "GCalEvent"
+      },
+      events : GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
+    },
+    GDriveFolder : {
+      _mixins : ["revisionable"],
+      _canonical : {
+        permissions : "GDriveFolderPermission"
+      },
+      permissions : new GGRC.ListLoaders.DirectListLoader("GDriveFolderPermission", "id")
+    },
+    GDriveFile : {
+      _mixins : ["revisionable"],
+      _canonical : {
+        permissions : "GDriveFilePermission"
+      },
+      permissions : new GGRC.ListLoaders.DirectListLoader("GDriveFilePermission", "id")
+    }
+  });
+
   GGRC.gapi_request_with_auth = $.proxy(GGRC.Controllers.GAPI, "gapi_request_with_auth");
   $(function() {
     $(document.body).ggrc_controllers_gapi({ scopes : scopes });
@@ -27,16 +93,12 @@
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  // GGRC.Mappings.Program.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
-  GGRC.Mappings.Program.folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
   GGRC.register_hook("Program.extended_info", GGRC.mustache_path + "/programs/gdrive_info.mustache");
 
   $.extend(true, CMS.Models.Audit.attributes, {
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Audit", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
-  //GGRC.Mappings.Audit.object_folders = new GGRC.ListLoaders.DirectListLoader("ObjectFolder", "folderable");
   CMS.Models.Audit.tree_view_options.show_view = GGRC.mustache_path + "/audits/gdrive_tree.mustache";
 
   GGRC.register_hook("Audit.tree_view_info", GGRC.mustache_path + "/audits/gdrive_info.mustache");
@@ -46,7 +108,6 @@
     "object_folders" : "CMS.Models.ObjectFolder.stubs"
     , "folders" : "CMS.Models.GDriveFolder.stubs"
   });
-  can.getObject("GGRC.Mappings.Request", window, true).folders = new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder");
   GGRC.register_hook("Request.tree_view_info", GGRC.mustache_path + "/requests/gdrive_info.mustache");
 
   $.extend(true, CMS.Models.DocumentationResponse.attributes, {
@@ -61,20 +122,11 @@
     "object_files" : "CMS.Models.ObjectFile.stubs"
     , "files" : "CMS.Models.GDriveFile.stubs"
   });
-  can.getObject("GGRC.Mappings.Document", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
 
   CMS.Models.Response.tree_view_options.child_options[1].show_view = GGRC.mustache_path + "/responses/gdrive_evidence_tree.mustache";
   CMS.Models.Response.tree_view_options.child_options[1].footer_view = GGRC.mustache_path + "/responses/gdrive_upload_evidence.mustache";
   //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
   // document when we go to present. however, this functionality is still supported. 
-  can.getObject("GGRC.Mappings.Response", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
-  can.getObject("GGRC.Mappings.DocumentationResponse", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
-  can.getObject("GGRC.Mappings.PopulationSampleResponse", window, true).files = new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile");
-
-  can.getObject("GGRC.Mappings.GDriveFolder", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDriveFolderPermission", "id");
-  can.getObject("GGRC.Mappings.GDriveFile", window, true).permissions = new GGRC.ListLoaders.DirectListLoader("GDriveFilePermission", "id");
-  can.getObject("GGRC.Mappings.GDriveFolder", window, true).revisions = new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id");
-  can.getObject("GGRC.Mappings.GDriveFile", window, true).revisions = new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id");
 
 
   // GGRC.JoinDescriptor.from_arguments_list([
@@ -86,7 +138,6 @@
     "object_events" : "CMS.Models.ObjectEvent.stubs"
     , "events" : "CMS.Models.GCalEvent.stubs"
   });
-  can.getObject("GGRC.Mappings.Meeting", window, true).events = new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent");
   GGRC.register_hook("Meeting.tree_view_info", GGRC.mustache_path + "/meetings/gcal_info.mustache");
 
   GGRC.register_hook("Role.option_detail", GGRC.mustache_path + "/roles/gdrive_option_detail.mustache");
