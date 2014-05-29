@@ -7,42 +7,15 @@
 
 ;(function(GGRC, can) {
 
-  function Proxy(
-      option_model_name, join_option_attr, join_model_name, join_object_attr,
-      instance_join_attr) {
-    return new GGRC.ListLoaders.ProxyListLoader(
-        join_model_name, join_object_attr, join_option_attr,
-        instance_join_attr, option_model_name);
-  }
+  var Proxy = GGRC.MapperHelpers.Proxy,
+      Direct = GGRC.MapperHelpers.Direct,
+      Indirect = GGRC.MapperHelpers.Indirect,
+      Search = GGRC.MapperHelpers.Search,
+      Multi = GGRC.MapperHelpers.Multi,
+      TypeFilter = GGRC.MapperHelpers.TypeFilter,
+      CustomFilter = GGRC.MapperHelpers.CustomFilter,
+      Cross = GGRC.MapperHelpers.Cross;
 
-  function Direct(option_model_name, instance_join_attr, remote_join_attr) {
-    return new GGRC.ListLoaders.DirectListLoader(
-      option_model_name, instance_join_attr, remote_join_attr);
-  }
-
-  function Indirect(instance_model_name, option_join_attr) {
-    return new GGRC.ListLoaders.IndirectListLoader(instance_model_name, option_join_attr);
-  }
-
-  function Search(term, types, params) {
-    return new GGRC.ListLoaders.SearchListLoader(term, types, params);
-  }
-
-  function Multi(sources) {
-    return new GGRC.ListLoaders.MultiListLoader(sources);
-  }
-
-  function TypeFilter(source, model_name) {
-    return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
-  }
-
-  function CustomFilter(source, filter_fn) {
-    return new GGRC.ListLoaders.CustomFilteredListLoader(source, filter_fn);
-  }
-
-  function Cross(local_mapping, remote_mapping) {
-    return new GGRC.ListLoaders.CrossListLoader(local_mapping, remote_mapping);
-  }
 
   function create_mappings(definitions) {
     var mappings = {};
