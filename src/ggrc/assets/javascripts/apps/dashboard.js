@@ -59,51 +59,53 @@ var admin_list_descriptors = {
   }
 };
 
-GGRC.admin_widget_descriptors = {
-  "people" : {
-      "model" : CMS.Models.Person
-    , "content_controller": GGRC.Controllers.ListView
-    , "content_controller_options": admin_list_descriptors["people"]
-    , "widget_id" : "people_list"
-    , "widget_icon" : "person"
-    , "show_filter" : false
-    , widget_name: function() {
-      return "People";
-    }
-    , widget_info : function() {
-      return "";
-    }
-  }
-  , "roles" : {
-      "model" : CMS.Models.Role
-    , "content_controller": GGRC.Controllers.ListView
-    , "content_controller_options": admin_list_descriptors["roles"]
-    , "widget_id" : "roles_list"
-    , "widget_icon" : "role"
-    , "show_filter" : false
-    , widget_name: function() {
-      return "Roles";
-    }
-    , widget_info : function() {
-      return "";
-    }
-  }
-  , "events" : {
-      "model" : CMS.Models.Event
-    , "content_controller": GGRC.Controllers.ListView
-    , "content_controller_options": admin_list_descriptors["events"]
-    , "widget_id" : "events_list"
-    , "widget_icon" : "event"
-    , widget_name: function() {
-      return "Events";
-    }
-    , widget_info : function() {
-      return "";
-    }
-  }
-};
-
 $(function() {
+var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
+  admin : {
+    "people_list" : {
+        "model" : CMS.Models.Person
+      , "content_controller": GGRC.Controllers.ListView
+      , "content_controller_options": admin_list_descriptors["people"]
+      , "widget_id" : "people_list"
+      , "widget_icon" : "person"
+      , "show_filter" : false
+      , widget_name: function() {
+        return "People";
+      }
+      , widget_info : function() {
+        return "";
+      }
+    }
+    , "roles_list" : {
+        "model" : CMS.Models.Role
+      , "content_controller": GGRC.Controllers.ListView
+      , "content_controller_options": admin_list_descriptors["roles"]
+      , "widget_id" : "roles_list"
+      , "widget_icon" : "role"
+      , "show_filter" : false
+      , widget_name: function() {
+        return "Roles";
+      }
+      , widget_info : function() {
+        return "";
+      }
+    }
+    , "events_list" : {
+        "model" : CMS.Models.Event
+      , "content_controller": GGRC.Controllers.ListView
+      , "content_controller_options": admin_list_descriptors["events"]
+      , "widget_id" : "events_list"
+      , "widget_icon" : "event"
+      , widget_name: function() {
+        return "Events";
+      }
+      , widget_info : function() {
+        return "";
+      }
+    }
+  }
+});
+
 
     var $area = $('.area').first()
       , instance
@@ -136,10 +138,14 @@ $(function() {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
+      var defaults = can.reduce(GGRC.WidgetList.get_widget_list_for(model_name), function(a, b, i) {
+        return a.concat([i]);
+      }, []);
+
       $area.cms_controllers_page_object($.extend({
           //model_descriptors: model_descriptors
-        /*,*/ widget_descriptors: GGRC.widget_descriptors || {}
-        , default_widgets: GGRC.default_widgets || []
+        /*,*/ widget_descriptors: GGRC.WidgetList.get_widget_list_for(model_name)
+        , default_widgets: defaults || GGRC.default_widgets || []
         , instance: GGRC.page_instance()
         , header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
         , page_title: function(controller) {
@@ -151,9 +157,9 @@ $(function() {
         }, extra_page_options[model_name]));
     } else if (/^\/admin\/?$/.test(window.location.pathname)) {
       $area.cms_controllers_dashboard({
-          widget_descriptors: GGRC.admin_widget_descriptors
+          widget_descriptors: GGRC.WidgetList.get_widget_list_for("admin")
         , menu_tree_spec: GGRC.admin_menu_spec
-        , default_widgets : ["people", "roles", "events"]
+        , default_widgets : ["people_list", "roles_list", "events_list"]
       });
     } else {
       $area.cms_controllers_dashboard({
