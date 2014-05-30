@@ -141,6 +141,11 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       var defaults = can.reduce(GGRC.WidgetList.get_widget_list_for(model_name), function(a, b, i) {
         return a.concat([i]);
       }, []);
+      // Ensure each extension has had a chance to initialize widgets
+      can.each(GGRC.extensions, function(extension) {
+        if (extension.init_widgets)
+          extension.init_widgets();
+      });
 
       $area.cms_controllers_page_object($.extend({
           //model_descriptors: model_descriptors

@@ -1,0 +1,86 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+}}
+
+<section class="info">
+  <div class="row-fluid">
+    <div class="span6">
+      <h3>{{instance.title}}</h3>
+    </div>
+    <div class="span6">&nbsp;</div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="rtf-block">
+        <p>{{{instance.description}}}</p>
+      </div>
+    </div>
+    <div class="span6">
+      <div class="row-fluid">
+        <div>
+          <p>
+            <strong>Status:</strong><br>
+            {{instance.status}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="rtf-block">
+        <strong>Workflow Owner:</strong>
+        {{instance.lead_email}}
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <p>
+        <!--
+        <strong>Due on:</strong>
+        {{#if instance.end_date}}{{instance.end_date}}{{else}}<em>not defined</em>{{/if}}
+      -->
+      </p>
+      <p>
+        <strong>Frequency:</strong>
+        <span style="text-transform:capitalize;">{{{instance.frequency}}}</span><!--<strong>Monthly</strong> - starts every <strong>7th</strong> due on every <strong>25th</strong>-->
+      </p>
+      <p>
+        <strong>gGRC Folder:</strong>
+        <a href="#">/gGRC Workflows/{{instance.title}}/</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="info-utility-link">
+        {{#is_allowed 'update' instance context='for'}}
+        <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="page">
+          <i class="grcicon-edit"></i>
+          Edit Workflow Info
+        </a>
+        {{/is_allowed}}
+        <div class="dropdown pull-right">
+          <a class="dropdown-toggle info-edit" href="#" data-toggle="dropdown" role="button">
+            More<i class="grcicon-carot"></i>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+            <li>
+              <a href="#cloneWorkflow" data-toggle="modal">
+                Clone Workflow...
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

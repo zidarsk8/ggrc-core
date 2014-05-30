@@ -452,6 +452,24 @@ can.Component.extend({
       $(el).parent().prev().show();
     },
 
+    enableTaskGroupSave : function(){
+      var title = $("#new_object_name").val()
+        , assignee = $("#new_task_assignee").val()
+        , end_date = $("#tg_end_date").val()
+        , $taskGroupBtn = $("#addTaskGroup");
+
+      if(title == "" || assignee == "" || end_date == ""){
+        $taskGroupBtn.addClass('disabled');
+        return;
+      }
+      $taskGroupBtn.removeClass('disabled');
+    },
+    "#tg_end_date,#new_task_assignee change" : function(){
+      this.enableTaskGroupSave();
+    },
+    "#new_object_name,#new_task_assignee,#tg_end_date keyup" : function(){
+      this.enableTaskGroupSave();
+    },
     // Task groups:
     "#addTaskGroup click" : function() {
       var title = $("#new_object_name").val()
@@ -476,6 +494,7 @@ can.Component.extend({
         taskLock: false
       });
       assessment.save();
+      $('#addTaskGroup').addClass('disabled');;
       $('.task-group-index').last().find('.openclose').trigger('click');
     },
     ".removeTaskGroup click" : function(el, ev) {
@@ -885,7 +904,7 @@ can.Component.extend({
       }
     },
     setWorkflow: function(workflow){
-      var frequency = workflow.frequency,
+      var frequency = workflow.frequency || 'one-time',
           regex = /<strong>(.*?)<\/strong>/g,
           match = regex.exec(frequency),
           frequencyType,
@@ -893,8 +912,11 @@ can.Component.extend({
           selected, $elements;
       this.attr('assessment', workflow);
       if(!match){
+        $('.frequency-wrap').hide();
+        $('#one-time').show()
         return;
       }
+
       frequencyType = match[1].replace(' ', '_');
       $("#frequency").val(frequencyType);
       $('.frequency-wrap').hide();

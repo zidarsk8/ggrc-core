@@ -35,10 +35,10 @@
                   <i class="grcicon-carot-white"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  <li class="show-role">
+                  <!--<li class="show-role">
                     <i class="grcicon-role-white"></i>
                     Role: gGRC Admin
-                  </li>
+                  </li>-->
                   <li>
                     <a href="#my-work-widget" class="to-my-work">
                       <i class="grcicon-dashboard"></i>
@@ -51,19 +51,37 @@
                       Admin Dashboard
                     </a>
                   </li>
-                  <li>
-                    <a class="clear-display-settings" href="#" tabindex="-1">
-                      <i class="grcicon-desktop"></i>
-                      Reset Layout to Default
-                    </a>
+                  <li class="notify-wrap">
+                    <span>
+                      <i class="grcicon-alarm"></i>
+                      Notifications
+                    </span>
+                    <div class="inner-list">
+                      <label>
+                        <input type="checkbox" name="notify-digest">
+                        Email notifications
+                      </label>
+                      <label>
+                        <input type="checkbox" name="notify-digest" checked="checked">
+                        Daily email digest
+                      </label>
+                      <label>
+                        <input type="checkbox" name="notify-digest">
+                        Calendar notifications
+                      </label>
+                    </div>
                   </li>
-                  <li>
+                  <li class="layout-wrap">
                     <a class="set-display-settings-default" href="#" tabindex="-1">
                       <i class="grcicon-desktop"></i>
-                      Set Layout as Default
+                      Save Layout
+                    </a>
+                    <a class="clear-display-settings" href="#" tabindex="-1">
+                      <i class="grcicon-reset"></i>
+                      Reset Layout
                     </a>
                   </li>
-                  <li>
+                  <li class="logout-wrap">
                     <a href="#" tabindex="-1">
                       <i class="grcicon-logout"></i>
                       Logout

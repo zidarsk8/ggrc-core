@@ -5,7 +5,8 @@
 
 from ggrc import db
 from .mixins import (
-    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged,
+    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
+    Titled, Slugged,
     )
 from .object_person import Personable
 from .context import HasOwnContext
@@ -13,7 +14,8 @@ from .context import HasOwnContext
 
 class Audit(
     Personable, HasOwnContext,
-    Timeboxed, Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
+    Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
+    db.Model):
   __tablename__ = 'audits'
 
   VALID_STATES = (

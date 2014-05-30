@@ -1460,6 +1460,50 @@
       }
   });
 
+
+  GGRC.MapperHelpers = {};
+
+  GGRC.MapperHelpers.Proxy = function Proxy(
+      option_model_name, join_option_attr, join_model_name, join_object_attr,
+      instance_join_attr) {
+    return new GGRC.ListLoaders.ProxyListLoader(
+        join_model_name, join_object_attr, join_option_attr,
+        instance_join_attr, option_model_name);
+  }
+
+  GGRC.MapperHelpers.Direct = function Direct(
+      option_model_name, instance_join_attr, remote_join_attr) {
+    return new GGRC.ListLoaders.DirectListLoader(
+      option_model_name, instance_join_attr, remote_join_attr);
+  }
+
+  GGRC.MapperHelpers.Indirect = function Indirect(
+      instance_model_name, option_join_attr) {
+    return new GGRC.ListLoaders.IndirectListLoader(
+      instance_model_name, option_join_attr);
+  }
+
+  GGRC.MapperHelpers.Search = function Search(term, types, params) {
+    return new GGRC.ListLoaders.SearchListLoader(term, types, params);
+  }
+
+  GGRC.MapperHelpers.Multi = function Multi(sources) {
+    return new GGRC.ListLoaders.MultiListLoader(sources);
+  }
+
+  GGRC.MapperHelpers.TypeFilter = function TypeFilter(source, model_name) {
+    return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
+  }
+
+  GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {
+    return new GGRC.ListLoaders.CustomFilteredListLoader(source, filter_fn);
+  }
+
+  GGRC.MapperHelpers.Cross = function Cross(local_mapping, remote_mapping) {
+    return new GGRC.ListLoaders.CrossListLoader(local_mapping, remote_mapping);
+  }
+
+
   GGRC.all_local_results = function(instance) {
     // Returns directly-linked objects
     var loaders
