@@ -1119,3 +1119,13 @@ p.modal-value {
     margin-bottom: 0;
   }
 }
+
+.hidden-fields-area {
+  small {
+    font-size: $f-small;
+    &.label-small {
+      display: block;
+      padding-left: 16px;
+    }
+  }
+}
