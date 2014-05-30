@@ -1,0 +1,20 @@
+dashboard-js-files:
+  - apps/workflows.js
+  - models/cycle.js
+  - models/cycle_task.js
+  - models/task.js
+  - models/task_group.js
+  - models/workflow.js
+  - models/workflow_join_models.js
+  - mustache_helpers.js
+
+dashboard-js-spec-files:
+
+dashboard-js-template-files:
+  - dashboard/lhn_workflows.mustache
+  - tasks/modal_content.mustache
+  - tasks/tree_footer.mustache
+  - task_groups/modal_content.mustache
+  - task_groups/tree_footer.mustache
+  - workflows/modal_content.mustache
+  - workflows/info.mustache

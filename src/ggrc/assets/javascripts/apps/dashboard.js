@@ -383,6 +383,12 @@ $(function() {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
+      // Ensure each extension has had a chance to initialize widgets
+      can.each(GGRC.extensions, function(extension) {
+        if (extension.init_widgets)
+          extension.init_widgets();
+      });
+
       $area.cms_controllers_page_object($.extend({
           model_descriptors: model_descriptors
         , widget_descriptors: GGRC.extra_widget_descriptors || {}

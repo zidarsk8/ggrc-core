@@ -33,6 +33,66 @@ $(window).on('hashchange', function() {
 
 jQuery.migrateMute = true; //turn off console warnings for jQuery-migrate
 
+
+GGRC.extensions = GGRC.extensions || [];
+
+GGRC.extensions.push({
+    name: "core"
+
+  , object_type_decision_tree: function() {
+      return {
+        "program" : CMS.Models.Program
+      , "audit" : CMS.Models.Audit
+      /*, "directive" : {
+        _discriminator: function(data) {
+          var model_i, model;
+          models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
+          for (model_i in models) {
+            model = models[model_i];
+            if (model.meta_kinds.indexOf(data.kind) >= 0) {
+              return model;
+            }
+          }
+          throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
+        }
+      }*/
+      , "contract" : CMS.Models.Contract
+      , "policy" : CMS.Models.Policy
+      , "standard" : CMS.Models.Standard
+      , "regulation" : CMS.Models.Regulation
+      , "org_group" : CMS.Models.OrgGroup
+      , "project" : CMS.Models.Project
+      , "facility" : CMS.Models.Facility
+      , "product" : CMS.Models.Product
+      , "data_asset" : CMS.Models.DataAsset
+      , "market" : CMS.Models.Market
+      , "system_or_process" : {
+        _discriminator: function(data) {
+          if (data.is_biz_process)
+            return CMS.Models.Process;
+          else
+            return CMS.Models.System;
+        }
+      }
+      , "system" : CMS.Models.System
+      , "process" : CMS.Models.Process
+      , "control" : CMS.Models.Control
+      , "objective" : CMS.Models.Objective
+      , "risky_attribute" : CMS.Models.RiskyAttribute
+      , "risk" : CMS.Models.Risk
+      , "section" : CMS.Models.Section
+      , "clause" : CMS.Models.Clause
+      , "section_objective" : CMS.Models.SectionObjective
+      , "person" : CMS.Models.Person
+      , "role" : CMS.Models.Role
+      , "threat" : CMS.Models.Threat
+      , "vulnerability" : CMS.Models.Vulnerability
+      , "template" : CMS.Models.Template
+      }
+    }
+});
+
+
 function ModelError(message, data) {
   this.name = "ModelError";
   this.message = message || "Invalid Model encountered";
@@ -150,57 +210,28 @@ var confirmleaving = function confirmleaving() {
   }
   , name : "GGRC/window"
 });
+
 jQuery.extend(GGRC, {
-  infer_object_type : function(data) {
-    var decision_tree = {
-      "program" : CMS.Models.Program
-      , "audit" : CMS.Models.Audit
-      /*, "directive" : {
-        _discriminator: function(data) {
-          var model_i, model;
-          models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
-          for (model_i in models) {
-            model = models[model_i];
-            if (model.meta_kinds.indexOf(data.kind) >= 0) {
-              return model;
-            }
+    get_object_type_decision_tree: function() {
+      var tree = {}
+        , extensions = GGRC.extensions || []
+        ;
+
+      can.each(extensions, function(extension) {
+        if (extension.object_type_decision_tree) {
+          if (can.isFunction(extension.object_type_decision_tree)) {
+            $.extend(tree, extension.object_type_decision_tree());
+          } else {
+            $.extend(tree, extension.object_type_decision_tree);
           }
-          throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
         }
-      }*/
-      , "contract" : CMS.Models.Contract
-      , "policy" : CMS.Models.Policy
-      , "standard" : CMS.Models.Standard
-      , "regulation" : CMS.Models.Regulation
-      , "org_group" : CMS.Models.OrgGroup
-      , "project" : CMS.Models.Project
-      , "facility" : CMS.Models.Facility
-      , "product" : CMS.Models.Product
-      , "data_asset" : CMS.Models.DataAsset
-      , "market" : CMS.Models.Market
-      , "system_or_process" : {
-        _discriminator: function(data) {
-          if (data.is_biz_process)
-            return CMS.Models.Process;
-          else
-            return CMS.Models.System;
-        }
-      }
-      , "system" : CMS.Models.System
-      , "process" : CMS.Models.Process
-      , "control" : CMS.Models.Control
-      , "objective" : CMS.Models.Objective
-      , "risky_attribute" : CMS.Models.RiskyAttribute
-      , "risk" : CMS.Models.Risk
-      , "section" : CMS.Models.Section
-      , "clause" : CMS.Models.Clause
-      , "section_objective" : CMS.Models.SectionObjective
-      , "person" : CMS.Models.Person
-      , "role" : CMS.Models.Role
-      , "threat" : CMS.Models.Threat
-      , "vulnerability" : CMS.Models.Vulnerability
-      , "template" : CMS.Models.Template
-    };
+      });
+
+      return tree;
+    }
+
+  , infer_object_type : function(data) {
+    var decision_tree = GGRC.get_object_type_decision_tree();
 
     function resolve_by_key(subtree, data) {
       var kind = data[subtree._key];

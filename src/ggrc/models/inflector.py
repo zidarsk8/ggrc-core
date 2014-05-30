@@ -127,5 +127,14 @@ def register_inflections(inflector):
               value, inflector.model))
     _inflection_to_model[value] = inflector.model
 
+
+def unregister_inflector(inflector):
+  for mode, value in inflector.all_inflections().items():
+    if value in _inflection_to_model:
+      del _inflection_to_model[value]
+  if inflector.model in _inflectors:
+    del _inflectors[inflector.model]
+
+
 def get_model(s):
   return _inflection_to_model.get(s, None)
