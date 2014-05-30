@@ -164,7 +164,7 @@
         .dropdown-menu {
           @include reset-list();
           @include border-radius(0);
-          min-width:100px;
+          min-width: 210px;
           float: none;
           background: $black;
           li {
@@ -185,6 +185,17 @@
               font-size: 11px;
               i {
                 margin: 7px 6px 0 0;
+              }
+            }
+            &.layout-wrap {
+              @include clearfix();
+              a {
+                float: left;
+                clear: none;
+                padding-right: 0;
+                i {
+                  margin-right: 0;
+                }
               }
             }
           }
@@ -477,6 +488,32 @@
       }
       a {
         color:$text;
+      }
+    }
+  }
+}
+
+.notify-wrap {
+  border-top: 1px dotted $menuLink;
+  border-bottom: 1px dotted $menuLink;
+  padding: 5px 0;
+  span {
+    display:block;
+    color:$menuLink;
+    line-height:30px;
+    padding: 0 10px;
+    i {
+      margin: 7px 6px 0 0;
+      @include opacity(0.6);
+    }
+  }
+  .inner-list {
+    padding-left: 36px;
+    label {
+      color:$menuLink;
+      font-size: 12px;
+      input {
+        margin: -2px 0 0 0;
       }
     }
   }

@@ -7,6 +7,9 @@ $(document).ready(function(){
   $('.object-area').css('height', $(window).height() - 156 );
   $('.object-area').css('width', $(window).width() - 448 );
 
+  $('input[name=notify-digest]').parent().on('click', function(ev){
+    ev.stopPropagation();
+  });
 
   $('body').on('click', '.info-expand a', function() {
     var $this = $(this),
@@ -810,4 +813,5 @@ $(function () {
   dataView.syncGridSelection(grid, true);
 
   $("#gridContainer").resizable();
+
 })
