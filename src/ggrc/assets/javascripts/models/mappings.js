@@ -77,7 +77,7 @@
     get_canonical_mapping : function(object, option) {
       var mapping = null;
       can.each(this.modules, function(mod, name) {
-        if (mod._canonical_mappings[object][option]) {
+        if (mod._canonical_mappings && mod._canonical_mappings[object] && mod._canonical_mappings[object][option]) {
           mapping = CMS.Models[object].get_mapper(mod._canonical_mappings[object][option]);
           return false;
         }

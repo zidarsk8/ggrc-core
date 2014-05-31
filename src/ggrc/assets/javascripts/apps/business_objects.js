@@ -9,10 +9,6 @@
 
 (function(can, $) {
 
-  var object_class = GGRC.infer_object_type(GGRC.page_object)
-    , object_table = object_class && object_class.table_plural
-    , object = GGRC.page_instance();
-
   if (!GGRC.widget_descriptors)
     GGRC.widget_descriptors = {};
   if (!GGRC.default_widgets)
@@ -36,22 +32,24 @@
     */
     make_info_widget : function(instance, widget_view) {
       var default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
-      return new this({
-        widget_id: "info",
-        widget_name: function() {
-          if (instance.constructor.title_singular === 'Person')
-            return 'Info';
-          else
-            return instance.constructor.title_singular + " Info";
-        },
-        widget_icon: "grcicon-info",
-        content_controller : GGRC.Controllers.InfoWidget,
-        content_controller_options : {
-          instance: instance,
-          model: instance.constructor,
-          widget_view: widget_view || default_info_widget_view
-        }
-      });
+      return new this(
+        instance.constructor.shortName + ":info",
+        {
+          widget_id: "info",
+          widget_name: function() {
+            if (instance.constructor.title_singular === 'Person')
+              return 'Info';
+            else
+              return instance.constructor.title_singular + " Info";
+          },
+          widget_icon: "grcicon-info",
+          content_controller : GGRC.Controllers.InfoWidget,
+          content_controller_options : {
+            instance: instance,
+            model: instance.constructor,
+            widget_view: widget_view || default_info_widget_view
+          }
+        });
     },
     /*
       make a tree view widget descriptor with mostly default-for-GGRC settings.
@@ -102,23 +100,28 @@
 
       $.extend.apply($, [true, descriptor].concat(extenders || []));
 
-      return new this(descriptor);
+      return new this(instance.constructor.shortName + ":" + far_model.table_singular, descriptor);
     },
-    newInstance : function(opts) {
+    newInstance : function(id, opts) {
       var ret;
-      if(GGRC.widget_descriptors[opts.widget_id]) {
-        if(GGRC.widget_descriptors[opts.widget_id] instanceof this) {
-          $.extend(GGRC.widget_descriptors[opts.widget_id], opts);
+      if(!opts && typeof id === "object") {
+        opts = id;
+        id = opts.widget_id;
+      }
+
+      if(GGRC.widget_descriptors[id]) {
+        if(GGRC.widget_descriptors[id] instanceof this) {
+          $.extend(GGRC.widget_descriptors[id], opts);
         } else {
           ret = this._super.apply(this);
-          $.extend(ret, GGRC.widget_descriptors[opts.widget_id], opts);
-          GGRC.widget_descriptors[opts.widget_id] = ret;
+          $.extend(ret, GGRC.widget_descriptors[id], opts);
+          GGRC.widget_descriptors[id] = ret;
         }
-        return GGRC.widget_descriptors[opts.widget_id];
+        return GGRC.widget_descriptors[id];
       } else {
         ret = this._super.apply(this, arguments);
         $.extend(ret, opts);
-        GGRC.widget_descriptors[ret.widget_id] = ret;
+        GGRC.widget_descriptors[id] = ret;
         return ret;
       }
     }
@@ -170,14 +173,21 @@
           break;
         case GGRC.Controllers.TreeView:
           descriptors[widget_id] = GGRC.WidgetDescriptor.make_tree_view(
-            widget.content_controller_options && widget.content_controller_options.instance || widget.instance,
+            widget.content_controller_options
+              && (widget.content_controller_options.instance || widget.content_controller_options.parent_instance)
+              || widget.instance,
             widget.content_controller_options && widget.content_controller_options.model || widget.far_model || widget.model,
             widget.content_controller_options && widget.content_controller_options.mapping || widget.mapping,
             widget
             );
           break;
         default:
-          descriptors[widget_id] = new GGRC.WidgetDescriptor(widget);
+          descriptors[widget_id] = new GGRC.WidgetDescriptor(page_type + ":" + widget_id, widget);
+        }
+      });
+      can.each(descriptors, function(descriptor, id) {
+        if(descriptor.suppressed) {
+          delete descriptors[id];
         }
       });
       return descriptors;
@@ -209,12 +219,24 @@
       } else {
         this[page_type][id] = descriptor;
       }
+    },
+    suppress_widget : function(page_type, id) {
+      this[page_type] = this[page_type] || {};
+      if(this[page_type][id]) {
+        can.extend(true, this[page_type][id], { suppressed : true });
+      } else {
+        this[page_type][id] = { suppressed : true };
+      }
     }
   });
 
   var widget_list = new GGRC.WidgetList("ggrc_core");
 
 $(function() {
+
+  var object_class = GGRC.infer_object_type(GGRC.page_object)
+    , object_table = object_class && object_class.table_plural
+    , object = GGRC.page_instance();
 
   if (!GGRC.page_object)
     return;

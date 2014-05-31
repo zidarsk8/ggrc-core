@@ -62,7 +62,7 @@ var admin_list_descriptors = {
 $(function() {
 var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
   admin : {
-    "people_list" : {
+    "people" : {
         "model" : CMS.Models.Person
       , "content_controller": GGRC.Controllers.ListView
       , "content_controller_options": admin_list_descriptors["people"]
@@ -76,7 +76,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         return "";
       }
     }
-    , "roles_list" : {
+    , "roles" : {
         "model" : CMS.Models.Role
       , "content_controller": GGRC.Controllers.ListView
       , "content_controller_options": admin_list_descriptors["roles"]
@@ -90,7 +90,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
         return "";
       }
     }
-    , "events_list" : {
+    , "events" : {
         "model" : CMS.Models.Event
       , "content_controller": GGRC.Controllers.ListView
       , "content_controller_options": admin_list_descriptors["events"]
@@ -111,6 +111,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       , instance
       , model_name
       , extra_page_options
+      , defaults
       ;
 
     extra_page_options = {
@@ -138,14 +139,12 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       instance = GGRC.page_instance();
       model_name = instance.constructor.shortName;
 
-      var defaults = can.reduce(GGRC.WidgetList.get_widget_list_for(model_name), function(a, b, i) {
-        return a.concat([i]);
-      }, []);
       // Ensure each extension has had a chance to initialize widgets
       can.each(GGRC.extensions, function(extension) {
         if (extension.init_widgets)
           extension.init_widgets();
       });
+      defaults = Object.keys(GGRC.WidgetList.get_widget_list_for(model_name));
 
       $area.cms_controllers_page_object($.extend({
           //model_descriptors: model_descriptors
@@ -164,7 +163,7 @@ var admin_widgets = new GGRC.WidgetList("ggrc_admin", {
       $area.cms_controllers_dashboard({
           widget_descriptors: GGRC.WidgetList.get_widget_list_for("admin")
         , menu_tree_spec: GGRC.admin_menu_spec
-        , default_widgets : ["people_list", "roles_list", "events_list"]
+        , default_widgets : ["people", "roles", "events"]
       });
     } else {
       $area.cms_controllers_dashboard({
