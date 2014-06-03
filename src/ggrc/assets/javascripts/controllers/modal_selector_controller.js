@@ -1268,8 +1268,8 @@
       join_descriptors =
         GGRC.Mappings.get_canonical_mappings_for(object_model_name);
     } else {
-      join_descriptors =
-        [GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name)];
+      join_descriptors = {};
+      join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
     }
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
