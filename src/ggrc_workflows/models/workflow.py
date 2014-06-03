@@ -11,6 +11,7 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
+from sqlalchemy.orm import validates
 
 
 class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
@@ -21,9 +22,23 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
 
   VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
 
-  frequency = deferred(db.Column(db.Enum(*VALID_FREQUENCIES),
-      nullable=False, default='continuous'),
-    'Workflow')
+  @classmethod
+  def default_frequency(cls):
+    return 'continuous'
+
+  @validates('frequency')
+  def validate_frequency(self, key, value):
+    if value is None:
+      value = self.default_frequency()
+    if value not in self.VALID_FREQUENCIES:
+      message = "Invalid state '{}'".format(value)
+      raise ValueError(message)
+    return value
+
+  frequency = deferred( 
+    db.Column(db.String, nullable=False, default=default_frequency), 
+    'Workflow'
+    )
 
   workflow_objects = db.relationship(
       'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
