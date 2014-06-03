@@ -13,10 +13,11 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
 
 
-class Workflow(Stateful, Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'workflows'
 
-  VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
+  #Use these states for WorkflowCycle when it is implemented
+  #VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
 
   VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
 
