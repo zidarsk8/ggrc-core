@@ -383,7 +383,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 
   // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
   // set up a failure handler on a later transformation of that deferred.  Why?  The reason is that
-  //  we have a default failure handler that should only be called if no other one is registered, 
+  //  we have a default failure handler that should only be called if no other one is registered,
   //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
   //  then() or pipe()), then the original one won't normally be notified of failure.
   can.ajax = $.ajax = function(options) {
@@ -553,16 +553,20 @@ jQuery(document).ready(function($) {
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
-        .sticky_popover($.extend({}, defaults, { 
-          trigger: 'sticky-hover' 
+        .sticky_popover($.extend({}, defaults, {
+          trigger: 'sticky-hover'
           , placement : function() {
             var $el = this.$element
-              , space = $(document).width() - ($el.offset().left + $el.width());
+              , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
+              , spaceRight = ($el.offset().left)
+              , popover_size = 420;
             // Display on right if there is enough space
-            if($el.closest(".widget-area:first-child").length && space > 420)
+            if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
               return "right";
-            else
+            else if(spaceRight > popover_size){
               return "left";
+            }
+            return "top";
           }
         }))
         .triggerHandler(e);
@@ -606,7 +610,7 @@ jQuery(document).ready(function($) {
   $.fn.showhide = showhide(".widget", ".content, .filter");
   $.fn.modal_showhide = showhide(".modal", ".hidden-fields-area");
   $('body').on('click', ".expand-link a", $.fn.modal_showhide);
-  
+
   $.fn.widget_showhide = showhide(".info", ".hidden-fields-area");
   $('body').on('click', ".info-expand a", $.fn.widget_showhide);
 
@@ -640,7 +644,7 @@ jQuery(document).ready(function($) {
           $title.find('.description-inline').removeClass('out');
           if ($title.is('.description-only')) {
             $title.removeClass('out');
-          }      
+          }
           $view.text('view');
         }
       }
@@ -670,11 +674,11 @@ jQuery(document).ready(function($) {
 
 jQuery(function($) {
   // tree
-  
+
   $('body').on('click', 'ul.tree .item-title', function(e) {
     var $this = $(this),
         $content = $this.closest('li').find('.item-content');
-    
+
     if($this.hasClass("active")) {
       $content.slideUp('fast');
       $this.removeClass("active");
@@ -682,12 +686,12 @@ jQuery(function($) {
       $content.slideDown('fast');
       $this.addClass("active");
     }
-    
+
   });
 
 
   // tree-structure
-  
+
   $('body').on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(e) {
     openclose.call(this);
     e.stopPropagation();
@@ -744,11 +748,11 @@ jQuery(function($) {
     });
 
     return this;
-    
+
   }
-  
+
   $.fn.openclose = openclose;
-  
+
 });
 
 $(window).load(function(){
@@ -760,12 +764,12 @@ $(window).load(function(){
       $('.header-content').next('.content').removeClass('affixed');
     }
   });
-  
+
   // pbc filters show-hide
   $('body').on('click', '.advanced-filter-trigger', function() {
     var $this = $(this),
         $filters = $this.closest('.inner-tree').find('.pbc-filters');
-    
+
     if($this.hasClass("active")) {
       $filters.slideUp('fast');
       $this.removeClass("active");
@@ -775,16 +779,16 @@ $(window).load(function(){
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    
+
     return false;
-    
+
   });
-  
+
   // Google Circle CTA Button
   $('body').on('mouseenter', '.square-trigger', function() {
     var $this = $(this),
         $popover = $this.closest('.circle-holder').find('.square-popover');
-    
+
     $popover.slideDown('fast');
     $this.addClass("active");
     return false;
@@ -792,20 +796,20 @@ $(window).load(function(){
   $('body').on('mouseleave', '.square-popover', function() {
     var $this = $(this),
         $trigger = $this.closest('.circle-holder').find('.square-trigger');
-    
+
     $this.slideUp('fast');
     $trigger.removeClass('active');
     $this.removeClass("active");
     return false;
   });
-  
+
   // References popup preview
   $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
     if($(this).width() > $('.new-tree .tree-info').width()) {
       $(this).addClass('shrink-it');
     }
   });
-  
+
   // Popover trigger for person tooltip in styleguide
   // The popover disappears if the show/hide isn't controlled manually
   var last_popover;
@@ -873,21 +877,21 @@ $(window).load(function(){
       last_popover.leave(ev);
     }
   });
-  
+
   // Tab indexing form fields in modal
   $('body').on('focus', '.modal', function() {
     $('.wysiwyg-area').each(function() {
       var $this = $(this),
           $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
           $descriptionField = $this.find('iframe.wysihtml5-sandbox');
-      
+
       function addingTabindex() {
         $descriptionField.attr('tabindex', $textarea);
       }
       setTimeout(addingTabindex,100)
     });
   });
-  
+
   // Prevent link popup in code mode
   $('body').on('click', 'a[data-wysihtml5-command=popupCreateLink]', function(e){
     var $this = $(this);
@@ -902,27 +906,27 @@ $(window).load(function(){
   $('body').on('click', '.watermark-trigger', function() {
     var $this = $(this),
         $showWatermark = $this.closest('.tree-item').find('.watermark-icon');
-    
+
     $showWatermark.fadeIn('fast');
     $this.addClass("active");
     $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
-    
+
     return false;
-    
+
   });
-  
+
 });
 
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
-    
+
     this.wysihtml5({
         link: true,
         image: false,
         html: true,
         'font-styles': false,
         parserRules: wysihtml5ParserRules });
-    
+
     this.each(function() {
       var $that = $(this)
       , editor = $that.data("wysihtml5").editor
@@ -1046,7 +1050,7 @@ jQuery(function($){
         , close : function() {
           //$that.val($that.attr("value"));
         }
-      }).focus(function(){     
+      }).focus(function(){
         //Use the below line instead of triggering keydown
         $(this).data("uiAutocomplete").search($(this).val());
     }).data('ui-autocomplete');
@@ -1104,8 +1108,8 @@ jQuery(function($) {
 (function($) {
 
   window.getPageToken = function getPageToken() {
-      return $(document.body).data("page-subtype") 
-            || $(document.body).data("page-type") 
+      return $(document.body).data("page-subtype")
+            || $(document.body).data("page-type")
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
 // hello
