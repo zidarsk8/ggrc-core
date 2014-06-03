@@ -137,7 +137,9 @@
           content_controller_options : {
             mapping : "workflows",
             parent_instance : page_instance,
-            model : CMS.Models.Workflow
+            model : CMS.Models.Workflow,
+            show_view : GGRC.mustache_path + "/workflows/tree.mustache",
+            footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
         }
       };
@@ -180,6 +182,7 @@
         content_controller_options : {
           parent_instance : object,
           model : CMS.Models.Task,
+          show_view : GGRC.mustache_path + "/tasks/tree.mustache",
           mapping : "tasks" }}},
       { person : {
         widget_id : "person",

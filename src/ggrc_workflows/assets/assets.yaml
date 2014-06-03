@@ -18,3 +18,4 @@ dashboard-js-template-files:
   - task_groups/tree_footer.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
+  - workflows/tree.mustache
