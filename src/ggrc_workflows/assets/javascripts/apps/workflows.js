@@ -138,7 +138,8 @@
             mapping : "workflows",
             parent_instance : page_instance,
             model : CMS.Models.Workflow,
-            show_view : GGRC.mustache_path + "/workflows/tree.mustache"
+            show_view : GGRC.mustache_path + "/workflows/tree.mustache",
+            footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
         }
       };
