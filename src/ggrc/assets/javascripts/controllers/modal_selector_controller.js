@@ -1272,8 +1272,8 @@
         [GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name)];
     }
 
-    can.each(join_descriptors, function(descriptor) {
-      var option_model_name = descriptor.option_model_name
+    can.each(join_descriptors, function(descriptor, far_model_name) {
+      var option_model_name = descriptor.option_model_name || far_model_name
         , extra_options = modal_descriptor_view_options[option_model_name]
         ;
 
@@ -1285,7 +1285,8 @@
           || ~can.inArray(option_model_name, exclude_option_types)
           //  For some recently-added join settings, there is no join model, so
           //  short-circuit
-          || !descriptor.model_name)
+          || !descriptor.model_name
+          || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
         return;
 
       if (!option_set.default_option_descriptor)
