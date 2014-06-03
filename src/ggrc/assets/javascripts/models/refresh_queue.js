@@ -5,11 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require can.jquery-all
-//= require controllers/tree_view_controller
-//= require controls/control
-//= require controls/category
-
+(function(can, $) {
 /*  RefreshQueue
  *
  *  enqueue(obj, force=false) -> queue or null
@@ -213,38 +209,5 @@ can.Construct("RefreshQueue", {
     }
 });
 
-
-(function(can, $) {
-
-if(!/^\/programs\/\d+/.test(window.location.pathname))
- return;
-
-$(function() {
-  program_widget_descriptors = {
-      person: {
-          widget_id: "person"
-        , widget_name: "People"
-        , widget_icon: "person"
-        , content_controller: GGRC.Controllers.TreeView
-        , content_controller_options: {
-              show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache"
-            , footer_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache"
-            , parent_instance: GGRC.page_instance()
-            , allow_reading: true
-            , allow_mapping: true
-            , allow_creating: true
-            , model: CMS.Models.Person
-            , mapping: "mapped_and_or_authorized_people"
-            }
-        }
-  };
-
-  if (/programs\/\d+/.test(window.location)) {
-    if (!GGRC.extra_widget_descriptors)
-      GGRC.extra_widget_descriptors = {};
-    $.extend(GGRC.extra_widget_descriptors, program_widget_descriptors);
-  }
-
-});
 
 })(window.can, window.can.$);

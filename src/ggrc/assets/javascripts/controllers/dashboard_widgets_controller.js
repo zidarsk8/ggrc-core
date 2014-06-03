@@ -108,7 +108,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         , page_instance = GGRC.page_instance()
         , page_model_name =
             page_instance && page_instance.constructor.shortName
-        , mapping_model_name = GGRC.JoinDescriptor.join_model_name_for(
+        , mapping_model_name = GGRC.Mappings.join_model_name_for(
             page_model_name, list_model_name)
         ;
       if (mapping_model_name) {

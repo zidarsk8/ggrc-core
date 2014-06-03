@@ -30,7 +30,6 @@ CMS.Controllers.TreeLoader("GGRC.Controllers.ListView", {
     , search_query : ""
     , search_params : null
     , parent_instance : null
-    , object_type : null
     , parent_type : null
     , object_display : null
     , parent_display : null

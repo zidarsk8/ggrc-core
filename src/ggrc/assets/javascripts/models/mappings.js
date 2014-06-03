@@ -17,12 +17,172 @@
       Cross = GGRC.MapperHelpers.Cross;
 
 
-  function create_mappings(definitions) {
-    var mappings = {};
+  /*
+    class GGRC.Mappings
+    represents everything known about how GGRC objects connect to each other.
 
-    // Recursively handle mixins
-    function reify_mixins(definition) {
-      var final_definition = {};
+    a Mappings instance contains the set of known mappings for a module, such as "ggrc_core"
+    or "ggrc_gdrive_integration".  The set of all Mappings instances is used throughout the
+    system to build widgets, map and unmap objects, etc.
+
+    To configure a new Mappings instance, use the following format :
+    { <mixin name or source object type> : { 
+        _mixins : [ <mixin name>, ... ],
+        _canonical : { <option type> : <name of mapping in parent object>, ... }
+        <mapping name> : GGRC.Mappings.Proxy(...) | GGRC.Mappings.Direct(...) | GGRC.Mappings.Indirect(...) 
+                        | GGRC.Mappings.Multi(...) | GGRC.Mappings.TypeFilter(...) | GGRC.Mappings.Cross(...)
+                        | GGRC.Mappings.CustomFilter(...),
+        ...
+      } 
+    }
+  */
+  can.Construct("GGRC.Mappings", {
+    // Convenience properties for building mappings types.
+    Proxy : Proxy,
+    Direct : Direct,
+    Indirect : Indirect,
+    Search : Search,
+    Multi : Multi,
+    TypeFilter : TypeFilter,
+    CustomFilter : CustomFilter,
+    Cross : Cross,
+    modules : {},
+
+    /*
+      return all mappings from all modules for an object type.
+      object - a string representing the object type's shortName
+
+      return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
+    */
+    get_mappings_for : function(object) {
+      var mappings = {};
+      can.each(this.modules, function(mod, name) {
+        if (mod[object]) {
+          can.each(mod[object], function(mapping, mapping_name) {
+            if(mapping_name === "_canonical")
+              return;
+            mappings[mapping_name] = mapping;
+          });
+        }
+      });
+      return mappings;
+    },
+    /*
+      return the canonical mapping (suitable for joining) between two objects.
+      object - the string type (shortName) of the "from" object's class
+      option - the string type (shortName) of the "to" object's class
+
+      return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
+    */
+    get_canonical_mapping : function(object, option) {
+      var mapping = null;
+      can.each(this.modules, function(mod, name) {
+        if (mod._canonical_mappings && mod._canonical_mappings[object] && mod._canonical_mappings[object][option]) {
+          mapping = CMS.Models[object].get_mapper(mod._canonical_mappings[object][option]);
+          return false;
+        }
+      });
+      return mapping;
+    },
+    /*
+      return all canonical mappings (suitable for joining) from all modules for an object type.
+      object - a string representing the object type's shortName
+
+      return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by option type
+    */
+    get_canonical_mappings_for : function(object) {
+      var mappings = {};
+      can.each(this.modules, function(mod, name) {
+        if (mod._canonical_mappings && mod._canonical_mappings[object]) {
+          can.each(mod._canonical_mappings[object], function(mapping_name, option) {
+            mappings[option] = CMS.Models[object].get_mapper(mapping_name);
+          });
+        }
+      });
+      return mappings;
+    },
+    /*
+      return the join model for the canonical mapping between two objects if and only if the canonical mapping is a Proxy.
+      model_name_a - the string type (shortName) of the "from" object's class
+      model_name_b - the string type (shortName) of the "to" object's class
+
+      return: an string of the shortName of the join model (subclass of can.Model.Join) or null
+    */
+    join_model_name_for: function (model_name_a, model_name_b) {
+      var join_descriptor = this.get_canonical_mapping(model_name_a, model_name_b);
+      if (join_descriptor instanceof GGRC.ListLoaders.ProxyListLoader) {
+        return join_descriptor.model_name;
+      } else {
+       return null;
+      }
+    },
+    /*
+      make a new instance of the join model for the canonical mapping between two objects
+       if and only if the canonical mapping is a Proxy.
+      object - the string type (shortName) of the "from" object's class
+      option - the string type (shortName) of the "to" object's class
+      join_attrs - any other attributes to add to the new instance
+
+      return: an instance of the join model (subclass of can.Model.Join) or null
+    */
+    make_join_object: function(object, option, join_attrs) {
+      var join_model
+        , join_mapping = this.get_canonical_mapping(object.constructor.shortName, option.constructor.shortName)
+        , object_attrs = { id: object.id, type: object.constructor.shortName }
+        , option_attrs = { id: option.id, type: option.constructor.shortName }
+        ;
+
+      if(join_mapping) {
+        join_model = CMS.Models[join_mapping.model_name];
+        join_attrs = $.extend({}, join_attrs || {});
+        join_attrs[join_model.option_attr] = option_attrs;
+        join_attrs[join_model.object_attr] = object_attrs;
+
+        return new join_model(join_attrs);
+      } else {
+        return null;
+      }
+    }
+  }, {
+    /*
+      On init:
+      kick off the application of mixins to the mappings and resolve canonical mappings
+    */
+    init : function(name, opts) {
+      var created_mappings, that = this;
+      this.constructor.modules[name] = this;
+      this._canonical_mappings = {};
+      if(this.groups) {
+        can.each(this.groups, function(group, name) {
+          if(typeof group === "function") {
+            that.groups[name] = $.proxy(group, that.groups);
+          }
+        });
+      }
+      created_mappings = this.create_mappings(opts);
+
+      can.each(created_mappings, function(mappings, object_type) {
+        if(mappings._canonical) {
+          if(!that._canonical_mappings[object_type]) {
+            that._canonical_mappings[object_type] = {};
+          }
+
+          can.each(mappings._canonical || [], function(option_types, mapping_name) {
+            if(!can.isArray(option_types)) {
+              option_types = [option_types];
+            }
+            can.each(option_types, function(option_type) {
+              that._canonical_mappings[object_type][option_type] = mapping_name;
+            });
+          });
+        }
+      });
+      $.extend(this, created_mappings);
+    },
+    // Recursively handle mixins -- this function should not be called directly.
+    reify_mixins : function(definition, definitions) {
+      var that = this,
+        final_definition = {};
       if (definition._mixins) {
         can.each(definition._mixins, function(mixin) {
           if (typeof(mixin) === "string") {
@@ -30,37 +190,67 @@
             if (!definitions[mixin])
               console.debug("Undefined mixin: " + mixin, definitions);
             else
-              can.extend(final_definition, reify_mixins(definitions[mixin]));
+              can.extend(true, final_definition, that.reify_mixins(definitions[mixin], definitions));
           } else if (can.isFunction(mixin)) {
             // If function, call with current definition state
             mixin(final_definition);
           } else {
             // Otherwise, assume object and extend
+            if (final_definition._canonical && mixin._canonical) {
+              mixin = can.extend({}, mixin);
+              can.each(mixin._canonical, function(types, mapping) {
+                if(final_definition._canonical[mapping]) {
+                  if(!can.isArray(final_definition._canonical[mapping])) {
+                    final_definition._canonical[mapping] = [final_definition._canonical[mapping]];
+                  }
+                  final_definition._canonical[mapping] = can.unique(final_definition._canonical[mapping].concat(types));
+                } else {
+                  final_definition._canonical[mapping] = types;
+                }
+              });
+              final_definition._canonical = can.extend({}, mixin._canonical, final_definition._canonical);
+              delete mixin._canonical;
+            }
             can.extend(final_definition, mixin);
           }
         });
       }
-      can.extend(final_definition, definition);
+      can.extend(true, final_definition, definition);
       delete final_definition._mixins;
       return final_definition;
+    },
+
+    // create mappings for definitions -- this function should not be called directly/
+    create_mappings : function(definitions) {
+      var that = this,
+        mappings = {};
+
+      can.each(definitions, function(definition, name) {
+        // Only output the mappings if it's a model, e.g., uppercase first letter
+        if (name[0] === name[0].toUpperCase())
+          mappings[name] = that.reify_mixins(definition, definitions);
+      });
+
+      return mappings;
     }
+  });
 
-    can.each(definitions, function(definition, name) {
-      // Only output the mappings if it's a model, e.g., uppercase first letter
-      if (name[0] === name[0].toUpperCase())
-        mappings[name] = reify_mixins(definition);
-    });
-
-    return mappings;
-  }
-
-  GGRC.Mappings = create_mappings({
+  new GGRC.Mappings("ggrc_core", {
       base: {
       }
 
     // Governance
     , Control: {
         _mixins: ["personable"] //controllable
+      , _canonical : {
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System"],
+        "programs" : "Program",
+        "objectives" : "Objective",
+        "implemented_controls" : "Control",
+        "section_base" : ["Section", "Clause"],
+        "audits" : "Audit",
+        "joined_directives" : ["Regulation", "Policy", "Contract", "Standard"]
+      }
       , related_objects: Proxy(
           null, "controllable", "ObjectControl", "control", "object_controls") //control_objects
       , related_data_assets: TypeFilter("related_objects", "DataAsset")
@@ -170,6 +360,11 @@
       }
     , section_base: {
         _mixins: ["personable"] //sectionable
+      , _canonical : {
+        "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System"],
+        "objectives" : "Objective",
+        "controls" : "Control"
+      }
       , related_objects: Proxy(
           null, "sectionable", "ObjectSection", "section", "object_sections") //section_objects
       , related_and_able_objects : Multi([
@@ -198,43 +393,72 @@
 
     , Section: {
         _mixins: ["section_base"]
+      , _canonical : {
+        directive : ["Regulation", "Policy", "Standard"]
+      }
+      , directive : Direct("Directive", "sections", "directive")
       }
 
     , Clause: {
         _mixins: ["section_base"]
+      , "canonical" : {
+        contracts : "Contract"
+      }
       , contracts: Proxy(
           "Contract", "directive", "DirectiveSection", "section", "directive_sections")
       }
 
     , controllable: {
+        _canonical : {
+          "controls" : "Control"
+        },
         controls: Proxy(
           "Control", "control", "ObjectControl", "controllable", "object_controls")
       }
 
     , objectiveable: {
+        _canonical : {
+          objectives : "Objective"
+        },
         objectives: Proxy(
           "Objective", "objective", "ObjectObjective", "objectiveable", "object_objectives")
       }
 
     , sectionable: {
-        _sections_base : Proxy(
+        _canonical : {
+          _sections_base : ["Section", "Clause"]
+        }
+        , _sections_base : Proxy(
           null, "section", "ObjectSection", "sectionable", "object_sections")
         , sections : TypeFilter("_sections_base", "Section")
         , clauses : TypeFilter("_sections_base", "Clause")
       }
 
     , personable: {
+        _canonical : {
+          "people" : "Person"
+        },
         people: Proxy(
           "Person", "person", "ObjectPerson", "personable", "object_people")
       }
 
     , documentable: {
+        _canonical : {
+          "documents" : "Document"
+        },
         documents: Proxy(
           "Document", "document", "ObjectDocument", "documentable", "object_documents")
       }
 
     , related_object: {
-        related_objects_as_source: Proxy(
+       _canonical : {
+        "related_objects_as_source" : [
+          "DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product",
+          "Project", "System", "Regulation", "Policy", "Contract", "Standard",
+          "Program", "DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"
+          ]
+      }
+      , related_objects_as_source: Proxy(
           null, "destination", "Relationship", "source", "related_destinations")
       , related_objects_as_destination: Proxy(
           null, "source", "Relationship", "destination", "related_sources")
@@ -270,6 +494,12 @@
         _mixins: [
             "related_object", "personable", "objectiveable"
           ]
+      , _canonical : {
+          "controls" : "Control"
+        , "directives" : ["Regulation", "Policy", "Contract", "Standard"]
+        , "audits" : "Audit"
+        , "context" : "Context"
+      }
       , controls: Proxy(
           "Control", "control", "ProgramControl", "program", "program_controls")
       /*, objectives: Proxy(
@@ -286,7 +516,6 @@
       , related_people_via_audits: TypeFilter("related_objects_via_audits", "Person")
       //, related_controls_via_audits: TypeFilter("related_objects_via_audits", "Control")
 
-      , authorizations: Direct("UserRole", "context", "user_roles")
       , authorizations_via_audits: Cross("audits", "authorizations")
       , context: Direct("Context", "related_object", "context")
       , contexts_via_audits: Cross("audits", "context")
@@ -309,6 +538,12 @@
         _mixins: [
           "related_object", "personable", "objectiveable"
           ]
+      , _canonical : {
+          "sections" : "Section"
+        , "clauses" : "Clause"
+        , "joined_controls" : "Control"
+        , "programs" : "Program"
+      }
       , sections: Direct("Section", "directive", "sections")
       , joined_sections: Proxy(
           "Section", "section", "DirectiveSection", "directive", "directive_sections")
@@ -391,7 +626,16 @@
       }
 
     , Person: {
-        owned_programs: Indirect("Program", "contact")
+        _canonical : {
+          "related_objects" : [
+            "Program", "Regulation", "Contract", "Policy",  "Standard",
+            "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
+            "OrgGroup", "Process", "Product", "Project", "System"
+            ],
+          "authorizations" : "UserRole"
+        }
+
+      , owned_programs: Indirect("Program", "contact")
       , owned_regulations: Indirect("Regulation", "contact")
       , owned_contracts: Indirect("Contract", "contact")
       , owned_policies: Indirect("Policy", "contact")
@@ -477,7 +721,11 @@
     }
 
     , Context: {
-        user_roles: Direct("UserRole", "context", "user_roles")
+        _canonical : {
+            "user_roles" : "UserRole"
+          , "authorized_people" : "Person"
+        }
+      , user_roles: Direct("UserRole", "context", "user_roles")
       , authorized_people: Proxy("Person", "person", "UserRole", "context", "user_roles")
     }
 
@@ -491,7 +739,12 @@
     }
 
     , Audit : {
-        requests: Direct("Request", "audit", "requests")
+        _canonical : {
+            "requests" : "Request"
+          , "_program" : "Program"
+          , "context" : "Context"
+        }
+      , requests: Direct("Request", "audit", "requests")
       , _program: Direct("Program", "audits", "program")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
@@ -557,7 +810,11 @@
       , extended_related_objects: Cross("requests", "extended_related_objects")
     }
     , Request : {
-        responses: Direct("Response", "request", "responses")
+        _canonical : {
+            "responses" : ["DocumentataionResponse", "InterviewResponse", "PopulationSampleResponse"]
+          , "audit" : "Audit"
+        }
+      , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
@@ -581,12 +838,18 @@
       , business_objects : Multi(["related_objects", "controls", "people"])
     }
     , InterviewResponse : {
-      _mixins : ["response"]
+        _canonical : {
+          "meetings" : "Meeting"
+        }
+      , _mixins : ["response"]
       , meetings: Direct("Meeting", "response", "meetings")
       , business_objects : Multi(["related_objects", "controls", "documents"])
     }
     , PopulationSampleResponse : {
-      _mixins : ["response"]
+      _canonical : {
+        "population_samples" : "PopulationSample"
+      }
+      , _mixins : ["response"]
       , business_objects : Multi(["related_objects", "controls", "people", "documents"])
       , population_samples : Direct("PopulationSample", "response", "population_samples")
     }

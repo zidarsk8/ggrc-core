@@ -7,7 +7,14 @@
 
 
 (function($, CMS, GGRC) {
-  var WorkflowExtension = {};
+  var WorkflowExtension = {},
+    _workflow_object_types = [
+      "Program",
+      "Regulation", "Standard", "Policy", "Contract",
+      "Objective", "Control", "Section", "Clause",
+      "System", "Process",
+      "DataAsset", "Facility", "Market", "Product", "Project"
+      ];
 
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
@@ -29,13 +36,27 @@
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
         CustomFilter = GGRC.MapperHelpers.CustomFilter;
-
     // Add mappings for basic workflow objects
-    $.extend(GGRC.Mappings,
-      {
+    var mappings = {
         Task: {
+          _canonical: {
+            subtasks : "Task",
+            task_groups: "TaskGroup"
+          },
           subtasks: Direct(
-            "CycleTask", "task", "tasks")
+            "CycleTask", "task", "tasks"),
+          task_groups: Proxy(
+            "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
+        },
+
+        TaskGroup: {
+          _canonical: {
+            tasks : "Task",
+            objects : _workflow_object_types
+          },
+          tasks: Proxy("Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
+          objects: Proxy(
+            null, "object", "TaskGroupObject", "task_group", "task_group_objects")
         },
 
         Cycle: {
@@ -44,6 +65,12 @@
         },
 
         Workflow: {
+          _canonical : {
+            objects : _workflow_object_types,
+            tasks : "Task",
+            task_groups : "TaskGroup",
+            people : "Person"
+          },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
           tasks: Proxy(
@@ -61,43 +88,27 @@
               return result.instance.status != "Finished";
             }),
           current_tasks: Cross("current_cycle", "tasks")
+        },
+
+        People: {
+          _canonical: {
+            workflows: "Workflow"
+          },
+          workflows: Proxy(
+            "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
         }
-      });
+      };
 
     // Insert `workflows` mappings to all business object types
-    var _workflow_object_types = [
-      "Program",
-      "Regulation", "Standard", "Policy", "Contract",
-      "Objective", "Control", "Section", "Clause",
-      "System", "Process",
-      "DataAsset", "Facility", "Market", "Product", "Project"
-      ];
-
     can.each(_workflow_object_types, function(type) {
-      GGRC.Mappings[type].workflows = new GGRC.ListLoaders.ProxyListLoader(
+      mappings[type] = {};
+      mappings[type].workflows = new GGRC.ListLoaders.ProxyListLoader(
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
+      mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
+        "TaskGroupObject", "object", "task_group", "task_group_objects", null);
+      mappings[type]._canonical = { "workflows" : "Workflow", "task_groups" : "TaskGroup" };
     });
-  };
-
-  // Construct and add JoinDescriptors for workflow extension
-  WorkflowExtension.init_join_descriptors = function init_join_descriptors() {
-    var join_descriptor_arguments = [
-      [all_object_types, "Workflow", "WorkflowObject", "workflow", "object"],
-      ["Workflow", all_object_types, "WorkflowObject", "object", "workflow"],
-      ["Workflow", "Task", "WorkflowTask", "task", "workflow"],
-      ["Task", "Workflow", "WorkflowTask", "workflow", "task"],
-      ["Workflow", "TaskGroup", null, null, "workflow"],
-      //["Workflow", "TaskGroup", "TaskGroup", "task_group", "workflow"],
-      //["TaskGroup", "Workflow", "TaskGroup", "workflow", "task_group"],
-      ["Workflow", "Person", "WorkflowPerson", "person", "workflow"],
-      ["Person", "Workflow", "WorkflowPerson", "workflow", "person"],
-      [all_object_types, "TaskGroup", "TaskGroupObject", "task_group", "object"],
-      ["TaskGroup", all_object_types, "TaskGroupObject", "object", "task_group"],
-      ["TaskGroup", "Task", "TaskGroupTask", "task", "task_group"],
-      ["Task", "TaskGroup", "TaskGroupTask", "task_group", "task"]
-    ];
-
-    GGRC.JoinDescriptor.from_arguments_list(join_descriptor_arguments);
+    new GGRC.Mappings("ggrc_workflows", mappings);
   };
 
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
@@ -110,29 +121,28 @@
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
-  }
+  };
 
   WorkflowExtension.init_widgets_for_other_pages =
       function init_widgets_for_other_pages() {
-    var index;
+    var descriptor = {},
+      page_instance = GGRC.page_instance();
 
-    // Explicitly remove `task_group` widget on other pages
-    if (GGRC.extra_widget_descriptors.task_group)
-      delete GGRC.extra_widget_descriptors.task_group;
-
-    index = GGRC.extra_default_widgets.indexOf("task_group");
-    if (index > -1)
-      GGRC.extra_default_widgets.splice(index, 1);
-
-    if (GGRC.extra_widget_descriptors.workflow) {
-      GGRC.extra_widget_descriptors.workflow.content_controller_options.mapping =
-        "workflows";
+    if(page_instance && ~can.inArray(page_instance.constructor.shortName, _workflow_object_types)) {
+      descriptor[page_instance.constructor.shortName] = {
+        workflow : {
+          widget_id : "workflow",
+          widget_name : "Workflows",
+          content_controller : GGRC.Controllers.TreeView,
+          content_controller_options : {
+            mapping : "workflows",
+            parent_instance : page_instance,
+            model : CMS.Models.Workflow
+          }
+        }
+      };
     }
-
-    /*can.each(GGRC.extra_widget_descriptors, function(descriptor, name) {
-      if (~new_default_widgets.indexOf(name))
-        new_widget_descriptors[name] = descriptor;
-    });*/
+    new GGRC.WidgetList("ggrc_workflows", descriptor);
   };
 
   WorkflowExtension.init_widgets_for_workflow_page =
@@ -146,19 +156,50 @@
         objects_widget_descriptor,
         history_widget_descriptor,
         current_widget_descriptor,
-        object = GGRC.page_instance();
+        object = GGRC.page_instance(),
+        object_descriptors = {};
 
-    can.each(GGRC.extra_widget_descriptors, function(descriptor, name) {
+    can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
       if (~new_default_widgets.indexOf(name))
         new_widget_descriptors[name] = descriptor;
     });
 
-    new_widget_descriptors.info.content_controller_options.widget_view =
-      GGRC.mustache_path + "/workflows/info.mustache";
 
-    new_widget_descriptors.task.content_controller_options.mapping = "tasks";
-    new_widget_descriptors.person.content_controller_options.mapping = "people";
-    new_widget_descriptors.task_group.content_controller_options.mapping = "task_groups";
+    $.extend(
+      true,
+      new_widget_descriptors,
+      { info : {
+        content_controller : GGRC.Controllers.InfoWidget,
+        content_controller_options :
+          { widget_view : GGRC.mustache_path + "/workflows/info.mustache" }}},
+      { task : {
+        widget_id : "task",
+        widget_name : "Tasks",
+        widget_icon : "task",
+        content_controller : GGRC.Controllers.TreeView,
+        content_controller_options : {
+          parent_instance : object,
+          model : CMS.Models.Task,
+          mapping : "tasks" }}},
+      { person : {
+        widget_id : "person",
+        widget_name : "People",
+        widget_icon : "person",
+        content_controller : GGRC.Controllers.TreeView,
+        content_controller_options : {
+          parent_instance : object,
+          model : CMS.Models.Person,
+          mapping : "people" }}},
+      { task_group : {
+        widget_id : "task_group",
+        widget_name : "Task Groups",
+        widget_icon : "task_group",
+        content_controller : GGRC.Controllers.TreeView,
+        content_controller_options : {
+          parent_instance : object,
+          model : CMS.Models.TaskGroup,
+          mapping : "task_groups" }}}
+      );
 
     objects_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
@@ -221,14 +262,12 @@
     new_widget_descriptors.history = history_widget_descriptor;
     new_widget_descriptors.current = current_widget_descriptor;
 
-    GGRC.extra_widget_descriptors = new_widget_descriptors;
-    GGRC.extra_default_widgets = new_default_widgets;
+    new GGRC.WidgetList("ggrc_workflows", { Workflow : new_widget_descriptors });
   }
 
 
   GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
 
   WorkflowExtension.init_mappings();
-  WorkflowExtension.init_join_descriptors();
 
 })(this.can.$, this.CMS, this.GGRC);

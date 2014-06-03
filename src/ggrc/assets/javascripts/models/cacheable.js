@@ -596,7 +596,7 @@ can.Model("can.Model.Cacheable", {
 
   , get_mapper: function(name) {
       var mappers, mapper;
-      mappers = GGRC.Mappings[this.shortName];
+      mappers = GGRC.Mappings.get_mappings_for(this.shortName);
       if (mappers) {
         mapper = mappers[name];
         return mapper;

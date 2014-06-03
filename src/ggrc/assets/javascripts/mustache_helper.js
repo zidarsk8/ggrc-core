@@ -1214,7 +1214,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     can_map = Permission.is_allowed('create', 'Relationship', context_id);
   }
   else {
-    resource_type = GGRC.JoinDescriptor.join_model_name_for(
+    resource_type = GGRC.Mappings.join_model_name_for(
       source.constructor.shortName, target_type);
 
     if (!(source instanceof CMS.Models.Program)
@@ -2253,10 +2253,10 @@ Mustache.registerHelper("with_mappable_instances_as", function(name, list, optio
     list.attr("length"); //setup live.
     list = can.map(list, function(item, key) {
       var inst = item.instance || item;
-      var jds = GGRC.JoinDescriptor.by_object_option_models[page_inst.constructor.shortName][inst.constructor.shortName];
+      var jds = GGRC.Mappings.join_model_name_for(page_inst.constructor.shortName, inst.constructor.shortName);
       if(inst !== page_inst
-         && jds && jds.length > 0
-         && Permission.is_allowed("create", jds[0].options.join_model_name, page_context)
+         && jds
+         && Permission.is_allowed("create", jds, page_context)
       ) {
         return inst;
       }

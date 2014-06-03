@@ -1515,7 +1515,7 @@
     if (instance._all_local_results_binding)
       return instance._all_local_results_binding.refresh_stubs();
 
-    loaders = GGRC.Mappings[instance.constructor.shortName];
+    loaders = GGRC.Mappings.get_mappings_for(instance.constructor.shortName);
     can.each(loaders, function(loader, name) {
       if (loader instanceof GGRC.ListLoaders.DirectListLoader
           || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
