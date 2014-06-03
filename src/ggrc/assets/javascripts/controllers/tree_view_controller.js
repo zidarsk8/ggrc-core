@@ -658,6 +658,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       , "[data-object-type=" + instance.constructor.table_singular + "]"
       ].join("")
     ).remove();
+    that.element.trigger("updateSticky");
     ev.stopPropagation();
   }
 
