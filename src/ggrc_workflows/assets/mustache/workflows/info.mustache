@@ -16,7 +16,7 @@
   <div class="row-fluid">
     <div class="span6">
       <div class="rtf-block">
-        <p>{{{instance.description}}}</p>
+        <p>{{{firstnonempty instance.description '<em>No description</em>'}}}</p>
       </div>
     </div>
     <div class="span6">
@@ -35,7 +35,17 @@
     <div class="span12">
       <div class="rtf-block">
         <strong>Workflow Owner:</strong>
-        {{instance.lead_email}}
+        {{#if instance.owners.length}}
+          {{#using contacts=instance.owners}}
+          {{#contacts}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+          {{/contacts}}
+          {{/using}}
+        {{else}}
+          <span class="error">
+            None
+          </span>
+        {{/if}}
       </div>
     </div>
   </div>
@@ -54,7 +64,8 @@
       </p>
       <p>
         <strong>gGRC Folder:</strong>
-        <a href="#">/gGRC Workflows/{{instance.title}}/</a>
+        <!--a href="#">/gGRC Workflows/{{instance.title}}/</a-->
+        <i>Folder connections for workflows are not yet implemented</i>
       </p>
     </div>
   </div>

@@ -606,13 +606,24 @@ can.each(["with_page_object_as", "with_current_user_as"], function(fname) {
 });
 
 Mustache.registerHelper("iterate", function() {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , options = arguments[arguments.length - 1];
+  var i = 0, j = 0
+  , args = can.makeArray(arguments).slice(0, arguments.length - 1)
+  , options = arguments[arguments.length - 1]
+  , step = options.hash && options.hash.step || 1
+  , ctx = {}
+  , ret = [];
 
-  return can.map(args, function(arg) {
-    var ctx = options.contexts;
-    return options.fn(ctx.add({iterator : typeof arg === "string" ? new String(arg) : arg }));
-  }).join("");
+  options.hash && options.hash.listen && Mustache.resolve(options.hash.listen);
+
+  for(; i < args.length; i += step) {
+    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
+    for(j = 0; j < step; j++) {
+      ctx["iterator_" + j] = typeof args[i + j] === "string" ? new String(args[i + j]) : args[i + j];
+    }
+    ret.push(options.fn(options.contexts.add(ctx)));
+  }
+
+  return ret.join("");
 });
 
 Mustache.registerHelper("is_private", function(options) {

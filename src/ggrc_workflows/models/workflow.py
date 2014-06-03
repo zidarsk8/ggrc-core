@@ -7,14 +7,22 @@
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed
+    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
 
 
-class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+class Workflow(Stateful, Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'workflows'
+
+  VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
+
+  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
+
+  frequency = deferred(db.Column(db.Enum(*VALID_FREQUENCIES),
+      nullable=False, default='continuous'),
+    'Workflow')
 
   workflow_objects = db.relationship(
       'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
@@ -47,5 +55,6 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'workflow_tasks',
       PublishOnly('tasks'),
       'task_groups',
+      'frequency',
       #'cycles',
       ]
