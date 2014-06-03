@@ -52,10 +52,12 @@
 
           <div class="span6">
           {{#if instance.viewLink}}
-            <a href="{{instance.viewLink}}" class="info-action">
-              View {{instance.class.title_singular}}
-              <i class="grcicon-goto"></i>
-            </a>
+            {{#is_allowed "view_object_page" instance}}
+              <a href="{{instance.viewLink}}" class="info-action">
+                View {{instance.class.title_singular}}
+                <i class="grcicon-goto"></i>
+              </a>
+            {{/is_allowed}}
           {{/if}}
           </div>
 
@@ -96,7 +98,7 @@
         {{#if child_options.length}}
           {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
             <div class="inner-tree">
-              <h6>Mapped Objects ({{child_count}})</h6>
+              <h6>Mapped Objects ({{child_count}}) donkage</h6>
               {{#child_options}}
                 <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
               {{/child_options}}
