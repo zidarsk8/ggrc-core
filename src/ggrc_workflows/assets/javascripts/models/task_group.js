@@ -23,7 +23,8 @@
       task_group_tasks: "CMS.Models.TaskGroupTask.stubs",
       tasks: "CMS.Models.Task.stubs",
       task_group_objects: "CMS.Models.TaskGroupObject.stubs",
-      objects: "CMS.Models.get_stubs"
+      objects: "CMS.Models.get_stubs",
+      modified_by : "CMS.Models.Person.stub"
     },
 
     tree_view_options: {

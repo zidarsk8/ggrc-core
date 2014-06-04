@@ -19,6 +19,7 @@
     destroy: "DELETE /api/tasks/{id}",
 
     attributes: {
+      modified_by : "CMS.Models.Person.stub"
     },
     tree_view_options: {
       //show_view: GGRC.mustache_path + "/tasks/tree.mustache",

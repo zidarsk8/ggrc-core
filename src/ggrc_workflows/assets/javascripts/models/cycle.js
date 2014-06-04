@@ -19,7 +19,8 @@
     destroy: "DELETE /api/cycles/{id}",
     attributes: {
       workflow: "CMS.Models.Workflow.stub",
-      tasks: "CMS.Models.CycleTask.stubs"
+      tasks: "CMS.Models.CycleTask.stubs",
+      modified_by : "CMS.Models.Person.stub"
     },
 
     init: function() {
