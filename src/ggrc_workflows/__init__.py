@@ -72,4 +72,5 @@ def contributed_object_views():
 
   return [
       object_view(models.Workflow),
+      object_view(models.Task),
       ]

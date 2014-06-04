@@ -27,8 +27,9 @@
       workflow_tasks: "CMS.Models.WorkflowTask.stubs",
       task_groups: "CMS.Models.TaskGroup.stubs",
       start_date: "date",
-      end_date: "date"
+      end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
+      modified_by : "CMS.Models.Person.stub"
     },
 
     tree_view_options : {
