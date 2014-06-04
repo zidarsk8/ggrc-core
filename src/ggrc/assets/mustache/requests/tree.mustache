@@ -49,7 +49,11 @@
               {{#if objective}}
                 <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
                   <i class="grcicon-objective-color"></i>
-                  <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+                  {{#is_allowed "view_object_page" objective}}
+                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+                  {{else}}
+                    <span class="object-title" target="_blank">{{objective.title}}</span>
+                  {{/is_allowed}}
                 </div>
               {{else}}
                 {{#using audit=instance.audit}}
@@ -176,7 +180,11 @@
                       </div>
                       <div class="media-body">
                         <div class="tree-description short">
-                          <a class="object-title" target="_blank" href="{{objective.viewLink}}">{{objective.title}}</a>
+                        {{#is_allowed "view_object_page" objective}}
+                          <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+                        {{else}}
+                          <span class="object-title" target="_blank">{{objective.title}}</span>
+                        {{/is_allowed}}
                           <br>
                           {{objective.description}}
                         </div>
