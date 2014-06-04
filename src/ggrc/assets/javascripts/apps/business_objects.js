@@ -596,6 +596,9 @@ $(function() {
         , Project: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
+        , Section: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
         , System: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
