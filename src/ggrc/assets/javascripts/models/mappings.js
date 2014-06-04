@@ -135,8 +135,8 @@
       if(join_mapping) {
         join_model = CMS.Models[join_mapping.model_name];
         join_attrs = $.extend({}, join_attrs || {});
-        join_attrs[join_model.option_attr] = option_attrs;
-        join_attrs[join_model.object_attr] = object_attrs;
+        join_attrs[join_mapping.option_attr] = option_attrs;
+        join_attrs[join_mapping.object_attr] = object_attrs;
 
         return new join_model(join_attrs);
       } else {
