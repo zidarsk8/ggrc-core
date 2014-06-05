@@ -247,7 +247,7 @@
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
-        "section_base" : ["Section", "Clause"],
+        "_sections_base" : ["Section", "Clause"],
         "audits" : "Audit",
         "joined_directives" : ["Regulation", "Policy", "Contract", "Standard"]
       }
