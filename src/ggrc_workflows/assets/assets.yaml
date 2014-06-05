@@ -1,5 +1,6 @@
 dashboard-js-files:
   - apps/workflows.js
+  - apps/tasks.js
   - models/cycle.js
   - models/cycle_task.js
   - models/task.js
@@ -15,6 +16,7 @@ dashboard-js-template-files:
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
   - tasks/info.mustache
+  - tasks/extended_info.mustache
   - task_groups/modal_content.mustache
   - task_groups/tree_footer.mustache
   - workflows/modal_content.mustache
