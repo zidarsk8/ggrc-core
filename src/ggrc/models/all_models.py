@@ -110,9 +110,9 @@ all_models = [
   Event,
   BackgroundTask,
   NotificationConfig,
-    Notification,
-    NotificationRecipient,
-    NotificationObject,
+  Notification,
+  NotificationRecipient,
+  NotificationObject,
   ]
 
 __all__ = [model.__name__ for model in all_models]

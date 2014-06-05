@@ -1,18 +1,21 @@
-#Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
-#Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-#Created By: mouli@meics.org
-#Maintained By: dan@reciprocitylabs.com
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: mouli@meics.org
+# Maintained By: dan@reciprocitylabs.com
+
 
 """
- GGRC notification feature prepare email, digest, calendar event and send it if is triggerd
+ GGRC email notification module prepares email, email digest, notify email to recipients when it is triggerd
 """
+
+
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
 from ggrc import db
-from ggrc_notification import *
 
-class GGRCNotificationBase:
+
+class NotificationBase(object):
   notif_type = None
 
   def __init__(self, notif_type):
@@ -24,13 +27,13 @@ class GGRCNotificationBase:
   def notify(self):
     pass
 
-class GGRCEmailNotification(GGRCNotificationBase):
+
+class EmailNotification(NotificationBase):
   def __init__(self, notif_type='Email_Now'):
-    GGRCNotificationBase.__init__(self, notif_type)
+    super(EmailNotification, self).__init__(notif_type)
 
   def prepare(self, target_objs, sender, recipients, subject, content):
     now = datetime.now()
-
     notification = Notification(
       notif_date=now,
       created_at=now,
@@ -46,7 +49,7 @@ class GGRCEmailNotification(GGRCNotificationBase):
         created_at=datetime.now(),
         object_id=obj.id, 
         object_type=obj.type,
-        notification_id=notification.id
+        notification=notification
       )
       db.session.add(notification_object)
       db.session.flush()
@@ -57,7 +60,7 @@ class GGRCEmailNotification(GGRCNotificationBase):
         status='Progress',
         notif_type=self.notif_type,
         recipient_id=recipient.id,
-        notification_id=notification.id
+        notification=notification
       )
       db.session.add(notification_recipient)
       db.session.flush()
@@ -72,7 +75,6 @@ class GGRCEmailNotification(GGRCNotificationBase):
 
     for notification in pending_notifications:
       sender = Person.query.filter(Person.id==notification.sender_id).first()
-
       assignees = {}
       for notify_recipient in notification.recipients:
         recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
@@ -80,7 +82,6 @@ class GGRCEmailNotification(GGRCNotificationBase):
 
       if len(assignees) < 1:
         continue 
-
       to_list = ""
       cnt = 0
       for id, assignee in assignees.items():
@@ -103,9 +104,9 @@ class GGRCEmailNotification(GGRCNotificationBase):
     db.session.commit()
 
 
-class GGRCEmailDigestNotification(GGRCEmailNotification):
+class EmailDigestNotification(EmailNotification):
   def __init__(self, notif_type='Email_Digest'):
-    GGRCEmailNotification.__init__(self, notif_type)
+    super(EmailDigestNotification, self).__init__(notif_type)
 
   def notify(self):
     pending_notifications = db.session.query(Notification).\
@@ -138,7 +139,6 @@ class GGRCEmailDigestNotification(GGRCEmailNotification):
 
       if len(assignees) < 1:
         return
-
       to_list = ""
       cnt = 0
       for id, assignee in assignees.items():

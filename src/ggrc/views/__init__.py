@@ -20,9 +20,7 @@ from .registry import object_view
 from ggrc.models.background_task import (
     BackgroundTask, queued_task, create_task, make_task_response
     )
-from ggrc.notification import GGRCEmailNotification, GGRCEmailDigestNotification
-from flask import current_app
-from datetime import datetime
+from . import notification
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
@@ -300,64 +298,3 @@ def user_permissions():
      logged in user
   '''
   return get_permissions_json()
-
-@app.route("/prepare_email")
-@login_required
-def prepare_email_ggrc_users():
-  """ prepare email digest
-  """
-  model = request.args.get('model')
-  id = request.args.get('id')
-  from ggrc.models import all_models
-  cls = getattr(all_models, model)
-  obj = cls.query.filter(cls.id == int(id)).first()
-  if obj is not None:
-    target_objs=[]
-    recipients=[obj.contact]
-    email_notification = GGRCEmailNotification()
-    if obj is not None:
-      subject = obj.type + " " + obj.title + " created"
-      content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural + \
-       "/" + str(obj.id) + " created on " + str(obj.created_at)
-      email_notification.prepare(target_objs, obj.contact, recipients, subject, content)
-  return render_template("dashboard/index.haml")
-
-@app.route("/prepare_emaildigest")
-@login_required
-def prepare_email_digest_ggrc_users():
-  """ prepare email digest
-  """
-  model = request.args.get('model')
-  id = request.args.get('id')
-  import ggrc.models
-  from ggrc.models import all_models
-  cls = getattr(all_models, model)
-  obj = cls.query.filter(cls.id == int(id)).first()
-  if obj is not None:
-    target_objs=[]
-    recipients=[obj.contact]
-    email_digest_notification = GGRCEmailDigestNotification()
-    if obj is not None:
-      subject = obj.type + " " + "Email Digest for " + datetime.now().strftime('%Y/%m/%d')
-      content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural+ \
-       "/" + str(obj.id) + " created on " + str(obj.created_at)
-      email_digest_notification.prepare(target_objs, obj.contact, recipients, subject, content)
-  return render_template("dashboard/index.haml")
-
-@app.route("/notify_email")
-@login_required
-def notify_email_ggrc_users():
-  """ notify email for a program object
-  """
-  email_notification = GGRCEmailNotification()
-  email_notification.notify()
-  return render_template("dashboard/index.haml")
-
-@app.route("/notify_emaildigest")
-@login_required
-def notify_email_digest_ggrc_users():
-  """ notify email digest 
-  """
-  email_digest_notification = GGRCEmailDigestNotification()
-  email_digest_notification.notify()
-  return render_template("dashboard/index.haml")

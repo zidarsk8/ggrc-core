@@ -3,13 +3,19 @@
 # Created By: mouli@meics.org
 # Maintained By: dan@reciprocitylabs.com
 
+"""
+ GGRC notification SQLAlchemy layer data model extensions
+"""
+
 from ggrc.app import db
 from .mixins import Base, Stateful
+
 
 class NotificationConfig(Base, db.Model):
   __tablename__ = 'notification_configs'
   notif_type = db.Column(db.String)
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
+
 
 class Notification(Base, db.Model):
   __tablename__ = 'notifications'
@@ -18,15 +24,17 @@ class Notification(Base, db.Model):
   subject = db.Column(db.String)
   sender_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
   recipients = db.relationship(
-      'NotificationRecipient', backref='notifications', cascade='all, delete-orphan')
+      'NotificationRecipient', backref='notification', cascade='all, delete-orphan')
   notification_object = db.relationship(
-      'NotificationObject', backref='notifications', cascade='all, delete-orphan')
+      'NotificationObject', backref='notification', cascade='all, delete-orphan')
+
 
 class NotificationObject(Base, db.Model):
   __tablename__ = 'notification_objects'
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
+
 
 class NotificationRecipient(Base, Stateful, db.Model):
   __tablename__ = 'notification_recipients'
