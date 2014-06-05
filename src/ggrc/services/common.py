@@ -454,6 +454,7 @@ class ModelView(View):
         query = query.limit(limit)
       except (TypeError, ValueError):
         pass
+    query = query.distinct()
     return query
 
   def get_object(self, id):
@@ -763,7 +764,7 @@ class Resource(ModelView):
     if '__page_only' in request.args:
       page_number = int(request.args.get('__page', 0))
       matches = []
-      total = matches_query.distinct().count()
+      total = matches_query.count()
     else:
       page_number = int(request.args.get('__page', 1))
       matches = matches_query\
@@ -773,7 +774,7 @@ class Resource(ModelView):
       if page_number == 1 and len(matches) < page_size:
         total = len(matches)
       else:
-        total = matches_query.distinct().count()
+        total = matches_query.count()
     page = Pagination(
         matches_query, page_number, page_size, total, matches)
     collection_extras = {
