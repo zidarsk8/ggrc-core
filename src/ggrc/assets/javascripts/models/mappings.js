@@ -316,6 +316,13 @@
       }
     , Objective: {
         _mixins: ["personable"] //objectiveable
+      , _canonical : {
+          "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System",
+                               "Regulation", "Contract", "Policy", "Standard", "Program"]
+        , "objectives" : "Objective"
+        , "controls" : "Control"
+        , "_sections_base" : ["Section", "Clause"]
+      }
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
       , related_and_able_objects : Multi([
