@@ -103,6 +103,7 @@
                 <div class="drag"></div>
                 <div class="arrow"></div>
               </li>
+              {{^assessment.finished}}
               <li class="progress-object {{#if_equals assessment.status 'In progress'}}started{{/if}} {{#if_equals assessment.status 'Finished'}}finished{{/if}}">
                 <a href="#progress_widget" class="progress_widget w-arrow">
                   <div class="oneline">
@@ -113,24 +114,20 @@
                 <div class="drag"></div>
                 <div class="arrow"></div>
               </li>
+              {{/assessment.finished}}
               {{/assessment.started}}
+              {{^assessment.started}}
               <li class="inner-nav-button">
-                {{^assessment.started}}
                 <button type="submit" href="#workflowStart" data-toggle="modal" class="btn" {{^assessment.task_groups.length}}disabled="disabled"{{/task_groups}}>
                   Start Workflow
                 </button>
-                {{/assessment.started}}
-                {{#assessment.started}}
-                  {{^assessment.finished}}
-                  <button type="submit" class="btn end-workflow">
-                    End Workflow
-                  </button>
-                  {{/finished}}
-                  {{#assessment.finished}}
-                  <span class="message"><em>Workflow finished</em></span>
-                  {{/finished}}
-                {{/started}}
               </li>
+              {{/assessment.started}}
+              {{#assessment.finished}}
+              <li class="inner-nav-button">
+                  <span class="message"><em>Workflow finished</em></span>
+              </li>
+              {{/assessment.finished}}
             </ul>
           </div>
         </div>
@@ -232,6 +229,11 @@
                               <li>
                                 <a href="#cloneWorkflow" data-toggle="modal">
                                   Clone Workflow...
+                                </a>
+                              </li>
+                              <li>
+                                <a class="end-workflow" href="#">
+                                  Finish Workflow
                                 </a>
                               </li>
                             </ul>
@@ -749,7 +751,7 @@
                     <li class="tree-item program task-item task_group rq-draft
                       {{#if_equals status 'started'}}rq-requested{{/if}}
                       {{#if_equals status 'finished'}}rq-accepted{{/if}}
-                      {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
+                      {{^if_equals status 'finished'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
                       <div class="item-main">
                         <div class="openclose">
                           <div class="row-fluid">
@@ -883,7 +885,7 @@
                                   <ul class="tree-structure new-tree colored-list">
                                     {{#each obj_tasks}}
                                     <li class="tree-item rq-draft obj_task
-                                      {{#if_equals status 'finished'}}rq-accepted{{/if}}
+                                      {{#if_equals status 'finished'}}rq-updated{{/if}}
                                       {{#if_equals status 'verified'}}rq-accepted{{/if}}
                                       {{#if_equals status 'started'}}rq-requested{{/if}}
                                       {{^if_equals status 'verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}" data-index="{{@index}}">
