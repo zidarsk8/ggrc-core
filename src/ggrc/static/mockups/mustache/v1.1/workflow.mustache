@@ -231,11 +231,13 @@
                                   Clone Workflow...
                                 </a>
                               </li>
+                              {{^assessment.finished}}
                               <li>
                                 <a class="end-workflow" href="#">
                                   Finish Workflow
                                 </a>
                               </li>
+                              {{/assessment.finished}}
                             </ul>
                           </div>
                         </div>
