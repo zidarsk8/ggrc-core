@@ -6,7 +6,19 @@
 
 from ggrc import db
 from ggrc.models.mixins import Base, Titled, Slugged, Described, Timeboxed
+from ggrc.models.associationproxy import association_proxy
+from ggrc.models.reflection import PublishOnly
 
 
 class Task(Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'tasks'
+
+  task_group_tasks = db.relationship(
+    'TaskGroupTask', backref='task', cascade='all, delete-orphan')
+  task_groups = association_proxy(
+    'task_group_tasks', 'task_group', 'TaskGroupTask')
+
+  _publish_attrs = [
+    'task_group_tasks',
+    PublishOnly('task_groups')
+    ]

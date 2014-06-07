@@ -1,0 +1,9 @@
+  <li>
+    <div class="objective-selector field-wrap task-wrap">
+      <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
+      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
+      <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{instance.end_date}}">
+      <span class="required">*</span>
+      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
+    </div>
+  </li>

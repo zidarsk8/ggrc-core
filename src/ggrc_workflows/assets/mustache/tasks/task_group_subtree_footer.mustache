@@ -1,0 +1,12 @@
+  <div>
+    <a href="#" class="toggleClosest btn">Add Task</a>
+  </div>
+  <div class="hide objective-selector field-wrap task-wrap">
+    <span class="empty"></span>
+    <input tabindex="3" type="text" name="object_title2" class="search-icon autocomplete addEnable" placeholder="Add Task" data-index="{{@index}}" data-type="tasks">
+    <input tabindex="2" class="date" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{instance.end_date}}">
+    <span class="required">*</span>
+    <a href="#" data-index="{{@index}}" data-type="objects" class="toggleClosest"><i class="grcicon-deleted"></i></a>
+
+    <a href="#" class="btn btn-success addTrigger toggleClosest disabled no-float" data-index="{{@index}}" data-type="tasks">Save</a>
+  </div>

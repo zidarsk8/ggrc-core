@@ -25,7 +25,7 @@ class WorkflowObject(Timeboxed, Mapping, db.Model):
 
   @property
   def object(self):
-    return getattr(self, self.object)
+    return getattr(self, self.object_attr)
 
   @object.setter
   def object(self, value):

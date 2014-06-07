@@ -1,4 +1,9 @@
-
+/*!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
 
 GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   defaults : {
@@ -82,4 +87,49 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     });
   }
 
+});
+
+
+can.Component.extend({
+  tag: "ggrc-quick-add",
+  template: "<content/>",
+  scope: {
+    parent_instance: null,
+    source_mapping: null,
+    model: null,
+  },
+  events: {
+    init: function() {
+      this.scope.attr("controller", this);
+    },
+    "a[data-toggle=submit]:not(.disabled) click": function(el){
+      var that = this,
+        far_model = this.scope.model || this.scope.instance.constructor;
+      GGRC.Mappings.make_join_object(
+        this.scope.parent_instance,
+        this.scope.instance,
+        { context : this.scope.parent_instance.context }
+      ).save().done(function() {
+        el.trigger("modal:success");
+      });
+    },
+    autocomplete_select : function(el, event, ui) {
+      var that = this;
+      setTimeout(function() {
+        that.scope.attr(el.attr("name"), ui.item);
+      });
+    },
+    "input[data-mapping] change" : function(el) {
+      if (!el.val()) {
+        this.scope.attr(el.attr("name"), null);
+      }
+    }
+  },
+  helpers: {
+    mapping_autocomplete : function(options) {
+      return function(el) {
+        $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
+      };
+    }
+  },
 });

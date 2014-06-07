@@ -201,7 +201,24 @@
         content_controller_options : {
           parent_instance : object,
           model : CMS.Models.TaskGroup,
-          mapping : "task_groups" }}}
+          show_view : GGRC.mustache_path + "/task_groups/tree.mustache",
+          mapping : "task_groups",
+          draw_children : true,
+          child_options : [
+            {
+              model : can.Model.Cacheable,
+              mapping : "objects",
+              show_view : GGRC.mustache_path + "/base_objects/task_group_subtree.mustache",
+              footer_view : GGRC.mustache_path + "/base_objects/task_group_subtree_footer.mustache"
+            },
+            {
+              model : CMS.Models.Task,
+              mapping : "tasks",
+              show_view : GGRC.mustache_path + "/tasks/task_group_subtree.mustache",
+              footer_view : GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache"
+            }
+          ]
+        }}}
       );
 
     objects_widget_descriptor = {
