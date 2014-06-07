@@ -132,9 +132,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     this._attached_deferred.then(function() {
       if (that.element) {
         that.element.trigger("updateCount", 0)
-        if (that.options.allow_reading) {
-          that.init_count();
-        }
+        that.init_count();
       }
     });
 

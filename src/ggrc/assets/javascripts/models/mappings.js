@@ -635,9 +635,13 @@
     , Person: {
         _canonical : {
           "related_objects" : [
+        // NOTE: non-obvious coupling here: the existence of a
+        // canonical mapping from Person to one of these objects
+        // determines whether that object's count will initialize on the
+        // inner nav, so it should include everything appearing there
             "Program", "Regulation", "Contract", "Policy",  "Standard",
             "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-            "OrgGroup", "Process", "Product", "Project", "System"
+            "OrgGroup", "Process", "Product", "Project", "System", "Audit"
             ],
           "authorizations" : "UserRole"
         }
