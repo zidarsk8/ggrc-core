@@ -564,7 +564,7 @@
       , controls: Multi(["direct_controls", "joined_controls"])
 
       , programs: Proxy(
-          "Program", "program", "ProgramDirective", "directives", "program_directives")
+          "Program", "program", "ProgramDirective", "directive", "program_directives")
 
       , orphaned_objects: Multi([
           "sections"
