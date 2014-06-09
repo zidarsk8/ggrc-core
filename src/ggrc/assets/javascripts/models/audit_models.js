@@ -219,6 +219,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , init : function() {
     this._super.apply(this, arguments);
+    this.validatePresenceOf("description");
     this.validatePresenceOf("due_on");
     this.validatePresenceOf("assignee");
     if(this === CMS.Models.Request) {
