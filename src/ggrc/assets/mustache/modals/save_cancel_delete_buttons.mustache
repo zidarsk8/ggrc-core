@@ -27,7 +27,7 @@
         {{#mapping}}
         <input type="checkbox" id="map-and-save" checked="checked">&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
         {{/mapping}}
-        <a tabindex="24" class="btn btn-primary preventdoubleclick {{#instance.computed_errors}}disabled{{/instance.computed_errors}}" data-toggle="modal-submit" href="javascript://">Save</a>
+        <a tabindex="24" class="btn btn-primary preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">Save</a>
       </div>
     </div>
   </div>
