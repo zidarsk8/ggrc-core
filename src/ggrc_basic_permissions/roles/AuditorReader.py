@@ -56,7 +56,7 @@ permissions = {
         "Role",
         "Context",
         {
-            "type": "Task",
+            "type": "BackgroundTask",
             "terms": {
                 "property_name": "modified_by",
                 "value": "$current_user"
