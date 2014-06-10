@@ -314,6 +314,116 @@ jQuery.extend(GGRC, {
 
   , delay_leaving_page_until : $.proxy(notifier, "queue")
 });
+
+
+GGRC.Math =  GGRC.Math || {};
+$.extend(GGRC.Math, {
+  string_add : function(a, b) {
+    var _a, _b, i, _c = 0;
+    var ret = [];
+    var adi = a.indexOf(".");
+    var bdi = b.indexOf(".");
+    if(adi < 0) {
+         a = a + ".";
+        adi = a.length - 1;
+    }
+    if(bdi < 0) {
+        b = b + ".";
+        bdi = b.length - 1;
+    }
+    while(adi < bdi) {
+        a = "0" + a;
+        adi++;
+    }
+    while(bdi < adi) {
+         b = "0" + b;
+        bdi++;
+    }
+    
+    for(i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
+        _a = a[i] || 0;
+        _b = b[i] || 0;
+        if(_a === "." || _b === ".") {
+            if(_a !== "." || _b !== ".")
+                throw "Decimal alignment error";
+            ret.unshift(".");
+        } else {
+            ret.unshift((+_a) + (+_b) + _c);
+            _c = Math.floor(ret[0] / 10);
+            ret[0] = (ret[0] % 10).toString(10);
+        }
+    }
+    if(_c > 0) ret.unshift(_c.toString(10));
+    if(ret[ret.length - 1] === ".") ret.pop();
+    return ret.join("");
+},
+
+string_half : function(a) {
+ var i, _a, _c = 0, ret = [];
+ 
+    if(!~a.indexOf(".")) {
+        a = a + ".";
+    }
+    for(i = 0; i < a.length; i++) {
+        _a = a[i];
+        if(_a === ".") {
+            ret.push(".");
+        } else {
+          _a = Math.floor((+_a + _c) / 2);
+          if(+a[i] % 2) {
+              _c = 10;
+          } else {
+              _c = 0;
+          }
+          ret.push(_a.toString(10));
+      }
+    }
+    if(_c > 0) ret.push("5");
+    if(ret[ret.length - 1] === ".") ret.pop();
+    while(ret[0] === "0" && ret.length > 1) ret.shift();
+    return ret.join("");
+},
+
+string_max : function(a, b) {
+  return this.string_less_than(a, b) ? b : a;
+},
+
+string_less_than : function(a, b) {
+      var i,
+      _a = a.replace(/^0*/, ""),
+      _b = b.replace(/^0*/, ""),
+      adi = _a.indexOf("."),
+      bdi = _b.indexOf(".");
+    if(adi < 0) {
+      _a = _a + ".";
+      adi = _a.length - 1;
+    }
+    if(bdi < 0) {
+      _b = _b + ".";
+      bdi = _b.length - 1;
+    }
+    if(adi < bdi) {
+      return true;
+    }
+    if(bdi < adi) {
+      return false;
+    }
+    for(i = 0; i < _a.length - 1; i++) {
+      if(_a[i] === ".") {
+          // continue
+      } else {
+        if((+_a[i] || 0) < (+_b[i] || 0)) {
+          return true;
+        } else if((+_a[i] || 0) > (+_b[i] || 0)) {
+          return false;
+        }
+      }
+    }
+    return _b.length >= _a.length ? false : true;
+}
+
+});
+
 })(GGRC);
 
 

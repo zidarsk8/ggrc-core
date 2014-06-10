@@ -1,9 +1,25 @@
-  <li>
-    <div class="objective-selector field-wrap task-wrap">
-      <a class="drag {{#taskLock}}disabled{{/taskLock}}" href="#"><i class="grcicon-drag"></i></a>
-      <input tabindex="4" type="text" name="tasks_title" class="editTitle search-icon autocomplete" placeholder="Add Task" value="{{title}}" data-index="{{@index}}" data-type="tasks">
-      <input tabindex="2" class="date editDate" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{instance.end_date}}">
-      <span class="required">*</span>
-      <a href="#" data-index="{{@index}}" data-type="tasks" class="deleteTrigger {{#taskLock}}disabled{{/taskLock}}"><i class="grcicon-deleted"></i></a>
+  <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    <div class="item-main objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}} {{(el) -> $(el).ggrc_controllers_quick_form({ instance : $(el).data("model") }); }}>
+      <a class="drag " href="#"><i class="grcicon-drag"></i></a>
+      {{#with_page_object_as "page_instance"}}
+      {{#with_mapping 'tasks' page_instance}}
+      <ggrc-quick-update parent_instance="page_instance" instance="instance" source_mapping="tasks">
+        {{#using task=instance.task}}
+        <input tabindex="3" type="text" name="task" class="editTitle search-icon autocomplete" placeholder="No Title" value="{{task.title}}">
+        {{/using}}
+        <input tabindex="2" class="date editDate" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+        <span class="required">*</span>
+      </ggrc-quick-update>
+      {{/with_mapping}}
+      {{/with_page_object_as}}
+      {{#if allow_mapping}}
+      {{#if mappings}}
+      {{#is_allowed_all 'delete' mappings}}
+      <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger"><i class="grcicon-deleted"></i>
+        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+      </a>
+      {{/is_allowed_all}}
+      {{/if}}
+      {{/if}}
     </div>
   </li>

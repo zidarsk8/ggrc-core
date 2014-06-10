@@ -4,6 +4,7 @@
     Created By: brad@reciprocitylabs.com
     Maintained By: brad@reciprocitylabs.com
 */
+;(function(cam, $, GGRC) {
 
 GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   defaults : {
@@ -89,7 +90,6 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
 
 });
 
-
 can.Component.extend({
   tag: "ggrc-quick-add",
   template: "<content/>",
@@ -97,18 +97,29 @@ can.Component.extend({
     parent_instance: null,
     source_mapping: null,
     model: null,
+    attributes: {}
   },
   events: {
     init: function() {
+      var that = this;
       this.scope.attr("controller", this);
+      this.element.bind("inserted", function() {
+        $(this).find("input:not([data-mapping])").each(function(i, el) {
+          that.scope.attributes.attr($(el).attr("name"), $(el).val());
+        });
+      });
     },
     "a[data-toggle=submit]:not(.disabled) click": function(el){
       var that = this,
         far_model = this.scope.model || this.scope.instance.constructor;
       GGRC.Mappings.make_join_object(
         this.scope.parent_instance,
-        this.scope.instance,
-        { context : this.scope.parent_instance.context }
+        this.scope.instance || this.scope.attributes.instance,
+        $.extend({
+          context : this.scope.parent_instance.context
+                    || new CMS.Models.Context({id : null})
+                  },
+                  this.scope.attributes.serialize())
       ).save().done(function() {
         el.trigger("modal:success");
       });
@@ -119,10 +130,13 @@ can.Component.extend({
         that.scope.attr(el.attr("name"), ui.item);
       });
     },
-    "input[data-mapping] change" : function(el) {
+    "input[null-if-empty] change" : function(el) {
       if (!el.val()) {
-        this.scope.attr(el.attr("name"), null);
+        this.scope.attributes.attr(el.attr("name"), null);
       }
+    },
+    "input:not([data-mapping]) change" : function(el) {
+      this.scope.attributes.attr(el.attr("name"), el.val());
     }
   },
   helpers: {
@@ -133,3 +147,58 @@ can.Component.extend({
     }
   },
 });
+
+
+can.Component.extend({
+  tag: "ggrc-quick-update",
+  template: "<content/>",
+  scope: {
+    instance: null,
+    source_mapping: null,
+    model: null,
+    attributes: {}
+  },
+  events: {
+    init: function() {
+      this.scope.attr("controller", this);
+      this.scope.attr("model", this.scope.model || this.scope.instance.constructor);
+      this.scope.instance.refresh();
+    },
+    //currently we don't support proxy object updates in mappings, so for now a change
+    //  to a connected object (assuming we are operating on a proxy object) will trigger
+    //  a deletion of the proxy object and creation of a new one.
+    autocomplete_select : function(el, event, ui) {
+      var that = this;
+      setTimeout(function() {
+        var serial = that.scope.instance.serialize();
+        delete serial[el.attr("name")];
+        delete serial[el.attr("name") + "_id"];
+        delete serial[el.attr("name") + "_type"];
+        that.scope.instance.destroy();
+        GGRC.Mappings.make_join_object(
+          this.scope.parent_instance,
+          ui.item,
+          $.extend({ context : this.scope.parent_instance.context }, serial)
+        ).save();
+      });
+    },
+    "input[null-if-empty] change" : function(el) {
+      if (!el.val()) {
+        this.scope.instance.attr(el.attr("name"), null);
+      }
+    },
+    "input:not([data-mapping]) change" : function(el) {
+      this.scope.instance.attr(el.attr("name"), el.val());
+      this.scope.instance.save();
+    }
+  },
+  helpers: {
+    mapping_autocomplete : function(options) {
+      return function(el) {
+        $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
+      };
+    }
+  },
+});
+
+})(this.can, this.can.$, this.GGRC);

@@ -1,12 +1,22 @@
-  <div>
-    <a href="#" class="toggleClosest btn">Add Task</a>
-  </div>
-  <div class="hide objective-selector field-wrap task-wrap">
-    <span class="empty"></span>
-    <input tabindex="3" type="text" name="object_title2" class="search-icon autocomplete addEnable" placeholder="Add Task" data-index="{{@index}}" data-type="tasks">
-    <input tabindex="2" class="date" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{instance.end_date}}">
-    <span class="required">*</span>
-    <a href="#" data-index="{{@index}}" data-type="objects" class="toggleClosest"><i class="grcicon-deleted"></i></a>
+  {{#toggle show_new_object_form}}
+    {{#with_page_object_as 'page_instance'}}
+    {{#with_mapping 'tasks' page_instance}}
+    <li class="tree-footer">
+      <ggrc-quick-add parent_instance="parent_instance" source_mapping="tasks">
+        <div class="objective-selector field-wrap task-wrap">
+          <input tabindex="3" type="text" name="instance" data-mapping="tasks" null-if-empty="true" class="search-icon" placeholder="Add Task" {{mapping_autocomplete}} value="{{instance.title}}">
+          <input tabindex="2" class="date" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date}}">
+          <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+          <input type="hidden" name="sort_index" value="{{sort_index_at_end}}" />
 
-    <a href="#" class="btn btn-success addTrigger toggleClosest disabled no-float" data-index="{{@index}}" data-type="tasks">Save</a>
-  </div>
+          <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Save</a>
+        </div>
+      </ggrc-quick-add>
+    </li>
+    {{/with_mapping}}
+    {{/with_page_instance_as}}
+  {{else}}
+    <li class="tree-footer">
+      <a href="javascript://" class="btn" {{toggle_button}}>Add Task</a>
+    </li>
+  {{/toggle}}

@@ -1,18 +1,20 @@
   {{#toggle show_new_object_form}}
     {{#with_page_object_as 'page_instance'}}
     {{#with_mapping 'objects' page_instance}}
-    <ggrc-quick-add parent_instance="parent_instance" source_mapping="objects">
-      <div class="objective-selector field-wrap">
-        <input tabindex="3" type="text" name="instance" data-mapping="objects" class="search-icon" placeholder="Add Object" {{mapping_autocomplete}} value="{{instance.title}}">
-        <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+    <li class="tree-footer">
+      <ggrc-quick-add parent_instance="parent_instance" source_mapping="objects">
+        <div class="objective-selector field-wrap">
+          <input tabindex="3" type="text" name="instance" null-if-empty="true" data-mapping="objects" class="search-icon" placeholder="Add Object" {{mapping_autocomplete}} value="{{instance.title}}">
+          <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
 
-        <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Save</a>
-      </div>
-    </ggrc-quick-add>
+          <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Save</a>
+        </div>
+      </ggrc-quick-add>
+    </li>
     {{/with_mapping}}
     {{/with_page_instance_as}}
   {{else}}
-    <div>
+    <li class="tree-footer">
       <a href="javascript://" class="btn" {{toggle_button}}>Add Object</a>
-    </div>
+    </li>
   {{/toggle}}

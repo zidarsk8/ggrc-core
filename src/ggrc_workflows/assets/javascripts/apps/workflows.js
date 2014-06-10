@@ -54,6 +54,7 @@
             tasks : "Task",
             objects : _workflow_object_types
           },
+          task_group_tasks: Direct("TaskGroupTask", "task_group", "task_group_tasks"),
           tasks: Proxy("Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
             null, "object", "TaskGroupObject", "task_group", "task_group_objects")
@@ -213,9 +214,10 @@
             },
             {
               model : CMS.Models.Task,
-              mapping : "tasks",
+              mapping : "task_group_tasks",
               show_view : GGRC.mustache_path + "/tasks/task_group_subtree.mustache",
-              footer_view : GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache"
+              footer_view : GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache",
+              sort_property : 'sort_index'
             }
           ]
         }}}

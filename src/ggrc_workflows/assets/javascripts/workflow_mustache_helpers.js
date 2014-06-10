@@ -5,6 +5,8 @@
     Maintained By: dan@reciprocitylabs.com
 */
 
+;(function(can, $, Mustache) {
+
 Mustache.registerHelper("toggle", function(compute, options) {
   function toggle(trigger) {
     if(typeof trigger === "function") {
@@ -26,3 +28,20 @@ Mustache.registerHelper("toggle", function(compute, options) {
     return options.inverse(options.contexts, { helpers : { toggle_button : toggle }});
   }
 });
+
+Mustache.registerHelper("sort_index_at_end", function(list, options) {
+  var max_int = Number.MAX_SAFE_INTEGER.toString(10),
+    list_max = "0";
+  list = Mustache.resolve(list);
+
+  can.each(list, function(item) {
+    var idx = item.sort_index || item.instance && item.instance.sort_index;
+    if(typeof idx !== "undefined") {
+      list_max = GGRC.Math.string_max(idx, list_max);
+    }
+  });
+
+  return GGRC.Math.string_half(GGRC.Math.string_add(list_max, max_int));
+});
+
+})(this.can, this.can.$, this.Mustache);

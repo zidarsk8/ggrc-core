@@ -8,13 +8,14 @@
                 <i class="grcicon-person-green pull-left icon-field"></i>
                 <div class="objective-selector">
                   {{#using assignee=instance.contact}}
-                  <input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-lookup="Person" placeholder="Choose Assignee" value="{{assignee.email}}" data-index="{{@index}}" data-field="assignee">
+                  <!--input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-lookup="Person" placeholder="Choose Assignee" value="{{assignee.email}}" data-index="{{@index}}" data-field="assignee" -->
+                    {{#if assignee}}
+                      {{assignee.email}}
+                    {{else}}
+                      No&nbsp;contact
+                    {{/if}}
                   {{/using}}
                 </div>
-              </li>
-              <li>
-                <label class="pull-left inline-black">due date:</label>
-                <input tabindex="2" class="span7 date saveTaskGroupField short-field" data-index="{{@index}}" data-field="end_date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{instance.end_date}}">
               </li>
 
               <li>
@@ -34,9 +35,14 @@
                 {{/with_mapping}}
               </li>
               <li>
-                <span class="counter removeTaskGroup" data-index="{{@index}}">
+                {{#is_allowed 'delete' instance context='for'}}
+                <span class="counter removeTaskGroup">
+                  <a href="javascript://" class="info-action delete" data-toggle="delete">
+                    {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                  </a>
                   <i class="grcicon-deleted"></i>
                 </span>
+                {{/is_allowed}}
               </li>
             </ul>
             <div class="item-data">
@@ -52,10 +58,13 @@
       <div class="tier-2-info-content">
         <div class="show-description">
           <div class="row-fluid">
-            <div class="span6 task-group-title">
+            <div class="span12 task-group-title">
+              <h3>
+                {{> /static/mustache/base_objects/edit_object_link.mustache}}
+              </h3>
               <h3 class=".taskGroupTitle">
                 {{instance.title}}
-                <a href="#" class="toggleClosest"><i class="grcicon-edit"></i></a>
+                {{!<a href="#" class="toggleClosest"><i class="grcicon-edit"></i></a>}}
               </h3>
               <div class="taskGroupTitleForm edit-field hide">
                 <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
@@ -67,9 +76,10 @@
           <div class="row-fluid">
             <div class="span12">
               {{#if_equals instance.description ""}}
-              <a href="#" class="toggleClosest">+ Add Description</a>
+              {{!<a href="#" class="toggleClosest">+ Add Description</a>}}
+                <i>No description</i>
               {{else}}
-              {{{instance.description}}}<a class="task-edit-icon toggleClosest" href="#"><i class="grcicon-edit"></i></a>
+              {{{instance.description}}}{{!<a class="task-edit-icon toggleClosest" href="#"><i class="grcicon-edit"></i></a>}}
               {{/if_equals}}
             </div>
             <div class="hide">
@@ -109,7 +119,7 @@
               {{/if_equals}}
               {{/if}}
               <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).sortable({ items : "li:not(.tree-footer)", handle : ".drag" }) }}></ul>
 
             </div>
             {{/child_options.1}}

@@ -1295,8 +1295,12 @@ can.each({
   "localize_date" : "MM/DD/YYYY"
   , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
 }, function(tmpl, fn) {
-  Mustache.registerHelper(fn, function(date) {
-    date = resolve_computed(date);
+  Mustache.registerHelper(fn, function(date, options) {
+    if (!options) {
+      date = new Date();
+    } else {
+      date = resolve_computed(date);
+    }
     return date ? moment(date).format(tmpl) : "";
   });
 });
