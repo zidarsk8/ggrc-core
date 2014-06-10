@@ -1,4 +1,4 @@
-<li class="tree-item program task-group-index" data-index="{{@index}}">
+<li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" data-model="true" {{data 'model'}}>
       <div class="openclose">
         <div class="row-fluid">
@@ -6,13 +6,13 @@
             <ul class="tree-action-list">
               <li>
                 <i class="grcicon-person-green pull-left icon-field"></i>
-                <div class="objective-selector">
+                <div class="objective-selector" style="white-space: nowrap; margin-right: 20px;">
                   {{#using assignee=instance.contact}}
                   <!--input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-lookup="Person" placeholder="Choose Assignee" value="{{assignee.email}}" data-index="{{@index}}" data-field="assignee" -->
                     {{#if assignee}}
                       {{assignee.email}}
                     {{else}}
-                      No&nbsp;contact
+                      No contact
                     {{/if}}
                   {{/using}}
                 </div>
@@ -37,10 +37,9 @@
               <li>
                 {{#is_allowed 'delete' instance context='for'}}
                 <span class="counter removeTaskGroup">
-                  <a href="javascript://" class="info-action delete" data-toggle="delete">
-                    {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                  <a href="javascript://" class="info-action delete" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}">
+                    <i class="grcicon-deleted"></i>
                   </a>
-                  <i class="grcicon-deleted"></i>
                 </span>
                 {{/is_allowed}}
               </li>
