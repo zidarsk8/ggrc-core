@@ -119,7 +119,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
         role_id__in: auditor_role.id
       });
     }).then(function(auditor_roles){
-      return $.when(
+      return $.when.apply($,
         can.map(auditor_roles, function(role){
           if(typeof instance.auditor !== "undefined" &&
               instance.auditor != null &&
