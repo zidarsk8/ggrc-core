@@ -101,12 +101,12 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      var that = this;
       this.scope.attr("controller", this);
-      this.element.bind("inserted", function() {
-        $(this).find("input:not([data-mapping])").each(function(i, el) {
-          that.scope.attributes.attr($(el).attr("name"), $(el).val());
-        });
+    },
+    inserted: function(el) {
+      var that = this;
+      this.element.find("input:not([data-mapping])").each(function(i, el) {
+        that.scope.attributes.attr($(el).attr("name"), $(el).val());
       });
     },
     "a[data-toggle=submit]:not(.disabled) click": function(el){
