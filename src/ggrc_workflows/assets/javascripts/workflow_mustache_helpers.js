@@ -44,4 +44,25 @@ Mustache.registerHelper("sort_index_at_end", function(list, options) {
   return GGRC.Math.string_half(GGRC.Math.string_add(list_max, max_int));
 });
 
+Mustache.registerHelper("sortable_if", function() {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1),
+    options = arguments[arguments.length - 1];
+  var val, inverse = false;
+  if(args[0] === "not") {
+    args.shift();
+    inverse = true;
+  }
+
+  return function(el) {
+    can.view.live.attributes(el, can.compute(function() {
+      var val = Mustache.resolve(args[0]);
+      if(val ^ inverse) {  //value XOR inverse, one must be true, one false
+        $(el).sortable(JSON.parse(args[1] || "{}"));
+      } else if($(el).is(".ui-sortable")) {
+        $(el).sortable("destroy");
+      }
+    }));
+  };
+});
+
 })(this.can, this.can.$, this.Mustache);

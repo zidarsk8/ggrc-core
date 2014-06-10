@@ -18,6 +18,7 @@ class TaskGroup(
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
+  lock_task_order = db.Column(db.Boolean(), nullable=True)
 
   task_group_objects = db.relationship(
       'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
@@ -35,5 +36,6 @@ class TaskGroup(
       'task_group_objects',
       PublishOnly('objects'),
       'task_group_tasks',
-      PublishOnly('tasks')
+      PublishOnly('tasks'),
+      'lock_task_order'
       ]

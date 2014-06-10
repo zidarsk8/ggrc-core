@@ -1,6 +1,6 @@
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}} {{(el) -> $(el).ggrc_controllers_quick_form({ instance : $(el).data("model") }); }}>
-      <a class="drag " href="#"><i class="grcicon-drag"></i></a>
+      {{^parent_instance.lock_task_order}}<a class="drag " href="javascript://"><i class="grcicon-drag"></i></a>{{/parent_instance.lock_task_order}}
       {{#with_page_object_as "page_instance"}}
       {{#with_mapping 'tasks' page_instance}}
       <ggrc-quick-update parent_instance="page_instance" instance="instance" source_mapping="tasks">
