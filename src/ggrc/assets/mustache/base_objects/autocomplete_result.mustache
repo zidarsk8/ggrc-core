@@ -16,10 +16,12 @@
   </li>
   {{/is_allowed}}
 {{/items}}
+{{#if model}}
 {{#is_allowed "create" model.shortName context=null}}
 <li class="ui-menu-item add-new" data-ui-autocomplete-item="">
-  <a data-object-plural="objectives" data-modal-class="modal-wide" href="javascript://" data-object-singular="Objective" data-toggle="modal-ajax-form" data-modal-reset="reset" >
+  <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" >
     + Create New
   </a>
 </li>
 {{/is_allowed}}
+{{/if}}

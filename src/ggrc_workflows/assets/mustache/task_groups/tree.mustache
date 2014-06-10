@@ -37,7 +37,15 @@
               <li>
                 {{#is_allowed 'delete' instance context='for'}}
                 <span class="counter removeTaskGroup">
-                  <a href="javascript://" class="info-action delete" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}">
+                  <a href="javascript://" 
+                    class="info-action delete" 
+                    data-toggle="modal-ajax-deleteform" 
+                    data-object-plural="{{model.table_plural}}" 
+                    data-object-singular="{{model.model_singular}}" 
+                    data-modal-reset="reset" 
+                    data-modal-class="modal" 
+                    data-refresh="true"
+                    data-object-id="{{instance.id}}">
                     <i class="grcicon-deleted"></i>
                   </a>
                 </span>

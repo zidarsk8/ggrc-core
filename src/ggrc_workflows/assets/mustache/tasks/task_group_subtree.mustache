@@ -1,11 +1,11 @@
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}} {{(el) -> $(el).ggrc_controllers_quick_form({ instance : $(el).data("model") }); }}>
-      {{^parent_instance.lock_task_order}}<a class="drag " href="javascript://"><i class="grcicon-drag"></i></a>{{/parent_instance.lock_task_order}}
+    <div class="item-main objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
+      <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://"><i class="grcicon-drag"></i></a>
       {{#with_page_object_as "page_instance"}}
       {{#with_mapping 'tasks' page_instance}}
       <ggrc-quick-update parent_instance="page_instance" instance="instance" source_mapping="tasks">
         {{#using task=instance.task}}
-        <input tabindex="3" type="text" name="task" class="editTitle search-icon autocomplete" placeholder="No Title" value="{{task.title}}">
+          <input tabindex="3" type="text" name="task" class="editTitle search-icon autocomplete" placeholder="Select Object" value="{{task.title}}" data-mapping="tasks" {{mapping_autocomplete}}>
         {{/using}}
         <input tabindex="2" class="date editDate" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
         <span class="required">*</span>
@@ -15,7 +15,7 @@
       {{#if allow_mapping}}
       {{#if mappings}}
       {{#is_allowed_all 'delete' mappings}}
-      <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger"><i class="grcicon-deleted"></i>
+      <a href="javascript://" {{^parent_instance.lock_task_order}}data-toggle="unmap"{{/parent_instance.lock_task_order}} data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}"><i class="grcicon-deleted"></i>
         {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
       </a>
       {{/is_allowed_all}}

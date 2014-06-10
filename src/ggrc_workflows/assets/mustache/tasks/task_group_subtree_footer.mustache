@@ -7,7 +7,9 @@
           <input tabindex="3" type="text" name="instance" data-mapping="tasks" null-if-empty="true" class="search-icon" placeholder="Add Task" {{mapping_autocomplete}} value="{{instance.title}}">
           <input tabindex="2" class="date" data-index="{{@index}}" data-type="tasks" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date}}">
           <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-          <input type="hidden" name="sort_index" value="{{sort_index_at_end}}" />
+          {{#using tgts=parent_instance.task_group_tasks}}
+          <input type="hidden" name="sort_index" value="{{sort_index_at_end tgts}}" />
+          {{/using}}
 
           <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Save</a>
         </div>

@@ -174,12 +174,16 @@ can.Component.extend({
         delete serial[el.attr("name")];
         delete serial[el.attr("name") + "_id"];
         delete serial[el.attr("name") + "_type"];
-        that.scope.instance.destroy();
-        GGRC.Mappings.make_join_object(
-          this.scope.parent_instance,
-          ui.item,
-          $.extend({ context : this.scope.parent_instance.context }, serial)
-        ).save();
+        delete serial.id;
+        delete serial.href;
+        delete serial.selfLink;
+        delete serial.created_at;
+        delete serial.updated_at;
+        delete serial.provisional_id;
+        serial[el.attr("name")] = ui.item.stub();
+        that.scope.instance.destroy().then(function() {
+          new that.scope.instance.constructor(serial).save();
+        });
       });
     },
     "input[null-if-empty] change" : function(el) {
