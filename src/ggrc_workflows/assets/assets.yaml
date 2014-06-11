@@ -17,6 +17,7 @@ dashboard-js-template-files:
   - cycle_task_group_objects/tree.mustache
   - cycle_task_group_object_tasks/tree.mustache
   - dashboard/lhn_workflows.mustache
+  - dashboard/object_nav_actions.mustache
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
   - task_groups/modal_content.mustache
