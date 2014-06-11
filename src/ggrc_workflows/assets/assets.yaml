@@ -1,7 +1,7 @@
 dashboard-js-files:
   - apps/workflows.js
-  - models/cycle.js
-  - models/cycle_task.js
+  - controllers/workflow_page.js
+  - models/cycle_models.js
   - models/task.js
   - models/task_group.js
   - models/workflow.js
@@ -11,6 +11,11 @@ dashboard-js-files:
 dashboard-js-spec-files:
 
 dashboard-js-template-files:
+  - cycles/tree.mustache
+  - cycle_task_groups/current_cycle_header.mustache
+  - cycle_task_groups/tree.mustache
+  - cycle_task_group_objects/tree.mustache
+  - cycle_task_group_object_tasks/tree.mustache
   - dashboard/lhn_workflows.mustache
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache

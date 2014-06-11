@@ -208,6 +208,11 @@
         new_widget_descriptors[name] = descriptor;
     });
 
+    // Initialize controller -- probably this should go in a separate
+    // initialization area
+    $(function() {
+      $(document.body).ggrc_controllers_workflow_page();
+    });
 
     $.extend(
       true,
@@ -304,7 +309,8 @@
   }
 
 
-  GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
+  GGRC.register_hook(
+      "LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
 
   WorkflowExtension.init_mappings();
 
