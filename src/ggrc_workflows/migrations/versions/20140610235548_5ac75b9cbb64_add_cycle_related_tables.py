@@ -2,14 +2,14 @@
 """Add Cycle-related tables
 
 Revision ID: 5ac75b9cbb64
-Revises: 8ca25af37c4
+Revises: 2078f4b2c9f9
 Create Date: 2014-06-10 23:55:48.137814
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '5ac75b9cbb64'
-down_revision = '8ca25af37c4'
+down_revision = '2078f4b2c9f9'
 
 from alembic import op
 import sqlalchemy as sa
