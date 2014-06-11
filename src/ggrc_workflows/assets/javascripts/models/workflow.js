@@ -26,6 +26,7 @@
       tasks: "CMS.Models.Task.stubs",
       workflow_tasks: "CMS.Models.WorkflowTask.stubs",
       task_groups: "CMS.Models.TaskGroup.stubs",
+      cycles: "CMS.Models.Cycle.stubs",
       start_date: "date",
       end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"

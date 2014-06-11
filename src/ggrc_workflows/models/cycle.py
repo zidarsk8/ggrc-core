@@ -6,17 +6,23 @@
 
 from ggrc import db
 from ggrc.models.mixins import (
-    Slugged, Described, Timeboxed, Stateful, WithContact
+    Slugged, Titled, Described, Timeboxed, Stateful, WithContact
     )
 
 
 class Cycle(
     WithContact, Stateful, Timeboxed, Described, Titled, Slugged, db.Model):
   __tablename__ = 'cycles'
+  _title_uniqueness = False
+
+  VALID_STATES = (None, "InProgress", "Completed")
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
+  cycle_task_groups = db.relationship(
+      'CycleTaskGroup', backref='cycle', cascade='all, delete-orphan')
 
   _publish_attrs = [
-      'workflow'
+      'workflow',
+      'cycle_task_groups',
       ]

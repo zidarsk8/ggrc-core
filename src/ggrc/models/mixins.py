@@ -154,9 +154,12 @@ class Titled(object):
 
   @staticmethod
   def _extra_table_args(cls):
-    return (
-        db.UniqueConstraint('title', name='uq_t_{}'.format(cls.__tablename__)),
-        )
+    if getattr(cls, '_title_uniqueness', True):
+      return (
+          db.UniqueConstraint(
+            'title', name='uq_t_{}'.format(cls.__tablename__)),
+          )
+    return ()
 
   # REST properties
   _publish_attrs = ['title']
@@ -265,7 +268,7 @@ class Stateful(object):
     if value is None:
       value = self.default_status()
     if value not in self.valid_statuses():
-      message = "Invalid state '{}'".format(value)
+      message = u"Invalid state '{}'".format(value)
       raise ValueError(message)
     return value
 
@@ -336,9 +339,11 @@ class Slugged(Base):
 
   @staticmethod
   def _extra_table_args(cls):
-    return (
-        db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
-        )
+    if getattr(cls, '_slug_uniqueness', True):
+      return (
+          db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+          )
+    return ()
 
   # REST properties
   _publish_attrs = ['slug']

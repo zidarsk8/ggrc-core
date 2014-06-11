@@ -16,7 +16,17 @@ class TaskGroup(
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
+  task_group_objects = db.relationship(
+      'TaskGroupObject', backref='task_group', cascade='all, delete-orphan')
+  task_group_tasks = db.relationship(
+      'TaskGroupTask', backref='task_group', cascade='all, delete-orphan')
+  cycle_task_groups = db.relationship(
+      'CycleTaskGroup', backref='task_group', cascade='all, delete-orphan')
 
   _publish_attrs = [
-      'workflow'
+      'workflow',
+      'task_group_objects',
+      'task_group_tasks',
+      # Intentionally do not include `cycle_task_groups`
+      #'cycle_task_groups',
       ]

@@ -24,9 +24,14 @@
   // Register Workflow models for use with `infer_object_type`
   WorkflowExtension.object_type_decision_tree = function() {
     return {
-      "workflow": CMS.Models.Workflow,
+      "cycle": CMS.Models.Cycle,
+      "cycle_task_group": CMS.Models.CycleTaskGroup,
+      "cycle_task_group_object": CMS.Models.CycleTaskGroupObject,
+      "cycle_task_group_object_task": CMS.Models.CycleTaskGroupObjectTask,
+
       "task": CMS.Models.Task,
-      "task_group": CMS.Models.TaskGroup
+      "task_group": CMS.Models.TaskGroup,
+      "workflow": CMS.Models.Workflow
     };
   };
 
@@ -35,7 +40,8 @@
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
-        CustomFilter = GGRC.MapperHelpers.CustomFilter;
+        CustomFilter = GGRC.MapperHelpers.CustomFilter,
+        Reify = GGRC.MapperHelpers.Reify;
     // Add mappings for basic workflow objects
     var mappings = {
         Task: {
@@ -54,14 +60,10 @@
             tasks : "Task",
             objects : _workflow_object_types
           },
-          tasks: Proxy("Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
+          tasks: Proxy(
+            "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
             null, "object", "TaskGroupObject", "task_group", "task_group_objects")
-        },
-
-        Cycle: {
-          tasks: Direct(
-            "CycleTask", "cycle", "tasks")
         },
 
         Workflow: {
@@ -87,7 +89,47 @@
           current_cycle: CustomFilter("cycles", function(result) {
               return result.instance.status != "Finished";
             }),
-          current_tasks: Cross("current_cycle", "tasks")
+          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
+        },
+
+        Cycle: {
+          cycle_task_groups: Direct(
+            "CycleTaskGroup", "cycle", "cycle_task_groups"),
+          reify_cycle_task_groups: Reify("cycle_task_groups")
+        },
+
+        CycleTaskGroup: {
+          cycle: Direct(
+            "Cycle", "cycle_task_groups", "cycle"),
+          //task_group: Direct(
+          //  "TaskGroup", "cycle", "tasks"),
+          cycle_task_group_objects: Direct(
+            "CycleTaskGroupObject",
+            "cycle_task_group",
+            "cycle_task_group_objects")
+        },
+
+        CycleTaskGroupObject: {
+          cycle_task_group: Direct(
+            "CycleTaskGroup", "cycle_task_group_objects", "cycle_task_group"),
+          //task_group_object: Direct(
+          //  "TaskGroupObject", "cycle", "tasks")
+          cycle_task_group_object_tasks: Direct(
+            "CycleTaskGroupObjectTask",
+            "cycle_task_group_object",
+            "cycle_task_group_object_tasks")
+        },
+
+        CycleTaskGroupObjectTask: {
+          cycle_task_group_object: Direct(
+            "CycleTaskGroupObject",
+            "cycle_task_group_object_tasks", "cycle_task_group_object"),
+          //task_group_object: Direct(
+          //  "TaskGroupObject", "cycle", "tasks")
+          //cycle_task_entries: Direct(
+          //  "CycleTaskEntry",
+          //  "cycle_task_group_object_task",
+          //  "cycle_task_entries")
         },
 
         People: {
@@ -231,15 +273,11 @@
       widget_name: "History",
       widget_icon: "history",
       //object_category: "history",
-      //model: can.Model.Cacheable //far_model,
       content_controller_options: {
-        child_options: [],
         draw_children: true,
         parent_instance: object,
-        model: can.Model.Cacheable, //"Cycle"
-        mapping: "previous_cycles",
-        //show_view : GGRC.mustache_path + "/sections/tree.mustache",
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        model: "Cycle",
+        mapping: "current_cycle",
       }
     };
     current_widget_descriptor = {
@@ -250,15 +288,12 @@
       widget_name: "Current Cycle",
       widget_icon: "cycle",
       //object_category: "history",
-      //model: can.Model.Cacheable //far_model,
       content_controller_options: {
-        child_options: [],
         draw_children: true,
         parent_instance: object,
-        model: can.Model.Cacheable, //"CycleTask"
-        mapping: "current_tasks",
-        //show_view : GGRC.mustache_path + "/sections/tree.mustache",
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        model: "CycleTaskGroup",
+        mapping: "current_task_groups",
+        header_view: GGRC.mustache_path + "/cycle_task_groups/current_cycle_header.mustache"
       }
     };
     new_widget_descriptors.objects = objects_widget_descriptor;

@@ -63,7 +63,10 @@ def contributed_services():
       service('task_group_objects', models.TaskGroupObject),
       service('task_entries', models.TaskEntry),
 
-      #service('cycles', models.Cycle),
+      service('cycles', models.Cycle),
+      service('cycle_task_groups', models.CycleTaskGroup),
+      service('cycle_task_group_objects', models.CycleTaskGroupObject),
+      service('cycle_task_group_object_tasks', models.CycleTaskGroupObjectTask)
       ]
 
 
