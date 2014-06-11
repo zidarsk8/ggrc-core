@@ -6,11 +6,13 @@ dashboard-js-files:
   - models/task_group.js
   - models/workflow.js
   - models/workflow_join_models.js
-  - mustache_helpers.js
+  - workflow_mustache_helpers.js
 
 dashboard-js-spec-files:
 
 dashboard-js-template-files:
+  - base_objects/task_group_subtree_footer.mustache
+  - base_objects/task_group_subtree.mustache
   - cycles/tree.mustache
   - cycle_task_groups/current_cycle_header.mustache
   - cycle_task_groups/tree.mustache
@@ -19,8 +21,11 @@ dashboard-js-template-files:
   - dashboard/lhn_workflows.mustache
   - dashboard/object_nav_actions.mustache
   - tasks/modal_content.mustache
+  - tasks/task_group_subtree_footer.mustache
+  - tasks/task_group_subtree.mustache
   - tasks/tree_footer.mustache
   - task_groups/modal_content.mustache
+  - task_groups/tree.mustache
   - task_groups/tree_footer.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache

@@ -18,6 +18,8 @@ class TaskGroupTask(Timeboxed, Mapping, db.Model):
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
   task_id = db.Column(
       db.Integer, db.ForeignKey('tasks.id'), nullable=False)
+  sort_index = db.Column(
+      db.String(length=250), nullable=False)
 
   @staticmethod
   def _extra_table_args(cls):
@@ -30,6 +32,7 @@ class TaskGroupTask(Timeboxed, Mapping, db.Model):
   _publish_attrs = [
       'task_group',
       'task',
+      'sort_index'
       ]
   _sanitize_html = []
 

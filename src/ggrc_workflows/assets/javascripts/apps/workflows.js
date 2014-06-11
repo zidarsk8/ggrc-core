@@ -60,6 +60,8 @@
             tasks : "Task",
             objects : _workflow_object_types
           },
+          task_group_tasks: Direct(
+            "TaskGroupTask", "task_group", "task_group_tasks"),
           tasks: Proxy(
             "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
@@ -248,7 +250,25 @@
         content_controller_options : {
           parent_instance : object,
           model : CMS.Models.TaskGroup,
-          mapping : "task_groups" }}}
+          show_view : GGRC.mustache_path + "/task_groups/tree.mustache",
+          mapping : "task_groups",
+          draw_children : true,
+          child_options : [
+            {
+              model : can.Model.Cacheable,
+              mapping : "objects",
+              show_view : GGRC.mustache_path + "/base_objects/task_group_subtree.mustache",
+              footer_view : GGRC.mustache_path + "/base_objects/task_group_subtree_footer.mustache"
+            },
+            {
+              model : CMS.Models.Task,
+              mapping : "task_group_tasks",
+              show_view : GGRC.mustache_path + "/tasks/task_group_subtree.mustache",
+              footer_view : GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache",
+              sort_property : 'sort_index'
+            }
+          ]
+        }}}
       );
 
     objects_widget_descriptor = {

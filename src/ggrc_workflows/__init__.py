@@ -34,9 +34,11 @@ _workflow_object_types = [
 
 for type_ in _workflow_object_types:
   model = getattr(all_models, type_)
-  model.__bases__ = (models.workflow_object.Workflowable,) + model.__bases__
+  model.__bases__ = (
+    models.workflow_object.Workflowable,
+    models.task_group_object.TaskGroupable,
+    ) + model.__bases__
   model.late_init_workflowable()
-  model.__bases__ = (models.task_group_object.TaskGroupable,) + model.__bases__
   model.late_init_task_groupable()
 
 
