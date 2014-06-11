@@ -8,6 +8,7 @@ from .mixins import deferred, Titled, Slugged
 
 class Help(Titled, Slugged, db.Model):
   __tablename__ = 'helps'
+  _title_uniqueness = False
 
   content = deferred(db.Column(db.Text), 'Help')
 
