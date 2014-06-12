@@ -25,8 +25,11 @@ class CycleTaskGroupObjectTask(
     "TaskGroupTask",
     foreign_keys="CycleTaskGroupObjectTask.task_group_task_id"
     )
+  sort_index = db.Column(
+      db.String(length=250), nullable=False)
 
   _publish_attrs = [
       'cycle_task_group_object',
       'task_group_task',
+      'sort_index',
       ]

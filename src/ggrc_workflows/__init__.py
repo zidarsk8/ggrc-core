@@ -124,4 +124,5 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           task_group_task=task_group_task,
           title=task.title,
           description=task.description,
+          sort_index=task_group_task.sort_index,
           )

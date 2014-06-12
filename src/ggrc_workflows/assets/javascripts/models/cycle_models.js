@@ -127,6 +127,7 @@
     },
 
     tree_view_options: {
+      sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache"
     }
   }, {});
