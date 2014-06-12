@@ -18,6 +18,7 @@
     create: "POST /api/workflows",
     update: "PUT /api/workflows/{id}",
     destroy: "DELETE /api/workflows/{id}",
+
     attributes: {
       objects: "CMS.Models.get_stubs",
       workflow_objects: "CMS.Models.WorkflowObject.stubs",
@@ -30,11 +31,11 @@
       start_date: "date",
       end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
-      modified_by : "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub"
     },
 
-    tree_view_options : {
-      show_view : GGRC.mustache_path + "/workflows/tree.mustache"
+    tree_view_options: {
+      show_view: GGRC.mustache_path + "/workflows/tree.mustache"
     },
 
     init: function() {
@@ -43,7 +44,7 @@
     },
   }, {
 
-    start_day_of_month : can.compute(function(val) {
+    start_day_of_month: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.start_date);
@@ -53,7 +54,8 @@
         return this.attr("start_date").getDate();
       }
     }),
-    end_day_of_month : can.compute(function(val) {
+
+    end_day_of_month: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.end_date);
@@ -63,7 +65,8 @@
         return this.attr("end_date").getDate();
       }
     }),
-    start_month_of_quarter : can.compute(function(val) {
+
+    start_month_of_quarter: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.start_date);
@@ -73,7 +76,8 @@
         return this.attr("start_date").getMonth() % 3 + 1;
       }
     }),
-    end_month_of_quarter : can.compute(function(val) {
+
+    end_month_of_quarter: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.end_date);
@@ -81,8 +85,10 @@
         this.attr("end_date", newdate);
       } else {
         return this.attr("end_date").getMonth() % 3 + 1;
-      }    }),
-    start_month_of_year : can.compute(function(val) {
+      }
+    }),
+
+    start_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.start_date);
@@ -92,7 +98,8 @@
         return this.attr("start_date").getMonth() + 1;
       }
     }),
-    end_month_of_year : can.compute(function(val) {
+
+    end_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
         newdate = new Date(this.end_date);
@@ -102,7 +109,8 @@
         return this.attr("end_date").getMonth() + 1;
       }
     }),
-    start_day_of_week : can.compute(function(val) {
+
+    start_day_of_week: can.compute(function(val) {
       var newdate;
       if(val) {
         val = +val;
@@ -113,7 +121,8 @@
         return this.attr("start_date").getDay();
       }
     }),
-    end_day_of_week : can.compute(function(val) {
+
+    end_day_of_week: can.compute(function(val) {
       var newdate;
       if(val) {
         val = +val;

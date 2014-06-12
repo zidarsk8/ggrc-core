@@ -1,4 +1,4 @@
-<li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" data-model="true" {{data 'model'}}>
       <div class="openclose">
         <div class="row-fluid">
@@ -37,13 +37,13 @@
               <li>
                 {{#is_allowed 'delete' instance context='for'}}
                 <span class="counter removeTaskGroup">
-                  <a href="javascript://" 
-                    class="info-action delete" 
-                    data-toggle="modal-ajax-deleteform" 
-                    data-object-plural="{{model.table_plural}}" 
-                    data-object-singular="{{model.model_singular}}" 
-                    data-modal-reset="reset" 
-                    data-modal-class="modal" 
+                  <a href="javascript://"
+                    class="info-action delete"
+                    data-toggle="modal-ajax-deleteform"
+                    data-object-plural="{{model.table_plural}}"
+                    data-object-singular="{{model.model_singular}}"
+                    data-modal-reset="reset"
+                    data-modal-class="modal"
                     data-refresh="true"
                     data-object-id="{{instance.id}}">
                     <i class="grcicon-deleted"></i>
@@ -102,7 +102,7 @@
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-          
+
           <div class="row-fluid">
             {{#child_options.0}}
             <div class="span6">
@@ -117,7 +117,7 @@
             <div class="span6 task-list">
               {{#if list.length}}
               {{^if_equals list.length 1}}
-              <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance : $(el).data("instance") }); }}>
+              <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance: $(el).data("instance") }); }}>
                 <label>
                   <input type="checkbox" name="lock_task_order" {{#instance.lock_task_order}}checked="checked"{{/instance.lock_task_order}}>
                   Lock Task Order
@@ -126,9 +126,9 @@
               {{/if_equals}}
               {{/if}}
               <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
-              <ul class="tree-structure new-tree" {{data 'options'}} 
-                {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }} 
-                {{sortable_if instance.lock_task_order '{ "items" : "li:not(.tree-footer)", "handle" : ".drag" }' inverse=true}}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}}
+                {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
+                {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}></ul>
 
             </div>
             {{/child_options.1}}
