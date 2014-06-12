@@ -268,7 +268,10 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "input, textarea, select change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
-      this.set_value_from_element(el);
+      // Set the value if it isn't a search field
+      if(!el.hasClass("search-icon")){
+        this.set_value_from_element(el);
+      }
   }
 
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
