@@ -109,7 +109,7 @@
               {{/if_equals}}
               {{#if_equals instance.status "Requested"}}
                 {{#if_can_edit_request instance}}
-                <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}}">Respond</button>
+                <button data-name="status" data-value="Responded" class="btn btn-primary {{instance._disabled}} {{^instance.responses.length}}disabled{{/instance.responses.length}}">Respond</button>
                 {{else}}
                 <small class="gray"><em>{{instance.status}}</em></small>
                 {{/if_can_edit_request}}
