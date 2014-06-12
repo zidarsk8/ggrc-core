@@ -372,57 +372,32 @@
     change_option: function(el, ev) {
       var self = this
         , li = el.closest('li')
-        , original_option = li.data('option');
+        , clicked_option = li.data('option');
         ;
-      
+
+      // Look for and remove the existing join.
       $.map(li.parent().children(), function(el){
         var el = $(el)
         , option = el.closest('li').data('option')
         , join = self.find_join(option.id)
         ;
 
-        if (option.id == original_option.id) {
-          // First, check if join instance already exists
-          if (join) {
-            // Ensure '_removed' attribute is false
-            join.attr('_removed', false);
-          } else if(option.id !== 0) {
-            // Otherwise, create it
-            join = self.get_new_join(
-                option.id, option.scope, option.constructor.shortName);
-            join.save().then(function() {
-                self.join_list.push(join);
-                self.refresh_object_list();
-                self.element.trigger("relationshipcreated", join);
+        if(join) {
+          join.refresh().done(function() {
+            join.destroy().then(function() {
+              self.element.trigger("relationshipdestroyed", join);
             });
-          }
-        } else {
-          // Check if instance is still selected
-          if (join) {
-            // Ensure '_removed' attribute is false
-            if (join.isNew()) {
-              // It was created, then removed, so remove from list
-              join_index = this.join_list.indexOf(join);
-              if (join_index >= 0) {
-                this.join_list.splice(join_index, 1);
-              }
-            } else {
-              // FIXME: The data should be updated in bulk, and only when "Save"
-              //   is clicked.  Right now, it updates continuously.
-              //join.attr('_removed', true);
-              join.refresh().done(function() {
-                join.destroy().then(function() {
-                  join_index = self.join_list.indexOf(join);
-                  if (join_index >= 0) {
-                    self.join_list.splice(join_index, 1);
-                  }
-                  self.refresh_object_list();
-                  self.element.trigger("relationshipdestroyed", join);
-                });
-              });
-            }
-          }
+          });
         }
+      });
+
+      // Create the new join.
+      var join = self.get_new_join(
+          clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
+      join.save().then(function() {
+          self.join_list.push(join);
+          self.refresh_option_list();
+          self.element.trigger("relationshipcreated", join);
       });
     },
 
