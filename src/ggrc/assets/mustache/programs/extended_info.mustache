@@ -81,7 +81,7 @@
       </div>
       <div class="span6">
       {{#with_page_object_as 'page_instance'}}
-        {{^if_equals parent_instance page_instance}}
+        {{^if_equals instance page_instance}}
           {{#with_direct_mappings_as 'mappings' page_instance instance}}
             {{#if mappings.length}}
               <span class="primary">

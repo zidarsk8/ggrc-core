@@ -162,7 +162,7 @@ def factory_for(model_class):
       module_name = '.'.join(path[:-1])
       factory_name = path[-1]
       __import__(module_name)
-      model_class = getattr(sys.modules[module_name], factory_name)
+      model_class = getattr(sys.modules[module_name], factory_name, None)
     else:
       factory_name = model_class
       import ggrc.models

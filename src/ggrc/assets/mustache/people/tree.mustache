@@ -38,10 +38,12 @@
         <div class="row-fluid">
           <div class="span6">
             {{#if instance.viewLink}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
+              {{#is_allowed "view_object_page" instance}}
+                <a href="{{instance.viewLink}}" class="info-action">
+                  View {{instance.class.title_singular}}
+                  <i class="grcicon-goto"></i>
+                </a>
+              {{/is_allowed}}
             {{/if}}
           </div>
           <div class="span6">

@@ -314,6 +314,144 @@ jQuery.extend(GGRC, {
 
   , delay_leaving_page_until : $.proxy(notifier, "queue")
 });
+
+/*
+  The GGRC Math library provides basic arithmetic across arbitrary precision numbers represented
+  as strings.  We wrote this initially to handle easy re-sorting of items in tree views, since
+  we could easily get hundreds of re-sorts by halving the distance from zero to MAX_SAFE_INT
+  until we got down to 10^-250 which would overflow the string on the data side with zeroes.
+*/
+GGRC.Math =  GGRC.Math || {};
+$.extend(GGRC.Math, {
+  /*
+    @param a an addend represented as a decimal notation string
+    @param b an addend represented as a decimal notation string
+
+    @return the sum of the numbers represented in a and b, as a decimal notation string.
+  */
+  string_add : function(a, b) {
+    var _a, _b, i, _c = 0;
+    var ret = [];
+    var adi = a.indexOf(".");
+    var bdi = b.indexOf(".");
+    if(adi < 0) {
+         a = a + ".";
+        adi = a.length - 1;
+    }
+    if(bdi < 0) {
+        b = b + ".";
+        bdi = b.length - 1;
+    }
+    while(adi < bdi) {
+        a = "0" + a;
+        adi++;
+    }
+    while(bdi < adi) {
+         b = "0" + b;
+        bdi++;
+    }
+    
+    for(i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
+        _a = a[i] || 0;
+        _b = b[i] || 0;
+        if(_a === "." || _b === ".") {
+            if(_a !== "." || _b !== ".")
+                throw "Decimal alignment error";
+            ret.unshift(".");
+        } else {
+            ret.unshift((+_a) + (+_b) + _c);
+            _c = Math.floor(ret[0] / 10);
+            ret[0] = (ret[0] % 10).toString(10);
+        }
+    }
+    if(_c > 0) ret.unshift(_c.toString(10));
+    if(ret[ret.length - 1] === ".") ret.pop();
+    return ret.join("");
+},
+
+  /*
+    @param a a decimal notation string
+    
+    @return one half of the number represented in a, as a decimal notation string.
+  */
+string_half : function(a) {
+ var i, _a, _c = 0, ret = [];
+ 
+    if(!~a.indexOf(".")) {
+        a = a + ".";
+    }
+    for(i = 0; i < a.length; i++) {
+        _a = a[i];
+        if(_a === ".") {
+            ret.push(".");
+        } else {
+          _a = Math.floor((+_a + _c) / 2);
+          if(+a[i] % 2) {
+              _c = 10;
+          } else {
+              _c = 0;
+          }
+          ret.push(_a.toString(10));
+      }
+    }
+    if(_c > 0) ret.push("5");
+    if(ret[ret.length - 1] === ".") ret.pop();
+    while(ret[0] === "0" && ret.length > 1) ret.shift();
+    return ret.join("");
+},
+
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return the maximum of the numbers represented in a and b, as a decimal notation string.
+  */
+string_max : function(a, b) {
+  return this.string_less_than(a, b) ? b : a;
+},
+
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return true if the number represented in a is less than that in b, false otherwise
+  */
+string_less_than : function(a, b) {
+      var i,
+      _a = a.replace(/^0*/, ""),
+      _b = b.replace(/^0*/, ""),
+      adi = _a.indexOf("."),
+      bdi = _b.indexOf(".");
+    if(adi < 0) {
+      _a = _a + ".";
+      adi = _a.length - 1;
+    }
+    if(bdi < 0) {
+      _b = _b + ".";
+      bdi = _b.length - 1;
+    }
+    if(adi < bdi) {
+      return true;
+    }
+    if(bdi < adi) {
+      return false;
+    }
+    for(i = 0; i < _a.length - 1; i++) {
+      if(_a[i] === ".") {
+          // continue
+      } else {
+        if((+_a[i] || 0) < (+_b[i] || 0)) {
+          return true;
+        } else if((+_a[i] || 0) > (+_b[i] || 0)) {
+          return false;
+        }
+      }
+    }
+    return _b.length >= _a.length ? false : true;
+}
+
+});
+
 })(GGRC);
 
 
@@ -383,7 +521,7 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 
   // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
   // set up a failure handler on a later transformation of that deferred.  Why?  The reason is that
-  //  we have a default failure handler that should only be called if no other one is registered, 
+  //  we have a default failure handler that should only be called if no other one is registered,
   //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
   //  then() or pipe()), then the original one won't normally be notified of failure.
   can.ajax = $.ajax = function(options) {
@@ -553,16 +691,20 @@ jQuery(document).ready(function($) {
     // force the 'enter' event.
     if (!$(e.currentTarget).data('sticky_popover')) {
       $(e.currentTarget)
-        .sticky_popover($.extend({}, defaults, { 
-          trigger: 'sticky-hover' 
+        .sticky_popover($.extend({}, defaults, {
+          trigger: 'sticky-hover'
           , placement : function() {
             var $el = this.$element
-              , space = $(document).width() - ($el.offset().left + $el.width());
+              , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
+              , spaceRight = ($el.offset().left)
+              , popover_size = 420;
             // Display on right if there is enough space
-            if($el.closest(".widget-area:first-child").length && space > 420)
+            if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
               return "right";
-            else
+            else if(spaceRight > popover_size){
               return "left";
+            }
+            return "top";
           }
         }))
         .triggerHandler(e);
@@ -606,7 +748,7 @@ jQuery(document).ready(function($) {
   $.fn.showhide = showhide(".widget", ".content, .filter");
   $.fn.modal_showhide = showhide(".modal", ".hidden-fields-area");
   $('body').on('click', ".expand-link a", $.fn.modal_showhide);
-  
+
   $.fn.widget_showhide = showhide(".info", ".hidden-fields-area");
   $('body').on('click', ".info-expand a", $.fn.widget_showhide);
 
@@ -640,7 +782,7 @@ jQuery(document).ready(function($) {
           $title.find('.description-inline').removeClass('out');
           if ($title.is('.description-only')) {
             $title.removeClass('out');
-          }      
+          }
           $view.text('view');
         }
       }
@@ -670,11 +812,11 @@ jQuery(document).ready(function($) {
 
 jQuery(function($) {
   // tree
-  
+
   $('body').on('click', 'ul.tree .item-title', function(e) {
     var $this = $(this),
         $content = $this.closest('li').find('.item-content');
-    
+
     if($this.hasClass("active")) {
       $content.slideUp('fast');
       $this.removeClass("active");
@@ -682,12 +824,12 @@ jQuery(function($) {
       $content.slideDown('fast');
       $this.addClass("active");
     }
-    
+
   });
 
 
   // tree-structure
-  
+
   $('body').on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(e) {
     openclose.call(this);
     e.stopPropagation();
@@ -744,11 +886,11 @@ jQuery(function($) {
     });
 
     return this;
-    
+
   }
-  
+
   $.fn.openclose = openclose;
-  
+
 });
 
 $(window).load(function(){
@@ -760,12 +902,12 @@ $(window).load(function(){
       $('.header-content').next('.content').removeClass('affixed');
     }
   });
-  
+
   // pbc filters show-hide
   $('body').on('click', '.advanced-filter-trigger', function() {
     var $this = $(this),
         $filters = $this.closest('.inner-tree').find('.pbc-filters');
-    
+
     if($this.hasClass("active")) {
       $filters.slideUp('fast');
       $this.removeClass("active");
@@ -775,16 +917,16 @@ $(window).load(function(){
       $this.addClass("active");
       $this.html('<i class="grcicon-search"></i> Hide Filters');
     }
-    
+
     return false;
-    
+
   });
-  
+
   // Google Circle CTA Button
   $('body').on('mouseenter', '.square-trigger', function() {
     var $this = $(this),
         $popover = $this.closest('.circle-holder').find('.square-popover');
-    
+
     $popover.slideDown('fast');
     $this.addClass("active");
     return false;
@@ -792,20 +934,20 @@ $(window).load(function(){
   $('body').on('mouseleave', '.square-popover', function() {
     var $this = $(this),
         $trigger = $this.closest('.circle-holder').find('.square-trigger');
-    
+
     $this.slideUp('fast');
     $trigger.removeClass('active');
     $this.removeClass("active");
     return false;
   });
-  
+
   // References popup preview
   $('body').on('mouseenter', '.new-tree .tree-info a.reference', function() {
     if($(this).width() > $('.new-tree .tree-info').width()) {
       $(this).addClass('shrink-it');
     }
   });
-  
+
   // Popover trigger for person tooltip in styleguide
   // The popover disappears if the show/hide isn't controlled manually
   var last_popover;
@@ -873,21 +1015,21 @@ $(window).load(function(){
       last_popover.leave(ev);
     }
   });
-  
+
   // Tab indexing form fields in modal
   $('body').on('focus', '.modal', function() {
     $('.wysiwyg-area').each(function() {
       var $this = $(this),
           $textarea = $this.find('textarea.wysihtml5').attr('tabindex'),
           $descriptionField = $this.find('iframe.wysihtml5-sandbox');
-      
+
       function addingTabindex() {
         $descriptionField.attr('tabindex', $textarea);
       }
       setTimeout(addingTabindex,100)
     });
   });
-  
+
   // Prevent link popup in code mode
   $('body').on('click', 'a[data-wysihtml5-command=popupCreateLink]', function(e){
     var $this = $(this);
@@ -902,27 +1044,27 @@ $(window).load(function(){
   $('body').on('click', '.watermark-trigger', function() {
     var $this = $(this),
         $showWatermark = $this.closest('.tree-item').find('.watermark-icon');
-    
+
     $showWatermark.fadeIn('fast');
     $this.addClass("active");
     $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
-    
+
     return false;
-    
+
   });
-  
+
 });
 
 jQuery(function($){
   $.fn.cms_wysihtml5 = function() {
-    
+
     this.wysihtml5({
         link: true,
         image: false,
         html: true,
         'font-styles': false,
         parserRules: wysihtml5ParserRules });
-    
+
     this.each(function() {
       var $that = $(this)
       , editor = $that.data("wysihtml5").editor
@@ -976,20 +1118,12 @@ jQuery(function($){
 });
 
 jQuery(function($){
-  $.cms_autocomplete = function(el){
-    var ctl = this;
-    // Add autocomplete to the owner field
-    var acs = ($(el) || this.element.find('input[data-lookup]')).map(function() {
-      var $that = $(this)
-        , name = $that.attr("name") || ""
-        , prop = name.substr(name.lastIndexOf(".") + 1)
-        , searchtypes = can.map($that.data("lookup").split(","), function(t) { return CMS.Models[t].model_singular; });
-
-      // Return if this field temporarily isn't storing data
-      if (!name) return false;
-
-      return $that.autocomplete({
-        // Ensure that the input.change event still occurs
+  $.widget(
+    "ggrc.autocomplete",
+    $.ui.autocomplete,
+    {
+      options: {
+      // Ensure that the input.change event still occurs
         change : function(event, ui) {
           if(!$(event.target).parents(document.body).length)
             console.warn("autocomplete menu change event is coming from detached nodes");
@@ -998,38 +1132,23 @@ jQuery(function($){
 
         , minLength: 0
 
-        // Search for the people based on the term
         , source : function(request, response) {
+        // Search for the people based on the term
           var query = request.term || ''
+            , queue = new RefreshQueue()
             , that = this;
 
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
-          ctl.bindXHRToButton(GGRC.Models.Search
-          .search_for_types(
-              request.term || '',
-              searchtypes,
-              {
-              // FIXME: Remove or figure out when this is necessary.
-              //{
-              //  __permission_type: 'create'
-              //  , __permission_model: 'Object' + $that.data("lookup")
-              })
-          .then(function(search_result) {
-            var objects = []
-              , queue = new RefreshQueue()
-              ;
-
-            can.each(searchtypes, function(searchtype) {
-              objects.push.apply(
-                objects, search_result.getResultsForType(searchtype));
-            });
+          this.options.controller.bindXHRToButton(
             // Retrieve full people data
+            this.options.source_for_refreshable_objects.call(this, request).then(function(objects) {
             can.each(objects, function(object) {
               queue.enqueue(object);
             });
             queue.trigger().then(function(objs) {
+              objs = that.options.apply_filter.call(that, objs, request);
               if(objs.length) {
                 // Envelope the object to not break model instance due to
                 // shallow copy done by jQuery in `response()`
@@ -1040,45 +1159,147 @@ jQuery(function($){
                 that._trigger( "open" );
               }
             });
-          }), $that, null, false);
+          }), $(this.element), null, false);
         }
-        , select : ctl.proxy("autocomplete_select", $that)
+
+        , apply_filter : function(objects) {
+          return objects;
+        }
+
+        , source_for_refreshable_objects : function(request) {
+          var that = this;
+          return GGRC.Models.Search
+            .search_for_types(
+              request.term || '',
+              this.options.searchtypes,
+              {
+              // FIXME: Remove or figure out when this is necessary.
+              //{
+              //  __permission_type: 'create'
+              //  , __permission_model: 'Object' + $that.data("lookup")
+              })
+            .then(function(search_result) {
+              var objects = [];
+
+              can.each(that.options.searchtypes, function(searchtype) {
+                objects.push.apply(
+                  objects, search_result.getResultsForType(searchtype));
+              });
+              return objects;
+            });
+        }
+
+        , select : function(ev, ui) {
+          return $(this).data($(this).data("autocomplete-widget-name"))
+            .options.controller
+            .autocomplete_select($(this), ev, ui);
+        }
         , close : function() {
           //$that.val($that.attr("value"));
         }
-      }).focus(function(){     
-        //Use the below line instead of triggering keydown
-        $(this).data("uiAutocomplete").search($(this).val());
-    }).data('ui-autocomplete');
-    });
-    acs.each(function(i, ac) {
-      ac._renderMenu = function(ul, items) {
-        var model_class = ac.element.data("lookup")
-          , template = ac.element.data("template")
-          , model
-          ;
+      },
+      _create : function() {
+        var that = this
+        , $that = $(this.element)
+        , base_search = $that.data("lookup")
+        , searchtypes;
 
-        if (!template) {
-          model = CMS.Models[model_class] || GGRC.Models[model_class];
-          template =
-              '/' + model.table_plural + '/autocomplete_result.mustache';
+        this._super.apply(this, arguments);
+
+        $that.data("autocomplete-widget-name", this.widgetFullName);
+
+        $that.focus(function() {
+          $(this).data(that.widgetFullName).search($(this).val());
+        });
+
+        if(base_search) {
+          base_search = base_search.trim();
+          if (base_search.indexOf("__mappable") === 0 || base_search.indexOf("__all") === 0) {
+            searchtypes = GGRC.Mappings.get_canonical_mappings_for(
+              this.options.parent_instance.constructor.shortName
+              );
+            if (base_search.indexOf("__mappable") === 0) {
+              searchtypes = can.map(searchtypes, function(mapping) {
+                return mapping instanceof GGRC.ListLoaders.ProxyListLoader ? mapping : undefined;
+              });
+            }
+            if (base_search.indexOf("_except:")) {
+              can.each(base_search.substr(base_search.indexOf("_except:") + 8).split(","), function(remove) {
+                delete searchtypes[remove];
+              });
+            }
+            searchtypes = Object.keys(searchtypes);
+          } else {
+            searchtypes = base_search.split(",");
+          }
+
+          this.options.searchtypes = can.map(searchtypes, function(t) { return CMS.Models[t].model_singular; });
+        }
+      },
+      _renderMenu : function(ul, items) {
+          var model_class = this.element.data("lookup")
+            , template = this.element.data("template")
+            , model
+            ;
+
+          if (!template) {
+            model = CMS.Models[model_class] || GGRC.Models[model_class];
+            template =
+                '/' + (model ? model.table_plural : "base_objects") + '/autocomplete_result.mustache';
+          }
+
+          can.view.render(
+            GGRC.mustache_path + template,
+            {
+              model_class: model_class,
+              // Reverse the enveloping we did 25 lines up
+              items: can.map(items, function(item) { return item.item; })
+            },
+            function(frag) {
+              $(ul).html(frag);
+              $(ul).cms_controllers_lhn_tooltips();
+              can.view.hookup(ul);
+            });
+      }
+  });
+  $.widget.bridge("ggrc_autocomplete", $.ggrc.autocomplete);
+
+  $.widget("ggrc.mapping_autocomplete", $.ggrc.autocomplete, {
+    options : {
+      source_for_refreshable_objects : function(request) {
+        var $el = $(this.element),
+          mapping = this.options.controller.options;
+
+        if (mapping.scope) {
+          mapping = mapping.scope.source_mapping;
+        } else {
+          mapping = inst.source_mapping;
         }
 
-        can.view.render(
-          GGRC.mustache_path + template,
-          {
-            model_class: model_class,
-            // Reverse the enveloping we did 25 lines up
-            items: can.map(items, function(item) { return item.item; })
-          },
-          function(frag) {
-            $(ul).html(frag);
-            $(ul).cms_controllers_lhn_tooltips()
-            can.view.hookup(ul);
-          });
-      };
-    });
-  }
+        return $.when(can.map(mapping, function(binding) {
+          return binding.instance;
+        }));
+      },
+      apply_filter : function(objects, request) {
+        return can.map(objects, function(object) {
+          if(!request.term || object.title && ~object.title.indexOf(request.term))
+            return object;
+          else
+            return undefined;
+        });
+      }
+    }
+  });
+  $.widget.bridge("ggrc_mapping_autocomplete", $.ggrc.mapping_autocomplete);
+
+  $.cms_autocomplete = function(el) {
+    var ctl = this;
+    // Add autocomplete to the owner field
+    ($(el) || this.element.find('input[data-lookup]'))
+    .filter("[name][name!='']")
+    .ggrc_autocomplete({ controller : ctl });
+  };
+
 });
 
 jQuery(function($) {
@@ -1104,8 +1325,8 @@ jQuery(function($) {
 (function($) {
 
   window.getPageToken = function getPageToken() {
-      return $(document.body).data("page-subtype") 
-            || $(document.body).data("page-type") 
+      return $(document.body).data("page-subtype")
+            || $(document.body).data("page-type")
             || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
     }
 // hello

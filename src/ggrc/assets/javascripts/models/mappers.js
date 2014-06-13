@@ -1411,12 +1411,10 @@
       init: function(source) {
         this._super();
 
-        if (source instanceof GGRC.ListLoaders.BaseListLoader)
-          this.source = source;
-        else if (source instanceof GGRC.ListLoaders.ListBinding)
+        if (source instanceof GGRC.ListLoaders.ListBinding)
           this.source_binding = source;
         else
-          throw new Error("Invalid source:", source);
+          this.source = source;
       }
 
     , insert_from_source_binding: function(binding, results, index) {
@@ -1497,6 +1495,10 @@
 
   GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {
     return new GGRC.ListLoaders.CustomFilteredListLoader(source, filter_fn);
+  }
+
+  GGRC.MapperHelpers.Reify = function Reify(source) {
+    return new GGRC.ListLoaders.ReifyingListLoader(source);
   }
 
   GGRC.MapperHelpers.Cross = function Cross(local_mapping, remote_mapping) {

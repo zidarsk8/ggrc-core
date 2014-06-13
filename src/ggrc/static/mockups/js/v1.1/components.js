@@ -761,6 +761,7 @@ can.Component.extend({
       }, 500);
       this.scope.assessment.attr('finished', true);
       this.scope.assessment.attr('status', 'Finished');
+      $('.end-cycle').trigger('click');
       this.scope.assessment.save();
     },
     ".unmap click" : function(el) {

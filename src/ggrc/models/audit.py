@@ -17,6 +17,7 @@ class Audit(
     Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
     db.Model):
   __tablename__ = 'audits'
+  _slug_uniqueness = False
 
   VALID_STATES = (
       u'Planned', u'In Progress', u'Manager Review',

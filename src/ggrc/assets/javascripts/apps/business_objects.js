@@ -94,7 +94,9 @@
             , draw_children: false
             , parent_instance: instance
             , model: far_model
-            , list_loader: $.proxy(mapping, "refresh_list")
+            , list_loader: function() {
+                return mapping.refresh_list();
+              }
           }
       };
 
@@ -490,6 +492,12 @@ $(function() {
             , Objective: {
                   mapping: "objectives"
                 }
+            , Section: {
+                  mapping: "sections"
+                }
+            , Clause: {
+                  mapping: "clauses"
+                }
             }
 
         , Program: {
@@ -556,6 +564,9 @@ $(function() {
           }
 
         , Clause: {
+            _mixins: ["governance_objects", "business_objects", "extended_audits"]
+          }
+        , Section: {
             _mixins: ["governance_objects", "business_objects", "extended_audits"]
           }
         , Objective: {

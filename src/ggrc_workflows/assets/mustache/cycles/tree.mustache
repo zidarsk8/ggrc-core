@@ -1,0 +1,57 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+        <div class="span12">
+
+          <div class="item-data">
+            <div class="tree-title-area">
+              {{instance.title}}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+
+      {{#instance.description}}
+      <div class="show-description">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="tree-description short">
+              {{{instance.description}}}
+            </div>
+            {{{show_long}}}
+          </div>
+        </div>
+      </div>
+      {{/instance.description}}
+
+    </div>
+
+    {{#if draw_children}}
+      {{#child_options}}
+        <div class="inner-tree">
+          <h6>Task Groups ({{list.length}})</h6>
+          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+        </div>
+      {{/child_options}}
+    {{/if}}
+
+  </div>
+  {{/if}}
+</li>

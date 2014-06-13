@@ -158,7 +158,6 @@ ul.new-tree {
       overflow: visible;
       .type {
         float: left;
-        width: 23%;
         .grcicon-carot {
           margin-left: -6px;
         }
@@ -1343,6 +1342,7 @@ ul.new-tree {
     z-index: 9999;
     margin: 0;
     padding: 0;
+    font-weight: normal;
     @include border-radius($default-border-radius);
     min-width: 160px;
     float: none;

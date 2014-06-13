@@ -92,10 +92,12 @@
 
           <div class="span6">
           {{#if instance.viewLink}}
-            <a href="{{instance.viewLink}}" class="info-action">
-              View {{instance.class.title_singular}}
-              <i class="grcicon-goto"></i>
-            </a>
+            {{#is_allowed "view_object_page" instance}}
+              <a href="{{instance.viewLink}}" class="info-action">
+                View {{instance.class.title_singular}}
+                <i class="grcicon-goto"></i>
+              </a>
+            {{/is_allowed}}
           {{/if}}
           </div>
 
@@ -147,10 +149,17 @@
           <div class="row-fluid">
             <div class="span12">
               Part of
-              <a href="{{directive.viewLink}}">
-                <i class="grcicon-{{directive.class.table_singular}}-color"></i>
-                {{directive.title}}
-              </a>
+              {{#is_allowed "view_object_page" directive}}
+                <a href="{{directive.viewLink}}">
+                  <i class="grcicon-{{directive.class.table_singular}}-color"></i>
+                  {{directive.title}}
+                </a>
+              {{else}}
+                <span>
+                  <i class="grcicon-{{directive.class.table_singular}}-color"></i>
+                  {{directive.title}}
+                </span>
+              {{/is_allowed}}
             </div>
           </div>
         {{/using}}

@@ -25,7 +25,7 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
 
   @property
   def object(self):
-    return getattr(self, self.object)
+    return getattr(self, self.object_attr)
 
   @object.setter
   def object(self, value):
@@ -61,25 +61,27 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
 
 
 class TaskGroupable(object):
-  @declared_attr
-  def task_group_objects(cls):
-    cls.task_groups = association_proxy(
-        'task_group_objects', 'task_groups',
-        creator=lambda task_group: TaskGroupObject(
-            task_group=task_group,
-            object_type=cls.__name__,
-            )
-        )
-    joinstr = 'and_(foreign(TaskGroupObject.object_id) == {type}.id, '\
-                   'foreign(TaskGroupObject.object_type) == "{type}")'
-    joinstr = joinstr.format(type=cls.__name__)
-    return db.relationship(
-        'TaskGroupObject',
-        primaryjoin=joinstr,
-        backref='{0}_object'.format(cls.__name__),
-        cascade='all, delete-orphan',
-        post_update=True
-        )
+  @classmethod
+  def late_init_task_groupable(cls):
+    def make_task_group_objects(cls):
+      cls.task_groups = association_proxy(
+          'task_group_objects', 'task_group',
+          creator=lambda task_group: TaskGroupObject(
+              task_group=task_group,
+              object_type=cls.__name__,
+              )
+          )
+      joinstr = 'and_(foreign(TaskGroupObject.object_id) == {type}.id, '\
+                     'foreign(TaskGroupObject.object_type) == "{type}")'
+      joinstr = joinstr.format(type=cls.__name__)
+      return db.relationship(
+          'TaskGroupObject',
+          primaryjoin=joinstr,
+          backref='{0}_object'.format(cls.__name__),
+          cascade='all, delete-orphan',
+          #post_update=True
+          )
+    cls.task_group_objects = make_task_group_objects(cls)
 
   _publish_attrs = [
       PublishOnly('task_groups'),

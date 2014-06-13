@@ -1,0 +1,27 @@
+{{#items}}
+<li class="ui-menu-item" {{data 'ui-autocomplete-item'}}>
+  <a href="javascript://" class='show-extended' {{data 'model'}}>
+    {{title}}
+  </a>
+</li>
+{{/items}}
+{{^items}}
+  {{#is_allowed "create" model.shortName context=null}}
+  <li data-ui-autocomplete-item="">
+    No results
+  </li>
+  {{else}}
+  <li class="ui-menu-item" data-ui-autocomplete-item="">
+    No results
+  </li>
+  {{/is_allowed}}
+{{/items}}
+{{#if model}}
+{{#is_allowed "create" model.shortName context=null}}
+<li class="ui-menu-item add-new" data-ui-autocomplete-item="">
+  <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" >
+    + Create New
+  </a>
+</li>
+{{/is_allowed}}
+{{/if}}

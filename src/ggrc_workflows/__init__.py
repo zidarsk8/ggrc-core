@@ -34,8 +34,12 @@ _workflow_object_types = [
 
 for type_ in _workflow_object_types:
   model = getattr(all_models, type_)
-  model.__bases__ = (models.workflow_object.Workflowable,) + model.__bases__
+  model.__bases__ = (
+    models.workflow_object.Workflowable,
+    models.task_group_object.TaskGroupable,
+    ) + model.__bases__
   model.late_init_workflowable()
+  model.late_init_task_groupable()
 
 
 def get_public_config(current_user):
@@ -63,7 +67,10 @@ def contributed_services():
       service('task_group_objects', models.TaskGroupObject),
       service('task_entries', models.TaskEntry),
 
-      #service('cycles', models.Cycle),
+      service('cycles', models.Cycle),
+      service('cycle_task_groups', models.CycleTaskGroup),
+      service('cycle_task_group_objects', models.CycleTaskGroupObject),
+      service('cycle_task_group_object_tasks', models.CycleTaskGroupObjectTask)
       ]
 
 
@@ -72,4 +79,49 @@ def contributed_object_views():
 
   return [
       object_view(models.Workflow),
+      object_view(models.Task),
       ]
+
+
+from ggrc.services.common import Resource
+
+@Resource.model_posted.connect_via(models.Cycle)
+def handle_cycle_post(sender, obj=None, src=None, service=None):
+  if not src.get('autogenerate'):
+    return
+
+  # Determine the relevant Workflow
+  workflow = obj.workflow
+
+  # Populate the top-level Cycle object
+  obj.title = workflow.title
+  obj.description = workflow.description
+
+  # Populate CycleTaskGroups based on Workflow's TaskGroups
+  for task_group in workflow.task_groups:
+    cycle_task_group = models.CycleTaskGroup(
+        cycle=obj,
+        task_group=task_group,
+        title=task_group.title,
+        description=task_group.description,
+        )
+    #db.session.add(cycle_task_group)
+
+    for task_group_object in task_group.task_group_objects:
+      object = task_group_object.object
+
+      cycle_task_group_object = models.CycleTaskGroupObject(
+          cycle_task_group=cycle_task_group,
+          task_group_object=task_group_object,
+          title=object.title,
+          )
+
+      for task_group_task in task_group.task_group_tasks:
+        task = task_group_task.task
+
+        cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
+          cycle_task_group_object=cycle_task_group_object,
+          task_group_task=task_group_task,
+          title=task.title,
+          description=task.description,
+          )

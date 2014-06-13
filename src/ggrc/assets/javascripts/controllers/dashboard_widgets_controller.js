@@ -114,6 +114,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
       if (mapping_model_name) {
         // FIXME These should be calls to is_allowed! But, this doesn't work at the moment
         // and needs to be resolved ASAP
+        console.log("allow_reading", options.allow_reading);
         options.allow_reading = options.allow_reading !== false && Permission.is_allowed_for(
             "read", mapping_model_name);
         options.allow_creating = options.allow_creating !== false && Permission.is_allowed_for(

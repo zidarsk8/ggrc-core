@@ -135,8 +135,8 @@
       if(join_mapping) {
         join_model = CMS.Models[join_mapping.model_name];
         join_attrs = $.extend({}, join_attrs || {});
-        join_attrs[join_model.option_attr] = option_attrs;
-        join_attrs[join_model.object_attr] = object_attrs;
+        join_attrs[join_mapping.option_attr] = option_attrs;
+        join_attrs[join_mapping.object_attr] = object_attrs;
 
         return new join_model(join_attrs);
       } else {
@@ -247,7 +247,7 @@
         "programs" : "Program",
         "objectives" : "Objective",
         "implemented_controls" : "Control",
-        "section_base" : ["Section", "Clause"],
+        "_sections_base" : ["Section", "Clause"],
         "audits" : "Audit",
         "joined_directives" : ["Regulation", "Policy", "Contract", "Standard"]
       }
@@ -316,6 +316,13 @@
       }
     , Objective: {
         _mixins: ["personable"] //objectiveable
+      , _canonical : {
+          "related_objects" : ["DataAsset", "Facility", "Market", "OrgGroup", "Process", "Product", "Project", "System",
+                               "Regulation", "Contract", "Policy", "Standard", "Program"]
+        , "objectives" : "Objective"
+        , "controls" : "Control"
+        , "_sections_base" : ["Section", "Clause"]
+      }
       , related_objects: Proxy(
           null, "objectiveable", "ObjectObjective", "objective", "objective_objects")
       , related_and_able_objects : Multi([

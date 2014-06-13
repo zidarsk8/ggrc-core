@@ -140,13 +140,14 @@
       .modal_form(option, $trigger)
       .ggrc_controllers_delete({
           $trigger : $trigger
+        , skip_refresh : !$trigger.data("refresh")
         , new_object_form : false
         , button_view : GGRC.mustache_path + "/modals/delete_cancel_buttons.mustache"
         , model : model
         , instance : instance
         , delete_counts : delete_counts
         , modal_title : "Delete " + $trigger.attr("data-object-singular")
-        , content_view : GGRC.mustache_path + "/base_objects/confirm_delete.mustache" 
+        , content_view : GGRC.mustache_path + "/base_objects/confirm_delete.mustache"
       });
 
       $target.on('modal:success', function(e, data) {

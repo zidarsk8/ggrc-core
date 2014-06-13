@@ -11,10 +11,34 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
+from sqlalchemy.orm import validates
 
 
 class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'workflows'
+
+  #Use these states for WorkflowCycle when it is implemented
+  #VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
+
+  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
+
+  @classmethod
+  def default_frequency(cls):
+    return 'continuous'
+
+  @validates('frequency')
+  def validate_frequency(self, key, value):
+    if value is None:
+      value = self.default_frequency()
+    if value not in self.VALID_FREQUENCIES:
+      message = u"Invalid state '{}'".format(value)
+      raise ValueError(message)
+    return value
+
+  frequency = deferred( 
+    db.Column(db.String, nullable=True, default=default_frequency),
+    'Workflow'
+    )
 
   workflow_objects = db.relationship(
       'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
@@ -34,8 +58,8 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   task_groups = db.relationship(
       'TaskGroup', backref='workflow', cascade='all, delete-orphan')
 
-  #cycles = db.relationship(
-  #    'Cycle', backref='workflow', cascade='all, delete-orphan')
+  cycles = db.relationship(
+      'Cycle', backref='workflow', cascade='all, delete-orphan')
 
   _fulltext_attrs = []
 
@@ -47,5 +71,6 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'workflow_tasks',
       PublishOnly('tasks'),
       'task_groups',
-      #'cycles',
+      'frequency',
+      'cycles',
       ]
