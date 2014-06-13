@@ -23,11 +23,13 @@ dashboard-js-template-files:
   - cycle_task_group_object_tasks/tree.mustache
   - dashboard/lhn_workflows.mustache
   - dashboard/object_nav_actions.mustache
-  - tasks/tree.mustache
   - tasks/modal_content.mustache
   - tasks/task_group_subtree_footer.mustache
   - tasks/task_group_subtree.mustache
   - tasks/tree_footer.mustache
+  - tasks/info.mustache
+  - tasks/extended_info.mustache
+  - tasks/tree.mustache
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
   - task_groups/tree_footer.mustache

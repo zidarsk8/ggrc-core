@@ -248,7 +248,6 @@
         "objectives" : "Objective",
         "implemented_controls" : "Control",
         "_sections_base" : ["Section", "Clause"],
-        "audits" : "Audit",
         "joined_directives" : ["Regulation", "Policy", "Contract", "Standard"]
       }
       , related_objects: Proxy(

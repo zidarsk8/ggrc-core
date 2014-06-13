@@ -24,7 +24,8 @@
     attributes: {
       workflow: "CMS.Models.Workflow.stub",
       cycle_task_groups: "CMS.Models.CycleTaskGroup.stubs",
-      modified_by: "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub"
     },
 
     tree_view_options: {
@@ -55,7 +56,8 @@
 
     attributes: {
       cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
-      modified_by: "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub"
     },
 
     tree_view_options: {
@@ -80,7 +82,8 @@
       cycle: "CMS.Models.Cycle.stub",
       task_group: "CMS.Models.TaskGroup.stub",
       cycle_task_group_objects: "CMS.Models.CycleTaskGroupObject.stubs",
-      modified_by: "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub"
     },
 
     tree_view_options: {
@@ -114,7 +117,8 @@
       task_group_object: "CMS.Models.TaskGroupObject.stub",
       cycle_task_group_object_tasks:
         "CMS.Models.CycleTaskGroupObjectTask.stubs",
-      modified_by: "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub"
     },
 
     tree_view_options: {
@@ -147,7 +151,8 @@
       cycle_task_group_object: "CMS.Models.CycleTaskGroupObject.stub",
       task_group_task: "CMS.Models.TaskGroupTask.stub",
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
-      modified_by: "CMS.Models.Person.stub"
+      modified_by: "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub"
     },
 
     tree_view_options: {

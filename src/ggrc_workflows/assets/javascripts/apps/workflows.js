@@ -50,8 +50,6 @@
             subtasks: "Task",
             task_groups: "TaskGroup"
           },
-          subtasks: Direct(
-            "CycleTask", "task", "tasks"),
           task_groups: Proxy(
             "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
         },
@@ -159,10 +157,10 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      mappings[type]._canonical = {
-        "workflows": "Workflow",
-        "task_groups": "TaskGroup"
-      };
+      //mappings[type]._canonical = {
+      //  "workflows": "Workflow",
+      //  "task_groups": "TaskGroup"
+      //};
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
@@ -174,6 +172,8 @@
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
+    } else if (page_instance instanceof CMS.Models.Task) {
+      WorkflowExtension.init_widgets_for_task_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
@@ -203,8 +203,38 @@
     new GGRC.WidgetList("ggrc_workflows", descriptor);
   };
 
+  WorkflowExtension.init_widgets_for_task_page =
+      function init_widgets_for_task_page() {
+
+    var task_widget_descriptors = {},
+        new_default_widgets = [
+          "info"
+        ];
+
+    can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
+      if (~new_default_widgets.indexOf(name))
+        task_widget_descriptors[name] = descriptor;
+    });
+
+    $.extend(
+      true,
+      task_widget_descriptors,
+      {
+        info: {
+          content_controller: GGRC.Controllers.InfoWidget,
+          content_controller_options: {
+            widget_view: GGRC.mustache_path + "/tasks/info.mustache"
+          }
+        }
+      }
+    );
+
+    new GGRC.WidgetList("ggrc_workflows", task_widget_descriptors);
+  };
+
   WorkflowExtension.init_widgets_for_workflow_page =
       function init_widgets_for_workflow_page() {
+
     var new_widget_descriptors = {},
         new_default_widgets = [
           "info",
@@ -227,6 +257,10 @@
     $(function() {
       $(document.body).ggrc_controllers_workflow_page();
     });
+
+    GGRC.register_hook(
+        "ObjectNav.Actions",
+        GGRC.mustache_path + "/dashboard/object_nav_actions");
 
     $.extend(
       true,
@@ -356,8 +390,6 @@
 
   GGRC.register_hook(
       "LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
-  GGRC.register_hook(
-      "ObjectNav.Actions", GGRC.mustache_path + "/dashboard/object_nav_actions");
 
   WorkflowExtension.init_mappings();
 
