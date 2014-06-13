@@ -18,7 +18,8 @@ class CycleTaskEntry(Described, Base, db.Model):
       )
   cycle_task_group_object_task = db.relationship(
     'CycleTaskGroupObjectTask',
-    foreign_keys='CycleTaskEntry.cycle_task_group_object_task_id'
+    foreign_keys='CycleTaskEntry.cycle_task_group_object_task_id',
+    backref='cycle_task_entries',
     )
 
   _publish_attrs = [

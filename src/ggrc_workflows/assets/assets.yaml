@@ -14,12 +14,16 @@ dashboard-js-template-files:
   - base_objects/task_group_subtree_footer.mustache
   - base_objects/task_group_subtree.mustache
   - cycles/tree.mustache
+  - cycle_task_entries/tree.mustache
+  - cycle_task_entries/tree_footer.mustache
+  - cycle_task_entries/modal_content.mustache
   - cycle_task_groups/current_cycle_header.mustache
   - cycle_task_groups/tree.mustache
   - cycle_task_group_objects/tree.mustache
   - cycle_task_group_object_tasks/tree.mustache
   - dashboard/lhn_workflows.mustache
   - dashboard/object_nav_actions.mustache
+  - tasks/tree.mustache
   - tasks/modal_content.mustache
   - tasks/task_group_subtree_footer.mustache
   - tasks/task_group_subtree.mustache

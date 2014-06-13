@@ -25,6 +25,7 @@
   WorkflowExtension.object_type_decision_tree = function() {
     return {
       "cycle": CMS.Models.Cycle,
+      "cycle_task_entry": CMS.Models.CycleTaskEntry,
       "cycle_task_group": CMS.Models.CycleTaskGroup,
       "cycle_task_group_object": CMS.Models.CycleTaskGroupObject,
       "cycle_task_group_object_task": CMS.Models.CycleTaskGroupObjectTask,

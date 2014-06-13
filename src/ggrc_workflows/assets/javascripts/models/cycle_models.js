@@ -56,6 +56,11 @@
     attributes: {
       cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
       modified_by: "CMS.Models.Person.stub"
+    },
+
+    tree_view_options: {
+      show_view: _mustache_path + "/tree.mustache",
+      footer_view: _mustache_path + "/tree_footer.mustache"
     }
   }, {});
 
@@ -146,7 +151,15 @@
 
     tree_view_options: {
       sort_property: 'sort_index',
-      show_view: _mustache_path + "/tree.mustache"
+      show_view: _mustache_path + "/tree.mustache",
+      draw_children: true,
+      child_options: [
+        {
+          model: "CycleTaskEntry",
+          mapping: "cycle_task_entries",
+          allow_creating: true
+        }
+      ]
     }
   }, {});
 

@@ -31,5 +31,6 @@ class CycleTaskGroupObjectTask(
   _publish_attrs = [
       'cycle_task_group_object',
       'task_group_task',
+      'cycle_task_entries',
       'sort_index',
       ]
