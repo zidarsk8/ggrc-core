@@ -90,8 +90,28 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
 
 });
 
+/*
+  Below this line we're defining a few can.Components, which are in this file
+  because they work similarly to the quick form controller (in fact, you should
+  expect the quick form controller to be refactored into a component in the 
+  future) but they share no code with the quick form controller.
+
+  the first component is quick add.  It is meant to have one or more form elements
+  and a data-toggle="submit" link which will create a new join object between
+  the parent instance and some selected option instance (likely picked through an 
+  autocomplete dropdown).
+
+  Technically you can choose your instance however you want, as long as you find
+  some way of getting its value into the component scope.  Extending this component
+  with other methods to do that is fine.  You can also just pass it in when 
+  instantiating the component.
+*/
 can.Component.extend({
   tag: "ggrc-quick-add",
+  // <content> in a component template will be replaced with whatever is contained
+  //  within the component tag.  Since the views for the original uses of these components
+  //  were already created with content, we just used <content> instead of making
+  //  new view template files.
   template: "<content/>",
   scope: {
     parent_instance: null,
@@ -103,6 +123,9 @@ can.Component.extend({
     init: function() {
       this.scope.attr("controller", this);
     },
+    // The inserted event fires when the component content is added to the DOM.
+    //  At this time, live bound rendering should be resolved, which is not the
+    //  case during init.
     inserted: function(el) {
       var that = this;
       this.element.find("input:not([data-mapping])").each(function(i, el) {
@@ -124,6 +147,8 @@ can.Component.extend({
         el.trigger("modal:success");
       });
     },
+    // this works like autocomplete_select on all modal forms and 
+    //  descendant class objects.
     autocomplete_select : function(el, event, ui) {
       var that = this;
       setTimeout(function() {
@@ -140,6 +165,9 @@ can.Component.extend({
     }
   },
   helpers: {
+    // Mapping-based autocomplete selectors use this helper to 
+    //  attach the mapping autocomplete ui widget.  These elements should
+    //  be decorated with data-mapping attributes.
     mapping_autocomplete : function(options) {
       return function(el) {
         $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
@@ -148,7 +176,16 @@ can.Component.extend({
   },
 });
 
+/*
+  This component is for quickly updating the properties of an object through form fields.
+  It works similar to GGRC.Controllers.QuickForm but has an extra feature: if the instance
+  we're working with is a join object, and the option type is changed, it will work around
+  the lack of support in proxy mappers for join objects being changed like that, and 
+  destroy the join object while creating a new one.
 
+  Field updates trigger updates to the model automatically, even on the server.  This differs
+  from the quick-add component above, in that it is not waiting for a submit trigger.
+*/
 can.Component.extend({
   tag: "ggrc-quick-update",
   template: "<content/>",
@@ -186,11 +223,16 @@ can.Component.extend({
         });
       });
     },
+    // null-if-empty attributes are a pattern carried over from GGRC.Controllers.Modals
+    //  Useful for connected objects.
     "input[null-if-empty] change" : function(el) {
       if (!el.val()) {
         this.scope.instance.attr(el.attr("name"), null);
       }
     },
+    // data-mapping is the element decoration that triggers an autocomplete based on a
+    //  mapping to a parent instance.  The mapping_autocomplete helper defined below is
+    //  generally for these.
     "input:not([data-mapping]) change" : function(el) {
       this.scope.instance.attr(el.attr("name"), el.val());
       this.scope.instance.save();

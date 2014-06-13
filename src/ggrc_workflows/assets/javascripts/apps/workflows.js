@@ -253,6 +253,10 @@
           show_view : GGRC.mustache_path + "/task_groups/tree.mustache",
           mapping : "task_groups",
           draw_children : true,
+          //note that we are using special naming for the tree views here.
+          //  also, tasks for a task group aren't directly mapping to the
+          //  tasks themselves but to the join object.  This is impotant
+          //  since the join objects themselves have important attributes.
           child_options : [
             {
               model : can.Model.Cacheable,

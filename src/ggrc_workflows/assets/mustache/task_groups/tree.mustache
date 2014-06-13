@@ -128,7 +128,7 @@
               <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
               <ul class="tree-structure new-tree" {{data 'options'}} 
                 {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }} 
-                {{sortable_if "not" instance.lock_task_order '{ "items" : "li:not(.tree-footer)", "handle" : ".drag" }'}}></ul>
+                {{sortable_if instance.lock_task_order '{ "items" : "li:not(.tree-footer)", "handle" : ".drag" }' inverse=true}}></ul>
 
             </div>
             {{/child_options.1}}
