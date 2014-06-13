@@ -106,7 +106,9 @@
             <div class="show-description">
               <div class="row-fluid">
                 <div class="span12">
-                  {{{firstnonempty request.description '<i>No description</i>'}}}
+                  <div class="rtf">
+                    {{{firstnonempty request.description '<i>No description</i>'}}}
+                  </div>
                 </div>
               </div>
             </div>
@@ -131,7 +133,7 @@
             <div class="row-fluid">
               <div class="span12">
                 <div class="tree-description">
-                  <strong>{{{firstnonempty instance.description 'Response'}}}</strong>
+                  {{{firstnonempty instance.description 'Response'}}}
                 </div>
               </div>
             </div>
