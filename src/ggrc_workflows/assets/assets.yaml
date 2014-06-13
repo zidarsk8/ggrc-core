@@ -1,6 +1,5 @@
 dashboard-js-files:
   - apps/workflows.js
-  - apps/tasks.js
   - controllers/workflow_page.js
   - models/cycle_models.js
   - models/task.js

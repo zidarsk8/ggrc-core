@@ -174,6 +174,8 @@
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
+    } else if (page_instance instanceof CMS.Models.Task) {
+      WorkflowExtension.init_widgets_for_task_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
@@ -203,8 +205,38 @@
     new GGRC.WidgetList("ggrc_workflows", descriptor);
   };
 
+  WorkflowExtension.init_widgets_for_task_page =
+      function init_widgets_for_task_page() {
+
+    var task_widget_descriptors = {},
+        new_default_widgets = [
+          "info"
+        ];
+
+    can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
+      if (~new_default_widgets.indexOf(name))
+        task_widget_descriptors[name] = descriptor;
+    });
+
+    $.extend(
+      true,
+      task_widget_descriptors,
+      {
+        info: {
+          content_controller: GGRC.Controllers.InfoWidget,
+          content_controller_options: {
+            widget_view: GGRC.mustache_path + "/tasks/info.mustache"
+          }
+        }
+      }
+    );
+
+    new GGRC.WidgetList("ggrc_workflows", task_widget_descriptors);
+  };
+
   WorkflowExtension.init_widgets_for_workflow_page =
       function init_widgets_for_workflow_page() {
+
     var new_widget_descriptors = {},
         new_default_widgets = [
           "info",
