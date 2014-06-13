@@ -717,7 +717,6 @@ ul.new-tree {
           }
         }
       }
-      &.rq-amended-request,
       &.rq-amended {
         > .item-main {
           &:hover {
@@ -814,6 +813,7 @@ ul.new-tree {
           }
         }
       }
+      &.rq-amended-request,
       &.rq-rejected {
         > .item-main {
           &:hover {
