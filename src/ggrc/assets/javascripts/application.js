@@ -315,9 +315,20 @@ jQuery.extend(GGRC, {
   , delay_leaving_page_until : $.proxy(notifier, "queue")
 });
 
-
+/*
+  The GGRC Math library provides basic arithmetic across arbitrary precision numbers represented
+  as strings.  We wrote this initially to handle easy re-sorting of items in tree views, since
+  we could easily get hundreds of re-sorts by halving the distance from zero to MAX_SAFE_INT
+  until we got down to 10^-250 which would overflow the string on the data side with zeroes.
+*/
 GGRC.Math =  GGRC.Math || {};
 $.extend(GGRC.Math, {
+  /*
+    @param a an addend represented as a decimal notation string
+    @param b an addend represented as a decimal notation string
+
+    @return the sum of the numbers represented in a and b, as a decimal notation string.
+  */
   string_add : function(a, b) {
     var _a, _b, i, _c = 0;
     var ret = [];
@@ -358,6 +369,11 @@ $.extend(GGRC.Math, {
     return ret.join("");
 },
 
+  /*
+    @param a a decimal notation string
+    
+    @return one half of the number represented in a, as a decimal notation string.
+  */
 string_half : function(a) {
  var i, _a, _c = 0, ret = [];
  
@@ -384,10 +400,22 @@ string_half : function(a) {
     return ret.join("");
 },
 
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return the maximum of the numbers represented in a and b, as a decimal notation string.
+  */
 string_max : function(a, b) {
   return this.string_less_than(a, b) ? b : a;
 },
 
+  /*
+    @param a a number represented as a decimal notation string
+    @param b a number represented as a decimal notation string
+
+    @return true if the number represented in a is less than that in b, false otherwise
+  */
 string_less_than : function(a, b) {
       var i,
       _a = a.replace(/^0*/, ""),
