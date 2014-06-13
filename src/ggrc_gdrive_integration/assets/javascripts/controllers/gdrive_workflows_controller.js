@@ -594,39 +594,43 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         return (res >= 0) ? res : can.inArray(folder, audit_folders);
       }, -1);
 
-      if(af_index > -1 && instance.objective) {
-        //we added an objective where previously there was not one.
+      if(af_index > -1) {
+        if (instance.objective) {
+          //we added an objective where previously there was not one.
 
-        //First remove the mapping to the audit folder, else we could constantly revisit this process.
-        audit_folder = audit_folders[af_index];
-        obj_folder_to_destroy = req_folders_mapping[can.inArray(audit_folder, req_folders)].mappings[0].instance;
+          //First remove the mapping to the audit folder, else we could constantly revisit this process.
+          audit_folder = audit_folders[af_index];
+          obj_folder_to_destroy = req_folders_mapping[can.inArray(audit_folder, req_folders)].mappings[0].instance;
 
-        return $.when(
-          report_progress(
-            'Linking Request "' + instance.objective.reify().title + '" to new folder'
-            , new CMS.Models.GDriveFolder({
-              title : instance.objective.reify().title
-              , parents : audit_folders
-            }).save().then(function(folder) {
-              return new CMS.Models.ObjectFolder({
-                folder : folder
-                , folder_id : folder.id
-                , folderable : instance
-                , context : instance.context || { id : null }
-              }).save().then(function() { return folder; });
-            })
-          )
-          , CMS.Models.GDriveFile.findAll({parentfolderid : audit_folders[0].id})
-          , instance.responses.reify()
-          , obj_folder_to_destroy.refresh().then(function(of) { return of.destroy(); })
-        ).then(
-          that.proxy("move_files_to_new_folder", audit_folders)
-          , function() {
-            console.warn("a prerequisite failed", arguments[0]);
-          }
-        ).done(function() {
+          return $.when(
+            report_progress(
+              'Linking Request "' + instance.objective.reify().title + '" to new folder'
+              , new CMS.Models.GDriveFolder({
+                title : instance.objective.reify().title
+                , parents : audit_folders
+              }).save().then(function(folder) {
+                return new CMS.Models.ObjectFolder({
+                  folder : folder
+                  , folder_id : folder.id
+                  , folderable : instance
+                  , context : instance.context || { id : null }
+                }).save().then(function() { return folder; });
+              })
+            )
+            , CMS.Models.GDriveFile.findAll({parentfolderid : audit_folders[0].id})
+            , instance.responses.reify()
+            , obj_folder_to_destroy.refresh().then(function(of) { return of.destroy(); })
+          ).then(
+            that.proxy("move_files_to_new_folder", audit_folders)
+            , function() {
+              console.warn("a prerequisite failed", arguments[0]);
+            }
+          ).done(function() {
+            that.update_permissions(model, ev, instance);
+          });
+        } else {
           that.update_permissions(model, ev, instance);
-        });
+        }
       } else if(req_folders.length < 1) {
         return;
       } else if(af_index < 0 && !instance.objective) {
