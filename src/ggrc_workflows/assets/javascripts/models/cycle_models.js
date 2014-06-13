@@ -146,6 +146,7 @@
     attributes: {
       cycle_task_group_object: "CMS.Models.CycleTaskGroupObject.stub",
       task_group_task: "CMS.Models.TaskGroupTask.stub",
+      cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub"
     },
 
