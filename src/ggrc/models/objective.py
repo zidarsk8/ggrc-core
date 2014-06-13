@@ -10,10 +10,11 @@ from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .object_objective import Objectiveable
+from .audit_object import Auditable
 from .reflection import PublishOnly
 
 class Objective(
-    Objectiveable, Documentable, Personable, Ownable, BusinessObject,
+    Auditable, Objectiveable, Documentable, Personable, Ownable, BusinessObject,
     db.Model):
   __tablename__ = 'objectives'
 
