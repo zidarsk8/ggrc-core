@@ -20,6 +20,7 @@ class NotificationConfig(Base, db.Model):
 class Notification(Base, db.Model):
   __tablename__ = 'notifications'
   notif_date = db.Column(db.DateTime)
+  notif_pri = db.Column(db.Integer)
   content = db.Column(db.Text)
   subject = db.Column(db.String)
   sender_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)

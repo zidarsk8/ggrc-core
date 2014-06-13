@@ -22,9 +22,12 @@ class NotificationBase(object):
     self.notif_type = notif_type
 
   def prepare(self, target_objs, sender, recipients, subject, content):
-    pass
+    return None
 
   def notify(self):
+    pass
+
+  def notify_one(self, notification):
     pass
 
 
@@ -65,7 +68,7 @@ class EmailNotification(NotificationBase):
       db.session.add(notification_recipient)
       db.session.flush()
 
-    db.session.commit()
+    return notification
 
   def notify(self):
     pending_notifications = db.session.query(Notification).\
@@ -101,8 +104,35 @@ class EmailNotification(NotificationBase):
         notify_recipient.status="Successful"
         db.session.add(notify_recipient)
         db.session.flush()
-    db.session.commit()
 
+  def notify_one(self, notification):
+    sender = Person.query.filter(Person.id==notification.sender_id).first()
+    assignees = {}
+    for notify_recipient in notification.recipients:
+      recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
+      assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
+
+    if len(assignees) < 1:
+      return
+
+    to_list = ""
+    cnt = 0
+    for id, assignee in assignees.items():
+      to_list = to_list + assignee
+      if cnt < len(assignees)-1:
+        to_list + ","
+
+    message = mail.EmailMessage(
+      sender=sender.name + "<" + sender.email + ">", 
+      to=to_list,
+      subject=notification.subject,
+      body=notification.content)
+    message.send()
+
+    for notify_recipient in notification.recipients:
+      notify_recipient.status="Successful"
+      db.session.add(notify_recipient)
+      db.session.flush()
 
 class EmailDigestNotification(EmailNotification):
   def __init__(self, notif_type='Email_Digest'):
@@ -120,42 +150,55 @@ class EmailDigestNotification(EmailNotification):
       if not pending_notifications_by_date.has_key(notif_date):
         pending_notifications_by_date[notif_date]=[]
       pending_notifications_by_date[notif_date].append(notification)
-  
+
+    to={}
+    sender_ids={}
     for notif_date, notifications in pending_notifications_by_date.items():
+      content={}
+      subject="gGRC daily email digest for " + notif_date
       empty_line = """
 
       """
-      content = ""
-      assignees = {}
       for notification in notifications:
-        sender = Person.query.filter(Person.id==notification.sender_id).first()
-        for notify_recipient in notification.recipients:
-          recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
-          assignees[recipient.id]=recipient
-        if len(assignees) < 1:
-          continue
-        content = content + empty_line + notification.content
-        subject = notification.subject
+        sender_id = notification.sender_id
+        notif_pri = notification.notif_pri
+        if not sender_ids.has_key(sender_id):
+          sender = Person.query.filter(Person.id==sender_id).first()
+          if sender is None:
+            continue
+          sender_ids[sender_id] = sender
 
-      if len(assignees) < 1:
-        return
-      to_list = ""
-      cnt = 0
-      for id, assignee in assignees.items():
-        to_list = to_list + assignee.name + " <" + assignee.email + ">"
-        if cnt < len(assignees)-1:
-          to_list = to_list + ', '
-         
-      message = mail.EmailMessage(
-        sender=sender.name + "<" + sender.email + ">", 
-        to=to_list,
-        subject=subject,
-        body=content)
-      message.send()
+        for notify_recipient in notification.recipients:
+          if not to.has_key(notify_recipient.recipient_id):
+            recipient_id=notify_recipient.recipient_id
+            recipient = Person.query.filter(Person.id==recipient_id).first()
+            if recipient is None:
+              continue
+            to[recipient_id]=recipient
+            key=(recipient_id, sender_id)
+            if not content.has_key(key):
+              content[key]={}
+            if not content[key].has_key(notification.notif_pri):
+              content[key][notif_pri]=""
+            content[key][notif_pri] = content[key][notif_pri] + empty_line + notification.content
+
+      for (recipient_id, sender_id), items in content.items():
+        recipient=to[recipient_id] 
+        sender=sender_ids[sender_id] 
+        import collections
+        sorted_items = collections.OrderedDict(sorted(items.items()))
+        body=""
+        for key, value in sorted_items.items():
+          body = body + value
+        message = mail.EmailMessage(
+          sender=sender.name + "<" + sender.email + ">", 
+          to=recipient.name + "<" + recipient.email + ">", 
+          subject=subject,
+          body=body)
+        message.send()
 
       for notification in notifications:
         for notify_recipient in notification.recipients:
           notify_recipient.status="Successful"
           db.session.add(notify_recipient)
           db.session.flush()
-      db.session.commit()

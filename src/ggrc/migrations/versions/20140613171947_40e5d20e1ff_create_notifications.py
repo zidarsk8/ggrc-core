@@ -1,14 +1,14 @@
 
-"""Creating Notification Tables
+"""create notifications
 
-Revision ID: 3bd8fab9698b
+Revision ID: 40e5d20e1ff
 Revises: 2f469c9420bf
-Create Date: 2014-06-03 17:19:11.262219
+Create Date: 2014-06-13 17:19:47.832382
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '3bd8fab9698b'
+revision = '40e5d20e1ff'
 down_revision = '2f469c9420bf'
 
 from alembic import op
@@ -24,6 +24,7 @@ def upgrade():
       sa.Column('updated_at', sa.DateTime(), nullable=True),
       sa.Column('context_id', sa.Integer(), nullable=True),
       sa.Column('notif_date', sa.DateTime(), nullable=True),
+      sa.Column('notif_pri', sa.Integer, nullable=True),
       sa.Column('content', sa.Text(), nullable=True),
       sa.Column('subject', sa.Text(), nullable=True),
       sa.Column('sender_id', sa.Integer, nullable=False),

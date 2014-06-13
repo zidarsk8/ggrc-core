@@ -5,6 +5,7 @@
 
 from flask import current_app, request, render_template
 from ggrc.app import app
+from ggrc import db
 from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.notification import EmailNotification, EmailDigestNotification
@@ -29,6 +30,7 @@ def prepare_email_ggrc_users():
       content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural + \
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_notification.prepare(target_objs, obj.contact, recipients, subject, content)
+      db.session.commit()
   return render_template("dashboard/index.haml")
 
 
@@ -51,6 +53,7 @@ def prepare_email_digest_ggrc_users():
       content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural+ \
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_digest_notification.prepare(target_objs, obj.contact, recipients, subject, content)
+      db.session.commit()
   return render_template("dashboard/index.haml")
 
 
@@ -61,6 +64,7 @@ def notify_email_ggrc_users():
   """
   email_notification = EmailNotification()
   email_notification.notify()
+  db.session.commit()
   return render_template("dashboard/index.haml")
 
 
@@ -71,4 +75,5 @@ def notify_email_digest_ggrc_users():
   """
   email_digest_notification = EmailDigestNotification()
   email_digest_notification.notify()
+  db.session.commit()
   return render_template("dashboard/index.haml")
