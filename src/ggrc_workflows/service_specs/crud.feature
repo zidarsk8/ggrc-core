@@ -29,6 +29,7 @@ Feature: Basic RESTful CRUD Support
       | TaskGroupTask             |
       | Cycle                     |
       | CycleTaskGroup            |
+      | CycleTaskEntry            |
       | CycleTaskGroupObject      |
       | CycleTaskGroupObjectTask  |
 

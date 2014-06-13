@@ -42,6 +42,24 @@
   }, {});
 
 
+  _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
+  can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
+    root_object: "cycle_task_entry",
+    root_collection: "cycle_task_entries",
+    category: "workflow",
+    findAll: "GET /api/cycle_task_entries",
+    findOne: "GET /api/cycle_task_entries/{id}",
+    create: "POST /api/cycle_task_entries",
+    update: "PUT /api/cycle_task_entries/{id}",
+    destroy: "DELETE /api/cycle_task_entries/{id}",
+
+    attributes: {
+      cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
+      modified_by: "CMS.Models.Person.stub"
+    }
+  }, {});
+
+
   _mustache_path = GGRC.mustache_path + "/cycle_task_groups";
   can.Model.Cacheable("CMS.Models.CycleTaskGroup", {
     root_object: "cycle_task_group",

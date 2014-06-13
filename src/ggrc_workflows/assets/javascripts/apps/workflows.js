@@ -125,13 +125,21 @@
         CycleTaskGroupObjectTask: {
           cycle_task_group_object: Direct(
             "CycleTaskGroupObject",
-            "cycle_task_group_object_tasks", "cycle_task_group_object"),
+            "cycle_task_group_object_tasks",
+            "cycle_task_group_object"),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
-          //cycle_task_entries: Direct(
-          //  "CycleTaskEntry",
-          //  "cycle_task_group_object_task",
-          //  "cycle_task_entries")
+          cycle_task_entries: Direct(
+            "CycleTaskEntry",
+            "cycle_task_group_object_task",
+            "cycle_task_entries")
+        },
+
+        CycleTaskEntry: {
+          cycle_task_group_object_task: Direct(
+            "CycleTaskGroupObjectTask",
+            "cycle_task_entries",
+            "cycle_task_group_object_task")
         },
 
         People: {
@@ -150,7 +158,10 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      mappings[type]._canonical = { "workflows": "Workflow", "task_groups": "TaskGroup" };
+      mappings[type]._canonical = {
+        "workflows": "Workflow",
+        "task_groups": "TaskGroup"
+      };
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
