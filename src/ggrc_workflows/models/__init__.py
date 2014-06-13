@@ -7,7 +7,6 @@
 from ggrc.models.all_models import register_model
 
 from .task import Task
-from .task_entry import TaskEntry
 from .task_group import TaskGroup
 from .task_group_object import TaskGroupObject
 from .task_group_task import TaskGroupTask
@@ -15,14 +14,14 @@ from .workflow import Workflow
 from .workflow_object import WorkflowObject
 from .workflow_person import WorkflowPerson
 from .workflow_task import WorkflowTask
-#from .cycle import Cycle
-#from .cycle_task_group import CycleTaskGroup
-#from .cycle_task_group_task import CycleTaskGroupTask
-#from .cycle_task import CycleTask
+from .cycle import Cycle
+from .cycle_task_entry import CycleTaskEntry
+from .cycle_task_group import CycleTaskGroup
+from .cycle_task_group_object import CycleTaskGroupObject
+from .cycle_task_group_object_task import CycleTaskGroupObjectTask
 
 
 register_model(Task)
-register_model(TaskEntry)
 register_model(TaskGroup)
 register_model(TaskGroupObject)
 register_model(TaskGroupTask)
@@ -30,7 +29,9 @@ register_model(Workflow)
 register_model(WorkflowObject)
 register_model(WorkflowPerson)
 register_model(WorkflowTask)
-#register_model(Cycle)
-#register_model(CycleTask)
-#register_model(CycleTaskGroup)
-#register_model(CycleTaskGroupTask)
+
+register_model(Cycle)
+register_model(CycleTaskEntry)
+register_model(CycleTaskGroup)
+register_model(CycleTaskGroupObject)
+register_model(CycleTaskGroupObjectTask)

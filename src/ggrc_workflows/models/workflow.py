@@ -7,7 +7,7 @@
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
+    deferred, Base, Titled, Slugged, Described, Timeboxed
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
@@ -31,12 +31,12 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
     if value is None:
       value = self.default_frequency()
     if value not in self.VALID_FREQUENCIES:
-      message = "Invalid state '{}'".format(value)
+      message = u"Invalid state '{}'".format(value)
       raise ValueError(message)
     return value
 
   frequency = deferred( 
-    db.Column(db.String, nullable=False, default=default_frequency), 
+    db.Column(db.String, nullable=True, default=default_frequency),
     'Workflow'
     )
 
@@ -58,8 +58,8 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   task_groups = db.relationship(
       'TaskGroup', backref='workflow', cascade='all, delete-orphan')
 
-  #cycles = db.relationship(
-  #    'Cycle', backref='workflow', cascade='all, delete-orphan')
+  cycles = db.relationship(
+      'Cycle', backref='workflow', cascade='all, delete-orphan')
 
   _fulltext_attrs = []
 
@@ -72,5 +72,5 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       PublishOnly('tasks'),
       'task_groups',
       'frequency',
-      #'cycles',
+      'cycles',
       ]

@@ -286,6 +286,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
+    , sort_property : null
     , start_expanded : false //true
     , draw_children : true
     , find_function : null
@@ -611,9 +612,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   }
 
   , draw_items : function(options_list) {
-      var $footer = this.element.children('.tree-footer').first()
+      var that = this
+        , $footer = this.element.children('.tree-footer').first()
         , $items = $()
+        , $existing = this.element.children('li:not(.tree-header, .tree-footer)')
         , draw_items_dfds = []
+        , sort_prop = this.options.sort_property
         ;
 
       options_list = can.makeArray(options_list);
@@ -623,14 +627,63 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         $items.push($li[0]);
       });
 
-      if($footer.length) {
-        $items.insertBefore($footer);
+      if (sort_prop) {
+         $items.each(function(i, item) {
+            var j, $item = $(item);
+            for(j = $existing.length - 1; j >= 0; j--) {
+              if(GGRC.Math.string_less_than(
+                $existing.eq(j).control().options.instance[sort_prop],
+                $item.control().options.instance[sort_prop]
+              )) {
+                $item.insertAfter($existing.eq(j));
+                $existing.splice(j + 1, 0, item);
+                return;
+              }
+            }
+            if($existing.length) {
+              $item.insertBefore($existing);
+            } else if($footer.length) {
+              $item.insertBefore($footer);
+            } else {
+              $item.appendTo(this.element);
+            }
+            $existing.splice(0, 0, item);
+         });
       } else {
-        $items.appendTo(this.element);
+        if($footer.length) {
+          $items.insertBefore($footer);
+        } else {
+          $items.appendTo(this.element);
+        }
       }
       return $.when.apply($, draw_items_dfds);
     }
 
+  , " sortupdate" : function(el, ev, ui) {
+    var that = this,
+      $item = $(ui.item),
+      $before = $item.prev("li:not(.tree-header, .tree-footer)"),
+      $after = $item.next("li:not(.tree-header, .tree-footer)"),
+      before_index = $before.length
+                     ? $before.control().options.instance[this.options.sort_property]
+                     : "0",
+      after_index = $after.length
+                    ? $after.control().options.instance[this.options.sort_property]
+                    : Number.MAX_SAFE_INTEGER.toString(10);
+
+    ev.stopPropagation();
+
+    if(!this.options.sort_property) {
+      return;
+    }
+
+    $item.control().options.instance.refresh().then(function(inst) {
+      inst.attr(
+        that.options.sort_property,
+        GGRC.Math.string_half(GGRC.Math.string_add(before_index, after_index))
+      ).save();
+    });
+  }
 
   , " removeChild" : function(el, ev, data) {
     var that = this

@@ -23,6 +23,7 @@ class SectionBase(
     db.Model):
   _table_plural = 'section_bases'
   __tablename__ = 'sections'
+  _title_uniqueness = False
 
   type = db.Column(db.String)
   directive_id = deferred(

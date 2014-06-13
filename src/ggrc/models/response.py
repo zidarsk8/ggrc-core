@@ -18,6 +18,8 @@ class Response(
   __mapper_args__ = {
       'polymorphic_on': 'response_type',
       }
+  _title_uniqueness = False
+  _slug_uniqueness = False
 
   # Override `Titled.title` to provide default=""
   title = deferred(

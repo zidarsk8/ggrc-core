@@ -9,6 +9,7 @@ from .mixins import deferred, Base, Described, Titled, Slugged
 
 class Request(Titled, Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
+  _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview', u'population sample')
   VALID_STATES = (u'Draft', u'Requested', u'Responded', u'Amended Request',

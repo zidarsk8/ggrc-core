@@ -1,0 +1,93 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+        <div class="span12">
+          <ul class="tree-action-list">
+            <li>
+              {{^instance.status}}
+              <span class="gray"><em>Assigned</em></span>
+              {{/instance.status}}
+              {{#if_equals instance.status 'started'}}
+              <span class="gray"><em>In progress</em></span>
+              {{/if_equals}}
+              {{#if_equals instance.status 'finished'}}
+              <span class="task-done"><em>Finished</em></span>
+              {{/if_equals}}
+            </li>
+            <li>
+              <span class="counter">
+                due
+                <strong class="error">{{instance.end_date}}</strong>
+              </span>
+              {{^if_equals instance.status 'finished'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
+            </li>
+
+            <li>
+              {{#with_mapping_count instance 'cycle_task_group_objects'}}
+              <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                <i class="grcicon-object-black"></i>
+                <strong class="error">{{count}}</strong>
+              </span>
+              {{/with_mapping_count}}
+            </li>
+
+            <!--li>
+              <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                <i class="grcicon-task-black"></i>
+                <strong class="error">{{tasks.length}}</strong>
+              </span>
+            </li-->
+          </ul>
+
+          <div class="item-data">
+            <div class="tree-title-area">
+              {{instance.title}}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+
+      {{#instance.description}}
+      <div class="show-description">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="tree-description short">
+              {{{instance.description}}}
+            </div>
+            {{{show_long}}}
+          </div>
+        </div>
+      </div>
+      {{/instance.description}}
+
+    </div>
+
+    {{#if draw_children}}
+      {{#child_options}}
+        <div class="inner-tree">
+          <h6>Objects ({{list.length}})</h6>
+          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+        </div>
+      {{/child_options}}
+    {{/if}}
+
+  </div>
+  {{/if}}
+</li>

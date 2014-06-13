@@ -10,3 +10,5 @@ from ggrc.models.mixins import Timeboxed, BusinessObject
 
 class Threat(Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'threats'
+  _title_uniqueness = False
+  _slug_uniqueness = False

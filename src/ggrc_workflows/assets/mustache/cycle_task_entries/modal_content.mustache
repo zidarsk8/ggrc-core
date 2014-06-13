@@ -1,0 +1,21 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+}}
+
+<form action="javascript://">
+  <div class="row-fluid">
+    <div class="span8">
+      <input id="workflow_id" name="cycle_task_group_object_task" type="hidden" model="Workflow" value="{{firstnonempty instance.cycle_task_group_object_task.id object_params.cycle_task_group_object_task}}">
+      <label for="program_description">
+        Details
+        <i class="grcicon-help-black" rel="tooltip" title="Commentary goes here"></i>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Comments" tabindex="2">{{instance.description}}</textarea>
+      </div>
+    </div>
+  </div>
+</form>
