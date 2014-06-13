@@ -57,7 +57,7 @@
       _canonical : {
         "events" : "GCalEvent"
       },
-      events : GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
+      events : new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
     },
     GDriveFolder : {
       _mixins : ["revisionable"],

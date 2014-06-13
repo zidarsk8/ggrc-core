@@ -1,0 +1,142 @@
+  <li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    <div class="item-main" data-model="true" {{data 'model'}}>
+      <div class="openclose">
+        <div class="row-fluid">
+          <div class="span12">
+            <ul class="tree-action-list">
+              <li>
+                <i class="grcicon-person-green pull-left icon-field"></i>
+                <div class="objective-selector" style="white-space: nowrap; margin-right: 20px;">
+                  {{#using assignee=instance.contact}}
+                  <!--input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-lookup="Person" placeholder="Choose Assignee" value="{{assignee.email}}" data-index="{{@index}}" data-field="assignee" -->
+                    {{#if assignee}}
+                      {{assignee.email}}
+                    {{else}}
+                      No contact
+                    {{/if}}
+                  {{/using}}
+                </div>
+              </li>
+
+              <li>
+                {{#with_mapping 'objects' instance}}
+                <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
+                  <i class="grcicon-object-black"></i>
+                  <strong class="error">{{objects.length}}</strong>
+                </span>
+                {{/with_mapping}}
+              </li>
+              <li>
+                {{#with_mapping 'tasks' instance}}
+                <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                  <i class="grcicon-task-black"></i>
+                  <strong class="error">{{tasks.length}}</strong>
+                </span>
+                {{/with_mapping}}
+              </li>
+              <li>
+                {{#is_allowed 'delete' instance context='for'}}
+                <span class="counter removeTaskGroup">
+                  <a href="javascript://"
+                    class="info-action delete"
+                    data-toggle="modal-ajax-deleteform"
+                    data-object-plural="{{model.table_plural}}"
+                    data-object-singular="{{model.model_singular}}"
+                    data-modal-reset="reset"
+                    data-modal-class="modal"
+                    data-refresh="true"
+                    data-object-id="{{instance.id}}">
+                    <i class="grcicon-deleted"></i>
+                  </a>
+                </span>
+                {{/is_allowed}}
+              </li>
+            </ul>
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{instance.title}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content" style="display: none;">
+      <div class="tier-2-info-content">
+        <div class="show-description">
+          <div class="row-fluid">
+            <div class="span12 task-group-title">
+              <h3>
+                {{> /static/mustache/base_objects/edit_object_link.mustache}}
+              </h3>
+              <h3 class=".taskGroupTitle">
+                {{instance.title}}
+                {{!<a href="#" class="toggleClosest"><i class="grcicon-edit"></i></a>}}
+              </h3>
+              <div class="taskGroupTitleForm edit-field hide">
+                <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
+                <a href="#" id="editFieldSave" class="btn btn-success pull-left toggleClosest">Save</a>
+                <a href="#" id="editFieldCancel" class="pull-left toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
+              </div>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <div class="span12">
+              {{#if_equals instance.description ""}}
+              {{!<a href="#" class="toggleClosest">+ Add Description</a>}}
+                <i>No description</i>
+              {{else}}
+              {{{instance.description}}}{{!<a class="task-edit-icon toggleClosest" href="#"><i class="grcicon-edit"></i></a>}}
+              {{/if_equals}}
+            </div>
+            <div class="hide">
+              <div class="wysiwyg-area">
+                <textarea id="program_description" class="span12 double wysihtml5 saveTaskGroupField" data-index="{{@index}}" data-field="description" name="description" placeholder="Enter Description" tabindex="3">{{{instance.description}}}</textarea>
+              </div>
+              <a href="#" class="btn btn-success toggleClosest">Save</a>
+              <a href="#" class="toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
+            </div>
+          </div>
+          <br>
+
+
+      {{#if draw_children}}
+        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+
+          <div class="row-fluid">
+            {{#child_options.0}}
+            <div class="span6">
+              <strong>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
+              <ul class="items-list tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              </ul>
+            </div>
+            {{/child_options.0}}
+
+
+            {{#child_options.1}}
+            <div class="span6 task-list">
+              {{#if list.length}}
+              {{^if_equals list.length 1}}
+              <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance: $(el).data("instance") }); }}>
+                <label>
+                  <input type="checkbox" name="lock_task_order" {{#instance.lock_task_order}}checked="checked"{{/instance.lock_task_order}}>
+                  Lock Task Order
+                </label>
+              </span>
+              {{/if_equals}}
+              {{/if}}
+              <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
+              <ul class="tree-structure new-tree" {{data 'options'}}
+                {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
+                {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}></ul>
+
+            </div>
+            {{/child_options.1}}
+          </div>
+        {{/prune_context}}
+      {{/if}}
+
+        </div>
+      </div>
+    </div>
+  </li>

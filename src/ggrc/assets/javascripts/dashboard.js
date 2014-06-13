@@ -98,7 +98,14 @@ jQuery(function($) {
 // - this cannot use other response headers because it is proxied through
 //   an iframe to achieve AJAX file upload (using remoteipart)
 jQuery(function($) {
-  function disableButton(){
+
+  var submit_import = 'form.import div.import-interface input[type=submit]',
+      file_select_elem = 'form.import div.import-interface input[type=file]';
+
+  function onSubmitClick(ev){
+    if ($(this).hasClass('disabled') || $(file_select_elem).val() === "") {
+      ev && ev.preventDefault();
+    }
     $(this).addClass("disabled");
   }
   function checkStatus(result, type, $btn){
@@ -115,6 +122,7 @@ jQuery(function($) {
         setTimeout(function(){checkStatus(result, type, $btn);}, 3000);
       }
       else if(task.status == "Success"){
+        var $container = $("#results-container");
         $btn && $btn.removeClass("disabled");
         // Check if redirect:
         try{
@@ -133,8 +141,8 @@ jQuery(function($) {
             }
           }
         }
-        $("#results-container").html(task.result.content);
-        $('form.import .btn').unbind().unbind().click(disableButton);
+        $container.html(task.result.content);
+        $container.find('input[type=submit]').click(onSubmitClick);
         if(msg === "Upload and Review"){
           // Don't display "Upload and Review successful." message;
           // But kill progress message.
@@ -155,7 +163,11 @@ jQuery(function($) {
       }
     });
   }
-  $('form.import .btn').unbind().click(disableButton);
+  $(submit_import).click(onSubmitClick);
+  // handler to initialize import upload button as disabled
+  $(submit_import).ready(function(){
+    $(submit_import).addClass("disabled");
+  });
   $('body').on('ajax:success', 'form.import', function(e, data, status, xhr) {
     var $btn = $('form.import .btn.disabled').first();
     if (xhr.getResponseHeader('Content-Type') == 'application/json') {
@@ -188,26 +200,23 @@ jQuery(function($) {
     });
   });
 
-  // handler to initialize import upload button as disabled
-  var submit_import = 'form.import div.import-interface input[type=submit]';
-  $(submit_import).ready(disableButton);
-
   // change button to disabled when no file selected, and vice versa
-  var file_select_elem = 'form.import div.import-interface input[type=file]';
   $(file_select_elem).change(function(ev) {
     if (this.value === "") {
-      $(submit_import).each(disableButton);
+      $(submit_import).each(onSubmitClick);
     } else {
       $(submit_import).removeClass('disabled');
     }
   });
 
-  // Prevent attempted submissions with no file from going through;
-  // uses click instead of submit because the latter doesn't trigger
-  $(submit_import).on('click', function (ev) {
-    if ($(file_select_elem).val() === "") {
-      ev.preventDefault();
-    }
+  jQuery(function($) {
+    $('body').on('ajax:success', 'form[data-remote][data-update-target]', function(e, data, status, xhr) {
+      if (xhr.getResponseHeader('Content-Type') == 'text/html') {
+        var $container = $($(this).data('update-target'));
+        $container.html(data);
+        $container.find('input[type=submit]').click(onSubmitClick);
+      }
+    });
   });
 });
 
@@ -218,15 +227,6 @@ jQuery(function($) {
 
   $('body').on('ajax:complete', '[data-ajax-complete="refresh"]', refresh_page);
 });
-
-jQuery(function($) {
-  $('body').on('ajax:success', 'form[data-remote][data-update-target]', function(e, data, status, xhr) {
-    if (xhr.getResponseHeader('Content-Type') == 'text/html') {
-      $($(this).data('update-target')).html(data);
-    }
-  });
-});
-
 
 jQuery(function($) {
   $('body').on('ajax:success', '#helpedit form', function(e, data, status, xhr) {
@@ -355,7 +355,7 @@ function resize_areas() {
   ,   footerMargin
   ,   internavHeight
   ;
-  
+
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
@@ -456,7 +456,7 @@ jQuery(function($) {
     var $this = $(this);
     expander($this.hasClass('section-add') ? $this : $this.prev('.section-add'), "out");
   });
-  
+
   $('body').on('click', '.show-long', function(e) {
     var $this = $(this)
       , $descField = $this.closest('.span12').find('.tree-description')
@@ -466,7 +466,7 @@ jQuery(function($) {
   });
 
   // activate widget from object nav
-  
+
   $('body').on('mouseenter', 'ul.internav li a', function(e) {
     var $this = $(this)
     ,   $widgetID = $this.attr("href")
@@ -514,7 +514,7 @@ jQuery(function($) {
       $this.removeClass("widget-active");
     }
   });
-  
+
   // show/hide audit lead and firm
   $('body').on('mouseover', '.ui-autocomplete li a', function(e) {
     var $this = $(this);
@@ -526,7 +526,7 @@ jQuery(function($) {
     $this.removeClass("active");
     $this.closest('li').removeClass("active");
   });
-  
+
 });
 
 jQuery(resize_areas);

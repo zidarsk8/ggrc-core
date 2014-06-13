@@ -87,6 +87,7 @@ dashboard-js-files:
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
+  - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
   - base_objects/contacts.mustache

@@ -4,3 +4,47 @@
     Created By: sasmita
     Maintained By: sasmita
 }}
+
+  <li class="tree-item program">
+    <div class="item-main">
+      <div class="openclose">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{instance.title}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        <div class="show-description">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="span6">
+{{!               <a href="#" class="info-action">
+                View Task
+                <i class="grcicon-goto"></i>
+              </a>
+ }}              </div>
+              <div class="span6">
+              {{#is_allowed_to_unmap instance}}
+              <a href="#" class="info-action unmap pull-right" data-type="tasks" data-index="{{@index}}">
+                <i class="grcicon-remove"></i>
+                Unmap
+              </a>
+              {{/is_allowed_to_unmap}}
+              </div>
+              <div class="tree-description">
+                <h5>{{instance.title}}</h5>
+                <p>{{{instance.description}}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>

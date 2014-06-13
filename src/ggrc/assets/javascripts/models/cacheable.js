@@ -56,7 +56,7 @@ function dateConverter(d, oldValue, fn, key) {
     ret.subtract(new Date().getTimezoneOffset(), "minute");
   }
 
-  if(oldValue && oldValue.getTime && ret.toDate().getTime() === oldValue.getTime()) {
+  if(oldValue && oldValue.getTime && ret && ret.toDate().getTime() === oldValue.getTime()) {
     return oldValue;  // avoid changing to new Date object if the value is the same.
   }
   return ret ? ret.toDate() : undefined;
@@ -641,7 +641,9 @@ can.Model("can.Model.Cacheable", {
         return errors;
       }
     })
-
+  , computed_unsuppressed_errors : can.compute(function() {
+    return this.errors();
+  })
   , get_list_counter: function(name) {
       var binding = this.get_binding(name);
       if(!binding) return new $.Deferred().reject();
