@@ -50,8 +50,6 @@
             subtasks: "Task",
             task_groups: "TaskGroup"
           },
-          subtasks: Direct(
-            "CycleTask", "task", "tasks"),
           task_groups: Proxy(
             "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
         },
@@ -159,10 +157,10 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      mappings[type]._canonical = {
-        "workflows": "Workflow",
-        "task_groups": "TaskGroup"
-      };
+      //mappings[type]._canonical = {
+      //  "workflows": "Workflow",
+      //  "task_groups": "TaskGroup"
+      //};
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
@@ -259,6 +257,10 @@
     $(function() {
       $(document.body).ggrc_controllers_workflow_page();
     });
+
+    GGRC.register_hook(
+        "ObjectNav.Actions",
+        GGRC.mustache_path + "/dashboard/object_nav_actions");
 
     $.extend(
       true,
@@ -388,8 +390,6 @@
 
   GGRC.register_hook(
       "LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
-  GGRC.register_hook(
-      "ObjectNav.Actions", GGRC.mustache_path + "/dashboard/object_nav_actions");
 
   WorkflowExtension.init_mappings();
 
