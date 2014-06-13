@@ -57,6 +57,7 @@ class Request(Slugged, Described, Base, db.Model):
     'gdrive_upload_path',
     'test',
     'notes',
+    'description',
   ]
 
   def _display_name(self):

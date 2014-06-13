@@ -71,6 +71,7 @@ class Response(Noted, Described, Hyperlinked, WithContact, Slugged, db.Model):
       'response_type',
       ]
   _sanitize_html = [
+      'description',
       ]
 
   def _display_name(self):

@@ -47,6 +47,7 @@ class Audit(
 
   _sanitize_html = [
     'gdrive_evidence_folder',
+    'description',
     ]
 
   _include_links = [
