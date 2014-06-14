@@ -349,6 +349,21 @@ can.Model.Cacheable("CMS.Models.Request", {
         });
       }
     }
+  },
+  after_save : function() {
+    var obj = this.objective.reify();
+    if(obj && can.map(this.get_mapping("objectives_via_audit"), function(mapping) {
+      if(mapping.instance === obj)
+        return mapping;
+    }).length < 1) {
+      this.notifier.queue(
+        new CMS.Models.AuditObject({
+          audit: this.audit,
+          auditable: this.objective,
+          context: this.audit.reify().context
+        }).save()
+      );
+    }
   }
 });
 

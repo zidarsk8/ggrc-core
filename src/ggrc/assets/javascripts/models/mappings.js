@@ -777,6 +777,8 @@
         }
       , requests: Direct("Request", "audit", "requests")
       , _program: Direct("Program", "audits", "program")
+      , objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects")
+      , objectives: TypeFilter("objects", "Objective")
       , objectives_via_program : Cross("_program", "objectives")
       , responses_via_requests: Cross("requests", "responses")
       , related_objects: Multi(['requests', 'responses_via_requests'])
@@ -847,6 +849,7 @@
         }
       , responses: Direct("Response", "request", "responses")
       , _audit: Direct("Audit", "requests", "audit")
+      , objectives_via_audit : Cross("_audit", "objectives")
       , documentation_responses : TypeFilter("responses", "DocumentationResponse")
       , interview_responses : TypeFilter("responses", "InterviewResponse")
       , population_sample_responses : TypeFilter("responses", "PopulationSampleResponse")
