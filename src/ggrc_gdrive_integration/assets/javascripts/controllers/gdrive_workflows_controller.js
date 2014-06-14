@@ -79,41 +79,56 @@ function report_progress(str, xhr) {
 
   function build_flashes() {
     var flash = {}
-    , successes = []
-    , failures = []
-    , pendings = [];
+    , container_string = "<div class='audit-status'>"
+    , head_string = "<div class='audit-status-head'>"
+    , closer = "</ul></div></div>"
+    , successes = [container_string + head_string + "Actions completed successfully. [Click to open]</div><ul>"]
+    , failures = [container_string + head_string + "There were errors. [Click to open]"]
+    , pendings = [container_string + head_string + "GDrive actions in progress... Please wait [Click to open]</div><ul>"]
+    , success_count = 0
+    , failure_count = 0
+    , pending_count = 0;
 
     can.each(allops, function(op) {
       switch(op.xhr.state()) {
         case "resolved":
-        successes.push(op.str + " -- Done<br>");
+        successes.push("<li>" + op.str + " -- Done</li>");
+        success_count++;
         break;
         case "rejected":
-        failures.push(op.str + " -- FAILED<br>");
+        failures.push("<li>" + op.str + " -- FAILED</li>");
+        failure_count++;
         break;
         case "pending":
-        pendings.push(op.str + "...<br>");
+        pendings.push("<li>" + op.str + "...</li>");
+        pending_count++;
       }
     });
 
-    if(successes.length) {
-      flash.success = successes;
-    }
-    if(failures.length) {
-      flash.error = failures;
-    }
-    if(pendings.length) {
-      flash.warning = pendings.concat(["Please wait until " + (pendings.length === 1 ? "this operation completes" : "these operations complete")]);
+    if(success_count) {
+      flash.success = successes.concat(closer);
     } else {
-      setTimeout(function() {
-        if(can.map(allops, function(op) {
-          return op.xhr.state() === "pending" ? op : undefined;
-        }).length < 1) {
-          allops = [];
-        }
-      }, 1000);
+      flash.success = []
+    }
+    if(failure_count) {
+      flash.error = failures.concat(closer);
+    } else{
+      flash.error = []
+    }
+    if(pending_count) {
+      flash.warning = pendings.concat(closer);
+    } else {
+      flash.warning = []
     }
     $(document.body).trigger("ajax:flash", flash);
+    // initialize items in hidden state
+    $('.audit-status ul').each(function() {
+      $(this).hide();
+    });
+    // hide empty lists: alerts without a ul
+    $('.alert:not(:has(ul))').each(function() {
+      $(this).hide();
+    });
   }
 
   allops.push({str : str, xhr : xhr});
@@ -881,6 +896,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       this.create_meeting(instance);
     }
   }
+
+  , ".audit-status-head click": function(el, ev){
+    $(ev.currentTarget.parentElement).find('ul').toggle();
+  }
+
   , "a.create-meeting click" : function(el, ev){
     var instance = el.closest("[data-model], :data(model)").data("model");
     this.create_meeting(instance);
