@@ -164,6 +164,9 @@ ul.new-tree {
       }
       .tree-title-area {
         width: auto;
+        &.oneline {
+          width: 85%;
+        }
       }
     }
     .accepted {
