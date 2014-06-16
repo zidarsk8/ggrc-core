@@ -238,7 +238,7 @@
         modal_title = "Map " + modal_title + " to " + object_params.section.title;
       }
       
-			var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
+      var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
 
       $target
       .modal_form(option, $trigger)
