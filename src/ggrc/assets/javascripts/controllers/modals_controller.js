@@ -138,17 +138,15 @@ can.Control("GGRC.Controllers.Modals", {
         this.options.instance.attr(path, ui.item.stub());
         // Make sure person name/email gets written to the input field
         setTimeout(function(){
-          if(el.val() === ""){
-            el.val(ui.item.title || ui.item.name || ui.item.email);
-            instance._transient || instance.attr("_transient", new can.Observe({}));
-            can.reduce(path.split("."), function(current, next) {
-              current = current + "." + next;
-              instance.attr(current) || instance.attr(current, new can.Observe({}));
-              return current;
-            }, "_transient");
-            instance.attr("_transient." + path, ui.item[prop]);
-            el.blur();
-          }
+          el.val(ui.item.title || ui.item.name || ui.item.email);
+          instance._transient || instance.attr("_transient", new can.Observe({}));
+          can.reduce(path.split("."), function(current, next) {
+            current = current + "." + next;
+            instance.attr(current) || instance.attr(current, new can.Observe({}));
+            return current;
+          }, "_transient");
+          instance.attr("_transient." + path, ui.item[prop]);
+          el.blur();
         }, 50);
       }
     } else {
