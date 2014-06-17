@@ -9,8 +9,26 @@ from ggrc import db
 from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.notification import EmailNotification, EmailDigestNotification
+from ggrc_workflows.notification import handle_task_put
 from datetime import datetime
 
+@app.route("/modify_status", methods=["GET", "POST"])
+@login_required
+def modify_status():
+  """ prepare email digest
+  """
+  model = request.args.get('model')
+  id = request.args.get('id')
+  status = request.args.get('status')
+  cls = getattr(all_models, model)
+  obj = cls.query.filter(cls.id == int(id)).first()
+  if obj is not None:
+    obj.status=status
+    db.session.add(obj)
+    db.session.commit()
+    handle_task_put(sender=None, obj=obj, src=obj, service=None)
+    db.session.commit()
+  return render_template("dashboard/index.haml")
 
 @app.route("/prepare_email", methods=["GET", "POST"])
 @login_required
