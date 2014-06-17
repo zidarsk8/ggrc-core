@@ -9,7 +9,7 @@ from ggrc import db
 from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.notification import EmailNotification, EmailDigestNotification
-from ggrc_workflows.notification import handle_task_put
+from ggrc_workflows.notification import *
 from datetime import datetime
 
 @app.route("/modify_status", methods=["GET", "POST"])
@@ -89,6 +89,15 @@ def notify_email_ggrc_users():
 @app.route("/notify_emaildigest", methods=["GET", "POST"])
 @login_required
 def notify_email_digest_ggrc_users():
+  """ handle any outstading tasks prior to notify email digest
+  """
+  handle_tasks_overdue()
+  handle_tasks_due(2)
+  handle_workflow_cycle_status_change('Completed')
+  handle_workflow_cycle_started(0)
+  handle_workflow_cycle_started(7)
+  db.session.commit()
+
   """ notify email digest 
   """
   email_digest_notification = EmailDigestNotification()
