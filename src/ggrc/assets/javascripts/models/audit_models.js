@@ -75,7 +75,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       var audit_firm = this.attr("audit_firm");
       var audit_firm_text = this.attr("_transient.audit_firm");
       if(!audit_firm && audit_firm_text
-        || (audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
+        || (audit_firm_text !== "" && audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
         return "No valid org group selected for firm";
       }
     });
