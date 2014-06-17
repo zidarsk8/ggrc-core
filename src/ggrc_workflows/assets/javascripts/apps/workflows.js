@@ -229,7 +229,7 @@
       }
     );
 
-    new GGRC.WidgetList("ggrc_workflows", task_widget_descriptors);
+    new GGRC.WidgetList("ggrc_workflows", { Task: task_widget_descriptors });
   };
 
   WorkflowExtension.init_widgets_for_workflow_page =
