@@ -95,6 +95,21 @@ can.Control("GGRC.Controllers.Modals", {
   , "input[data-lookup] focus" : function(el, ev) {
     this.autocomplete(el);
   }
+  , "input[data-lookup] keyup" : function(el, ev) {
+    // Set the transient field for validation
+    var name = el.attr('name').split('.'),
+        instance = this.options.instance,
+        value = el.val();
+    
+    name.pop(); //set the owner to null, not the email
+    instance._transient || instance.attr("_transient", new can.Observe({}));
+    can.reduce(name.slice(0, -1), function(current, next) {
+      current = current + "." + next;
+      instance.attr(current) || instance.attr(current, new can.Observe({}));
+      return current;
+    }, "_transient");
+    instance.attr(["_transient"].concat(name).join("."), value);
+  }
 
   , autocomplete : function(el) {
     $.cms_autocomplete.call(this, el);
@@ -367,14 +382,6 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
 
         if($elem.is("[data-lookup]")) {
-          name.pop(); //set the owner to null, not the email
-          instance._transient || instance.attr("_transient", new can.Observe({}));
-          can.reduce(name.slice(0, -1), function(current, next) {
-            current = current + "." + next;
-            instance.attr(current) || instance.attr(current, new can.Observe({}));
-            return current;
-          }, "_transient");
-          instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
             value = null;
           } else {
