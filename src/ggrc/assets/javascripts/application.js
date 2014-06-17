@@ -708,8 +708,8 @@ jQuery(document).ready(function($) {
           , placement : function() {
             var $el = this.$element
               , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
-              , spaceRight = ($el.offset().left)
-              , popover_size = 420;
+              , spaceRight = $el.offset().left
+              , popover_size = 620;
             // Display on right if there is enough space
             if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
               return "right";
