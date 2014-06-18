@@ -17,6 +17,7 @@ from ggrc import db
 
 class NotificationBase(object):
   notif_type = None
+  notif_pri = None
 
   def __init__(self, notif_type):
     self.notif_type = notif_type
@@ -38,6 +39,7 @@ class EmailNotification(NotificationBase):
   def prepare(self, target_objs, sender, recipients, subject, content):
     now = datetime.now()
     notification = Notification(
+      notif_pri=self.notif_pri,
       notif_date=now,
       created_at=now,
       content=content,
