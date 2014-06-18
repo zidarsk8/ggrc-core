@@ -116,13 +116,14 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , autocomplete_select : function(el, event, ui) {
-    var original_event;
+    var original_event,
+        that = this;
+
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
     if(ui.item) {
       var path = el.attr("name").split(".")
         , instance = this.options.instance
         , index = 0
-        , that = this
         , prop = path.pop();
 
       if (/^\d+$/.test(path[path.length - 1])) {
@@ -151,9 +152,8 @@ can.Control("GGRC.Controllers.Modals", {
       }
     } else {
       original_event = event;
-
       $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
-        el.data("ui-autocomplete").options.select(event, {item : new_obj});
+        that.autocomplete_select(el, original_event, { item : new_obj });
       }).one("hidden", function() {
         setTimeout(function() {
           $(this).off(".autocomplete");
