@@ -18,36 +18,27 @@ PRI_TASK_ASSIGNMENT=3
 PRI_TASK_CHANGES=4
 PRI_OTHERS=5
 
-def get_workflow_for_task(task_id):
-  workflow_task = db.session.query(models.WorkflowTask).\
-    join(models.WorkflowTask.task).\
-    filter(models.Task.id == task_id).first()
-  if workflow_task is not None:
-    return db.session.query(models.Workflow).filter(models.Workflow.id == workflow_task.workflow_id).first()
-  else:
-   return None
-
 def get_cycle_for_task(taskgroup_object_id):
   taskgroup= db.session.query(models.CycleTaskGroup).\
     join(models.CycleTaskGroupObject).\
     filter(models.TaskGroupObject.id == taskgroup_object_id).first()
   if taskgroup is not None:
-    return db.session.query(models.Cycle).filter(models.Cycle.id == taskgroup.cycle_id).first()
+    return db.session.query(models.Cycle).\
+      join(models.Cycle.contact).\
+      filter(models.Cycle.id == taskgroup.cycle_id).first()
   else:
    return None
 
 def handle_tasks_overdue():
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
+    join(models.CycleTaskGroupObjectTask.contact).\
     filter(models.CycleTaskGroupObjectTask.end_date < date.today()).all()
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is past overdue " 
     content="Task " + task.title + " : " + request.url_root + models.Task.__tablename__ + \
       "/" + str(task.task_group_task_id) + " due on " + str(task.end_date)
     notif_type = 'Email_Digest'
-    if task.contact_id is None:
-      current_app.logger.info("Trigger: Contact attribute is not set")
-      continue 
-    contact = db.session.query(Person).filter(Person.id == task.contact_id).first()
+    contact = task.contact
     if contact is None:
       current_app.logger.info("Trigger: Unable to find Contact")
       continue 
@@ -57,16 +48,14 @@ def handle_tasks_overdue():
 
 def handle_tasks_due(num_days):
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
+    join(models.CycleTaskGroupObjectTask.contact).\
     filter(models.CycleTaskGroupObjectTask.end_date < (date.today()+timedelta(num_days))).all()
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is due in " + str(days) + " days"
     content="Task " + task.title + " : " + request.url_root + models.Task.__tablename__ + \
       "/" + str(task.task_group_task_id) + " due on " + str(task.end_date)
     notif_type = 'Email_Digest'
-    if task.contact_id is None:
-      current_app.logger.info("Trigger: Contact attribute is not set")
-      continue 
-    contact = db.session.query(Person).filter(Person.id == task.contact_id).first()
+    contact = task.contact
     if contact is None:
       current_app.logger.info("Trigger: Unable to find Contact")
       continue 
@@ -77,12 +66,11 @@ def handle_tasks_due(num_days):
 def handle_workflow_cycle_status_change(status):
   if status not in ['Completed', 'Verified']:
     return
-  workflow_cycles= db.session.query(models.Cycle).filter(models.Cycle.status == status).all()
+  workflow_cycles= db.session.query(models.Cycle).\
+    join(models.Cycle.contact).\
+    filter(models.Cycle.status == status).all()
   for cycle in workflow_cycles:
-    if cycle_obj.contact_id is None:
-      current_app.logger.warn("Trigger: Cycle Contact attribute is not set")
-      continue
-    cycle_contact = db.session.query(Person).filter(Person.id == cycle_obj.contact_id).first()
+    cycle_contact = cycle.contact
     if cycle_contact is None:
       current_app.logger.warn("Trigger: Unable to find Cycle Contact")
       continue
@@ -105,16 +93,14 @@ def handle_workflow_cycle_status_change(status):
         prepare_notification(task, notif_type, notif_pri, subject, content, cycle_contact, recipients)
 
 def handle_workflow_cycle_started(num_days):
-  workflow_cycles= db.session.query(models.Cycle).all()
+  workflow_cycles= db.session.query(models.Cycle).\
+    join(models.Cycle.contact).all()
   for cycle in workflow_cycles:
     workflow_obj=db.session.query(models.Workflow).filter(models.Workflow.id == cycle.workflow_id).first()
     if workflow_obj is None:
       current_app.logger.warn("Trigger: Unable to find workflow")
       continue
-    if cycle.contact_id is None:
-      current_app.logger.warn("Trigger: Cycle Contact attribute is not set")
-      continue
-    cycle_contact = db.session.query(Person).filter(Person.id == cycle.contact_id).first()
+    cycle_contact = cycle.contact
     if cycle_contact is None: 
       current_app.logger.warn("Trigger: Unable to find contact for Cycle")
       continue
@@ -154,10 +140,7 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   if cycle_obj is None:
     current_app.logger.warn("Unable to find workflow cycle for task: " + src.title)
     return
-  if cycle_obj.contact_id is None:
-    current_app.logger.warn("Trigger: Cycle Contact attribute is not set")
-    return
-  cycle_contact = db.session.query(Person).filter(Person.id == cycle_obj.contact_id).first()
+  cycle_contact = cycle_obj.contact
   if cycle_contact is None:
     current_app.logger.warn("Trigger: Unable to find Cycle Contact")
     return
@@ -177,13 +160,13 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
   if notif_type == 'Email_Digest':
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
-    current_app.logger.info("preparing Email Digest")
+    current_app.logger.info("Preparing Email Digest with priority:" + str(notif_pri))
     emaildigest_notification.prepare([src], owner, recipients, subject, content)
   elif notif_type == 'Email_Now':
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)
-    current_app.logger.info("Sending Email")
+    current_app.logger.info("Sending Email with priority:" + str(notif_pri))
     email_notification.notify_one(notification)
   else:
     return None
@@ -191,5 +174,5 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)
-    current_app.logger.info("Sending Email")
+    current_app.logger.info("Sending Email with priority:" + str(notif_pri))
     email_notification.notify_one(notification)
