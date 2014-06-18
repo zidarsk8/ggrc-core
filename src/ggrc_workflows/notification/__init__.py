@@ -119,7 +119,7 @@ def handle_workflow_cycle_started(num_days):
       current_app.logger.warn("Trigger: Unable to find contact for Cycle")
       continue
     if cycle.end_date != None and cycle.status != 'Started' and \
-      (cycle.start_date - date.today()) < timedelta(num_days):
+      (cycle.start_date - date.today()) == timedelta(num_days):
       subject="Workflow Cycle " + '"' + cycle.title + '" ' + "will start in " + str(num_days) + " days"
       content="Workflow: "  + workflow_obj.title + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
           "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
@@ -148,8 +148,8 @@ def handle_task_put(sender, obj=None, src=None, service=None):
     return
   subject="Task " + '"' + src.title + '" ' + " status changed to " + src.status
   content="Task " + '"' + src.title + '" ' + "URL: " + request.url_root + \
-    + "/" + models.Task.__tablename__ + "/" + str(obj.task_group_task_id) + " due on " + str(src.end_date) + \
-   " Contact: " + contact.name
+    "/" + models.Task.__tablename__ + "/" + str(obj.task_group_task_id) + " due on " + str(src.end_date) + \
+    " Contact: " + contact.name
   cycle_obj = get_cycle_for_task(src.cycle_task_group_object_id)
   if cycle_obj is None:
     current_app.logger.warn("Unable to find workflow cycle for task: " + src.title)
