@@ -32,7 +32,9 @@ def get_cycle_for_task(taskgroup_object_id):
 def handle_tasks_overdue():
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
     join(models.CycleTaskGroupObjectTask.contact).\
-    filter(models.CycleTaskGroupObjectTask.end_date < date.today()).all()
+    filter(models.CycleTaskGroupObjectTask.end_date < date.today()).\
+    filter(models.CycleTaskGroupObjectTask.status != 'Completed' or models.CycleTaskGroupObjectTask.status != 'Verified').\
+    all()
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is past overdue " 
     content="Task " + task.title + " : " + request.url_root + models.Task.__tablename__ + \
@@ -49,9 +51,11 @@ def handle_tasks_overdue():
 def handle_tasks_due(num_days):
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
     join(models.CycleTaskGroupObjectTask.contact).\
-    filter(models.CycleTaskGroupObjectTask.end_date < (date.today()+timedelta(num_days))).all()
+    filter((models.CycleTaskGroupObjectTask.end_date - date.today()) == timedelta(num_days)).\
+    filter(models.CycleTaskGroupObjectTask.status != 'Completed' or models.CycleTaskGroupObjectTask.status != 'Verified').\
+    all()
   for task in tasks:
-    subject="Task " + '"' + task.title + '" ' + "is due in " + str(days) + " days"
+    subject="Task " + '"' + task.title + '" ' + "is due in " + str(num_days) + " days"
     content="Task " + task.title + " : " + request.url_root + models.Task.__tablename__ + \
       "/" + str(task.task_group_task_id) + " due on " + str(task.end_date)
     notif_type = 'Email_Digest'
