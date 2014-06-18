@@ -28,8 +28,6 @@ class Objective(
       'objective_controls', 'control', 'ObjectiveControl')
   objective_objects = db.relationship(
       'ObjectObjective', backref='objective', cascade='all, delete-orphan')
-  requests = db.relationship(
-     'Request', backref='objective')
 
   _publish_attrs = [
       PublishOnly('section_objectives'),
