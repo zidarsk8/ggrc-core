@@ -45,14 +45,14 @@
         </div>
         <div class="span4">
           <div class="item-data">
-            {{#using objective=instance.objective}}
-              {{#if objective}}
+            {{#with_mapping "_objective" instance}}
+              {{#if _objective.0.instance}}
                 <div class="tree-title-area" rel="tooltip" data-placement="top" data-original-title="{{objective.title}}">
                   <i class="grcicon-objective-color"></i>
-                  {{#is_allowed "view_object_page" objective}}
-                    <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
+                  {{#is_allowed "view_object_page" _objective.0.instance}}
+                    <a class="object-title" href="{{_objective.0.instance.viewLink}}" target="_blank">{{_objective.0.instance.title}}</a>
                   {{else}}
-                    <span class="object-title" target="_blank">{{objective.title}}</span>
+                    <span class="object-title" target="_blank">{{_objective.0.instance.title}}</span>
                   {{/is_allowed}}
                 </div>
               {{else}}
@@ -71,7 +71,7 @@
                 {{/with_mapping}}
                 {{/using}}
               {{/if}}
-            {{/using}}
+            {{/with_mapping}}
           </div>
         </div>
         <div class="span4">
