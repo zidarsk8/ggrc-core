@@ -40,6 +40,7 @@ def upgrade():
       sa.Column('modified_by_id', sa.Integer(), nullable=True),
       sa.Column('updated_at', sa.DateTime(), nullable=True),
       sa.Column('context_id', sa.Integer(), nullable=True),
+      sa.Column('enable_flag', sa.Boolean(), nullable=True),
       sa.Column('notif_type', sa.String(length=250), nullable=True),
       sa.Column('person_id', sa.Integer(), nullable=False),
       sa.ForeignKeyConstraint(['context_id'], ['contexts.id'],),

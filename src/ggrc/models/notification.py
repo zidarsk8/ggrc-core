@@ -13,8 +13,7 @@ from .mixins import Base, Stateful
 
 class NotificationConfig(Base, db.Model):
   __tablename__ = 'notification_configs'
-  #ToDo(Mouli): Add enable flag to indicate if the notification is enable or not, By default EmailDigest is enabled
-  #enable_flag = db.Column(db.Boolean)
+  enable_flag = db.Column(db.Boolean)
   notif_type = db.Column(db.String)
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
 
