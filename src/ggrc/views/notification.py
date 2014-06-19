@@ -94,8 +94,8 @@ def notify_email_digest_ggrc_users():
   handle_tasks_overdue()
   handle_tasks_due(2)
   handle_workflow_cycle_status_change('Completed')
-  handle_workflow_cycle_started(0)
-  handle_workflow_cycle_started(7)
+  handle_workflow_cycle_started()
+  handle_workflow_cycle_starting(7)
   db.session.commit()
 
   """ notify email digest 

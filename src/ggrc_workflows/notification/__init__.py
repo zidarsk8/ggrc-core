@@ -51,7 +51,7 @@ def handle_tasks_overdue():
 def handle_tasks_due(num_days):
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
     join(models.CycleTaskGroupObjectTask.contact).\
-    filter((models.CycleTaskGroupObjectTask.end_date - date.today()) == timedelta(num_days)).\
+    filter(models.CycleTaskGroupObjectTask.end_date == (date.today() + timedelta(num_days))).\
     filter(models.CycleTaskGroupObjectTask.status != 'Completed' or models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
@@ -64,7 +64,7 @@ def handle_tasks_due(num_days):
       current_app.logger.info("Trigger: Unable to find Contact")
       continue 
     recipients = [contact]
-    notif_pri = PRI_TASKS_DUE
+    notif_pri = PRI_TASK_DUE
     prepare_notification(task, notif_type, notif_pri, subject, content, contact, recipients)
 
 def handle_workflow_cycle_status_change(status):
@@ -83,22 +83,27 @@ def handle_workflow_cycle_status_change(status):
       current_app.logger.warn("Trigger: Unable to find workflow")
       continue
     if status == 'Verified':
-       new_status = 'Closed'
+       new_status = 'Finished'
     else:
        new_status = 'Verified'
     #ToDo(Mouli): Check all cycle tasks are in status, then notify that tasks need to be changed 
+    recipients=[]
     for person in workflow_obj.people:
+      recipients.append(person)
+    if len(recipients):
       subject="Workflow Cycle " + '"' + cycle.title + '" ' + "is ready to be "  + new_status
       content="Workflow " + workflow_obj.title + " : " + request.url_root + workflow_obj._inflector.table_plural + \
         "/" + str(workflow_obj.id) + " due on " + str(workflow_obj.end_date)
       notif_type = 'Email_Digest'
-      recipients.append(person)
-      if len(recipients):
-        prepare_notification(task, notif_type, notif_pri, subject, content, cycle_contact, recipients)
+      notif_pri = PRI_OTHERS
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, cycle_contact, recipients)
 
-def handle_workflow_cycle_started(num_days):
+def handle_workflow_cycle_started():
   workflow_cycles= db.session.query(models.Cycle).\
-    join(models.Cycle.contact).all()
+    join(models.Cycle.contact).\
+    filter(models.Cycle.status == 'InProgress').\
+    filter(models.Cycle.start_date == date.today()).\
+    all()
   for cycle in workflow_cycles:
     workflow_obj=db.session.query(models.Workflow).filter(models.Workflow.id == cycle.workflow_id).first()
     if workflow_obj is None:
@@ -108,18 +113,41 @@ def handle_workflow_cycle_started(num_days):
     if cycle_contact is None: 
       current_app.logger.warn("Trigger: Unable to find contact for Cycle")
       continue
-    if cycle.end_date != None and cycle.status != 'Started' and \
-      (cycle.start_date - date.today()) == timedelta(num_days):
-      subject="Workflow Cycle " + '"' + cycle.title + '" ' + "will start in " + str(num_days) + " days"
-      content="Workflow: "  + workflow_obj.title + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
-          "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
-      notif_type = 'Email_Digest'
-      notif_pri = PRI_OTHERS
-      recipients=[]
-      for person in workflow_obj.people:
-        recipients.append(person)
-      if len(recipients):
-        prepare_notification(cycle, notif_type, notif_pri, subject, content, cycle_contact, recipients)
+    subject="Workflow Cycle " + '"' + cycle.title + '" ' + "started " + str(cycle.start_date) 
+    content="Workflow: "  + workflow_obj.title + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
+      "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
+    notif_type = 'Email_Digest'
+    notif_pri = PRI_OTHERS
+    recipients=[]
+    for person in workflow_obj.people:
+      recipients.append(person)
+    if len(recipients):
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, cycle_contact, recipients)
+
+def handle_workflow_cycle_starting(num_days):
+  workflow_cycles= db.session.query(models.Cycle).\
+    join(models.Cycle.contact).\
+    filter(models.Cycle.start_date == (date.today() + timedelta(num_days))).\
+    all()
+  for cycle in workflow_cycles:
+    workflow_obj=db.session.query(models.Workflow).filter(models.Workflow.id == cycle.workflow_id).first()
+    if workflow_obj is None:
+      current_app.logger.warn("Trigger: Unable to find workflow")
+      continue
+    cycle_contact = cycle.contact
+    if cycle_contact is None: 
+      current_app.logger.warn("Trigger: Unable to find contact for Cycle")
+      continue
+    subject="Workflow Cycle " + '"' + cycle.title + '" ' + "will start in " + str(num_days) + " days"
+    content="Workflow: "  + workflow_obj.title + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
+      "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
+    notif_type = 'Email_Digest'
+    notif_pri = PRI_OTHERS
+    recipients=[]
+    for person in workflow_obj.people:
+      recipients.append(person)
+    if len(recipients):
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, cycle_contact, recipients)
 
 #ToDo(Mouli) uncomment the PUT trigger after edit modal is completed
 #@Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
