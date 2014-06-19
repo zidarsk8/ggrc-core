@@ -2350,5 +2350,8 @@ Mustache.registerHelper("with_allowed_as", function(name, action, mappings, opti
   return options.fn(options.contexts.add(ctx));
 });
 
+Mustache.registerHelper("log", function(obj){
+  console.log(resolve_computed(obj));
+});
 
 })(this, jQuery, can);
