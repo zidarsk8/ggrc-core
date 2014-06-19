@@ -14,7 +14,8 @@ from ggrc_workflows.models import (
     Workflow, TaskGroup, Task,
     WorkflowObject, WorkflowTask, WorkflowPerson,
     TaskGroupObject, TaskGroupTask,
-    Cycle, CycleTaskGroup, CycleTaskGroupObject, CycleTaskGroupObjectTask
+    Cycle, CycleTaskEntry,
+    CycleTaskGroup, CycleTaskGroupObject, CycleTaskGroupObjectTask
     )
 
 
@@ -63,6 +64,10 @@ class CycleFactory(factories.ModelFactory):
   status = FuzzyChoice(MODEL.VALID_STATES)
 
 
+class CycleTaskEntryFactory(factories.ModelFactory):
+  MODEL = CycleTaskEntry
+
+
 class CycleTaskGroupFactory(factories.ModelFactory):
   MODEL = CycleTaskGroup
   status = FuzzyChoice(MODEL.VALID_STATES)
@@ -89,6 +94,7 @@ def workflow_factories_registration(context):
   factories.TaskGroupObjectFactory = TaskGroupObjectFactory
   factories.TaskGroupTaskFactory = TaskGroupTaskFactory
   factories.CycleFactory = CycleFactory
+  factories.CycleTaskEntryFactory = CycleTaskEntryFactory
   factories.CycleTaskGroupFactory = CycleTaskGroupFactory
   factories.CycleTaskGroupObjectFactory = CycleTaskGroupObjectFactory
   factories.CycleTaskGroupObjectTaskFactory = CycleTaskGroupObjectTaskFactory

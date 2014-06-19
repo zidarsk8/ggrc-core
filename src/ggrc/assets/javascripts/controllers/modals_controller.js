@@ -95,19 +95,35 @@ can.Control("GGRC.Controllers.Modals", {
   , "input[data-lookup] focus" : function(el, ev) {
     this.autocomplete(el);
   }
+  , "input[data-lookup] keyup" : function(el, ev) {
+    // Set the transient field for validation
+    var name = el.attr('name').split('.'),
+        instance = this.options.instance,
+        value = el.val();
+    
+    name.pop(); //set the owner to null, not the email
+    instance._transient || instance.attr("_transient", new can.Observe({}));
+    can.reduce(name.slice(0, -1), function(current, next) {
+      current = current + "." + next;
+      instance.attr(current) || instance.attr(current, new can.Observe({}));
+      return current;
+    }, "_transient");
+    instance.attr(["_transient"].concat(name).join("."), value);
+  }
 
   , autocomplete : function(el) {
     $.cms_autocomplete.call(this, el);
   }
 
   , autocomplete_select : function(el, event, ui) {
-    var original_event;
+    var original_event,
+        that = this;
+
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
     if(ui.item) {
       var path = el.attr("name").split(".")
         , instance = this.options.instance
         , index = 0
-        , that = this
         , prop = path.pop();
 
       if (/^\d+$/.test(path[path.length - 1])) {
@@ -123,27 +139,21 @@ can.Control("GGRC.Controllers.Modals", {
         this.options.instance.attr(path, ui.item.stub());
         // Make sure person name/email gets written to the input field
         setTimeout(function(){
-          if(el.val() === ""){
-            // Setting el.val is needed for Auditor field to work
-            var obj = that.options.instance.attr(path);
-            if(obj && obj.type === "Person" && obj.type in CMS.Models && obj.id in CMS.Models[obj.type].cache){
-              el.val(CMS.Models[obj.type].cache[obj.id].name || CMS.Models[obj.type].cache[obj.id].email);
-            }
-            instance._transient || instance.attr("_transient", new can.Observe({}));
-            can.reduce(path.split("."), function(current, next) {
-              current = current + "." + next;
-              instance.attr(current) || instance.attr(current, new can.Observe({}));
-              return current;
-            }, "_transient");
-            instance.attr("_transient." + path, ui.item[prop]);
-          }
-        }, 150);
+          el.val(ui.item.title || ui.item.name || ui.item.email);
+          instance._transient || instance.attr("_transient", new can.Observe({}));
+          can.reduce(path.split("."), function(current, next) {
+            current = current + "." + next;
+            instance.attr(current) || instance.attr(current, new can.Observe({}));
+            return current;
+          }, "_transient");
+          instance.attr("_transient." + path, ui.item[prop]);
+          el.blur();
+        }, 50);
       }
     } else {
       original_event = event;
-
       $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
-        el.data("ui-autocomplete").options.select(event, {item : new_obj});
+        that.autocomplete_select(el, original_event, { item : new_obj });
       }).one("hidden", function() {
         setTimeout(function() {
           $(this).off(".autocomplete");
@@ -268,7 +278,10 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "input, textarea, select change" : function(el, ev) {
       this.options.instance.removeAttr("_suppress_errors");
-      this.set_value_from_element(el);
+      // Set the value if it isn't a search field
+      if(!el.hasClass("search-icon")){
+        this.set_value_from_element(el);
+      }
   }
 
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
@@ -364,14 +377,6 @@ can.Control("GGRC.Controllers.Modals", {
       } else {
 
         if($elem.is("[data-lookup]")) {
-          name.pop(); //set the owner to null, not the email
-          instance._transient || instance.attr("_transient", new can.Observe({}));
-          can.reduce(name.slice(0, -1), function(current, next) {
-            current = current + "." + next;
-            instance.attr(current) || instance.attr(current, new can.Observe({}));
-            return current;
-          }, "_transient");
-          instance.attr(["_transient"].concat(name).join("."), value);
           if(!value) {
             value = null;
           } else {

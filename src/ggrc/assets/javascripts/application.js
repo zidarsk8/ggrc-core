@@ -329,76 +329,87 @@ $.extend(GGRC.Math, {
 
     @return the sum of the numbers represented in a and b, as a decimal notation string.
   */
-  string_add : function(a, b) {
-    var _a, _b, i, _c = 0;
-    var ret = [];
-    var adi = a.indexOf(".");
-    var bdi = b.indexOf(".");
-    if(adi < 0) {
-         a = a + ".";
-        adi = a.length - 1;
+  string_add: function(a, b) {
+    var _a, _b, i, _c = 0,
+        ret = [],
+        adi = a.indexOf("."),
+        bdi = b.indexOf(".");
+
+    if (adi < 0) {
+      a = a + ".";
+      adi = a.length - 1;
     }
-    if(bdi < 0) {
-        b = b + ".";
-        bdi = b.length - 1;
+    if (bdi < 0) {
+      b = b + ".";
+      bdi = b.length - 1;
     }
-    while(adi < bdi) {
-        a = "0" + a;
-        adi++;
+    while (adi < bdi) {
+      a = "0" + a;
+      adi++;
     }
-    while(bdi < adi) {
-         b = "0" + b;
-        bdi++;
+    while (bdi < adi) {
+      b = "0" + b;
+      bdi++;
     }
-    
-    for(i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
-        _a = a[i] || 0;
-        _b = b[i] || 0;
-        if(_a === "." || _b === ".") {
-            if(_a !== "." || _b !== ".")
-                throw "Decimal alignment error";
-            ret.unshift(".");
-        } else {
-            ret.unshift((+_a) + (+_b) + _c);
-            _c = Math.floor(ret[0] / 10);
-            ret[0] = (ret[0] % 10).toString(10);
-        }
+
+    for (i = Math.max(a.length, b.length) - 1; i >= 0; i--) {
+      _a = a[i] || 0;
+      _b = b[i] || 0;
+      if (_a === "." || _b === ".") {
+        if (_a !== "." || _b !== ".")
+          throw "Decimal alignment error";
+        ret.unshift(".");
+      } else {
+        ret.unshift((+_a) + (+_b) + _c);
+        _c = Math.floor(ret[0] / 10);
+        ret[0] = (ret[0] % 10).toString(10);
+      }
     }
-    if(_c > 0) ret.unshift(_c.toString(10));
-    if(ret[ret.length - 1] === ".") ret.pop();
+    if (_c > 0) {
+      ret.unshift(_c.toString(10));
+    }
+    if (ret[ret.length - 1] === ".") {
+      ret.pop();
+    }
     return ret.join("");
-},
+  },
 
   /*
     @param a a decimal notation string
-    
+
     @return one half of the number represented in a, as a decimal notation string.
   */
-string_half : function(a) {
- var i, _a, _c = 0, ret = [];
- 
-    if(!~a.indexOf(".")) {
-        a = a + ".";
+  string_half: function(a) {
+    var i, _a, _c = 0, ret = [];
+
+    if (!~a.indexOf(".")) {
+      a = a + ".";
     }
-    for(i = 0; i < a.length; i++) {
-        _a = a[i];
-        if(_a === ".") {
-            ret.push(".");
+    for (i = 0; i < a.length; i++) {
+      _a = a[i];
+      if (_a === ".") {
+        ret.push(".");
+      } else {
+        _a = Math.floor((+_a + _c) / 2);
+        if (+a[i] % 2) {
+          _c = 10;
         } else {
-          _a = Math.floor((+_a + _c) / 2);
-          if(+a[i] % 2) {
-              _c = 10;
-          } else {
-              _c = 0;
-          }
-          ret.push(_a.toString(10));
+          _c = 0;
+        }
+        ret.push(_a.toString(10));
       }
     }
-    if(_c > 0) ret.push("5");
-    if(ret[ret.length - 1] === ".") ret.pop();
-    while(ret[0] === "0" && ret.length > 1) ret.shift();
+    if (_c > 0) {
+      ret.push("5");
+    }
+    if (ret[ret.length - 1] === ".") {
+      ret.pop();
+    }
+    while (ret[0] === "0" && ret.length > 1) {
+      ret.shift();
+    }
     return ret.join("");
-},
+  },
 
   /*
     @param a a number represented as a decimal notation string
@@ -406,9 +417,9 @@ string_half : function(a) {
 
     @return the maximum of the numbers represented in a and b, as a decimal notation string.
   */
-string_max : function(a, b) {
-  return this.string_less_than(a, b) ? b : a;
-},
+  string_max: function(a, b) {
+    return this.string_less_than(a, b) ? b : a;
+  },
 
   /*
     @param a a number represented as a decimal notation string
@@ -416,39 +427,40 @@ string_max : function(a, b) {
 
     @return true if the number represented in a is less than that in b, false otherwise
   */
-string_less_than : function(a, b) {
-      var i,
-      _a = a.replace(/^0*/, ""),
-      _b = b.replace(/^0*/, ""),
-      adi = _a.indexOf("."),
-      bdi = _b.indexOf(".");
-    if(adi < 0) {
+  string_less_than: function(a, b) {
+    var i,
+        _a = a.replace(/^0*/, ""),
+        _b = b.replace(/^0*/, ""),
+        adi = _a.indexOf("."),
+        bdi = _b.indexOf(".");
+
+    if (adi < 0) {
       _a = _a + ".";
       adi = _a.length - 1;
     }
-    if(bdi < 0) {
+    if (bdi < 0) {
       _b = _b + ".";
       bdi = _b.length - 1;
     }
-    if(adi < bdi) {
+    if (adi < bdi) {
       return true;
     }
-    if(bdi < adi) {
+    if (bdi < adi) {
       return false;
     }
-    for(i = 0; i < _a.length - 1; i++) {
-      if(_a[i] === ".") {
-          // continue
+    for (i = 0; i < _a.length - 1; i++) {
+      if (_a[i] === ".") {
+        // continue
       } else {
-        if((+_a[i] || 0) < (+_b[i] || 0)) {
+        if ((+_a[i] || 0) < (+_b[i] || 0)) {
           return true;
-        } else if((+_a[i] || 0) > (+_b[i] || 0)) {
+        } else if ((+_a[i] || 0) > (+_b[i] || 0)) {
           return false;
         }
       }
     }
     return _b.length >= _a.length ? false : true;
-}
+  }
 
 });
 
@@ -696,8 +708,8 @@ jQuery(document).ready(function($) {
           , placement : function() {
             var $el = this.$element
               , spaceLeft = $(document).width() - ($el.offset().left + $el.width())
-              , spaceRight = ($el.offset().left)
-              , popover_size = 420;
+              , spaceRight = $el.offset().left
+              , popover_size = 620;
             // Display on right if there is enough space
             if($el.closest(".widget-area:first-child").length && spaceLeft > popover_size)
               return "right";
@@ -1123,17 +1135,17 @@ jQuery(function($){
     $.ui.autocomplete,
     {
       options: {
-      // Ensure that the input.change event still occurs
-        change : function(event, ui) {
+        // Ensure that the input.change event still occurs
+        change: function(event, ui) {
           if(!$(event.target).parents(document.body).length)
             console.warn("autocomplete menu change event is coming from detached nodes");
           $(event.target).trigger("change");
-        }
+        },
 
-        , minLength: 0
+        minLength: 0,
 
-        , source : function(request, response) {
-        // Search for the people based on the term
+        source: function(request, response) {
+          // Search for the people based on the term
           var query = request.term || ''
             , queue = new RefreshQueue()
             , that = this;
@@ -1160,13 +1172,13 @@ jQuery(function($){
               }
             });
           }), $(this.element), null, false);
-        }
+        },
 
-        , apply_filter : function(objects) {
+        apply_filter: function(objects) {
           return objects;
-        }
+        },
 
-        , source_for_refreshable_objects : function(request) {
+        source_for_refreshable_objects: function(request) {
           var that = this;
           return GGRC.Models.Search
             .search_for_types(
@@ -1187,18 +1199,20 @@ jQuery(function($){
               });
               return objects;
             });
-        }
+        },
 
-        , select : function(ev, ui) {
+        select: function(ev, ui) {
           return $(this).data($(this).data("autocomplete-widget-name"))
             .options.controller
             .autocomplete_select($(this), ev, ui);
-        }
-        , close : function() {
+        },
+
+        close: function() {
           //$that.val($that.attr("value"));
         }
       },
-      _create : function() {
+
+      _create: function() {
         var that = this
         , $that = $(this.element)
         , base_search = $that.data("lookup")
@@ -1212,7 +1226,7 @@ jQuery(function($){
           $(this).data(that.widgetFullName).search($(this).val());
         });
 
-        if(base_search) {
+        if (base_search) {
           base_search = base_search.trim();
           if (base_search.indexOf("__mappable") === 0 || base_search.indexOf("__all") === 0) {
             searchtypes = GGRC.Mappings.get_canonical_mappings_for(
@@ -1233,10 +1247,13 @@ jQuery(function($){
             searchtypes = base_search.split(",");
           }
 
-          this.options.searchtypes = can.map(searchtypes, function(t) { return CMS.Models[t].model_singular; });
+          this.options.searchtypes = can.map(searchtypes, function(t) {
+            return CMS.Models[t].model_singular;
+          });
         }
       },
-      _renderMenu : function(ul, items) {
+
+      _renderMenu: function(ul, items) {
           var model_class = this.element.data("lookup")
             , template = this.element.data("template")
             , model
@@ -1265,8 +1282,8 @@ jQuery(function($){
   $.widget.bridge("ggrc_autocomplete", $.ggrc.autocomplete);
 
   $.widget("ggrc.mapping_autocomplete", $.ggrc.autocomplete, {
-    options : {
-      source_for_refreshable_objects : function(request) {
+    options: {
+      source_for_refreshable_objects: function(request) {
         var $el = $(this.element),
           mapping = this.options.controller.options;
 
@@ -1280,9 +1297,9 @@ jQuery(function($){
           return binding.instance;
         }));
       },
-      apply_filter : function(objects, request) {
+      apply_filter: function(objects, request) {
         return can.map(objects, function(object) {
-          if(!request.term || object.title && ~object.title.indexOf(request.term))
+          if (!request.term || object.title && ~object.title.indexOf(request.term))
             return object;
           else
             return undefined;
@@ -1297,7 +1314,7 @@ jQuery(function($){
     // Add autocomplete to the owner field
     ($(el) || this.element.find('input[data-lookup]'))
     .filter("[name][name!='']")
-    .ggrc_autocomplete({ controller : ctl });
+    .ggrc_autocomplete({ controller: ctl });
   };
 
 });

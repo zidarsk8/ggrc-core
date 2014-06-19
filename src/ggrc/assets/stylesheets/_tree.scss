@@ -164,6 +164,9 @@ ul.new-tree {
       }
       .tree-title-area {
         width: auto;
+        &.oneline {
+          width: 85%;
+        }
       }
     }
     .accepted {
@@ -717,7 +720,6 @@ ul.new-tree {
           }
         }
       }
-      &.rq-amended-request,
       &.rq-amended {
         > .item-main {
           &:hover {
@@ -814,6 +816,7 @@ ul.new-tree {
           }
         }
       }
+      &.rq-amended-request,
       &.rq-rejected {
         > .item-main {
           &:hover {

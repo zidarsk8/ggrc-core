@@ -26,10 +26,10 @@
 */
 Mustache.registerHelper("toggle", function(compute, options) {
   function toggle(trigger) {
-    if(typeof trigger === "function") {
+    if (typeof trigger === "function") {
       trigger = Mustache.resolve(trigger);
     }
-    if(typeof trigger !== "string") {
+    if (typeof trigger !== "string") {
       trigger = "click";
     }
     return function(el) {
@@ -39,10 +39,12 @@ Mustache.registerHelper("toggle", function(compute, options) {
     };
   }
 
-  if(compute()) {
-    return options.fn(options.contexts, { helpers : { toggle_button : toggle }});
+  if (compute()) {
+    return options.fn(
+      options.contexts, { helpers: { toggle_button: toggle }});
   } else {
-    return options.inverse(options.contexts, { helpers : { toggle_button : toggle }});
+    return options.inverse(
+      options.contexts, { helpers: { toggle_button: toggle }});
   }
 });
 
@@ -60,12 +62,12 @@ Mustache.registerHelper("toggle", function(compute, options) {
 */
 Mustache.registerHelper("sort_index_at_end", function(list, options) {
   var max_int = Number.MAX_SAFE_INTEGER.toString(10),
-    list_max = "0";
+      list_max = "0";
   list = Mustache.resolve(list);
 
   can.each(list, function(item) {
     var idx = item.sort_index || item.instance && item.instance.sort_index;
-    if(typeof idx !== "undefined") {
+    if (typeof idx !== "undefined") {
       list_max = GGRC.Math.string_max(idx, list_max);
     }
   });
@@ -90,16 +92,16 @@ Mustache.registerHelper("sort_index_at_end", function(list, options) {
 */
 Mustache.registerHelper("sortable_if", function() {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1),
-    options = arguments[arguments.length - 1],
-    inverse = options.hash && options.hash.inverse;
+      options = arguments[arguments.length - 1],
+      inverse = options.hash && options.hash.inverse;
 
   return function(el) {
     can.view.live.attributes(el, can.compute(function() {
       var val = Mustache.resolve(args[0]),
-        sortable_opts = args[1];
-      if(val ^ inverse) {  //value XOR inverse, one must be true, one false
+          sortable_opts = args[1];
+      if (val ^ inverse) {  //value XOR inverse, one must be true, one false
         $(el).sortable(JSON.parse(sortable_opts || "{}"));
-      } else if($(el).is(".ui-sortable")) {
+      } else if ($(el).is(".ui-sortable")) {
         $(el).sortable("destroy");
       }
     }));

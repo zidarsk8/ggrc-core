@@ -65,9 +65,9 @@ def contributed_services():
       service('task_groups', models.TaskGroup),
       service('task_group_tasks', models.TaskGroupTask),
       service('task_group_objects', models.TaskGroupObject),
-      service('task_entries', models.TaskEntry),
 
       service('cycles', models.Cycle),
+      service('cycle_task_entries', models.CycleTaskEntry),
       service('cycle_task_groups', models.CycleTaskGroup),
       service('cycle_task_group_objects', models.CycleTaskGroupObject),
       service('cycle_task_group_object_tasks', models.CycleTaskGroupObjectTask)
@@ -124,4 +124,5 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           task_group_task=task_group_task,
           title=task.title,
           description=task.description,
+          sort_index=task_group_task.sort_index,
           )

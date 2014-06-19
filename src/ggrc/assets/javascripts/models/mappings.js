@@ -248,7 +248,6 @@
         "objectives" : "Objective",
         "implemented_controls" : "Control",
         "_sections_base" : ["Section", "Clause"],
-        "audits" : "Audit",
         "joined_directives" : ["Regulation", "Policy", "Contract", "Standard"]
       }
       , related_objects: Proxy(
@@ -564,7 +563,7 @@
       , controls: Multi(["direct_controls", "joined_controls"])
 
       , programs: Proxy(
-          "Program", "program", "ProgramDirective", "directives", "program_directives")
+          "Program", "program", "ProgramDirective", "directive", "program_directives")
 
       , orphaned_objects: Multi([
           "sections"

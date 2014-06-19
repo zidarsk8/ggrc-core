@@ -7,7 +7,9 @@
         PBC Response
         <span class="required">*</span>
       </label>
-      <input id="response_description" tabindex="1" class="input-block-level" placeholder="Response Title" name="description" type="text" value="{{{description}}}" autofocus>
+      <div class="wysiwyg-area">
+          <textarea id="response_description" tabindex="1" class="input-block-level double wysihtml5" placeholder="Response Title" name="description" autofocus>{{{description}}}</textarea>
+      </div>
     </div>
     
     {{#using contact=instance.contact}}

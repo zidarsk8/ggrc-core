@@ -18,7 +18,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
             <i class="grcicon-person-green pull-left"></i>
             <div class="objective-selector">
@@ -36,7 +36,7 @@
               {{/using}}
             </div>
           </div>
-          
+
           <div class="span1">
             <div class="counter">
               {{#child_options.0}}
@@ -45,7 +45,7 @@
               {{/child_options.0}}
             </div>
           </div>
-          
+
           <div class="span1">
             <div class="counter">
               {{#child_options.1}}
@@ -56,7 +56,7 @@
               {{/child_options.1}}
             </div>
           </div>
-          
+
           <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
               <div class="response-control">
                 {{#if_equals instance.status "Assigned"}}
@@ -109,11 +109,13 @@
             <div class="show-description">
               <div class="row-fluid">
                 <div class="span12">
-                  {{{firstnonempty request.description '<i>No description</i>'}}}
+                  <div class="rtf">
+                    {{{firstnonempty request.description '<i>No description</i>'}}}
+                  </div>
                 </div>
               </div>
             </div>
-            
+
             <div class="row-fluid">
             {{#if request.requested_on}}
               {{#using requested_on=request.requested_on}}
@@ -129,25 +131,23 @@
           </div>
         {{/using}}
         {{/if_instance_of}}
-        
-        {{#if_helpers '\
-          #if' allow_mapping_or_creating '\
-            and #is_allowed' 'update' instance _1_context=instance.context.id '\
-            and #if_can_edit_request' parent_instance '\
-            and ^if_auditor' parent_instance '\
-          or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=instance.context.id '\
-          and #if' allow_mapping_or_creating}}
-          <div class="tier-2-info-content">
-            <div class="show-description">
-              <div class="row-fluid">
-                <div class="span12">
-                  <div class="tree-description">
-                    <strong>{{{firstnonempty instance.description 'Response'}}}</strong>
-                  </div>
+        <div class="tier-2-info-content">
+          <div class="show-description">
+            <div class="row-fluid">
+              <div class="span12">
+                <div class="tree-description">
+                  {{{firstnonempty instance.description 'Response'}}}
                 </div>
               </div>
             </div>
-            
+          </div>
+          {{#if_helpers '\
+            #if' allow_mapping_or_creating '\
+              and #is_allowed' 'update' instance _1_context=instance.context.id '\
+              and #if_can_edit_request' parent_instance '\
+              and ^if_auditor' parent_instance '\
+            or #is_allowed' '__GGRC_ADMIN__' model.shortName _4_context=instance.context.id '\
+            and #if' allow_mapping_or_creating}}
             <div class="row-fluid">
               <div class="span12">
                 <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Response" data-object-plural="responses" data-object-id="{{instance.id}}">
@@ -156,9 +156,8 @@
                 </a>
               </div>
             </div>
-          </div>
-        {{/if_helpers}}
-      
+          {{/if_helpers}}
+        </div>
       {{#child_options.0}}
       <div class="inner-tree">
         <h6>Mapped Objects ({{child_options.0.list.length}})
@@ -168,7 +167,7 @@
         </ul>
       </div>
       {{/child_options.0}}
-      
+
       {{#if_equals instance.response_type 'documentation'}}
       {{#child_options.1}}
       <div class="inner-tree">

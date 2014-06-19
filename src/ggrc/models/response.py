@@ -74,6 +74,7 @@ class Response(
       'response_type',
       ]
   _sanitize_html = [
+      'description',
       ]
 
   def _display_name(self):

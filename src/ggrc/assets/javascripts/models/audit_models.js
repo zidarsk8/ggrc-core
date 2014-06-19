@@ -75,7 +75,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
       var audit_firm = this.attr("audit_firm");
       var audit_firm_text = this.attr("_transient.audit_firm");
       if(!audit_firm && audit_firm_text
-        || (audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
+        || (audit_firm_text !== "" && audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
         return "No valid org group selected for firm";
       }
     });
@@ -119,7 +119,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
         role_id__in: auditor_role.id
       });
     }).then(function(auditor_roles){
-      return $.when(
+      return $.when.apply($,
         can.map(auditor_roles, function(role){
           if(typeof instance.auditor !== "undefined" &&
               instance.auditor != null &&
@@ -219,6 +219,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , init : function() {
     this._super.apply(this, arguments);
+    this.validatePresenceOf("description");
     this.validatePresenceOf("due_on");
     this.validatePresenceOf("assignee");
     if(this === CMS.Models.Request) {
