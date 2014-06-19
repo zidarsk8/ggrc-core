@@ -44,7 +44,7 @@
             </li>
             <li>
               <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
-                {{^instance.status}}
+                {{#if_equals instance.status 'Assigned'}}
                   <button class="btn btn-primary change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Start</button>
                 {{/status}}
                 {{#if_equals instance.status 'InProgress'}}

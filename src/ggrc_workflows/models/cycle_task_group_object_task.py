@@ -15,7 +15,7 @@ class CycleTaskGroupObjectTask(
   __tablename__ = 'cycle_task_group_object_tasks'
   _title_uniqueness = False
 
-  VALID_STATES = (None, u'InProgress', u'Finished', u'Verified')
+  VALID_STATES = (None, u'Assigned', u'InProgress', u'Finished', u'Verified')
 
   cycle_task_group_object_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=False)
