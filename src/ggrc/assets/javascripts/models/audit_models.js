@@ -29,6 +29,7 @@ can.Model.Cacheable("CMS.Models.Audit", {
     , people : "CMS.Models.Person.stubs"
     , contact : "CMS.Models.Person.stub"
     , audit_firm : "CMS.Models.OrgGroup.stub"
+    , audit_objects : "CMS.Models.AuditObject.stubs"
   }
   , defaults : {
     status : "Draft"
@@ -245,7 +246,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
     , requestor : "CMS.Models.Person.stub"
-    , objective : "CMS.Models.Objective.stub"
+    , audit_object : "CMS.Models.AuditObject.stub"
     , requested_on : "date"
     , due_on : "date"
   }
@@ -364,7 +365,22 @@ can.Model.Cacheable("CMS.Models.Request", {
         }).save()
       );
     }
-  }
+  },
+  request_object : can.compute(function(val) {
+    var match,
+      audit = this.attr("audit").reify(),
+      audit_objects = audit && audit.get_mapping("objects");
+    if(typeof val === undefined) {
+      return this.attr("audit_object").reify().attr("auditable").reify();
+    } else {
+      this.attr("_pending_object", val);
+      match = can.map(audit_objects, function(obj) {
+        if(audit_objects.something) {  /// note to yourself today from yourself yesterday, you left off here :)
+        }
+      });
+    }
+
+  })
 });
 
 
