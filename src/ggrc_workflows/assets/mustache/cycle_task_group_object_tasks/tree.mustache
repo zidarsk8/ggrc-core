@@ -20,13 +20,6 @@
         <div class="span12">
           <ul class="tree-action-list">
             <li>
-              {{#if_equals instance.status 'Verified'}}
-                <span class="task-done">
-                  <em>Verified</em>
-                </span>
-              {{/if_equals}}
-            </li>
-            <li>
               <span class="counter">
                 due
                 <strong class="error">{{instance.end_date}}</strong>
@@ -54,6 +47,11 @@
                   <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Decline</button>
                   <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
                 {{/status}}
+                {{#if_equals instance.status 'Verified'}}
+                  <span class="task-done">
+                    <em>Verified</em>
+                  </span>
+                {{/if_equals}}
                 {{#instance._undo.0}}
                   <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
                 {{/instance._undo.0}}
