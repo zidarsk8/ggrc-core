@@ -346,7 +346,7 @@
         model: can.Model.Cacheable,
         mapping: "objects",
         //show_view: GGRC.mustache_path + "/sections/tree.mustache",
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        footer_view: GGRC.mustache_path + "/wf_objects/tree_footer.mustache"
       }
     };
     history_widget_descriptor = {
