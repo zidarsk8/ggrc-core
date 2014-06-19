@@ -265,6 +265,8 @@
           else {
             GGRC.navigate(data.selfLink.replace('/api', ''));
           }
+        } else if (form_target == 'refresh_page_instance'){
+          GGRC.page_instance().refresh();
         } else {
           var dirty;
           $target.modal_form('hide');
