@@ -62,7 +62,7 @@ class EmailNotification(NotificationBase):
     for recipient in recipients:
       notification_recipient = NotificationRecipient(
         created_at=datetime.now(),
-        status='Progress',
+        status='InProgress',
         notif_type=self.notif_type,
         recipient_id=recipient.id,
         notification=notification
@@ -75,13 +75,15 @@ class EmailNotification(NotificationBase):
   def notify(self):
     pending_notifications = db.session.query(Notification).\
       join(Notification.recipients).\
-      filter(NotificationRecipient.status == 'Progress').\
+      filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
 
     for notification in pending_notifications:
       sender = Person.query.filter(Person.id==notification.sender_id).first()
       assignees = {}
       for notify_recipient in notification.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
         recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
         assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
 
@@ -103,6 +105,8 @@ class EmailNotification(NotificationBase):
 
     for notification in pending_notifications:
       for notify_recipient in notification.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
         notify_recipient.status="Successful"
         db.session.add(notify_recipient)
         db.session.flush()
@@ -111,6 +115,8 @@ class EmailNotification(NotificationBase):
     sender = Person.query.filter(Person.id==notification.sender_id).first()
     assignees = {}
     for notify_recipient in notification.recipients:
+      if notify_recipient.notif_type != self.notif_type:
+        continue
       recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
       assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
 
@@ -132,6 +138,8 @@ class EmailNotification(NotificationBase):
     message.send()
 
     for notify_recipient in notification.recipients:
+      if notify_recipient.notif_type != self.notif_type:
+        continue
       notify_recipient.status="Successful"
       db.session.add(notify_recipient)
       db.session.flush()
@@ -143,7 +151,7 @@ class EmailDigestNotification(EmailNotification):
   def notify(self):
     pending_notifications = db.session.query(Notification).\
       join(Notification.recipients).\
-      filter(NotificationRecipient.status == 'Progress').\
+      filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
 
     pending_notifications_by_date = {}
@@ -171,6 +179,8 @@ class EmailDigestNotification(EmailNotification):
           sender_ids[sender_id] = sender
 
         for notify_recipient in notification.recipients:
+          if notify_recipient.notif_type != self.notif_type:
+            continue
           if not to.has_key(notify_recipient.recipient_id):
             recipient_id=notify_recipient.recipient_id
             recipient = Person.query.filter(Person.id==recipient_id).first()
@@ -201,6 +211,8 @@ class EmailDigestNotification(EmailNotification):
 
       for notification in notifications:
         for notify_recipient in notification.recipients:
+          if notify_recipient.notif_type != self.notif_type:
+            continue
           notify_recipient.status="Successful"
           db.session.add(notify_recipient)
           db.session.flush()

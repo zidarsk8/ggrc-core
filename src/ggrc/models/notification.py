@@ -42,9 +42,10 @@ class NotificationRecipient(Base, Stateful, db.Model):
   __tablename__ = 'notification_recipients'
 
   VALID_STATES = [
-    "Progress",
+    "InProgress",
     "Successful",
-    "Failure",
+    "NotificationDisabled",
+    "Failed",
   ]
 
   notif_type = db.Column(db.String)
