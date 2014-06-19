@@ -6,7 +6,13 @@
 }}
 
 
-<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item governance rq-draft 
+  {{#if_equals instance.status 'InProgress'}}rq-requested{{/if}}
+  {{#if_equals instance.status 'Verified'}}rq-accepted{{/if}}
+  {{#if_equals instance.status 'Finished'}}rq-updated{{/if}}
+  {{^if_equals instance.status 'Verified'}}{{#is_overdue end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}"
+  data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
+  >
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
@@ -14,14 +20,10 @@
         <div class="span12">
           <ul class="tree-action-list">
             <li>
-              {{^instance.status}}
-              <span class="gray"><em>Assigned</em></span>
-              {{/instance.status}}
-              {{#if_equals instance.status 'started'}}
-              <span class="gray"><em>In progress</em></span>
-              {{/if_equals}}
-              {{#if_equals instance.status 'finished'}}
-              <span class="task-done"><em>Finished</em></span>
+              {{#if_equals instance.status 'Verified'}}
+                <span class="task-done">
+                  <em>Verified</em>
+                </span>
               {{/if_equals}}
             </li>
             <li>
@@ -29,16 +31,33 @@
                 due
                 <strong class="error">{{instance.end_date}}</strong>
               </span>
-              {{^if_equals instance.status 'finished'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
+              {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
 
             <li>
-              {{!#with_mapping_count instance 'cycle_task_entries'}}
+              {{#with_mapping_count instance 'cycle_task_entries'}}
               <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                 <i class="grcicon-object-black"></i>
                 <strong class="error">{{count}}</strong>
               </span>
-              {{!/with_mapping_count}}
+              {{/with_mapping_count}}
+            </li>
+            <li>
+              <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
+                {{^instance.status}}
+                  <button class="btn btn-primary change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Start</button>
+                {{/status}}
+                {{#if_equals instance.status 'InProgress'}}
+                  <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                {{/if_equals}}
+                {{#if_equals instance.status 'Finished'}}
+                  <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Decline</button>
+                  <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
+                {{/status}}
+                {{#instance._undo.0}}
+                  <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                {{/instance._undo.0}}
+              </div>
             </li>
           </ul>
 

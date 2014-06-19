@@ -69,7 +69,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     }
     var that = this
       , name = el.data('name')
-      , old_value = this.options.instance.attr(name);
+      , old_value = this.options.instance.attr(name) || "";
 
     // Check if the undo button was clicked:
     this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);

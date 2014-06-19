@@ -502,6 +502,10 @@ ul.new-tree {
         }
       }
     }
+    .task-done {
+      font-size: 13px;
+      color: $green;
+    }
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
