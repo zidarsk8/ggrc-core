@@ -366,6 +366,19 @@ can.Model.Cacheable("CMS.Models.Request", {
       );
     }
   },
+  // Compute for determining the connected object via audit_objects
+  //  and returning it or setting it.  If we desire an auditable 
+  //  object to be the request_object, but do not have an audit_object
+  //  that joins the request's audit to the auditable yet, create a
+  //  pending AuditObject that will be created on the server only when the
+  //  request is saved.  If the appropriate AuditObject already exists,
+  //  it becomes the request's audit_object value (saved as an attribute on
+  //  save of the request) and this compute will
+  //  then return the new auditable when called as a getter.
+  //
+  //  As of 6/19/2014 this is not completely implemented.  When work on this
+  //  branch resumes, please complete implementation to align with the
+  //  description above --BM
   request_object : can.compute(function(val) {
     var match,
       audit = this.attr("audit").reify(),
@@ -375,9 +388,13 @@ can.Model.Cacheable("CMS.Models.Request", {
     } else {
       this.attr("_pending_object", val);
       match = can.map(audit_objects, function(obj) {
-        if(audit_objects.something) {  /// note to yourself today from yourself yesterday, you left off here :)
+        if(audit_objects.auditable.reify() === val) {
+          return obj;
         }
       });
+      if(match.length > 0) {
+        this.attr
+      }
     }
 
   })

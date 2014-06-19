@@ -914,7 +914,7 @@
             "Section", "section", "MultitypeSearchJoin"),
     }
     , AuditObject : {
-      _auditable : Direct("Cacheable", null, "auditable")
+      _auditable : Direct(null, null, "auditable")
     }
   });
 })(GGRC, can);
