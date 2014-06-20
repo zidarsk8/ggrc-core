@@ -184,7 +184,7 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='radio'] change": "change_option",
+    ".confirm-buttons a.btn-primary click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
@@ -205,6 +205,9 @@
           deferred.resolve();
           self.element.trigger('loaded');
         });
+
+      // Change the Done button to Save because we're making the change when submitting the modal form.
+      $(".confirm-buttons a.btn-primary").text('Save');
 
       // Start listening for events
       this.on();
@@ -369,8 +372,10 @@
       this.context.attr('selected_option', el.data('option'));
     },
 
-    change_option: function(el, ev) {
+    change_option: function(el_, ev) {
+      
       var self = this
+        , el = $(".people-selector").find("input[type=radio]:checked")
         , li = el.closest('li')
         , clicked_option = li.data('option');
         ;
@@ -394,7 +399,7 @@
       // Create the new join.
       var join = self.get_new_join(
           clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
-      join.save().then(function() {
+          join.save().then(function() {
           self.join_list.push(join);
           self.refresh_option_list();
           self.element.trigger("relationshipcreated", join);
