@@ -45,14 +45,14 @@
             <li>
               <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
                 {{#if_equals instance.status 'Assigned'}}
-                  <button class="btn btn-primary change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Start</button>
+                  <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
                 {{/status}}
                 {{#if_equals instance.status 'InProgress'}}
                   <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
                 {{/if_equals}}
                 {{#if_equals instance.status 'Finished'}}
                   <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Decline</button>
-                  <button class="btn btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
+                  <button class="btn btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
                 {{/status}}
                 {{#if_equals instance.status 'Verified'}}
                   <span class="task-done">

@@ -67,6 +67,10 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
       return;
     }
+    if(el.data('openclose')){
+      var main = el.closest('.item-main');
+      main.openclose(el.data('openclose'));
+    }
     var that = this
       , name = el.data('name')
       , old_value = this.options.instance.attr(name) || "";
@@ -86,6 +90,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     }).then(function(){
       that.options.instance.attr('_disabled', '');
     });
+    that.options.instance.refresh();
   }
 
 });
