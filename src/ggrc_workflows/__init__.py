@@ -126,5 +126,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           description=task.description,
           sort_index=task_group_task.sort_index,
           end_date=task_group_task.end_date,
+          contact=task_group_object.task_group.contact,
           status="Assigned",
           )
