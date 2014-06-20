@@ -5,7 +5,7 @@
 
 
 """
- GGRC email notification module prepares email, email digest, notify email to recipients when it is triggerd
+ GGRC email notification module hook to prepares email, email digest, notify email to recipients 
 """
 
 
