@@ -26,7 +26,14 @@
               </span>
               {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
-
+            <li {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
+              {{#using contact=instance.contact}}
+                <i class="grcicon-person-green pull-left icon-field"></i>
+                <div class="objective-selector">
+                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                </div>
+              {{/using}}
+            </li>
             <li>
               {{#with_mapping_count instance 'cycle_task_entries'}}
               <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
