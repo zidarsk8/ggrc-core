@@ -6,11 +6,7 @@
 }}
 
 
-<li class="tree-item governance rq-draft 
-  {{#if_equals instance.status 'InProgress'}}rq-requested{{/if}}
-  {{#if_equals instance.status 'Verified'}}rq-accepted{{/if}}
-  {{#if_equals instance.status 'Finished'}}rq-updated{{/if}}
-  {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}rq-rejected{{/is_overdue}}{{/if_equals}}"
+<li class="tree-item governance" {{addclass "t-" instance.status}}
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
   >
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
@@ -30,7 +26,7 @@
               {{#using contact=instance.contact}}
                 <i class="grcicon-person-green pull-left icon-field"></i>
                 <div class="objective-selector">
-                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
                 </div>
               {{/using}}
             </li>

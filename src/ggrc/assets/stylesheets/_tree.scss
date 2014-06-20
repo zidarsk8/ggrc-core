@@ -674,7 +674,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-draft {
+      &.rq-draft,
+      &.t-assigned {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -690,7 +691,7 @@ ul.new-tree {
           }
         }
       }
-      &.rq-requested {
+      &.rq-requested,&.t-inprogress {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -740,7 +741,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-updated {
+      &.rq-updated,
+      &.t-finished {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -756,7 +758,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-accepted {
+      &.rq-accepted,
+      &.t-verified {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -821,7 +824,8 @@ ul.new-tree {
         }
       }
       &.rq-amended-request,
-      &.rq-rejected {
+      &.rq-rejected,
+      &.t-overdue {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -866,7 +870,11 @@ ul.new-tree {
       &.rq-assigned,
       &.rq-submitted,
       &.rq-rejected,
-      &.rq-accepted {
+      &.t-assigned,
+      &.t-inprogress,
+      &.t-verified,
+      &.t-finished,
+      &.t-overdue, {
         > .item-main {
           &:hover {
             .row-fluid {

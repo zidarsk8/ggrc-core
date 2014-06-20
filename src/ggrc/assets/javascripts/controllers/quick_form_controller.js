@@ -68,8 +68,21 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       return;
     }
     if(el.data('openclose')){
-      var main = el.closest('.item-main');
-      main.openclose(el.data('openclose'));
+      var action = el.data('openclose'),
+          main = el.closest('.item-main'),
+          openclose = main.find('.openclose'),
+          isOpened = openclose.hasClass('active');
+      
+      // We can't use main.openclose(action) here because content may not be loaded yet
+      if(action === 'trigger'){
+        openclose.trigger('click');
+      }
+      else if(action === 'close' && isOpened){
+        openclose.trigger('click');
+      }
+      else if(action === 'open' && !isOpened){
+        openclose.trigger('click');
+      }
     }
     var that = this
       , name = el.data('name')
@@ -90,7 +103,6 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     }).then(function(){
       that.options.instance.attr('_disabled', '');
     });
-    that.options.instance.refresh();
   }
 
 });
