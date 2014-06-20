@@ -35,7 +35,7 @@ def get_assignee(task):
   if task_group is not None and task_group.contact_id is not None:
     return db.session.query(Person).filter(Person.id==task_group.contact_id).first()
   if task_group is None:
-    current_app.logger.warn("Trigger: Task Group object is not found")
+    current_app.logger.warn("Trigger: CycleTaskGroup object is not found")
     return None
   cycle = get_taskgroup_cycle(task_group)
   if cycle is not None and cycle.contact_id is not None:
@@ -43,12 +43,6 @@ def get_assignee(task):
   if cycle is None:
     current_app.logger.warn("Trigger: Cycle object is not found")
     return None
-  workflow = get_cycle_workflow(cycle)
-  if workflow is None:
-    current_app.logger.warn("Trigger: Cycle object is not found")
-    return None
-  else:
-   return workflow.owner
 
 def get_workflow(task):
   cycle = get_cycle(task)
@@ -61,7 +55,7 @@ def get_workflow(task):
 def get_cycle(task):
   task_group = get_taskgroup(task) 
   if task_group is None:
-    current_app.logger.warn("Trigger: TaskGroup object is not found")
+    current_app.logger.warn("Trigger: CycleTaskGroup object is not found")
     return None
   return db.session.query(models.Cycle).\
     join(models.Cycle.contact).\
@@ -76,23 +70,29 @@ def get_cycle_workflow(cycle):
     filter(models.Workflow.id == cycle.workflow_id).first()
   return workflow
 
+def get_taskgroup_object(task):
+  task_group_object= db.session.query(models.CycleTaskGroupObject).\
+    filter(models.CycleTaskGroupObject.id == task.cycle_task_group_object_id).first()
+  return task_group_object
+
 def get_taskgroup(task):
-  task_group= db.session.query(models.CycleTaskGroup).\
-    join(models.CycleTaskGroupObject).\
-    filter(models.TaskGroupObject.id == task.cycle_task_group_object_id).first()
+  task_group_object = get_taskgroup_object(task)
+  if task_group_object == None:
+    return None
+  task_group = db.session.query(models.CycleTaskGroup).\
+    filter(models.CycleTaskGroup.id == task_group_object.cycle_task_group_id).first()
   return task_group
 
 def handle_tasks_overdue():
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
     filter(models.CycleTaskGroupObjectTask.end_date < date.today()).\
-    filter(models.CycleTaskGroupObjectTask.status != 'Completed' or \
-      models.CycleTaskGroupObjectTask.status != 'Verified').\
+    filter(models.CycleTaskGroupObjectTask.status != 'Completed').\
+    filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is past overdue " 
-    content="Task " + '"' + task.title + '" URL: ' + request.url_root + \
-      models.Task.__tablename__ + "/" + str(task.task_group_task_id) + \
-      " due on " + str(task.end_date)
+    content=subject + " URL: " + request.url_root + \
+      models.Task.__tablename__ + "/" + str(task.task_group_task_id)
     notif_type = 'Email_Digest'
     workflow_owner = get_workflow_owner(task)
     if workflow_owner is None:
@@ -109,13 +109,13 @@ def handle_tasks_overdue():
 def handle_tasks_due(num_days):
   tasks = db.session.query(models.CycleTaskGroupObjectTask).\
     filter(models.CycleTaskGroupObjectTask.end_date == (date.today() + timedelta(num_days))).\
-    filter(models.CycleTaskGroupObjectTask.status != 'Completed' or \
-      models.CycleTaskGroupObjectTask.status != 'Verified').\
+    filter(models.CycleTaskGroupObjectTask.status != 'Completed').\
+    filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is due in " + str(num_days) + " days"
-    content="Task " + '"' + task.title + '" URL: '  + request.url_root + models.Task.__tablename__ + \
-      "/" + str(task.task_group_task_id) + " due on " + str(task.end_date)
+    content=subject + " URL: " + request.url_root + models.Task.__tablename__ + \
+      str(task.task_group_task_id) 
     notif_type = 'Email_Digest'
     workflow_owner = get_workflow_owner(task)
     if workflow_owner is None:
@@ -150,9 +150,8 @@ def handle_workflow_cycle_status_change(status):
       recipients.append(person)
     if len(recipients):
       subject="Workflow Cycle " + '"' + cycle.title + '" ' + "is ready to be "  + new_status
-      content="Workflow " + '"' + workflow_obj.title + '" URL: ' + \
-        request.url_root + workflow_obj._inflector.table_plural + \
-        "/" + str(workflow_obj.id) + " due on " + str(workflow_obj.end_date)
+      content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
+        str(workflow_obj.id) + "#current_widget" 
       notif_type = 'Email_Digest'
       notif_pri = PRI_OTHERS
       prepare_notification(cycle, notif_type, notif_pri, subject, content, workflow_obj.owner, recipients)
@@ -164,21 +163,22 @@ def handle_workflow_cycle_started():
     filter(models.Cycle.start_date == date.today()).\
     all()
   for cycle in workflow_cycles:
-    workflow_obj=db.session.query(models.Workflow).filter(models.Workflow.id == cycle.workflow_id).first()
+    workflow_obj=db.session.query(models.Workflow).\
+      filter(models.Workflow.id == cycle.workflow_id).first()
     if workflow_obj is None:
       current_app.logger.warn("Trigger: Unable to find workflow")
       continue
     subject="Workflow Cycle " + '"' + cycle.title + '" ' + "started " + str(cycle.start_date) 
-    content="Workflow: "  + '"' + workflow_obj.title + '" URL: ' + \
-      request.url_root + workflow_obj._inflector.table_plural + \
-      "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
+    content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
+      str(workflow_obj.id) + "#current_widget"
     notif_type = 'Email_Digest'
     notif_pri = PRI_OTHERS
     recipients=[]
     for person in workflow_obj.people:
       recipients.append(person)
     if len(recipients):
-      prepare_notification(cycle, notif_type, notif_pri, subject, content, workflow_obj.owner, recipients)
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, \
+       workflow_obj.owner, recipients)
 
 def handle_workflow_cycle_starting(num_days):
   workflow_cycles= db.session.query(models.Cycle).\
@@ -186,41 +186,33 @@ def handle_workflow_cycle_starting(num_days):
     filter(models.Cycle.start_date == (date.today() + timedelta(num_days))).\
     all()
   for cycle in workflow_cycles:
-    workflow_obj=db.session.query(models.Workflow).filter(models.Workflow.id == cycle.workflow_id).first()
+    workflow_obj=db.session.query(models.Workflow).\
+      filter(models.Workflow.id == cycle.workflow_id).first()
     if workflow_obj is None:
       current_app.logger.warn("Trigger: Unable to find workflow")
       continue
     subject="Workflow Cycle " + '"' + cycle.title + '" ' + "will start in " + str(num_days) + " days"
-    content="Workflow: "  + '"' + workflow_obj.title + '" URL: ' + \
-      request.url_root + workflow_obj._inflector.table_plural + \
-      "/" + str(workflow_obj.id) + " due on " + str(cycle.end_date)
+    content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
+      str(workflow_obj.id) + "#current_widget" 
     notif_type = 'Email_Digest'
     notif_pri = PRI_OTHERS
     recipients=[]
     for person in workflow_obj.people:
       recipients.append(person)
     if len(recipients):
-      prepare_notification(cycle, notif_type, notif_pri, subject, content, workflow_obj.owner, recipients)
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, \
+        workflow_obj.owner, recipients)
 
 # ToDo(Mouli): Uncomment once workflow state trigger is working end-end
 #@Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
-  current_app.logger.info("Trigger: Task status changed to " + src.status) 
   if not getattr(obj, 'status'): 
     current_app.logger.warn("Trigger: Status attribute is not modified")
     return
   notif_pri=PRI_TASK_CHANGES
-  if src.contact_id is None:
-    current_app.logger.warn("Trigger: Task Contact attribute is not set")
-    return
-  contact = db.session.query(Person).filter(Person.id == src.contact_id).first()
-  if contact is None:
-    current_app.logger.warn("Trigger: Unable to find Task Contact")
-    return
   subject="Task " + '"' + src.title + '" ' + " status changed to " + src.status
-  content="Task " + '"' + src.title + '" URL: ' + request.url_root + \
-    "/" + models.Task.__tablename__ + "/" + str(obj.task_group_task_id) + \
-    " due on " + str(src.end_date) + " Contact: " + contact.name
+  content=subject + " URL: " + request.url_root + \
+    models.Task.__tablename__ + "/" + str(src.task_group_task_id)
   workflow_owner = get_workflow_owner(src)
   if workflow_owner is None:
     current_app.logger.warn("Unable to find workflow owner for task: " + src.title)
@@ -240,19 +232,18 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   if obj.status in ['Completed']: 
     notif_type='Email_Digest'
     recipients=[workflow_owner]
-    prepare_notification(src, notif_type, notif_pri, subject, assignee, contact, recipients)
+    prepare_notification(src, notif_type, notif_pri, subject, content, assignee, recipients)
 
-def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, override=False):
+def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
+  override=False):
   if notif_type == 'Email_Digest':
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
-    current_app.logger.info("Preparing Email Digest with priority:" + str(notif_pri))
     emaildigest_notification.prepare([src], owner, recipients, subject, content)
   elif notif_type == 'Email_Now':
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)
-    current_app.logger.info("Sending Email with priority:" + str(notif_pri))
     email_notification.notify_one(notification)
   else:
     return None
@@ -260,5 +251,4 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)
-    current_app.logger.info("Sending Email with priority:" + str(notif_pri))
     email_notification.notify_one(notification)

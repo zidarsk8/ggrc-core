@@ -181,18 +181,18 @@ class EmailDigestNotification(EmailNotification):
         for notify_recipient in notification.recipients:
           if notify_recipient.notif_type != self.notif_type:
             continue
-          if not to.has_key(notify_recipient.recipient_id):
-            recipient_id=notify_recipient.recipient_id
+          recipient_id=notify_recipient.recipient_id
+          if not to.has_key(recipient_id):
             recipient = Person.query.filter(Person.id==recipient_id).first()
             if recipient is None:
               continue
             to[recipient_id]=recipient
-            key=(recipient_id, sender_id)
-            if not content.has_key(key):
-              content[key]={}
-            if not content[key].has_key(notification.notif_pri):
-              content[key][notif_pri]=""
-            content[key][notif_pri] = content[key][notif_pri] + empty_line + notification.content
+          key=(recipient_id, sender_id)
+          if not content.has_key(key):
+            content[key]={}
+          if not content[key].has_key(notification.notif_pri):
+            content[key][notif_pri]=""
+          content[key][notif_pri] = content[key][notif_pri] + empty_line + notification.content
 
       for (recipient_id, sender_id), items in content.items():
         recipient=to[recipient_id] 

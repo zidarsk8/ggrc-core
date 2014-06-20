@@ -26,7 +26,8 @@ def modify_status():
     obj.status=status
     db.session.add(obj)
     db.session.commit()
-    handle_task_put(sender=None, obj=obj, src=obj, service=None)
+    if model in ['CycleTaskGroupObjectTask']:
+      handle_task_put(sender=None, obj=obj, src=obj, service=None)
     db.session.commit()
   return render_template("dashboard/index.haml")
 
