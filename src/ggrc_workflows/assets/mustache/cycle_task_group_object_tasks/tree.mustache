@@ -6,7 +6,7 @@
 }}
 
 
-<li class="tree-item governance" {{addclass "t-" instance.status}}
+<li class="tree-item governance" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
   >
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
@@ -15,13 +15,6 @@
       <div class="row-fluid">
         <div class="span12">
           <ul class="tree-action-list">
-            <li>
-              <span class="counter">
-                due
-                <strong class="error">{{instance.end_date}}</strong>
-              </span>
-              {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
-            </li>
             <li {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
               {{#using contact=instance.contact}}
                 <i class="grcicon-person-green pull-left icon-field"></i>
@@ -37,6 +30,16 @@
                 <strong class="error">{{count}}</strong>
               </span>
               {{/with_mapping_count}}
+            </li>
+            <li>
+              <div class="date">
+                <span rel="tooltip" data-placement="top" {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}class="error"{{/is_overdue}}{{/if}} data-original-title="Due On">
+                  {{instance.end_date}}
+                </span>
+              </div>
+            </li>
+            <li>
+            {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
             <li>
               <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
