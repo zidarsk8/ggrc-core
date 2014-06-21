@@ -759,7 +759,8 @@ ul.new-tree {
         }
       }
       &.rq-accepted,
-      &.t-verified {
+      &.t-verified,
+      &.t-completed {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -873,6 +874,7 @@ ul.new-tree {
       &.t-assigned,
       &.t-inprogress,
       &.t-verified,
+      &.t-finished,
       &.t-finished,
       &.t-overdue, {
         > .item-main {

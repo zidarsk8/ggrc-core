@@ -6,13 +6,21 @@
 }}
 
 
-<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item governance" {{addclass "t-" instance.status}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
         <div class="span12">
           <ul class="tree-action-list">
+            <li>
+              {{#if_equals instance.status 'Completed'}}
+              <span class="task-done"><em>Completed</em></span>
+              {{/if_equals}}
+              {{#if_equals instance.status 'InProgress'}}
+              <span class="gray"><em>In progress</em></span>
+              {{/if_equals}}
+            </li>
             <li>
               {{#with_mapping_count instance 'cycle_task_group_object_tasks'}}
               <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
