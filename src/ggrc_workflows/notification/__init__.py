@@ -115,7 +115,7 @@ def handle_tasks_due(num_days):
   for task in tasks:
     subject="Task " + '"' + task.title + '" ' + "is due in " + str(num_days) + " days"
     content=subject + " URL: " + request.url_root + models.Task.__tablename__ + \
-      str(task.task_group_task_id) 
+      "/" + str(task.task_group_task_id) 
     notif_type = 'Email_Digest'
     workflow_owner = get_workflow_owner(task)
     if workflow_owner is None:
@@ -151,10 +151,11 @@ def handle_workflow_cycle_status_change(status):
     if len(recipients):
       subject="Workflow Cycle " + '"' + cycle.title + '" ' + "is ready to be "  + new_status
       content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
-        str(workflow_obj.id) + "#current_widget" 
+        "/" + str(workflow_obj.id) + "#current_widget" 
       notif_type = 'Email_Digest'
       notif_pri = PRI_OTHERS
-      prepare_notification(cycle, notif_type, notif_pri, subject, content, workflow_obj.owner, recipients)
+      prepare_notification(cycle, notif_type, notif_pri, subject, content, \
+        cycle.contact, recipients)
 
 def handle_workflow_cycle_started():
   workflow_cycles= db.session.query(models.Cycle).\
@@ -170,7 +171,7 @@ def handle_workflow_cycle_started():
       continue
     subject="Workflow Cycle " + '"' + cycle.title + '" ' + "started " + str(cycle.start_date) 
     content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
-      str(workflow_obj.id) + "#current_widget"
+      "/" + str(workflow_obj.id) + "#current_widget"
     notif_type = 'Email_Digest'
     notif_pri = PRI_OTHERS
     recipients=[]
@@ -178,7 +179,7 @@ def handle_workflow_cycle_started():
       recipients.append(person)
     if len(recipients):
       prepare_notification(cycle, notif_type, notif_pri, subject, content, \
-       workflow_obj.owner, recipients)
+       cycle.contact, recipients)
 
 def handle_workflow_cycle_starting(num_days):
   workflow_cycles= db.session.query(models.Cycle).\
@@ -193,7 +194,7 @@ def handle_workflow_cycle_starting(num_days):
       continue
     subject="Workflow Cycle " + '"' + cycle.title + '" ' + "will start in " + str(num_days) + " days"
     content=subject + " URL: " + request.url_root + workflow_obj._inflector.table_plural + \
-      str(workflow_obj.id) + "#current_widget" 
+      "/" + str(workflow_obj.id) + "#current_widget" 
     notif_type = 'Email_Digest'
     notif_pri = PRI_OTHERS
     recipients=[]
@@ -201,9 +202,8 @@ def handle_workflow_cycle_starting(num_days):
       recipients.append(person)
     if len(recipients):
       prepare_notification(cycle, notif_type, notif_pri, subject, content, \
-        workflow_obj.owner, recipients)
+        cycle.contact, recipients)
 
-# ToDo(Mouli): Uncomment once workflow state trigger is working end-end
 #@Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
   if not getattr(obj, 'status'): 
