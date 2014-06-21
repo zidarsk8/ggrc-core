@@ -142,30 +142,76 @@ can.Model.Cacheable("CMS.Models.Audit", {
     }).then(function(){
       return instance;
     });
-  }, findAuditors : function(){
-    var loader = this.get_binding('authorizations');
-    var auditors_list = new can.List();
+  }, findAuditors : function(return_list){
+    // If return_list is true, use findAuditors in the
+    //  classical way, where the exact state of the list
+    //  isn't needed immeidately (as in a Mustache helper);
+    //  if false, return a deferred that resolves to the list
+    //  when the list is fully ready, for cases like permission
+    //  checks for other modules.
+    var loader = this.get_binding('authorizations'),
+      auditors_list = new can.List(),
+      dfds = []
+      ;
 
-    $.map(loader.list, function(binding) {
-      // FIXME: This works for now, but is sad.
-      if (!binding.instance.selfLink)
-        return;
-      var role = binding.instance.role.reify();
-      function checkRole() {
-        if (role.attr('name') === 'Auditor') {
-          auditors_list.push({
-            person: binding.instance.person.reify()
-            , binding: binding.instance
-          });
+    if(return_list) {
+      $.map(loader.list, function(binding) {
+        // FIXME: This works for now, but is sad.
+        if (!binding.instance.selfLink)
+          return;
+        var role = binding.instance.role.reify();
+        function checkRole() {
+          if (role.attr('name') === 'Auditor') {
+            auditors_list.push({
+              person: binding.instance.person.reify()
+              , binding: binding.instance
+            });
+          }
         }
-      }
-      if(role.selfLink) {
-        checkRole();
-      } else {
-        role.refresh().then(checkRole);
-      }
-    });
-    return auditors_list;
+        if(role.selfLink) {
+          checkRole();
+        } else {
+          role.refresh().then(checkRole);
+        }
+      });
+      return auditors_list;
+    } else {
+      return loader.refresh_instances().then(function() {
+        $.map(loader.list, function(binding) {
+          // FIXME: This works for now, but is sad.
+          
+          dfds.push(new $.Deferred(function(dfd) {
+
+            if (!binding.instance.selfLink) {
+              binding.instance.refresh().then(function() {
+                dfd.resolve(binding.instance);
+              });
+            } else {
+              dfd.resolve(binding.instance);
+            }
+          }).then(function(instance) {
+
+            var role = instance.role.reify();
+            function checkRole() {
+              if (role.attr('name') === 'Auditor') {
+                auditors_list.push({
+                  person: instance.person.reify()
+                  , binding: instance
+                });
+              }
+            }
+            if(role.selfLink) {
+              checkRole();
+            } else {
+              return role.refresh().then(checkRole);
+            }
+          }));
+        });
+        return $.when.apply($, dfds).then(function() {
+          return auditors_list;
+        });
+      });
+    }
   }
 });
 
@@ -465,14 +511,18 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   save : function() {
     if(this.isNew()) {
       var audit = this.request.reify().audit.reify()
-        , auditors = audit.findAuditors();
-      
-      if(auditors.length > 0){
-        this.mark_for_addition("people", auditors[0].person);
-      }
-      this.mark_for_addition("people", this.contact);
+        , auditors_dfd = audit.findAuditors();
+
+      return auditors_dfd.then(function(auditors) {
+        if(auditors.length > 0){
+          this.mark_for_addition("people", auditors[0].person);
+        }
+        this.mark_for_addition("people", this.contact);
+        return this._super.apply(this, arguments);
+      });
+    } else {
+      return this._super.apply(this, arguments);
     }
-    return this._super.apply(this, arguments);
   }
 });
 
