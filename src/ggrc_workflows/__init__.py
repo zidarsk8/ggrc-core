@@ -104,6 +104,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         task_group=task_group,
         title=task_group.title,
         description=task_group.description,
+        end_date=task_group.end_date,
         )
     #db.session.add(cycle_task_group)
 
@@ -126,6 +127,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           description=task.description,
           sort_index=task_group_task.sort_index,
           end_date=task_group_task.end_date,
-          contact=task_group_object.task_group.contact,
+          contact=task_group.contact,
           status="Assigned",
           )
