@@ -17,6 +17,18 @@ class NotificationConfig(Base, db.Model):
   notif_type = db.Column(db.String)
   person_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
 
+  _publish_attrs = [
+    'person_id',
+    'notif_type',
+    'enable_flag',
+  ]
+
+  VALID_TYPES = [
+    'Email_Now',
+    'Email_Digest',
+    'Calendar',
+  ]
+
 
 class Notification(Base, db.Model):
   __tablename__ = 'notifications'

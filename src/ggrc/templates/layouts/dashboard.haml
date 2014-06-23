@@ -60,13 +60,25 @@
                         Notifications
                       %div.inner-list
                         %label
-                          %input{ 'type': 'checkbox' }
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Email_Now' 
+                          }
                           Email notifications
                         %label
-                          %input{ 'type': 'checkbox' }
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Email_Digest' 
+                          }
                           Daily email digest
                         %label
-                          %input{ 'type': 'checkbox' }
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Calendar'
+                          }
                           Calendar notifications
                     %li.layout-wrap
                       %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
