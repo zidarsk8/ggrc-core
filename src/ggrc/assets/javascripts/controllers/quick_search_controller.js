@@ -1144,7 +1144,8 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         can.view(tooltip_view, { instance: instance }, function(frag) {
 
           var tooltip_width = self.options.$extended.outerWidth()
-            , el_left = el.parent().offset().left
+            , offset = el.parent().offset()
+            , el_left = offset ? offset.left : 0
             , offset_left = el_left - tooltip_width > 0 ?
                 el_left - tooltip_width : el_left + el.parent().width();
 

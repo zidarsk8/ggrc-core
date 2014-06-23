@@ -67,9 +67,26 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
     if(!el.data('name') || !el.data('value') || $(el).hasClass('disabled')){
       return;
     }
+    if(el.data('openclose')){
+      var action = el.data('openclose'),
+          main = el.closest('.item-main'),
+          openclose = main.find('.openclose'),
+          isOpened = openclose.hasClass('active');
+      
+      // We can't use main.openclose(action) here because content may not be loaded yet
+      if(action === 'trigger'){
+        openclose.trigger('click');
+      }
+      else if(action === 'close' && isOpened){
+        openclose.trigger('click');
+      }
+      else if(action === 'open' && !isOpened){
+        openclose.trigger('click');
+      }
+    }
     var that = this
       , name = el.data('name')
-      , old_value = this.options.instance.attr(name);
+      , old_value = this.options.instance.attr(name) || "";
 
     // Check if the undo button was clicked:
     this.options.instance.attr('_undo') || that.options.instance.attr('_undo', []);
