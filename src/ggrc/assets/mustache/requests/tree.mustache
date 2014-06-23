@@ -124,7 +124,7 @@
               {{#if_match instance.status "Respon"}}
                 {{#if_auditor instance}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
-                <a href="javascript://" data-toggle="modal-ajax-form" data-object-singular="Request" data-object-params='{"modal_title":"Amend Request"}' data-object-plural="requests" data-object-id="{{instance.id}}" class="btn btn-warning {{instance._disabled}} modal-wide" data-template="/static/mustache/requests/amend_modal_content.mustache">Amend</a>
+                <a href="javascript://" data-toggle="modal-ajax-form" data-object-singular="Request" data-object-params='{"modal_title":"Amend Request"}' data-object-plural="requests" data-object-id="{{instance.id}}" class="btn btn-warning {{instance._disabled}}" data-modal-class="modal-wide" data-template="/static/mustache/requests/amend_modal_content.mustache">Amend</a>
                 {{else}}
                 <small class="gray"><em>Responded</em></small>
                 {{/if_auditor}}
