@@ -917,17 +917,24 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 
   , refresh_counts: function() {
-      var models;
+      var self = this
+        , search_id = this.search_id
+        , models;
       models = can.map(this.get_lists(), this.proxy("get_list_model"));
 
       // Retrieve and display counts
       return GGRC.Models.Search.counts_for_types(
           this.current_term, models, this.current_params
-        ).then(this.proxy("display_counts"));
+        ).then(function() {
+          if (self.search_id === search_id) {
+            return self.display_counts.apply(self, arguments);
+          }
+        });
     }
 
   , refresh_visible_lists: function() {
       var self = this
+        , search_id = this.search_id
         , lists = this.get_visible_lists()
         , models = can.map(lists, this.proxy("get_list_model"))
         ;
@@ -982,7 +989,11 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         return GGRC.Models.Search.search_for_types(
             this.current_term, models, this.current_params
-          ).then(this.proxy("display_lists"));
+          ).then(function() {
+            if (self.search_id === search_id) {
+              return self.display_lists.apply(self, arguments);
+            }
+          });
       } else {
         return new $.Deferred().resolve();
       }
@@ -1004,6 +1015,11 @@ can.Control("CMS.Controllers.LHN_Search", {
         });
         this.options.loaded_lists = [];
 
+        //  `search_id` exists solely to provide a simple unique value for
+        //  each search to ensure results are shown for the correct search
+        //  parameters (avoiding a race condition with quick search term
+        //  changes)
+        this.search_id = (this.search_id || 0) + 1;
         this.current_term = term;
         this.current_params = extra_params;
         // Retrieve and display results for visible lists
@@ -1128,7 +1144,8 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
         can.view(tooltip_view, { instance: instance }, function(frag) {
 
           var tooltip_width = self.options.$extended.outerWidth()
-            , el_left = el.parent().offset().left
+            , offset = el.parent().offset()
+            , el_left = offset ? offset.left : 0
             , offset_left = el_left - tooltip_width > 0 ?
                 el_left - tooltip_width : el_left + el.parent().width();
 
