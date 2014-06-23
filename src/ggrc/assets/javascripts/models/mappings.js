@@ -106,7 +106,7 @@
       model_name_a - the string type (shortName) of the "from" object's class
       model_name_b - the string type (shortName) of the "to" object's class
 
-      return: an string of the shortName of the join model (subclass of can.Model.Join) or null
+      return: a string of the shortName of the join model (subclass of can.Model.Join) or null
     */
     join_model_name_for: function (model_name_a, model_name_b) {
       var join_descriptor = this.get_canonical_mapping(model_name_a, model_name_b);
