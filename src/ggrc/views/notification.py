@@ -29,7 +29,7 @@ def modify_status():
     if model in ['CycleTaskGroupObjectTask']:
       handle_task_put(sender=None, obj=obj, src=obj, service=None)
     db.session.commit()
-  return render_template("dashboard/index.haml")
+  return 'Ok'
 
 @app.route("/prepare_email", methods=["GET", "POST"])
 @login_required
@@ -50,7 +50,7 @@ def prepare_email_ggrc_users():
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_notification.prepare(target_objs, obj.contact, recipients, subject, content)
       db.session.commit()
-  return render_template("dashboard/index.haml")
+  return 'Ok'
 
 
 @app.route("/prepare_emaildigest", methods=["GET", "POST"])
@@ -73,7 +73,7 @@ def prepare_email_digest_ggrc_users():
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_digest_notification.prepare(target_objs, obj.contact, recipients, subject, content)
       db.session.commit()
-  return render_template("dashboard/index.haml")
+  return 'Ok'
 
 
 @app.route("/notify_email", methods=["GET", "POST"])
@@ -84,14 +84,14 @@ def notify_email_ggrc_users():
   email_notification = EmailNotification()
   email_notification.notify()
   db.session.commit()
-  return render_template("dashboard/index.haml")
+  return 'Ok'
 
 
 @app.route("/notify_emaildigest", methods=["GET", "POST"])
-@login_required
 def notify_email_digest_ggrc_users():
   """ handle any outstading tasks prior to notify email digest
   """
+  current_app.logger.info("notify email digest invoked")
   handle_tasks_overdue()
   handle_tasks_due(2)
   handle_workflow_cycle_status_change('Completed')
@@ -104,4 +104,4 @@ def notify_email_digest_ggrc_users():
   email_digest_notification = EmailDigestNotification()
   email_digest_notification.notify()
   db.session.commit()
-  return render_template("dashboard/index.haml")
+  return 'Ok'
