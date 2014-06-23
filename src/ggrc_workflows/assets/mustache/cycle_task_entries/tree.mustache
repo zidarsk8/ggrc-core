@@ -6,50 +6,48 @@
 }}
 
 
-<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-        <div class="span12">
-
-          <div class="item-data">
-            <div class="tree-title-area">
-              {{instance.description}}
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {{#if expanded}}
-  <div class="tier-2-info item-content">
-    <div class="tier-2-info-content">
-
-      <div class="show-description">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="tree-description short">
-              {{{object.description}}}
-            </div>
-            {{{show_long}}}
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    {{#if draw_children}}
-      {{#child_options}}
-        <div class="inner-tree">
-          <h6>Tasks ({{list.length}})</h6>
-          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-        </div>
-      {{/child_options}}
+<li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="pull-right">
+    <a href="#"></a>
+    <a class="info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+    <i class="grcicon-edit"></i>
+    </a>
+    
+    
+    
+    {{!#if allow_mapping}}
+    {{#if mappings}}
+    {{#is_allowed_all 'delete' mappings}}
+    {{^is_dashboard}}
+      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+        <i class="grcicon-deleted"></i>
+      </a>
+    {{/is_dashboard}}
+    {{/is_allowed_all}}
     {{/if}}
-
+    {{!/if}}
+    
   </div>
-  {{/if}}
+  {{instance.description}}
+  
+  <ul class="attachment-list">
+    <li>
+      <a href="#">
+        <i class="grcicon-attach"></i>
+        <span>supportingwalkthroughevidence.pdf</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <i class="grcicon-attach"></i>
+        <span>screenshot.pdf</span>
+      </a>
+    </li>
+  </ul>
+  <span class="entry-author">On {{date instance.created_at}}</span>
+  <br />
+  <a href="#" class="entry-attachment">
+    <i class="grcicon-attach-color"></i> Attach supporting file
+  </a>
 </li>
