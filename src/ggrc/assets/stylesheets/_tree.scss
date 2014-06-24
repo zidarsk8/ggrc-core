@@ -502,6 +502,10 @@ ul.new-tree {
         }
       }
     }
+    .task-done {
+      font-size: 13px;
+      color: $green;
+    }
     &.tree-item-open {
       @include box-shadow(inset 0 0 8px #bbb);
       background:#fff;
@@ -670,7 +674,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-draft {
+      &.rq-draft,
+      &.t-assigned {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -686,7 +691,7 @@ ul.new-tree {
           }
         }
       }
-      &.rq-requested {
+      &.rq-requested,&.t-inprogress {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -736,7 +741,8 @@ ul.new-tree {
           }
         }
       }
-      &.rq-updated {
+      &.rq-updated,
+      &.t-finished {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -752,7 +758,9 @@ ul.new-tree {
           }
         }
       }
-      &.rq-accepted {
+      &.rq-accepted,
+      &.t-verified,
+      &.t-completed {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -817,7 +825,8 @@ ul.new-tree {
         }
       }
       &.rq-amended-request,
-      &.rq-rejected {
+      &.rq-rejected,
+      &.t-overdue {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -862,7 +871,12 @@ ul.new-tree {
       &.rq-assigned,
       &.rq-submitted,
       &.rq-rejected,
-      &.rq-accepted {
+      &.t-assigned,
+      &.t-inprogress,
+      &.t-verified,
+      &.t-finished,
+      &.t-finished,
+      &.t-overdue, {
         > .item-main {
           &:hover {
             .row-fluid {
