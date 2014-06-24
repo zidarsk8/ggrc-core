@@ -251,4 +251,4 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)
-    email_notification.notify_one(notification)
+    email_notification.notify_one(notification, override)

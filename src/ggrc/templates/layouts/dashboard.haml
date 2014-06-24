@@ -51,18 +51,43 @@
                         My Work ({{current_user.system_wide_role}})
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
-                        %a{'href': "/admin"}
+                        %a{'href': "/admin#people_list_widget"}
                           %i.grcicon-admin
                           Admin Dashboard
-                    %li
+                    %li.notify-wrap
+                      %span
+                        %i.grcicon-alarm
+                        Notifications
+                      %div.inner-list
+                        %label
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Email_Now' 
+                          }
+                          Email notifications
+                        %label
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Email_Digest' 
+                          }
+                          Daily email digest
+                        %label
+                          %input{ 
+                            'type': 'checkbox', 
+                            'name': 'notifications', 
+                            'value': 'Calendar'
+                          }
+                          Calendar notifications
+                    %li.layout-wrap
                       %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
                         %i.grcicon-desktop
-                        Reset Layout to Default
-                    %li
+                        Save Layout
                       %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-desktop
-                        Set Layout as Default
-                    %li
+                        %i.grcicon-reset
+                        Reset Layout
+                    %li.logout-wrap
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
                         Logout

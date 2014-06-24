@@ -15,6 +15,19 @@ from datetime import datetime
 from ggrc import db
 
 
+def isNotificationEnabled(person_id, notif_type):
+  notification_config = NotificationConfig.query.\
+    filter(NotificationConfig.person_id==person_id).\
+    filter(NotificationConfig.notif_type==notif_type).\
+    first()
+  if notification_config is None:
+    if notif_type == 'Email_Digest':
+      return True
+    else:
+      return False
+  else:
+    return notification_config.enable_flag
+  
 class NotificationBase(object):
   notif_type = None
   notif_pri = None
@@ -78,14 +91,25 @@ class EmailNotification(NotificationBase):
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
 
+    enable_notif={}
     for notification in pending_notifications:
       sender = Person.query.filter(Person.id==notification.sender_id).first()
       assignees = {}
       for notify_recipient in notification.recipients:
         if notify_recipient.notif_type != self.notif_type:
           continue
-        recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
-        assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
+        recipient_id=notify_recipient.recipient_id
+        if recipient_id is None:
+          continue
+        if not enable_notif.has_key(recipient_id):
+          enable_notif[recipient_id]=isNotificationEnabled(recipient_id, self.notif_type)
+        if not enable_notif[recipient_id]:
+          continue
+        recipient = Person.query.filter(Person.id==recipient_id).first()
+        if recipient is None:
+          continue
+        if not assignees.has_key(recipient.id):
+          assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
 
       if len(assignees) < 1:
         continue 
@@ -107,18 +131,36 @@ class EmailNotification(NotificationBase):
       for notify_recipient in notification.recipients:
         if notify_recipient.notif_type != self.notif_type:
           continue
-        notify_recipient.status="Successful"
+        if enable_notif.has_key(notify_recipient.recipient_id) and \
+           enable_notif[notify_recipient.recipient_id]:
+          notify_recipient.status="Successful"
+        else:
+          notify_recipient.status="NotificationDisabled"
         db.session.add(notify_recipient)
         db.session.flush()
 
-  def notify_one(self, notification):
-    sender = Person.query.filter(Person.id==notification.sender_id).first()
-    assignees = {}
+  def notify_one(self, notification, override=False):
+    sender=Person.query.filter(Person.id==notification.sender_id).first()
+    assignees={}
+    enable_notif={}
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
         continue
-      recipient = Person.query.filter(Person.id==notify_recipient.recipient_id).first()
-      assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
+      recipient_id=notify_recipient.recipient_id
+      if recipient_id is None:
+        continue
+      if not enable_notif.has_key(recipient_id):
+        if override:
+          enable_notif[recipient_id]=True
+        else:
+          enable_notif[recipient_id]=isNotificationEnabled(recipient_id, self.notif_type)
+      if not enable_notif[recipient_id]:
+        continue
+      recipient=Person.query.filter(Person.id==recipient_id).first()
+      if recipient is None:
+        continue
+      if not assignees.has_key(recipient.id):
+        assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
 
     if len(assignees) < 1:
       return
@@ -140,7 +182,11 @@ class EmailNotification(NotificationBase):
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
         continue
-      notify_recipient.status="Successful"
+      if enable_notif.has_key(notify_recipient.recipient_id) and \
+         enable_notif[notify_recipient.recipient_id]:
+        notify_recipient.status="Successful"
+      else:
+        notify_recipient.status="NotificationDisabled"
       db.session.add(notify_recipient)
       db.session.flush()
 
@@ -163,6 +209,7 @@ class EmailDigestNotification(EmailNotification):
 
     to={}
     sender_ids={}
+    enable_notif={}
     for notif_date, notifications in pending_notifications_by_date.items():
       content={}
       subject="gGRC daily email digest for " + notif_date
@@ -182,6 +229,12 @@ class EmailDigestNotification(EmailNotification):
           if notify_recipient.notif_type != self.notif_type:
             continue
           recipient_id=notify_recipient.recipient_id
+          if recipient_id is None:
+            continue
+          if not enable_notif.has_key(recipient_id):
+            enable_notif[recipient_id] = isNotificationEnabled(recipient_id, self.notif_type)
+          if not enable_notif[recipient_id]:
+            continue
           if not to.has_key(recipient_id):
             recipient = Person.query.filter(Person.id==recipient_id).first()
             if recipient is None:
@@ -213,6 +266,10 @@ class EmailDigestNotification(EmailNotification):
         for notify_recipient in notification.recipients:
           if notify_recipient.notif_type != self.notif_type:
             continue
-          notify_recipient.status="Successful"
+          if enable_notif.has_key(notify_recipient.recipient_id) and \
+             enable_notif[notify_recipient.recipient_id]:
+            notify_recipient.status="Successful"
+          else:
+            notify_recipient.status="NotificationDisabled"
           db.session.add(notify_recipient)
           db.session.flush()
