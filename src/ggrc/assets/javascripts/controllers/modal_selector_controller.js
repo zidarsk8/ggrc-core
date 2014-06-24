@@ -1101,7 +1101,7 @@
         this.search_reset().then(function() {
           // Move the just-created object to the top
           self.move_option_to_top_and_select(data);
-          if(options && options.map_and_save){
+          if(options && options.map_and_save && self.element){
             self.on_map(self.element.find('.map-button'));
           }
         });
