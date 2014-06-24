@@ -38,8 +38,8 @@
     },
 
     "[data-ggrc-action=end-cycle] click": function() {
-      //console.debug(arguments);
-    }
+
+    },
   });
 
 })(this.CMS, this.GGRC, this.can, this.can.$);

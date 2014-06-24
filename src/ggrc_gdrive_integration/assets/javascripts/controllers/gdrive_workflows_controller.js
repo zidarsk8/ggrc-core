@@ -17,13 +17,13 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
       dfd = instance[parent_attr].reify().get_binding("folders").refresh_instances();
     } else {
       has_parent = false;
-      dfd = $.when([{}]); //make parent_folder instance be undefined; 
+      dfd = $.when([{}]); //make parent_folder instance be undefined;
                           // GDriveFolder.create will translate that into 'root'
     }
     return dfd.then(function(parent_folders) {
       parent_folders = can.map(parent_folders, function(pf) {
         return pf.instance && pf.instance.userPermission &&
-          (pf.instance.userPermission.role === "writer" || 
+          (pf.instance.userPermission.role === "writer" ||
            pf.instance.userPermission.role === "owner") ? pf : undefined;
       });
       if(has_parent && parent_folders.length < 1){
@@ -38,7 +38,7 @@ var create_folder = function(cls, title_generator, parent_attr, model, ev, insta
       return xhr;
     }).then(function(created_folder) {
       var refresh_queue;
-      
+
       folder = created_folder;
 
       return report_progress(
@@ -317,7 +317,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         };
 
         if(rolesmap[role.name] && person.email) { // only push valid emails
-          //Authorizations like "Auditor" do not get Program permissions. 
+          //Authorizations like "Auditor" do not get Program permissions.
           //  Only the ones in the map above get permissions
           push_person(rolesmap[role.name], person.email, true);
         }
@@ -551,11 +551,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
   , "{CMS.Models.Audit} updated" : "update_audit_owner_permission"
   , update_audit_owner_permission : function(model, ev, instance){
-    
+
     if(!(instance instanceof CMS.Models.Audit)) {
       return;
     }
-    
+
     var dfd = instance.delay_resolving_save_until(this.update_permissions(model, ev, instance));
   }
   , "{CMS.Models.Request} updated" : "update_request_folder"
@@ -660,8 +660,42 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     })
     );
   }
-
   , "a[data-toggle=gdrive-picker] click" : function(el, ev) {
+
+    var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]);
+    dfd.then(function(){
+      gapi.load('picker', {'callback': createPicker});
+
+      // Create and render a Picker object for searching images.
+      function createPicker() {
+        window.oauth_dfd.done(function(token, oauth_user) {
+          var picker = new google.picker.PickerBuilder()
+          .addView(new google.picker.DocsUploadView())
+          .addView(google.picker.ViewId.DOCS)
+          .setOAuthToken(gapi.auth.getToken().access_token)
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+          .setDeveloperKey(GGRC.config.GAPI_KEY)
+          .setCallback(pickerCallback)
+          .build();
+
+          picker.setVisible(true);
+        });
+      }
+
+      function pickerCallback(data) {
+        if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+          el.trigger('picked', data);
+        }
+        else if (data[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+          el.trigger('rejected', data);
+        }
+      }
+    });
+  }
+  , ".entry-attachment picked": function() {
+    //TODO: Handle mapping
+  }
+  , "a[data-toggle=evidence-gdrive-picker] click" : function(el, ev) {
     var response = CMS.Models.Response.findInCacheById(el.data("response-id"))
     , request = response.request.reify()
     , parent_folder = (request.get_mapping("folders")[0] || {}).instance;
@@ -859,7 +893,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     setTimeout(poll, 5000);
   }
   , create_meeting : function(instance){
-    
+
     new CMS.Models.GCalEvent({
       calendar : GGRC.config.DEFAULT_CALENDAR
       , summary : instance.title
@@ -867,7 +901,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       , end : instance.end_at
       , attendees : can.map(instance.get_mapping("people"), function(m) { return m.instance; })
     }).save().then(function(cev) {
-      
+
       new CMS.Models.ObjectEvent({
         eventable : instance
         , calendar : GGRC.config.DEFAULT_CALENDAR
