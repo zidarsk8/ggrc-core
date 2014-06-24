@@ -135,8 +135,8 @@ class BaseRowConverter(object):
   def after_save(self, db_session, **options):
     from ggrc.login import get_current_user_id
     current_user_id = get_current_user_id()
-    # assign owner if it's ownable
-    if hasattr(self.obj, 'owners') and current_user_id:
+    # assign owner if it's ownable ONLY IF IT DOESN'T ALREADY HAVE AN OWNER
+    if hasattr(self.obj, 'owners') and current_user_id and not self.obj.owners:
       current_user = Person.query.get(current_user_id)
       if current_user and current_user not in self.obj.owners:
         # then create an ObjectOwner connector, add to session
