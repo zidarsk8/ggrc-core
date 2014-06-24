@@ -89,7 +89,7 @@ def notify_email_ggrc_users():
 
 @app.route("/notify_emaildigest", methods=["GET", "POST"])
 def notify_email_digest_ggrc_users():
-  """ handle any outstading tasks prior to notify email digest
+  """ handle any outstanding tasks and newly starting workflow cycles prior to notify email digest
   """
   handle_tasks_overdue()
   handle_tasks_due(2)

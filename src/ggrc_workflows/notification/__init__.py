@@ -247,7 +247,7 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     email_notification.notify_one(notification)
   else:
     return None
-  if override is True and notif_type != 'Email_Now':
+  if override and notif_type != 'Email_Now':
     email_notification = EmailNotification()
     email_notification.notif_pri = notif_pri
     notification = email_notification.prepare([src], owner, recipients, subject, content)

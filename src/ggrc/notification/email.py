@@ -93,51 +93,7 @@ class EmailNotification(NotificationBase):
 
     enable_notif={}
     for notification in pending_notifications:
-      sender = Person.query.filter(Person.id==notification.sender_id).first()
-      assignees = {}
-      for notify_recipient in notification.recipients:
-        if notify_recipient.notif_type != self.notif_type:
-          continue
-        recipient_id=notify_recipient.recipient_id
-        if recipient_id is None:
-          continue
-        if not enable_notif.has_key(recipient_id):
-          enable_notif[recipient_id]=isNotificationEnabled(recipient_id, self.notif_type)
-        if not enable_notif[recipient_id]:
-          continue
-        recipient = Person.query.filter(Person.id==recipient_id).first()
-        if recipient is None:
-          continue
-        if not assignees.has_key(recipient.id):
-          assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
-
-      if len(assignees) < 1:
-        continue 
-      to_list = ""
-      cnt = 0
-      for id, assignee in assignees.items():
-        to_list = to_list + assignee
-        if cnt < len(assignees)-1:
-          to_list + ","
-
-      message = mail.EmailMessage(
-        sender=sender.name + "<" + sender.email + ">", 
-        to=to_list,
-        subject=notification.subject,
-        body=notification.content)
-      message.send()
-
-    for notification in pending_notifications:
-      for notify_recipient in notification.recipients:
-        if notify_recipient.notif_type != self.notif_type:
-          continue
-        if enable_notif.has_key(notify_recipient.recipient_id) and \
-           enable_notif[notify_recipient.recipient_id]:
-          notify_recipient.status="Successful"
-        else:
-          notify_recipient.status="NotificationDisabled"
-        db.session.add(notify_recipient)
-        db.session.flush()
+      self.notify_one(notification)
 
   def notify_one(self, notification, override=False):
     sender=Person.query.filter(Person.id==notification.sender_id).first()
@@ -162,22 +118,20 @@ class EmailNotification(NotificationBase):
       if not assignees.has_key(recipient.id):
         assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
 
-    if len(assignees) < 1:
-      return
+    if len(assignees) > 0:
+      to_list = ""
+      cnt = 0
+      for id, assignee in assignees.items():
+        to_list = to_list + assignee
+        if cnt < len(assignees)-1:
+          to_list + ","
 
-    to_list = ""
-    cnt = 0
-    for id, assignee in assignees.items():
-      to_list = to_list + assignee
-      if cnt < len(assignees)-1:
-        to_list + ","
-
-    message = mail.EmailMessage(
-      sender=sender.name + "<" + sender.email + ">", 
-      to=to_list,
-      subject=notification.subject,
-      body=notification.content)
-    message.send()
+      message = mail.EmailMessage(
+        sender=sender.name + "<" + sender.email + ">", 
+        to=to_list,
+        subject=notification.subject,
+        body=notification.content)
+      message.send()
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
