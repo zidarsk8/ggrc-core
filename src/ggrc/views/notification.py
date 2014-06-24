@@ -11,8 +11,6 @@ from ggrc.models import all_models
 from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc_workflows.notification import *
 from datetime import datetime
-import flask
-from flask.ext.login import current_user
 
 @app.route("/modify_status", methods=["GET", "POST"])
 @login_required
@@ -93,7 +91,6 @@ def notify_email_ggrc_users():
 def notify_email_digest_ggrc_users():
   """ handle any outstading tasks prior to notify email digest
   """
-  current_app.logger.info("notify email digest invoked")
   handle_tasks_overdue()
   handle_tasks_due(2)
   handle_workflow_cycle_status_change('Completed')
@@ -107,33 +104,3 @@ def notify_email_digest_ggrc_users():
   email_digest_notification.notify()
   db.session.commit()
   return 'Ok'
-
-
-@app.route("/api/set_active_notifications",
-           methods=["POST"])
-@login_required
-def set_active_notifications():
-  """
-  Sets notification config for user
-  """
-  if not current_user:
-    return flask.jsonify({'result': False})
-
-  active = request.json.get('active', [])
-  notificationConfig = all_models.NotificationConfig.query.\
-      filter(all_models.NotificationConfig.person_id == current_user.id).all()
-
-  if(len(notificationConfig) == 0):
-    types = all_models.NotificationConfig.VALID_TYPES
-    for type in types:
-      notificationConfig.append(all_models.NotificationConfig(
-                                person_id=current_user.id,
-                                notif_type=type,
-                                enable_flag=False)
-                                )
-  for nc in notificationConfig:
-    nc.enable_flag = nc.notif_type in active
-    db.session.add(nc)
-
-  db.session.commit()
-  return flask.jsonify({'result': True})

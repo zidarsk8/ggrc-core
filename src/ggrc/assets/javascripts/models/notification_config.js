@@ -20,7 +20,7 @@
     update: "PUT /api/notification_config/{id}",
     destroy: "DELETE /api/notification_config/{id}",
     active: "POST /api/set_active_notifications",
-    
+
     findActive: function(){
       if(GGRC.current_user === null){
         return $.when([]);
@@ -28,12 +28,51 @@
       return this.findAll({person_id: GGRC.current_user.id});
     },
     setActive: function(active){
-      
-      return $.ajax({
-        type: 'POST',
-        url: this.active.split(' ')[1],
-        data: {'active': active},
-        contentType: 'application/json;charset=UTF-8',
+      var existing_types, all_types, valid_types;
+
+      if(!GGRC.current_user){
+        console.warn('User object is not set.');
+        return $.when();
+      }
+
+      valid_types = $.map($('input[name=notifications]'), function(input){
+        return input.value;
+      });
+
+      return this.findActive().then(function(configs){
+
+        existing_types = $.map(configs, function(config){
+          return config.notif_type;
+        });
+        all_types = $.map(valid_types, function(type){
+          var index = existing_types.indexOf(type);
+          if(index == -1){
+            // Create a new notificationConfig if it doesn't exist yet
+            return new CMS.Models.NotificationConfig({
+              person_id: GGRC.current_user.id,
+              notif_type: type,
+              enable_flag: null,
+              context: {id: null}
+            });
+          }
+          return configs[index];
+        });
+        return $.map(all_types, function(config){
+          var enabled = active.indexOf(config.notif_type) != -1;
+          if(config.attr('enable_flag') === enabled){
+            // There was no change to this config object
+            return;
+          }
+          if(!config.id){
+            // This is a new object so no need for refresh()
+            config.attr('enable_flag', enabled);
+            return config.save();
+          }
+          return config.refresh().then(function(refreshed_config){
+            refreshed_config.attr('enable_flag', enabled);
+            return refreshed_config.save();
+          });
+        });
       });
     }
   }, {});
