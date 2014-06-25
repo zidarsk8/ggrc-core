@@ -157,10 +157,10 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      //mappings[type]._canonical = {
-      //  "workflows": "Workflow",
-      //  "task_groups": "TaskGroup"
-      //};
+      mappings[type]._canonical = {
+       "workflows": "Workflow",
+       "task_groups": "TaskGroup"
+      };
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
