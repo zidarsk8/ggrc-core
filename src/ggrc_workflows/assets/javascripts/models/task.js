@@ -18,9 +18,12 @@
     update: "PUT /api/tasks/{id}",
     destroy: "DELETE /api/tasks/{id}",
 
+    mixins : ["ownable"],
+
     attributes: {
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      owners : "CMS.Models.Person.stubs"
     },
     tree_view_options: {
       //show_view: GGRC.mustache_path + "/tasks/tree.mustache",
