@@ -257,13 +257,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     var permission_dfds = [];
     var that = this;
 
-    var push_person = function(role, email, queue_to_top) {
+    var push_person = function(dfds, role, email, queue_to_top) {
       if(!permissions[email] || permissions[email] !== "writer" || role !== "reader") {
         email = email.toLowerCase();
         permissions[email] = role;
         if(!that.user_permission_ids[email]) {
           if(queue_to_top) {
-            permission_dfds.push(CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
+            dfds.push(CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
               that.user_permission_ids[permissionId] = email;
               that.user_permission_ids[email] = permissionId;
             }));
@@ -279,28 +279,57 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
     can.each(permissions_by_type[instance.constructor.model_singular], function(role, key) {
       var people = instance[key];
+      var pdfd = [];
       if(typeof people === "function") {
         people = people.call(instance);
       }
-      can.each(!people || people.push ? people : [people], function(person) {
-        if(person.person) {
-          person = person.person;
-        }
-        person = person.reify();
-        if(person.selfLink) {
-          person = person.email;
-          push_person(role, person, true);
-        } else {
-          permission_dfds.push(
-            person.refresh()
-            .then(function(p) { return p.email; })
-            .then($.proxy(push_person, null, role))
-          );
-        }
-      });
+      // in some cases we have a list,
+      //  in others we have a deferred resolving to a list.
+      // In both cases we need to wait for any person found in the list
+      //  to refresh.
+      // this has been done previously with permission_dfds,
+      //  but if we have a new wait, we need to place the dfd waiting
+      //  for the list to resolve in permission_dfds and then chain to the
+      //  refresh of each person.
+
+
+      function iterate_people(dfds, people) {
+        can.each(!people || people.push ? people : [people], function(person) {
+          if(person.person) {
+            person = person.person;
+          }
+          person = person.reify();
+          if(person.selfLink) {
+            person = person.email;
+            push_person(dfds, role, person, true);
+          } else {
+            dfds.push(
+              person.refresh()
+              .then(function(p) { return p.email; })
+              .then($.proxy(push_person, null, dfds, role))
+            );
+          }
+        });
+      }
+
+      if(can.isDeferred(people)) {
+        // if we have to wait for people to resolve,
+        //  then we have to have permission_dfds wait
+        //  for its chain to finish.
+        permission_dfds.push(
+          people.then($.proxy(iterate_people, that, pdfd))
+          .then(function() {
+            return $.when.apply($, pdfd);
+          })
+        );
+      } else {
+        // Otherwise we can push the refresh of 
+        //  each person directly onto permission_dfds
+        iterate_people(permission_dfds, people);
+      }
     });
     if(GGRC.config.GAPI_ADMIN_GROUP) {
-      push_person("writer", GGRC.config.GAPI_ADMIN_GROUP, true);
+      push_person(permission_dfds, "writer", GGRC.config.GAPI_ADMIN_GROUP, true);
     }
     if(instance instanceof CMS.Models.Program) {
       var auths = {};
@@ -309,7 +338,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       //  So a user may have more than one role at this point, and we only want to change the GDrive
       //  permission based on the most recent one.
 
-      can.each(instance.get_mapping("authorizations"), function(authmapping) {
+      instance.get_binding("authorizations").refresh_instances().then(function(authmapping) {
         // FIXME: This will cause missing authorizations, but this function
         //   needs to be reworked to ensure required paths are loaded before
         //   use (.person and .role).
@@ -369,13 +398,15 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
                while "Permission IDs" will match on internal account permissions (where email address is
                usually not provided).  Check both.
+
+               A previous revision of this tried building email addresses with permission.name + "@" + permission.domain
+               but the name field is likely different from the LDAP name for users, maybe less so with domains,
+               but the effect is it creates bad values for email sometimes when used.
             */
 
             var email = permission.emailAddress
                         ? permission.emailAddress.toLowerCase()
-                        : (permission.name && permission.domain
-                          ? (permission.name + "@" + permission.domain)
-                          : that.user_permission_ids[permission.id]);
+                        : that.user_permission_ids[permission.id];
             var pending_permission = permissions_to_create[email];
 
             // Case matrix.
