@@ -39,6 +39,8 @@ class SectionRowConverter(BaseRowConverter):
       self.obj.directive_id = int(directive_id)
       db_session.add(self.obj)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, SectionTitleHandler, **options)
 
 class ClauseRowConverter(SectionRowConverter):
   model_class = Clause
@@ -128,6 +130,15 @@ class SectionsConverter(BaseConverter):
     yield []
     yield self.object_map.keys()
 
-
 class ClausesConverter(SectionsConverter):
   row_converter = ClauseRowConverter
+
+class SectionTitleHandler(TitleHandler):
+  def validate(self, data):
+    super(SectionTitleHandler, self).validate(data)
+
+    # check for collisions within the directive
+    directive = self.importer.obj.directive
+    scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    if scoped_db_collisions:
+      self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
