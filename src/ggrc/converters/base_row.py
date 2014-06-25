@@ -510,6 +510,23 @@ class TitleHandler(ColumnHandler):
         self.add_error("Another item in this import already has this title.")
 
 
+class SectionTitleHandler(TitleHandler):
+  def validate(self, data):
+    # check for collisions within the directive
+    directive = self.importer.obj.directive
+    scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    if scoped_db_collisions:
+      self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
+
+    # ... and then within the same import
+    has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
+    if has_import_collision:
+      if True == self.options.get('allow_duplicates_on_import'):
+        self.add_warning("Another item in this import already has this title.")
+      else:
+        self.add_error("Another item in this import already has this title.")
+
+
 class DateColumnHandler(ColumnHandler):
 
   def parse_item(self, value):
