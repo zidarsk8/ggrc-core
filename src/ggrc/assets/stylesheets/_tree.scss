@@ -692,6 +692,7 @@ ul.new-tree {
         }
       }
       &.rq-requested,&.t-inprogress {
+      &.rq-requested,&.t-inprogress,&.t-declined {
         > .item-main {
           &:hover {
             .row-fluid {
@@ -873,6 +874,7 @@ ul.new-tree {
       &.rq-rejected,
       &.t-assigned,
       &.t-inprogress,
+      &.t-declined,
       &.t-verified,
       &.t-finished,
       &.t-finished,
