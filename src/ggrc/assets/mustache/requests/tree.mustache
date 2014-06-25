@@ -11,36 +11,36 @@
       <div class="row-fluid">
         <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
-	          <div class="type">
-	            <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
-	            <div class="state-type dropdown">
-	              {{#if_helpers '\
-			            #if_equals' 'Draft' instance.status '\
-			            and ^if' instance.responses.length '\
-			            ' _1_context=instance.context.id }}
-	              <span class="dropdown-toggle" data-toggle="dropdown" role="button">
-	                <i class="grcicon-carot"></i>
-	              </span>
-	              
-	              <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
-	                {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
-	                <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
-	                  <span>
-	                    <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
-	                    {{iterator}} 
-	                  </span>
-	                </li>
-	                {{/iterate}}
-	              </ul>
-	              {{else}}
-	              
-	              <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
-	              {{/if_helpers}}
-	            </div>
-	          </div>
-	          <div class="tree-title-area">
-	            <span>{{strip_html_tags instance.description}}</span>
-	          </div>
+            <div class="type">
+              <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
+              <div class="state-type dropdown">
+                {{#if_helpers '\
+                  #if_equals' 'Draft' instance.status '\
+                  and ^if' instance.responses.length '\
+                  ' _1_context=instance.context.id }}
+                <span class="dropdown-toggle" data-toggle="dropdown" role="button">
+                  <i class="grcicon-carot"></i>
+                </span>
+                
+                <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
+                  {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
+                  <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
+                    <span>
+                      <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
+                      {{iterator}} 
+                    </span>
+                  </li>
+                  {{/iterate}}
+                </ul>
+                {{else}}
+                
+                <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
+                {{/if_helpers}}
+              </div>
+            </div>
+            <div class="tree-title-area">
+              <span>{{strip_html_tags instance.description}}</span>
+            </div>
           </div>
         </div>
         <div class="span2">
@@ -56,12 +56,12 @@
                 {{#with_mapping "authorizations" audit}}
                 {{#if_helpers "\
                   ^if_equals" instance.status "Accepted" "\
-			            and ^if_auditor" instance _1_include_admin=false}}
-			            <div class="tree-title-area">
+                  and ^if_auditor" instance _1_include_admin=false}}
+                  <div class="tree-title-area">
                     <a class="utility-link controls danger" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-  			              <i class="grcicon-objective-danger"></i>
-  			              Map Objective
-  			            </a>
+                      <i class="grcicon-objective-danger"></i>
+                      Map Objective
+                    </a>
                   </div>
                 {{/if_helpers}}
                 {{/with_mapping}}
@@ -71,7 +71,7 @@
           </div>
         </div>
         <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-	        <i class="grcicon-person-green pull-left"></i>
+          <i class="grcicon-person-green pull-left"></i>
           {{#using assignee=instance.assignee}}
           {{#if_helpers "\
             #if_can_edit_request" instance "\
@@ -124,7 +124,7 @@
               {{#if_match instance.status "Respon"}}
                 {{#if_auditor instance}}
                 <button data-name="status" data-value="Accepted" class="btn btn-add {{instance._disabled}}">Accept</button>
-                <button data-name="status" data-value="Amended Request" class="btn btn-warning {{instance._disabled}}">Amend</button>
+                <a href="javascript://" data-toggle="modal-ajax-form" data-object-singular="Request" data-object-params='{"modal_title":"Amend Request"}' data-object-plural="requests" data-object-id="{{instance.id}}" class="btn btn-warning {{instance._disabled}}" data-modal-class="modal-wide" data-template="/static/mustache/requests/amend_modal_content.mustache">Amend</a>
                 {{else}}
                 <small class="gray"><em>Responded</em></small>
                 {{/if_auditor}}
