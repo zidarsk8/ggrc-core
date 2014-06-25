@@ -31,7 +31,7 @@ class SectionRowConverter(BaseRowConverter):
     self.handle_raw_attr('reference_url')
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
     self.handle('controls', LinkControlsHandler)
-    self.handle_title('title', is_required=True, allow_duplicates_on_import=True)
+    self.handle_title('title', is_required=True)
 
   def save_object(self, db_session, **options):
     directive_id = options.get('directive_id')
@@ -67,6 +67,9 @@ class ClauseRowConverter(SectionRowConverter):
       db_session.add(self.obj)
       ds = DirectiveSection(directive_id=directive_id, section=self.obj)
       db_session.add(ds)
+
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
 
 
 class SectionsConverter(BaseConverter):

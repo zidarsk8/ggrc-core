@@ -207,7 +207,6 @@ class ColumnHandler(object):
 
   def __init__(self, importer, key, **options):
     options.setdefault('no_import', False)
-    options.setdefault('allow_duplicates_on_import', False)
     self.importer = importer
     self.base_importer = importer.importer
     self.key = key
@@ -504,10 +503,7 @@ class TitleHandler(ColumnHandler):
     # ... and then within the same import
     has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
     if has_import_collision:
-      if True == self.options.get('allow_duplicates_on_import'):
-        self.add_warning("Another item in this import already has this title.")
-      else:
-        self.add_error("Another item in this import already has this title.")
+      self.add_error("Another item in this import already has this title.")
 
 
 class SectionTitleHandler(TitleHandler):
@@ -521,10 +517,7 @@ class SectionTitleHandler(TitleHandler):
     # ... and then within the same import
     has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
     if has_import_collision:
-      if True == self.options.get('allow_duplicates_on_import'):
-        self.add_warning("Another item in this import already has this title.")
-      else:
-        self.add_error("Another item in this import already has this title.")
+      self.add_error("Another item in this import already has this title.")
 
 
 class DateColumnHandler(ColumnHandler):
