@@ -691,7 +691,6 @@ ul.new-tree {
           }
         }
       }
-      &.rq-requested,&.t-inprogress {
       &.rq-requested,&.t-inprogress,&.t-declined {
         > .item-main {
           &:hover {
