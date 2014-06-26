@@ -152,6 +152,7 @@
       task_group_task: "CMS.Models.TaskGroupTask.stub",
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub",
+      contact: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub"
     },
 
