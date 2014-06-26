@@ -72,17 +72,40 @@ def all_cache_entries():
     resource('systems_or_processes', 'SystemOrProcess'),
     resource('systems', 'System'),
     resource('processes', 'Process'),
+
+    # FIXME: Extension-defined models should be registered from the extensions.
+
+    # ggrc_basic_permissions models
     resource('roles', 'Role'),
     resource('user_roles', 'UserRole'),
+
+    # ggrc_gdrive_integration models
     resource('object_folders', 'ObjectFolder'),
     resource('object_files', 'ObjectFile'),
     resource('object_events', 'ObjectEvent'),
+
+    # ggrc_risk_assessments models
     resource('templates', 'Template'),
     resource('risk_assessments', 'RiskAssessment'),
     resource('risk_assessment_mappings', 'RiskAssessmentMapping'),
     resource('risk_assessment_control_mappings', 'RiskAssessmentControlMapping'),
     resource('threats', 'Threat'),
     resource('vulnerabilities', 'Vulnerability'),
+
+    # ggrc_workflows models
+    resource('cycle_task_entries', 'CycleTaskEntry'),
+    resource('cycle_task_group_object_tasks', 'CycleTaskGroupObjectTask'),
+    resource('cycle_task_group_objects', 'CycleTaskGroupObject'),
+    resource('cycle_task_groups', 'CycleTaskGroup'),
+    resource('cycles', 'Cycle'),
+    resource('task_group_objects', 'TaskGroupObject'),
+    resource('task_group_tasks', 'TaskGroupTask'),
+    resource('task_groups', 'TaskGroup'),
+    resource('tasks', 'Task'),
+    resource('workflow_objects', 'WorkflowObject'),
+    resource('workflow_people', 'WorkflowPerson'),
+    resource('workflow_tasks', 'WorkflowTask'),
+    resource('workflows', 'Workflow'),
     ]
 
   return ret

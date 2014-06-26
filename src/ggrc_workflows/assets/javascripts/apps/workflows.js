@@ -85,10 +85,10 @@
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.status == "Finished";
+              return result.instance.status != "InProgress";
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.status != "Finished";
+              return result.instance.status == "InProgress";
             }),
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
         },
@@ -361,7 +361,7 @@
         draw_children: true,
         parent_instance: object,
         model: "Cycle",
-        mapping: "current_cycle",
+        mapping: "previous_cycles",
       }
     };
     current_widget_descriptor = {
