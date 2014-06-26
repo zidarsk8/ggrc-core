@@ -6,50 +6,38 @@
 }}
 
 
-<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-    <div class="openclose">
-      <a class="openclose-placeholder" href="javascript://"> </a>
-      <div class="row-fluid">
-        <div class="span12">
+<li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="pull-right">
+    <a href="#"></a>
+    <a class="info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+    <i class="grcicon-edit"></i>
+    </a>
 
-          <div class="item-data">
-            <div class="tree-title-area">
-              {{instance.description}}
-            </div>
-          </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
 
-  {{#if expanded}}
-  <div class="tier-2-info item-content">
-    <div class="tier-2-info-content">
-
-      <div class="show-description">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="tree-description short">
-              {{{object.description}}}
-            </div>
-            {{{show_long}}}
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    {{#if draw_children}}
-      {{#child_options}}
-        <div class="inner-tree">
-          <h6>Tasks ({{list.length}})</h6>
-          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-        </div>
-      {{/child_options}}
+    {{!#if allow_mapping}}
+    {{#if mappings}}
+    {{#is_allowed_all 'delete' mappings}}
+    {{^is_dashboard}}
+      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+        <i class="grcicon-deleted"></i>
+      </a>
+    {{/is_dashboard}}
+    {{/is_allowed_all}}
     {{/if}}
+    {{!/if}}
 
   </div>
-  {{/if}}
+  {{{instance.description}}}
+  {{#child_options.0}}
+    <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+    </ul>
+  {{/child_options.0}}
+  <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+    data-model="{{instance.type}}", data-id="{{instance.id}}">
+    <i class="grcicon-attach-color"></i> Attach supporting file
+  </a>
+  <span class="entry-author">On {{date instance.created_at}}</span>
+  <br />
 </li>

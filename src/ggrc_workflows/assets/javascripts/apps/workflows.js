@@ -135,6 +135,8 @@
         },
 
         CycleTaskEntry: {
+          documents: Proxy(
+            "Document", "document", "ObjectDocument", "documentable", "object_documents"),
           cycle_task_group_object_task: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",
@@ -385,7 +387,7 @@
     new_widget_descriptors.current = current_widget_descriptor;
 
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
-  }
+  };
 
 
   GGRC.register_hook(
