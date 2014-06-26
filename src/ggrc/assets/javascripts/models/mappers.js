@@ -495,11 +495,13 @@
         binding.source_binding = binding.instance.get_binding(this.source);
 
         binding.source_binding.list.bind("add", function(ev, results) {
-          var matching_results = can.map(can.makeArray(results), function(result) {
-            if (self.filter_fn(result))
-              return self.make_result(result.instance, [result], binding);
-          });
-          self.insert_results(binding, matching_results);
+          if (binding._refresh_stubs_deferred) {
+            var matching_results = can.map(can.makeArray(results), function(result) {
+              if (self.filter_fn(result))
+                return self.make_result(result.instance, [result], binding);
+            });
+            self.insert_results(binding, matching_results);
+          }
         });
 
         binding.source_binding.list.bind("remove", function(ev, results) {
