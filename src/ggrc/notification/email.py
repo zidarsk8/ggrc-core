@@ -16,7 +16,7 @@ from ggrc import db
 
 
 def isNotificationEnabled(person_id, notif_type):
-  notification_config = NotificationConfig.query.\
+  notification_config=NotificationConfig.query.\
     filter(NotificationConfig.person_id==person_id).\
     filter(NotificationConfig.notif_type==notif_type).\
     first()
@@ -29,11 +29,11 @@ def isNotificationEnabled(person_id, notif_type):
     return notification_config.enable_flag
   
 class NotificationBase(object):
-  notif_type = None
-  notif_pri = None
+  notif_type=None
+  notif_pri=None
 
   def __init__(self, notif_type):
-    self.notif_type = notif_type
+    self.notif_type=notif_type
 
   def prepare(self, target_objs, sender, recipients, subject, content):
     return None
@@ -50,8 +50,8 @@ class EmailNotification(NotificationBase):
     super(EmailNotification, self).__init__(notif_type)
 
   def prepare(self, target_objs, sender, recipients, subject, content):
-    now = datetime.now()
-    notification = Notification(
+    now=datetime.now()
+    notification=Notification(
       notif_pri=self.notif_pri,
       notif_date=now,
       created_at=now,
@@ -63,7 +63,7 @@ class EmailNotification(NotificationBase):
     db.session.flush()
 
     for obj in target_objs:
-      notification_object = NotificationObject(
+      notification_object=NotificationObject(
         created_at=datetime.now(),
         object_id=obj.id, 
         object_type=obj.type,
@@ -73,7 +73,7 @@ class EmailNotification(NotificationBase):
       db.session.flush()
 
     for recipient in recipients:
-      notification_recipient = NotificationRecipient(
+      notification_recipient=NotificationRecipient(
         created_at=datetime.now(),
         status='InProgress',
         notif_type=self.notif_type,
@@ -86,7 +86,7 @@ class EmailNotification(NotificationBase):
     return notification
 
   def notify(self):
-    pending_notifications = db.session.query(Notification).\
+    pending_notifications=db.session.query(Notification).\
       join(Notification.recipients).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
@@ -116,22 +116,27 @@ class EmailNotification(NotificationBase):
       if recipient is None:
         continue
       if not assignees.has_key(recipient.id):
-        assignees[recipient.id] = recipient.name + " <" + recipient.email + ">"
+        assignees[recipient.id]=recipient.name + " <" + recipient.email + ">"
 
     if len(assignees) > 0:
-      to_list = ""
-      cnt = 0
+      to_list=""
+      cnt=0
       for id, assignee in assignees.items():
-        to_list = to_list + assignee
+        to_list=to_list + assignee
         if cnt < len(assignees)-1:
           to_list + ","
 
-      message = mail.EmailMessage(
+      message=mail.EmailMessage(
         sender=sender.name + "<" + sender.email + ">", 
         to=to_list,
         subject=notification.subject,
         body=notification.content)
-      message.send()
+
+      #ToDo(Mouli): Handle exception by changing status to error
+      try:
+        message.send()
+      except: 
+        pass
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
@@ -149,14 +154,14 @@ class EmailDigestNotification(EmailNotification):
     super(EmailDigestNotification, self).__init__(notif_type)
 
   def notify(self):
-    pending_notifications = db.session.query(Notification).\
+    pending_notifications=db.session.query(Notification).\
       join(Notification.recipients).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
 
-    pending_notifications_by_date = {}
+    pending_notifications_by_date={}
     for notification in pending_notifications:
-      notif_date = notification.notif_date.strftime('%Y/%m/%d')
+      notif_date=notification.notif_date.strftime('%Y/%m/%d')
       if not pending_notifications_by_date.has_key(notif_date):
         pending_notifications_by_date[notif_date]=[]
       pending_notifications_by_date[notif_date].append(notification)
@@ -171,13 +176,13 @@ class EmailDigestNotification(EmailNotification):
 
       """
       for notification in notifications:
-        sender_id = notification.sender_id
-        notif_pri = notification.notif_pri
+        sender_id=notification.sender_id
+        notif_pri=notification.notif_pri
         if not sender_ids.has_key(sender_id):
-          sender = Person.query.filter(Person.id==sender_id).first()
+          sender=Person.query.filter(Person.id==sender_id).first()
           if sender is None:
             continue
-          sender_ids[sender_id] = sender
+          sender_ids[sender_id]=sender
 
         for notify_recipient in notification.recipients:
           if notify_recipient.notif_type != self.notif_type:
@@ -186,11 +191,11 @@ class EmailDigestNotification(EmailNotification):
           if recipient_id is None:
             continue
           if not enable_notif.has_key(recipient_id):
-            enable_notif[recipient_id] = isNotificationEnabled(recipient_id, self.notif_type)
+            enable_notif[recipient_id]=isNotificationEnabled(recipient_id, self.notif_type)
           if not enable_notif[recipient_id]:
             continue
           if not to.has_key(recipient_id):
-            recipient = Person.query.filter(Person.id==recipient_id).first()
+            recipient=Person.query.filter(Person.id==recipient_id).first()
             if recipient is None:
               continue
             to[recipient_id]=recipient
@@ -199,22 +204,27 @@ class EmailDigestNotification(EmailNotification):
             content[key]={}
           if not content[key].has_key(notification.notif_pri):
             content[key][notif_pri]=""
-          content[key][notif_pri] = content[key][notif_pri] + empty_line + notification.content
+          content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
 
       for (recipient_id, sender_id), items in content.items():
         recipient=to[recipient_id] 
         sender=sender_ids[sender_id] 
         import collections
-        sorted_items = collections.OrderedDict(sorted(items.items()))
+        sorted_items=collections.OrderedDict(sorted(items.items()))
         body=""
         for key, value in sorted_items.items():
-          body = body + value
-        message = mail.EmailMessage(
+          body=body + value
+        message=mail.EmailMessage(
           sender=sender.name + "<" + sender.email + ">", 
           to=recipient.name + "<" + recipient.email + ">", 
           subject=subject,
           body=body)
-        message.send()
+ 
+        #ToDo(Mouli): Handle exception by changing status to error
+        try:
+          message.send()
+        except:
+          pass
 
       for notification in notifications:
         for notify_recipient in notification.recipients:

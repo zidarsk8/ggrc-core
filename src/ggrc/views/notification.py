@@ -21,11 +21,11 @@ WORKFLOW_CYCLE_STARTING=7
 def modify_status():
   """ prepare email digest
   """
-  model = request.args.get('model')
-  id = request.args.get('id')
-  status = request.args.get('status')
-  cls = getattr(all_models, model)
-  obj = cls.query.filter(cls.id == int(id)).first()
+  model=request.args.get('model')
+  id=request.args.get('id')
+  status=request.args.get('status')
+  cls=getattr(all_models, model)
+  obj=cls.query.filter(cls.id == int(id)).first()
   if obj is not None:
     obj.status=status
     db.session.add(obj)
@@ -40,17 +40,17 @@ def modify_status():
 def prepare_email_ggrc_users():
   """ prepare email digest
   """
-  model = request.args.get('model')
-  id = request.args.get('id')
-  cls = getattr(all_models, model)
-  obj = cls.query.filter(cls.id == int(id)).first()
+  model=request.args.get('model')
+  id=request.args.get('id')
+  cls=getattr(all_models, model)
+  obj=cls.query.filter(cls.id == int(id)).first()
   if obj is not None:
     target_objs=[]
     recipients=[obj.contact]
-    email_notification = EmailNotification()
+    email_notification=EmailNotification()
     if obj is not None:
-      subject = obj.type + " " + obj.title + " created"
-      content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural + \
+      subject=obj.type + " " + obj.title + " created"
+      content=obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural + \
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_notification.prepare(target_objs, obj.contact, recipients, subject, content)
       db.session.commit()
@@ -61,18 +61,18 @@ def prepare_email_ggrc_users():
 def prepare_email_digest_ggrc_users():
   """ prepare email digest
   """
-  model = request.args.get('model')
-  id = request.args.get('id')
+  model=request.args.get('model')
+  id=request.args.get('id')
   import ggrc.models
-  cls = getattr(all_models, model)
-  obj = cls.query.filter(cls.id == int(id)).first()
+  cls=getattr(all_models, model)
+  obj=cls.query.filter(cls.id == int(id)).first()
   if obj is not None:
     target_objs=[]
     recipients=[obj.contact]
     email_digest_notification = EmailDigestNotification()
     if obj is not None:
-      subject = obj.type + " " + "Email Digest for " + datetime.now().strftime('%Y/%m/%d')
-      content = obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural+ \
+      subject=obj.type + " " + "Email Digest for " + datetime.now().strftime('%Y/%m/%d')
+      content=obj.type + ": " + obj.title + " : " + request.url_root + obj._inflector.table_plural+ \
        "/" + str(obj.id) + " created on " + str(obj.created_at)
       email_digest_notification.prepare(target_objs, obj.contact, recipients, subject, content)
       db.session.commit()
@@ -83,7 +83,7 @@ def prepare_email_digest_ggrc_users():
 def notify_email_ggrc_users():
   """ notify email for a program object
   """
-  email_notification = EmailNotification()
+  email_notification=EmailNotification()
   email_notification.notify()
   db.session.commit()
   return 'Ok'
@@ -102,7 +102,7 @@ def notify_email_digest_ggrc_users():
 
   """ notify email digest 
   """
-  email_digest_notification = EmailDigestNotification()
+  email_digest_notification=EmailDigestNotification()
   email_digest_notification.notify()
   db.session.commit()
   return 'Ok'
