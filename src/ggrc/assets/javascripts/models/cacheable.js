@@ -797,7 +797,10 @@ can.Model("can.Model.Cacheable", {
           })
           .then($.proxy(that.constructor, "model"))
           .done(function(d) {
-            d.updated();
+            // FIXME: Remove this if it hasn't introduced regressions.  We want
+            //   to avoid triggering `updated` when there haven't been actual
+            //   changes.
+            //d.updated();
             dfd.resolve(d);
           })
           .fail(function() {

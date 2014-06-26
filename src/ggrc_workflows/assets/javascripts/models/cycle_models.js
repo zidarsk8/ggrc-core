@@ -132,6 +132,18 @@
           allow_creating: false
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.cycle_task_group.reify().selfLink) {
+            instance.cycle_task_group.reify().refresh();
+          }
+        }
+      });
     }
   }, {});
 
@@ -167,6 +179,18 @@
           allow_creating: true
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.cycle_task_group_object.reify().selfLink) {
+            instance.cycle_task_group_object.reify().refresh();
+          }
+        }
+      });
     }
   }, {
     overdue: can.compute(function(val) {
