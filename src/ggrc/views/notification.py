@@ -12,6 +12,10 @@ from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc_workflows.notification import *
 from datetime import datetime
 
+
+WORKFLOW_CYCLE_DUE=3
+WORKFLOW_CYCLE_STARTING=7
+
 @app.route("/modify_status", methods=["GET", "POST"])
 @login_required
 def modify_status():
@@ -52,7 +56,6 @@ def prepare_email_ggrc_users():
       db.session.commit()
   return 'Ok'
 
-
 @app.route("/prepare_emaildigest", methods=["GET", "POST"])
 @login_required
 def prepare_email_digest_ggrc_users():
@@ -75,7 +78,6 @@ def prepare_email_digest_ggrc_users():
       db.session.commit()
   return 'Ok'
 
-
 @app.route("/notify_email", methods=["GET", "POST"])
 @login_required
 def notify_email_ggrc_users():
@@ -86,16 +88,16 @@ def notify_email_ggrc_users():
   db.session.commit()
   return 'Ok'
 
-
 @app.route("/notify_emaildigest", methods=["GET", "POST"])
 def notify_email_digest_ggrc_users():
   """ handle any outstanding tasks and newly starting workflow cycles prior to notify email digest
   """
   handle_tasks_overdue()
-  handle_tasks_due(2)
+  handle_workflow_cycle_overdue()
+  handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
   handle_workflow_cycle_status_change('Completed')
   handle_workflow_cycle_started()
-  handle_workflow_cycle_starting(7)
+  handle_workflow_cycle_starting(WORKFLOW_CYCLE_STARTING)
   db.session.commit()
 
   """ notify email digest 
