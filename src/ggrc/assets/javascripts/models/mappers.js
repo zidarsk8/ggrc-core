@@ -852,13 +852,13 @@
         var self = this
           , new_results
           , lists = can.map(
-            binding.sources,
+            binding.source_bindings,
             function(source) {
-              return can.map(
+              return [can.map(
                 source.list,
                 function(result) {
                   return result.instance;
-                });
+                })];
               })
           ;
 

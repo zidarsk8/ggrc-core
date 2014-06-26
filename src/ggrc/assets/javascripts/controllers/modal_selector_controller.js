@@ -1396,26 +1396,14 @@
         }
         //hard code some of the submenu
         //this.options.option_type_menu_2 = this.options.option_type_menu;
-        this.options.option_type_menu_2 = [
-              { model_name: "Program", model_display: "Program" } 
-
-            , { model_name: "Regulation", model_display: "Regulation" }
-            , { model_name: "Policy" , model_display: "Policy"  }
-            , { model_name: "Standard" , model_display: "Standard"  }
-            , { model_name: "Contract" , model_display: "Contract"  }
-            , { model_name: "Clause" , model_display: "Clause"  }
-            , { model_name: "Section" , model_display: "Section"  }
-            , { model_name: "Objective" , model_display: "Objective"  }
-            , { model_name: "Control" , model_display: "Control"  }
-
-            , { model_name: "People" , model_display: "People"  }
-
-            , { model_name: "System" , model_display: "System"  }
-            , { model_name: "Process" , model_display: "Process"  }
-            , { model_name: "Data Asset" , model_display: "Data Asset"  }
-            , { model_name: "Product" , model_display: "Product"  }
-            , { model_name: "Facility" , model_display: "Facility"  }
-            , { model_name: "Market" , model_display: "Market"  }];
+        this.options.option_type_menu_2 = can.map([
+              "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
+              "Person", "System", "Process", "DataAsset", "Product", "Facility" , "Market"
+              ],
+              function(key) {
+                return CMS.Models[key];
+              }
+            );
 
         /*if (!this.options.option_type_menu2) {
           menu2 = [
@@ -1468,7 +1456,10 @@
       }
 
     , ".addFilterRule click": function() {
-      this.context.filter_list.push([{value:""}]);
+      this.context.filter_list.push({
+          value: "",
+          model_name: this.options.option_type_menu_2[0].model_singular
+        });
     }
 
     , ".remove_filter click": function(el) {
@@ -1513,6 +1504,9 @@
     , ".objectReview click" : function(){
       //Get the selected object value
       var selected = $("select.option-type-selector").val();
+      var self = this;
+      var loader;
+      
       
       this.set_option_descriptor(selected);
 
@@ -1525,23 +1519,52 @@
       var f_len = this.context.filter_list.length,
         filters = [];
 
-      for (var i = 0; i < f_len; i++){
-        var select = 'select.select-filter' + i,
-          search = 'input.search-filter' + i;
+      this.context.filter_list.each(function(filter_obj) {
+        filters.push(
+          filter_obj.search_filter.get_binding(
+            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected)
+          ));
+      });
 
-        var data = {};
-        data.filter_model_type = $(select).val();
-        data.search_str = $(search).val();
-        filters.push(data);
+      if (filters.length > 0) {
+        if(filters.length === 1) {
+          //don't bother making an intersecting filter when there's only one.
+          loader = filters[0];
+        } else {
+          // make an intersecting loader, that only shows the results that 
+          //  show up in all sources.
+          loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        }
+
+        this.last_loader = loader;
+        self.option_list.replace([]);
+        self.element.find('.option_column ul.new-tree').empty();
+        loader.refresh_instances().then(function(options) {
+          var active_fn = function() {
+            return self.element &&
+                   self.last_loader === loader;
+          };
+
+          var draw_fn = function(options) {
+            self.insert_options(options);
+          };
+
+          self._start_pager(can.map(options, function(op) {
+              return op.instance;
+            }), 20, active_fn, draw_fn);
+        });
+      } else {
+        // With no mappings specified, just do a general search
+        //  on the type selected.
+        this.last_loader = null;
+        this.options.option_search_term = '';
+        this.refresh_option_list();
+        this.constructor.last_option_search_term = null;
       }
-
       //for(var i = 0; i < filters.length; i++){
       //  console.log(filters[i].filter_model_type + ":"+ filters[i].search_str + " ");
       //}
 
-      this.options.option_search_term = term;
-      this.refresh_option_list();
-      this.constructor.last_option_search_term = term;
     }
 
     //Over write the parent class method to select the row. 
@@ -1682,6 +1705,14 @@
       can.Model.stopBatch();
       //Refresh_option_list is done from the search button
       //this.refresh_option_list();
+    },
+
+    autocomplete_select : function(el, ev, ui) {
+      setTimeout(function(){
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+        el.trigger('change');
+      }, 0);
+      this.context.attr(el.attr("name"), ui.item);
     }
   });
   
