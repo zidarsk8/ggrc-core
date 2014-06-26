@@ -30,24 +30,14 @@
 
   </div>
   {{{instance.description}}}
-
-  <ul class="attachment-list">
-    <li>
-      <a href="#">
-        <i class="grcicon-attach"></i>
-        <span>supportingwalkthroughevidence.pdf</span>
-      </a>
-    </li>
-    <li>
-      <a href="#">
-        <i class="grcicon-attach"></i>
-        <span>screenshot.pdf</span>
-      </a>
-    </li>
-  </ul>
-  <span class="entry-author">On {{date instance.created_at}}</span>
-  <br />
-  <a href="javascript://" class="entry-attachment" data-toggle="gdrive-picker">
+  {{#child_options.0}}
+    <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+    </ul>
+  {{/child_options.0}}
+  <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+    data-model="{{instance.type}}", data-id="{{instance.id}}">
     <i class="grcicon-attach-color"></i> Attach supporting file
   </a>
+  <span class="entry-author">On {{date instance.created_at}}</span>
+  <br />
 </li>

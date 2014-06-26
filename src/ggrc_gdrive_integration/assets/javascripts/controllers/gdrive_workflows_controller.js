@@ -683,17 +683,71 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       }
 
       function pickerCallback(data) {
-        if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-          el.trigger('picked', data);
+
+        var files, models,
+            PICKED = google.picker.Action.PICKED,
+            ACTION = google.picker.Response.ACTION,
+            DOCUMENTS = google.picker.Response.DOCUMENTS,
+            CANCEL = google.picker.Action.CANCEL;
+
+        if (data[ACTION] == PICKED) {
+          files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
+          el.trigger('picked', {
+            files: files
+          });
         }
-        else if (data[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+        else if (data[ACTION] == CANCEL) {
           el.trigger('rejected', data);
         }
       }
     });
   }
-  , ".entry-attachment picked": function() {
-    //TODO: Handle mapping
+  , ".entry-attachment picked": function(el, ev, data) {
+    var object = CMS.Models[el.data("model")].findInCacheById(el.data("id")),
+        files = data.files || [];
+    return new RefreshQueue().enqueue(files).trigger().then(function(files){
+      can.each(files, function(file) {
+        //Since we can re-use existing file references from the picker, check for that case.
+        CMS.Models.Document.findAll({link : file.alternateLink }).done(function(d) {
+          if(d.length) {
+            //file found, just link to object
+            report_progress(
+              "Linking Drive file \"" + d[0].title + "\"",
+              $.when([new CMS.Models.ObjectDocument({
+                  context : object.context || {id : null}
+                  , documentable : object
+                  , document : d[0]
+                }).save(),
+
+              ])
+            )
+          } else {
+            //file not found, make Document object.
+            report_progress(
+              "Linking new Drive file \"" + file.title + "\""
+              , new CMS.Models.Document({
+                context : object.context || {id : null}
+                , title : file.title
+                , link : file.alternateLink
+              }).save().then(function(doc) {
+                return $.when([
+                  new CMS.Models.ObjectDocument({
+                    context : object.context || {id : null}
+                    , documentable : object
+                    , document : doc
+                  }).save(),
+                  new CMS.Models.ObjectFile({
+                    context : object.context || {id : null}
+                    , file : file
+                    , fileable : doc
+                  }).save()
+                ]);
+              })
+            );
+          }
+        });
+      });
+    });
   }
   , "a[data-toggle=evidence-gdrive-picker] click" : function(el, ev) {
     var response = CMS.Models.Response.findInCacheById(el.data("response-id"))

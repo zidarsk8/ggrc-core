@@ -6,9 +6,10 @@
 
 from ggrc import db
 from ggrc.models.mixins import Base, Described
+from ggrc.models.object_document import Documentable
 
 
-class CycleTaskEntry(Described, Base, db.Model):
+class CycleTaskEntry(Described, Documentable, Base, db.Model):
   __tablename__ = 'cycle_task_entries'
 
   cycle_task_group_object_task_id = db.Column(
