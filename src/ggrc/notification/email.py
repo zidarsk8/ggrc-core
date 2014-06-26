@@ -9,6 +9,7 @@
 """
 
 
+from flask import current_app
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
@@ -171,9 +172,9 @@ class EmailDigestNotification(EmailNotification):
     enable_notif={}
     for notif_date, notifications in pending_notifications_by_date.items():
       content={}
+      content_for_recipient={}
       subject="gGRC daily email digest for " + notif_date
       empty_line = """
-
       """
       for notification in notifications:
         sender_id=notification.sender_id
@@ -183,7 +184,6 @@ class EmailDigestNotification(EmailNotification):
           if sender is None:
             continue
           sender_ids[sender_id]=sender
-
         for notify_recipient in notification.recipients:
           if notify_recipient.notif_type != self.notif_type:
             continue
@@ -204,7 +204,8 @@ class EmailDigestNotification(EmailNotification):
             content[key]={}
           if not content[key].has_key(notification.notif_pri):
             content[key][notif_pri]=""
-          content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
+          else:
+            content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
 
       for (recipient_id, sender_id), items in content.items():
         recipient=to[recipient_id] 
@@ -214,16 +215,22 @@ class EmailDigestNotification(EmailNotification):
         body=""
         for key, value in sorted_items.items():
           body=body + value
+        if not content_for_recipient.has_key(recipient_id):
+          content_for_recipient[recipient_id]= "Emails sent by " + sender.name + empty_line + body
+        else:
+          content_for_recipient[recipient_id]=content_for_recipient[recipient_id] + empty_line + body
+      
+      for recipient_id, body in content_for_recipient.items():
+        #ToDo(Mouli): Use gGRCAdmin for sender of email digest 
         message=mail.EmailMessage(
-          sender=sender.name + "<" + sender.email + ">", 
+          sender=recipient.name + "<" + recipient.email + ">", 
           to=recipient.name + "<" + recipient.email + ">", 
           subject=subject,
           body=body)
- 
-        #ToDo(Mouli): Handle exception by changing status to error
         try:
           message.send()
         except:
+          #ToDo(Mouli): Handle exception by changing status to error
           pass
 
       for notification in notifications:
