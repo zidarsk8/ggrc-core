@@ -11,7 +11,7 @@
       <label>
         Summary
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
       <br>
@@ -23,7 +23,7 @@
     <div class="span8">
       <label>
         Task Details
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
       <div class="wysiwyg-area">
         <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
