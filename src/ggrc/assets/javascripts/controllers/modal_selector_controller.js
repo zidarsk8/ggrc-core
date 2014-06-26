@@ -1503,36 +1503,43 @@
     //Search button click
     , ".objectReview click" : function(){
       //Get the selected object value
-      var selected = $("select.option-type-selector").val();
-      var self = this;
-      var loader;
-      
+      var selected = $("select.option-type-selector").val(),
+        self = this,
+        loader,
+        term = $("#search").val() || "",
+      //Get the filter_list length, for each select get the value for type, 
+      //for each search, find the search text
+        f_len = this.context.filter_list.length,
+        filters = [],
+        cancel_filter;
       
       this.set_option_descriptor(selected);
 
-      //search text filter
-      var term = $("#search").val();
-      if(term == undefined) term = "";
-
-      //Get the filter_list length, for each select get the value for type, 
-      //for each search, find the search text
-      var f_len = this.context.filter_list.length,
-        filters = [];
-
       this.context.filter_list.each(function(filter_obj) {
+        if(cancel_filter || !filter_obj.search_filter) {
+          cancel_filter = true;
+          return;
+        }
         filters.push(
           filter_obj.search_filter.get_binding(
             GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected)
           ));
       });
+      if(cancel_filter) {
+        //missing search term.
+        return;
+      }
 
       if (filters.length > 0) {
-        if(filters.length === 1) {
+        if(filters.length === 1 && !term) {
           //don't bother making an intersecting filter when there's only one.
           loader = filters[0];
         } else {
           // make an intersecting loader, that only shows the results that 
           //  show up in all sources.
+          if(term) {
+            filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
+          }
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
@@ -1557,14 +1564,10 @@
         // With no mappings specified, just do a general search
         //  on the type selected.
         this.last_loader = null;
-        this.options.option_search_term = '';
+        this.options.option_search_term = term;
         this.refresh_option_list();
-        this.constructor.last_option_search_term = null;
+        this.constructor.last_option_search_term = term;
       }
-      //for(var i = 0; i < filters.length; i++){
-      //  console.log(filters[i].filter_model_type + ":"+ filters[i].search_str + " ");
-      //}
-
     }
 
     //Over write the parent class method to select the row. 
