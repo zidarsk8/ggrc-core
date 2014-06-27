@@ -2355,4 +2355,22 @@ Mustache.registerHelper("log", function(obj){
   console.log(resolve_computed(obj));
 });
 
+Mustache.registerHelper("autocomplete_select", function(options) {
+  var cls;
+  if(options.hash && options.hash.controller) {
+    cls = Mustache.resolve(cls);
+    if(typeof cls === "string") {
+      cls = can.getObject(cls);
+    }
+  }
+  return function(el) {
+    $(el).bind("inserted", function() {
+      var $ctl = $(this).parents(":data(controls)");
+      $(this).ggrc_autocomplete($.extend({}, options.hash, {
+        controller : cls ? $ctl.control(cls) : $ctl.control()
+      })); 
+    });
+  };
+});
+
 })(this, jQuery, can);
