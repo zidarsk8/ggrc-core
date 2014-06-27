@@ -74,3 +74,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'frequency',
       'cycles',
       ]
+
+from ggrc_gdrive_integration.models.object_folder import Folderable
+Workflow.__bases__ = (Folderable,) + Workflow.__bases__
+Workflow.late_init_folderable()

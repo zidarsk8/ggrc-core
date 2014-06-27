@@ -54,8 +54,26 @@
       </p>
       <p>
         <strong>gGRC Folder:</strong>
-        <!--a href="#">/gGRC Workflows/{{instance.title}}/</a-->
-        <i>Folder connections for workflows are not yet implemented</i>
+
+        {{#with_mapping 'folders' instance}}
+          {{#last folders}}
+          {{#if instance.selfLink}}
+          <a href="{{instance.alternateLink}}" target="_blank">
+            {{instance.title}}
+          </a>
+          {{/last}}
+          {{else}}
+            No folder for this {{instance.class.title_singular}}.
+            <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+              data-model="{{instance.type}}" data-type="folders" data-id="{{instance.id}}">
+              <i class="grcicon-attach-color"></i> Attach folder
+            </a>
+          {{/if}}
+        {{else}}
+          {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
+          The GDrive folder for this {{instance.class.title_singular}} could not be accessed.
+          {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder" instance=instance}}}
+        {{/with_mapping}}
       </p>
     </div>
   </div>
