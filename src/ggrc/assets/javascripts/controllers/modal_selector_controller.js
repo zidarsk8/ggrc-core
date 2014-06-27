@@ -1484,9 +1484,13 @@
           return;
         }
         filters.push(
-          filter_obj.search_filter.get_binding(
-            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected)
-          ));
+          // Must type filter here because the canonical mapping
+          //  may be polymorphic.
+          new GGRC.ListLoaders.TypeFilteredListLoader(
+            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
+            [selected]
+          ).attach(filter_obj.search_filter)
+        );
       });
       if(cancel_filter) {
         //missing search term.
@@ -1495,7 +1499,7 @@
 
       if (filters.length > 0) {
         if(filters.length === 1 && !term) {
-          //don't bother making an intersecting filter when there's only one.
+          //don't bother making an intersecting filter when there's only one source
           loader = filters[0];
         } else {
           // make an intersecting loader, that only shows the results that 
