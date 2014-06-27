@@ -9,7 +9,6 @@
 """
 
 
-from flask import current_app
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
@@ -172,7 +171,7 @@ class EmailDigestNotification(EmailNotification):
     enable_notif={}
     for notif_date, notifications in pending_notifications_by_date.items():
       content={}
-      content_for_recipient={}
+      content_for_recipients={}
       subject="gGRC daily email digest for " + notif_date
       empty_line = """
       """
@@ -204,8 +203,7 @@ class EmailDigestNotification(EmailNotification):
             content[key]={}
           if not content[key].has_key(notification.notif_pri):
             content[key][notif_pri]=""
-          else:
-            content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
+          content[key][notif_pri]=content[key][notif_pri] + empty_line + notification.content
 
       for (recipient_id, sender_id), items in content.items():
         recipient=to[recipient_id] 
@@ -215,13 +213,15 @@ class EmailDigestNotification(EmailNotification):
         body=""
         for key, value in sorted_items.items():
           body=body + value
-        if not content_for_recipient.has_key(recipient_id):
-          content_for_recipient[recipient_id]= "Emails sent by " + sender.name + empty_line + body
-        else:
-          content_for_recipient[recipient_id]=content_for_recipient[recipient_id] + empty_line + body
+        begin_message = empty_line + "Emails sent by " + sender.name 
+        if not content_for_recipients.has_key(recipient_id):
+          content_for_recipients[recipient_id]= ""
+        content_for_recipients[recipient_id]=begin_message + \
+          content_for_recipients[recipient_id] + empty_line + body
       
-      for recipient_id, body in content_for_recipient.items():
+      for recipient_id, body in content_for_recipients.items():
         #ToDo(Mouli): Use gGRCAdmin for sender of email digest 
+        recipient=to[recipient_id] 
         message=mail.EmailMessage(
           sender=recipient.name + "<" + recipient.email + ">", 
           to=recipient.name + "<" + recipient.email + ">", 
