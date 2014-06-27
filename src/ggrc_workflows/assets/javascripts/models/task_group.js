@@ -36,6 +36,18 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+      this.validatePresenceOf("end_date");
+      this.validate(["_transient.contact", "contact"], function(newVal, prop) {
+        var contact = this.attr("contact");
+        var contact_text = this.attr("_transient.contact");
+        if(
+          !contact
+          || !contact_text
+          || (contact_text && !contact)
+          || (contact_text !== "" && contact_text != null && contact != null && contact_text !== contact.reify().email)) {
+          return "No valid contact selected for assignee";
+        }
+      });
     }
   }, {});
 
