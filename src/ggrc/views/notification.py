@@ -30,8 +30,9 @@ def modify_status():
     obj.status=status
     db.session.add(obj)
     db.session.commit()
+    src_obj={'status': status}
     if model in ['CycleTaskGroupObjectTask']:
-      handle_task_put(sender=None, obj=obj, src=obj, service=None)
+      handle_task_put(sender=None, obj=obj, src=src_obj, service=None)
     db.session.commit()
   return 'Ok'
 
@@ -93,9 +94,11 @@ def notify_email_digest_ggrc_users():
   """ handle any outstanding tasks and newly starting workflow cycles prior to notify email digest
   """
   handle_tasks_overdue()
+  handle_task_group_status_change('Finished')
   handle_workflow_cycle_overdue()
   handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
-  handle_workflow_cycle_status_change('Completed')
+  handle_workflow_cycle_status_change('Finished')
+  handle_workflow_cycle_status_change('Verified')
   handle_workflow_cycle_started()
   handle_workflow_cycle_starting(WORKFLOW_CYCLE_STARTING)
   db.session.commit()
