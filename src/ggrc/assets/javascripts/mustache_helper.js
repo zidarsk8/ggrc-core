@@ -1539,19 +1539,23 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
       }
 
       if (instance instanceof CMS.Models.Audit) {
-        instance.reify().get_binding('authorizations').refresh_list().then(function() {
-          if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
+        $.when(
+          instance.reify().get_binding('authorizations').refresh_list(),
+          instance.findAuditors()
+        ).then(function(authorizations, auditors) {
+          if(~can.inArray(person.id, $.map(auditors, function(p) { return p.person.id; }))){
             state.attr('roles').push('Auditor');
           }
-        }).then(function() {
-          instance.reify().get_mapping('authorizations').bind("change", function() { 
+          authorizations.list.bind("change", function() {
             state.attr('roles', can.map(state.attr('roles'), function(role) {
               if (role != 'Auditor')
                 return role;
             }));
-            if(~can.inArray(person.id, $.map(instance.findAuditors(), function(p) { return p.person.id; }))){
-              state.attr('roles').push('Auditor');
-            }
+            instance.findAuditors().then(function(auds) {
+              if(~can.inArray(person.id, $.map(auds, function(p) { return p.person.id; }))){
+                state.attr('roles').push('Auditor');
+              }
+            });
           });
         });
       }
@@ -1932,26 +1936,30 @@ Mustache.registerHelper("if_in_map", function(list, path, value, options) {
 });
 
 Mustache.registerHelper("with_auditors", function(instance, options) {
-  var auditors
+  var auditors, auditors_dfd
     , decoy
     ;
 
   instance = resolve_computed(instance);
   if (options.hash && options.hash.decoy) {
-    decoy = resolve_computed(options.hash.decoy);
+    decoy = Mustache.resolve(options.hash.decoy);
     decoy.attr();
   }
 
-  if(!instance) 
+  if(!instance)
     return "";
 
-  auditors = resolve_computed(instance).findAuditors();
-  if(auditors.attr("length") > 0){
-    return options.fn(options.contexts.add({"auditors": auditors}));
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
+  auditors_dfd = Mustache.resolve(instance).findAuditors().done(function(aud) {
+    auditors = aud;
+  });
+  return defer_render("span", function() {
+    if(auditors && auditors.attr("length") > 0){
+      return options.fn(options.contexts.add({"auditors": auditors}));
+    }
+    else{
+      return options.inverse(options.contexts);
+    }
+  }, auditors_dfd);
 });
 
 Mustache.registerHelper("if_instance_of", function(inst, cls, options) {
@@ -2069,14 +2077,14 @@ Mustache.registerHelper("remove_space", function(str, options){
 });
 
 Mustache.registerHelper("if_auditor", function(instance, options){
-  var instance, audit, auditors
+  var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")
     , include_admin = !options.hash || options.hash.include_admin !== false;
 
-  instance = resolve_computed(instance);
+  instance = Mustache.resolve(instance);
   instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
 
-  if(!instance) 
+  if(!instance)
     return "";
 
   audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
@@ -2085,7 +2093,7 @@ Mustache.registerHelper("if_auditor", function(instance, options){
     return "";  //take no action until audit is available
 
   audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
-  auditors = audit.findAuditors();
+  auditors = audit.findAuditors(true); // immediate-mode findAuditors
 
   if((include_admin && admin) || (auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id)) {
     return options.fn(options.contexts);
@@ -2111,31 +2119,33 @@ Mustache.registerHelper("if_can_edit_request", function(instance, options){
       return "";  //take no action until audit is available
 
     audit = audit.reify();
-    auditors = audit.findAuditors();
+    auditors_dfd = audit.findAuditors();
     
-    var accepted = instance.status === "Accepted"
-      , update = Permission.is_allowed("update", instance)
-      , map = Permission.is_allowed("mapping", instance)
-      , create = Permission.is_allowed("creating", instance)
-      , assignee = instance.assignee.id === GGRC.current_user.id
-      , audit_lead = audit.contact.id === GGRC.current_user.id
-      , auditor = auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
-      , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
-      , assignee_states = ["Requested", "Amended Request"]
-      , can_auditor_edit = auditor && ~can.inArray(instance.status, auditor_states)
-      , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.status, assignee_states)
-      ;
-    //    instead of
-    //    ^if' allow_mapping_or_creating '\
-    //    or ^is_allowed' 'update' instance '\
-    //    ' _1_context=instance.context.id
-    if(admin || can_auditor_edit || can_assignee_edit || 
-        (!accepted && (update || map || create))){
-      return options.fn(options.contexts);
-    }
-    else{
-      return options.inverse(options.contexts);
-    }
+    return defer_render("span", function(auditors) {
+      var accepted = instance.status === "Accepted"
+        , update = Permission.is_allowed("update", instance)
+        , map = Permission.is_allowed("mapping", instance)
+        , create = Permission.is_allowed("creating", instance)
+        , assignee = instance.assignee.id === GGRC.current_user.id
+        , audit_lead = audit.contact.id === GGRC.current_user.id
+        , auditor = auditors && auditors.length > 0 && auditors[0].person.id === GGRC.current_user.id
+        , auditor_states = ["Draft", "Responded", "Amended Response"] // States in which an auditor can edit a request
+        , assignee_states = ["Requested", "Amended Request"]
+        , can_auditor_edit = auditor && ~can.inArray(instance.status, auditor_states)
+        , can_assignee_edit = (audit_lead || assignee) && ~can.inArray(instance.status, assignee_states)
+        ;
+      //    instead of
+      //    ^if' allow_mapping_or_creating '\
+      //    or ^is_allowed' 'update' instance '\
+      //    ' _1_context=instance.context.id
+      if(admin || can_auditor_edit || can_assignee_edit ||
+          (!accepted && (update || map || create))){
+        return options.fn(options.contexts);
+      }
+      else{
+        return options.inverse(options.contexts);
+      }
+    }, auditors_dfd);
 });
 
 Mustache.registerHelper("strip_html_tags", function(str){
@@ -2353,6 +2363,24 @@ Mustache.registerHelper("with_allowed_as", function(name, action, mappings, opti
 
 Mustache.registerHelper("log", function(obj){
   console.log(resolve_computed(obj));
+});
+
+Mustache.registerHelper("autocomplete_select", function(options) {
+  var cls;
+  if(options.hash && options.hash.controller) {
+    cls = Mustache.resolve(cls);
+    if(typeof cls === "string") {
+      cls = can.getObject(cls);
+    }
+  }
+  return function(el) {
+    $(el).bind("inserted", function() {
+      var $ctl = $(this).parents(":data(controls)");
+      $(this).ggrc_autocomplete($.extend({}, options.hash, {
+        controller : cls ? $ctl.control(cls) : $ctl.control()
+      })); 
+    });
+  };
 });
 
 })(this, jQuery, can);

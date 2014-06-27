@@ -239,6 +239,8 @@
         modal_title = "Map " + modal_title + " to " + object_params.section.title;
       }
       
+      var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
+
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
@@ -249,7 +251,7 @@
         , current_user : GGRC.current_user
         , instance : instance
         , modal_title : object_params.modal_title || modal_title
-        , content_view : GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache"
+        , content_view : content_view
         , mapping : mapping
       });
 

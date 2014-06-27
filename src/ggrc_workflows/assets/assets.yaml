@@ -38,3 +38,7 @@ dashboard-js-template-files:
   - workflows/modal_content.mustache
   - workflows/info.mustache
   - workflows/tree.mustache
+  - wf_objects/tree_footer.mustache
+  - selectors/object_selector_base_modal.mustache
+  - selectors/object_selector_option_column.mustache
+  - selectors/object_selector_option_items.mustache
