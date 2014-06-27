@@ -9,6 +9,7 @@
 """
 
 
+from flask import current_app
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
@@ -136,7 +137,7 @@ class EmailNotification(NotificationBase):
       try:
         message.send()
       except: 
-        pass
+        current_app.logger.error("Unable to send email") 
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
@@ -217,7 +218,7 @@ class EmailDigestNotification(EmailNotification):
         if not content_for_recipients.has_key(recipient_id):
           content_for_recipients[recipient_id]= ""
         content_for_recipients[recipient_id]=begin_message + \
-          content_for_recipients[recipient_id] + empty_line + body
+          content_for_recipients[recipient_id] + body
       
       for recipient_id, body in content_for_recipients.items():
         #ToDo(Mouli): Use gGRCAdmin for sender of email digest 
@@ -231,7 +232,7 @@ class EmailDigestNotification(EmailNotification):
           message.send()
         except:
           #ToDo(Mouli): Handle exception by changing status to error
-          pass
+          current_app.logger.error("Unable to send email to " + recipient.name)
 
       for notification in notifications:
         for notify_recipient in notification.recipients:
