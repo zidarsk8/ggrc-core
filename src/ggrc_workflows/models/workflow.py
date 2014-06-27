@@ -35,7 +35,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       raise ValueError(message)
     return value
 
-  frequency = deferred( 
+  frequency = deferred(
     db.Column(db.String, nullable=True, default=default_frequency),
     'Workflow'
     )
@@ -75,6 +75,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'cycles',
       ]
 
+# TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
 from ggrc_gdrive_integration.models.object_folder import Folderable
 Workflow.__bases__ = (Folderable,) + Workflow.__bases__
 Workflow.late_init_folderable()
