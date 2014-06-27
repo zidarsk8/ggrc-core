@@ -4,8 +4,9 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from flask import Blueprint
-from ggrc import settings
-#from ggrc.app import app
+from sqlalchemy import inspect
+
+from ggrc import settings, db
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
@@ -96,6 +97,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   # Populate the top-level Cycle object
   obj.title = workflow.title
   obj.description = workflow.description
+  obj.status = 'InProgress'
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
@@ -106,7 +108,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         description=task_group.description,
         end_date=task_group.end_date,
         )
-    #db.session.add(cycle_task_group)
 
     for task_group_object in task_group.task_group_objects:
       object = task_group_object.object
@@ -130,3 +131,65 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           contact=task_group.contact,
           status="Assigned",
           )
+
+
+# 'InProgress' states propagate via these links
+_cycle_object_parent_attr = {
+    models.CycleTaskGroupObjectTask: 'cycle_task_group_object',
+    models.CycleTaskGroupObject: 'cycle_task_group',
+    models.CycleTaskGroup: 'cycle'
+    }
+
+# 'Finished' and 'Verified' states are determined via these links
+_cycle_object_children_attr = {
+    models.CycleTaskGroupObject: 'cycle_task_group_object_tasks',
+    models.CycleTaskGroup: 'cycle_task_group_objects',
+    # Don't include Cycle, since its state must be set explicitly
+    #models.Cycle: 'cycle_task_groups'
+    }
+
+
+def update_cycle_object_parent_state(obj):
+  parent_attr = _cycle_object_parent_attr.get(type(obj), None)
+  if not parent_attr:
+    return
+
+  parent = getattr(obj, parent_attr, None)
+  if not parent:
+    return
+
+  # If any child is `InProgress`, then parent should be `InProgress`
+  if obj.status == 'InProgress':
+    if parent.status != 'InProgress':
+      parent.status = 'InProgress'
+      db.session.add(parent)
+      update_cycle_object_parent_state(parent)
+  # If all children are `Completed` or `Verified`, then parent should be same
+  elif obj.status == 'Finished' or obj.status == 'Verified':
+    children_attr = _cycle_object_children_attr.get(type(parent), None)
+    if children_attr:
+      children = getattr(parent, children_attr, None)
+      children_finished = True
+      children_verified = True
+      for child in children:
+        if child.status != 'Verified':
+          children_verified = False
+          if child.status != 'Finished':
+            children_finished = False
+      if children_verified:
+        parent.status = 'Verified'
+        update_cycle_object_parent_state(parent)
+      elif children_finished:
+        parent.status = 'Finished'
+        update_cycle_object_parent_state(parent)
+      #children_states_match = map(lambda c: c.status == obj.status, children)
+      #if all(children_states_match):
+      #  parent.status = obj.status
+      #  update_cycle_object_parent_state(parent)
+
+
+@Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
+def handle_cycle_task_group_object_task_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    update_cycle_object_parent_state(obj)

@@ -57,12 +57,20 @@
     attributes: {
       cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      documents : "CMS.Models.Document.stubs",
     },
 
     tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
-      footer_view: _mustache_path + "/tree_footer.mustache"
+      footer_view: _mustache_path + "/tree_footer.mustache",
+      child_options: [{
+        //0: Documents
+        model: "Document",
+        mapping: "documents",
+        show_view: _mustache_path + "/documents.mustache",
+        footer_view: _mustache_path + "/documents_footer.mustache"
+      }],
     }
   }, {});
 
@@ -132,6 +140,18 @@
           allow_creating: false
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.cycle_task_group.reify().selfLink) {
+            instance.cycle_task_group.reify().refresh();
+          }
+        }
+      });
     }
   }, {});
 
@@ -152,6 +172,7 @@
       task_group_task: "CMS.Models.TaskGroupTask.stub",
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub",
+      contact: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub"
     },
 
@@ -166,6 +187,18 @@
           allow_creating: true
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.cycle_task_group_object.reify().selfLink) {
+            instance.cycle_task_group_object.reify().refresh();
+          }
+        }
+      });
     }
   }, {
     overdue: can.compute(function(val) {

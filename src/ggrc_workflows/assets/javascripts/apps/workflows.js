@@ -85,10 +85,10 @@
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.status == "Finished";
+              return result.instance.status != "InProgress";
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.status != "Finished";
+              return result.instance.status == "InProgress";
             }),
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
         },
@@ -135,6 +135,8 @@
         },
 
         CycleTaskEntry: {
+          documents: Proxy(
+            "Document", "document", "ObjectDocument", "documentable", "object_documents"),
           cycle_task_group_object_task: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",
@@ -157,10 +159,10 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
-      //mappings[type]._canonical = {
-      //  "workflows": "Workflow",
-      //  "task_groups": "TaskGroup"
-      //};
+      mappings[type]._canonical = {
+       "workflows": "Workflow",
+       "task_groups": "TaskGroup"
+      };
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };
@@ -361,7 +363,7 @@
         draw_children: true,
         parent_instance: object,
         model: "Cycle",
-        mapping: "current_cycle",
+        mapping: "previous_cycles",
       }
     };
     current_widget_descriptor = {
@@ -385,7 +387,7 @@
     new_widget_descriptors.current = current_widget_descriptor;
 
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
-  }
+  };
 
 
   GGRC.register_hook(

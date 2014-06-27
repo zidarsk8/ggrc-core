@@ -298,6 +298,7 @@ can.Control("CMS.Controllers.InnerNav", {
     , widget_list : null
     , spinners : {}
     , contexts : null
+    , instance : null
   }
 }, {
     init: function(options) {
@@ -306,6 +307,8 @@ can.Control("CMS.Controllers.InnerNav", {
 
       if (!this.options.widget_list)
         this.options.widget_list = new can.Observe.List([]);
+
+      this.options.instance = GGRC.page_instance();
 
       this.sortable();
 

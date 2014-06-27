@@ -6,11 +6,12 @@
 
 from ggrc import db
 from ggrc.models.mixins import Base, Titled, Slugged, Described, Timeboxed
+from ggrc.models.object_owner import Ownable
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.reflection import PublishOnly
 
 
-class Task(Timeboxed, Described, Titled, Slugged, Base, db.Model):
+class Task(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'tasks'
 
   task_group_tasks = db.relationship(
