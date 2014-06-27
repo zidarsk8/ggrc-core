@@ -39,6 +39,8 @@ class SectionRowConverter(BaseRowConverter):
       self.obj.directive_id = int(directive_id)
       db_session.add(self.obj)
 
+  def handle_title(self, key, **options):
+    return self.handle(key, SectionTitleHandler, **options)
 
 class ClauseRowConverter(SectionRowConverter):
   model_class = Clause
@@ -65,6 +67,9 @@ class ClauseRowConverter(SectionRowConverter):
       db_session.add(self.obj)
       ds = DirectiveSection(directive_id=directive_id, section=self.obj)
       db_session.add(ds)
+
+  def handle_title(self, key, **options):
+    return self.handle(key, TitleHandler, **options)
 
 
 class SectionsConverter(BaseConverter):
@@ -127,7 +132,6 @@ class SectionsConverter(BaseConverter):
     yield []
     yield []
     yield self.object_map.keys()
-
 
 class ClausesConverter(SectionsConverter):
   row_converter = ClauseRowConverter

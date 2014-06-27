@@ -491,17 +491,34 @@ class TitleHandler(ColumnHandler):
     super(TitleHandler, self).validate(data)
     # check for collisions in db
     object_class = self.importer.model_class
-    db_collisions = object_class.query.filter_by(title=data).all()
-    # Only add error for collision if it doesn't match one of the slugs
-    if db_collisions:
+    # check for objects in the same table with the same slug (regardless of parent scope (self.importer.obj))
+    global_db_collisions = object_class.query.filter_by(title=data).all()
+    # add error for collision if it doesn't match one of the slugs
+    if global_db_collisions:
       current_slug = self.importer.obj.slug
-      if not any(current_slug == x.slug for x in db_collisions):
+      if not any(current_slug == x.slug for x in global_db_collisions):
         self.add_error("An object with this title already exists.")
         return
-    # ... and then in existing imports
-    has_import_collision = data in [x.obj.title for x in self.base_importer.created_objects()]
+
+    # ... and then within the same import
+    has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
     if has_import_collision:
       self.add_error("Another item in this import already has this title.")
+
+
+class SectionTitleHandler(TitleHandler):
+  def validate(self, data):
+    # check for collisions within the directive
+    directive = self.importer.obj.directive
+    scoped_db_collisions = self.importer.model_class.query.filter_by(directive=directive, title=data).all()
+    if scoped_db_collisions:
+      self.add_error("Another item within this {type} already has this title.".format(type=self.importer.obj.directive.kind))
+
+    # ... and then within the same import
+    has_import_collision = data in [x.obj.title for x in self.base_importer.objects]
+    if has_import_collision:
+      self.add_error("Another item in this import already has this title.")
+
 
 class DateColumnHandler(ColumnHandler):
 
