@@ -48,14 +48,14 @@
               </select>
             {{/if_equals}}
           {{/if}}
-          <div class="modal-search objective-selector">
+          <!-- div class="modal-search objective-selector">
             <input 
               id="search" 
               class="input-large search-icon" 
               placeholder="Enter text to search for Object" 
               value="{{option_search_term}}" 
               type="text">
-          </div>
+          </div -->          
         </div>
       </div>
 
@@ -83,13 +83,14 @@
               <input 
                 id="search-filter{{@index}}"
                 class="input-large search-icon search-filter{{@index}}" 
-                placeholder="Enter text to search for Object"
-                type="text"
+                placeholder="Enter text to search for {{model_name}}"
+                type="text" 
                 name="filter_list.{{@index}}.search_filter"
                 value="{{firstnonempty search_filter.name search_filter.email search_filter.title}}"
                 data-lookup="{{this}}"
-                data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
-                {{ autocomplete_select }}>
+                data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache" 
+                {{ autocomplete_select }}
+                >
             </div>
             {{/model_name}}
           </div>

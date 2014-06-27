@@ -1403,29 +1403,7 @@
               function(key) {
                 return CMS.Models[key];
               }
-            );
-
-        /*if (!this.options.option_type_menu2) {
-          menu2 = [
-              { category: "Governance"
-              , items: []
-              }
-            , { category: "Assets/Business"
-              , items: []
-              }
-            , { category: "People/Groups"
-              , items: []
-              }
-            ];
-          can.each(this.options.option_descriptors, function(descriptor) {
-            menu2[lookup[descriptor.model.category] || 0].items.push({
-                model_name: descriptor.model.shortName
-              , model_display: descriptor.model.title_plural
-            })
-          })
-
-          this.options.option_type_menu2 = menu2;
-        } */   
+            ); 
     }
 
   , init_context: function() {
@@ -1469,8 +1447,6 @@
 
     //Over write this for search button to update the list
     , on_select_option_type: function(el, ev) {
-        //this.set_option_descriptor($(el).val()); //Setting up option descriptor to value
-        //this.element.find("#search").focus();
     }
 
     , "select.option-type-selector change": "on_select_option_type"
@@ -1478,19 +1454,6 @@
     
     //Over write search text to noop, search button updates the list
     , "#search keyup": function(el, ev) {
-        /*var self = this
-          , $el = $(el)
-          , term = $el.val()
-          ;
-        if (term !== this.options.option_search_term) {
-          this.options.option_search_term = term;
-          setTimeout(function() {
-            if (self.options.option_search_term === term) {
-              self.refresh_option_list();
-              self.constructor.last_option_search_term = term;
-            }
-          }, 200);
-        }*/
     }
 
 
