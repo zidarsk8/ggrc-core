@@ -54,14 +54,11 @@
       </p>
       <p>
         <strong>gGRC Folder:</strong>
-
         {{#with_mapping 'folders' instance}}
-          {{#last folders}}
-          {{#if instance.selfLink}}
-          <a href="{{instance.alternateLink}}" target="_blank">
-            {{instance.title}}
-          </a>
-          {{/last}}
+          {{#if folders.length}}
+            <a href="{{folders.0.instance.alternateLink}}" target="_blank">
+              {{folders.0.instance.title}}
+            </a>
           {{else}}
             No folder for this {{instance.class.title_singular}}.
             <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
@@ -72,7 +69,6 @@
         {{else}}
           {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
           The GDrive folder for this {{instance.class.title_singular}} could not be accessed.
-          {{{render '/static/mustache/gdrive/gapi_errors.mustache' type="folder" instance=instance}}}
         {{/with_mapping}}
       </p>
     </div>
