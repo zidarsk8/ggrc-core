@@ -222,6 +222,49 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   if obj.status in ['Finished']: 
     prepare_notification_for_task(obj, assignee, workflow_owner, subject, notif_pri)
 
+@Resource.model_posted.connect_via(models.WorkflowPerson)
+def handle_workflow_person_post(sender, obj=None, src=None, service=None):
+  person=obj.person
+  workflow=obj.workflow
+  subject="Member " + person.name + " is added to workflow " + workflow.title
+  prepare_notification_for_workflow_member(workflow, person, subject, PRI_OTHERS)
+
+@Resource.model_deleted.connect_via(models.WorkflowPerson)
+def handle_workflow_person_deleted(sender, obj=None, service=None):
+  person=obj.person
+  workflow=obj.workflow
+  subject="Member " + person.name + " is removed from workflow " + workflow.title
+  prepare_notification_for_workflow_member(workflow, person, subject, PRI_OTHERS)
+
+def prepare_notification_for_workflow_member(workflow, member, subject, notif_pri):
+  workflow_owner=get_workflow_owner(workflow)
+  if workflow_owner is None:
+    current_app.logger.warn("Trigger: Unable to find workflow owner")
+    return
+  empty_line="""
+  """
+  content=empty_line + subject + empty_line +  \
+    "  " + request.url_root + workflow._inflector.table_plural + \
+    "/" + str(workflow.id) 
+  recipients_email=[]
+  recipients_emaildigest=[]
+  if isNotificationEnabled(member.id, 'Email_Now'):
+    recipients_email.append(member)
+  if isNotificationEnabled(member.id, 'Email_Digest'):
+    recipients_emaildigest.append(member)
+  for person in workflow.people:
+    if isNotificationEnabled(person.id, 'Email_Now'):
+      recipients_email.append(person)
+    if isNotificationEnabled(person.id, 'Email_Digest'):
+      recipients_emaildigest.append(person)
+  if len(recipients_email) or len(recipients_emaildigest):
+    if len(recipients_email):
+      prepare_notification(workflow, 'Email', notif_pri, subject, content, \
+        workflow_owner, recipients_email)
+    if len(recipients_emaildigest):
+      prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
+        workflow_owner, recipients_emaildigest)
+
 def prepare_notification_for_cycle(cycle, subject, notif_pri):
   workflow=db.session.query(models.Workflow).\
     filter(models.Workflow.id == cycle.workflow_id).first()
