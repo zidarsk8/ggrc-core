@@ -38,14 +38,9 @@
       this.validatePresenceOf("title");
       this.validatePresenceOf("end_date");
       this.validate(["_transient.contact", "contact"], function(newVal, prop) {
-        var contact = this.attr("contact");
-        var contact_text = this.attr("_transient.contact");
-        if(
-          !contact
-          || !contact_text
-          || (contact_text && !contact)
-          || (contact_text !== "" && contact_text != null && contact != null && contact_text !== contact.reify().email)) {
-          return "No valid contact selected for assignee";
+        var is_valid = this.contact ? (this.contact.reify().email == this.attr("_transient.contact")) : false;
+        if(!is_valid) {
+            return "No valid contact selected for assignee";
         }
       });
     }
