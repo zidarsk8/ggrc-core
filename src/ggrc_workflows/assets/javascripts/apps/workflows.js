@@ -72,7 +72,8 @@
             objects: _workflow_object_types,
             tasks: "Task",
             task_groups: "TaskGroup",
-            people: "Person"
+            people: "Person",
+            folders : "GDriveFolder"
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
@@ -84,6 +85,8 @@
             "TaskGroup", "workflow", "task_groups"),
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
+          folders:
+            new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
               return result.instance.status != "InProgress";
             }),

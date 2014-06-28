@@ -716,15 +716,22 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       function createPicker() {
         window.oauth_dfd.done(function(token, oauth_user) {
           var picker = new google.picker.PickerBuilder()
-          .addView(new google.picker.DocsUploadView())
-          .addView(google.picker.ViewId.DOCS)
-          .setOAuthToken(gapi.auth.getToken().access_token)
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-          .setDeveloperKey(GGRC.config.GAPI_KEY)
-          .setCallback(pickerCallback)
-          .build();
+            .setOAuthToken(gapi.auth.getToken().access_token)
+            .setDeveloperKey(GGRC.config.GAPI_KEY)
+            .setCallback(pickerCallback)
 
-          picker.setVisible(true);
+          if(el.data('type') === 'folders'){
+            var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+              .setIncludeFolders(true)
+              .setSelectFolderEnabled(true);
+            picker.addView(view);
+          }
+          else{
+            picker.addView(new google.picker.DocsUploadView())
+              .addView(google.picker.ViewId.DOCS)
+              .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+          }
+          picker.build().setVisible(true);
         });
       }
 
@@ -743,7 +750,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           });
         }
         else if (data[ACTION] == CANCEL) {
-          el.trigger('rejected', data);
+          el.trigger('rejected');
         }
       }
     });
@@ -764,10 +771,19 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                   , documentable : object
                   , document : d[0]
                 }).save(),
-
               ])
             )
           } else {
+            if(el.data('type') === 'folders'){
+              report_progress("Linking folder " + file.title,
+                new CMS.Models.ObjectFolder({
+                  folderable : object
+                  , folder : file
+                  , context : object.context || {id: null}
+                }).save()
+              );
+              return;
+            }
             //file not found, make Document object.
             report_progress(
               "Linking new Drive file \"" + file.title + "\""
