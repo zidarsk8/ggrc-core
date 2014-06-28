@@ -159,6 +159,7 @@ def prepare_notification_for_taskgroup(task_group, sender, recipient, subject, n
 def handle_tasks_overdue():
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
     filter(models.CycleTaskGroupObjectTask.end_date < date.today()).\
+    filter(models.CycleTaskGroupObjectTask.status != 'Finished').\
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
@@ -167,14 +168,15 @@ def handle_tasks_overdue():
       continue
     workflow_owner=contact[0]
     assignee=contact[1]
-    subject="Task " + "'" + task.title + "' is past overdue " 
+    subject="Task " + "'" + task.title + "' is past overdue "  + str(task.end_date)
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_OVERDUE)
 
 def handle_task_group_status_change(status):
-  if status not in ['Finished', 'Verified']:
+  if status not in ['Finished']:
     return
   task_groups=db.session.query(models.CycleTaskGroup).\
     filter(models.CycleTaskGroup.status == status).\
+    filter(models.CycleTaskGroup.end_date > date.today()).\
     all()
   for task_group in task_groups:
     contact=get_task_group_contacts(task_group)
@@ -188,6 +190,7 @@ def handle_task_group_status_change(status):
 def handle_tasks_due(num_days):
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
     filter(models.CycleTaskGroupObjectTask.end_date == (date.today() + timedelta(num_days))).\
+    filter(models.CycleTaskGroupObjectTask.status != 'Finished').\
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
@@ -229,7 +232,9 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri):
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner")
     return
-  content=empty_line + subject + " for workflow " + "'" + workflow.title + " '" + empty_line +  \
+  empty_line="""
+  """
+  content=empty_line + subject + empty_line +  \
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) + "#current_widget"
   recipients_email=[]
@@ -248,56 +253,59 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri):
         workflow_owner, recipients_emaildigest)
 
 def handle_workflow_cycle_status_change(status):
-  if status not in ['Finished', 'Verified']:
+  if status not in ['InProgress', 'Finished']:
     return
   workflow_cycles=db.session.query(models.Cycle).\
-    join(models.Cycle.contact).\
-    filter(models.Cycle.status == status).all()
+    filter(models.Cycle.status == status).\
+    filter(models.Cycle.end_date > date.today()).\
+    all()
   for cycle in workflow_cycles:
-    if status == 'Finished':
+    if status == 'InProgress':
+       new_status='Finished'
+    elif status == 'Finished':
        new_status='Verified'
     else:
-       new_status='Ended'
-    subject="Workflow Cycle " + "'" + cycle.title + "' is ready to be "  + new_status
+      continue
+    subject="Workflow " + "'" + cycle.title + "' is ready to be "  + new_status
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
 
 def handle_workflow_cycle_started():
   workflow_cycles=db.session.query(models.Cycle).\
-    join(models.Cycle.contact).\
     filter(models.Cycle.status == 'InProgress').\
     filter(models.Cycle.start_date == date.today()).\
     all()
   for cycle in workflow_cycles:
-    subject="Workflow Cycle " + "'" + cycle.title + "' started " + str(cycle.start_date) 
+    subject="Workflow " + "'" + cycle.title + "' started " + str(cycle.start_date) 
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
 
 def handle_workflow_cycle_overdue():
   workflow_cycles=db.session.query(models.Cycle).\
-    join(models.Cycle.contact).\
     filter(models.Cycle.status != 'Finished').\
+    filter(models.Cycle.status != 'Verified').\
     filter(models.Cycle.end_date < date.today()).\
     all()
   for cycle in workflow_cycles:
-    subject="Workflow Cycle " + "'" + cycle.title + "' overdue " + str(cycle.end_date) 
+    subject="Workflow " + "'" + cycle.title + "' is past overdue " + str(cycle.end_date) 
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
 
 def handle_workflow_cycle_due(num_days):
   workflow_cycles=db.session.query(models.Cycle).\
-    join(models.Cycle.contact).\
     filter(models.Cycle.status != 'Finished').\
+    filter(models.Cycle.status != 'Verified').\
     filter(models.Cycle.end_date == (date.today() + timedelta(num_days))).\
     all()
   for cycle in workflow_cycles:
-    subject="Workflow Cycle " + "'" + cycle.title + "' is due in " + str(num_days) + " days"
+    subject="Workflow " + "'" + cycle.title + "' is due in " + str(num_days) + " days"
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
 
 def handle_workflow_cycle_starting(num_days):
   workflow_cycles=db.session.query(models.Cycle).\
-    join(models.Cycle.contact).\
+    filter(models.Cycle.status != 'Finished').\
+    filter(models.Cycle.status != 'Verified').\
     filter(models.Cycle.start_date == (date.today() + timedelta(num_days))).\
     all()
   for cycle in workflow_cycles:
-    subject="Workflow Cycle " + "'" + cycle.title + "' will start in " + str(num_days) + " days"
+    subject="Workflow " + "'" + cycle.title + "' will start in " + str(num_days) + " days"
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
