@@ -16,11 +16,10 @@ from datetime import datetime
 WORKFLOW_CYCLE_DUE=3
 WORKFLOW_CYCLE_STARTING=7
 
+"""
 @app.route("/modify_status", methods=["GET", "POST"])
 @login_required
 def modify_status():
-  """ prepare email digest
-  """
   model=request.args.get('model')
   id=request.args.get('id')
   status=request.args.get('status')
@@ -39,8 +38,6 @@ def modify_status():
 @app.route("/prepare_email", methods=["GET", "POST"])
 @login_required
 def prepare_email_ggrc_users():
-  """ prepare email digest
-  """
   model=request.args.get('model')
   id=request.args.get('id')
   cls=getattr(all_models, model)
@@ -60,8 +57,6 @@ def prepare_email_ggrc_users():
 @app.route("/prepare_emaildigest", methods=["GET", "POST"])
 @login_required
 def prepare_email_digest_ggrc_users():
-  """ prepare email digest
-  """
   model=request.args.get('model')
   id=request.args.get('id')
   import ggrc.models
@@ -82,13 +77,15 @@ def prepare_email_digest_ggrc_users():
 @app.route("/notify_email", methods=["GET", "POST"])
 @login_required
 def notify_email_ggrc_users():
-  """ notify email for a program object
-  """
   email_notification=EmailNotification()
   email_notification.notify()
   db.session.commit()
   return 'Ok'
-
+"""
+# AppEngine cron supports only GET
+# ToDo(Mouli): Cron job to check all model extensions and invoke notify_email_digest
+# Each model extension has a trigger to handle respective models such as ggrc_workflows
+#
 @app.route("/notify_emaildigest", methods=["GET", "POST"])
 def notify_email_digest_ggrc_users():
   """ handle any outstanding tasks and newly starting workflow cycles prior to notify email digest

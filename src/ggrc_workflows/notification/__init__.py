@@ -82,6 +82,8 @@ def get_cycle(task):
   return db.session.query(models.Cycle).\
     filter(models.Cycle.id == task_group.cycle_id).first()
 
+# ToDo(Mouli): Consolidate common queries and use model associations instead of separate queries
+#
 def get_taskgroup_cycle(task_group):
   return db.session.query(models.Cycle).\
     filter(models.Cycle.id == task_group.cycle_id).first()
