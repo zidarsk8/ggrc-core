@@ -31,9 +31,7 @@
         autogenerate: true
       });
 
-      cycle.save().then(function(cycle) {
-        page_instance.cycles.push(cycle);
-      });
+      cycle.save();
     },
 
     "[data-ggrc-action=end-cycle] click": function() {
