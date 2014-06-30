@@ -7,6 +7,7 @@ from flask import Blueprint
 from sqlalchemy import inspect
 
 from ggrc import settings, db
+from ggrc.login import get_current_user
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
@@ -88,6 +89,8 @@ from ggrc.services.common import Resource
 
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
+  current_user = get_current_user()
+
   if not src.get('autogenerate'):
     return
 
@@ -107,6 +110,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         title=task_group.title,
         description=task_group.description,
         end_date=task_group.end_date,
+        modified_by=current_user,
         )
 
     for task_group_object in task_group.task_group_objects:
@@ -116,6 +120,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           cycle_task_group=cycle_task_group,
           task_group_object=task_group_object,
           title=object.title,
+          modified_by=current_user,
           )
 
       for task_group_task in task_group.task_group_tasks:
@@ -130,6 +135,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           end_date=task_group_task.end_date,
           contact=task_group.contact,
           status="Assigned",
+          modified_by=current_user,
           )
 
 
