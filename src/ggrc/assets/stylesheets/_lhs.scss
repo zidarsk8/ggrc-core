@@ -188,6 +188,13 @@
         }
       }
     }
+    li {
+      &.workflow {
+        a {
+          color: $programs;
+        }
+      }
+    }
   }
   ul.sub-level,
   ul.sub-actions {

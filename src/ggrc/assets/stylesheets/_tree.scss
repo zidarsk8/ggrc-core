@@ -453,6 +453,12 @@ ul.new-tree {
       display: none;
       margin-right: 20px;
     }
+    .objective-selector {
+      .short-field {
+        margin-top: 4px;
+        min-height: 23px;
+      }
+    }
     .watermark-trigger {
       &.active {
         .utility-link {
