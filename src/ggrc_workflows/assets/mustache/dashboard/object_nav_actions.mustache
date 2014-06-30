@@ -5,9 +5,10 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-
+{{^instance.cycles.length}}
 <li class="inner-nav-button">
   <button type="submit" href="#workflowStart" data-ggrc-action="start-cycle" data-toggle="modal" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
     Start Workflow
   </button>
 </li>
+{{/instance}}
