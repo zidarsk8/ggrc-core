@@ -31,10 +31,7 @@
         autogenerate: true
       });
 
-      cycle.save().then(function(cycle) {
-        //console.debug("done", arguments);
-      });
-      //console.debug("creating", arguments);
+      cycle.save();
     },
 
     "[data-ggrc-action=end-cycle] click": function() {

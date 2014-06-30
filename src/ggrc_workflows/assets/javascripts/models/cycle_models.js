@@ -51,6 +51,17 @@
           allow_creating: false
         }
       ]
+    },
+    init: function(){
+      var that = this;
+      this._super.apply(this, arguments);
+      this.bind("created", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.workflow.reify().selfLink) {
+            instance.workflow.reify().refresh();
+          }
+        }
+      });
     }
   }, {});
 
