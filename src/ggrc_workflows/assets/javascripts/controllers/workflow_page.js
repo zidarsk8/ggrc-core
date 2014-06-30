@@ -32,9 +32,8 @@
       });
 
       cycle.save().then(function(cycle) {
-        //console.debug("done", arguments);
+        page_instance.cycles.push(cycle);
       });
-      //console.debug("creating", arguments);
     },
 
     "[data-ggrc-action=end-cycle] click": function() {

@@ -5,18 +5,10 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-{{#widget_list}}
-{{#if_equals "Current Cycle" internav_display}}
-{{!
-    We can't use '^instance.cycles.length' instead of count, because
-    it isn't live bound and doesn't get updated when Start Workflow is clicked
-}}
-{{^count}}
-  <li class="inner-nav-button">
-    <button type="submit" href="#workflowStart" data-ggrc-action="start-cycle" data-toggle="modal" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-      Start Workflow
-    </button>
-  </li>
-{{/count}}
-{{/if_equals}}
-{{/widget_list}}
+{{^instance.cycles.length}}
+<li class="inner-nav-button">
+  <button type="submit" href="#workflowStart" data-ggrc-action="start-cycle" data-toggle="modal" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+    Start Workflow
+  </button>
+</li>
+{{/instance.cycles.length}}
