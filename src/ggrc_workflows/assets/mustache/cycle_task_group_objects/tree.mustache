@@ -14,8 +14,11 @@
         <div class="span12">
           <ul class="tree-action-list">
             <li>
-              {{#if_equals instance.status 'Completed'}}
-              <span class="task-done"><em>Completed</em></span>
+              {{#if_equals instance.status 'Verified'}}
+              <span class="task-done"><em>Verified</em></span>
+              {{/if_equals}}
+              {{#if_equals instance.status 'Finished'}}
+              <span class=""><em>Finished</em></span>
               {{/if_equals}}
               {{#if_equals instance.status 'InProgress'}}
               <span class="gray"><em>In progress</em></span>
