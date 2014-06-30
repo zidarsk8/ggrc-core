@@ -504,11 +504,16 @@ ul.new-tree {
     input {
       margin-bottom: 0;
     }
+    .field-wrap {
+      .btn-success {
+        margin-top: 10px;
+      }
+    }
   }
 }
 
 .lock-wrap {
-  margin-right: 30%;
+  margin-right: 22%;
   label {
     margin-bottom: 0;
   }

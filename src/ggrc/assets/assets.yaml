@@ -221,6 +221,7 @@ dashboard-js-template-files:
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
   - requests/filters.mustache
+  - requests/amend_modal_content.mustache
   - org_groups/autocomplete_result.mustache
   - base_objects/edit_object_link.mustache
 

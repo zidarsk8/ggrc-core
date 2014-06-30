@@ -16,11 +16,11 @@
         <div class="span12">
           <ul class="tree-action-list">
             <li {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
+              <i class="grcicon-person-green pull-left icon-field"></i>
               {{#using contact=instance.contact}}
-                <i class="grcicon-person-green pull-left icon-field"></i>
-                <div class="objective-selector">
-                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
-                </div>
+              <div class="objective-selector">
+                <input type="text" name="contact.name" data-lookup="Person" class="span10 short-field search-icon" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+              </div>
               {{/using}}
             </li>
             <li>

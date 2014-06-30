@@ -8,36 +8,32 @@
 
 <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="pull-right">
-    <a href="#"></a>
-    <a class="info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-    <i class="grcicon-edit"></i>
-    </a>
-
-
-
-    {{!#if allow_mapping}}
-    {{#if mappings}}
-    {{#is_allowed_all 'delete' mappings}}
-    {{^is_dashboard}}
-      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-        <i class="grcicon-deleted"></i>
+    {{^if_equals parent_instance.status 'Verified'}}
+      <a class="info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+      <i class="grcicon-edit"></i>
       </a>
-    {{/is_dashboard}}
-    {{/is_allowed_all}}
-    {{/if}}
-    {{!/if}}
 
+      {{#if mappings}}
+      {{#is_allowed_all 'delete' mappings}}
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+          <i class="grcicon-deleted"></i>
+        </a>
+      {{/is_allowed_all}}
+      {{/if}}
+    {{/if_equals}}
   </div>
   {{{instance.description}}}
   {{#child_options.0}}
     <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
     </ul>
   {{/child_options.0}}
+  {{^if_equals parent_instance.status 'Verified'}}
   <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
-    data-model="{{instance.type}}", data-id="{{instance.id}}">
+    data-model="{{instance.type}}" data-id="{{instance.id}}">
     <i class="grcicon-attach-color"></i> Attach supporting file
   </a>
+  {{/if_equals}}
   <span class="entry-author">On {{date instance.created_at}}</span>
   <br />
 </li>

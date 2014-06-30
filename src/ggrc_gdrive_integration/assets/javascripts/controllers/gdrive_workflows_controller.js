@@ -79,41 +79,56 @@ function report_progress(str, xhr) {
 
   function build_flashes() {
     var flash = {}
-    , successes = []
-    , failures = []
-    , pendings = [];
+    , container_string = "<div class='audit-status'>"
+    , head_string = "<div class='audit-status-head'>"
+    , closer = "</ul></div></div>"
+    , successes = [container_string + head_string + "Actions completed successfully. [Click to open]</div><ul>"]
+    , failures = [container_string + head_string + "There were errors. [Click to open]"]
+    , pendings = [container_string + head_string + "GDrive actions in progress... Please wait [Click to open]</div><ul>"]
+    , success_count = 0
+    , failure_count = 0
+    , pending_count = 0;
 
     can.each(allops, function(op) {
       switch(op.xhr.state()) {
         case "resolved":
-        successes.push(op.str + " -- Done<br>");
+        successes.push("<li>" + op.str + " -- Done</li>");
+        success_count++;
         break;
         case "rejected":
-        failures.push(op.str + " -- FAILED<br>");
+        failures.push("<li>" + op.str + " -- FAILED</li>");
+        failure_count++;
         break;
         case "pending":
-        pendings.push(op.str + "...<br>");
+        pendings.push("<li>" + op.str + "...</li>");
+        pending_count++;
       }
     });
 
-    if(successes.length) {
-      flash.success = successes;
-    }
-    if(failures.length) {
-      flash.error = failures;
-    }
-    if(pendings.length) {
-      flash.warning = pendings.concat(["Please wait until " + (pendings.length === 1 ? "this operation completes" : "these operations complete")]);
+    if(success_count) {
+      flash.success = successes.concat(closer);
     } else {
-      setTimeout(function() {
-        if(can.map(allops, function(op) {
-          return op.xhr.state() === "pending" ? op : undefined;
-        }).length < 1) {
-          allops = [];
-        }
-      }, 1000);
+      flash.success = []
+    }
+    if(failure_count) {
+      flash.error = failures.concat(closer);
+    } else{
+      flash.error = []
+    }
+    if(pending_count) {
+      flash.warning = pendings.concat(closer);
+    } else {
+      flash.warning = []
     }
     $(document.body).trigger("ajax:flash", flash);
+    // initialize items in hidden state
+    $('.audit-status ul').each(function() {
+      $(this).hide();
+    });
+    // hide empty lists: alerts without a ul
+    $('.alert:not(:has(ul))').each(function() {
+      $(this).hide();
+    });
   }
 
   allops.push({str : str, xhr : xhr});
@@ -242,13 +257,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
     var permission_dfds = [];
     var that = this;
 
-    var push_person = function(role, email, queue_to_top) {
+    var push_person = function(dfds, role, email, queue_to_top) {
       if(!permissions[email] || permissions[email] !== "writer" || role !== "reader") {
         email = email.toLowerCase();
         permissions[email] = role;
         if(!that.user_permission_ids[email]) {
           if(queue_to_top) {
-            permission_dfds.push(CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
+            dfds.push(CMS.Models.GDriveFilePermission.findUserPermissionId(email).then(function(permissionId) {
               that.user_permission_ids[permissionId] = email;
               that.user_permission_ids[email] = permissionId;
             }));
@@ -264,28 +279,57 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
 
     can.each(permissions_by_type[instance.constructor.model_singular], function(role, key) {
       var people = instance[key];
+      var pdfd = [];
       if(typeof people === "function") {
         people = people.call(instance);
       }
-      can.each(!people || people.push ? people : [people], function(person) {
-        if(person.person) {
-          person = person.person;
-        }
-        person = person.reify();
-        if(person.selfLink) {
-          person = person.email;
-          push_person(role, person, true);
-        } else {
-          permission_dfds.push(
-            person.refresh()
-            .then(function(p) { return p.email; })
-            .then($.proxy(push_person, null, role))
-          );
-        }
-      });
+      // in some cases we have a list,
+      //  in others we have a deferred resolving to a list.
+      // In both cases we need to wait for any person found in the list
+      //  to refresh.
+      // this has been done previously with permission_dfds,
+      //  but if we have a new wait, we need to place the dfd waiting
+      //  for the list to resolve in permission_dfds and then chain to the
+      //  refresh of each person.
+
+
+      function iterate_people(dfds, people) {
+        can.each(!people || people.push ? people : [people], function(person) {
+          if(person.person) {
+            person = person.person;
+          }
+          person = person.reify();
+          if(person.selfLink) {
+            person = person.email;
+            push_person(dfds, role, person, true);
+          } else {
+            dfds.push(
+              person.refresh()
+              .then(function(p) { return p.email; })
+              .then($.proxy(push_person, null, dfds, role))
+            );
+          }
+        });
+      }
+
+      if(can.isDeferred(people)) {
+        // if we have to wait for people to resolve,
+        //  then we have to have permission_dfds wait
+        //  for its chain to finish.
+        permission_dfds.push(
+          people.then($.proxy(iterate_people, that, pdfd))
+          .then(function() {
+            return $.when.apply($, pdfd);
+          })
+        );
+      } else {
+        // Otherwise we can push the refresh of 
+        //  each person directly onto permission_dfds
+        iterate_people(permission_dfds, people);
+      }
     });
     if(GGRC.config.GAPI_ADMIN_GROUP) {
-      push_person("writer", GGRC.config.GAPI_ADMIN_GROUP, true);
+      push_person(permission_dfds, "writer", GGRC.config.GAPI_ADMIN_GROUP, true);
     }
     if(instance instanceof CMS.Models.Program) {
       var auths = {};
@@ -294,7 +338,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       //  So a user may have more than one role at this point, and we only want to change the GDrive
       //  permission based on the most recent one.
 
-      can.each(instance.get_mapping("authorizations"), function(authmapping) {
+      instance.get_binding("authorizations").refresh_instances().then(function(authmapping) {
         // FIXME: This will cause missing authorizations, but this function
         //   needs to be reworked to ensure required paths are loaded before
         //   use (.person and .role).
@@ -354,13 +398,15 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                Email addresses will match on permissions that are sent outside of GMail/GApps/google.com
                while "Permission IDs" will match on internal account permissions (where email address is
                usually not provided).  Check both.
+
+               A previous revision of this tried building email addresses with permission.name + "@" + permission.domain
+               but the name field is likely different from the LDAP name for users, maybe less so with domains,
+               but the effect is it creates bad values for email sometimes when used.
             */
 
             var email = permission.emailAddress
                         ? permission.emailAddress.toLowerCase()
-                        : (permission.name && permission.domain
-                          ? (permission.name + "@" + permission.domain)
-                          : that.user_permission_ids[permission.id]);
+                        : that.user_permission_ids[permission.id];
             var pending_permission = permissions_to_create[email];
 
             // Case matrix.
@@ -670,15 +716,22 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       function createPicker() {
         window.oauth_dfd.done(function(token, oauth_user) {
           var picker = new google.picker.PickerBuilder()
-          .addView(new google.picker.DocsUploadView())
-          .addView(google.picker.ViewId.DOCS)
-          .setOAuthToken(gapi.auth.getToken().access_token)
-          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-          .setDeveloperKey(GGRC.config.GAPI_KEY)
-          .setCallback(pickerCallback)
-          .build();
+            .setOAuthToken(gapi.auth.getToken().access_token)
+            .setDeveloperKey(GGRC.config.GAPI_KEY)
+            .setCallback(pickerCallback)
 
-          picker.setVisible(true);
+          if(el.data('type') === 'folders'){
+            var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+              .setIncludeFolders(true)
+              .setSelectFolderEnabled(true);
+            picker.addView(view);
+          }
+          else{
+            picker.addView(new google.picker.DocsUploadView())
+              .addView(google.picker.ViewId.DOCS)
+              .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+          }
+          picker.build().setVisible(true);
         });
       }
 
@@ -697,7 +750,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           });
         }
         else if (data[ACTION] == CANCEL) {
-          el.trigger('rejected', data);
+          el.trigger('rejected');
         }
       }
     });
@@ -718,10 +771,19 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
                   , documentable : object
                   , document : d[0]
                 }).save(),
-
               ])
             )
           } else {
+            if(el.data('type') === 'folders'){
+              report_progress("Linking folder " + file.title,
+                new CMS.Models.ObjectFolder({
+                  folderable : object
+                  , folder : file
+                  , context : object.context || {id: null}
+                }).save()
+              );
+              return;
+            }
             //file not found, make Document object.
             report_progress(
               "Linking new Drive file \"" + file.title + "\""
@@ -969,6 +1031,11 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       this.create_meeting(instance);
     }
   }
+
+  , ".audit-status-head click": function(el, ev){
+    $(ev.currentTarget.parentElement).find('ul').toggle();
+  }
+
   , "a.create-meeting click" : function(el, ev){
     var instance = el.closest("[data-model], :data(model)").data("model");
     this.create_meeting(instance);

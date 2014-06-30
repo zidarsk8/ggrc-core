@@ -6,7 +6,7 @@
 }}
 
 
-<li class="tree-item governance t-assigned" data-object-id="{{instance.id}}" {{addclass "t-" instance.status}} data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item governance t-assigned" data-object-id="{{instance.id}}" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
@@ -29,7 +29,7 @@
                 due
                 <strong class="error">{{instance.end_date}}</strong>
               </span>
-              {{^if_equals instance.status 'finished'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
+              {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
 
             <li>
