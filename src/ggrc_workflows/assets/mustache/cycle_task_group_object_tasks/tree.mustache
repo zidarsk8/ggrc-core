@@ -49,8 +49,11 @@
                 {{#if_equals instance.status 'InProgress'}}
                   <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
                 {{/if_equals}}
+                {{#if_equals instance.status 'Declined'}}
+                  <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                {{/if_equals}}
                 {{#if_equals instance.status 'Finished'}}
-                  <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="InProgress">Decline</button>
+                  <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
                   <button class="btn btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
                 {{/status}}
                 {{#if_equals instance.status 'Verified'}}

@@ -20,6 +20,7 @@ from .registry import object_view
 from ggrc.models.background_task import (
     BackgroundTask, queued_task, create_task, make_task_response
     )
+from . import notification
 
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON

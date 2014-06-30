@@ -43,6 +43,7 @@ from .request import Request
 from .response import Response, DocumentationResponse, InterviewResponse, PopulationSampleResponse
 from .meeting import Meeting
 from .background_task import BackgroundTask
+from .notification import NotificationConfig, Notification, NotificationObject, NotificationRecipient
 
 #TODO: This isn't currently used
 #from .relationship_type import RelationshipType
@@ -108,6 +109,10 @@ all_models = [
   Revision,
   Event,
   BackgroundTask,
+  NotificationConfig,
+  Notification,
+  NotificationRecipient,
+  NotificationObject,
   ]
 
 __all__ = [model.__name__ for model in all_models]

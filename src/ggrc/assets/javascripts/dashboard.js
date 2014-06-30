@@ -296,6 +296,48 @@ jQuery(function($) {
 
 jQuery(function($) {
 
+  function checkActive(notification_configs) {
+    var inputs = $('.notify-wrap').find('input'),
+        active_notifications;
+
+    active_notifications = $.map(notification_configs, function(a){
+      if(a.enable_flag) {
+        return a.notif_type;
+      }
+    });
+    $.map(inputs, function(input) {
+      // Handle the default case, in case notification objects are not set:
+      if(notification_configs.length === 0) {
+        input.checked = input.value === 'Email_Digest';
+      } else {
+        input.checked = active_notifications.indexOf(input.value) > -1;
+      }
+    });
+  }
+
+  CMS.Models.NotificationConfig.findActive().then(checkActive);
+
+  // Don't close the dropdown if clicked on checkbox
+  $('body').on('click', '.notify-wrap', function(ev){
+    ev.stopPropagation();
+  });
+
+  $('body').on('click', 'input[name=notifications]', function(ev, el){
+    var li = $(ev.target).closest('.notify-wrap'),
+        inputs = li.find('input'),
+        active = [];
+
+    inputs.prop('disabled', true);
+    active = $.map(inputs, function(input){
+      if(input.checked){
+        return input.value;
+      }
+    });
+    CMS.Models.NotificationConfig.setActive(active).always(function(response){
+      inputs.prop('disabled', false);
+    });
+  });
+
   $('body').on('click', '.clear-display-settings', function(e) {
     CMS.Models.DisplayPrefs.findAll().done(function(data) {
       var destroys = [];

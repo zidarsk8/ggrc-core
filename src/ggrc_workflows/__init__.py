@@ -7,6 +7,7 @@ from flask import Blueprint
 from sqlalchemy import inspect
 
 from ggrc import settings, db
+from ggrc.login import get_current_user
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
@@ -88,6 +89,8 @@ from ggrc.services.common import Resource
 
 @Resource.model_posted.connect_via(models.Cycle)
 def handle_cycle_post(sender, obj=None, src=None, service=None):
+  current_user = get_current_user()
+
   if not src.get('autogenerate'):
     return
 
@@ -107,6 +110,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         title=task_group.title,
         description=task_group.description,
         end_date=task_group.end_date,
+        modified_by=current_user,
         )
 
     for task_group_object in task_group.task_group_objects:
@@ -116,6 +120,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           cycle_task_group=cycle_task_group,
           task_group_object=task_group_object,
           title=object.title,
+          modified_by=current_user,
           )
 
       for task_group_task in task_group.task_group_tasks:
@@ -130,6 +135,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           end_date=task_group_task.end_date,
           contact=task_group.contact,
           status="Assigned",
+          modified_by=current_user,
           )
 
 
@@ -144,8 +150,7 @@ _cycle_object_parent_attr = {
 _cycle_object_children_attr = {
     models.CycleTaskGroupObject: 'cycle_task_group_object_tasks',
     models.CycleTaskGroup: 'cycle_task_group_objects',
-    # Don't include Cycle, since its state must be set explicitly
-    #models.Cycle: 'cycle_task_groups'
+    models.Cycle: 'cycle_task_groups'
     }
 
 
@@ -159,12 +164,12 @@ def update_cycle_object_parent_state(obj):
     return
 
   # If any child is `InProgress`, then parent should be `InProgress`
-  if obj.status == 'InProgress':
+  if obj.status == 'InProgress' or obj.status == 'Declined':
     if parent.status != 'InProgress':
       parent.status = 'InProgress'
       db.session.add(parent)
       update_cycle_object_parent_state(parent)
-  # If all children are `Completed` or `Verified`, then parent should be same
+  # If all children are `Finished` or `Verified`, then parent should be same
   elif obj.status == 'Finished' or obj.status == 'Verified':
     children_attr = _cycle_object_children_attr.get(type(parent), None)
     if children_attr:
@@ -182,10 +187,6 @@ def update_cycle_object_parent_state(obj):
       elif children_finished:
         parent.status = 'Finished'
         update_cycle_object_parent_state(parent)
-      #children_states_match = map(lambda c: c.status == obj.status, children)
-      #if all(children_states_match):
-      #  parent.status = obj.status
-      #  update_cycle_object_parent_state(parent)
 
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
