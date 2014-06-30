@@ -481,6 +481,9 @@
   &.programs {
     background-position: 0 -36px;
   }
+  &.workflow {
+    background-position: 0 -36px;
+  }
   &.business,
   &.entities {
     background-position: 0 -72px;
@@ -583,10 +586,12 @@
 .grcicon-object-color { background-position:-6px -392px; }
 
 .grcicon-workflow-color { background-position:-294px -296px; }
+.grcicon-workflow { background-position:-6px -368px; }
 .grcicon-task-color { background-position:-318px -344px; }
 .grcicon-task-black { background-position:-294px -392px; }
 .grcicon-task-white { background-position:-294px -344px; }
-.grcicon-task-group-color { background-position:-318px -8px; }
+.grcicon-task { background-position:-294px -344px; }
+.grcicon-task_group-color { background-position:-318px -8px; }
 
 .grcicon-system { background-position:-126px -248px; }
 .grcicon-system-black { background-position:-126px -224px; }
@@ -698,7 +703,7 @@ i.short {
   .grcicon-object-color { background-position:-6px -344px; }
   .grcicon-workflow-color { background-position:-6px -344px; }
   .grcicon-task-color { background-position:-294px -392px; }
-  .grcicon-task-group-color { background-position:-318px -56px; }
+  .grcicon-task_group-color { background-position:-318px -56px; }
   .grcicon-history-color { background-position: -318px -104px; }
   .grcicon-cycle-color { background-position: -342px -32px; }
 
@@ -743,7 +748,7 @@ i.short {
       .grcicon-object-color { background-position:-6px -368px; }
       .grcicon-workflow-color { background-position:-6px -368px; }
       .grcicon-task-color { background-position:-294px -344px; }
-      .grcicon-task-group-color { background-position:-318px -32px; }
+      .grcicon-task_group-color { background-position:-318px -32px; }
       .grcicon-history-color { background-position: -318px -128px; }
       .grcicon-cycle-color { background-position: -342px -56px; }
     }
@@ -774,7 +779,7 @@ i.short {
           .grcicon-object-color { background-position:-6px -392px; }
           .grcicon-workflow-color { background-position:-294px -296px; }
           .grcicon-task-color { background-position:-294px -320px; }
-          .grcicon-task-group-color { background-position:-318px -8px; }
+          .grcicon-task_group-color { background-position:-318px -8px; }
           .grcicon-system-color { background-position:-6px -320px; }
           .grcicon-process-color { background-position:-270px -296px; }
           .grcicon-control-color { background-position:-30px -320px; }
@@ -828,7 +833,7 @@ i.short {
     .grcicon-object-color { background-position:-6px -368px; }
     .grcicon-workflow-color { background-position:-6px -368px; }
     .grcicon-task-color { background-position:-294px -344px; }
-    .grcicon-task-group-color { background-position:-318px -32px; }
+    .grcicon-task_group-color { background-position:-318px -32px; }
     .grcicon-history-color { background-position: -318px -128px; }
     .grcicon-cycle-color { background-position: -342px -56px; }
   }
@@ -874,6 +879,6 @@ i.short {
     .grcicon-object-color { background-position:-6px -344px; }
     .grcicon-workflow-color { background-position:-6px -344px; }
     .grcicon-task-color { background-position:-294px -392px; }
-    .grcicon-task-group-color { background-position:-318px -56px; }
+    .grcicon-task_group-color { background-position:-318px -56px; }
   }
 }
