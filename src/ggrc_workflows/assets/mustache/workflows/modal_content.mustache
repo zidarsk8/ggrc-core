@@ -73,13 +73,13 @@
         <label>
           <span class="start-text">starts every</span>
           <select name="start_day_of_week" class="input-small">
-            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2}}
+            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2 listen=instance.start_day_of_week}}
             <option value="{{iterator_0}}" {{#if_equals instance.start_day_of_week iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
           </select>
           <span>due on every</span>
           <select name="end_day_of_week" class="input-small">
-            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2}}
+            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2 listen=instance.end_day_of_week}}
             <option value="{{iterator_0}}" {{#if_equals instance.end_day_of_week iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
           </select>
@@ -91,13 +91,13 @@
         <label>
           <span class="start-text">starts every</span>
           <select name="start_day_of_month" class="input-small">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.start_day_of_month}}
             <option {{#if_equals instance.start_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
           <span>due on every</span>
           <select name="end_day_of_month" class="input-small">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.end_day_of_month}}
             <option {{#if_equals instance.end_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
@@ -110,23 +110,23 @@
         <label>
           <span class="start-text">starts every</span>
           <select name="start_month_of_quarter" class="input-medium">
-            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2}}
+            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2 listen=instance.start_month_of_quarter}}
             <option value="{{iterator_0}}" {{#if_equals instance.start_month_of_quarter iterator_0}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterator}}
           </select>
           <select name="start_day_of_month" class="input-mini">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.start_day_of_month}}
             <option {{#if_equals instance.start_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
           <span>due on every</span>
           <select name="end_month_of_quarter" class="input-medium">
-            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2}}
+            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2 listen=instance.end_month_of_quarter}}
             <option value="{{iterator_0}}" {{#if_equals instance.end_month_of_quarter iterator_0}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
           </select>
           <select name="end_day_of_month" class="input-mini">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.end_day_of_month}}
             <option {{#if_equals instance.end_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
@@ -138,23 +138,23 @@
         <label>
           <span class="start-text">starts every</span>
           <select name="start_month_of_year" class="input-small">
-            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2}}
+            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2 listen=instance.start_month_of_year}}
               <option value="{{iterator_0}}" {{#if_equals iterator_0 instance.start_month_of_year}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
           </select>
           <select name="start_day_of_month" class="input-mini">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.start_day_of_month}}
             <option {{#if_equals instance.start_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
           <span>due on every</span>
           <select name="end_month_of_year" class="input-small">
-            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2}}
+            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2 listen=instance.end_month_of_year}}
               <option value="{{iterator_0}}" {{#if_equals iterator_0 instance.end_month_of_year}}selected="selected"{{/if_equals}}>{{iterator_1}}</option>
             {{/iterate}}
           </select>
           <select name="end_day_of_month" class="input-mini">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
+            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 listen=instance.end_day_of_month}}
             <option {{#if_equals instance.end_day_of_month iterator}}selected="selected"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
