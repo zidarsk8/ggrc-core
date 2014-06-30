@@ -1,0 +1,17 @@
+{{^status}}
+  <span class="gray"><em>Assigned</em></span>
+{{/status}}
+{{#if_equals status 'Verified'}}
+  <span class="task-done"><em>Verified</em></span>
+{{/if_equals}}
+{{#if_equals status 'Finished'}}
+  <span class="gray"><em>Finished</em></span>
+{{/if_equals}}
+{{#if_equals status 'InProgress'}}
+  <span class="gray"><em>In progress</em></span>
+{{/if_equals}}
+{{^if_equals instance.status 'Verified'}}
+  {{#is_overdue instance.end_date}}
+    <span class="error"><em>Overdue</em></span>
+  {{/is_overdue}}
+{{/if_equals}}
