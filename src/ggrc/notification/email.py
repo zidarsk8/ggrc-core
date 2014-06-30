@@ -173,8 +173,12 @@ class EmailDigestNotification(EmailNotification):
     for notif_date, notifications in pending_notifications_by_date.items():
       content={}
       content_for_recipients={}
+      begin_message={}
       subject="gGRC daily email digest for " + notif_date
       empty_line = """
+      """
+      empty_line2 = """
+
       """
       for notification in notifications:
         sender_id=notification.sender_id
@@ -214,11 +218,14 @@ class EmailDigestNotification(EmailNotification):
         body=""
         for key, value in sorted_items.items():
           body=body + value
-        begin_message = empty_line + "Emails sent by " + sender.name 
         if not content_for_recipients.has_key(recipient_id):
           content_for_recipients[recipient_id]= ""
-        content_for_recipients[recipient_id]=begin_message + \
-          content_for_recipients[recipient_id] + body
+        if not begin_message.has_key((recipient_id, sender_id)):
+          begin_message[(recipient_id, sender_id)] = empty_line2 +\
+            "Emails sent by " + sender.name 
+          content_for_recipients[recipient_id]= content_for_recipients[recipient_id] + \
+            begin_message[(recipient_id, sender_id)]
+        content_for_recipients[recipient_id]= content_for_recipients[recipient_id] + body
       
       for recipient_id, body in content_for_recipients.items():
         #ToDo(Mouli): Use gGRCAdmin for sender of email digest 
