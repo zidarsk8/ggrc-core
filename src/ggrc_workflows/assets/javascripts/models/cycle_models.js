@@ -8,7 +8,19 @@
 
 (function(can) {
 
-  var _mustache_path;
+  var _mustache_path,
+      overdue_compute;
+
+  overdue_compute = can.compute(function(val) {
+    if (this.attr("status") === "Verified") {
+      return "";
+    }
+    var date = moment(this.attr("end_date"));
+    if(date && date.isBefore(new Date())){
+      return "overdue";
+    }
+    return "";
+  });
 
   _mustache_path = GGRC.mustache_path + "/cycles";
   can.Model.Cacheable("CMS.Models.Cycle", {
@@ -106,7 +118,9 @@
         }
       ]
     }
-  }, {});
+  }, {
+    overdue: overdue_compute,
+  });
 
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_group_objects";
@@ -153,7 +167,9 @@
         }
       });
     }
-  }, {});
+  }, {
+    overdue: overdue_compute
+  });
 
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_group_object_tasks";
@@ -201,16 +217,7 @@
       });
     }
   }, {
-    overdue: can.compute(function(val) {
-      if (this.attr("status") === "Verified") {
-        return "";
-      }
-      var date = moment(this.attr("end_date"));
-      if(date && date.isBefore(new Date())){
-        return "overdue";
-      }
-      return "";
-    }),
+    overdue: overdue_compute,
   });
 
 })(window.can);
