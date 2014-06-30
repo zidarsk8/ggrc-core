@@ -25,7 +25,8 @@
       task_group_objects: "CMS.Models.TaskGroupObject.stubs",
       objects: "CMS.Models.get_stubs",
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      end_date: "date",
     },
 
     tree_view_options: {
@@ -38,9 +39,14 @@
       this.validatePresenceOf("title");
       this.validatePresenceOf("end_date");
       this.validate(["_transient.contact", "contact"], function(newVal, prop) {
-        var is_valid = this.contact ? (this.contact.reify().email == this.attr("_transient.contact")) : false;
-        if(!is_valid) {
-            return "No valid contact selected for assignee";
+        var contact_exists = this.contact ? true : false;
+        var reified_contact = contact_exists ? this.contact.reify() : false;
+        var contact_has_email_address = reified_contact ? reified_contact.email : false;
+        
+        // This check will not work until the bug introduced with commit 8a5f600c65b7b45fd34bf8a7631961a6d5a19638
+        // is resolved.
+        if(!contact_has_email_address) {
+          return "No valid contact selected for assignee";
         }
       });
     }

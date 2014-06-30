@@ -17,7 +17,14 @@
                   {{/using}}
                 </div>
               </li>
-
+              <li>
+                <strong>End date: </strong>
+                  {{#if instance.start_date}}
+                    {{localize_date instance.start_date}}
+                  {{else}}
+                    Not set
+                  {{/if}}
+              </li>
               <li>
                 {{#with_mapping 'objects' instance}}
                 <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
