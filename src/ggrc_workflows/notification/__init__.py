@@ -248,20 +248,28 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
   content=empty_line + subject + empty_line +  \
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) 
+  to_email={}
+  to_emaildigest={}
   recipients_email=[]
   recipients_emaildigest=[]
   if isNotificationEnabled(member.id, 'Email_Now'):
     recipients_email.append(member)
+    to_email[member.id]=True
   if isNotificationEnabled(member.id, 'Email_Digest'):
     recipients_emaildigest.append(member)
+    to_emaildigest[member.id]=True
   for person in workflow.people:
     if isNotificationEnabled(person.id, 'Email_Now'):
-      recipients_email.append(person)
+      if not to_email.has_key(person.id):
+        to_email[person.id]=True
+        recipients_email.append(person)
     if isNotificationEnabled(person.id, 'Email_Digest'):
-      recipients_emaildigest.append(person)
+      if not to_emaildigest.has_key(person.id):
+        to_emaildigest[person.id]=True
+        recipients_emaildigest.append(person)
   if len(recipients_email) or len(recipients_emaildigest):
     if len(recipients_email):
-      prepare_notification(workflow, 'Email', notif_pri, subject, content, \
+      prepare_notification(workflow, 'Email_Now', notif_pri, subject, content, \
         workflow_owner, recipients_email)
     if len(recipients_emaildigest):
       prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
@@ -291,7 +299,7 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri):
       recipients_emaildigest.append(person)
   if len(recipients_email) or len(recipients_emaildigest):
     if len(recipients_email):
-      prepare_notification(cycle, 'Email', notif_pri, subject, content, \
+      prepare_notification(cycle, 'Email_Now', notif_pri, subject, content, \
         workflow_owner, recipients_email)
     if len(recipients_emaildigest):
       prepare_notification(cycle, 'Email_Digest', notif_pri, subject, content, \
