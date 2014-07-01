@@ -403,6 +403,15 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
   });
 })(jQuery);
 
+// dismiss non-expandable success flash messages
+$(document).ready(function() {
+  $('section.content').bind("DOMSubtreeModified", function() {
+    setTimeout(function() {
+      $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
+    }, 5000);
+  });
+});
+
 jQuery(document).ready(function($) {
   // TODO: Not AJAX friendly
   $('.bar[data-percentage]').each(function() {

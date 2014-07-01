@@ -81,10 +81,11 @@ function report_progress(str, xhr) {
     var flash = {}
     , container_string = "<div class='audit-status'>"
     , head_string = "<div class='audit-status-head'>"
+    , list_bridge = "[Click to open]</div><ul class='flash-expandable'>"
     , closer = "</ul></div></div>"
-    , successes = [container_string + head_string + "Actions completed successfully. [Click to open]</div><ul>"]
-    , failures = [container_string + head_string + "There were errors. [Click to open]"]
-    , pendings = [container_string + head_string + "GDrive actions in progress... Please wait [Click to open]</div><ul>"]
+    , successes = [container_string + head_string + "Actions completed successfully." + list_bridge]
+    , failures = [container_string + head_string + "There were errors." + list_bridge]
+    , pendings = [container_string + head_string + "GDrive actions in progress..." + list_bridge]
     , success_count = 0
     , failure_count = 0
     , pending_count = 0;
@@ -122,11 +123,11 @@ function report_progress(str, xhr) {
     }
     $(document.body).trigger("ajax:flash", flash);
     // initialize items in hidden state
-    $('.audit-status ul').each(function() {
+    $('.audit-status ul.flash-expandable').each(function() {
       $(this).hide();
     });
-    // hide empty lists: alerts without a ul
-    $('.alert:not(:has(ul))').each(function() {
+    // hide empty lists: alerts without a li
+    $('.alert:not(:has(li))').each(function() {
       $(this).hide();
     });
   }
@@ -898,7 +899,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
 
   , ".audit-status-head click": function(el, ev){
-    $(ev.currentTarget.parentElement).find('ul').toggle();
+    $(ev.currentTarget.parentElement).find('ul.flash-expandable').toggle();
   }
 
   , "a.create-meeting click" : function(el, ev){
