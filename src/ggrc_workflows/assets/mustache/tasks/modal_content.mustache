@@ -14,10 +14,9 @@
         <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
+      <br>
     </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span8">
+    <div class="span4">
       {{#using owner=instance.owners.0 model_singular=model.model_singular}}
       <label>
         Owner
@@ -25,6 +24,7 @@
       </label>
       <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
       {{/using}}
+      <br>
     </div>
   </div>
   <div class="row-fluid">

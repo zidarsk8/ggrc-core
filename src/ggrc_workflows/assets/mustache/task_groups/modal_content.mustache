@@ -29,7 +29,6 @@
         <input tabindex="4" class="input-block-level" name="workflow.title" data-lookup="Workflow" data-template="/workflows/autocomplete_result.mustache" placeholder="Choose Workflow" type="text" value="{{firstexist workflow.title ''}}" />
         {{/using}}
       {{else}}
-        &nbsp;
         <input id="workflow_id" name="workflow" type="hidden" model="Workflow" value="{{firstnonempty instance.workflow.id object_params.workflow}}">
         Workflow
         {{#using workflow=instance.workflow}}
