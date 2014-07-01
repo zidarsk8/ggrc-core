@@ -34,6 +34,6 @@
     <i class="grcicon-attach-color"></i> Attach supporting file
   </a>
   {{/if_equals}}
-  <span class="entry-author">On {{date instance.created_at}}</span>
+  <span class="entry-author">Modified by {{#using person=parent_instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
   <br />
 </li>
