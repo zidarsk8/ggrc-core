@@ -265,6 +265,11 @@
       background-color:$entities;
     }
   }
+  &.workflow {
+    .header {
+      background-color:$programs;
+    }
+  }
   .filter {
     padding:3px 2px;
     background: $filterBgnd;

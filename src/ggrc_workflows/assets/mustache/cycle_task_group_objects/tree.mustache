@@ -25,9 +25,14 @@
               {{/with_mapping_count}}
             </li>
           </ul>
-
+          <span class="tier-trigger"></span>
           <div class="item-data">
             <div class="tree-title-area">
+              {{#using task_group_object=instance.task_group_object}}
+              {{#using object=task_group_object.object}}
+                <i class="grcicon-{{object.class.table_singular}}-color"></i>
+              {{/using}}
+              {{/using}}
               {{instance.title}}
             </div>
           </div>

@@ -549,6 +549,19 @@
         }
       }
     }
+    &.workflow {
+      li.active,
+      li:hover {
+        a {
+          color:#fff;
+          background-color:$programs;
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -313px;
+        }
+      }
+    }
   }
   ul.innernav-arrow {
     a {

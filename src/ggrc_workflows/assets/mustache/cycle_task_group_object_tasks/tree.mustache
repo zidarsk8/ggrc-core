@@ -67,7 +67,7 @@
               </div>
             </li>
           </ul>
-
+          <span class="tier-trigger"></span>
           <div class="item-data">
             <div class="tree-title-area">
               {{instance.title}}
@@ -108,23 +108,22 @@
         </div>
       </div>
 
-    </div>
-
-    {{#if draw_children}}
-      {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
-          {{#child_options}}
-          <div class="row-fluid">
-            <div class="span11">
-              <div class="inner-row">
-                <strong>Entries ({{list.length}})</strong>
-                <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+      {{#if draw_children}}
+        {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+            {{#child_options}}
+            <div class="row-fluid">
+              <div class="span11">
+                <div class="inner-row">
+                  <strong>Entries ({{list.length}})</strong>
+                  <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                </div>
               </div>
             </div>
-          </div>
-          {{/child_options}}
-      {{/prune_context}}
-    {{/if}}
+            {{/child_options}}
+        {{/prune_context}}
+      {{/if}}
 
+    </div>
   </div>
   {{/if}}
 </li>

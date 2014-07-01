@@ -909,6 +909,9 @@ ul.new-tree {
     a {
       font-weight:bold;
     }
+    &.inner-tree-footer {
+      padding-left: 0;
+    }
   }
   [class^="grcicon-"] {
     margin-top:7px;
