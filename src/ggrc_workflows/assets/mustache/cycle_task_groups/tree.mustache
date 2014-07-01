@@ -6,7 +6,7 @@
 }}
 
 
-<li class="tree-item governance t-assigned" data-object-id="{{instance.id}}" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item task-item governance t-assigned" data-object-id="{{instance.id}}" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
@@ -39,7 +39,7 @@
               </span>
             </li-->
           </ul>
-
+          <span class="tier-trigger"></span>
           <div class="item-data">
             <div class="tree-title-area">
               {{instance.title}}

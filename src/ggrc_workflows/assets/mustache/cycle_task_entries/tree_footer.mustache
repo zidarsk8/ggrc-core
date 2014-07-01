@@ -13,7 +13,7 @@
 }}
 
 {{^if_equals parent_instance.status 'Verified'}}
-<li class="tree-footer tree-item-add">
+<li class="tree-footer tree-item-add inner-tree-footer">
   <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#regulations, #combo" data-route="regulations" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="cycle_task_entries" data-object-params='{ "cycle_task_group_object_task": {{parent_instance.id}} }'>
     <strong>Add Entry</strong>
   </a>
