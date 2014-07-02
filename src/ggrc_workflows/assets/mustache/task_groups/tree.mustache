@@ -18,7 +18,7 @@
                 {{#using assignee=instance.contact}}
                 {{#if true}}
                     <div class="objective-selector">
-                      <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+                      <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
                     </div>
                 {{else}}
                   <div class="item-data">
