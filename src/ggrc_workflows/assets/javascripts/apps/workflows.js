@@ -327,7 +327,8 @@
                 mapping: "task_group_tasks",
                 show_view: GGRC.mustache_path + "/tasks/task_group_subtree.mustache",
                 footer_view: GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache",
-                sort_property: 'sort_index'
+                sort_property: 'sort_index',
+                allow_creating: true
               }
             ]
           }

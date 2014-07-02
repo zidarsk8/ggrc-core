@@ -14,8 +14,16 @@ from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
 from ggrc import db
+from ggrc import settings
 
 
+def getAppEngineEmail():
+  appengine_email = getattr(settings, 'APPENGINE_EMAIL') 
+  if appengine_email is not None and appengine_email != '' and appengine_email !=" ":
+    return appengine_email
+  else:
+    return None
+   
 #ToDo(Mouli): Add settings flag similar to memcache to prevent email in 
 #scenarios such as performance testing, true, false with regular expression
 def isNotificationEnabled(person_id, notif_type):
@@ -34,9 +42,11 @@ def isNotificationEnabled(person_id, notif_type):
 class NotificationBase(object):
   notif_type=None
   notif_pri=None
+  appengine_email=None
 
   def __init__(self, notif_type):
     self.notif_type=notif_type
+    self.appengine_email = getAppEngineEmail()
 
   def prepare(self, target_objs, sender, recipients, subject, content):
     return None
@@ -53,6 +63,9 @@ class EmailNotification(NotificationBase):
     super(EmailNotification, self).__init__(notif_type)
 
   def prepare(self, target_objs, sender, recipients, subject, content):
+    if self.appengine_email is None:
+      return None
+
     now=datetime.now()
     notification=Notification(
       notif_pri=self.notif_pri,
@@ -129,17 +142,20 @@ class EmailNotification(NotificationBase):
         if cnt < len(assignees)-1:
           to_list + ","
 
+      sender_info=sender.name + "<" + sender.email + ">" 
+      email_headers={"On-Behalf-Of":sender_info}
       message=mail.EmailMessage(
-        sender=sender.name + "<" + sender.email + ">", 
+        sender="gGRC Administrator on behalf of " + sender.name +  "<" + self.appengine_email + ">",
         to=to_list,
         subject=notification.subject,
+        headers=email_headers,
         body=notification.content)
 
       #ToDo(Mouli): Handle exception by changing status to error
       try:
         message.send()
       except: 
-        current_app.logger.error("Unable to send email") 
+        current_app.logger.error("Unable to send email to " + to_list) 
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
@@ -233,7 +249,7 @@ class EmailDigestNotification(EmailNotification):
         #ToDo(Mouli): Use gGRCAdmin for sender of email digest 
         recipient=to[recipient_id] 
         message=mail.EmailMessage(
-          sender=recipient.name + "<" + recipient.email + ">", 
+          sender="gGRC Administrator" + "<" + self.appengine_email + ">",
           to=recipient.name + "<" + recipient.email + ">", 
           subject=subject,
           body=body)

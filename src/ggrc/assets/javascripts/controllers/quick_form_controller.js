@@ -179,6 +179,20 @@ can.Component.extend({
     },
     "input:not([data-mapping]) change" : function(el) {
       this.scope.attributes.attr(el.attr("name"), el.val());
+    },
+    ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
+      var that = this;
+      GGRC.Mappings.make_join_object(
+        this.scope.parent_instance,
+        data,
+        $.extend({
+          context : this.scope.parent_instance.context
+                    || new CMS.Models.Context({id : null})
+                  },
+                  this.scope.attributes.serialize())
+      ).save().done(function() {
+        that.element.find("a[data-toggle=submit]").trigger("modal:success");
+      });
     }
   },
   helpers: {
@@ -187,7 +201,12 @@ can.Component.extend({
     //  be decorated with data-mapping attributes.
     mapping_autocomplete : function(options) {
       return function(el) {
-        $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
+        var $el = $(el);
+        $el.ggrc_mapping_autocomplete({
+          controller : options.contexts.attr("controller"),
+          model : $el.data("model"),
+          mapping : false
+        });
       };
     }
   },

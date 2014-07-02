@@ -1228,9 +1228,33 @@ jQuery(function($){
         },
 
         select: function(ev, ui) {
-          return $(this).data($(this).data("autocomplete-widget-name"))
-            .options.controller
-            .autocomplete_select($(this), ev, ui);
+          var original_event,
+              that = this,
+              ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
+              ;
+
+          if(ui.item) {
+            return ctl.autocomplete_select($(this), ev, ui);
+          } else {
+            original_event = event;
+            $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
+              ctl.autocomplete_select($(that), original_event, { item : new_obj });
+              $(that).trigger("modal:success", new_obj);
+            }).one("hidden", function() {
+              setTimeout(function() {
+                $(this).off(".autocomplete");
+              }, 100);
+            });
+            while(original_event = original_event.originalEvent) {
+              if(original_event.type === "keydown") {
+                //This selection event was generated from a keydown, so click the add new link.
+                var widget_name = el.data("autocompleteWidgetName");
+                el.data(widget_name).menu.active.find("a").click();
+                break;
+              }
+            }
+            return false;
+          }
         },
 
         close: function() {
@@ -1279,30 +1303,42 @@ jQuery(function($){
         }
       },
 
-      _renderMenu: function(ul, items) {
+      _setup_menu_context : function(items) {
           var model_class = this.element.data("lookup")
-            , template = this.element.data("template")
-            , model
+            
+            , model = CMS.Models[model_class || this.element.data("model")] 
+                      || GGRC.Models[model_class || this.element.data("model")]
             ;
 
-          if (!template) {
-            model = CMS.Models[model_class] || GGRC.Models[model_class];
-            template =
-                '/' + (model ? model.table_plural : "base_objects") + '/autocomplete_result.mustache';
-          }
+          return {
+            model_class: model_class,
+            model : model,
+            // Reverse the enveloping we did 25 lines up
+            items: can.map(items, function(item) { return item.item; }),
+          };
+      },
 
-          can.view.render(
-            GGRC.mustache_path + template,
-            {
-              model_class: model_class,
-              // Reverse the enveloping we did 25 lines up
-              items: can.map(items, function(item) { return item.item; })
-            },
-            function(frag) {
-              $(ul).html(frag);
-              $(ul).cms_controllers_lhn_tooltips();
-              can.view.hookup(ul);
-            });
+      _renderMenu: function(ul, items) {
+        var template = this.element.data("template"),
+          context = this._setup_menu_context(items)
+          model = context.model
+          ;
+
+        if (!template) {
+          if(model && GGRC.Templates[model.table_plural + "autocomplete_result"]) {
+            template = '/' + model.table_plural + '/autocomplete_result.mustache';
+          } else {
+            template = '/base_objects/autocomplete_result.mustache';
+          }
+        }
+        can.view.render(
+          GGRC.mustache_path + template,
+          context,
+          function(frag) {
+            $(ul).html(frag);
+            $(ul).cms_controllers_lhn_tooltips();
+            can.view.hookup(ul);
+          });
       }
   });
   $.widget.bridge("ggrc_autocomplete", $.ggrc.autocomplete);
@@ -1331,7 +1367,12 @@ jQuery(function($){
             return undefined;
         });
       }
-    }
+    },
+      _setup_menu_context : function(items) {
+        return $.extend(this._super(items), {
+          mapping : this.options.mapping == null ? this.element.data("mapping") : this.options.mapping
+        });
+      }
   });
   $.widget.bridge("ggrc_mapping_autocomplete", $.ggrc.mapping_autocomplete);
 
