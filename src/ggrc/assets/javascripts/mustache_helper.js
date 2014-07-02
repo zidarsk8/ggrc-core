@@ -1546,7 +1546,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
           if(~can.inArray(person.id, $.map(auditors, function(p) { return p.person.id; }))){
             state.attr('roles').push('Auditor');
           }
-          authorizations.list.bind("change", function() {
+          authorizations.bind("change", function() {
             state.attr('roles', can.map(state.attr('roles'), function(role) {
               if (role != 'Auditor')
                 return role;
