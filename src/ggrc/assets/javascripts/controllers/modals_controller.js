@@ -120,7 +120,6 @@ can.Control("GGRC.Controllers.Modals", {
         that = this;
 
     $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-    if(ui.item) {
       var path = el.attr("name").split(".")
         , instance = this.options.instance
         , index = 0
@@ -150,25 +149,6 @@ can.Control("GGRC.Controllers.Modals", {
           el.blur();
         }, 50);
       }
-    } else {
-      original_event = event;
-      $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(ev, new_obj) {
-        that.autocomplete_select(el, original_event, { item : new_obj });
-      }).one("hidden", function() {
-        setTimeout(function() {
-          $(this).off(".autocomplete");
-        }, 100);
-      });
-      while(original_event = original_event.originalEvent) {
-        if(original_event.type === "keydown") {
-          //This selection event was generated from a keydown, so click the add new link.
-          var widget_name = el.data("autocompleteWidgetName");
-          el.data(widget_name).menu.active.find("a").click();
-          break;
-        }
-      }
-      return false;
-    }
   }
 
   , immediate_find_or_create : function(el, ev, data) {
