@@ -22,17 +22,17 @@
     },
 
     "[data-ggrc-action=start-cycle] click": function() {
-      var page_instance = GGRC.page_instance()
-        , that = this
-        , cycle;
+      var page_instance = GGRC.page_instance(),
+          that = this,
+          cycle;
 
       GGRC.Controllers.Modals.confirm({
-        modal_title : "Confirm"
-        , modal_confirm : "Proceed"
-        , skip_refresh : true
-        , button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache"
-        , content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache"
-        , instance : GGRC.page_instance()
+        modal_title : "Confirm",
+        modal_confirm : "Proceed",
+        skip_refresh : true,
+        button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
+        content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
+        instance : GGRC.page_instance()
       }, function() {
         cycle = new CMS.Models.Cycle({
           context: { id: null, type: "Context" },
