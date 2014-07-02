@@ -36,6 +36,7 @@ dashboard-js-template-files:
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
   - task_groups/tree_footer.mustache
+  - workflows/confirm_start.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
   - workflows/tree.mustache
