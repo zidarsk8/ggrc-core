@@ -405,9 +405,9 @@ CMS.Models.get_stub = function(object) {
 }
 
 CMS.Models.get_stubs = function(objects) {
-  return can.map(CMS.Models.get_instances(objects), function(o) {
+  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
     return o.stub();
-  });
+  }));
 };
 
 CMS.Models.get_instances = function(objects) {
