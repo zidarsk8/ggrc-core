@@ -586,11 +586,28 @@ $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
 
 // dismiss non-expandable success flash messages
 $(document).ready(function() {
-  $('section.content').bind("DOMSubtreeModified", function() {
-    setTimeout(function() {
-      $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
-    }, 5000);
+  // monitor target, where flash messages are added
+  var target = $('section.content div.flash')[0];
+  var observer = new MutationObserver(function( mutations ) {
+    mutations.forEach(function( mutation ) {
+      // check for new nodes
+      if( mutation.addedNodes !== null ) {
+        // remove the success message from non-expandable
+        // flash success messages after five seconds
+        setTimeout(function() {
+          $('.flash .alert-success').not(':has(ul.flash-expandable)').remove();
+        }, 5000);
+      }
+    });
   });
+
+  var config = {
+      attributes: true
+    , childList: true
+    , characterData: true
+  };
+
+  observer.observe(target, config);
 });
 
 jQuery(document).ready(function($) {
