@@ -1,47 +1,59 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: laran@reciprocitylabs.com
+    Maintained By: laran@reciprocitylabs.com
+}}
   <li class="tree-item program task-group-index" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main" data-model="true" {{data 'model'}}>
+    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
       <div class="openclose">
         <div class="row-fluid">
           <div class="span12">
-            <ul class="tree-action-list">
-              <li>
-                <i class="grcicon-person-green pull-left icon-field"></i>
-                <div class="objective-selector" style="white-space: nowrap; margin-right: 20px;">
-                  {{#using assignee=instance.contact}}
-                  <!--input tabindex="1" type="text" name="lead_email" class="saveTaskGroupField span10 search-icon short-field autocomplete" data-lookup="Person" placeholder="Choose Assignee" value="{{assignee.email}}" data-index="{{@index}}" data-field="assignee" -->
-                    {{#if assignee}}
-                      {{assignee.email}}
-                    {{else}}
-                      No contact
-                    {{/if}}
-                  {{/using}}
-                </div>
-              </li>
-              <li>
+            <div class="item-data">
+              <div class="span3">
+                {{instance.title}}
+              </div>
+              <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+                <i class="grcicon-person-green pull-left"></i>
+                {{#using assignee=instance.contact}}
+                {{#if true}}
+                    <div class="objective-selector">
+                      <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+                    </div>
+                {{else}}
+                  <div class="item-data">
+                    <span class="tree-title-area read-only oneline">
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                    </span>
+                  </div>
+                {{/if}}
+                {{/using}}
+              </div>
+              <div class="span3">
                 <strong>End date: </strong>
                   {{#if instance.end_date}}
                     {{localize_date instance.end_date}}
                   {{else}}
                     Not set
                   {{/if}}
-              </li>
-              <li>
+              </div>
+              <div class="span1">
                 {{#with_mapping 'objects' instance}}
                 <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
                   <i class="grcicon-object-black"></i>
                   <strong class="error">{{objects.length}}</strong>
                 </span>
                 {{/with_mapping}}
-              </li>
-              <li>
+              </div>
+              <div class="span1">
                 {{#with_mapping 'tasks' instance}}
                 <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                   <i class="grcicon-task-black"></i>
                   <strong class="error">{{tasks.length}}</strong>
                 </span>
                 {{/with_mapping}}
-              </li>
-              <li>
+              </div>
+              <div class="span1">
                 {{#is_allowed 'delete' instance context='for'}}
                 <span class="counter removeTaskGroup">
                   <a href="javascript://"
@@ -57,11 +69,6 @@
                   </a>
                 </span>
                 {{/is_allowed}}
-              </li>
-            </ul>
-            <div class="item-data">
-              <div class="tree-title-area">
-                {{instance.title}}
               </div>
             </div>
           </div>
