@@ -137,7 +137,8 @@ src/app.yaml : src/app.yaml.dist
 		GAPI_CLIENT_ID="$(GAPI_CLIENT_ID)" \
 		GAPI_ADMIN_GROUP="$(GAPI_ADMIN_GROUP)" \
 		BOOTSTRAP_ADMIN_USERS="$(BOOTSTRAP_ADMIN_USERS)" \
-		RISK_ASSESSMENT_URL="$(RISK_ASSESSMENT_URL)"
+		RISK_ASSESSMENT_URL="$(RISK_ASSESSMENT_URL)"\
+		APPENGINE_EMAIL="$(APPENGINE_EMAIL)"
 
 deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
 
