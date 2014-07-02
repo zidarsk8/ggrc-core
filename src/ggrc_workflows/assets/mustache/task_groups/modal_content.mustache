@@ -49,7 +49,10 @@
       </div>
     </div>
     <div class="span4">
-      <label for="task_group_assignee">Assignee:</label>
+      <label for="task_group_assignee">
+        Assignee:
+        <span class="required">*</span>
+      </label>
         {{#using assignee=instance.contact}}
         <div class="objective-selector">
           <input id="task_group_assignee" tabindex="7" type="text" name="contact.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.email ''}}">
@@ -58,7 +61,8 @@
     </div>
     <div class="span4">
       <label>
-        Planned End Date 
+        Planned End Date
+        <span class="required">*</span>
       </label>
       <input class="input-block-level date" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
     </div>

@@ -1231,7 +1231,8 @@ jQuery(function($){
             while(original_event = original_event.originalEvent) {
               if(original_event.type === "keydown") {
                 //This selection event was generated from a keydown, so click the add new link.
-                el.data("ui-autocomplete").menu.active.find("a").click();
+                var widget_name = el.data("autocompleteWidgetName");
+                el.data(widget_name).menu.active.find("a").click();
                 break;
               }
             }

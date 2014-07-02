@@ -9,7 +9,9 @@
 (function(can) {
 
   var _mustache_path,
-      overdue_compute;
+      overdue_compute,
+      refresh_attr,
+      refresh_attr_wrap;
 
   overdue_compute = can.compute(function(val) {
     if (this.attr("status") === "Verified") {
@@ -21,6 +23,20 @@
     }
     return "";
   });
+
+  refresh_attr = function(instance, attr){
+    if (instance.attr(attr).reify().selfLink) {
+      instance.attr(attr).reify().refresh();
+    }
+  };
+
+  refresh_attr_wrap = function(attr){
+    return function(ev, instance) {
+      if (instance instanceof this) {
+        refresh_attr(instance, attr);
+      }
+    };
+  };
 
   _mustache_path = GGRC.mustache_path + "/cycles";
   can.Model.Cacheable("CMS.Models.Cycle", {
@@ -55,13 +71,7 @@
     init: function(){
       var that = this;
       this._super.apply(this, arguments);
-      this.bind("created", function(ev, instance) {
-        if (instance instanceof that) {
-          if (instance.workflow.reify().selfLink) {
-            instance.workflow.reify().refresh();
-          }
-        }
-      });
+      this.bind("created", refresh_attr_wrap('workflow').bind(this));
     }
   }, {});
 
@@ -94,6 +104,11 @@
         show_view: _mustache_path + "/documents.mustache",
         footer_view: _mustache_path + "/documents_footer.mustache"
       }],
+    },
+    init: function(){
+      this._super.apply(this, arguments);
+      this.bind("created",
+        refresh_attr_wrap("cycle_task_group_object_task").bind(this));
     }
   }, {});
 
@@ -168,15 +183,8 @@
     },
 
     init: function() {
-      var that = this;
       this._super.apply(this, arguments);
-      this.bind("updated", function(ev, instance) {
-        if (instance instanceof that) {
-          if (instance.cycle_task_group.reify().selfLink) {
-            instance.cycle_task_group.reify().refresh();
-          }
-        }
-      });
+      this.bind("updated", refresh_attr_wrap("cycle_task_group").bind(this));
     }
   }, {
     overdue: overdue_compute
@@ -219,10 +227,13 @@
     init: function() {
       var that = this;
       this._super.apply(this, arguments);
+
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          if (instance.cycle_task_group_object.reify().selfLink) {
-            instance.cycle_task_group_object.reify().refresh();
+          var object = instance.cycle_task_group_object.reify();
+          if (object.selfLink) {
+            object.refresh();
+            refresh_attr(object, "cycle_task_group");
           }
         }
       });
