@@ -1327,7 +1327,7 @@ jQuery(function($){
           ;
 
         if (!template) {
-          if(model && GGRC.Templates[model.table_plural + "autocomplete_result"]) {
+          if(model && GGRC.Templates[model.table_plural + "/autocomplete_result"]) {
             template = '/' + model.table_plural + '/autocomplete_result.mustache';
           } else {
             template = '/base_objects/autocomplete_result.mustache';
