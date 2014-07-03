@@ -324,7 +324,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
           })
         );
       } else {
-        // Otherwise we can push the refresh of 
+        // Otherwise we can push the refresh of
         //  each person directly onto permission_dfds
         iterate_people(permission_dfds, people);
       }
@@ -343,6 +343,9 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         // FIXME: This will cause missing authorizations, but this function
         //   needs to be reworked to ensure required paths are loaded before
         //   use (.person and .role).
+        if (authmapping instanceof can.List){
+          authmapping = authmapping[0];
+        }
         if (!authmapping.instance.selfLink)
           return;
         var auth = authmapping.instance;
@@ -364,7 +367,7 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
         if(rolesmap[role.name] && person.email) { // only push valid emails
           //Authorizations like "Auditor" do not get Program permissions.
           //  Only the ones in the map above get permissions
-          push_person(rolesmap[role.name], person.email, true);
+          push_person([], rolesmap[role.name], person.email, true);
         }
       });
     }
