@@ -332,6 +332,22 @@ ul.new-tree {
       font-style: italic;
       display: block;
     }
+    .info-action {
+      @include opacity(1);
+      i.grcicon-edit {
+        margin-top: 7px;
+      }
+    }
+    .entry-attachment {
+      &.tree-item-add {
+        display: inline-block;
+        margin-left: -6px;
+        margin-bottom: 10px;
+        i {
+          margin-top: 1px;
+        }
+      }
+    }
     &.add-entry {
       border-bottom: none;
       margin-top: 12px;
@@ -356,10 +372,16 @@ ul.new-tree {
   @include reset-list();
   padding: 4px 0 0 0;
   li {
-    margin-left: -4px;
+    margin-left: -6px;
     color: $gray;
     border-bottom: none;
     padding-bottom: 4px;
+    .info-action {
+      @include opacity(1);
+      i {
+        margin-top: 0;
+      }
+    }
     a {
       color: $gray;
       span {

@@ -395,7 +395,7 @@
 
 
   GGRC.register_hook(
-      "LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_workflows");
+      "LHN.Sections_workflow", GGRC.mustache_path + "/dashboard/lhn_workflows");
 
   WorkflowExtension.init_mappings();
 
