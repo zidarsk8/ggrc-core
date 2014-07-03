@@ -1465,6 +1465,8 @@
     
     //Search button click
     , ".objectReview click" : function(){
+      // Remove Search Criteria text
+      $('.results-wrap span.info').hide();
       //Get the selected object value
       var selected = $("select.option-type-selector").val(),
         self = this,
