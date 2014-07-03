@@ -607,7 +607,9 @@ $(document).ready(function() {
     , characterData: true
   };
 
-  observer.observe(target, config);
+  if(target) {
+    observer.observe(target, config);
+  }
 });
 
 jQuery(document).ready(function($) {
