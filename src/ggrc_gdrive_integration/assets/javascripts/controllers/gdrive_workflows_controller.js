@@ -712,7 +712,8 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
   }
   , "a[data-toggle=gdrive-picker] click" : function(el, ev) {
 
-    var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]);
+    var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
+        folder_id = el.data("folder-id");
     dfd.then(function(){
       gapi.load('picker', {'callback': createPicker});
 
@@ -731,8 +732,13 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
             picker.addView(view);
           }
           else{
-            picker.addView(new google.picker.DocsUploadView())
-              .addView(google.picker.ViewId.DOCS)
+            var docsUploadView = new google.picker.DocsUploadView()
+                  .setParent(folder_id),
+                docsView = new google.picker.DocsView()
+                  .setParent(folder_id);
+
+            picker.addView(docsUploadView)
+              .addView(docsView)
               .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
           }
           picker.build().setVisible(true);
