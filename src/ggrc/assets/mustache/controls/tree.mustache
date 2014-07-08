@@ -6,13 +6,13 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="control">
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="control" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -35,15 +35,18 @@
                   </div>
                 </li>
               {{/instance.contact}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
+              </li>
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -98,7 +101,7 @@
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
         {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-        
+
         <div class="row-fluid">
           <div class="span6">
             <div class="tree-info">

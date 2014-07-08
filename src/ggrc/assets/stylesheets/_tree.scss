@@ -223,7 +223,7 @@ ul.new-tree {
       margin-top: 0;
     }
   }
-  
+
   &.event-tree {
     [class^="grcicon-"] {
       margin-top: 1px;
@@ -429,7 +429,7 @@ ul.new-tree {
       }
     }
   }
-  
+
   a.simple-link {
     .row-fluid {
       &:hover {
@@ -440,7 +440,7 @@ ul.new-tree {
       }
     }
   }
-  
+
   li.tree-item {
     border-bottom:1px solid #ccc;
     line-height:31px;
@@ -474,7 +474,7 @@ ul.new-tree {
       padding-left: 20px !important;
       .request-control {
         text-align: right;
-      } 
+      }
     }
     &.progress-color {
       > .item-main {
@@ -661,6 +661,21 @@ ul.new-tree {
       padding: 1px 1px 0px 1px;
       background: $white;
       border-bottom: none !important;
+      > .item-main {
+        &:hover {
+          .row-fluid {
+            @include background-size(30px 6px !important);
+            background:darken($rqDraft,10%) image-url("bgnds/hover.png") no-repeat 50% bottom;
+          }
+        }
+        .row-fluid {
+          background: $rqDraft;
+          border-bottom: 1px solid #d8d8d8;
+          .tree-title-area {
+            color: $text;
+          }
+        }
+      }
       &:last-child {
         padding-bottom: 1px;
         border-bottom: 1px solid #ccc !important;
@@ -1103,7 +1118,7 @@ ul.new-tree {
   .tree-info {
     line-height: 18px;
   }
-  
+
   .edit-auditor a {
     font-size:11px;
     font-weight:bold;
@@ -1292,7 +1307,7 @@ ul.new-tree {
      text-decoration:none;
      i {
        @include opacity(0.6);
-     } 
+     }
     }
   }
 }
