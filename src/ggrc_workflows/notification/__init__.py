@@ -123,7 +123,11 @@ def get_task_group_contacts(task_group):
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner for task group " + task_group.title)
     return None
-  ret_tuple=(workflow_owner, workflow_owner)
+  if task_group.contact_id is None:
+    current_app.logger.warn("Trigger: Unable to find contacts for task group " + task_group.title)
+    return None
+  contacts = db.session.query(Person).filter(Person.id==task_group.contact_id).first()
+  ret_tuple=(workflow_owner, contacts)
   return ret_tuple
 
 def prepare_notification_for_task(task, sender, recipient, subject, notif_pri):
@@ -173,6 +177,7 @@ def handle_tasks_overdue():
     subject="Task " + "'" + task.title + "' is past overdue "  + str(task.end_date)
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_OVERDUE)
 
+"""
 def handle_task_group_status_change(status):
   if status not in ['Finished']:
     return
@@ -188,6 +193,7 @@ def handle_task_group_status_change(status):
     assignee=contact[1]
     subject="Task Group " + "'" + task_group.title + "' status changed to "  + status
     prepare_notification_for_taskgroup(task_group, workflow_owner, assignee, subject, PRI_OTHERS)
+"""
 
 def handle_tasks_due(num_days):
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
@@ -203,6 +209,20 @@ def handle_tasks_due(num_days):
     assignee=contact[1]
     subject="Task " + "'" + task.title + "' is due in " + str(num_days) + " days"
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_DUE)
+
+@Resource.model_put.connect_via(models.CycleTaskGroup)
+def handle_taskgroup_put(sender, obj=None, src=None, service=None):
+  if not (src.get('status') and getattr(obj, 'status')):
+    current_app.logger.warn("Trigger: Status attribute is not modified for task group")
+    return
+  contact=get_task_group_contacts(obj)
+  if contact is None:
+    current_app.logger.warn("Trigger: Unable to get task group contact information")
+    return
+  workflow_owner=contact[0]
+  assignee=contact[1]
+  subject="Task Group " + "'" + obj.title + "' status changed to "  + obj.status
+  prepare_notification_for_taskgroup(obj, workflow_owner, assignee, subject, PRI_OTHERS)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
@@ -221,8 +241,6 @@ def handle_task_put(sender, obj=None, src=None, service=None):
     notif_pri=PRI_TASK_ASSIGNMENT
   if obj.status in ['InProgress', 'Assigned', 'Declined', 'Verified']: 
     prepare_notification_for_task(obj, workflow_owner, assignee, subject, notif_pri)
-  if obj.status in ['Finished']: 
-    prepare_notification_for_task(obj, assignee, workflow_owner, subject, notif_pri)
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
@@ -239,6 +257,16 @@ def handle_workflow_person_deleted(sender, obj=None, service=None):
   prepare_notification_for_workflow_member(workflow, person, subject, PRI_OTHERS)
 
 def prepare_notification_for_workflow_member(workflow, member, subject, notif_pri):
+  found_cycle=False
+  for cycle in workflow.cycles:
+    if cycle.status not in ['InProgress', 'Finished', 'Verified']:
+      continue
+    else:
+      found_cycle=True
+      break
+  if not found_cycle:
+    current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
+    return
   workflow_owner=get_workflow_owner(workflow)
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner")
@@ -247,7 +275,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
   """
   content=empty_line + subject + empty_line +  \
     "  " + request.url_root + workflow._inflector.table_plural + \
-    "/" + str(workflow.id) 
+    "/" + str(workflow.id) + "#person_widget"
   to_email={}
   to_emaildigest={}
   recipients_email=[]

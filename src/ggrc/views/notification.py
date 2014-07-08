@@ -91,7 +91,6 @@ def notify_email_digest_ggrc_users():
   """ handle any outstanding tasks and newly starting workflow cycles prior to notify email digest
   """
   handle_tasks_overdue()
-  handle_task_group_status_change('Finished')
   handle_workflow_cycle_overdue()
   handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
   handle_workflow_cycle_status_change('InProgress')
