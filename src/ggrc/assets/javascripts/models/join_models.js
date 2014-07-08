@@ -30,9 +30,9 @@ can.Model.Cacheable("can.Model.Join", {
         });
       }
     }
-    if(this === can.Model.Join) {
+    if (this === can.Model.Join) {
       this.bind("created", reinit);
-      //this.bind("destroyed", reinit);
+      this.bind("destroyed", reinit);
     }
   }
 }, {
