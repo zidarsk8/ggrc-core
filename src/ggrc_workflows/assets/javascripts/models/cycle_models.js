@@ -116,10 +116,7 @@
       // TODO: This code only works if all the following objects are cached.
       // This is currently always true in the workflow view, but it will not
       // be the case in the tasks view on my work page.
-      var task = this.cycle_task_group_object_task.reify(),
-          object = task.cycle_task_group_object.reify(),
-          task_group = object.cycle_task_group.reify(),
-          cycle = task_group.cycle.reify(),
+      var cycle = this.cycle.reify(),
           workflow = cycle.workflow.reify(),
           folders = workflow.get_binding('folders');
 
