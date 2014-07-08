@@ -9,6 +9,7 @@
   <div class="row-fluid">
     <div class="span8">
       <input id="task_id" name="cycle_task_group_object_task" type="hidden" model="CycleTaskGroupObjectTask" value="{{firstnonempty instance.cycle_task_group_object_task.id object_params.cycle_task_group_object_task}}">
+      <input id="cycle_id" name="cycle" type="hidden" model="Cycle" value="{{firstnonempty instance.cycle.id object_params.cycle}}">
       <label for="program_description">
         Details
         <i class="grcicon-help-black" rel="tooltip" title="Commentary goes here"></i>

@@ -92,6 +92,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       documents : "CMS.Models.Document.stubs",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {
@@ -110,7 +111,22 @@
       this.bind("created",
         refresh_attr_wrap("cycle_task_group_object_task").bind(this));
     }
-  }, {});
+  }, {
+    workflowFolder: function(){
+      // TODO: This code only works if all the following objects are cached.
+      // This is currently always true in the workflow view, but it will not
+      // be the case in the tasks view on my work page.
+      var cycle = this.cycle.reify(),
+          workflow = cycle.workflow.reify(),
+          folders = workflow.get_binding('folders');
+
+      if(folders.list.length === 0){
+        // Workflow folder has not been assigned
+        return null;
+      }
+      return folders.list[0].instance;
+    }
+  });
 
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_groups";
@@ -166,7 +182,8 @@
       cycle_task_group_object_tasks:
         "CMS.Models.CycleTaskGroupObjectTask.stubs",
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {
@@ -208,7 +225,8 @@
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub",
       contact: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {

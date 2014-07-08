@@ -12,6 +12,8 @@ from ggrc.models.object_document import Documentable
 class CycleTaskEntry(Described, Documentable, Base, db.Model):
   __tablename__ = 'cycle_task_entries'
 
+  cycle_id = db.Column(
+      db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   cycle_task_group_object_task_id = db.Column(
       db.Integer,
       db.ForeignKey('cycle_task_group_object_tasks.id'),
@@ -24,5 +26,6 @@ class CycleTaskEntry(Described, Documentable, Base, db.Model):
     )
 
   _publish_attrs = [
+      'cycle',
       'cycle_task_group_object_task',
       ]
