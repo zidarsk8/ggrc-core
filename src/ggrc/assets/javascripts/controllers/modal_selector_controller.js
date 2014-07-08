@@ -1344,15 +1344,324 @@
     });
   });
 
-
-
-
   
+
+
+
+  //*****************************************************************************************
+  //MultitypeMultiSelectModalSelector extends MultitypeModalSelector
+  //Description: Generic Multitype-MultiSelect-Modal-Selector
+  //Should be used for any Object type
+  //*********************************************************************************************
+  GGRC.Controllers.MultitypeModalSelector("GGRC.Controllers.MultitypeMultiSelectModalSelector", {
+    defaults: {
+          option_type_menu: null
+        , option_descriptors: null
+        , base_modal_view: "/static/mustache/selectors/multitype_multiselect_base_modal.mustache"
+        , option_items_view: "/static/mustache/selectors/multitype_multiselect_option_items.mustache"
+        , option_column_view: "/static/mustache/selectors/multitype_multiselect_option_column.mustache"
+        , option_type: null
+        , option_model: null
+        , object_model: null
+        , join_model: null
+      }
+  },{
+    init_context: function() {
+      if (!this.context) {
+        // Calculate the total number of options
+        var option_type_count = 0;
+        if (this.options.option_type_menu) {
+          can.each(this.options.option_type_menu, function(type) { option_type_count += type.items.length; })
+        }
+
+        this.context = new can.Observe($.extend({
+          objects: this.object_list,
+          options: this.option_list,
+          joins: this.options.join_list,
+          actives: this.active_list,
+          option_type_count: this.options.option_type_menu ? option_type_count : null,
+          selected_object: null,
+          selected_option_type: null,
+          selected_options: [],
+          is_page_instance: false,
+          item_selected: false,
+          items_selected: 0
+          }, this.options));
+      }
+      return this.context;
+    }
+    , move_option_to_top_and_select: function(option) {
+
+        // If element is null, the modal was closed and we don't need to do anything
+        if(!this.element){
+          return;
+        }
+
+        var self = this;
+        var index = this.option_list.indexOf(option);
+        var option_column = this.element.find('.option_column ul.new-tree').first();
+        var option_row = option_column.find('li[data-id=' + option.id + ']');
+
+        if (index > -1) {
+          this.option_list.splice(index, 1);
+          this.option_list.unshift(option);
+        }
+        else {
+          this.option_list.unshift(option);
+        }
+        option_row.remove();
+
+        // Explicitly insert the option -- with paging, the object may not yet
+        //   be in the list.
+        this.insert_options([option], true).then(function() {
+          var option_column = self.element.find('.option_column ul.new-tree').first()
+            , option_row = option_column.find('li[data-id=' + option.id + ']')
+            , check_box = option_row.find('input.object-check-single')
+            ;
+          //Select the item and update the map button  
+          check_box.attr('checked','checked');
+          self.update_selected_items(check_box);
+        });
+    }
+
+    , " modal:success" : function(el, ev, data, options) {
+        var self = this;
+        // Scroll so the top element (the one just added) is in view
+        this.element.find(".option_column ul.new-tree").parent().scrollTop(0);
+        this.search_reset().then(function() {
+          // Move the just-created object to the top
+          self.move_option_to_top_and_select(data);
+          if(options && options.map_and_save && self.element){
+            self.on_map(self.element.find('.map-button'));
+          }
+        });
+    }
+    //Over write the parent class method to select the row. 
+    //The row is selected by selecting the check box
+    , ".option_column li.tree-item click": function(el, ev){}
+
+    , update_selected_items: function(el, ev){
+        var $check = $(this.element).find('.object-check-single'),
+          selected = $.grep($check, function(e){ return (e.checked == true && e.disabled == false );});
+        //Update Map button, #of items selected
+        this.context.attr('item_selected', (selected.length >= 1));
+        this.context.attr('items_selected', (selected.length));
+
+        //FIXME (good to have)
+        //If all the items are selected, top select all should be checked
+    }
+
+    , ".option_column input.object-check-single click": function(el, ev){
+        ev.stopPropagation();
+        this.update_selected_items(el, ev);
+    }
+
+    , "input[type=checkbox].object-check-all click": function(el, ev) {
+      var $el = $(el)
+        , $check = $(this.element).find('.object-check-single');
+
+      //FIXME: the below code. this unchecks all selected disabled items
+      //  if(!($check.prop('disabled')))  
+      $check.prop('checked', $el.prop('checked'));
+      this.update_selected_items(el, ev);
+    }
+
+        
+
+    , on_map: $.debounce(500, true, function(el, ev) {
+        var that = this; 
+
+        if(el.hasClass('disabled')){
+          return;
+        }
+        var join_instance = this.create_join();
+        var its = join_instance.length;
+        var pass = 0;
+
+        if (!(its > 0)) {
+          $(document.body).trigger("ajax:flash", {
+            error: "Select an object to map" });
+        } 
+        else {
+          for(var i = 0; i < its; i++){
+            //We have multiple join_instances
+            join_instance[i].save()
+              .done(function() {
+                $(document.body).trigger('ajax:flash', 
+                    { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+                pass += 1;
+                if(pass == its){
+                  $(that.element).modal_form('hide');
+                }
+              })
+              .fail(function(xhr) {
+                // Currently, the only error we encounter here is uniqueness
+                // constraint violations.  Let's use a nicer message!
+                //that.element.trigger("ajax:flash", { error : xhr.responseText });
+                //We should never get here, The mapped objects are already checked and disabled
+                if (that.element) {
+                  var message = "That object is already mapped";
+                  pass += 1;
+                  $(document.body).trigger("ajax:flash", { error: message });
+                  if(pass == its){
+                    $(that.element).modal_form('hide');
+                  }
+                }
+              });
+          }        
+        } //End else
+
+    })//end on_map
+
+
+    , create_join: function() {
+      var $check = $(this.element).find('.object-check-single:checked'),
+        selected = $check.filter(function() { return !this.disabled; }),
+        len = selected.length;
+      
+      for (var i = 0; i < len; i++){
+        var option =  $(selected[i]).closest('li').data('option');
+        this.context.selected_options.push(option);
+      }
+
+      var l = this.context.selected_options.length,
+        joins=[];
+      
+      if(l > 0){
+        for(var i = 0; i < l; i++){
+          if (this.context.selected_options[i]) {
+            var context_id = null
+              , context_object;
+  
+            if (this.context.selected_options[i].constructor.shortName == "Program") {
+              context_object = this.context.selected_options[i];
+            } else {
+              context_object = this.context.selected_object;
+            }
+            if (context_object.context && context_object.context.id) {
+              context_id = context_object.context.id;
+            }
+            join = this.context.option_descriptor.get_new_join(
+                this.context.selected_object, this.context.selected_options[i], context_id);
+            joins.push(join);
+          }
+        }
+        return joins;
+      }
+    }
+
+  }); 
+
+
+  function get_object_multitype_option_set(object_model_name, option_model_name, data, column_view, item_view) {
+    var join_descriptors = null
+      , option_descriptors = {}
+      , option_set = {
+            object_model: object_model_name
+        }
+      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
+      ;
+
+    if (!option_model_name) {
+      join_descriptors =
+        GGRC.Mappings.get_canonical_mappings_for(object_model_name);
+    } else {
+      join_descriptors = {};
+      join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
+    }
+
+    can.each(join_descriptors, function(descriptor, far_model_name) {
+      var option_model_name = descriptor.option_model_name || far_model_name
+        , extra_options = modal_descriptor_view_options[option_model_name]
+        ;
+
+      //  If we have duplicate options, we want to use the first, so return
+      //    early.
+      //  Also return now if the descriptor is explicitly excluded from the 
+      //    set of descriptors for this modal.
+      if (option_descriptors[option_model_name]
+          || ~can.inArray(option_model_name, exclude_option_types)
+          //  For some recently-added join settings, there is no join model, so
+          //  short-circuit
+          || !descriptor.model_name
+          || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
+        return;
+
+      if (!option_set.default_option_descriptor)
+        option_set.default_option_descriptor = option_model_name;
+
+      if (!extra_options){
+        extra_options = {
+            column_view : column_view
+          , items_view  : item_view
+        }
+      }
+
+      option_descriptors[option_model_name] =
+        ModalOptionDescriptor.from_join_model(
+            descriptor.model_name
+          , descriptor.option_attr
+          , option_model_name
+          , extra_options);
+    });
+
+    option_set.option_descriptors = option_descriptors;
+    return option_set;
+  }
+
+
+
+  ////Set up handler for all multiselect -modal-selector
+  $(function() {
+    $('body').on('click', '[data-toggle="multitype-multiselect-modal-selector"]', function(e) {
+      var $this = $(this)
+        , options
+        , data_set = can.extend({}, $this.data())
+        ;
+
+      can.each($this.data(), function(v, k) {
+        data_set[k.replace(/[A-Z]/g, function(s) { return "_" + s.toLowerCase(); })] = v; //this is just a mapping of keys to underscored keys
+        if(!/[A-Z]/.test(k)) //if we haven't changed the key at all, don't delete the original
+          delete data_set[k];
+      });
+
+
+      //set up the options for new multitype Object  modal
+      var column_view = GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
+      item_view =  GGRC.mustache_path + "/selectors/multitype_multiselect_option_items.mustache" ;
+
+      options = get_object_multitype_option_set(
+        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+      
+      options.selected_object = CMS.Models.get_instance(
+          data_set.join_object_type, data_set.join_object_id);
+
+      options.binding = options.selected_object.get_binding(
+          data_set.join_mapping)
+
+      //the below line is not needed, verify and clean up
+      //options.object_params = $this.data("object-params");
+
+      e.preventDefault();
+
+      // Trigger the controller
+      GGRC.Controllers.MultitypeMultiSelectModalSelector.launch($this, options)
+      .on("relationshipcreated relationshipdestroyed", function(ev, data) {
+        $this.trigger("modal:" + ev.type, data);
+      });
+    });
+  });
+
+
+
+
+  //********************************************************************************************************
+  //**********************************************************************************************************
   //MultitypeObjectModalSelector
   //and related handlers
 
 
-  GGRC.Controllers.MultitypeModalSelector("GGRC.Controllers.MultitypeObjectModalSelector", {
+  GGRC.Controllers.MultitypeMultiSelectModalSelector("GGRC.Controllers.MultitypeObjectModalSelector", {
     defaults: {
           option_type_menu: null
         , option_descriptors: null
@@ -1422,8 +1731,7 @@
           option_type_count: this.options.option_type_menu ? option_type_count : null,
           selected_object: null,
           selected_option_type: null,
-          //selected_option: null,
-          selected_option: [],
+          selected_options: [],
           is_page_instance: false,
           item_selected: false,
           items_selected: 0,
@@ -1539,120 +1847,12 @@
       }
     }
 
-    //Over write the parent class method to select the row. 
-    //The row is selected by selecting the check box
-    , ".option_column li.tree-item click": function(el, ev){}
-
-    , ".option_column input.object-check-single click": function(el, ev){
-        //find how many are selected
-        var $frag = $(".option_column")
-        , num_checked = $frag.find('.object-check-single').map(function(_,c) {
-            if($(c).is(':checked')) {
-              return c;
-            }
-          }).length;
-        ev.stopPropagation();
-        //Update Map button, #of items selected
-        this.context.attr('item_selected', (num_checked >= 1));
-        this.context.attr('items_selected', num_checked);
-    }
-
-    , ".option_column input.object-check-all click": function(el, ev) {
-      var $el = $(el)
-        , $check = $(this.element).find('.object-check-single');
-      $check.prop('checked', $el.prop('checked'));
-      
-      //Check if this is on or off, toggle the checks
-      var selected = $.grep($check, function(e){ return (e.checked == true && e.disabled == false ); });
-      this.context.attr('item_selected', (selected.length >= 1));
-      this.context.attr('items_selected', (selected.length));
-    }
-
-    , on_map: $.debounce(500, true, function(el, ev) {
-        var that = this; 
-
-        if(el.hasClass('disabled')){
-          return;
-        }
-        var join_instance = this.create_join();
-        var its = join_instance.length;
-        var pass = 0;
-
-        if (!(its > 0)) {
-          $(document.body).trigger("ajax:flash", {
-            error: "Select an object to map" });
-        } 
-        else {
-          for(var i = 0; i < its; i++){
-            //We have multiple join_instances
-            join_instance[i].save()
-              .done(function() {
-                $(document.body).trigger('ajax:flash', 
-                    { success: that.context.selected_option[0].constructor.shortName + " mapped successfully."});
-                pass += 1;
-                if(pass == its){
-                  $(that.element).modal_form('hide');
-                }
-              })
-              .fail(function(xhr) {
-                // Currently, the only error we encounter here is uniqueness
-                // constraint violations.  Let's use a nicer message!
-                //that.element.trigger("ajax:flash", { error : xhr.responseText });
-                //We should never get here, The mapped objects are already checked and disabled
-                if (that.element) {
-                  var message = "That object is already mapped";
-                  pass += 1;
-                  $(document.body).trigger("ajax:flash", { error: message });
-                  if(pass == its){
-                    $(that.element).modal_form('hide');
-                  }
-                }
-              });
-          }
-          
-        }
-    })
-
-    , create_join: function() {
-      var selected = $('.object-check-single:checked').filter(function() { return !this.disabled; });
-      
-      for (var i = 0; i < selected.length; i++){
-        var option =  $(selected[i]).closest('li').data('option');
-        this.context.selected_option.push(option);
-      }
-
-      var l = this.context.selected_option.length;
-      var joins=[];
-      
-      if(l > 0){
-        for(var i = 0; i < l; i++){
-          if (this.context.selected_option[i]) {
-            var context_id = null
-              , context_object
-              ;
-            if (this.context.selected_option[i].constructor.shortName == "Program") {
-              context_object = this.context.selected_option[i];
-            } else {
-              context_object = this.context.selected_object;
-            }
-            if (context_object.context && context_object.context.id) {
-              context_id = context_object.context.id;
-            }
-            join = this.context.option_descriptor.get_new_join(
-                this.context.selected_object, this.context.selected_option[i], context_id);
-            joins.push(join);
-          }
-        }
-        return joins;
-      }
-    }
-
     , set_option_descriptor: function(option_type) {
       var self = this
         , descriptor = this.options.option_descriptors[option_type]
         ;
 
-      this.constructor.last_selected_option_type = option_type;
+      this.constructor.last_selected_options_type = option_type;
 
       can.Model.startBatch();
 
@@ -1660,10 +1860,9 @@
       this.context.attr('option_column_view', descriptor.column_view);
       this.context.attr('option_detail_view', descriptor.detail_view);
       this.context.attr('option_descriptor', descriptor);
-      //this.context.attr('selected_option', null);
-      this.context.selected_option = [];
+      this.context.selected_options = [];
       this.context.attr('selected_result', can.compute(function() {
-        return self.get_result_for_option(self.context.attr('selected_option'));
+        return self.get_result_for_option(self.context.attr('selected_options'));
       }));
       this.context.attr('related_table_plural', descriptor.related_table_plural);
       this.context.attr('related_table_singular', descriptor.related_table_singular);
@@ -1689,68 +1888,6 @@
   });
   
 
-  ModalOptionDescriptor("ObjectModalOptionDescriptor", {
-      column_view : GGRC.mustache_path + "/selectors/object_selector_option_column.mustache"
-  }, {})
-
-
-  function get_object_multitype_option_set(object_model_name, option_model_name, data) {
-    var join_descriptors = null
-      , option_descriptors = {}
-      , option_set = {
-            object_model: object_model_name
-        }
-      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
-      ;
-
-    if (!option_model_name) {
-      join_descriptors =
-        GGRC.Mappings.get_canonical_mappings_for(object_model_name);
-    } else {
-      join_descriptors = {};
-      join_descriptors[option_model_name] = GGRC.Mappings.get_canonical_mapping(object_model_name, option_model_name);
-    }
-
-    can.each(join_descriptors, function(descriptor, far_model_name) {
-      var option_model_name = descriptor.option_model_name || far_model_name
-        , extra_options = modal_descriptor_view_options[option_model_name]
-        ;
-
-      //  If we have duplicate options, we want to use the first, so return
-      //    early.
-      //  Also return now if the descriptor is explicitly excluded from the 
-      //    set of descriptors for this modal.
-      if (option_descriptors[option_model_name]
-          || ~can.inArray(option_model_name, exclude_option_types)
-          //  For some recently-added join settings, there is no join model, so
-          //  short-circuit
-          || !descriptor.model_name
-          || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
-        return;
-
-      if (!option_set.default_option_descriptor)
-        option_set.default_option_descriptor = option_model_name;
-
-      if (!extra_options)
-        extra_options = {
-            column_view : GGRC.mustache_path + "/selectors/object_selector_option_column.mustache"
-          , items_view  : GGRC.mustache_path + "/selectors/object_selector_option_items.mustache"
-          , detail_view : GGRC.mustache_path + "/selectors/multitype_option_detail.mustache"
-        }
-
-      option_descriptors[option_model_name] =
-        ModalOptionDescriptor.from_join_model(
-            descriptor.model_name
-          , descriptor.option_attr
-          , option_model_name
-          , extra_options);
-    });
-
-    option_set.option_descriptors = option_descriptors;
-    return option_set;
-  }
-
-
   $(function() {
     $('body').on('click', '[data-toggle="multitype-object-modal-selector"]', function(e) {
       var $this = $(this)
@@ -1766,8 +1903,10 @@
 
 
       //set up the options for new multitype Object  modal
+      var column_view = GGRC.mustache_path + "/selectors/object_selector_option_column.mustache", 
+      item_view =  GGRC.mustache_path + "/selectors/object_selector_option_items.mustache" ;
       options = get_object_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set);
+        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
       
       options.selected_object = CMS.Models.get_instance(
           data_set.join_object_type, data_set.join_object_id);
@@ -1775,7 +1914,8 @@
       options.binding = options.selected_object.get_binding(
           data_set.join_mapping)
 
-      options.object_params = $this.data("object-params");
+      //The below line is not needed, verify and clean up
+      //options.object_params = $this.data("object-params");
 
       e.preventDefault();
 
@@ -1786,6 +1926,8 @@
       });
     });
   });
+
+  
 
 
 })(window.can, window.can.$);
