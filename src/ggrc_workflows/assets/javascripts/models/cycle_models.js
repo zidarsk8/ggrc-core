@@ -92,6 +92,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       documents : "CMS.Models.Document.stubs",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {
@@ -184,7 +185,8 @@
       cycle_task_group_object_tasks:
         "CMS.Models.CycleTaskGroupObjectTask.stubs",
       modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {
@@ -226,7 +228,8 @@
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
       modified_by: "CMS.Models.Person.stub",
       contact: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      context: "CMS.Models.Context.stub",
+      cycle: "CMS.Models.Cycle.stub",
     },
 
     tree_view_options: {

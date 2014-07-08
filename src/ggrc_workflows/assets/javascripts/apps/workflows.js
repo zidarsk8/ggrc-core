@@ -114,6 +114,8 @@
         },
 
         CycleTaskGroupObject: {
+          cycle: Direct(
+            "Cycle", "cycle_task_group_objects", "cycle"),
           cycle_task_group: Direct(
             "CycleTaskGroup", "cycle_task_group_objects", "cycle_task_group"),
           //task_group_object: Direct(
@@ -125,6 +127,8 @@
         },
 
         CycleTaskGroupObjectTask: {
+          cycle: Direct(
+            "Cycle", "cycle_task_group_object_tasks", "cycle"),
           cycle_task_group_object: Direct(
             "CycleTaskGroupObject",
             "cycle_task_group_object_tasks",
@@ -140,6 +144,8 @@
         CycleTaskEntry: {
           documents: Proxy(
             "Document", "document", "ObjectDocument", "documentable", "object_documents"),
+          cycle: Direct(
+            "Cycle", "cycle_task_entries", "cycle"),
           cycle_task_group_object_task: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",

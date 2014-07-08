@@ -17,6 +17,8 @@ class CycleTaskGroupObjectTask(
 
   VALID_STATES = (None, 'InProgress', 'Assigned', 'Finished', 'Declined', 'Verified')
 
+  cycle_id = db.Column(
+      db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   cycle_task_group_object_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=False)
   task_group_task_id = db.Column(
@@ -29,6 +31,7 @@ class CycleTaskGroupObjectTask(
       db.String(length=250), nullable=False)
 
   _publish_attrs = [
+      'cycle',
       'cycle_task_group_object',
       'task_group_task',
       'cycle_task_entries',

@@ -117,6 +117,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
       object = task_group_object.object
 
       cycle_task_group_object = models.CycleTaskGroupObject(
+          cycle=obj,
           cycle_task_group=cycle_task_group,
           task_group_object=task_group_object,
           title=object.title,
@@ -127,6 +128,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         task = task_group_task.task
 
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
+          cycle=obj,
           cycle_task_group_object=cycle_task_group_object,
           task_group_task=task_group_task,
           title=task.title,
