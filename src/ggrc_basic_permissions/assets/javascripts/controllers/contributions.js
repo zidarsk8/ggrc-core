@@ -36,11 +36,11 @@
       options.$target = $target;
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], $.extend({ $trigger: $trigger}, options));
-      
+
       return $target;
     },
 
-  }, { 
+  }, {
     init: function(){
       this.init_context();
       this.init_view();
@@ -85,7 +85,7 @@
       var self = this
         , instance = this.options.instance
         ;
-      
+
       function finish(){
         CMS.Models[self.options.scope].cache[self.options.scope_id].refresh();
         self.element.trigger("modal:success").modal_form("hide");
@@ -184,7 +184,7 @@
 
     ".object_column li click": "select_object",
     ".option_column li click": "select_option",
-    ".option_column li input[type='radio'] change": "change_option",
+    ".confirm-buttons a.btn-primary click": "change_option",
 
     init_bindings: function() {
       this.join_list.bind("change", this.proxy("update_active_list"));
@@ -345,7 +345,6 @@
       if(!role_found){
         $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
       }
-      
     },
 
     /*" hide": function(el, ev) {
@@ -369,10 +368,12 @@
       this.context.attr('selected_option', el.data('option'));
     },
 
-    change_option: function(el, ev) {
+    change_option: function(el_, ev) {
       var self = this
+        , el = $(".people-selector").find("input[type=radio]:checked")
         , li = el.closest('li')
-        , clicked_option = li.data('option');
+        , clicked_option = li.data('option')
+        , join
         ;
 
       // Look for and remove the existing join.
@@ -391,14 +392,16 @@
         }
       });
 
-      // Create the new join.
-      var join = self.get_new_join(
-          clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
-      join.save().then(function() {
-          self.join_list.push(join);
-          self.refresh_option_list();
-          self.element.trigger("relationshipcreated", join);
-      });
+      // Create the new join (skipping "No Access" role, with id == 0)
+      if (clicked_option.id > 0) {
+        join = self.get_new_join(
+            clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
+        join.save().then(function() {
+            self.join_list.push(join);
+            self.refresh_option_list();
+            self.element.trigger("relationshipcreated", join);
+        });
+      }
     },
 
     // HELPERS
@@ -591,7 +594,7 @@
 
       e.preventDefault();
       e.stopPropagation();
-      
+
       options.instance = CMS.Models[scope].cache[instance_id];
       options.userRole_id = data_set.params.userRole_id;
       options.scope_id = data_set.params.scope_id;
