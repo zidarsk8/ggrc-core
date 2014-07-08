@@ -73,6 +73,12 @@ def all_cache_entries():
     resource('systems', 'System'),
     resource('processes', 'Process'),
 
+    # ggrc notification models
+    resource('notification_configs', 'NotificationConfig'),
+    resource('notifications', 'Notification'),
+    resource('notification_recipients', 'NotificationRecipient'),
+    resource('notification_objects', 'NotificationObject'),
+
     # FIXME: Extension-defined models should be registered from the extensions.
 
     # ggrc_basic_permissions models
@@ -156,6 +162,29 @@ def all_mapping_entries():
     mapping('ObjectEvent', 'eventable', True),
     mapping('ObjectFolder', 'folderable', True),
     mapping('ObjectFile', 'fileable', True),
+    mapping('Notification', 'recipients'),
+    mapping('Notification', 'notification_object'),
+    # ggrc_workflows mappings:
+    mapping('TaskGroupObject', 'object'),
+    mapping('TaskGroupObject', 'task_group'),
+    mapping('TaskGroupTask', 'task'),
+    mapping('TaskGroupTask', 'task_group'),
+    mapping('TaskGroup', 'workflow'),
+    mapping('WorkflowObject', 'object'),
+    mapping('WorkflowObject', 'workflow'),
+    mapping('Cycle', 'workflow'),
+    mapping('Cycle', 'cycle_task_groups'),
+    mapping('CycleTaskGroup', 'cycle'),
+    mapping('CycleTaskGroup', 'cycle_task_group_objects'),
+    mapping('CycleTaskGroup', 'task_group'),
+    mapping('CycleTaskGroupObject', 'cycle'),
+    mapping('CycleTaskGroupObject', 'object'),
+    mapping('CycleTaskGroupObject', 'cycle_task_group_object_tasks'),
+    mapping('CycleTaskGroupObjectTask', 'cycle'),
+    mapping('CycleTaskGroupObjectTask', 'cycle_task_entries'),
+    mapping('CycleTaskGroupObjectTask', 'task'),
+    mapping('CycleTaskEntry', 'cycle'),
+    mapping('CycleTaskEntry', 'cycle_task_group_object_task'),
     #mapping('RiskAssessmentMapping'),
     #mapping('RiskAssessmentControlMapping'),
     ]
