@@ -73,6 +73,12 @@ def all_cache_entries():
     resource('systems', 'System'),
     resource('processes', 'Process'),
 
+    # ggrc notification models
+    resource('notification_configs', 'NotificationConfig'),
+    resource('notifications', 'Notification'),
+    resource('notification_recipients', 'NotificationRecipient'),
+    resource('notification_objects', 'NotificationObject'),
+
     # FIXME: Extension-defined models should be registered from the extensions.
 
     # ggrc_basic_permissions models
@@ -156,6 +162,8 @@ def all_mapping_entries():
     mapping('ObjectEvent', 'eventable', True),
     mapping('ObjectFolder', 'folderable', True),
     mapping('ObjectFile', 'fileable', True),
+    mapping('Notification', 'recipients'),
+    mapping('Notification', 'notification_object'),
     #mapping('RiskAssessmentMapping'),
     #mapping('RiskAssessmentControlMapping'),
     ]
