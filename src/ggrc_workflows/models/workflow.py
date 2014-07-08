@@ -12,6 +12,10 @@ from ggrc.models.mixins import (
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
 from sqlalchemy.orm import validates
+from .task_group_object import TaskGroupObject
+from .cycle_task_group_object import CycleTaskGroupObject
+from collections import OrderedDict
+from datetime import date
 
 
 class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
@@ -74,6 +78,47 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'frequency',
       'cycles',
       ]
+
+from ggrc.models.computed_property import computed_property
+class WorkflowState(object):
+
+  _publish_attrs = ['workflow_state']
+
+  @computed_property
+  def workflow_state(self):
+    priority_states = OrderedDict([
+      # The first True state will be returned
+      ("Overdue", False),
+      ("InProgress", False),
+      ("Finished", False),
+      ("Assigned", False),
+      (None, False),
+      ("Verified", False)
+    ])
+
+    cycle_objects = db.session.query(CycleTaskGroupObject)\
+      .join(TaskGroupObject)\
+      .filter(
+        TaskGroupObject.object_id == self.id,
+        TaskGroupObject.object_type == self.type,
+        TaskGroupObject.id == CycleTaskGroupObject.task_group_object_id
+      )\
+      .all()
+
+    for cycle_object in cycle_objects:
+      today = date.today()
+      if cycle_object.end_date <= today:
+        priority_states["Overdue"] = True
+      priority_states[cycle_object.status] = True
+
+    for state in priority_states.keys():
+      if priority_states[state]:
+        return state
+
+    return None
+
+from ggrc.models.mixins import BusinessObject
+BusinessObject.__bases__ = (WorkflowState,) + BusinessObject.__bases__
 
 # TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
 from ggrc_gdrive_integration.models.object_folder import Folderable
