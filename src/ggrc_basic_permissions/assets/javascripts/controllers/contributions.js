@@ -206,9 +206,6 @@
           self.element.trigger('loaded');
         });
 
-      // Change the Done button to Save because we're making the change when submitting the modal form.
-      $(".confirm-buttons a.btn-primary").text('Save');
-
       // Start listening for events
       this.on();
 
