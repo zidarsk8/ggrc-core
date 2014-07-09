@@ -47,7 +47,7 @@
       {{#child_options}}
         <div class="inner-tree">
           <h6>Task Groups ({{list.length}})</h6>
-          <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+          <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
         </div>
       {{/child_options}}
     {{/if}}

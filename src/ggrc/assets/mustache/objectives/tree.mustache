@@ -134,7 +134,7 @@
               <h6>{{firstnonempty title_plural "Business Objects"}} ({{child_count}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
               </h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure colored-list new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             </div>
           {{/child_options}}
         {{/prune_context}}

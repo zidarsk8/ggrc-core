@@ -12,7 +12,7 @@
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -29,7 +29,7 @@
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
               </li>
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -38,7 +38,7 @@
                 </span>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@
           </div>
 
         </div>
-        
+
         {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
@@ -116,7 +116,7 @@
               <h6>Mapped Objects ({{child_count}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
               </h6>
-                <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
               {{/child_options}}
             </div>
           {{/prune_context}}

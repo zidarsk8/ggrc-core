@@ -35,9 +35,6 @@
                 {{/with_page_object_as}}
               </li>
               <li>
-                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
-              </li>
-              <li>
               {{#with_mapping_count instance 'related_objects'}}
                 {{#prune_context}}
                     <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
@@ -72,6 +69,9 @@
                       {{/if}}
                     </span>
               {{/with_mapping_count}}
+              </li>
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
               </li>
             </ul>
 
@@ -214,7 +214,7 @@
               <h6>Objectives, Controls, and Business Objects ({{child_count}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
               </h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
         {{/prune_context}}
