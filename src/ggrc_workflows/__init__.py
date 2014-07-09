@@ -14,6 +14,14 @@ from ggrc.views.registry import object_view
 import ggrc_workflows.models as models
 
 
+# Initialize signal handler for status changes
+from blinker import Namespace
+signals = Namespace()
+status_change = signals.signal('Status Changed', 
+  """
+     This is used to signal any listeners of any changes in model object status attribute 
+  """)
+
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
   'ggrc_workflows',
@@ -111,6 +119,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         description=task_group.description,
         end_date=task_group.end_date,
         modified_by=current_user,
+        contact=task_group.contact,
         )
 
     for task_group_object in task_group.task_group_objects:
@@ -168,8 +177,10 @@ def update_cycle_object_parent_state(obj):
   # If any child is `InProgress`, then parent should be `InProgress`
   if obj.status == 'InProgress' or obj.status == 'Declined':
     if parent.status != 'InProgress':
+      old_status = parent.status
       parent.status = 'InProgress'
       db.session.add(parent)
+      status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
       update_cycle_object_parent_state(parent)
   # If all children are `Finished` or `Verified`, then parent should be same
   elif obj.status == 'Finished' or obj.status == 'Verified':
@@ -184,10 +195,14 @@ def update_cycle_object_parent_state(obj):
           if child.status != 'Finished':
             children_finished = False
       if children_verified:
+        old_status=parent.status
         parent.status = 'Verified'
+        status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
         update_cycle_object_parent_state(parent)
       elif children_finished:
+        old_status=parent.status
         parent.status = 'Finished'
+        status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
         update_cycle_object_parent_state(parent)
 
 
