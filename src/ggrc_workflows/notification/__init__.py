@@ -11,6 +11,7 @@ from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
 from ggrc import db
+from ggrc_workflows import status_change
 
 PRI_TASK_OVERDUE=1
 PRI_TASK_DUE=2
@@ -36,6 +37,13 @@ def get_taskgroup_workflow_owner(task_group):
   workflow=get_taskgroup_workflow(task_group) 
   if workflow is None:
     current_app.logger.warn("Trigger: workflow is not found for task group " + task_group.title)
+    return None
+  return get_workflow_owner(workflow)
+
+def get_cycle_workflow_owner(cycle):
+  workflow=get_cycle_workflow(cycle) 
+  if workflow is None:
+    current_app.logger.warn("Trigger: workflow is not found for cycle" + cycle.title)
     return None
   return get_workflow_owner(workflow)
 
@@ -124,9 +132,23 @@ def get_task_group_contacts(task_group):
     current_app.logger.warn("Trigger: Unable to find workflow owner for task group " + task_group.title)
     return None
   if task_group.contact_id is None:
-    current_app.logger.warn("Trigger: Unable to find contacts for task group " + task_group.title)
-    return None
+    current_app.logger.warn("Trigger: Unable to find contacts for task group " + \
+      task_group.title + " , using workflow owner as contact")
+    ret_tuple=(workflow_owner, workflow_owner)
   contacts = db.session.query(Person).filter(Person.id==task_group.contact_id).first()
+  ret_tuple=(workflow_owner, contacts)
+  return ret_tuple
+
+def get_cycle_contacts(cycle):
+  workflow_owner=get_cycle_workflow_owner(cycle)
+  if workflow_owner is None:
+    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle" + cycle.title)
+    return None
+  if cycle.contact_id is None:
+    current_app.logger.warn("Trigger: Unable to find contacts for cycle" + \
+      cycle.title + " , using workflow owner as contact")
+    ret_tuple=(workflow_owner, workflow_owner)
+  contacts = db.session.query(Person).filter(Person.id==cycle.contact_id).first()
   ret_tuple=(workflow_owner, contacts)
   return ret_tuple
 
@@ -210,10 +232,22 @@ def handle_tasks_due(num_days):
     subject="Task " + "'" + task.title + "' is due in " + str(num_days) + " days"
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_DUE)
 
-@Resource.model_put.connect_via(models.CycleTaskGroup)
-def handle_taskgroup_put(sender, obj=None, src=None, service=None):
-  if not (src.get('status') and getattr(obj, 'status')):
-    current_app.logger.warn("Trigger: Status attribute is not modified for task group")
+@status_change.connect_via(models.Cycle)
+def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
+  if obj is None:
+    current_app.logger.warn("Trigger: Unable to get cycle object")
+    return
+  contact=get_cycle_contacts(obj)
+  if contact is None:
+    current_app.logger.warn("Trigger: Unable to get cycle contact information")
+    return
+  subject="Cycle" + "'" + obj.title + "' status changed to "  + new_status
+  prepare_notification_for_cycle(obj, subject, PRI_OTHERS)
+
+@status_change.connect_via(models.CycleTaskGroup)
+def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status=None):
+  if obj is None:
+    current_app.logger.warn("Trigger: Unable to get task group object")
     return
   contact=get_task_group_contacts(obj)
   if contact is None:
@@ -221,7 +255,7 @@ def handle_taskgroup_put(sender, obj=None, src=None, service=None):
     return
   workflow_owner=contact[0]
   assignee=contact[1]
-  subject="Task Group " + "'" + obj.title + "' status changed to "  + obj.status
+  subject="Task Group " + "'" + obj.title + "' status changed to "  + new_status
   prepare_notification_for_taskgroup(obj, workflow_owner, assignee, subject, PRI_OTHERS)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
