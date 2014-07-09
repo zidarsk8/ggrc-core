@@ -6,13 +6,13 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -37,16 +37,18 @@
                   </li>
                 {{/is_private}}
               {{/instance}}
-              
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
+              </li>
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -113,8 +115,22 @@
       </p>
       <p>
         <strong>gGRC Folder:</strong>
-        <!--a href="#">/gGRC Workflows/{{instance.title}}/</a-->
-        <i>Folder connections for workflows are not yet implemented</i>
+        {{#with_mapping 'folders' instance}}
+          {{#if folders.length}}
+            <a href="{{folders.0.instance.alternateLink}}" target="_blank">
+              {{folders.0.instance.title}}
+            </a>
+          {{else}}
+            No folder for this {{instance.class.title_singular}}.
+            <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+              data-model="{{instance.type}}" data-type="folders" data-id="{{instance.id}}">
+              <i class="grcicon-attach-color"></i> Attach folder
+            </a>
+          {{/if}}
+        {{else}}
+          {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
+          The GDrive folder for this {{instance.class.title_singular}} could not be accessed.
+        {{/with_mapping}}
       </p>
     </div>
     <div class="span6">
@@ -152,4 +168,3 @@
     </div>
     {{/if}}
   </li>
-

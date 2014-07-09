@@ -15,6 +15,7 @@ from sqlalchemy.orm import validates
 from ggrc.models.computed_property import computed_property
 from .task_group_object import TaskGroupObject
 from .cycle_task_group_object import CycleTaskGroupObject
+from .cycle import Cycle
 from collections import OrderedDict
 from datetime import date
 
@@ -66,10 +67,21 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   cycles = db.relationship(
       'Cycle', backref='workflow', cascade='all, delete-orphan')
 
+  @computed_property
+  def workflow_state(self):
+    cycles = db.session.query(Cycle)\
+      .filter(
+        Cycle.workflow_id == self.id
+      )\
+      .all()
+
+    return WorkflowState.get_state(cycles)
+
   _fulltext_attrs = []
 
   _publish_attrs = [
       'workflow_objects',
+      'workflow_state',
       PublishOnly('objects'),
       'workflow_people',
       PublishOnly('people'),
@@ -79,6 +91,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'frequency',
       'cycles',
       ]
+  _stub_attrs = ['workflow_state']
 
 
 class WorkflowState(object):
@@ -87,8 +100,8 @@ class WorkflowState(object):
   _update_attrs = []
   _stub_attrs = ['workflow_state']
 
-  @computed_property
-  def workflow_state(self):
+  @classmethod
+  def get_state(cls, objs):
     priority_states = OrderedDict([
       # The first True state will be returned
       ("Overdue", False),
@@ -97,6 +110,25 @@ class WorkflowState(object):
       ("Assigned", False),
       ("Verified", False)
     ])
+
+    for obj in objs:
+      today = date.today()
+      if obj.end_date and \
+         obj.end_date <= today and \
+         obj.status != "Verified":
+        priority_states["Overdue"] = True
+      elif not obj.status:
+        priority_states["Assigned"] = True
+      priority_states[obj.status] = True
+
+    for state in priority_states.keys():
+      if priority_states[state]:
+        return state
+
+    return None
+
+  @computed_property
+  def workflow_state(self):
 
     cycle_objects = db.session.query(CycleTaskGroupObject)\
       .join(TaskGroupObject)\
@@ -107,21 +139,7 @@ class WorkflowState(object):
       )\
       .all()
 
-    for cycle_object in cycle_objects:
-      today = date.today()
-      if cycle_object.end_date and \
-         cycle_object.end_date <= today and \
-         cycle_object.status != "Verified":
-        priority_states["Overdue"] = True
-      elif not cycle_object.status:
-        priority_states["Assigned"] = True
-      priority_states[cycle_object.status] = True
-
-    for state in priority_states.keys():
-      if priority_states[state]:
-        return state
-
-    return None
+    return WorkflowState.get_state(cycle_objects)
 
 # TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
 from ggrc_gdrive_integration.models.object_folder import Folderable
