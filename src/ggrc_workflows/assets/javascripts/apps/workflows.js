@@ -303,7 +303,8 @@
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.Person,
-            mapping: "people"
+            mapping: "people",
+            footer_view: GGRC.mustache_path + "/wf_people/tree_footer.mustache"
           }
         },
         task_group: {

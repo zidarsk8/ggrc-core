@@ -705,6 +705,7 @@
     });
   });
 
+  //************************************************************************************************
 
   can.Control("GGRC.Controllers.MultitypeModalSelector", {
       defaults: {
@@ -1551,6 +1552,13 @@
     }
 
   }); 
+  
+  multiselect_descriptor_view_option = {
+    "Person": {
+        column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
+        items_view  : GGRC.mustache_path + "/wf_people/multiselect_option_items.mustache"
+    }
+  }
 
 
   function get_object_multitype_option_set(object_model_name, option_model_name, data, column_view, item_view) {
@@ -1572,8 +1580,8 @@
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
       var option_model_name = descriptor.option_model_name || far_model_name
-        , extra_options = modal_descriptor_view_options[option_model_name]
-        ;
+        , extra_options = multiselect_descriptor_view_option[option_model_name];
+      
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.
