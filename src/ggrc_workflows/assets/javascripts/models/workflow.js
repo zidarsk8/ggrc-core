@@ -150,8 +150,8 @@
     start_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
-        if(val > 11) {
-          val = 11;
+        if(val > 12) {
+          val = 12;
         }
         newdate = new Date(this.start_date || null);
         if(moment(newdate).date(1).month(val - 1).daysInMonth() < newdate.getDate()) {
@@ -175,8 +175,8 @@
     end_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
-        if(val > 11) {
-          val = 11;
+        if(val > 12) {
+          val = 12;
         }
         newdate = new Date(this.end_date || null);
         if(moment(newdate).date(1).month(val - 1).daysInMonth() < newdate.getDate()) {

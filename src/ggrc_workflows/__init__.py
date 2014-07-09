@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from datetime import date, timedelta
+import calendar
 from flask import Blueprint
 from sqlalchemy import inspect
 
@@ -93,6 +95,107 @@ def contributed_object_views():
       ]
 
 
+def next_weekday(_date, direction='up'):
+  '''
+  _date.weekday() is 0 for Monday and 6 for Sunday.
+  Must adjust any weekday that is larger than 4 (Friday)
+  up to Monday or down to Friday
+  '''
+  if _date.weekday() > 4:
+    return _date + timedelta(
+      days=7 - _date.weekday() if direction == 'up' else 4 - _date.weekday()
+      )
+  else:
+    return _date
+
+def calc_start_date(frequency, _date, base_date=None):
+  if base_date is None:
+    base_date = date.today()
+  direction = 'up'
+  ret = None
+  if frequency == "one_time":
+    return next_weekday(_date, direction=direction)
+  if frequency == "annually":
+    ret = adjust_days(base_date.year, _date.month, _date.day)
+  if frequency == "monthly":
+    ret = adjust_days(
+        base_date.year,
+        base_date.month,
+        _date.day
+      )
+  if frequency == "quarterly":
+    ret = adjust_days(
+        base_date.year,
+        (base_date.month - 1) / 3 * 3 + 1 + (_date.month - 1) % 3,
+        _date.day
+      )
+  if frequency == "weekly":
+    if base_date.weekday() == _date.weekday():
+      ret = base_date
+    else:
+      ret = base_date \
+            - timedelta(days=base_date.weekday()) \
+            + timedelta(days=_date.weekday())
+  
+  return next_weekday(ret, direction=direction)
+
+
+def adjust_days(year, month, day):
+  if(month > 12):
+    year = year + 1
+    month = month - 12
+  if(calendar.monthrange(year, month)[1] < day):
+    day = calendar.monthrange(year, month)[1]
+  return date(year, month, day)
+
+
+def calc_end_date(frequency, _date, start_date):
+  direction = 'down'
+  ret = None
+  if frequency == "one_time":
+    ret = _date
+  if frequency == "annually":
+    if start_date.month > _date.month \
+       or (start_date.month == _date.month \
+           and start_date.day >= _date.day):
+      ret = adjust_days(start_date.year + 1, _date.month, _date.day)
+    else:
+      ret = adjust_days(start_date.year, _date.month, _date.day)
+  if frequency == "monthly":
+    ret = adjust_days(
+        start_date.year,
+        start_date.month \
+          + 1 if start_date.day >= _date.day else start_date.month,
+        _date.day
+        )
+  if frequency == "quarterly":
+    month_in_quarter = (_date.month - 1) % 3 + 1
+    start_month_in_quarter = (start_date.month - 1) % 3 + 1
+    ret = adjust_days(
+        start_date.year,
+        ((start_date.month - 1) / 3 \
+          + (1 if start_month_in_quarter > month_in_quarter
+                  or start_month_in_quarter == month_in_quarter
+                  and start_date.day > _date.day 
+              else 0)) \
+          * 3 + month_in_quarter,
+        _date.day
+        )
+  if frequency == "weekly":
+    if _date.weekday() == start_date.weekday():
+      ret = start_date + timedelta(days=7)
+    elif start_date.weekday() < _date.weekday():
+      ret = start_date \
+            - timedelta(days=start_date.weekday()) \
+            + timedelta(days=_date.weekday())
+    else:
+      ret = start_date \
+            + timedelta(days=7 - start_date.weekday()) \
+            + timedelta(days=_date.weekday())
+
+  return next_weekday(ret, direction=direction)
+
+
 from ggrc.services.common import Resource
 
 @Resource.model_posted.connect_via(models.Cycle)
@@ -109,6 +212,16 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   obj.title = workflow.title
   obj.description = workflow.description
   obj.status = 'InProgress'
+
+  obj.start_date = calc_start_date(
+    workflow.frequency, 
+    workflow.start_date
+    )
+  obj.end_date = calc_end_date(
+    workflow.frequency, 
+    workflow.end_date, 
+    obj.start_date
+    )
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
