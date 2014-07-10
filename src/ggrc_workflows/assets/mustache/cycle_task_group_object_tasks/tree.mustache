@@ -82,13 +82,14 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-
+  
+      {{#defer "task" instance.viewLink}}
       <div class="row-fluid">
         <div class="span6">
-          {{#if instance.viewLink}}
-            {{#is_allowed "view_instance_page" instance}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
+          {{#if task.viewLink}}
+            {{#is_allowed "view_object_page" object}}
+              <a href="{{task.viewLink}}" class="info-action">
+                View Task {{!object.class.title_singular}}
                 <i class="grcicon-goto"></i>
               </a>
             {{/is_allowed}}
@@ -102,11 +103,12 @@
             <div class="tree-description">
               <h5>{{instance.title}}</h5>
               {{{instance.description}}}
-            </div>
-            
+            </div>           
           </div>
         </div>
       </div>
+      {{/defer}}
+      
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}

@@ -258,6 +258,18 @@
     }
   }, {
     overdue: overdue_compute,
+    viewLink: function(){
+      var task_group_task = this.task_group_task.reify(),
+          task;
+
+      return task_group_task.refresh().then(function(task_group_task){
+        task = task_group_task.task.reify();
+        return task.refresh().then(function(task){
+          return task;
+        });
+      })
+
+    }
   });
 
 })(window.can);
