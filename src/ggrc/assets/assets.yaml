@@ -102,6 +102,7 @@ dashboard-js-template-files:
   - base_objects/search_result.mustache
   - base_objects/tree.mustache
   - base_objects/tree_footer_no_access.mustache
+  - base_objects/states.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache

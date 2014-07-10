@@ -17,9 +17,9 @@ import ggrc_workflows.models as models
 # Initialize signal handler for status changes
 from blinker import Namespace
 signals = Namespace()
-status_change = signals.signal('Status Changed', 
+status_change = signals.signal('Status Changed',
   """
-     This is used to signal any listeners of any changes in model object status attribute 
+     This is used to signal any listeners of any changes in model object status attribute
   """)
 
 # Initialize Flask Blueprint for extension
@@ -47,6 +47,7 @@ for type_ in _workflow_object_types:
   model.__bases__ = (
     models.workflow_object.Workflowable,
     models.task_group_object.TaskGroupable,
+    models.workflow.WorkflowState,
     ) + model.__bases__
   model.late_init_workflowable()
   model.late_init_task_groupable()

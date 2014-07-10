@@ -63,7 +63,7 @@
       var descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+        widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
         widget_id: far_model.table_singular,
         widget_guard: function(){
           if (far_model.title_plural === "Audits"
@@ -134,10 +134,10 @@
     WidgetList - an extensions-ready repository for widget descriptor configs.
     Create a new widget list with new GGRC.WidgetList(list_name, widget_descriptions)
       where widget_descriptions is an object with the structure:
-      { <page_name> : 
-        { <widget_id> : 
-          { <widget descriptor-ready properties> }, 
-        ...}, 
+      { <page_name> :
+        { <widget_id> :
+          { <widget descriptor-ready properties> },
+        ...},
       ...}
 
     See the comments for GGRC.WidgetDescriptor for details in what is necessary to define
@@ -243,7 +243,7 @@ $(function() {
   if (!GGRC.page_object)
     return;
 
-  // Info widgets display the object information instead of listing connected 
+  // Info widgets display the object information instead of listing connected
   //  objects.
   var info_widget_views = {
       'programs': GGRC.mustache_path + "/programs/info.mustache"
@@ -330,7 +330,7 @@ $(function() {
     , model_default_widgets = []
 
     // here we are going to define extra descriptor options, meaning that
-    //  these will be used as extra options to create widgets on top of 
+    //  these will be used as extra options to create widgets on top of
 
     , extra_descriptor_options = {
           all: {
@@ -755,7 +755,7 @@ $(function() {
     widget_list.add_widget(object.constructor.shortName, far_model.table_singular, descriptor);
   });
 
-    
+
 });
 
 })(window.can, window.can.$);

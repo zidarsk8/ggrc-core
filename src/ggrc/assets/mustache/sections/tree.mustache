@@ -6,13 +6,13 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -70,15 +70,18 @@
                     </span>
               {{/with_mapping_count}}
               </li>
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
+              </li>
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -211,7 +214,7 @@
               <h6>Objectives, Controls, and Business Objects ({{child_count}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
               </h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
         {{/prune_context}}
@@ -220,4 +223,3 @@
     </div>
     {{/if}}
   </li>
-

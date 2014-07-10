@@ -6,7 +6,7 @@
 }}
 
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="control">
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="control" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
@@ -35,6 +35,9 @@
                   </div>
                 </li>
               {{/instance.contact}}
+              <li>
+                {{{renderLive '/static/mustache/base_objects/states.mustache' status=instance.workflow_state}}}
+              </li>
             </ul>
 
             <div class="item-data">
@@ -122,7 +125,7 @@
               <h6>Mapped Objects ({{child_count}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}
               </h6>
-              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             </div>
           {{/child_options}}
         {{/prune_context}}

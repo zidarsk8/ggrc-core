@@ -1,0 +1,15 @@
+{{#if_equals status 'Verified'}}
+  <span class="task-done"><em>Verified</em></span>
+{{/if_equals}}
+{{#if_equals status 'Assigned'}}
+  <span class="gray"><em>Assigned</em></span>
+{{/if_equals}}
+{{#if_equals status 'Finished'}}
+  <span class="gray"><em>Finished</em></span>
+{{/if_equals}}
+{{#if_equals status 'InProgress'}}
+  <span class="gray"><em>In progress</em></span>
+{{/if_equals}}
+{{#if_equals status 'Overdue'}}
+    <span class="error"><em>Overdue</em></span>
+{{/if_equals}}
