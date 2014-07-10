@@ -81,7 +81,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
 
   _publish_attrs = [
       'workflow_objects',
-      'workflow_state',
+      PublishOnly('workflow_state'),
       PublishOnly('objects'),
       'workflow_people',
       PublishOnly('people'),
@@ -96,7 +96,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
 
 class WorkflowState(object):
 
-  _publish_attrs = ['workflow_state']
+  _publish_attrs = [PublishOnly('workflow_state')]
   _update_attrs = []
   _stub_attrs = ['workflow_state']
 
