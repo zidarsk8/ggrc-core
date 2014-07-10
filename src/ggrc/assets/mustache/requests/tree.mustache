@@ -161,10 +161,10 @@
                     <strong>request:</strong>
                   </div>
                   <div class="media-body">
-                    <div class="tree-description short">
+                    <div class="tree-description">
                       {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
                     </div>
-                    {{{show_long}}}
+                    
                   </div>
                 </div>
               </div>
@@ -179,7 +179,7 @@
                         <strong>objective:</strong>
                       </div>
                       <div class="media-body">
-                        <div class="tree-description short">
+                        <div class="tree-description">
                         {{#is_allowed "view_object_page" objective}}
                           <a class="object-title" href="{{objective.viewLink}}" target="_blank">{{objective.title}}</a>
                         {{else}}
@@ -188,7 +188,7 @@
                           <br>
                           {{objective.description}}
                         </div>
-                        {{{show_long}}}
+                        
                       </div>
                     </div>
                   </div>

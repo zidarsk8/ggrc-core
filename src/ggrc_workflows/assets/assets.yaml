@@ -47,4 +47,6 @@ dashboard-js-template-files:
   - selectors/multitype_multiselect_base_modal.mustache
   - selectors/multitype_multiselect_option_column.mustache
   - selectors/multitype_multiselect_option_items.mustache
+  - wf_people/tree_footer.mustache
+  - wf_people/multiselect_option_items.mustache
 

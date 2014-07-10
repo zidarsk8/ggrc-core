@@ -13,7 +13,7 @@
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
         <div class="span12">
-          
+
           <ul class="tree-action-list">
             {{#infer_roles instance}}
               <li>
@@ -28,7 +28,7 @@
             {{/infer_roles}}
             {{#with_page_object_as 'page_object'}}
               {{#if_instance_of page_object 'Person'}}
-              
+
                 {{^instance.contact}}
                   <li>
                     <div class="counter">
@@ -36,7 +36,7 @@
                     </div>
                   </li>
                 {{/instance.contact}}
-                
+
                 {{#mapping_count instance 'related_owned_objects'}}
                   <li>
                     <div class="counter">
@@ -63,7 +63,7 @@
               {{/if_instance_of}}
             {{/with_page_object_as}}
           </ul>
-          
+
           <div class="item-data">
             <div class="tree-title-area">
               <i class="grcicon-{{instance.class.table_singular}}-color"></i>
@@ -71,16 +71,16 @@
               <span class="small gray">{{instance.status}}</span>
             </div>
           </div>
-          
+
         </div>
       </div>
     </div>
   </div>
-  
+
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-    
+
       <!--
       <div class="row-fluid">
 
@@ -109,20 +109,20 @@
 
       </div>
       -->
-      
+
       {{#instance.description}}
         <div class="show-description">
           <div class="row-fluid">
             <div class="span12">
-              <div class="tree-description short">
+              <div class="tree-description">
                 {{{instance.description}}}
               </div>
-              {{{show_long}}}
+              
             </div>
           </div>
         </div>
       {{/instance.description}}
-      
+
       <div class="row-fluid">
         <div class="span5">
           <div class="tree-info">
@@ -227,12 +227,12 @@
               {{/iterate}}
             </select>
           {{/if_helpers}}
-          
+
         </div>
       </div>
-      
+
       {{{render_hooks 'Audit.tree_view_info'}}}
-      
+
       <ul class="info-audit">
         {{#using program=instance.program}}
         {{#with_mapping 'authorizations' instance}}
@@ -250,7 +250,7 @@
         {{/if_helpers}}
         {{/with_mapping}}
         {{/using}}
-        
+
         {{#is_allowed 'update' instance context='for'}}
           <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }'>
@@ -268,18 +268,18 @@
           #is_page_instance' instance.program '\
           or #is_profile'}}
 	        {{#is_allowed 'read' 'Request' context=instance.context.id}}
-	          
+
 	          <li>
 	          <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}"><i class="grcicon-export"></i> Export PBC List</a>
 	          </li>
 	        {{/is_allowed}}
-	
+
 	        {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
 	          <li>
 	          {{! FIXME: Better way to get the Audit link }}
 	          <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}"><i class="grcicon-imp-exp"></i> Import PBC List</a>
 	          </li>
-	          
+
 	          <!--
 	          <li>
 	          <a href="/audits/{{instance.id}}/import_pbc_template"><i class="grcicon-export"></i> Download PBC Import Template</a>
@@ -360,5 +360,5 @@
 
   </div>
   {{/if}}
-  
+
 </li>

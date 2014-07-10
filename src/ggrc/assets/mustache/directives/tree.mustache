@@ -5,13 +5,13 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-
+            
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -46,7 +46,7 @@
                     {{/with_mapping_count}}
                   </div>
                 </li>
-              {{else}}
+              {{else}}  
                 <li>
                   <div class="counter">
                     <i class="grcicon-section-black"></i>
@@ -57,14 +57,14 @@
                 </li>
               {{/if_instance_of}}
             </ul>
-
+            
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
-
+            
           </div>
         </div>
       </div>
@@ -134,7 +134,7 @@
         </div>
         {{/instance.url}}
       </div>
-
+      
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
           <div class="inner-tree">
@@ -142,7 +142,7 @@
             <h6>{{#if_equals instance.class.model_singular 'Contract'}}Clauses{{else}}Sections{{/if_equals}} ({{child_count}})<!-- {{^children_drawn}}<span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; left: 15px; top: -4px' }}> - Loading... </span>{{/children_drawn}}-->
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
               </h6>
-              <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
             {{/child_options}}
           </div>
         {{/prune_context}}
