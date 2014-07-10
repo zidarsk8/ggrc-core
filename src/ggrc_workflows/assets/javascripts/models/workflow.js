@@ -43,8 +43,17 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+      this.validatePresenceOf("start_date");
+      this.validatePresenceOf("end_date");
     },
   }, {
+
+    form_preload: function(new_object_form) {
+      if(new_object_form) {
+        this.attr("start_date", new Date())
+        .attr("end_date", moment().add(1, "month").subtract(1, "day").toDate());
+      }
+    },
 
     // start day of month, affects start_date.
     //  Use when month number doesn't matter or is

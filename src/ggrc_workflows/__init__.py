@@ -230,7 +230,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         task_group=task_group,
         title=task_group.title,
         description=task_group.description,
-        end_date=task_group.end_date,
+        end_date=obj.end_date,
         modified_by=current_user,
         contact=task_group.contact,
         )
@@ -256,7 +256,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           title=task.title,
           description=task.description,
           sort_index=task_group_task.sort_index,
-          end_date=task_group_task.end_date,
+          end_date=obj.end_date,
           contact=task_group.contact,
           status="Assigned",
           modified_by=current_user,
