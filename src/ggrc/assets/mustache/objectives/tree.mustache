@@ -12,7 +12,7 @@
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
           <div class="span12">
-            
+
             <ul class="tree-action-list">
               {{#infer_roles instance}}
                 <li>
@@ -36,14 +36,14 @@
                 </li>
               {{/instance.contact}}
             </ul>
-            
+
             <div class="item-data">
               <div class="tree-title-area">
                 <i class="grcicon-{{instance.class.table_singular}}-color"></i>
                 {{instance.title}}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -87,10 +87,10 @@
           <div class="show-description">
             <div class="row-fluid">
               <div class="span12">
-                <div class="tree-description short">
+                <div class="tree-description">
                   {{{instance.description}}}
                 </div>
-                {{{show_long}}}
+
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
         {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
-        
+
         <div class="row-fluid">
           <div class="span6">
             {{#instance.url}}
