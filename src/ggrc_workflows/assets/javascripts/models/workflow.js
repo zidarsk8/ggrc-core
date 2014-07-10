@@ -43,8 +43,17 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+      this.validatePresenceOf("start_date");
+      this.validatePresenceOf("end_date");
     },
   }, {
+
+    form_preload: function(new_object_form) {
+      if(new_object_form) {
+        this.attr("start_date", new Date())
+        .attr("end_date", moment().add(1, "month").subtract(1, "day").toDate());
+      }
+    },
 
     // start day of month, affects start_date.
     //  Use when month number doesn't matter or is
@@ -150,8 +159,8 @@
     start_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
-        if(val > 11) {
-          val = 11;
+        if(val > 12) {
+          val = 12;
         }
         newdate = new Date(this.start_date || null);
         if(moment(newdate).date(1).month(val - 1).daysInMonth() < newdate.getDate()) {
@@ -175,8 +184,8 @@
     end_month_of_year: can.compute(function(val) {
       var newdate;
       if(val) {
-        if(val > 11) {
-          val = 11;
+        if(val > 12) {
+          val = 12;
         }
         newdate = new Date(this.end_date || null);
         if(moment(newdate).date(1).month(val - 1).daysInMonth() < newdate.getDate()) {

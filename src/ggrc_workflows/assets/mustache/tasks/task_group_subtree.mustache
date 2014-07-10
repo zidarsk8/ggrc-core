@@ -7,7 +7,6 @@
         {{#using task=instance.task}}
           <input tabindex="3" type="text" name="task" class="editTitle search-icon autocomplete" placeholder="Select Object" value="{{task.title}}" data-mapping="tasks" {{mapping_autocomplete}}>
         {{/using}}
-        <input tabindex="2" class="date editDate" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
         <span class="required">*</span>
       </ggrc-quick-update>
       {{/with_mapping}}

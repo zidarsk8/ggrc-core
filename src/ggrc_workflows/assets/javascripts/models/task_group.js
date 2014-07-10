@@ -37,7 +37,6 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
-      this.validatePresenceOf("end_date");
       this.validate(["_transient.contact", "contact"], function(newVal, prop) {
         var contact_exists = this.contact ? true : false;
         var reified_contact = contact_exists ? this.contact.reify() : false;
