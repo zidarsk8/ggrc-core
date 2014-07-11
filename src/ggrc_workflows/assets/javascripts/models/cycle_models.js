@@ -75,7 +75,6 @@
     }
   }, {});
 
-
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
   can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
     root_object: "cycle_task_entry",
