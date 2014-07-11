@@ -225,6 +225,14 @@ dashboard-js-template-files:
   - requests/amend_modal_content.mustache
   - org_groups/autocomplete_result.mustache
   - base_objects/edit_object_link.mustache
+  - base_objects/tier2_content.mustache
+  - controls/tier2_content.mustache
+  - directives/tier2_content.mustache
+  - documents/tier2_content.mustache
+  - objectives/tier2_content.mustache
+  - people/tier2_content.mustache
+  - programs/tier2_content.mustache
+  - sections/tier2_content.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
