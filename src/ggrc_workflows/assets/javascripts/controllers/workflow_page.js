@@ -46,8 +46,24 @@
       });
     },
 
-    "[data-ggrc-action=end-cycle] click": function() {
-
+    "[data-ggrc-action=end-cycle] click": function(el) {
+      var $this = $(this)
+        , options = $this.data('modal-selector-options');
+      var workflow = $('button.end-cycle').closest('ul').control().options.parent_instance;
+      var current_cycles = workflow.get_mapping('current_cycle');
+      this.bindXHRToButton(function() {
+        var dfds = [];
+        if(current_cycles && current_cycles.length > 0) {
+          for(var i = 0; i < current_cycles.length; i++) {
+            dfds.push(current_cycles[i].instance.refresh().then(function(c) {
+              return c.attr('status','Finished').save();
+            }));
+          }
+        }
+        return $.when.apply($, dfds).done(function() {
+          GGRC.page_instance().refresh();
+        });
+      }(), el);
     },
   });
 
