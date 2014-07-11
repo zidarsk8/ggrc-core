@@ -41,6 +41,7 @@
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
+        Multi = GGRC.MapperHelpers.Multi,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
         Reify = GGRC.MapperHelpers.Reify;
     // Add mappings for basic workflow objects
@@ -77,8 +78,12 @@
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Proxy(
+          tasks: Multi([
+            "direct_tasks", "tasks_via_task_groups"]),
+          direct_tasks: Proxy(
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
+          tasks_via_task_groups: Cross(
+            "task_groups", "tasks"),
           people: Proxy(
             "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
           task_groups: Direct(
