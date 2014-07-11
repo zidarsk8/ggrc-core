@@ -1467,7 +1467,29 @@
       this.update_selected_items(el, ev);
     }
 
-        
+    , reset_selection_count: function(){
+        this.context.attr('item_selected', false);
+        this.context.attr('items_selected', 0);
+    } 
+
+    , "#search keyup": function(el, ev) {
+        var self = this
+          , $el = $(el)
+          , term = $el.val()
+          ;
+        if (term !== this.options.option_search_term) {
+          this.options.option_search_term = term;
+          //Object selected count and Add selected button should reset.
+          //User need to make their selection again
+          this.reset_selection_count();
+          setTimeout(function() {
+            if (self.options.option_search_term === term) {
+              self.refresh_option_list();
+              self.constructor.last_option_search_term = term;
+            }
+          }, 200);
+        }
+      }
 
     , on_map: $.debounce(500, true, function(el, ev) {
         var that = this; 
@@ -1784,6 +1806,7 @@
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       //Get the selected object value
+
       var selected = $("select.option-type-selector").val(),
         self = this,
         loader,
@@ -1816,6 +1839,10 @@
       }
 
       if (filters.length > 0) {
+        //Object selected count and Add selected button should reset.
+        //User need to make their selection again
+        this.reset_selection_count();
+
         if(filters.length === 1 && !term) {
           //don't bother making an intersecting filter when there's only one source
           loader = filters[0];
@@ -1846,6 +1873,10 @@
             }), 20, active_fn, draw_fn);
         });
       } else {
+        //Object selected count and Add selected button should reset.
+        //User need to make their selection again
+        this.reset_selection_count();
+
         // With no mappings specified, just do a general search
         //  on the type selected.
         this.last_loader = null;
