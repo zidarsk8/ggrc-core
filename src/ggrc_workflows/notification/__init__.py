@@ -19,6 +19,10 @@ PRI_TASK_ASSIGNMENT=3
 PRI_TASK_CHANGES=4
 PRI_OTHERS=5
 
+def get_cycle_by_id(id):
+  return db.session.query(models.Cycle).\
+    filter(models.Cycle.id == id).first()
+
 def get_workflow_owner(workflow):
   if workflow.owners is not None:
     for workflow_owner in workflow.owners:

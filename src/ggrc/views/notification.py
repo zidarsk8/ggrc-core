@@ -3,15 +3,18 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from flask import current_app, request, render_template
+from flask import current_app, request, redirect
 from ggrc.app import app
 from ggrc import db
 from ggrc.login import login_required
 from ggrc.models import all_models
-from ggrc.notification import EmailNotification, EmailDigestNotification
+from ggrc.notification import EmailNotification, EmailDigestNotification, CalendarService
 from ggrc_workflows.notification import *
 from datetime import datetime
+from oauth2client.client import OAuth2WebServerFlow
+from ggrc import settings
 
+TEST_CYCLE_ID=1
 
 WORKFLOW_CYCLE_DUE=3
 WORKFLOW_CYCLE_STARTING=7
@@ -101,5 +104,39 @@ def notify_email_digest_ggrc_users():
   """
   email_digest_notification=EmailDigestNotification()
   email_digest_notification.notify()
+  db.session.commit()
+  return 'Ok'
+
+GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID')
+GOOGLE_SECRET_KEY= getattr(settings, 'SECRET_KEY')
+
+@app.route("/workflow_calendar", methods=["GET", "POST"])
+def handle_workflow_calendar_event():
+  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
+    client_secret=GOOGLE_SECRET_KEY,
+    scope='https://www.googleapis.com/auth/calendar',
+    redirect_uri=request.url_root + 'oauth2callback')
+  auth_uri=flow.step1_get_authorize_url()
+  current_app.logger.info("auth uri: " + auth_uri + " redirect uri: " + request.url_root + "oauth2callback")
+  return redirect(auth_uri)
+
+@app.route("/oauth2callback", methods=["GET", "POST"])
+def handle_calendar_flow_auth():
+  error_return=request.args.get("error")
+  code=request.args.get("code")
+  if error_return is not None:
+    current_app.logger.error("Error occured in Calendar flow authorization: " + error_return)
+    return 'Error'
+  cycle=get_cycle_by_id(TEST_CYCLE_ID)
+  if cycle is None:
+    current_app.logger.error("Error occured in getting cycle object: ")
+    return 'Error'
+  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
+    client_secret=GOOGLE_SECRET_KEY,
+    scope='https://www.googleapis.com/auth/calendar',
+    redirect_uri=request.url_root + 'oauth2callback')
+  credentials=flow.step2_exchange(code)
+  calendar_service=CalendarService(credentials)
+  calendar_service.handle_workflow_start(cycle)
   db.session.commit()
   return 'Ok'

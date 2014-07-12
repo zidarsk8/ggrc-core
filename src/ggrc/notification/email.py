@@ -26,6 +26,7 @@ def getAppEngineEmail():
    
 #ToDo(Mouli): Add settings flag similar to memcache to prevent email in 
 #scenarios such as performance testing, true, false with regular expression
+#move to utils.py
 def isNotificationEnabled(person_id, notif_type):
   notification_config=NotificationConfig.query.\
     filter(NotificationConfig.person_id==person_id).\
@@ -42,11 +43,9 @@ def isNotificationEnabled(person_id, notif_type):
 class NotificationBase(object):
   notif_type=None
   notif_pri=None
-  appengine_email=None
 
   def __init__(self, notif_type):
     self.notif_type=notif_type
-    self.appengine_email = getAppEngineEmail()
 
   def prepare(self, target_objs, sender, recipients, subject, content):
     return None
@@ -59,8 +58,10 @@ class NotificationBase(object):
 
 
 class EmailNotification(NotificationBase):
+  appengine_email=None
   def __init__(self, notif_type='Email_Now'):
     super(EmailNotification, self).__init__(notif_type)
+    self.appengine_email = getAppEngineEmail()
 
   def prepare(self, target_objs, sender, recipients, subject, content):
     if self.appengine_email is None:
