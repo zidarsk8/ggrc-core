@@ -11,32 +11,13 @@
       <div class="openclose">
         <a class="openclose-placeholder" href="javascript://"> </a>
         <div class="row-fluid">
-          <div class="span4">
+          <div class="span7">
             <div class="item-data">
               <div class="tree-title-area">
                 {{{firstnonempty instance.description 'Response'}}}
               </div>
             </div>
           </div>
-
-          <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-            <i class="grcicon-person-green pull-left"></i>
-            <div class="objective-selector">
-              {{#using contact=instance.contact}}
-                {{#if_helpers '\
-                  #if_can_edit_request' parent_instance '\
-                  and ^if_auditor' parent_instance '\
-                  or #is_allowed' '__GGRC_ADMIN__' model.shortName _2_context=instance.context.id}}
-                  <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
-                {{else}}
-                <span class="read-only oneline">
-                  {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                </span>
-                {{/if_can_edit_request}}
-              {{/using}}
-            </div>
-          </div>
-
           <div class="span1">
             <div class="counter">
               {{#child_options.0}}
@@ -130,9 +111,26 @@
         <div class="tier-2-info-content">
           <div class="show-description">
             <div class="row-fluid">
-              <div class="span12">
+              <div class="span9">
                 <div class="tree-description">
                   {{{firstnonempty instance.description 'Response'}}}
+                </div>
+              </div>
+              <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+                <i class="grcicon-person-green pull-left"></i>
+                <div class="objective-selector">
+                  {{#using contact=instance.contact}}
+                    {{#if_helpers '\
+                      #if_can_edit_request' parent_instance '\
+                      and ^if_auditor' parent_instance '\
+                      or #is_allowed' '__GGRC_ADMIN__' model.shortName _2_context=instance.context.id}}
+                      <input type="text" name="contact.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                    {{else}}
+                    <span class="read-only oneline">
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                    </span>
+                    {{/if_can_edit_request}}
+                  {{/using}}
                 </div>
               </div>
             </div>
