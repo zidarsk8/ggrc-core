@@ -42,7 +42,8 @@
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
-        Reify = GGRC.MapperHelpers.Reify;
+        Reify = GGRC.MapperHelpers.Reify,
+        Search = GGRC.MapperHelpers.Search;
     // Add mappings for basic workflow objects
     var mappings = {
         Task: {
@@ -118,6 +119,9 @@
             "Cycle", "cycle_task_group_objects", "cycle"),
           cycle_task_group: Direct(
             "CycleTaskGroup", "cycle_task_group_objects", "cycle_task_group"),
+          task_group_object: Direct(
+            "TaskGroupObject", "task_group_objects", "task_group_object"
+          ),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_group_object_tasks: Direct(
@@ -154,10 +158,16 @@
 
         People: {
           _canonical: {
-            workflows: "Workflow"
+            workflows: "Workflow",
           },
           workflows: Proxy(
             "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
+
+        },
+        Person: {
+          assigned_tasks: Search("", [
+              "CycleTaskGroupObjectTask"//,
+          ], { contact_id: "id" }),
         }
       };
 
@@ -207,6 +217,35 @@
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+          }
+        }
+      };
+    }
+    if (page_instance && page_instance.constructor.shortName === 'Person') {
+      descriptor[page_instance.constructor.shortName] = {
+        task: {
+          widget_id: 'task',
+          widget_name: "Tasks",
+          content_controller: GGRC.Controllers.TreeView,
+
+          content_controller_options: {
+            parent_instance: GGRC.page_instance(),
+            model: CMS.Models.CycleTaskGroupObjectTask,
+            show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+            mapping: "assigned_tasks",
+            draw_children: true,
+            content_controller_options: {
+              child_options: [
+                {
+                  model: can.Model.Cacheable,
+                  mapping: "cycle_task_entries",
+                  show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                  footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                  draw_children: true,
+                  allow_creating: true
+                },
+              ]
+            }
           }
         }
       };
