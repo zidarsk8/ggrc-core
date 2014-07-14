@@ -148,7 +148,51 @@ can.Construct("RefreshQueueManager", {
 });
 
 can.Construct("RefreshQueue", {
-    refresh_queue_manager: new RefreshQueueManager()
+    refresh_queue_manager: new RefreshQueueManager(),
+    refresh_all: function(instance, props) {
+      var dfd = new $.Deferred();
+
+      _refresh_all(instance, props, dfd);
+      return dfd;
+
+      // Helper function called recursively for each property
+      function _refresh_all(instance, props, dfd) {
+        var prop = props[0],
+            next_props = props.slice(1),
+            next = instance[prop],
+            refresh_queue = new RefreshQueue(),
+            deferred;
+
+        if (next) {
+          refresh_queue.enqueue(next);
+          deferred = refresh_queue.trigger();
+        } else if (instance.get_binding) {
+          next = instance.get_binding(prop);
+          if (next) {
+            deferred = next.refresh_list();
+          }
+        }
+        if (deferred) {
+          deferred.then(function(refreshed_items) {
+            if (next_props.length) {
+              can.each(refreshed_items, function(item) {
+                _refresh_all(item, next_props, dfd);
+              });
+              return;
+            }
+            // All items were refreshed, resolve the deferred
+            if (next.push || next.list) {
+              // Last refreshed property was a list
+              dfd.resolve(refreshed_items);
+            }
+            // Last refreshed property was a single instance, return it as such
+            dfd.resolve(refreshed_items[0]);
+          });
+        } else {
+          console.warn("refresh_all failed at", prop);
+        }
+      }
+    },
 }, {
     init: function() {
       this.objects = [];
