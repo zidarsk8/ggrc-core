@@ -7,6 +7,7 @@
 from flask import current_app, request
 import ggrc_workflows.models as models
 from ggrc.notification import EmailNotification, EmailDigestNotification, isNotificationEnabled
+from ggrc.notification import CalendarNotification, CalendarService, get_calendar_event
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
@@ -22,6 +23,10 @@ PRI_OTHERS=5
 def get_cycle_by_id(id):
   return db.session.query(models.Cycle).\
     filter(models.Cycle.id == id).first()
+
+def get_taskgroup_by_id(id):
+  return db.session.query(models.CycleTaskGroup).\
+    filter(models.CycleTaskGroup.id == id).first()
 
 def get_workflow_owner(workflow):
   if workflow.owners is not None:
@@ -447,3 +452,74 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     notification=email_notification.prepare([src], owner, recipients, subject, content)
     if notification is not None:
       email_notification.notify_one(notification, override)
+
+class WorkflowCalendarService(CalendarService):
+  def __init__(self, credentials=None):
+    super(WorkflowCalendarService, self).__init__(credentials)
+
+  def handle_cycle_create(self, cycle):
+    workflow=get_cycle_workflow(cycle)
+    if workflow is None:
+      current_app.logger.warn("Workflow not found for cycle " + cycle.title)
+      return 
+    workflow_owner=get_workflow_owner(workflow)
+    if workflow_owner is None:
+      current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
+      return
+    calendar_event = get_calendar_event(self.calendar_service, workflow_owner.email, cycle.title)
+    if calendar_event is not None:
+      current_app.logger.warn("Calendar event is already created for cycle " + cycle.title)
+      return
+    # Prepare the calendar event to be sent
+    subject=cycle.title
+    content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
+      '/' + str(workflow.id) + '#current_widget'
+    notif=CalendarNotification()
+    notif.start_date=cycle.start_date
+    notif.end_date=cycle.end_date
+    notif.notif_pri=PRI_OTHERS
+    notif.calendar_service=self.calendar_service
+    calendar_notification = notif.prepare([cycle], workflow_owner, workflow.people, subject, content)
+    if calendar_notification is not None:
+      notif.notify_one(calendar_notification)
+    # create task group related events during start of workflow
+    for task_group in cycle.cycle_task_groups:
+      self.handle_taskgroup_create(task_group)
+
+  def handle_taskgroup_create(self, task_group):
+    workflow=get_taskgroup_workflow(task_group)
+    if workflow is None:
+      current_app.logger.warn("Workflow not found for task group " + task_group.title)
+      return 
+    cycle=get_taskgroup_cycle(task_group)
+    if cycle is None:
+      current_app.logger.warn("cycle not found for task group " + task_group.title)
+      return 
+    workflow_owner=get_workflow_owner(workflow)
+    if workflow_owner is None:
+      current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
+      return
+    recipient_contacts={}
+    for task_group_object in task_group.cycle_task_group_objects:
+      for task in task_group_object.cycle_task_group_object_tasks:
+         if task.contact is not None:
+           recipient_contacts[task.contact.id] = task.contact
+    assignees=[]
+    for id, contact in recipient_contacts.items():
+      assignees.append(contact)
+    calendar_event = get_calendar_event(self.calendar_service, workflow_owner.email, task_group.title)
+    if calendar_event is not None:
+      current_app.logger.warn("Calendar event is already created for task group " + task_group.title)
+      return
+    # Prepare the calendar event to be sent
+    subject=task_group.title
+    content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
+      '/' + str(workflow.id) + '#task_group_widget'
+    notif=CalendarNotification()
+    notif.start_date=cycle.start_date
+    notif.end_date=task_group.end_date
+    notif.notif_pri=PRI_OTHERS
+    notif.calendar_service=self.calendar_service
+    calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
+    if calendar_notification is not None:
+      notif.notify_one(calendar_notification)

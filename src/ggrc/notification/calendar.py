@@ -13,15 +13,11 @@
 from flask import current_app, request
 from apiclient import errors
 from apiclient.discovery import build
-from oauth2client.appengine import OAuth2Decorator
 import httplib2
-from ggrc_workflows.notification import *
 from ggrc.notification import NotificationBase, isNotificationEnabled
 from ggrc.models import Person, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
 from ggrc import db
-
-PRI_OTHERS=5
 
 class CalendarNotification(NotificationBase):
   start_date=None
@@ -150,32 +146,6 @@ class CalendarService(object):
       http = httplib2.Http()
       http = self.credentials.authorize(http)
       self.calendar_service=build(serviceName='calendar', version='v3', http=http)
-
-  def handle_workflow_start(self, cycle):
-    workflow=get_cycle_workflow(cycle)
-    if workflow is None:
-      current_app.logger.warn("Workflow not found for cycle " + cycle.title)
-      return 
-    workflow_owner=get_workflow_owner(workflow)
-    if workflow_owner is None:
-      current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
-      return
-    calendar_event = get_calendar_event(self.calendar_service, workflow_owner.email, cycle.title)
-    if calendar_event is not None:
-      current_app.logger.warn("Calendar event is already created for cycle " + cycle.title)
-      return
-    # Prepare the calendar event to be sent
-    subject=cycle.title
-    content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
-      '/' + str(workflow.id) + '#current_widget'
-    notif=CalendarNotification()
-    notif.start_date=cycle.start_date
-    notif.end_date=cycle.end_date
-    notif.notif_pri=PRI_OTHERS
-    notif.calendar_service=self.calendar_service
-    calendar_notification = notif.prepare([cycle], workflow_owner, workflow.people, subject, content)
-    if calendar_notification is not None:
-      notif.notify_one(calendar_notification)
 
 def create_calendar_event(calendar_service, calendar_id, event_details):
   calendar_event=None
