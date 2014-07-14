@@ -195,6 +195,8 @@
       WorkflowExtension.init_widgets_for_workflow_page();
     } else if (page_instance instanceof CMS.Models.Task) {
       WorkflowExtension.init_widgets_for_task_page();
+    } else if (page_instance instanceof CMS.Models.Person) {
+      WorkflowExtension.init_widgets_for_person_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
@@ -217,35 +219,6 @@
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-          }
-        }
-      };
-    }
-    if (page_instance && page_instance.constructor.shortName === 'Person') {
-      descriptor[page_instance.constructor.shortName] = {
-        task: {
-          widget_id: 'task',
-          widget_name: "Tasks",
-          content_controller: GGRC.Controllers.TreeView,
-
-          content_controller_options: {
-            parent_instance: GGRC.page_instance(),
-            model: CMS.Models.CycleTaskGroupObjectTask,
-            show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
-            mapping: "assigned_tasks",
-            draw_children: true,
-            content_controller_options: {
-              child_options: [
-                {
-                  model: can.Model.Cacheable,
-                  mapping: "cycle_task_entries",
-                  show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-                  footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-                  draw_children: true,
-                  allow_creating: true
-                },
-              ]
-            }
           }
         }
       };
@@ -439,6 +412,45 @@
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
   };
 
+  WorkflowExtension.init_widgets_for_person_page =
+      function init_widgets_for_person_page() {
+
+    var descriptor = {},
+        page_instance = GGRC.page_instance();
+
+    descriptor[page_instance.constructor.shortName] = {
+      task: {
+        widget_id: 'task',
+        widget_name: "Tasks",
+        content_controller: GGRC.Controllers.TreeView,
+
+        content_controller_options: {
+          parent_instance: GGRC.page_instance(),
+          model: CMS.Models.CycleTaskGroupObjectTask,
+          show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+          mapping: "assigned_tasks",
+          draw_children: true,
+          sort_property: 'end_date',
+          sort_function: function(a, b){
+            return (+new Date(a)) < (+new Date(b));
+          },
+          content_controller_options: {
+            child_options: [
+              {
+                model: can.Model.Cacheable,
+                mapping: "cycle_task_entries",
+                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                draw_children: true,
+                allow_creating: true
+              },
+            ]
+          }
+        }
+      }
+    };
+    new GGRC.WidgetList("ggrc_workflows", descriptor);
+  };
 
   GGRC.register_hook(
       "LHN.Sections_workflow", GGRC.mustache_path + "/dashboard/lhn_workflows");
