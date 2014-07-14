@@ -430,9 +430,14 @@
           show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
           mapping: "assigned_tasks",
           draw_children: true,
-          sort_property: 'end_date',
+          sort_property: null,
           sort_function: function(a, b){
-            return (+new Date(a)) < (+new Date(b));
+            var date_a = +new Date(a.end_date),
+                date_b = +new Date(b.end_date);
+            if(date_a === date_b){
+              return a.id < b.id;
+            }
+            return date_a < date_b;
           },
           content_controller_options: {
             child_options: [

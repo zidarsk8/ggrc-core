@@ -285,9 +285,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , single_object : false
     , find_params : {}
     , sort_property : null
-    , sort_function : function(first, second){
-      return GGRC.Math.string_less_than(first, second);
-    }
+    , sort_function : null
     , start_expanded : false //true
     , draw_children : true
     , find_function : null
@@ -628,14 +626,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         $items.push($li[0]);
       });
 
-      if (sort_prop) {
+      if (sort_prop || sort_function) {
          $items.each(function(i, item) {
             var j, $item = $(item);
             for(j = $existing.length - 1; j >= 0; j--) {
-              if(sort_function(
-                $existing.eq(j).control().options.instance[sort_prop],
-                $item.control().options.instance[sort_prop]
-              )) {
+              var old_item = $existing.eq(j).control().options.instance,
+                  new_item = $item.control().options.instance;
+              if (sort_function){
+                compare = sort_function(old_item, new_item);
+              }
+              else {
+                compare = GGRC.Math.string_less_than(
+                  old_item[sort_prop],
+                  new_item[sort_prop]
+                );
+              }
+              if (compare) {
                 $item.insertAfter($existing.eq(j));
                 $existing.splice(j + 1, 0, item);
                 return;
