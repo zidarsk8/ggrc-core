@@ -256,7 +256,7 @@
       });
     }
   }, {
-    overdue: overdue_compute,
+    overdue: overdue_compute
   });
 
 })(window.can);
