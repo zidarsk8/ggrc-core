@@ -83,17 +83,19 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
   
-      {{#defer "task" instance.viewLink}}
+      
       <div class="row-fluid">
         <div class="span6">
-          {{#if task.viewLink}}
-            {{#is_allowed "view_object_page" object}}
+          {{#using task_group_task=instance.task_group_task}}
+          {{#using task=task_group_task.task}}
+            {{#if task.viewLink}}  
               <a href="{{task.viewLink}}" class="info-action">
-                View Task {{!object.class.title_singular}}
+                View {{task.class.title_singular}}
                 <i class="grcicon-goto"></i>
-              </a>
-            {{/is_allowed}}
-          {{/if}}
+              </a>  
+            {{/if}}
+          {{/using}}
+          {{/using}}
         </div>
       </div>
 
@@ -107,7 +109,7 @@
           </div>
         </div>
       </div>
-      {{/defer}}
+      
       
 
       {{#if draw_children}}
