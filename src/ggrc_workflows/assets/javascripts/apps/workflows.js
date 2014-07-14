@@ -41,6 +41,7 @@
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
+        Multi = GGRC.MapperHelpers.Multi,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
         Reify = GGRC.MapperHelpers.Reify,
         Search = GGRC.MapperHelpers.Search;
@@ -71,15 +72,19 @@
         Workflow: {
           _canonical: {
             objects: _workflow_object_types,
-            tasks: "Task",
+            direct_tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders : "GDriveFolder"
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Proxy(
+          tasks: Multi([
+            "direct_tasks", "tasks_via_task_groups"]),
+          direct_tasks: Proxy(
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
+          tasks_via_task_groups: Cross(
+            "task_groups", "tasks"),
           people: Proxy(
             "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
           task_groups: Direct(

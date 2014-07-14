@@ -88,7 +88,8 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-
+  
+      
       <div class="row-fluid">
         <div class="span9">
           {{#is_dashboard}}
@@ -99,14 +100,17 @@
             </a>
           {{/defer}}
           {{/is_dashboard}}
-          {{#if instance.viewLink}}
-            {{#is_allowed "view_instance_page" instance}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
+
+          {{#using task_group_task=instance.task_group_task}}
+          {{#using task=task_group_task.task}}
+            {{#if task.viewLink}}  
+              <a href="{{task.viewLink}}" class="info-action">
+                View {{task.class.title_singular}}
                 <i class="grcicon-goto"></i>
-              </a>
-            {{/is_allowed}}
-          {{/if}}
+              </a>  
+            {{/if}}
+          {{/using}}
+          {{/using}}
         </div>
         <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
           <i class="grcicon-person-green pull-left icon-field"></i>
@@ -125,10 +129,11 @@
               <h5>{{instance.title}}</h5>
               {{{instance.description}}}
             </div>
-
           </div>
         </div>
       </div>
+      
+      
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
