@@ -9,7 +9,7 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
+        <div class="span4" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
           <div class="item-data">
             <div class="type">
               <i class="grcicon-{{remove_space instance.request_type}}" rel="tooltip" data-placement="top" data-original-title="{{instance.request_type}}"></i>
@@ -21,19 +21,19 @@
                 <span class="dropdown-toggle" data-toggle="dropdown" role="button">
                   <i class="grcicon-carot"></i>
                 </span>
-                
+
                 <ul class="dropdown-menu" aria-labelledby="drop2" role="menu">
                   {{#iterate 'Documentation' 'Interview' 'Population Sample'}}
                   <li data-value="{{iterator.toLowerCase}}" data-name="request_type">
                     <span>
                       <i class="grcicon-{{remove_space iterator.toLowerCase}}"></i>
-                      {{iterator}} 
+                      {{iterator}}
                     </span>
                   </li>
                   {{/iterate}}
                 </ul>
                 {{else}}
-                
+
                 <span rel="tooltip" data-placement="top" data-original-title="# of Responses">{{instance.responses.length}}</span>
                 {{/if_helpers}}
               </div>
@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <div class="span2">
+        <div class="span4">
           <div class="item-data">
             {{#using objective=instance.objective}}
               {{#if objective}}
@@ -74,26 +74,6 @@
             {{/using}}
           </div>
         </div>
-        <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
-          <i class="grcicon-person-green pull-left"></i>
-          {{#using assignee=instance.assignee}}
-          {{#if_helpers "\
-            #if_can_edit_request" instance "\
-            and ^if_auditor" instance _1_include_admin=false "\
-            or #is_allowed" "__GGRC_ADMIN__" instance }}
-              <div class="objective-selector">
-                <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
-              </div>
-          {{else}}
-            <div class="item-data">
-              <span class="tree-title-area read-only oneline">
-                {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-              </span>
-            </div>
-          {{/if_helpers}}
-          {{/using}}
-        </div>
-        
         <div class="span4">
           <div class="control-wrap">
             <div class="date">
@@ -155,7 +135,7 @@
         <div class="span12">
           <div class="show-description">
             <div class="row-fluid">
-              <div class="span12">
+              <div class="span9">
                 <div class="media">
                   <div class="pull-left">
                     <strong>request:</strong>
@@ -164,9 +144,28 @@
                     <div class="tree-description">
                       {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
                     </div>
-                    
+
                   </div>
                 </div>
+              </div>
+              <div class="span3" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+                <i class="grcicon-person-green pull-left"></i>
+                {{#using assignee=instance.assignee}}
+                {{#if_helpers "\
+                  #if_can_edit_request" instance "\
+                  and ^if_auditor" instance _1_include_admin=false "\
+                  or #is_allowed" "__GGRC_ADMIN__" instance }}
+                    <div class="objective-selector">
+                      <input type="text" name="assignee.name" data-lookup="Person" class="span8 short-field search-icon" placeholder="Enter text to search for Assignee" value="{{firstnonempty assignee.name assignee.email ''}}">
+                    </div>
+                {{else}}
+                  <div class="item-data">
+                    <span class="tree-title-area read-only oneline">
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
+                    </span>
+                  </div>
+                {{/if_helpers}}
+                {{/using}}
               </div>
             </div>
             {{#using objective=instance.objective}}
@@ -188,16 +187,16 @@
                           <br>
                           {{objective.description}}
                         </div>
-                        
+
                       </div>
                     </div>
                   </div>
                 </div>
               {{/if}}
             {{/using}}
-            
+
           </div>
-          
+
           {{#if instance.requested_on}}
             {{#using requested_on=instance.requested_on}}
             <strong>requested on: </strong>{{localize_date requested_on}}
@@ -205,7 +204,7 @@
           {{/if}}
 
           {{{render_hooks 'Request.tree_view_info'}}}
- 
+
           {{#if_can_edit_request instance}}
             <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
               <i class="grcicon-edit"></i>
@@ -226,7 +225,7 @@
       {{/each}}
     {{/if}}
     {{/if_equals}}
-    
+
   </div>
   {{/if}}
 

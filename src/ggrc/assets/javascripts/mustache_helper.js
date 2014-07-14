@@ -2383,4 +2383,33 @@ Mustache.registerHelper("autocomplete_select", function(options) {
   };
 });
 
+Mustache.registerHelper("find_template", function(base_name, instance, options) {
+  var tmpl;
+
+  base_name = Mustache.resolve(base_name);
+  if(!options) {
+    options = instance;
+    instance = options.context;
+  }
+  instance = Mustache.resolve(instance);
+  if(instance.instance) {
+    //binding result case
+    instance = instance.instance;
+  }
+
+  if (GGRC.Templates[instance.constructor.table_plural + "/" + base_name]) {
+    tmpl = "/static/mustache/" + instance.constructor.table_plural + "/" + base_name + ".mustache";
+  } else if (GGRC.Templates["base_objects/" + base_name]) {
+    tmpl = "/static/mustache/base_objects/" + base_name + ".mustache";
+  } else {
+    tmpl = null;
+  }
+
+  if(tmpl) {
+    return options.fn(options.contexts.add({ template : tmpl }));
+  } else {
+    return options.inverse(options.contexts);
+  }
+});
+
 })(this, jQuery, can);
