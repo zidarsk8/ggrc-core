@@ -117,8 +117,8 @@ def handle_calendar_request(resource, id):
   auth_uri=flow.step1_get_authorize_url()
   current_app.logger.info("auth uri: " + auth_uri + " redirect uri: " + request.url_root + \
         "oauth2callback/calendar") 
-  if not session.has_key('calendar_resource'):
-    current_app.logger.error("Calendar session event is in progress")
+  if session.has_key('calendar_resource'):
+    current_app.logger.error("Calendar resource is currently is in use for the session, please retry")
     return 'Error'
   session['calendar_resource']=(resource, id)
   return redirect(auth_uri)
@@ -127,9 +127,10 @@ def handle_calendar_request(resource, id):
 def handle_calendar_flow_auth_calendar():
   if not session.has_key('calendar_resource'):
     current_app.logger.error("Calendar resource not found in session")
-    return
+    return 'Error'
   resource=session['calendar_resource'][0]
   resource_id=session['calendar_resource'][1]
+  del session['calendar_resource']
   error_return=request.args.get("error")
   code=request.args.get("code")
   if error_return is not None:
