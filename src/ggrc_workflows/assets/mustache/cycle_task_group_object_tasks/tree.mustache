@@ -88,8 +88,7 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-  
-      
+
       <div class="row-fluid">
         <div class="span9">
           {{#is_dashboard}}
@@ -103,11 +102,11 @@
 
           {{#using task_group_task=instance.task_group_task}}
           {{#using task=task_group_task.task}}
-            {{#if task.viewLink}}  
+            {{#if task.viewLink}}
               <a href="{{task.viewLink}}" class="info-action">
                 View {{task.class.title_singular}}
                 <i class="grcicon-goto"></i>
-              </a>  
+              </a>
             {{/if}}
           {{/using}}
           {{/using}}
@@ -132,8 +131,6 @@
           </div>
         </div>
       </div>
-      
-      
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
