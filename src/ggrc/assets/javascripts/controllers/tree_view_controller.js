@@ -285,6 +285,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , single_object : false
     , find_params : {}
     , sort_property : null
+    , sort_function : function(first, second){
+      return GGRC.Math.string_less_than(first, second);
+    }
     , start_expanded : false //true
     , draw_children : true
     , find_function : null
@@ -616,8 +619,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         , $existing = this.element.children('li:not(.tree-header, .tree-footer)')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
+        , sort_function = this.options.sort_function
         ;
-
       options_list = can.makeArray(options_list);
       can.map(options_list, function(options) {
         var $li = $("<li />").cms_controllers_tree_view_node(options);
@@ -629,7 +632,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          $items.each(function(i, item) {
             var j, $item = $(item);
             for(j = $existing.length - 1; j >= 0; j--) {
-              if(GGRC.Math.string_less_than(
+              if(sort_function(
                 $existing.eq(j).control().options.instance[sort_prop],
                 $item.control().options.instance[sort_prop]
               )) {
