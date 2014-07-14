@@ -117,7 +117,6 @@
           // Workflow folder has not been assigned
           return null;
         }
-        console.log(folders);
         return folders[0].instance;
       });
     }
