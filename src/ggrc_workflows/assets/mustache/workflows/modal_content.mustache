@@ -195,10 +195,10 @@
       <div class="span6">
         <label>
           Email preferences
-          <i class="grcicon-help-black" rel="tooltip" checked="{{#if instance.notify_custom_message}}checked{{/if}}" title="This setting will override user email preferences"></i>
+          <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
           <br>
           <br>
-          <input type="checkbox" name="notify_on_change"> Notify user on every change
+          <input type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}}> Notify user on every change
         </label>
       </div>
     </div>

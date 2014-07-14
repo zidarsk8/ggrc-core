@@ -41,6 +41,11 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       raise ValueError(message)
     return value
 
+  notify_on_change = deferred(
+      db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
+  notify_custom_message = deferred(
+      db.Column(db.String, nullable=True), 'Workflow')
+
   frequency = deferred(
     db.Column(db.String, nullable=True, default=default_frequency),
     'Workflow'
@@ -77,11 +82,12 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
 
     return WorkflowState.get_state(cycles)
 
-  _fulltext_attrs = []
+  _fulltext_attrs = [
+      'notify_custom_message',
+      ]
 
   _publish_attrs = [
       'workflow_objects',
-      'workflow_state',
       PublishOnly('objects'),
       'workflow_people',
       PublishOnly('people'),
@@ -89,6 +95,9 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       PublishOnly('tasks'),
       'task_groups',
       'frequency',
+      PublishOnly('workflow_state'),
+      'notify_on_change',
+      'notify_custom_message',
       'cycles',
       ]
   _stub_attrs = ['workflow_state']
