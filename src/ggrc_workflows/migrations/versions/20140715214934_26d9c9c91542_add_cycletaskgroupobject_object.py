@@ -19,6 +19,15 @@ def upgrade():
     op.add_column('cycle_task_group_objects', sa.Column('object_id', sa.Integer(), nullable=False))
     op.add_column('cycle_task_group_objects', sa.Column('object_type', sa.String(length=250), nullable=False))
 
+    op.execute('''
+        UPDATE cycle_task_group_objects
+            JOIN task_group_objects
+                ON cycle_task_group_objects.task_group_object_id = task_group_objects.id
+            SET
+                cycle_task_group_objects.object_id = task_group_objects.object_id,
+                cycle_task_group_objects.object_type = task_group_objects.object_type;
+        ''')
+
 
 def downgrade():
     op.drop_column('cycle_task_group_objects', 'object_type')
