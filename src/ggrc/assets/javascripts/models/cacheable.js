@@ -927,60 +927,9 @@ can.Model("can.Model.Cacheable", {
     return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
   },
   refresh_all: function() {
-    var props = Array.prototype.slice.call(arguments, 0),
-        _instance = this,
-        dfd = new $.Deferred();
-    _refresh_all(this, props, dfd);
-    return dfd;
+    var props = Array.prototype.slice.call(arguments, 0);
 
-    // TODO: This function should get refactored a bit and
-    // moved somwhere else. I didn't have enough time to clean it up. - anze
-    function _refresh_all(instance, props, dfd) {
-      var prop = props[0],
-          next_props = props.slice(1),
-          next = instance[prop],
-          refresh_queue = new RefreshQueue();
-
-      if (!next) {
-        next = instance.get_binding(prop);
-        if (next) {
-          return next.refresh_list().then(function(list){
-            if (!next_props.length) {
-              dfd.resolve(list);
-              return list;
-            }
-            return deff.then(function(refreshed_list) {
-              return $.when($.map(refreshed_list, function(item) {
-                return _refresh_all(item, next_props.slice(), dfd);
-              }));
-            });
-          });
-        }
-      }
-      if (!next) {
-        console.warn("refresh_all failed at", prop);
-        return;
-      }
-
-      refresh_queue.enqueue(next);
-
-      return refresh_queue.trigger().then(function(refreshed_list) {
-        var dff = can.each(refreshed_list, function(item) {
-          if (next_props.length) {
-            return _refresh_all(item, next_props.slice(), dfd);
-          }
-          return item;
-        });
-        if(!next_props.length){
-          if(next.push){
-            dfd.resolve(dff);
-            return dff;
-          }
-          dfd.resolve(dff[0]);
-          return dff[0];
-        }
-      });
-    }
+    return RefreshQueue.refresh_all(this, props);
   }
 });
 
