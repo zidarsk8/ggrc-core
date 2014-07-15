@@ -14,11 +14,11 @@
 <div class="lhs-nav emphesized">
   <ul class="top-level">
     {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Program" li_class="programs" tooltip_view='/programs/extended_info.mustache'}}}
+    {{{render_hooks 'LHN.Sections_workflow'}}}
     {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Audit" li_class="programs" tooltip_view='/audits/extended_info.mustache' template_view='/static/mustache/audits/search_result.mustache'}}}
   </ul>
 </div>
 <div class="lhs-nav">
-  {{{render_hooks 'LHN.Sections_workflow'}}}
   <h2 class="governance">Governance</h2>
   <ul class="top-level">
     {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Regulation" li_class="governance"}}}
