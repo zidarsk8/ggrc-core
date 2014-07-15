@@ -6,19 +6,5 @@
 }}
 
 {{#is_allowed "read" "Workflow" context="any"}}
-<h2 class="workflow">Workflow</h2>
-<ul class="top-level">
-  <!--<li class="workflow accordion-group" data-tooltip-view="null" data-template="/static/mustache/dashboard/lhn_search_result_workflows.mustache" data-actions="/static/mustache/dashboard/lhn_search_actions_workflows.mustache" data-model-name="Workflow">
-    <a class="workflow" href="javascript://" data-object-singular="Workflow" data-parent=".top-level">
-      <i class="grcicon-workflow-color"></i>
-      Workflows
-      <small>(<span class="item-count"></span>)</small>
-    </a>
-    <div class="content">
-      <ul class="sub-level"></ul>
-      <ul class="sub-actions"></ul>
-    </div>
-  </li-->
   {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Workflow" li_class="workflow"}}}
-</ul>
 {{/is_allowed}}
