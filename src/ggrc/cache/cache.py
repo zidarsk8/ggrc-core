@@ -182,6 +182,7 @@ def all_mapping_entries():
     mapping('CycleTaskGroup', 'cycle_task_group_objects'),
     mapping('CycleTaskGroup', 'task_group'),
     mapping('CycleTaskGroupObject', 'cycle'),
+    mapping('CycleTaskGroupObject', 'object'),
     mapping('CycleTaskGroupObject', 'task_group_object'),
     mapping('CycleTaskGroupObject', 'cycle_task_group'),
     mapping('CycleTaskGroupObject', 'cycle_task_group_object_tasks'),
