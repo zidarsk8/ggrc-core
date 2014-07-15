@@ -227,7 +227,12 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     obj.start_date
     )
 
-  status_change.send(obj.__class__, obj=obj, new_status=obj.status, old_status=None)
+  status_change.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None
+      )
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
