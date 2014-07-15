@@ -52,8 +52,7 @@ def get_task_workflow(task):
   if cycle is None:
     current_app.logger.warn("Trigger: cycle is not found for task " + task.title)
     return None
-  return db.session.query(models.Workflow).\
-    filter(models.Workflow.id == cycle.workflow_id).first()
+  return get_cycle_workflow(cycle)
 
 def get_taskgroup_workflow(task_group):
   cycle=get_taskgroup_cycle(task_group) 
@@ -66,18 +65,18 @@ def get_taskgroup_workflow(task_group):
     return None
   return workflow
 
-def get_assignee(task):
-  if task.contact_id is not None:
-    return db.session.query(Person).filter(Person.id==task.contact_id).first()
+def get_task_assignee(task):
+  if task.contact is not None:
+    return task.contact
   task_group=get_taskgroup(task)
-  if task_group is not None and task_group.contact_id is not None:
-    return db.session.query(Person).filter(Person.id==task_group.contact_id).first()
+  if task_group is not None and task_group.contact is not None:
+    return task_group.contact
   if task_group is None:
     current_app.logger.warn("Trigger: task group for cycle is not found for task " + task.title)
     return None
   cycle=get_taskgroup_cycle(task_group)
-  if cycle is not None and cycle.contact_id is not None:
-    return db.session.query(Person).filter(Person.id==cycle.contact_id).first()
+  if cycle is not None and cycle is not None:
+    return cycle.contact
   if cycle is None:
     current_app.logger.warn("Trigger: cycle is not found for task " + task.title)
     return None
@@ -87,39 +86,26 @@ def get_cycle(task):
   if task_group is None:
     current_app.logger.warn("Trigger: cycle task group is not found for task " + task.title)
     return None
-  return db.session.query(models.Cycle).\
-    filter(models.Cycle.id == task_group.cycle_id).first()
+  return get_taskgroup_cycle(task_group)
 
-# ToDo(Mouli): Consolidate common queries and use model associations instead of separate queries
-#
 def get_taskgroup_cycle(task_group):
-  return db.session.query(models.Cycle).\
-    filter(models.Cycle.id == task_group.cycle_id).first()
+  return task_group.cycle
 
 def get_cycle_workflow(cycle):
-  workflow=db.session.query(models.Workflow).\
-    filter(models.Workflow.id == cycle.workflow_id).first()
-  return workflow
-
-def get_taskgroup_object(task):
-  task_group_object=db.session.query(models.CycleTaskGroupObject).\
-    filter(models.CycleTaskGroupObject.id == task.cycle_task_group_object_id).first()
-  return task_group_object
+  return cycle.workflow
 
 def get_taskgroup(task):
-  task_group_object=get_taskgroup_object(task)
+  task_group_object=task.cycle_task_group_object
   if task_group_object == None:
     return None
-  task_group=db.session.query(models.CycleTaskGroup).\
-    filter(models.CycleTaskGroup.id == task_group_object.cycle_task_group_id).first()
-  return task_group
+  return task_group_object.cycle_task_group
 
 def get_task_contacts(task):
   workflow_owner=get_task_workflow_owner(task)
   if workflow_owner is None:
     current_app.logger.warn("Unable to find workflow owner for task " + task.title)
     return None
-  assignee=get_assignee(task)
+  assignee=get_task_assignee(task)
   if assignee is None:
     current_app.logger.warn("Trigger: Unable to find assignee for task " + task.title)
     return None
@@ -131,12 +117,16 @@ def get_task_group_contacts(task_group):
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner for task group " + task_group.title)
     return None
-  if task_group.contact_id is None:
+  if task_group.contact is None:
     current_app.logger.warn("Trigger: Unable to find contacts for task group " + \
       task_group.title + " , using workflow owner as contact")
     ret_tuple=(workflow_owner, workflow_owner)
-  contacts = db.session.query(Person).filter(Person.id==task_group.contact_id).first()
-  ret_tuple=(workflow_owner, contacts)
+  else:
+    contacts=task_group.contact
+    if contacts is None:
+      current_app.logger.warn("Trigger: Unable to find contact information for task group " + task_group.title)
+      return None
+    ret_tuple=(workflow_owner, contacts)
   return ret_tuple
 
 def get_cycle_contacts(cycle):
@@ -144,12 +134,16 @@ def get_cycle_contacts(cycle):
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner for cycle" + cycle.title)
     return None
-  if cycle.contact_id is None:
+  if cycle.contact is None:
     current_app.logger.warn("Trigger: Unable to find contacts for cycle" + \
       cycle.title + " , using workflow owner as contact")
     ret_tuple=(workflow_owner, workflow_owner)
-  contacts = db.session.query(Person).filter(Person.id==cycle.contact_id).first()
-  ret_tuple=(workflow_owner, contacts)
+  else:
+    contacts=cycle.contact
+    if contacts is None:
+      current_app.logger.warn("Trigger: Unable to find contact information for cycle" + cycle.title)
+      return None
+    ret_tuple=(workflow_owner, contacts)
   return ret_tuple
 
 def prepare_notification_for_task(task, sender, recipient, subject, notif_pri):
@@ -241,7 +235,10 @@ def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=Non
   if contact is None:
     current_app.logger.warn("Trigger: Unable to get cycle contact information")
     return
-  subject="Cycle" + "'" + obj.title + "' status changed to "  + new_status
+  if new_status in ['InProgress']:
+    subject="Workflow Cycle " + "'" + obj.title + "' started, status set to InProgress"
+  else:
+    subject="Workflow Cycle " + "'" + obj.title + "' status changed to "  + new_status
   prepare_notification_for_cycle(obj, subject, PRI_OTHERS)
 
 @status_change.connect_via(models.CycleTaskGroup)
@@ -338,8 +335,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
         workflow_owner, recipients_emaildigest)
 
 def prepare_notification_for_cycle(cycle, subject, notif_pri):
-  workflow=db.session.query(models.Workflow).\
-    filter(models.Workflow.id == cycle.workflow_id).first()
+  workflow=get_cycle_workflow(cycle)
   if workflow is None:
     current_app.logger.warn("Trigger: Unable to find workflow for cycle")
     return
@@ -367,6 +363,7 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri):
       prepare_notification(cycle, 'Email_Digest', notif_pri, subject, content, \
         workflow_owner, recipients_emaildigest)
 
+"""
 def handle_workflow_cycle_status_change(status):
   if status not in ['InProgress', 'Finished']:
     return
@@ -392,6 +389,7 @@ def handle_workflow_cycle_started():
   for cycle in workflow_cycles:
     subject="Workflow " + "'" + cycle.title + "' started " + str(cycle.start_date) 
     prepare_notification_for_cycle(cycle, subject, PRI_OTHERS)
+"""
 
 def handle_workflow_cycle_overdue():
   workflow_cycles=db.session.query(models.Cycle).\
