@@ -94,10 +94,10 @@
           folders:
             new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.status != "InProgress";
+              return !result.instance.is_current;
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.status == "InProgress";
+              return result.instance.is_current;
             }),
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
         },

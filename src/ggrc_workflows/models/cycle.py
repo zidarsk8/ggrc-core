@@ -27,8 +27,10 @@ class Cycle(
       'CycleTaskGroupObjectTask', backref='cycle', cascade='all, delete-orphan')
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
+  is_current = db.Column(db.Boolean, default=True, nullable=False)
 
   _publish_attrs = [
       'workflow',
       'cycle_task_groups',
+      'is_current',
       ]
