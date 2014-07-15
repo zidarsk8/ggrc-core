@@ -648,7 +648,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
               }
             }
             if($existing.length) {
-              $item.insertBefore($existing);
+              $item.insertBefore($existing.eq(0));
             } else if($footer.length) {
               $item.insertBefore($footer);
             } else {
