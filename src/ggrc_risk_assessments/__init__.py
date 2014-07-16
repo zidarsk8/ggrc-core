@@ -37,12 +37,7 @@ def get_public_config(current_user):
 
 def contributed_services():
   return [
-      service('templates', models.Template),
       service('risk_assessments', models.RiskAssessment),
-      service('risk_assessment_mappings', models.RiskAssessmentMapping),
-      service('risk_assessment_control_mappings', models.RiskAssessmentControlMapping),
-      service('threats', models.Threat),
-      service('vulnerabilities', models.Vulnerability),
       ]
 
 
@@ -50,7 +45,4 @@ def contributed_object_views():
   from . import models
 
   return [
-      object_view(models.Template),
-      object_view(models.Threat),
-      object_view(models.Vulnerability),
       ]
