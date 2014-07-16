@@ -48,6 +48,14 @@
           return "No valid contact selected for assignee";
         }
       });
+      // FIXME this should be done with a can.route (we can't currently do this without 
+      //  being able to make arbitrary routes) and should not assume that there's a 
+      //  task group widget.  We currently get away with this because there's only one
+      //  place in the UI where Task Groups are created.  This is not a general solution
+      //  to the problem and DO NOT COPY THIS CODE ELSEWHERE. --BM  7/16/2014
+      this.bind("created", function(ev, data) {
+        window.location.hash='task_group_widget/task_group/' + data.id;
+      });
     }
   }, {});
 
