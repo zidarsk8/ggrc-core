@@ -125,16 +125,7 @@ def get_task_group_contacts(task_group):
   if workflow_owner is None:
     current_app.logger.warn("Trigger: Unable to find workflow owner for task group " + task_group.title)
     return None
-  if task_group.contact is None:
-    current_app.logger.warn("Trigger: Unable to find contacts for task group " + \
-      task_group.title + " , using workflow owner as contact")
-    ret_tuple=(workflow_owner, workflow_owner)
-  else:
-    contacts=task_group.contact
-    if contacts is None:
-      current_app.logger.warn("Trigger: Unable to find contact information for task group " + task_group.title)
-      return None
-    ret_tuple=(workflow_owner, contacts)
+  ret_tuple=(workflow_owner, workflow_owner)
   return ret_tuple
 
 def get_cycle_contacts(cycle):
