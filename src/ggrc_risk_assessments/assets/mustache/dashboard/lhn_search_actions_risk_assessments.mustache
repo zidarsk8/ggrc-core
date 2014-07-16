@@ -1,7 +1,7 @@
 {{#is_allowed 'create' model.shortName context='any'}}
 <li class="add-new" data-ui-autocomplete-item="">
-<a href="{{ggrc_config_value "RISK_ASSESSMENT_URL"}}/riskForm" target="_blank">
+  <a data-object-plural="{{model.table_plural}}" data-form-target="redirect" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" >
     + Create New
-</a>
+  </a>
 </li>
 {{/is_allowed}}
