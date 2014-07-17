@@ -1,0 +1,102 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: laran@reciprocitylabs.com
+    Maintained By: laran@reciprocitylabs.com
+}}
+<form action="javascript://">
+  <div class="row-fluid">
+    <div class="span8">
+      <label>
+        Title
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+      </label>
+      <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
+      <br>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span3">
+      <label>
+        <span class="start-text">Start Date</span>
+        <span class="required">*</span>
+      </label>
+      <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" 
+        type="text" value="{{localize_date instance.start_date}}">
+    </div>
+    <div class="span3">
+      <label>
+        <span>End Date</span>
+        <span class="required">*</span>
+      </label>
+      <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY"
+        type="text" value="{{localize_date instance.end_date}}">
+    </div>
+    <div class="span3">
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      <label>
+        Risk Manager
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+      </label>
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      {{/using}}
+      <br>
+    </div>
+    <div class="span3">
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      <label>
+        Risk Counsel
+        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+      </label>
+      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      {{/using}}
+      <br>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="expand-link">
+        <a class="show-hidden-fields" href="javascript://">
+          <span class="out">
+            <i class="grcicon-show-arrow"></i>
+            Show 
+          </span>
+          <span class="in">
+            <i class="grcicon-hide-arrow"></i>
+            Hide
+          </span>
+          Advanced
+          <span class="hidden-fields out">
+            Description, Notes
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="hidden-fields-area" style="display:none">
+    <div class="row-fluid">
+      <div class="span6">
+        <label>
+          Description
+          <i class="grcicon-help-black" rel="tooltip" title="Describe the Risk Assessment."></i>
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="risk_assessment_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="9">{{{description}}}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span6">
+        <label>
+          Notes
+          <i class="grcicon-help-black" rel="tooltip" title="Notes"></i>
+        </label>
+        <div class="wysiwyg-area">
+          <textarea id="risk_assessment_notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes" tabindex="9">{{{description}}}</textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

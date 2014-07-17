@@ -6,7 +6,7 @@
 can.Model.Cacheable("CMS.Models.RiskAssessment", {
     root_object : "risk_assessment"
   , root_collection : "risk_assessments"
-  , category : "risk"
+  , category : "risk_assessment"
   , findAll : "GET /api/risk_assessments"
   , findOne : "GET /api/risk_assessments/{id}"
   , create : "POST /api/risk_assessments"
