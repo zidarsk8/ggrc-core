@@ -90,8 +90,8 @@ def get_related_keys_for_expiration(context, o):
         obj = getattr(o, attr, None)
         if obj:
           if isinstance(obj, list):
-            for o in obj:
-              key = get_cache_key(o)
+            for inner_o in obj:
+              key = get_cache_key(inner_o)
               keys.append(key)
           else:
             key = get_cache_key(obj)

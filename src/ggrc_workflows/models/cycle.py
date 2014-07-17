@@ -8,6 +8,7 @@ from ggrc import db
 from ggrc.models.mixins import (
     Slugged, Titled, Described, Timeboxed, Stateful, WithContact
     )
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class Cycle(
@@ -28,6 +29,10 @@ class Cycle(
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
   is_current = db.Column(db.Boolean, default=True, nullable=False)
+
+  @hybrid_property
+  def cycle_task_group_object_objects(self):
+    return [o.object for o in self.cycle_task_group_objects]
 
   _publish_attrs = [
       'workflow',

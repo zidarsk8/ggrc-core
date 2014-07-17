@@ -178,6 +178,7 @@ def all_mapping_entries():
     mapping('WorkflowTask', 'workflow'),
     mapping('Cycle', 'workflow'),
     mapping('Cycle', 'cycle_task_groups'),
+    mapping('Cycle', 'cycle_task_group_object_objects'),
     mapping('CycleTaskGroup', 'cycle'),
     mapping('CycleTaskGroup', 'cycle_task_group_objects'),
     mapping('CycleTaskGroup', 'task_group'),
