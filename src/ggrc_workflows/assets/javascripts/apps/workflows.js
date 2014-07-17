@@ -205,6 +205,7 @@
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
+    WorkflowExtension.init_global();
   };
 
   WorkflowExtension.init_widgets_for_other_pages =
@@ -460,6 +461,23 @@
       }
     };
     new GGRC.WidgetList("ggrc_workflows", descriptor);
+  };
+
+  WorkflowExtension.init_global = function() {
+    $(function() {
+
+      if(!GGRC.current_user || !GGRC.current_user.id){
+        return;
+      }
+      CMS.Models.Person.findOne({
+        id: GGRC.current_user.id
+      }).then(function(person){
+        $('.task-count').ggrc_controllers_mapping_count({
+          mapping: 'assigned_tasks',
+          instance: person
+        });
+      });
+    });
   };
 
   GGRC.register_hook(

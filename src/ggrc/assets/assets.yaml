@@ -66,6 +66,7 @@ dashboard-js-files:
   - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
+  - controllers/mapping_count_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
@@ -125,6 +126,7 @@ dashboard-js-template-files:
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
+  - dashboard/mapping_count.mustache
   - directives/autocomplete_result.mustache
   - directives/tree.mustache
   - events/object_list.mustache
