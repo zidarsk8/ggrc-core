@@ -13,11 +13,15 @@ can.Model.Cacheable("CMS.Models.RiskAssessment", {
   , update : "PUT /api/risk_assessments/{id}"
   , destroy : "DELETE /api/risk_assessments/{id}"
   , attributes : {
+      ra_manager : "CMS.Models.Person.stub"
+    , ra_counsel : "CMS.Models.Person.stub"
     }
 
   , init : function() {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+      this.validatePresenceOf("start_date");
+      this.validatePresenceOf("end_date");
     }
 }, {});
 

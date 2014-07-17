@@ -3,7 +3,6 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-
 from ggrc import db
 from ggrc.models.mixins import deferred, Base, Titled, Described, Timeboxed, Noted
 from ggrc.models.object_document import Documentable
@@ -11,21 +10,27 @@ from ggrc.models.object_document import Documentable
 class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db.Model):
   __tablename__ = 'risk_assessments'
 
-  gdrive_evidence_folder = deferred(db.Column(db.String), 'RiskAssessment')
-  ra_manager_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False), 'RiskAssessment')
-  ra_counsel_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False), 'RiskAssessment')
+  ra_manager_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+  ra_manager = db.relationship('Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
+  
+  ra_counsel_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+  ra_counsel = db.relationship('Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
+  
+  program_id = deferred(db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
+  program = db.relationship('Program', uselist=False, foreign_keys='RiskAssessment.program_id')
   
 
   _fulltext_attrs = [
-    'name',
+    'title',
     'description',
     'notes',
     ]
 
   _publish_attrs = [
-    'name',
+    'title',
     'ra_manager',
     'ra_counsel',
+    'program',
     'description',
     'notes',
     ]

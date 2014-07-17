@@ -34,22 +34,22 @@
         type="text" value="{{localize_date instance.end_date}}">
     </div>
     <div class="span3">
-      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#using manager=instance.ra_manager model_singular=model.model_singular}}
       <label>
         Risk Manager
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="ra_manager.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist manager.email ''}}" />
       {{/using}}
       <br>
     </div>
     <div class="span3">
-      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#using counsel=instance.ra_counsel model_singular=model.model_singular}}
       <label>
         Risk Counsel
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        <i class="grcicon-help-black" rel="tooltip" title="This is the counsel in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="ra_counsel.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist counsel.email ''}}" />
       {{/using}}
       <br>
     </div>
