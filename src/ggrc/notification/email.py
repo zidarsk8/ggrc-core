@@ -169,6 +169,7 @@ class EmailNotification(NotificationBase):
         to=to_list,
         subject=notification.subject,
         headers=email_headers,
+        html=notification.content,
         body=notification.content)
       try:
         message.send()
@@ -184,6 +185,7 @@ class EmailNotification(NotificationBase):
         to=assignee,
         subject=notification.subject,
         headers=email_headers,
+        html=notify_custom_message[id] + empty_line +  notification.content,
         body=notify_custom_message[id] + empty_line +  notification.content)
 
       try:

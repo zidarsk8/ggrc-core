@@ -6,20 +6,22 @@
 
 from flask import current_app, request
 import ggrc_workflows.models as models
-from ggrc.notification import EmailNotification, EmailDigestNotification, isNotificationEnabled
+from ggrc.notification import EmailNotification, EmailDigestNotification
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
 from ggrc import db
 from ggrc_workflows import status_change
+from ggrc_workflows import calc_start_date
 
 PRI_TASK_OVERDUE=1
 PRI_TASK_DUE=2
 PRI_TASK_ASSIGNMENT=3
 PRI_TASK_CHANGES=4
 PRI_TASKGROUP=5
-PRI_CYCLE=6
-PRI_WORKFLOW_MEMBER_CHANGES=7
+PRI_WORKFLOW=6
+PRI_CYCLE=7
+PRI_WORKFLOW_MEMBER_CHANGES=8
 
 def notify_on_change(workflow):
   if workflow.notify_on_change is None:
@@ -294,7 +296,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
   to_email={}
   # custom message is set in email for new member added to workflow (not for email digest)
   if action in ['Add']:
-    notify_custom_message={member.id: workflow.notify_custom_message}
+    notify_custom_message={member.id: workflow.notify_custom_message + '<br>'}
   else:
     notify_custom_message=None
   recipients=[]
@@ -325,10 +327,26 @@ def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_mess
     "/" + str(workflow.id) + "#current_widget"
   email_content=content
   if notify_custom_message is True and workflow.notify_custom_message is not None:
-    email_content=workflow.notify_custom_message + empty_line + content
+    email_content=workflow.notify_custom_message + "<br>" + content
   prepare_notification(cycle, 'Email_Now', notif_pri, subject, email_content, \
     workflow_owner, workflow.people, override=override_flag)
   prepare_notification(cycle, 'Email_Digest', notif_pri, subject, content, \
+    workflow_owner, workflow.people, override=override_flag)
+
+def prepare_notification_for_workflow(workflow, subject, notif_pri):
+  workflow_owner=get_workflow_owner(workflow)
+  if workflow_owner is None:
+    current_app.logger.warn("Trigger: Unable to find workflow owner for cycle")
+    return
+  override_flag=notify_on_change(workflow)
+  empty_line="""
+  """
+  content=empty_line + subject + empty_line +  \
+    "  " + request.url_root + workflow._inflector.table_plural + \
+    "/" + str(workflow.id) + "#info_widget"
+  prepare_notification(workflow, 'Email_Now', notif_pri, subject, content, \
+    workflow_owner, workflow.people, override=override_flag)
+  prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
     workflow_owner, workflow.people, override=override_flag)
 
 def handle_workflow_cycle_overdue():
@@ -352,14 +370,15 @@ def handle_workflow_cycle_due(num_days):
     prepare_notification_for_cycle(cycle, subject, PRI_CYCLE)
 
 def handle_workflow_cycle_starting(num_days):
-  workflow_cycles=db.session.query(models.Cycle).\
-    filter(models.Cycle.status != 'Finished').\
-    filter(models.Cycle.status != 'Verified').\
-    filter(models.Cycle.start_date == (date.today() + timedelta(num_days))).\
-    all()
-  for cycle in workflow_cycles:
-    subject="Workflow " + "'" + cycle.title + "' will start in " + str(num_days) + " days"
-    prepare_notification_for_cycle(cycle, subject, PRI_CYCLE)
+  workflows=db.session.query(models.Workflow)
+  for workflow in workflows:
+    next_start_date=calc_start_date(
+      workflow.frequency, 
+      workflow.start_date)
+    starting_date=date.today() + timedelta(num_days)
+    if next_start_date == starting_date:
+      subject="Workflow " + "'" + workflow.title + "' will start in " + str(num_days) + " days"
+      prepare_notification_for_workflow(workflow, subject, PRI_WORKFLOW)
 
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
