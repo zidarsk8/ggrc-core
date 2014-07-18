@@ -17,7 +17,7 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db
   ra_counsel = db.relationship('Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
   
   program_id = deferred(db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
-  program = db.relationship('Program', uselist=False, foreign_keys='RiskAssessment.program_id')
+  program = db.relationship('Program', backref='risk_assessments', uselist=False, foreign_keys='RiskAssessment.program_id')
   
 
   _fulltext_attrs = [

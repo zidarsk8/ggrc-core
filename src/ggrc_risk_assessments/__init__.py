@@ -46,3 +46,37 @@ def contributed_object_views():
 
   return [
       ]
+
+
+# Mixin to mix risk_assessments into Program
+from ggrc import db
+from ggrc.models.reflection import PublishOnly
+
+class MixRiskAssessmentsIntoProgram(object):
+  @classmethod
+  def mix_risk_assessments_into_program(cls):
+    #cls.risk_assessments = db.relationship(
+    pass #    'RiskAssessment', cascade='all, delete-orphan')
+
+  _publish_attrs = [
+      PublishOnly('risk_assessments')
+      ]
+
+  _include_links = [
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(MixRiskAssessmentsIntoProgram, cls).eager_query()
+    return cls.eager_inclusions(query, MixRiskAssessmentsIntoProgram._include_links).options(
+        orm.subqueryload('risk_assessments'))
+
+# Mix RiskAssessments into Program
+
+from ggrc.models import all_models
+program_type = getattr(all_models, "Program")
+program_type.__bases__ = (MixRiskAssessmentsIntoProgram,) \
+ + program_type.__bases__
+program_type.mix_risk_assessments_into_program()
