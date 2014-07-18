@@ -119,6 +119,14 @@
         <span>Edit {{model.model_title}}</span>
       </a>
     </p>
+
+    <p class="pull-right" style="margin-right:20px">
+      {{#person_owned instance.owner.id}}
+        <a href="javascript://" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+          Submit For Review
+        </a>
+      {{/person_owned}}
+    </p>
     {{/is_allowed}}
     <p>
       <small>
