@@ -1,3 +1,37 @@
-<div class="span12">
-  Tier 2
+<div class="row-fluid">
+  <div class="span12">
+    <span class="span6">
+      <strong>Title:</strong>
+         {{{instance.title}}}
+    </span>
+    <span class="span3">
+      <strong>Started:</strong>
+      {{{localize_date instance.start_date}}}
+    </span>
+    <span class="span3">
+      <strong>Completed:</strong>
+      {{{localize_date instance.end_date}}}
+    </span>
+  </div>
+  <div class="span12">
+    <strong>Description:</strong>
+    {{{instance.description}}}
+  </div>
+  <div class="span6">
+    <strong>Risk Manager:</strong>
+    {{#using person=instance.ra_manager}}{{{render '/static/mustache/people/popover.mustache' person=instance.ra_manager}}}{{/using}}
+  </div>
+  <div class="span6">
+    <strong>Risk Counsel:</strong>
+    {{#using person=instance.ra_counsel}}{{{render '/static/mustache/people/popover.mustache' person=instance.ra_counsel}}}{{/using}}
+  </div>
+  <div class="span12">
+    <strong>Notes:</strong>
+    {{{instance.notes}}}
+  </div>
+  <div class="span12">
+    <strong>Files:</strong>
+    TODO
+  </div>
+  
 </div>
