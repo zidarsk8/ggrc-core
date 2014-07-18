@@ -71,11 +71,11 @@ def get_cache_key(obj, type=None, id=None):
   elif isinstance(obj, dict):
     type = obj.get('type', None)
     id = obj.get('id', None)
-  else:
-    if isinstance(type, (str, unicode)):
-      model = ggrc.models.get_model(type)
-      assert model is not None, "Invalid model name: {}".format(type)
-      type = ggrc.models.get_model(type)._inflector.table_plural
+  if isinstance(type, (str, unicode)):
+    model = ggrc.models.get_model(type)
+    assert model is not None, "Invalid model name: {}".format(type)
+    type = ggrc.models.get_model(type)._inflector.table_plural
+  if not isinstance(obj, (tuple, dict)):
     if type is None:
       type = obj._inflector.table_plural
     if id is None:
