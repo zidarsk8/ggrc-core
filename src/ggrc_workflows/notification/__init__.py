@@ -23,6 +23,9 @@ PRI_WORKFLOW=6
 PRI_CYCLE=7
 PRI_WORKFLOW_MEMBER_CHANGES=8
 
+WORKFLOW_CYCLE_DUE=3
+WORKFLOW_CYCLE_STARTING=[3, 7]
+
 def notify_on_change(workflow):
   if workflow.notify_on_change is None:
     return False
@@ -383,7 +386,6 @@ def handle_workflow_cycle_starting(num_days):
 def prepare_notification(src, notif_type, notif_pri, subject, content, owner, recipients, \
   override=False, notify_custom_message=None):
   if notif_type == 'Email_Digest':
-    #ToDo(Mouli): Additional checks for recipients prior to preparing email digest
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
     emaildigest_notification.prepare([src], owner, recipients, subject, content, override)
@@ -395,3 +397,20 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
       email_notification.notify_one(notification, notify_custom_message)
   else:
     return None
+
+def notify_email_digest():
+  """ Preprocessing of tasks, cycles prior to generating email digest
+  """
+  handle_tasks_overdue()
+  handle_workflow_cycle_overdue()
+  handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
+  for num_days in WORKFLOW_CYCLE_STARTING:
+    handle_workflow_cycle_starting(num_days)
+  db.session.commit()
+
+  """ Notify email digest
+  """
+  email_digest_notification=EmailDigestNotification()
+  email_digest_notification.notify()
+  db.session.commit()
+

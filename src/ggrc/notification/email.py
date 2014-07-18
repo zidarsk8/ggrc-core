@@ -24,8 +24,6 @@ def getAppEngineEmail():
   else:
     return None
    
-#ToDo(Mouli): Add settings flag similar to memcache to prevent email in 
-#scenarios such as performance testing, true, false with regular expression
 def isNotificationEnabled(person_id, notif_type):
   notification_config=NotificationConfig.query.\
     filter(NotificationConfig.person_id==person_id).\

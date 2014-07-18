@@ -350,3 +350,7 @@ def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
+
+def notify_email_digest():
+  import ggrc_workflows.notification as notification
+  notification.notify_email_digest()
