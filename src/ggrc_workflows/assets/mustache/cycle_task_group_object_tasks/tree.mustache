@@ -6,22 +6,45 @@
 }}
 
 
-<li class="tree-item governance" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
+<li class="tree-item governance item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
+  {{#instance}}{{data 'model'}}{{/instance}}
   >
-  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+  <div class="item-main">
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="span12">
+        <div class="item-data span3">
+          <div class="tree-title-area">
+            <span class="tier-trigger"></span>{{instance.title}}
+          </div>
+        </div>
+        <div class="span3 item-data">
+        {{#is_dashboard}}
+        {{#defer 'object' instance.object}}
+          <div class="tree-title-area">
+            <i class="grcicon-{{object.class.table_singular}}-color"></i>
+            <a class="object-title" href="{{object.viewLink}}" target="_blank">{{object.title}}</a>
+          </div>
+        {{/defer}}
+        {{/is_dashboard}}
+        </div>
+        <div class="span6">
           <ul class="tree-action-list">
-            <li {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
-              <i class="grcicon-person-green pull-left icon-field"></i>
-              {{#using contact=instance.contact}}
-              <div class="objective-selector">
-                <input type="text" name="contact.name" data-lookup="Person" class="span10 short-field search-icon" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+            <li>
+              <span rel="tooltip" data-placement="top" data-original-title="Last edit">
+                Edited: {{localize_date instance.updated_at}}
+              </span>
+            </li>
+            <li>
+              <div class="date">
+                <span rel="tooltip" data-placement="top" {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}class="error"{{/is_overdue}}{{/if}} data-original-title="Due On">
+                  Due: {{localize_date instance.end_date}}
+                </span>
               </div>
-              {{/using}}
+            </li>
+            <li>
+            {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
             <li>
               {{#with_mapping_count instance 'cycle_task_entries'}}
@@ -32,17 +55,7 @@
               {{/with_mapping_count}}
             </li>
             <li>
-              <div class="date">
-                <span rel="tooltip" data-placement="top" {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}class="error"{{/is_overdue}}{{/if}} data-original-title="Due On">
-                  {{instance.end_date}}
-                </span>
-              </div>
-            </li>
-            <li>
-            {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
-            </li>
-            <li>
-              <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-main').data('model')}); }}>
+              <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }}>
                 {{#if_equals instance.status 'Assigned'}}
                   <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
                 {{/status}}
@@ -67,13 +80,6 @@
               </div>
             </li>
           </ul>
-          <span class="tier-trigger"></span>
-          <div class="item-data">
-            <div class="tree-title-area">
-              {{instance.title}}
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
@@ -84,15 +90,23 @@
     <div class="tier-2-info-content">
 
       <div class="row-fluid">
-        <div class="span6">
-          {{#if instance.viewLink}}
-            {{#is_allowed "view_instance_page" instance}}
-              <a href="{{instance.viewLink}}" class="info-action">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
-            {{/is_allowed}}
-          {{/if}}
+        <div class="span9">
+          {{#is_dashboard}}
+          {{#defer 'workflow' instance.workflow}}
+            <a href="{{workflow.viewLink}}" class="info-action">
+              View Workflow
+              <i class="grcicon-goto"></i>
+            </a>
+          {{/defer}}
+          {{/is_dashboard}}
+        </div>
+        <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+          <i class="grcicon-person-green pull-left icon-field"></i>
+          {{#using contact=instance.contact}}
+          <div class="objective-selector">
+            <input type="text" name="contact.name" data-lookup="Person" class="span10 short-field search-icon" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+          </div>
+          {{/using}}
         </div>
       </div>
 
@@ -103,7 +117,6 @@
               <h5>{{instance.title}}</h5>
               {{{instance.description}}}
             </div>
-            
           </div>
         </div>
       </div>

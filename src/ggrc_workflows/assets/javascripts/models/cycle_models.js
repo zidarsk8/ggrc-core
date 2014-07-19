@@ -75,7 +75,6 @@
     }
   }, {});
 
-
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
   can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
     root_object: "cycle_task_entry",
@@ -112,19 +111,14 @@
         refresh_attr_wrap("cycle_task_group_object_task").bind(this));
     }
   }, {
-    workflowFolder: function(){
-      // TODO: This code only works if all the following objects are cached.
-      // This is currently always true in the workflow view, but it will not
-      // be the case in the tasks view on my work page.
-      var cycle = this.cycle.reify(),
-          workflow = cycle.workflow.reify(),
-          folders = workflow.get_binding('folders');
-
-      if(folders.list.length === 0){
-        // Workflow folder has not been assigned
-        return null;
-      }
-      return folders.list[0].instance;
+    workflowFolder: function() {
+      return this.refresh_all('cycle', 'workflow', 'folders').then(function(folders){
+        if (folders.length === 0) {
+          // Workflow folder has not been assigned
+          return null;
+        }
+        return folders[0].instance;
+      });
     }
   });
 
@@ -258,6 +252,16 @@
     }
   }, {
     overdue: overdue_compute,
+    workflow: function() {
+      return this.refresh_all('cycle', 'workflow').then(function(workflow){
+        return workflow;
+      });
+    },
+    object: function() {
+      return this.refresh_all('cycle_task_group_object', 'task_group_object', 'object').then(function(object){
+        return object;
+      });
+    }
   });
 
 })(window.can);

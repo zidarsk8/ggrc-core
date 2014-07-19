@@ -41,8 +41,10 @@
     var Proxy = GGRC.MapperHelpers.Proxy,
         Direct = GGRC.MapperHelpers.Direct,
         Cross = GGRC.MapperHelpers.Cross,
+        Multi = GGRC.MapperHelpers.Multi,
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
-        Reify = GGRC.MapperHelpers.Reify;
+        Reify = GGRC.MapperHelpers.Reify,
+        Search = GGRC.MapperHelpers.Search;
     // Add mappings for basic workflow objects
     var mappings = {
         Task: {
@@ -70,15 +72,19 @@
         Workflow: {
           _canonical: {
             objects: _workflow_object_types,
-            tasks: "Task",
+            direct_tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders : "GDriveFolder"
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Proxy(
+          tasks: Multi([
+            "direct_tasks", "tasks_via_task_groups"]),
+          direct_tasks: Proxy(
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
+          tasks_via_task_groups: Cross(
+            "task_groups", "tasks"),
           people: Proxy(
             "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
           task_groups: Direct(
@@ -118,6 +124,9 @@
             "Cycle", "cycle_task_group_objects", "cycle"),
           cycle_task_group: Direct(
             "CycleTaskGroup", "cycle_task_group_objects", "cycle_task_group"),
+          task_group_object: Direct(
+            "TaskGroupObject", "task_group_objects", "task_group_object"
+          ),
           //task_group_object: Direct(
           //  "TaskGroupObject", "cycle", "tasks")
           cycle_task_group_object_tasks: Direct(
@@ -154,10 +163,16 @@
 
         People: {
           _canonical: {
-            workflows: "Workflow"
+            workflows: "Workflow",
           },
           workflows: Proxy(
             "Workflow", "workflow", "WorkflowPerson", "person", "workflow_people"),
+
+        },
+        Person: {
+          assigned_tasks: Search("", [
+              "CycleTaskGroupObjectTask"//,
+          ], { contact_id: "id" }),
         }
       };
 
@@ -185,6 +200,8 @@
       WorkflowExtension.init_widgets_for_workflow_page();
     } else if (page_instance instanceof CMS.Models.Task) {
       WorkflowExtension.init_widgets_for_task_page();
+    } else if (page_instance instanceof CMS.Models.Person) {
+      WorkflowExtension.init_widgets_for_person_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
@@ -346,7 +363,7 @@
     objects_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree mockup-tree"></ul>',
       widget_id: "objects",
       widget_name: "Objects",
       widget_icon: "object",
@@ -400,6 +417,50 @@
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
   };
 
+  WorkflowExtension.init_widgets_for_person_page =
+      function init_widgets_for_person_page() {
+
+    var descriptor = {},
+        page_instance = GGRC.page_instance();
+
+    descriptor[page_instance.constructor.shortName] = {
+      task: {
+        widget_id: 'task',
+        widget_name: "Tasks",
+        content_controller: GGRC.Controllers.TreeView,
+
+        content_controller_options: {
+          parent_instance: GGRC.page_instance(),
+          model: CMS.Models.CycleTaskGroupObjectTask,
+          show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+          mapping: "assigned_tasks",
+          draw_children: true,
+          sort_property: null,
+          sort_function: function(a, b){
+            var date_a = +new Date(a.end_date),
+                date_b = +new Date(b.end_date);
+            if(date_a === date_b){
+              return a.id < b.id;
+            }
+            return date_a < date_b;
+          },
+          content_controller_options: {
+            child_options: [
+              {
+                model: can.Model.Cacheable,
+                mapping: "cycle_task_entries",
+                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                draw_children: true,
+                allow_creating: true
+              },
+            ]
+          }
+        }
+      }
+    };
+    new GGRC.WidgetList("ggrc_workflows", descriptor);
+  };
 
   GGRC.register_hook(
       "LHN.Sections_workflow", GGRC.mustache_path + "/dashboard/lhn_workflows");

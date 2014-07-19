@@ -37,6 +37,11 @@
                     %i.grcicon-help
                     %span
                       Help
+                %li.black-link
+                  %a#page-help{ 'href': "/dashboard#task_widget" }
+                    %i.grcicon-task
+                    %span
+                      My Tasks
                 %li.user.dropdown.dropdown-black.black-link
                   %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
                     %i.grcicon-user
@@ -60,23 +65,23 @@
                         Notifications
                       %div.inner-list
                         %label
-                          %input{ 
-                            'type': 'checkbox', 
-                            'name': 'notifications', 
-                            'value': 'Email_Now' 
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
+                            'value': 'Email_Now'
                           }
                           Email notifications
                         %label
-                          %input{ 
-                            'type': 'checkbox', 
-                            'name': 'notifications', 
-                            'value': 'Email_Digest' 
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
+                            'value': 'Email_Digest'
                           }
                           Daily email digest
                         %label
-                          %input{ 
-                            'type': 'checkbox', 
-                            'name': 'notifications', 
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
                             'value': 'Calendar'
                           }
                           Calendar notifications

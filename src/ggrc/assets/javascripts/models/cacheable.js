@@ -925,6 +925,11 @@ can.Model("can.Model.Cacheable", {
     GGRC.delay_leaving_page_until(dfd);
 
     return $.when(xhr, dfd).then(function(xhr_result) { return xhr_result; });
+  },
+  refresh_all: function() {
+    var props = Array.prototype.slice.call(arguments, 0);
+
+    return RefreshQueue.refresh_all(this, props);
   }
 });
 
