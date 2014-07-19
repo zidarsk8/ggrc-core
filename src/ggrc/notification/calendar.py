@@ -6,11 +6,10 @@
 
 """
  GGRC calendar service base class
- ToDo(Mouli): handling of workflow and taskgroup should be in ggrc.workflows.notifications in CalendarService inherited class 
 """
 
 
-from flask import current_app, request
+from flask import current_app
 from apiclient import errors
 from apiclient.discovery import build
 import httplib2

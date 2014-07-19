@@ -19,9 +19,11 @@ import ggrc_workflows.models as models
 # Initialize signal handler for status changes
 from blinker import Namespace
 signals = Namespace()
-status_change = signals.signal('Status Changed',
+status_change = signals.signal(
+  'Status Changed',
   """
-     This is used to signal any listeners of any changes in model object status attribute
+  This is used to signal any listeners of any changes in model object status
+  attribute
   """)
 
 # Initialize Flask Blueprint for extension
@@ -109,6 +111,7 @@ def next_weekday(_date, direction='up'):
   else:
     return _date
 
+
 def calc_start_date(frequency, _date, base_date=None):
   if base_date is None:
     base_date = date.today()
@@ -137,7 +140,7 @@ def calc_start_date(frequency, _date, base_date=None):
       ret = base_date \
             - timedelta(days=base_date.weekday()) \
             + timedelta(days=_date.weekday())
-  
+
   return next_weekday(ret, direction=direction)
 
 
@@ -177,7 +180,7 @@ def calc_end_date(frequency, _date, start_date):
         ((start_date.month - 1) / 3 \
           + (1 if start_month_in_quarter > month_in_quarter
                   or start_month_in_quarter == month_in_quarter
-                  and start_date.day > _date.day 
+                  and start_date.day > _date.day
               else 0)) \
           * 3 + month_in_quarter,
         _date.day
@@ -215,14 +218,21 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   obj.status = 'InProgress'
 
   obj.start_date = calc_start_date(
-    workflow.frequency, 
+    workflow.frequency,
     workflow.start_date
     )
   obj.end_date = calc_end_date(
-    workflow.frequency, 
-    workflow.end_date, 
+    workflow.frequency,
+    workflow.end_date,
     obj.start_date
     )
+
+  status_change.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None
+      )
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
@@ -294,7 +304,12 @@ def update_cycle_object_parent_state(obj):
       old_status = parent.status
       parent.status = 'InProgress'
       db.session.add(parent)
-      status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
+      status_change.send(
+          parent.__class__,
+          obj=parent,
+          new_status=parent.status,
+          old_status=old_status
+          )
       update_cycle_object_parent_state(parent)
   # If all children are `Finished` or `Verified`, then parent should be same
   elif obj.status == 'Finished' or obj.status == 'Verified':
@@ -311,12 +326,22 @@ def update_cycle_object_parent_state(obj):
       if children_verified:
         old_status=parent.status
         parent.status = 'Verified'
-        status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
+        status_change.send(
+            parent.__class__,
+            obj=parent,
+            new_status=parent.status,
+            old_status=old_status
+            )
         update_cycle_object_parent_state(parent)
       elif children_finished:
         old_status=parent.status
         parent.status = 'Finished'
-        status_change.send(parent.__class__, obj=parent, new_status=parent.status, old_status=old_status)
+        status_change.send(
+            parent.__class__,
+            obj=parent,
+            new_status=parent.status,
+            old_status=old_status
+            )
         update_cycle_object_parent_state(parent)
 
 
@@ -325,3 +350,15 @@ def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
+
+def notify_email_digest():
+  import ggrc_workflows.notification as notification
+  notification.notify_email_digest()
+
+def handle_calendar_request(resource, id):
+  import ggrc_workflows.notification as notification
+  return notification.handle_calendar_request(resource, id)
+  
+def handle_calendar_flow_auth():
+  import ggrc_workflows.notification as notification
+  return notification.handle_calendar_flow_auth()
