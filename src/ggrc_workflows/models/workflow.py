@@ -122,6 +122,9 @@ class WorkflowState(object):
 
     for obj in objs:
       today = date.today()
+      cycle = obj if isinstance(obj, Cycle) else obj.cycle
+      if not cycle.is_current:
+        continue
       if obj.end_date and \
          obj.end_date <= today and \
          obj.status != "Verified":

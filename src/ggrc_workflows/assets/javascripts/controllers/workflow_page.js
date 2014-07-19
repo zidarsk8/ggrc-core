@@ -56,7 +56,7 @@
         if(current_cycles && current_cycles.length > 0) {
           for(var i = 0; i < current_cycles.length; i++) {
             dfds.push(current_cycles[i].instance.refresh().then(function(c) {
-              return c.attr('status', 'Verified').save();
+              return c.attr('is_current', false).save();
             }));
           }
         }
