@@ -5,27 +5,31 @@
     Maintained By: laran@reciprocitylabs.com
 }}
 
-  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <div class="openclose">
-        <a class="openclose-placeholder" href="javascript://"> </a>
-        <div class="row-fluid">
-          <div class="span12">
+<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="risk_assessment">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+        <div class="span12">
 
-            <div class="item-data">
-              <div class="tree-title-area">
-                {{instance.title}}
-              </div>
+          <div class="item-data">
+            <div class="tree-title-area">
+              {{instance.title}}
             </div>
-
           </div>
+
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="tier-2-info item-content">
-      <div class="tier-2-info-content">
-        {{> '/static/mustache/risk_assessments/tier2_content.mustache'}}
-      </div>
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+      {{> '/static/mustache/risk_assessments/tier2_content.mustache'}}
     </div>
-  </li>
+  </div>
+  {{/if}}
+
+</li>
