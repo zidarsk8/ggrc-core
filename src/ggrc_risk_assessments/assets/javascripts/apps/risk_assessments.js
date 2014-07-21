@@ -51,7 +51,7 @@
       descriptor[page_instance.constructor.shortName] = {
         risk_assessments: {
           widget_id: "risk_assessments",
-          widget_name: "Assessments",
+          widget_name: "Risk Assessments",
           content_controller: GGRC.Controllers.TreeView,
           content_controller_options: {
             mapping: "risk_assessments",
