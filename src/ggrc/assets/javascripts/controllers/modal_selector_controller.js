@@ -1459,10 +1459,8 @@
 
     , "input[type=checkbox].object-check-all click": function(el, ev) {
       var $el = $(el)
-        , $check = $(this.element).find('.object-check-single');
-
-      //FIXME: the below code. this unchecks all selected disabled items
-      //  if(!($check.prop('disabled')))  
+        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+ 
       $check.prop('checked', $el.prop('checked'));
       this.update_selected_items(el, ev);
     }

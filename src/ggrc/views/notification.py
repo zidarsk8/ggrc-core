@@ -14,7 +14,7 @@ from datetime import datetime
 
 
 WORKFLOW_CYCLE_DUE=3
-WORKFLOW_CYCLE_STARTING=7
+WORKFLOW_CYCLE_STARTING=[3, 7]
 
 """
 @app.route("/modify_status", methods=["GET", "POST"])
@@ -93,7 +93,8 @@ def notify_email_digest_ggrc_users():
   handle_tasks_overdue()
   handle_workflow_cycle_overdue()
   handle_workflow_cycle_due(WORKFLOW_CYCLE_DUE)
-  handle_workflow_cycle_starting(WORKFLOW_CYCLE_STARTING)
+  for num_days in WORKFLOW_CYCLE_STARTING:
+    handle_workflow_cycle_starting(num_days)
   db.session.commit()
 
   """ notify email digest 
