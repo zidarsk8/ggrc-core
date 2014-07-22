@@ -94,10 +94,10 @@
           folders:
             new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.status != "InProgress";
+              return !result.instance.is_current;
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.status == "InProgress";
+              return result.instance.is_current;
             }),
           current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
         },
@@ -205,6 +205,7 @@
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
+    WorkflowExtension.init_global();
   };
 
   WorkflowExtension.init_widgets_for_other_pages =
@@ -363,7 +364,7 @@
     objects_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree mockup-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
       widget_id: "objects",
       widget_name: "Objects",
       widget_icon: "object",
@@ -382,7 +383,7 @@
     history_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
       widget_id: "history",
       widget_name: "History",
       widget_icon: "history",
@@ -460,6 +461,23 @@
       }
     };
     new GGRC.WidgetList("ggrc_workflows", descriptor);
+  };
+
+  WorkflowExtension.init_global = function() {
+    $(function() {
+
+      if(!GGRC.current_user || !GGRC.current_user.id){
+        return;
+      }
+      CMS.Models.Person.findOne({
+        id: GGRC.current_user.id
+      }).then(function(person){
+        $('.task-count').ggrc_controllers_mapping_count({
+          mapping: 'assigned_tasks',
+          instance: person
+        });
+      });
+    });
   };
 
   GGRC.register_hook(

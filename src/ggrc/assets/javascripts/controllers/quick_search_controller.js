@@ -220,7 +220,7 @@ can.Control("CMS.Controllers.LHN", {
         self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
       });
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
-      
+
     }
 
   , should_show_lhn: function() {
@@ -290,7 +290,7 @@ can.Control("CMS.Controllers.LHN", {
           }
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
-          //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the 
+          //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the
           //  open section is handled in the LHN Search controller.
           function initial_scroll() {
             self.element.find(".lhs-holder").scrollTop(self.options.display_prefs.getLHNState().panel_scroll || 0);
@@ -573,7 +573,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       }
 
       // 2-way binding is set up in the view using can-value, directly connecting the
-      //  search box and the display prefs to save the search value between page loads. 
+      //  search box and the display prefs to save the search value between page loads.
       //  We also listen for this value in the controller
       //  to trigger the search.
       return can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).then(function(frag, xhr) {
@@ -598,7 +598,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         self.run_search(initial_term, initial_params);
 
         // Above, category scrolling is listened on to save the scroll position.  Below, on page load the
-        //  open category is toggled open, and the search placed into the search box by display prefs is 
+        //  open category is toggled open, and the search placed into the search box by display prefs is
         //  sent to the search service.
         if(lhn_prefs.open_category) {
           self.toggle_list_visibility(
@@ -814,7 +814,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         can.view($list.data("template") || self.options.list_view, context, function(frag, xhr) {
           $list.find(self.options.list_content_selector).html(frag);
 
-          // If this category we're rendering is the one that is open, wait for the 
+          // If this category we're rendering is the one that is open, wait for the
           //  list to finish rendering in the content pane, then set the scrolltop
           //  of the category to the stored value in display prefs.
           if(model_name === self.options.display_prefs.getLHNState().open_category) {
