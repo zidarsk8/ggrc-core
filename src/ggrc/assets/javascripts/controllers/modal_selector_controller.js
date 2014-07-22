@@ -1391,6 +1391,34 @@
       }
       return this.context;
     }
+
+    , init_view: function() {
+        var self = this
+          , deferred = $.Deferred()
+          ;
+
+        can.view(
+          this.options.base_modal_view,
+          this.context,
+          function(frag) {
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
+            deferred.resolve();
+            self.element.trigger('loaded');
+            self.element.find(".results-wrap").cms_controllers_infinite_scroll();
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
+          });
+
+        // Start listening for events
+        this.on();
+
+        return deferred;
+    }
+
+    , ".results-wrap scrollNext": "show_next_page"
+
     , move_option_to_top_and_select: function(option) {
 
         // If element is null, the modal was closed and we don't need to do anything
