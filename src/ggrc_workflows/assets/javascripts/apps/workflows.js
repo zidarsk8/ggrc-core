@@ -460,7 +460,10 @@
         }
       }
     };
-    new GGRC.WidgetList("ggrc_workflows", descriptor);
+    new GGRC.WidgetList("ggrc_workflows", descriptor, [
+      "info_widget",
+      "task_widget"
+    ]);
   };
 
   WorkflowExtension.init_global = function() {
