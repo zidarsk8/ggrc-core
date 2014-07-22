@@ -257,6 +257,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           task_group_object=task_group_object,
           title=object.title,
           modified_by=current_user,
+          end_date=obj.end_date,
           object=object,
           )
 
