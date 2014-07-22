@@ -364,7 +364,7 @@
     objects_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree mockup-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
       widget_id: "objects",
       widget_name: "Objects",
       widget_icon: "object",
