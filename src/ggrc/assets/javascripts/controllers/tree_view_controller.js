@@ -799,7 +799,6 @@ can.Control("CMS.Controllers.TreeViewNode", {
       can.view(that.options.show_view, that.options, this._ifNotRemoved(function(frag) {
         that.replace_element(frag);
         that._draw_node_deferred.resolve();
-        $(window).trigger("hashchange", window.location.hash);
       }));
     //}, 20);
   }

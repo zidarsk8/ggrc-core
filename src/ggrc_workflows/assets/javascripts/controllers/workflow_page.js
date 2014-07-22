@@ -65,6 +65,18 @@
         });
       }(), el);
     },
+
+    //  FIXME: This should trigger expansion of the TreeNode, without using
+    //    global event listeners or routes or timeouts, but currently object
+    //    creation and tree insertion is disconnected.
+    "{CMS.Models.TaskGroup} created": function(model, ev, instance) {
+      if (instance instanceof CMS.Models.TaskGroup) {
+        setTimeout(function() {
+          window.location.hash =
+            'task_group_widget/task_group/' + instance.id;
+        }, 250);
+      }
+    }
   });
 
 })(this.CMS, this.GGRC, this.can, this.can.$);
