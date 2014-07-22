@@ -59,7 +59,7 @@
               <li>
                 <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
                   {{#if_equals instance.status 'Assigned'}}
-                    <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">StartX</button>
+                    <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
                   {{/status}}
                   {{#if_equals instance.status 'InProgress'}}
                     <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
