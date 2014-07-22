@@ -51,10 +51,12 @@ for type_ in _workflow_object_types:
   model.__bases__ = (
     models.workflow_object.Workflowable,
     models.task_group_object.TaskGroupable,
+    models.cycle_task_group_object.CycleTaskGroupable,
     models.workflow.WorkflowState,
     ) + model.__bases__
   model.late_init_workflowable()
   model.late_init_task_groupable()
+  model.late_init_cycle_task_groupable()
 
 
 def get_public_config(current_user):
@@ -255,6 +257,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           task_group_object=task_group_object,
           title=object.title,
           modified_by=current_user,
+          object=object,
           )
 
       for task_group_task in task_group.task_group_tasks:

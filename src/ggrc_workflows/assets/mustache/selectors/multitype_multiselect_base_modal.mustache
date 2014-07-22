@@ -1,7 +1,7 @@
 {{!
     Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: Sasmita 
+    Created By: Sasmita
     Maintained By: Sasmita
 }}
 
@@ -26,38 +26,38 @@
     <div class="modal-filter">
       <div class="row-fluid">
         <div class="span6">
-          <div class="modal-search objective-selector">            
+          <div class="modal-search objective-selector">
             <a class="btn btn-mini search-reset" href="#">
               <i class="grcicon-x-grey"></i>
             </a>
-            <input 
-              id="search" 
-              class="input-block-level search-icon" 
-              placeholder="Search..." 
-              value="{{option_search_term}}" 
+            <input
+              id="search"
+              class="input-block-level search-icon"
+              placeholder="Search..."
+              value="{{option_search_term}}"
               type="text">
           </div>
         </div>
-        
+
         <div class="span6">
-          &nbsp;          
-          <div class="pull-right">            
-            <a class="btn btn-add" 
-               href="javascript://" 
-               data-mapping="true" 
-               data-toggle="modal-ajax-form" 
-               data-modal-class="modal-wide" 
-               data-object-singular="{{related_model_singular}}" 
+          &nbsp;
+          <div class="pull-right">
+            <a class="btn btn-add"
+               href="javascript://"
+               data-mapping="true"
+               data-toggle="modal-ajax-form"
+               data-modal-class="modal-wide"
+               data-object-singular="{{related_model_singular}}"
                data-object-plural="{{related_table_plural}}">
               <i class="grcicon-add"></i>
               {{#if_equals new_object_title 'Person'}}
-                Add 
+                Add
               {{else}}
-                Create 
+                Create
               {{/#if_equals}}
               {{ new_object_title }}
-            </a>            
-          </div>          
+            </a>
+          </div>
         </div>
 
       </div>
@@ -68,7 +68,7 @@
     <div class="results">
       <div class="bar-h"></div>
       <!-- Header line of the list -->
-      <ul class="new-tree mockup-tree">
+      <ul class="new-tree multitype-tree">
         <li class="tree-item object-filter">
         <div class="item-main">
         <div class="row-fluid">
@@ -126,7 +126,7 @@
             <span>
               <strong> {{items_selected}} objects selected </strong>
             </span>
-            <a class="btn btn-primary preventdoubleclick 
+            <a class="btn btn-primary preventdoubleclick
               {{#if_helpers '\
                 ^if' item_selected '\
                 or #if' is_page_instance}} disabled {{/if_helpers}}map-button" href="javascript://">
@@ -136,4 +136,3 @@
         </div>
       </div>
     </div>
-

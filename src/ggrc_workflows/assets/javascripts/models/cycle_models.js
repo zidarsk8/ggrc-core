@@ -178,6 +178,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       cycle: "CMS.Models.Cycle.stub",
+      object: "CMS.Models.get_stub",
     },
 
     tree_view_options: {
