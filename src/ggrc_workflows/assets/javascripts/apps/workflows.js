@@ -427,7 +427,7 @@
     descriptor[page_instance.constructor.shortName] = {
       task: {
         widget_id: 'task',
-        widget_name: "Tasks",
+        widget_name: "My Tasks",
         content_controller: GGRC.Controllers.TreeView,
 
         content_controller_options: {
@@ -460,7 +460,10 @@
         }
       }
     };
-    new GGRC.WidgetList("ggrc_workflows", descriptor);
+    new GGRC.WidgetList("ggrc_workflows", descriptor, [
+      "info_widget",
+      "task_widget"
+    ]);
   };
 
   WorkflowExtension.init_global = function() {

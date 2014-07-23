@@ -65,7 +65,8 @@ can.Control("CMS.Controllers.Dashboard", {
   , init_widget_area: function() {
       this.widget_area_controller = new CMS.Controllers.SortableWidgets(
           this.element.find('.widget-area'), {
-              dashboard_controller: this
+              dashboard_controller: this,
+              sort: GGRC.WidgetList.get_default_widget_sort()
           });
       if (!this.inner_nav_controller) {
         //  If there is no inner-nav, then ensure widgets are shown
