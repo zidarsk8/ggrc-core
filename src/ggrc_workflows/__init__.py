@@ -3,7 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 import calendar
 from flask import Blueprint
 from sqlalchemy import inspect
@@ -13,6 +13,7 @@ from ggrc.login import get_current_user
 #from ggrc.rbac import permissions
 from ggrc.services.registry import service
 from ggrc.views.registry import object_view
+from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 import ggrc_workflows.models as models
 
 
@@ -215,6 +216,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   workflow = obj.workflow
 
   # Populate the top-level Cycle object
+  obj.context = workflow.context
   obj.title = workflow.title
   obj.description = workflow.description
   obj.status = 'InProgress'
@@ -239,6 +241,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
     cycle_task_group = models.CycleTaskGroup(
+        context=obj.context,
         cycle=obj,
         task_group=task_group,
         title=task_group.title,
@@ -252,6 +255,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
       object = task_group_object.object
 
       cycle_task_group_object = models.CycleTaskGroupObject(
+          context=obj.context,
           cycle=obj,
           cycle_task_group=cycle_task_group,
           task_group_object=task_group_object,
@@ -265,6 +269,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         task = task_group_task.task
 
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
+          context=obj.context,
           cycle=obj,
           cycle_task_group_object=cycle_task_group_object,
           task_group_task=task_group_task,
@@ -354,3 +359,162 @@ def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
+
+
+# FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
+def _get_or_create_personal_context(user):
+  personal_context = user.get_or_create_object_context(
+      context=1,
+      name='Personal Context for {0}'.format(user.id),
+      description='',
+      )
+  personal_context.modified_by = get_current_user()
+  db.session.add(personal_context)
+  db.session.flush()
+  return personal_context
+
+
+def _find_role(role_name):
+  return db.session.query(Role).filter(Role.name == role_name).first()
+
+
+@Resource.model_posted.connect_via(models.WorkflowPerson)
+def handle_workflow_person_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
+
+  # add a user_roles mapping assigning the user creating the workflow
+  # the WorkflowOwner role in the workflow's context.
+  workflow_member_role = _find_role('WorkflowMember')
+  user_role = UserRole(
+      person=obj.person,
+      role=workflow_member_role,
+      context=obj.context,
+      modified_by=get_current_user(),
+      )
+  db.session.add(user_role)
+
+
+@Resource.model_posted.connect_via(models.Workflow)
+def handle_workflow_post(sender, obj=None, src=None, service=None):
+  db.session.flush()
+  # get the personal context for this logged in user
+  user = get_current_user()
+  personal_context = _get_or_create_personal_context(user)
+  context = obj.build_object_context(
+      context=personal_context,
+      name='{object_type} Context {timestamp}'.format(
+        object_type=service.model.__name__,
+        timestamp=datetime.now()),
+      description='',
+      )
+  context.modified_by = get_current_user()
+
+  db.session.add(obj)
+  db.session.flush()
+  db.session.add(context)
+  db.session.flush()
+  obj.contexts.append(context)
+  obj.context = context
+
+  # add a user_roles mapping assigning the user creating the workflow
+  # the WorkflowOwner role in the workflow's context.
+  workflow_owner_role = _find_role('WorkflowOwner')
+  user_role = UserRole(
+      person=get_current_user(),
+      role=workflow_owner_role,
+      context=context,
+      modified_by=get_current_user(),
+      )
+  # pass along a temporary attribute for logging the events.
+  user_role._display_related_title = obj.title
+  db.session.add(user_role)
+  db.session.flush()
+
+  # Create the context implication for Workflow roles to default context
+  db.session.add(ContextImplication(
+      source_context=context,
+      context=None,
+      source_context_scope='Workflow',
+      context_scope=None,
+      modified_by=get_current_user(),
+      ))
+
+  if not src.get('private'):
+    # Add role implication - all users can read a public workflow
+    add_public_workflow_context_implication(context)
+
+
+def add_public_workflow_context_implication(context, check_exists=False):
+  if check_exists and db.session.query(ContextImplication)\
+      .filter(
+          and_(
+            ContextImplication.context_id == context.id,
+            ContextImplication.source_context_id == None))\
+      .count() > 0:
+    return
+  db.session.add(ContextImplication(
+    source_context=None,
+    context=context,
+    source_context_scope=None,
+    context_scope='Workflow',
+    modified_by=get_current_user(),
+    ))
+
+
+from ggrc_basic_permissions.contributed_roles import (
+    RoleContributions, RoleDeclarations, DeclarativeRoleImplications
+    )
+from ggrc_workflows.roles import (
+    WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
+    )
+
+
+class WorkflowRoleContributions(RoleContributions):
+  contributions = {
+      'ProgramCreator': {
+        'create': ['Workflow', 'Task'],
+        'read': ['Task'],
+        'update': ['Task'],
+        'delete': ['Task'],
+        },
+      'ObjectEditor': {
+        'create': ['Workflow', 'Task'],
+        'read': ['Task'],
+        'update': ['Task'],
+        'delete': ['Task'],
+        },
+      'Reader': {
+        'read': ['Task']
+        }
+      }
+
+
+class WorkflowRoleDeclarations(RoleDeclarations):
+  def roles(self):
+    return {
+        'WorkflowOwner': WorkflowOwner,
+        'WorkflowMember': WorkflowMember,
+        'BasicWorkflowReader': BasicWorkflowReader,
+        'WorkflowBasicReader': WorkflowBasicReader,
+        }
+
+
+class WorkflowRoleImplications(DeclarativeRoleImplications):
+  # (Source Context Type, Context Type)
+  #   -> Source Role -> Implied Role for Context
+  implications = {
+      (None, 'Workflow'): {
+        'ProgramCreator': ['BasicWorkflowReader'],
+        'ObjectEditor': ['BasicWorkflowReader'],
+        'Reader': ['BasicWorkflowReader'],
+        },
+      ('Workflow', None): {
+        'WorkflowOwner': ['WorkflowBasicReader'],
+        'WorkflowMember': ['WorkflowBasicReader'],
+        },
+      }
+
+
+ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
+ROLE_DECLARATIONS = WorkflowRoleDeclarations()
+ROLE_IMPLICATIONS = WorkflowRoleImplications()
