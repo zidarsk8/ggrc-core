@@ -170,9 +170,9 @@
 
         },
         Person: {
-          assigned_tasks: Search("", [
+          assigned_tasks: Search("findAll", [
               "CycleTaskGroupObjectTask"//,
-          ], { contact_id: "id" }),
+          ], { contact_id: "id", 'cycle.is_current': true }),
         }
       };
 

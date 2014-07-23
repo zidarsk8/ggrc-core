@@ -1468,17 +1468,24 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural))
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
-          , self = this
-          ;
+        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural)),
+            mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify(),
+            self = this,
+            result;
 
         if (mappings) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
         }
         else {
-          return GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding)).pipe(function(mappings) {
+          if (this.term === "findAll") {
+            result = CMS.Models.CycleTaskGroupObjectTask.findAll(this.get_params(binding)).pipe(function(mappings) {
+              return {entries: mappings};
+            });
+          } else {
+            result = GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding));
+          }
+          return result.pipe(function(mappings) {
             can.each(mappings.entries, function(entry, i) {
               var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
               mappings.entries[i] = new _class({ id: entry.id });
