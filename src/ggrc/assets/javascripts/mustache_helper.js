@@ -2257,9 +2257,11 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
       instance.get_list_counter(mapping_name))
 });
 
-Mustache.registerHelper("is_overdue", function(_date, options){
+Mustache.registerHelper("is_overdue", function(_date, status, options){
+  options = arguments.length === 2 ? arguments[1] : options;
+  status = arguments.length === 2 ? "" : resolve_computed(status);
   var date = moment(resolve_computed(_date));
-  if(date && date.isBefore(new Date())){
+  if(status !== 'Verified' && date && date.isBefore(new Date())){
     return options.fn(options.contexts);
   }
   else{
