@@ -1,0 +1,13 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+{{#is_allowed "read" "Risk" context="any"}}
+<h2 class="risk">Risk Assessment V2</h2>
+<ul class="top-level">
+  {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Risk" li_class="risk"}}}
+</ul>
+{{/is_allowed}}

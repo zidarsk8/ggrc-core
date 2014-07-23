@@ -1,0 +1,9 @@
+dashboard-js-files:
+  - apps/risk_assessment_v2.js
+  - models/risk.js
+
+dashboard-js-spec-files:
+
+dashboard-js-template-files:
+  - dashboard/lhn_risk_assessment_v2.mustache
+  - risks/modal_content.mustache
