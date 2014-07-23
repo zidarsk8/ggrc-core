@@ -4,31 +4,7 @@
     Created By: Sasmita 
     Maintained By: Sasmita
 }}
-<li class="tree-item object-filter">
-  <div class="item-main">
-    <div class="row-fluid">
-      <div class="span9">
-        <div class="item-data">
-          <div class="tree-title-area">
-            <span>
-              <strong>
-                {{ options.length }} Objects found
-              </strong>
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="span3">
-        <div class="object-check all-check">
-          <label>
-            Select all
-            <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-</li>
+
 {{#each options}}
 <li class="tree-item control governance task-item" 
   data-object-type="{{instance.class.table_singular}}"
