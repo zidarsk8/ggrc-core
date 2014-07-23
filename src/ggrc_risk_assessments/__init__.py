@@ -80,3 +80,26 @@ program_type = getattr(all_models, "Program")
 program_type.__bases__ = (MixRiskAssessmentsIntoProgram,) \
  + program_type.__bases__
 program_type.mix_risk_assessments_into_program()
+
+
+from ggrc_basic_permissions.contributed_roles import (
+    RoleContributions, RoleDeclarations, RoleImplications
+    )
+    
+class RiskAssessmentRoleContributions(RoleContributions):
+  contributions = {
+    'ProgramOwner': {
+      'create': ['RiskAssessment'],
+      'read': ['RiskAssessment'],
+      'update': ['RiskAssessment'],
+      'delete': ['RiskAssessment'],
+      },
+    'ProgramEditor': {
+      'read': ['RiskAssessment']
+      },
+    'ProgramReader': {
+      'read': ['RiskAssessment']
+      }
+    }
+    
+ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()

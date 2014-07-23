@@ -19,6 +19,8 @@
     };
   };
 
+  CMS.Models.Program.attributes.risk_assessments = "CMS.Models.RiskAssessment.stubs";
+
   // Configure mapping extensions for ggrc_risk_assessments
   RiskAssessmentsExtension.init_mappings = function init_mappings() {
     var Proxy = GGRC.MapperHelpers.Proxy,
