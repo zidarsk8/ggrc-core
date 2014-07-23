@@ -71,7 +71,7 @@
 
         Workflow: {
           _canonical: {
-            objects: _workflow_object_types,
+            objects: _workflow_object_types.concat(["Cacheable"]),
             direct_tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
