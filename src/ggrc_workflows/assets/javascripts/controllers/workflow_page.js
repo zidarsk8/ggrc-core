@@ -35,7 +35,7 @@
         instance : GGRC.page_instance()
       }, function() {
         cycle = new CMS.Models.Cycle({
-          context: { id: null, type: "Context" },
+          context: page_instance.context.stub(),
           workflow: { id: page_instance.id, type: "Workflow" },
           autogenerate: true
         });

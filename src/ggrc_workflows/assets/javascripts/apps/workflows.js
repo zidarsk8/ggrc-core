@@ -75,7 +75,8 @@
             direct_tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
-            folders : "GDriveFolder"
+            folders: "GDriveFolder",
+            context: "Context"
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
@@ -85,8 +86,7 @@
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
           tasks_via_task_groups: Cross(
             "task_groups", "tasks"),
-          people: Proxy(
-            "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
+
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
           cycles: Direct(
@@ -99,7 +99,20 @@
           current_cycle: CustomFilter("cycles", function(result) {
               return result.instance.is_current;
             }),
-          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
+          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
+
+          people: Proxy(
+            "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
+          context: Direct(
+            "Context", "related_object", "context"),
+          authorization_contexts: Multi([
+            "context"]), //, "contexts_via_audits"]),
+          authorizations: Cross(
+            "authorization_contexts", "user_roles"),
+          authorized_people: Cross(
+            "authorization_contexts", "authorized_people"),
+          mapped_and_or_authorized_people: Multi([
+            "people", "authorized_people"])
         },
 
         Cycle: {
@@ -324,7 +337,9 @@
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.Person,
-            mapping: "people",
+            mapping: "mapped_and_or_authorized_people",
+            show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache",
+            footer_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache",
             footer_view: GGRC.mustache_path + "/wf_people/tree_footer.mustache"
           }
         },
@@ -419,6 +434,14 @@
     new_widget_descriptors.current = current_widget_descriptor;
 
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
+
+    // Setup extra refresh required due to automatic creation of permissions
+    // on creation of WorkflowPerson
+    CMS.Models.WorkflowPerson.bind("created", function(ev, instance) {
+      if (instance instanceof CMS.Models.WorkflowPerson) {
+        instance.context.reify().refresh();
+      }
+    });
   };
 
   WorkflowExtension.init_widgets_for_person_page =

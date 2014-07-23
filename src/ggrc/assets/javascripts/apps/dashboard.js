@@ -45,7 +45,7 @@ var admin_list_descriptors = {
   }
   , "roles" : {
       model : CMS.Models.Role
-    , extra_params : { scope__in: "System,Admin,Private Program" }
+    , extra_params : { scope__in: "System,Admin,Private Program,Workflow" }
     , object_category : "governance"
     , object_display : "Roles"
     , list_view : "/static/mustache/roles/object_list.mustache"

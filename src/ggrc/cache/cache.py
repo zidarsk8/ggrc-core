@@ -172,6 +172,7 @@ def all_mapping_entries():
     mapping('TaskGroup', 'workflow'),
     mapping('WorkflowObject', 'object', True),
     mapping('WorkflowObject', 'workflow'),
+    mapping('WorkflowPerson', 'context'),
     mapping('WorkflowPerson', 'person'),
     mapping('WorkflowPerson', 'workflow'),
     mapping('WorkflowTask', 'task'),
