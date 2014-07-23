@@ -17,6 +17,10 @@ permissions = {
         "CycleTaskEntry",
         "UserRole",
         "Context",
+        "Document",
+        "ObjectDocument",
+        "ObjectFolder",
+        "ObjectFile",
     ],
     "create": [
         "Workflow",
