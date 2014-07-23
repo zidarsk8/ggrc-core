@@ -11,7 +11,9 @@ from .roles import (
     ProgramOwner, ProgramReader, Reader, gGRC_Admin,
     )
 
+
 DECLARED_ROLE = "CODE DECLARED ROLE"
+
 
 def contribute_role_permissions(permissions, additional_permissions):
   for action, resource_permissions in additional_permissions.items():
@@ -19,6 +21,7 @@ def contribute_role_permissions(permissions, additional_permissions):
     for resource_permission in resource_permissions:
       permissions[action].append(resource_permission)
   return permissions
+
 
 def get_declared_role(rolename, resolved_roles={}):
   if rolename in resolved_roles:
@@ -31,6 +34,7 @@ def get_declared_role(rolename, resolved_roles={}):
     resolved_roles[rolename] = role_definition
     return role_definition
   return None
+
 
 def lookup_declarations(declarations={}):
   if len(declarations) == 0:
@@ -46,6 +50,7 @@ def lookup_declarations(declarations={}):
   else:
     return declarations
 
+
 def lookup_contributions(rolename):
   extension_modules = get_extension_modules()
   contributions = {}
@@ -56,6 +61,7 @@ def lookup_contributions(rolename):
       contribute_role_permissions(contributions, ext_role_contributions)
   return contributions;
 
+
 def lookup_role_implications(rolename, context_implication):
   extension_modules = get_extension_modules()
   role_implications = []
@@ -65,6 +71,7 @@ def lookup_role_implications(rolename, context_implication):
       role_implications.extend(
           ext_implications.implications_for(rolename, context_implication))
   return role_implications
+
 
 class RoleDeclarations(object):
   """
@@ -77,6 +84,7 @@ class RoleDeclarations(object):
   """
   def roles(self):
     return {}
+
 
 class RoleContributions(object):
   """
@@ -94,6 +102,7 @@ class RoleContributions(object):
     if method:
       return method(self)
     return {}
+
 
 class RoleImplications(object):
   def implications_for(self, rolename, context_implication):
