@@ -14,6 +14,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
+      <input id="context_id" name="context" type="hidden" model="Context" value="{{firstnonempty instance.context.id object_params.context}}">
       <br>
     </div>
     <div class="span4">
@@ -32,7 +33,7 @@
         <input id="workflow_id" name="workflow" type="hidden" model="Workflow" value="{{firstnonempty instance.workflow.id object_params.workflow}}">
         Workflow
         {{#using workflow=instance.workflow}}
-          <div>{{{workflow.title}}</div>
+          <div>{{workflow.title}}</div>
         {{/using}}
       {{/if_helpers}}
     </div>
