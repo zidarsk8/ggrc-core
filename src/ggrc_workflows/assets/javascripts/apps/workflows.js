@@ -170,9 +170,12 @@
 
         },
         Person: {
-          assigned_tasks: Search("findAll", [
-              "CycleTaskGroupObjectTask"//,
-          ], { contact_id: "id", 'cycle.is_current': true }),
+          assigned_tasks: Search(function(binding) {
+            return CMS.Models.CycleTaskGroupObjectTask.findAll({
+              contact_id: binding.instance.id,
+              'cycle.is_current': true
+            });
+          })
         }
       };
 

@@ -1363,12 +1363,10 @@
 
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
   }, {
-      init: function(term, types, params) {
+      init: function(query_function) {
         this._super();
 
-        this.term = term || '';
-        this.types = types;
-        this.params = params || {};
+        this.query_function = query_function;
       }
 
     , init_listeners: function(binding) {
@@ -1392,16 +1390,6 @@
           if (mapping instanceof model)
             that.remove_instance_from_mapping(binding, mapping);
         });
-      }
-
-    , get_params: function(binding) {
-        var params = can.extend({}, this.params);
-        for (var prop in params) {
-          if (params[prop] && binding.instance[params[prop]]) {
-            params[prop] = binding.instance[params[prop]];
-          }
-        }
-        return params;
       }
 
     , is_valid_mapping: function(binding, mapping) {
@@ -1478,22 +1466,16 @@
           return new $.Deferred().resolve(mappings);
         }
         else {
-          if (this.term === "findAll") {
-            result = CMS.Models.CycleTaskGroupObjectTask.findAll(this.get_params(binding)).pipe(function(mappings) {
-              return {entries: mappings};
-            });
-          } else {
-            result = GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding));
-          }
+          result = this.query_function(binding);
           return result.pipe(function(mappings) {
-            can.each(mappings.entries, function(entry, i) {
+            can.each(mappings, function(entry, i) {
               var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
-              mappings.entries[i] = new _class({ id: entry.id });
+              mappings[i] = new _class({ id: entry.id });
             });
 
-            //binding.instance.attr(object_join_attr, mappings.entries);
-            self.insert_instances_from_mappings(binding, mappings.entries.reify());
-            return mappings.entries;
+            //binding.instance.attr(object_join_attr, mappings);
+            self.insert_instances_from_mappings(binding, mappings.reify());
+            return mappings;
           });
         }
       }
@@ -1578,8 +1560,8 @@
       instance_model_name, option_join_attr);
   }
 
-  GGRC.MapperHelpers.Search = function Search(term, types, params) {
-    return new GGRC.ListLoaders.SearchListLoader(term, types, params);
+  GGRC.MapperHelpers.Search = function Search(query_function) {
+    return new GGRC.ListLoaders.SearchListLoader(query_function);
   }
 
   GGRC.MapperHelpers.Multi = function Multi(sources) {
