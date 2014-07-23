@@ -72,7 +72,7 @@
         Workflow: {
           _canonical: {
             objects: _workflow_object_types.concat(["Cacheable"]),
-            direct_tasks: "Task",
+            tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders: "GDriveFolder",
@@ -80,12 +80,8 @@
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Multi([
-            "direct_tasks", "tasks_via_task_groups"]),
-          direct_tasks: Proxy(
+          tasks: Proxy(
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
-          tasks_via_task_groups: Cross(
-            "task_groups", "tasks"),
 
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
