@@ -100,34 +100,6 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
         controller_content =
           controller_content.find(this.options.content_controller_selector);
 
-      // Determine whether the user can read this widget
-      // FIXME: This only affects TreeView widgets and should be moved
-      var options = this.options.content_controller_options
-        , list_model_name =
-            options.model && options.model.shortName || options.model
-        , page_instance = GGRC.page_instance()
-        , page_model_name =
-            page_instance && page_instance.constructor.shortName
-        , mapping_model_name = GGRC.Mappings.join_model_name_for(
-            page_model_name, list_model_name)
-        ;
-      if (mapping_model_name) {
-        // FIXME These should be calls to is_allowed! But, this doesn't work at the moment
-        // and needs to be resolved ASAP
-        options.allow_reading = options.allow_reading !== false && Permission.is_allowed_for(
-            "read", mapping_model_name);
-        options.allow_creating = options.allow_creating !== false && Permission.is_allowed_for(
-            "create", mapping_model_name);
-      }
-      else {
-        options.allow_reading = options.allow_reading !== false && Permission.is_allowed(
-            "read", mapping_model_name, Permission.page_context_id());
-      }
-
-      if (!options.allow_creating && !options.allow_reading) {
-        options.footer_view = GGRC.mustache_path + "/base_objects/tree_footer_no_access.mustache"
-      }
-
       if (this.options.content_controller_options.init) {
         this.options.content_controller_options.init();
       }
