@@ -8,5 +8,5 @@ from ggrc import db
 from ggrc.models.mixins import Base, Titled, Slugged
 
 
-class Risk(Slugged, Base, db.Model):
+class Risk(Titled, Slugged, Base, db.Model):
   __tablename__ = 'risks'
