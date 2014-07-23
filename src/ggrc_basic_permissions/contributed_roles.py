@@ -112,6 +112,21 @@ class RoleImplications(object):
     """
     return []
 
+
+class DeclarativeRoleImplications(RoleImplications):
+  implications = {}
+
+  def implications_for(self, rolename, context_implication):
+    '''Given a role assignment in context return the implied role assignments
+    in src_context.
+    '''
+    src_context_scope = context_implication.source_context_scope
+    context_scope = context_implication.context_scope
+    result = self.implications.get((src_context_scope, context_scope), {})\
+        .get(rolename, list())
+    return result
+
+
 class BasicRoleDeclarations(RoleDeclarations):
   def roles(self):
     return {
@@ -131,7 +146,7 @@ class BasicRoleDeclarations(RoleDeclarations):
         'Auditor': Auditor,
         }
 
-class BasicRoleImplications(RoleImplications):
+class BasicRoleImplications(DeclarativeRoleImplications):
   # (Source Context Type, Context Type)
   #   -> Source Role -> Implied Role for Context
   implications = {
@@ -160,13 +175,3 @@ class BasicRoleImplications(RoleImplications):
         'Reader': ['ProgramReader'],
         },
       }
-
-  def implications_for(self, rolename, context_implication):
-    '''Given a role assignment in context return the implied role assignments
-    in src_context.
-    '''
-    src_context_scope = context_implication.source_context_scope
-    context_scope = context_implication.context_scope
-    result = self.implications.get((src_context_scope, context_scope), {})\
-        .get(rolename, list())
-    return result
