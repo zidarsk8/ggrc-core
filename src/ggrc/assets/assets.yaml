@@ -175,8 +175,6 @@ dashboard-js-template-files:
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
-  - risks/modal_content.mustache
-  - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
   - roles/object_list.mustache
   - sections/info.mustache
@@ -200,7 +198,6 @@ dashboard-js-template-files:
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache
   - objectives/tree_footer.mustache
-  - risks/tree_footer.mustache
   - sections/tree_footer.mustache
   - people/tree_footer.mustache
   - documents/tree_footer.mustache
