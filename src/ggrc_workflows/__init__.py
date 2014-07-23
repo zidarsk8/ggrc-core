@@ -350,3 +350,15 @@ def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
+
+    if obj.cycle.workflow.object_approval \
+       and obj.cycle.status == 'Verified':
+      for tgobj in obj.task_group_task.task_group.objects:
+        old_status = tgobj.status
+        tgobj.status = 'Final'
+        status_change.send(
+            tgobj.__class__,
+            obj=tgobj,
+            new_status=tgobj.status,
+            old_status=old_status
+            )

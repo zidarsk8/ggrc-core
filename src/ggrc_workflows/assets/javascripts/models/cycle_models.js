@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: dan@reciprocitylabs.com
     Maintained By: dan@reciprocitylabs.com
@@ -245,7 +245,8 @@
           var object = instance.cycle_task_group_object.reify();
           if (object.selfLink) {
             object.refresh();
-            refresh_attr(object, "cycle_task_group");
+            refresh_attr(object, "cycle_task_group", "cycle", "workflow");
+            refresh_attr(object, "task_group_object", "object");
           }
         }
       });

@@ -99,7 +99,9 @@
           current_cycle: CustomFilter("cycles", function(result) {
               return result.instance.status == "InProgress";
             }),
-          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
+          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
+          current_task_group_objects: Cross("current_task_groups", "cycle_task_group_objects_for_page_object"),
+          current_tasks: Cross("current_task_groups", "cycle_task_group_object_tasks_for_page_object")
         },
 
         Cycle: {
@@ -116,7 +118,14 @@
           cycle_task_group_objects: Direct(
             "CycleTaskGroupObject",
             "cycle_task_group",
-            "cycle_task_group_objects")
+            "cycle_task_group_objects"),
+          cycle_task_group_objects_for_page_object: CustomFilter(
+            "cycle_task_group_objects", function(object) {
+              return object.instance.task_group_object.reify().object.reify() === GGRC.page_instance();
+            }),
+          cycle_task_group_object_tasks_for_page_object: Cross(
+            "cycle_task_group_objects_for_page_object", "cycle_task_group_object_tasks"
+            )
         },
 
         CycleTaskGroupObject: {
@@ -181,6 +190,10 @@
       mappings[type] = {};
       mappings[type].workflows = new GGRC.ListLoaders.ProxyListLoader(
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
+      mappings[type].approval_workflows = CustomFilter(
+        "workflows", function(binding) {
+          return binding.instance.object_approval;
+        });
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
       mappings[type]._canonical = {
@@ -224,7 +237,16 @@
             parent_instance: page_instance,
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
+            draw_children: true,
+            child_options: [{
+              title_plural: "Current Tasks",
+              model: CMS.Models.CycleTaskGroupObjectTask,
+              mapping: "current_tasks",
+              allow_creating: true,
+              show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+              footer_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/current_tg_tree_footer.mustache"
+            }]
           }
         }
       };

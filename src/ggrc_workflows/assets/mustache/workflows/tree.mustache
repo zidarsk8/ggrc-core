@@ -60,7 +60,9 @@
         {{> '/static/mustache/workflows/tier2_content.mustache'}}
       </div>
 
-      {{#if draw_children}}
+      {{#if_helpers '\
+        #if' draw_children '\
+        and ^if_equals' instance.workflow_state 'Finished'}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
             {{#child_options}}
               <div class="inner-tree">

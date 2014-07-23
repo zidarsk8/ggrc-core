@@ -17,26 +17,44 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
     return $.when(
       new CMS.Models.Workflow({
         frequency: "one_time",
-        title: "Approval for "
+        title: "Object review for "
                 + this.original_object.constructor.title_singular
                 + ' "' + this.original_object.title + '"',
         start_date: new Date(),
         end_date: this.end_date,
+        object_approval: true,
+        notify_on_change: true,
+        notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
+          + GGRC.current_user.name + " (" + GGRC.current_user.email 
+          + ") asked you to review newly created "
+          + this.original_object.constructor.model_singular + ' "' + this.original_object.title
+          + '" before ' + moment(this.end_date).format("MM/DD/YYYY") + ". "
+          + "Click <a href='" + window.location.href.replace("#.*$", "#") 
+          + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
         context: that.original_object.context
       }).save(),
-      new CMS.Models.Task({
-        title: "Approve "
-                + this.original_object.constructor.title_singular
-                + ' "' + this.original_object.title + '"',
-        context: that.original_object.context
-      }).save()
-    ).then(function(wf, task) {
+      CMS.Models.Task.findAll({title : "Object review"})
+    ).then(function(wf, tasks) {
+      if (tasks.length < 1) {
+        return $.when(
+          wf,
+          new CMS.Models.Task({
+            title: "Object review for "
+                    + that.original_object.constructor.title_singular
+                    + ' "' + that.original_object.title + '"',
+            context: {id : null}
+          }).save()
+        );
+      } else {
+        return $.when(wf, tasks[0]);
+      }
+    }).then(function(wf, task) {
       return $.when(
         wf,
         task,
         new CMS.Models.TaskGroup({
           workflow : wf,
-          title : "Approval for "
+          title: "Object review for "
                   + that.original_object.constructor.title_singular
                   + ' "' + that.original_object.title + '"',
           contact: that.contact,
