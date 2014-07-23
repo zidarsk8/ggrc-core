@@ -200,6 +200,13 @@
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
       };
+
+    // Also register a render hook for object approval      
+    GGRC.register_hook(
+      type + ".info_widget_actions",
+      GGRC.mustache_path + "/base_objects/approval_link.mustache"
+      );
+
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
   };

@@ -426,7 +426,11 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, options.contexts);
 });
 
-Mustache.registerHelper("render_hooks", function(hook, options) {
+Mustache.registerHelper("render_hooks", function() {
+  var args = can.makeArray(arguments),
+      options = args.splice(args.length - 1, 1)[0],
+      hook = can.map(args, Mustache.resolve).join(".");
+
   return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
     return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
   }).join("\n");
