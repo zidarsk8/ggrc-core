@@ -38,7 +38,7 @@
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
    *  For CrossListLoader, the mappings are (`result`, `binding`), where
-   *    `binding` is the "remote binding" which 
+   *    `binding` is the "remote binding" which
    */
   can.Construct("GGRC.ListLoaders.MappingResult", {
   }, {
@@ -834,7 +834,7 @@
 
         can.each(this.sources, function(source) {
           var source_binding = null;
-          /// Here is a deviation from the norm, since we want to 
+          /// Here is a deviation from the norm, since we want to
           ///  allow source bindings from possibly several disparate
           ///  instances.  Pass them in as already created objects
           ///  and we won't try to find them on the binding instance.
@@ -1213,7 +1213,7 @@
   });
 
   /*  IndirectListLoader
-   *  - handles indirect relationships 
+   *  - handles indirect relationships
    *  (zero-to-many, no local join but has a direct mapping in another object)
    *
    *  - listens to:
@@ -1333,7 +1333,7 @@
           , object_attr = this.object_attr + (this.object_attr !== 'context' && model.attributes[this.object_attr].indexOf('stubs') > -1 ?  '.id' : '_id')
           , self = this
           ;
-        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id; 
+        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id;
         if (mappings || !params[object_attr]) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
@@ -1352,7 +1352,7 @@
   });
 
   /*  SearchListLoader
-   *  - handles search relationships 
+   *  - handles search relationships
    *
    *  - listens to:
    *      - model.created
