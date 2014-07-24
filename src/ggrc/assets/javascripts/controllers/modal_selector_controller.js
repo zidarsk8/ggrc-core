@@ -1598,9 +1598,13 @@
     }
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
+      //  If the resource type doesn't exist, short-circuit
+      if (!CMS.Models[far_model_name]) {
+        return;
+      }
+
       var option_model_name = descriptor.option_model_name || far_model_name
         , extra_options = multiselect_descriptor_view_option[option_model_name];
-      
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.

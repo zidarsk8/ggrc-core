@@ -10,6 +10,7 @@ from ggrc.notification import EmailNotification, EmailDigestNotification
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
+from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc_workflows import status_change
 from ggrc_workflows import calc_start_date
@@ -30,11 +31,12 @@ def notify_on_change(workflow):
     return workflow.notify_on_change
 
 def get_workflow_owner(workflow):
-  if workflow.owners is not None:
-    for workflow_owner in workflow.owners:
-      return workflow_owner
-  else:
-    return None
+  workflow_owner_role = Role.query.filter(Role.name == 'WorkflowOwner').first()
+  user_roles = UserRole.query.filter(
+      UserRole.context_id == workflow.context_id,
+      UserRole.role_id == workflow_owner_role.id)
+  for user_role in user_roles:
+    return user_role.person
 
 def get_task_workflow_owner(task):
   workflow=get_task_workflow(task) 

@@ -39,6 +39,7 @@ dashboard-js-template-files:
   - workflows/confirm_start.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
+  - workflows/contacts.mustache
   - workflows/tree.mustache
   - workflows/search_result.mustache
   - workflows/extended_info.mustache

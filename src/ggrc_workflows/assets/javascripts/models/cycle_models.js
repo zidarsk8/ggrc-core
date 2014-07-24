@@ -90,7 +90,8 @@
       cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
-      documents : "CMS.Models.Document.stubs",
+      object_documents: "CMS.Models.ObjectDocument.stubs",
+      documents: "CMS.Models.Document.stubs",
       cycle: "CMS.Models.Cycle.stub",
     },
 

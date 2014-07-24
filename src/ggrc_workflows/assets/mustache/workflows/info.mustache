@@ -24,18 +24,7 @@
   <div class="row-fluid">
     <div class="span12">
       <div class="rtf-block">
-        <strong>Workflow Owner:</strong>
-        {{#if instance.owners.length}}
-          {{#using contacts=instance.owners}}
-          {{#contacts}}
-            {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-          {{/contacts}}
-          {{/using}}
-        {{else}}
-          <span class="error">
-            None
-          </span>
-        {{/if}}
+        {{{render '/static/mustache/workflows/contacts.mustache' instance=instance stacked=true}}}
       </div>
     </div>
   </div>

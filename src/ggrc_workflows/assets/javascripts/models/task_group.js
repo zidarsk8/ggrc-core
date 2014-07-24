@@ -18,7 +18,10 @@
     update: "PUT /api/task_groups/{id}",
     destroy: "DELETE /api/task_groups/{id}",
 
+    mixins: ["contactable"],
+
     attributes: {
+      contact : "CMS.Models.Person.stub",
       workflow: "CMS.Models.Workflow.stub",
       task_group_tasks: "CMS.Models.TaskGroupTask.stubs",
       tasks: "CMS.Models.Task.stubs",
@@ -41,7 +44,7 @@
         var contact_exists = this.contact ? true : false;
         var reified_contact = contact_exists ? this.contact.reify() : false;
         var contact_has_email_address = reified_contact ? reified_contact.email : false;
-        
+
         // This check will not work until the bug introduced with commit 8a5f600c65b7b45fd34bf8a7631961a6d5a19638
         // is resolved.
         if(!contact_has_email_address) {

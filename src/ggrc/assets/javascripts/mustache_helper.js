@@ -1211,7 +1211,12 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
 
   context_id = source.context ? source.context.id : null;
 
-  if (target_type === 'Cacheable') {
+  resource_type = GGRC.Mappings.join_model_name_for(
+    source.constructor.shortName, target_type);
+
+  // The special case for `Cacheable` should no longer be necessary given
+  // correct definition of the canonical mapping for Cacheable.
+  if (!resource_type && target_type === 'Cacheable') {
     //  FIXME: This will *not* work for customizable roles -- this *only* works
     //    for the limited default roles as of 2013-10-07, and assumes that:
     //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
@@ -1225,9 +1230,6 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     can_map = Permission.is_allowed('create', 'Relationship', context_id);
   }
   else {
-    resource_type = GGRC.Mappings.join_model_name_for(
-      source.constructor.shortName, target_type);
-
     if (!(source instanceof CMS.Models.Program)
         && target instanceof CMS.Models.Program)
       context_id = target.context ? target.context.id : null;
