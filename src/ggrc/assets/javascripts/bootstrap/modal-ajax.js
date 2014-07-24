@@ -175,7 +175,7 @@
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
       if (object_params) {
-        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\n"));
       } else {
         object_params = {};
       }
@@ -219,7 +219,7 @@
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
-      , model = CMS.Models[$trigger.attr("data-object-singular")]
+      , model = CMS.Models[$trigger.attr("data-object-singular")] || CMS.ModelHelpers[$trigger.attr("data-object-singular")]
       , mapping = $trigger.data('mapping')
       , instance;
       if($trigger.attr('data-object-id') === "page") {
@@ -228,7 +228,7 @@
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
       if (object_params) {
-        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\n"));
       } else {
         object_params = {};
       }

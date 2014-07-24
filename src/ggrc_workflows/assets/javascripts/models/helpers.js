@@ -1,3 +1,52 @@
+/*!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+*/
+
+;(function(can, $, CMS) {
+
+can.Observe("CMS.ModelHelpers.CycleTask", {
+  findInCacheById : function() { return null; },
+}, {
+  init : function() {
+    this.attr("owners", new CMS.Models.Person.List(this.owners));
+  },
+  save : function() {
+    var that = this;
+    return new CMS.Models.Task(this._data).save().then(function(task) {
+    return new CMS.Models.TaskGroupTask({
+      task_group: that.task_group,
+      task: task,
+      sort_index: Number.MAX_SAFE_INTEGER / 2,
+      contact: that.contact,
+      context: that.context
+    }).save();
+  }).then(function(task_group_task) {
+      return new CMS.Models.CycleTaskGroupObjectTask({
+        cycle: that.cycle,
+        start_date: that.cycle.reify().start_date,
+        end_date: that.cycle.reify().end_date,
+        task_group_task: task_group_task,
+        cycle_task_group_object: that.cycle_task_group_object,
+        sort_index: that.sort_index,
+        title: that.title,
+        description: that.description,
+        status: "Assigned",
+        contact: that.contact,
+        context: that.context
+      }).save();
+    });
+  },
+  computed_errors: can.compute(function() {
+    var errors = null;
+    if(!this.attr("title")) {
+      errors = { title: "Must be defined" };
+    }
+    return errors;
+  })
+});
 
 
 can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
@@ -75,7 +124,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
         new CMS.Models.TaskGroupTask({
           task_group: tg,
           task: task,
-          sort_index: Number.MAX_SAFE_INTEGER / 2,
+          sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
           contact: that.contact,
           context: wf.context
         }).save(),
@@ -104,3 +153,5 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
     return errors;
   })
 });
+
+})(this.can, this.can.$, this.CMS);
