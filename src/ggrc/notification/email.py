@@ -12,7 +12,7 @@
 from flask import current_app
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
-from datetime import datetime
+from datetime import datetime, timedelta
 from ggrc import db
 from ggrc import settings
 
@@ -397,6 +397,7 @@ class EmailDeferredNotification(EmailNotification):
   def notify(self):
     deferred_notifs=db.session.query(Notification).\
       join(Notification.recipients).\
+      filter(Notification.notif_date < (datetime.now() - timedelta(minutes=60))).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
@@ -437,6 +438,7 @@ class EmailDigestDeferredNotification(EmailDigestNotification):
   def notify(self):
     deferred_notifs=db.session.query(Notification).\
       join(Notification.recipients).\
+      filter(Notification.notif_date < (datetime.now() - timedelta(minutes=60))).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
