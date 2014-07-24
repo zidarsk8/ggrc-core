@@ -59,7 +59,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
       , "DataAsset" : {}
       , "Program" : {}
       , "Market" : {}
-      , "Risk" : {}
       , "Regulation" : {}
       , "Policy" : {}
       , "Standard" : {}
