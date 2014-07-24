@@ -82,7 +82,7 @@
           &.text-risk,
           &.text-attribute {
             a {
-              color:$risk;  
+              color:$risk;
             }
           }
           &.text-business,
@@ -93,7 +93,7 @@
           &.text-product,
           &.text-orggroup {
             a {
-              color:$business;  
+              color:$business;
             }
           }
           &.text-governance,
@@ -106,7 +106,7 @@
           &.text-regulation,
           &.text-standard {
             a {
-              color:$governance;  
+              color:$governance;
             }
           }
         }
@@ -287,7 +287,7 @@
       padding-left:12px;
       .btn {
         padding-right:6px;
-        padding-left:6px;      
+        padding-left:6px;
       }
     }
     .form-inline {
@@ -937,6 +937,7 @@
   &.person-preview {
     overflow: visible;
     height: auto;
+    width: 600px;
   }
 }
 
