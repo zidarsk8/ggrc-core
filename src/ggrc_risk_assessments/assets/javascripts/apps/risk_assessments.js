@@ -39,6 +39,10 @@
             risk_assessments: Direct(
               "RiskAssessment", "program", "risk_assessments"),
           },
+          RiskAssessment: {
+            documents: Proxy(
+              "Document", "document", "ObjectDocument", "documentable", "object_documents"),
+          },
         };
         new GGRC.Mappings("ggrc_risk_assessments", mappings);
   };
@@ -48,6 +52,7 @@
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
     var descriptor = {},
         page_instance = GGRC.page_instance();
+    var _mustache_path = GGRC.mustache_path + "/risk_assessments";
   
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {
@@ -60,7 +65,8 @@
             parent_instance: page_instance,
             model: CMS.Models.RiskAssessment,
             show_view: GGRC.mustache_path + "/risk_assessments/tree.mustache",
-            footer_view: GGRC.mustache_path + "/risk_assessments/tree_footer.mustache"
+            footer_view: GGRC.mustache_path + "/risk_assessments/tree_footer.mustache",
+            draw_children: true,
           }
         }
       };

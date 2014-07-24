@@ -13,3 +13,6 @@ dashboard-js-template-files:
   - risk_assessments/tree_footer.mustache
   - risk_assessments/tier2_content.mustache
   - risk_assessments/modal_content.mustache
+  - risk_assessments/documents.mustache
+  - risk_assessments/documents_footer.mustache
+  
