@@ -822,6 +822,8 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
     return;
 
   loader = context.get_binding(binding);
+  if(!loader)
+    return;
   frame.attr(binding, loader.list);
 
   options = arguments[2] || options;
