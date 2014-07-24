@@ -1710,7 +1710,7 @@
           , lookup = {
               governance: 0
             , business: 1
-            , entities: 2
+            //, entities: 2
             };
 
         if (!this.options.option_type_menu) {
@@ -1721,15 +1721,22 @@
             , { category: "Assets/Business"
               , items: []
               }
-            , { category: "People/Groups"
-              , items: []
-              }
+            //, { category: "People/Groups"
+            //  , items: []
+            //  }
             ];
           can.each(this.options.option_descriptors, function(descriptor) {
-            menu[lookup[descriptor.model.category] || 0].items.push({
-                model_name: descriptor.model.shortName
-              , model_display: descriptor.model.title_plural
-            })
+            if (descriptor.model.category == "workflow" || 
+                descriptor.model.category == "undefined" ||
+                descriptor.model.category == "entities"){
+              return false;
+            }
+            else{
+              menu[lookup[descriptor.model.category] || 0].items.push({
+                  model_name: descriptor.model.shortName
+                , model_display: descriptor.model.title_plural
+              })
+            }
           })
 
           this.options.option_type_menu = menu;
