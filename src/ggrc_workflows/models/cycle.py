@@ -27,8 +27,17 @@ class Cycle(
       'CycleTaskGroupObjectTask', backref='cycle', cascade='all, delete-orphan')
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
+  is_current = db.Column(db.Boolean, default=True, nullable=False)
+
+  @property
+  def cycle_task_group_object_objects_for_cache(self):
+    """Changing Cycle state must invalidate `workflow_state` on objects
+    """
+    return [
+        (o.object_type, o.object_id) for o in self.cycle_task_group_objects]
 
   _publish_attrs = [
       'workflow',
       'cycle_task_groups',
+      'is_current',
       ]

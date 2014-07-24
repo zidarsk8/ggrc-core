@@ -75,7 +75,6 @@ jQuery(function ($) {
 /* no worky 
   $(document).on("click", ".sluggroup", function(event){
     //alert("here");
-   // $('.riskWidget').each(function(i){
     var $this = $(this);
     $('.sluggroup').removeClass('selected');
     $this.addClass('selected');
@@ -417,26 +416,6 @@ $('body').on('click', '#showCompanyDirectory', function(e) {
   });
 });
 
-function toggleRisk() {
-  //$('.riskWidget').fadeToggle("fast", "linear");
-  var interval = 200;
-  $('.riskWidget').each(function(i){
-    var el = $(this);
-    if(el.hasClass('active')){
-      $('#grcbutton-risk').addClass('halfopacity').removeClass('active');
-      $.cookie('toggle_risk', null);
-      el.delay(i*interval).slideUp(interval);
-      el.removeClass('active');
-    }else{
-      $('#grcbutton-risk').removeClass('halfopacity').addClass('active');
-      $.cookie('toggle_risk', '1', { expires: 1, path: '/' });
-      el.delay(i*interval).slideDown(interval);
-      el.addClass('active');
-    }
-  });
-
-}
-
 function toggleGovernance() {
    var interval = 200;
   $('.govWidget').each(function(i){
@@ -461,15 +440,6 @@ jQuery(function($) {
     toggleGovernance();
   else
     $('.govWidget').hide();
-  if ($.cookie('toggle_risk') == '1')
-    toggleRisk();
-  else
-    $('.riskWidget').hide();
-
-  $('body').on('click', '#grcbutton-risk', function(e) {
-    toggleRisk();
-    e.preventDefault();
-  });
 
   $('body').on('click', '#grcbutton-governance', function(e) {
     toggleGovernance();

@@ -32,10 +32,68 @@ class CycleTaskGroupObject(
       backref='cycle_task_group_object',
       cascade='all, delete-orphan'
       )
+  object_id = db.Column(db.Integer, nullable=False)
+  object_type = db.Column(db.String, nullable=False)
 
   _publish_attrs = [
       'cycle',
       'cycle_task_group',
       'task_group_object',
       'cycle_task_group_object_tasks',
+      'object',
       ]
+
+  @property
+  def object_attr(self):
+    return '{0}_object'.format(self.object_type)
+
+  @property
+  def object(self):
+    return getattr(self, self.object_attr)
+
+  @object.setter
+  def object(self, value):
+    self.object_id = value.id if value is not None else None
+    self.object_type = value.__class__.__name__ if value is not None \
+        else None
+    return setattr(self, self.object_attr, value)
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        #db.UniqueConstraint('cycle_task_group_id', 'object_id', 'object_type'),
+        )
+
+  def _display_name(self):
+    return \
+        self.object.display_name + '<->' + self.cycle_task_group.display_name
+
+
+class CycleTaskGroupable(object):
+  @classmethod
+  def late_init_cycle_task_groupable(cls):
+    def make_cycle_task_group_objects(cls):
+      joinstr = 'and_(foreign(CycleTaskGroupObject.object_id) == {type}.id, '\
+                     'foreign(CycleTaskGroupObject.object_type) == "{type}")'
+      joinstr = joinstr.format(type=cls.__name__)
+      return db.relationship(
+          'CycleTaskGroupObject',
+          primaryjoin=joinstr,
+          backref='{0}_object'.format(cls.__name__),
+          cascade='all, delete-orphan',
+          #post_update=True
+          )
+    cls.cycle_task_group_objects = make_cycle_task_group_objects(cls)
+
+  _publish_attrs = [
+      #'cycle_task_group_objects',
+      ]
+
+  @classmethod
+  def eager_query(cls):
+    from sqlalchemy import orm
+
+    query = super(CycleTaskGroupable, cls).eager_query()
+    return query.options(
+        #orm.subqueryload('cycle_task_group_objects'),
+        )

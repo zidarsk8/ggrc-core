@@ -12,7 +12,7 @@
     root_object: "workflow",
     root_collection: "workflows",
     category: "workflow",
-    mixins: ["ownable"],
+    mixins: [],
     findAll: "GET /api/workflows",
     findOne: "GET /api/workflows/{id}",
     create: "POST /api/workflows",
@@ -32,7 +32,6 @@
       end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
       modified_by: "CMS.Models.Person.stub",
-      owners : "CMS.Models.Person.stubs",
       context: "CMS.Models.Context.stub"
     },
 

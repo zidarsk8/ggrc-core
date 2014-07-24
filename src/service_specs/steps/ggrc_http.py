@@ -232,7 +232,7 @@ def define_current_user(context, user_json):
   context.current_user_json = json.dumps(context.current_user_data)
 
 def get_related_resource_types(resource_type, resource_types):
-  model = getattr(ggrc.models, resource_type)
+  model = ggrc.models.get_model(resource_type)
   for attr in ggrc.db.inspect(model).attrs:
     if isinstance(attr, RelationshipProperty):
       columns = tuple(attr.local_columns)[0]

@@ -273,6 +273,9 @@
       if (self.options.scope) {
         params.scope = self.options.scope;
       }
+      else if (instance && instance.constructor.shortName === "Workflow" && instance.context) {
+        params.scope = "Workflow";
+      }
       else if (instance && instance.constructor.shortName === "Program" && instance.context) {
         params.scope = "Private Program";
       }
@@ -290,6 +293,9 @@
           options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
           if (params.scope == "Private Program") {
             description = "A person with the No Access role will not be able to see this Private Program.";
+          }
+          else if (params.scope == "Workflow") {
+            description = "A person with the No Access role will not be able to update or contribute to this Workflow.";
           }
           else {
             description = "This role allows a user access to the MyWork dashboard and applications Help files.";

@@ -11,6 +11,7 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
+from ggrc.models.context import HasOwnContext
 from sqlalchemy.orm import validates
 from ggrc.models.computed_property import computed_property
 from .task_group_object import TaskGroupObject
@@ -20,7 +21,8 @@ from collections import OrderedDict
 from datetime import date
 
 
-class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+class Workflow(
+    HasOwnContext, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'workflows'
 
   #Use these states for WorkflowCycle when it is implemented
@@ -126,6 +128,9 @@ class WorkflowState(object):
 
     for obj in objs:
       today = date.today()
+      cycle = obj if isinstance(obj, Cycle) else obj.cycle
+      if not cycle.is_current:
+        continue
       if obj.end_date and \
          obj.end_date <= today and \
          obj.status != "Verified":

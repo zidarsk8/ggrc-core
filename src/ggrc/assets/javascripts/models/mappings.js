@@ -716,12 +716,20 @@
       , extended_related_projects:    Multi(["related_projects", "owned_projects"])
       , extended_related_systems:     Multi(["related_systems", "owned_systems"])
 
-      , related_objects_via_search: Search("", [
-          "Program",  "Regulation", "Contract", "Policy", "Standard",
-          "Section", "Clause", "Objective", "Control",
-          "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Audit"//, "Request", "Response"
-        ], { contact_id: "id" })
+      , related_objects_via_search: Search(function(binding) {
+          var types = [
+            "Program",  "Regulation", "Contract", "Policy", "Standard",
+            "Section", "Clause", "Objective", "Control",
+            "System", "Process", "DataAsset", "Product", "Project", "Facility",
+            "Market", "OrgGroup", "Audit"//, "Request", "Response"
+            ];
+
+          return GGRC.Models.Search.search_for_types(
+              "", types, { contact_id: binding.instance.id }
+            ).pipe(function(mappings) {
+              return mappings.entries;
+            });
+        })
 
       , extended_related_programs_via_search:    TypeFilter("related_objects_via_search", "Program")
       , extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation")
