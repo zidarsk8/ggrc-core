@@ -245,8 +245,8 @@
           var object = instance.cycle_task_group_object.reify();
           if (object.selfLink) {
             object.refresh();
-            refresh_attr(object, "cycle_task_group", "cycle", "workflow");
-            refresh_attr(object, "task_group_object", "object");
+            object.refresh_all("cycle_task_group", "cycle", "workflow");
+            object.refresh_all("task_group_object", "object");
           }
         }
       });
