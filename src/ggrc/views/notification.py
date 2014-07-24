@@ -17,3 +17,17 @@ def notify_emaildigest():
     if hasattr(extension_module, 'notify_email_digest'):
       extension_module.notify_email_digest()
   return 'Ok'
+
+@app.route("/notify_email_deferred", methods=["GET", "POST"])
+def notify_email_deferred():
+  for extension_module in get_extension_modules():
+    if hasattr(extension_module, 'notify_email_deferred'):
+      extension_module.notify_email_deferred()
+  return 'Ok'
+
+@app.route("/notify_emaildigest_deferred", methods=["GET", "POST"])
+def notify_emaildigest_deferred():
+  for extension_module in get_extension_modules():
+    if hasattr(extension_module, 'notify_emaildigest_deferred'):
+      extension_module.notify_emaildigest_deferred()
+  return 'Ok'

@@ -7,11 +7,12 @@
 from flask import current_app, request
 import ggrc_workflows.models as models
 from ggrc.notification import EmailNotification, EmailDigestNotification
+from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
 from ggrc import db
-from ggrc_workflows import status_change
+from ggrc_workflows import status_change, workflow_cycle_start
 from ggrc_workflows import calc_start_date
 
 PRI_TASK_OVERDUE=1
@@ -162,8 +163,10 @@ def prepare_notification_for_task(task, sender, recipient, subject, notif_pri):
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) + "#task_widget"
   override_flag=notify_on_change(workflow)
-  prepare_notification(task, 'Email_Now', notif_pri, subject, content, sender, recipients, override=override_flag)
-  prepare_notification(task, 'Email_Digest', notif_pri, subject, content, sender, recipients, override=override_flag)
+  prepare_notification(task, 'Email_Deferred', notif_pri, subject, content, sender, \
+   recipients, override=override_flag)
+  prepare_notification(task, 'Email_Digest_Deferred', notif_pri, subject, content, sender, \
+   recipients, override=override_flag)
 
 def prepare_notification_for_taskgroup(task_group, sender, recipient, subject, notif_pri):
   workflow=get_taskgroup_workflow(task_group)
@@ -177,8 +180,8 @@ def prepare_notification_for_taskgroup(task_group, sender, recipient, subject, n
     "  " + request.url_root + workflow._inflector.table_plural + \
     "/" + str(workflow.id) + "#task_group_widget"
   override_flag=notify_on_change(workflow)
-  prepare_notification(task_group, 'Email_Now', notif_pri, subject, content, sender, recipients, override=override_flag)
-  prepare_notification(task_group, 'Email_Digest', notif_pri, subject, content, sender, recipients, override=override_flag)
+  prepare_notification(task_group, 'Email_Deferred', notif_pri, subject, content, sender, recipients, override=override_flag)
+  prepare_notification(task_group, 'Email_Digest_Deferred', notif_pri, subject, content, sender, recipients, override=override_flag)
 
 def handle_tasks_overdue():
   tasks=db.session.query(models.CycleTaskGroupObjectTask).\
@@ -210,7 +213,7 @@ def handle_tasks_due(num_days):
     subject="Task " + "'" + task.title + "' is due in " + str(num_days) + " days"
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_DUE)
 
-@status_change.connect_via(models.Cycle)
+@workflow_cycle_start.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
   if obj is None:
     current_app.logger.warn("Trigger: Unable to get cycle object")
@@ -225,6 +228,7 @@ def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=Non
     subject="Workflow Cycle " + "'" + obj.title + "' started, status set to InProgress"
   else:
     subject="Workflow Cycle " + "'" + obj.title + "' status changed to "  + new_status
+  current_app.logger.info(subject)
   prepare_notification_for_cycle(obj, subject, PRI_CYCLE, notify_custom_message)
 
 @status_change.connect_via(models.CycleTaskGroup)
@@ -239,6 +243,7 @@ def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status
   workflow_owner=contact[0]
   assignee=contact[1]
   subject="Task Group " + "'" + obj.title + "' status changed to "  + new_status
+  current_app.logger.info(subject)
   prepare_notification_for_taskgroup(obj, workflow_owner, assignee, subject, PRI_TASKGROUP)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
@@ -254,9 +259,10 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   assignee=contact[1]
   subject="Task " + "'" + obj.title + "' status changed to " + obj.status
   notif_pri=PRI_TASK_CHANGES
+  current_app.logger.info(subject)
   if obj.status in ['InProgress']:
     notif_pri=PRI_TASK_ASSIGNMENT
-  if obj.status in ['InProgress', 'Assigned', 'Declined', 'Verified']: 
+  if obj.status in ['InProgress', 'Finished', 'Assigned', 'Declined', 'Verified']: 
     prepare_notification_for_task(obj, workflow_owner, assignee, subject, notif_pri)
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
@@ -389,14 +395,30 @@ def prepare_notification(src, notif_type, notif_pri, subject, content, owner, re
     emaildigest_notification = EmailDigestNotification()
     emaildigest_notification.notif_pri = notif_pri
     emaildigest_notification.prepare([src], owner, recipients, subject, content, override)
+  elif notif_type == 'Email_Digest_Deferred':
+    emaildigest_notification = EmailDigestDeferredNotification()
+    emaildigest_notification.notif_pri = notif_pri
+    emaildigest_notification.prepare([src], owner, recipients, subject, content, override)
   elif notif_type == 'Email_Now':
     email_notification=EmailNotification()
     email_notification.notif_pri=notif_pri
-    notification=email_notification.prepare([src], owner, recipients, subject, content, override)
+    try:
+      notification=email_notification.prepare([src], owner, recipients, subject, content, override)
+    except Exception as e:
+      current_app.logger.warn("Exception occured in preparing EmailNotification: " + str(e))
+      return
     if notification is not None:
-      email_notification.notify_one(notification, notify_custom_message)
-  else:
-    return None
+      try:
+        email_notification.notify_one(notification, notify_custom_message)
+      except Exception as e:
+        current_app.logger.warn("Exception occured in notifying email: " + str(e))
+  elif notif_type == 'Email_Deferred':
+    try:
+      email_notification=EmailDeferredNotification()
+      email_notification.notif_pri=notif_pri
+      notification=email_notification.prepare([src], owner, recipients, subject, content, override)
+    except Exception as e:
+      current_app.logger.warn("Exception occured in preparing EmailDeferredNotification: " + str(e))
 
 def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
@@ -408,9 +430,20 @@ def notify_email_digest():
     handle_workflow_cycle_starting(num_days)
   db.session.commit()
 
-  """ Notify email digest
-  """
   email_digest_notification=EmailDigestNotification()
   email_digest_notification.notify()
   db.session.commit()
 
+def notify_email_deferred():
+  """ Processing of deferred emails in particular handling Task/Undo 
+  """
+  email_deferred=EmailDeferredNotification()
+  email_deferred.notify()
+  db.session.commit()
+
+  """ Processing of deferred email digest in particular handling Task/Undo 
+      Marking notification type to be EmailDigest
+  """
+  email_digest_deferred=EmailDigestDeferredNotification()
+  email_digest_deferred.notify()
+  db.session.commit()

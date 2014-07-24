@@ -10,3 +10,8 @@ cron:
   url: /notify_emaildigest
   schedule: every day 01:00
   timezone: US/Pacific
+
+- description: gGRC deferred email 
+  url: /notify_email_deferred
+  schedule: every day 10 mins
+  timezone: US/Pacific
