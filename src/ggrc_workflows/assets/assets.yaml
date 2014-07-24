@@ -6,6 +6,7 @@ dashboard-js-files:
   - models/task_group.js
   - models/workflow.js
   - models/workflow_join_models.js
+  - models/helpers.js
   - workflow_mustache_helpers.js
   - controllers/approval_workflow_controller.js
 
