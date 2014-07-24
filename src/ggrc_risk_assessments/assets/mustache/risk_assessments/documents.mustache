@@ -10,10 +10,9 @@
       <i class="grcicon-attach"></i>
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
-    {{^if_equals parent_instance.cycle_task_group_object_task.reify.status 'Verified'}}
-      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-        <i class="grcicon-deleted"></i>
-      </a>
-    {{/if_equals}}
+    <!-- FIXME: This probably should be restricted to ProgramOwner. Will verify and figure out how to restrict it. -->
+    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+      {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+      <i class="grcicon-deleted"></i>
+    </a>
   </li>
