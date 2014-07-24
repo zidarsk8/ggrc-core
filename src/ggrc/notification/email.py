@@ -397,7 +397,7 @@ class EmailDeferredNotification(EmailNotification):
   def notify(self):
     deferred_notifs=db.session.query(Notification).\
       join(Notification.recipients).\
-      filter(Notification.notif_date < (datetime.now() - timedelta(minutes=60))).\
+      filter(Notification.notif_date < (datetime.utcnow() - timedelta(minutes=10))).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
@@ -438,7 +438,7 @@ class EmailDigestDeferredNotification(EmailDigestNotification):
   def notify(self):
     deferred_notifs=db.session.query(Notification).\
       join(Notification.recipients).\
-      filter(Notification.notif_date < (datetime.now() - timedelta(minutes=60))).\
+      filter(Notification.notif_date < (datetime.utcnow() - timedelta(minutes=10))).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
     notifs_by_target={}
