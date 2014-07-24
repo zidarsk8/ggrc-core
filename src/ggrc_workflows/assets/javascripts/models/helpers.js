@@ -16,14 +16,14 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
   save : function() {
     var that = this;
     return new CMS.Models.Task(this._data).save().then(function(task) {
-    return new CMS.Models.TaskGroupTask({
-      task_group: that.task_group,
-      task: task,
-      sort_index: Number.MAX_SAFE_INTEGER / 2,
-      contact: that.contact,
-      context: that.context
-    }).save();
-  }).then(function(task_group_task) {
+      return new CMS.Models.TaskGroupTask({
+        task_group: that.task_group,
+        task: task,
+        sort_index: Number.MAX_SAFE_INTEGER / 2,
+        contact: that.contact,
+        context: that.context
+      }).save();
+    }).then(function(task_group_task) {
       return new CMS.Models.CycleTaskGroupObjectTask({
         cycle: that.cycle,
         start_date: that.cycle.reify().start_date,

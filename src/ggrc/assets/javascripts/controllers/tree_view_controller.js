@@ -244,7 +244,7 @@ can.Control("CMS.Controllers.TreeLoader", {
         new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
 
           that.insert_items(chunk);
-          if (that._pending_items.length > 0) {
+          if (that._pending_items && that._pending_items.length > 0) {
             setTimeout(that._ifNotRemoved(processChunk), 100);
           }
           else {
