@@ -13,5 +13,5 @@ cron:
 
 - description: gGRC deferred email 
   url: /notify_email_deferred
-  schedule: every day 10 mins
+  schedule: every 10 mins
   timezone: US/Pacific
