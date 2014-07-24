@@ -14,6 +14,44 @@
     <div class="span6">&nbsp;</div>
   </div>
   <div class="row-fluid">
+    <div class="span6">
+      <div class="rtf-block">
+      <strong>Risk Owner</strong>
+        {{#if owners.length}}
+          {{#owners}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+          {{/owners}}
+        {{else}}
+          <span class="error">
+            None
+          </span>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="rtf-block">
+      <strong>Risk Contact</strong>
+        {{#if contact}}
+          {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+        {{else}}
+          <span class="error">
+            None
+          </span>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
+      <h3>Description</h3>
+      <div class="rtf-block">
+        {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
     <div class="span12">
       <div class="info-expand">
         <a class="show-hidden-fields info-show-hide" href="javascript://">
