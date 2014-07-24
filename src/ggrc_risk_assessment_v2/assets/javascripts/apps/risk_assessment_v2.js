@@ -36,6 +36,46 @@
   };
 
 
+  // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
+  // Initialize widgets for risk page
+  RiskAssessmentV2Extension.init_widgets = function init_widgets() {
+    var page_instance = GGRC.page_instance();
+
+    // More cases to handle later
+    if (page_instance instanceof CMS.Models.Risk) {
+      RiskAssessmentV2Extension.init_widgets_for_risk_page();
+    }
+  };
+
+  RiskAssessmentV2Extension.init_widgets_for_risk_page =
+      function init_widgets_for_risk_page() {
+
+    var risk_widget_descriptors = {},
+        new_default_widgets = [
+          "info"
+        ];
+
+    can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
+      if (~new_default_widgets.indexOf(name))
+        risk_widget_descriptors[name] = descriptor;
+    });
+
+    $.extend(
+      true,
+      risk_widget_descriptors,
+      {
+        info: {
+          content_controller: GGRC.Controllers.InfoWidget,
+          content_controller_options: {
+            widget_view: GGRC.mustache_path + "/risks/info.mustache"
+          }
+        }
+      }
+    );
+
+    new GGRC.WidgetList("ggrc_risk_assessment_v2", { Risk: risk_widget_descriptors });
+  };
+
   GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_risk_assessment_v2");
 
   RiskAssessmentV2Extension.init_mappings();
