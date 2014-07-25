@@ -7,6 +7,7 @@ description = """
   """
 permissions = {
     "read": [
+        "Document",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
