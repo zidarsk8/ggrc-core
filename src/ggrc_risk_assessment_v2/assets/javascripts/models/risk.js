@@ -17,8 +17,13 @@
     create: "POST /api/risks",
     update: "PUT /api/risks/{id}",
     destroy: "DELETE /api/risks/{id}",
-
-    attributes: {},
+    mixins: ["ownable", "contactable"],
+    attributes : {
+      context : "CMS.Models.Context.stub",
+      contact : "CMS.Models.Person.stub",
+      owners : "CMS.Models.Person.stubs",
+      modified_by : "CMS.Models.Person.stub"
+    },
     tree_view_options: {},
 
     init: function() {

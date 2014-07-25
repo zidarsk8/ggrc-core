@@ -18,9 +18,9 @@
       <div class="rtf-block">
       <strong>Risk Owner</strong>
         {{#if owners.length}}
-          {{#owners}}
-            {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-          {{/owners}}
+          {{#using owner=owners.0}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=owner}}}
+          {{/using}}
         {{else}}
           <span class="error">
             None
@@ -34,7 +34,9 @@
       <div class="rtf-block">
       <strong>Risk Contact</strong>
         {{#if contact}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+          {{#using contact=contact}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+          {{/using}}
         {{else}}
           <span class="error">
             None
