@@ -181,18 +181,72 @@ can.Component.extend({
       this.scope.attributes.attr(el.attr("name"), el.val());
     },
     ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
-      var that = this;
-      GGRC.Mappings.make_join_object(
-        this.scope.parent_instance,
-        data,
-        $.extend({
-          context : this.scope.parent_instance.context
-                    || new CMS.Models.Context({id : null})
-                  },
-                  this.scope.attributes.serialize())
-      ).save().done(function() {
-        that.element.find("a[data-toggle=submit]").trigger("modal:success");
-      });
+      var that = this,
+        multi_map = data.multi_map;
+      
+      if(multi_map){
+        var length = data.arr.length, 
+            my_data;
+
+        if (length == 1){
+          my_data = data.arr[0];
+          
+          GGRC.Mappings.make_join_object(
+            this.scope.parent_instance,
+            my_data,
+            $.extend({
+              context : this.scope.parent_instance.context
+                      || new CMS.Models.Context({id : null})
+                      },
+                      this.scope.attributes.serialize())
+          ).save().done(function() {
+            that.element.find("a[data-toggle=submit]").trigger("modal:success");
+          });
+        }
+      
+        else{
+          for(var i = 0; i < length-1; i++){
+            my_data = data.arr[i];
+            
+            GGRC.Mappings.make_join_object(
+              this.scope.parent_instance,
+              my_data,
+              $.extend({
+                context : this.scope.parent_instance.context
+                        || new CMS.Models.Context({id : null})
+                        },
+                        this.scope.attributes.serialize())
+            ).save().done(function(){});
+          }
+          my_data = data.arr[length-1];
+          GGRC.Mappings.make_join_object(
+            this.scope.parent_instance,
+            my_data,
+            $.extend({
+              context : this.scope.parent_instance.context
+                      || new CMS.Models.Context({id : null})
+                      },
+                      this.scope.attributes.serialize())
+          ).save().done(function() {
+            that.element.find("a[data-toggle=submit]").trigger("modal:success");
+          });
+        }
+      } //end multi-map
+      
+      
+      else{  
+				GGRC.Mappings.make_join_object(
+					this.scope.parent_instance,
+					data,
+					$.extend({
+						context : this.scope.parent_instance.context
+											|| new CMS.Models.Context({id : null})
+										},
+										this.scope.attributes.serialize())
+				).save().done(function() {
+					that.element.find("a[data-toggle=submit]").trigger("modal:success");
+				});
+			}
     }
   },
   helpers: {
