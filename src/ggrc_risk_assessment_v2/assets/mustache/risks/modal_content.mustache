@@ -19,29 +19,36 @@
     </div>
   </div>
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.description}}field-failure{{/instance.computed_errors.description}}">
       <label>
         Description
+        <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this Risk and provide context for how and when this Risk might be used."></i>
-      </label>
+      </label> {{#instance.computed_errors.description}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.description}}
       <div class="wysiwyg-area">
         <textarea tabindex="3" id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
       </div>
     </div>
-    <div class="span6">
+    <div class="span6 {{#instance.computed_errors.owners}}field-failure{{/instance.computed_errors.owners}}">
       {{#using owner=instance.owners.0 model_singular='Risk'}}
         <label>
           Owner
+          <span class="required">*</span>
           <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this Risk."></i>
         </label>
         <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstnonempty owner.email}}" />
+      {{#instance.computed_errors.owners}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.owners}}
       {{/using}}
+    </div>
+    <div class="span6 {{#instance.computed_errors.contact}}field-failure{{/instance.computed_errors.contact}}">
       {{#using contact=instance.contact model_singular='Risk'}}
       <label>
         Contact
+        <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
       </label>
       <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstnonempty contact.email}}" />
+      {{#instance.computed_errors.contact}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.contact}}
       {{/using}}
     </div>
   </div>
