@@ -1489,7 +1489,7 @@
       }
 
     , on_map: $.debounce(500, true, function(el, ev) {
-        var that = this; 
+        var that = this, ajd; 
 
         if(el.hasClass('disabled')){
           return;
@@ -1497,6 +1497,7 @@
         var join_instance = this.create_join();
         var its = join_instance.length;
         var pass = 0;
+        var obj_arr = [];
 
         if (!(its > 0)) {
           $(document.body).trigger("ajax:flash", {
@@ -1505,16 +1506,35 @@
         else {
           for(var i = 0; i < its; i++){
             //We have multiple join_instances
-            join_instance[i].save()
-              .done(function() {
+            ajd = join_instance[i].save().done(function(obj) {
+              if(that.options.mapTaskGroup) {
+                //Modify the object to map to task group
+                var id = obj.object.id, 
+                    shortName = obj.object.type,
+                    new_obj = {};
+                    new_obj.id = id;
+                    new_obj.constructor.shortName = shortName;
+
+                obj_arr.push(new_obj);
+              }
+              else {
                 $(document.body).trigger('ajax:flash', 
-                    { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
-                pass += 1;
-                if(pass == its){
+                 { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              }
+              pass += 1;
+              if(pass == its){
+                  if(obj_arr.length >= 1){ 
+                    var obj = {};
+                    obj.multi_map = true;
+                    obj.arr = obj_arr;
+                    
+                    ////trigger the to add selected objects to task group;
+                    that.element.trigger("modal:success", [obj, {map_and_save: true}])
+                  }
                   $(that.element).modal_form('hide');
                 }
-              })
-              .fail(function(xhr) {
+            })
+            .fail(function(xhr) {
                 // Currently, the only error we encounter here is uniqueness
                 // constraint violations.  Let's use a nicer message!
                 //that.element.trigger("ajax:flash", { error : xhr.responseText });
@@ -1528,6 +1548,7 @@
                   }
                 }
               });
+            this.bindXHRToButton(ajd, el, "Saving, please wait...");
           }        
         } //End else
 
@@ -1636,6 +1657,7 @@
           , extra_options);
     });
 
+	option_set.mapTaskGroup = data.mapTaskGroup;
     option_set.option_descriptors = option_descriptors;
     return option_set;
   }

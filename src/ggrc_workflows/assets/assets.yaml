@@ -44,6 +44,7 @@ dashboard-js-template-files:
   - workflows/search_result.mustache
   - workflows/extended_info.mustache
   - wf_objects/tree_footer.mustache
+  - wf_objects/autocomplete_result.mustache 
   - selectors/object_selector_base_modal.mustache
   - selectors/object_selector_option_column.mustache
   - selectors/object_selector_option_items.mustache
