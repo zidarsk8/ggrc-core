@@ -66,6 +66,7 @@ dashboard-js-files:
   - controllers/list_view_controller.js
   - controllers/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
+  - controllers/mapping_count_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
@@ -125,6 +126,7 @@ dashboard-js-template-files:
   - dashboard/object_list.mustache
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
+  - dashboard/mapping_count.mustache
   - directives/autocomplete_result.mustache
   - directives/tree.mustache
   - events/object_list.mustache
@@ -173,8 +175,6 @@ dashboard-js-template-files:
   - programs/tree.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
-  - risks/modal_content.mustache
-  - risky_attributes/modal_content.mustache
   - roles/modal_content.mustache
   - roles/object_list.mustache
   - sections/info.mustache
@@ -198,7 +198,6 @@ dashboard-js-template-files:
   - controls/tree_footer.mustache
   - directives/tree_footer.mustache
   - objectives/tree_footer.mustache
-  - risks/tree_footer.mustache
   - sections/tree_footer.mustache
   - people/tree_footer.mustache
   - documents/tree_footer.mustache

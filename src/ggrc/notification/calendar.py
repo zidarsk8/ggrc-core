@@ -39,10 +39,16 @@ class CalendarNotification(NotificationBase):
     db.session.flush()
 
     for obj in target_objs:
+      if hasattr(obj, 'status'):
+        status=obj.status
+      else:
+        status='InProgress'
       notification_object=NotificationObject(
         created_at=datetime.now(),
-        object_id=obj.id, 
+        object_id=obj.id,
         object_type=obj.type,
+        modified_by_id=sender.id,
+        status=status,
         notification=notification
       )
       db.session.add(notification_object)

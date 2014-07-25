@@ -35,3 +35,9 @@ def handle_calendar_flow_auth():
       return extension_module.handle_calendar_flow_auth()
   return 'Ok'
 
+@app.route("/notify_email_deferred", methods=["GET", "POST"])
+def notify_email_deferred():
+  for extension_module in get_extension_modules():
+    if hasattr(extension_module, 'notify_email_deferred'):
+      extension_module.notify_email_deferred()
+  return 'Ok'

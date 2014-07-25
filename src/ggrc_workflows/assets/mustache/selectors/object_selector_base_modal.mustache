@@ -115,6 +115,39 @@
 
     <div class="results">
       <div class="bar-h"></div>
+      <!-- Header line of the list -->
+      <ul class="new-tree multitype-tree">
+        <li class="tree-item object-filter">
+          <div class="item-main">
+            <div class="row-fluid">
+              
+              <div class="span9">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    <span>
+                      <strong>
+                        {{ options.length }} Objects found
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="span3">
+                <div class="object-check all-check">
+                  <label>
+                    Select all
+                    <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+
       <div class="results-wrap">
         <span class="info">Define search criteria above to start</span>
 

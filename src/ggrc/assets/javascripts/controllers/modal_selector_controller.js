@@ -497,33 +497,6 @@
         join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
       }
 
-      , risk_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: data.related_title_singular,
-        modal_title: "Select " + data.related_title_plural,
-
-        related_model_singular: "Risk",
-        related_table_plural: "risks",
-        related_table_singular: "risk",
-        related_title_singular: "Risk",
-        related_title_plural: "Risks",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.RiskControl,
-
-        option_attr: 'control',
-        join_attr: 'risk',
-        option_id_field: 'control_id',
-        option_type_field: 'control_type',
-        join_id_field: 'risk_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
-      }
-
       , section_controls : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -550,7 +523,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
 
       , program_controls : {
@@ -579,7 +551,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
     };
 
@@ -1391,6 +1362,34 @@
       }
       return this.context;
     }
+
+    , init_view: function() {
+        var self = this
+          , deferred = $.Deferred()
+          ;
+
+        can.view(
+          this.options.base_modal_view,
+          this.context,
+          function(frag) {
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
+            deferred.resolve();
+            self.element.trigger('loaded');
+            self.element.find(".results-wrap").cms_controllers_infinite_scroll();
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
+          });
+
+        // Start listening for events
+        this.on();
+
+        return deferred;
+    }
+
+    , ".results-wrap scrollNext": "show_next_page"
+
     , move_option_to_top_and_select: function(option) {
 
         // If element is null, the modal was closed and we don't need to do anything
@@ -1459,10 +1458,8 @@
 
     , "input[type=checkbox].object-check-all click": function(el, ev) {
       var $el = $(el)
-        , $check = $(this.element).find('.object-check-single');
-
-      //FIXME: the below code. this unchecks all selected disabled items
-      //  if(!($check.prop('disabled')))  
+        , $check = $(this.element).find('.object-check-single:not(:disabled)');
+ 
       $check.prop('checked', $el.prop('checked'));
       this.update_selected_items(el, ev);
     }
@@ -1601,9 +1598,13 @@
     }
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
+      //  If the resource type doesn't exist, short-circuit
+      if (!CMS.Models[far_model_name]) {
+        return;
+      }
+
       var option_model_name = descriptor.option_model_name || far_model_name
         , extra_options = multiselect_descriptor_view_option[option_model_name];
-      
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.

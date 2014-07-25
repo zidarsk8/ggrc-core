@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#list}}
+<li class="{{class.category}}" data-model="true" {{data 'model'}}>
+  <a href="{{viewLink}}" class="show-extended">
+    <div>
+      <div class="lhs-main-title">
+        <span class="lhs-item">
+          {{firstnonempty title name email}}
+        </span>
+      </div>
+    </div>
+  </a>
+</li>
+{{/list}}
+{{^list}}
+<li class="spinner">
+</li>
+{{/list}}
+{{^is_allowed 'read' model.shortName context='any'}}
+<li class="no-access">
+  You do not have access to read this information.
+</li>
+{{/is_allowed}}
+{{#list.is_loading}}
+<li class="spinner">
+  <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+</li>
+{{/list.is_loading}}

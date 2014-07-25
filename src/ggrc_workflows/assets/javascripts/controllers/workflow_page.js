@@ -35,7 +35,7 @@
         instance : GGRC.page_instance()
       }, function() {
         cycle = new CMS.Models.Cycle({
-          context: { id: null, type: "Context" },
+          context: page_instance.context.stub(),
           workflow: { id: page_instance.id, type: "Workflow" },
           autogenerate: true
         });
@@ -56,7 +56,7 @@
         if(current_cycles && current_cycles.length > 0) {
           for(var i = 0; i < current_cycles.length; i++) {
             dfds.push(current_cycles[i].instance.refresh().then(function(c) {
-              return c.attr('status', 'Verified').save();
+              return c.attr('is_current', false).save();
             }));
           }
         }
@@ -65,6 +65,18 @@
         });
       }(), el);
     },
+
+    //  FIXME: This should trigger expansion of the TreeNode, without using
+    //    global event listeners or routes or timeouts, but currently object
+    //    creation and tree insertion is disconnected.
+    "{CMS.Models.TaskGroup} created": function(model, ev, instance) {
+      if (instance instanceof CMS.Models.TaskGroup) {
+        setTimeout(function() {
+          window.location.hash =
+            'task_group_widget/task_group/' + instance.id;
+        }, 250);
+      }
+    }
   });
 
 })(this.CMS, this.GGRC, this.can, this.can.$);

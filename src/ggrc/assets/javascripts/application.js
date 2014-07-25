@@ -78,8 +78,6 @@ GGRC.extensions.push({
       , "process" : CMS.Models.Process
       , "control" : CMS.Models.Control
       , "objective" : CMS.Models.Objective
-      , "risky_attribute" : CMS.Models.RiskyAttribute
-      , "risk" : CMS.Models.Risk
       , "section" : CMS.Models.Section
       , "clause" : CMS.Models.Clause
       , "section_objective" : CMS.Models.SectionObjective

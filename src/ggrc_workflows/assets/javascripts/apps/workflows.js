@@ -71,22 +71,18 @@
 
         Workflow: {
           _canonical: {
-            objects: _workflow_object_types,
-            direct_tasks: "Task",
+            objects: _workflow_object_types.concat(["Cacheable"]),
+            tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
-            folders : "GDriveFolder"
+            folders: "GDriveFolder",
+            context: "Context"
           },
           objects: Proxy(
             null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Multi([
-            "direct_tasks", "tasks_via_task_groups"]),
-          direct_tasks: Proxy(
+          tasks: Proxy(
             "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
-          tasks_via_task_groups: Cross(
-            "task_groups", "tasks"),
-          people: Proxy(
-            "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
+
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
           cycles: Direct(
@@ -94,12 +90,25 @@
           folders:
             new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
-              return result.instance.status != "InProgress";
+              return !result.instance.is_current;
             }),
           current_cycle: CustomFilter("cycles", function(result) {
-              return result.instance.status == "InProgress";
+              return result.instance.is_current;
             }),
-          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups")
+          current_task_groups: Cross("current_cycle", "reify_cycle_task_groups"),
+
+          people: Proxy(
+            "Person", "person", "WorkflowPerson", "workflow", "workflow_people"),
+          context: Direct(
+            "Context", "related_object", "context"),
+          authorization_contexts: Multi([
+            "context"]), //, "contexts_via_audits"]),
+          authorizations: Cross(
+            "authorization_contexts", "user_roles"),
+          authorized_people: Cross(
+            "authorization_contexts", "authorized_people"),
+          mapped_and_or_authorized_people: Multi([
+            "people", "authorized_people"])
         },
 
         Cycle: {
@@ -170,9 +179,12 @@
 
         },
         Person: {
-          assigned_tasks: Search("", [
-              "CycleTaskGroupObjectTask"//,
-          ], { contact_id: "id" }),
+          assigned_tasks: Search(function(binding) {
+            return CMS.Models.CycleTaskGroupObjectTask.findAll({
+              contact_id: binding.instance.id,
+              'cycle.is_current': true
+            });
+          })
         }
       };
 
@@ -205,6 +217,7 @@
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
     }
+    WorkflowExtension.init_global();
   };
 
   WorkflowExtension.init_widgets_for_other_pages =
@@ -320,7 +333,9 @@
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.Person,
-            mapping: "people",
+            mapping: "mapped_and_or_authorized_people",
+            show_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache",
+            footer_view: GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache",
             footer_view: GGRC.mustache_path + "/wf_people/tree_footer.mustache"
           }
         },
@@ -363,7 +378,7 @@
     objects_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree mockup-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
       widget_id: "objects",
       widget_name: "Objects",
       widget_icon: "object",
@@ -382,7 +397,7 @@
     history_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+      widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
       widget_id: "history",
       widget_name: "History",
       widget_icon: "history",
@@ -415,6 +430,14 @@
     new_widget_descriptors.current = current_widget_descriptor;
 
     new GGRC.WidgetList("ggrc_workflows", { Workflow: new_widget_descriptors });
+
+    // Setup extra refresh required due to automatic creation of permissions
+    // on creation of WorkflowPerson
+    CMS.Models.WorkflowPerson.bind("created", function(ev, instance) {
+      if (instance instanceof CMS.Models.WorkflowPerson) {
+        instance.context.reify().refresh();
+      }
+    });
   };
 
   WorkflowExtension.init_widgets_for_person_page =
@@ -426,7 +449,7 @@
     descriptor[page_instance.constructor.shortName] = {
       task: {
         widget_id: 'task',
-        widget_name: "Tasks",
+        widget_name: "My Tasks",
         content_controller: GGRC.Controllers.TreeView,
 
         content_controller_options: {
@@ -459,7 +482,27 @@
         }
       }
     };
-    new GGRC.WidgetList("ggrc_workflows", descriptor);
+    new GGRC.WidgetList("ggrc_workflows", descriptor, [
+      "info_widget",
+      "task_widget"
+    ]);
+  };
+
+  WorkflowExtension.init_global = function() {
+    $(function() {
+
+      if(!GGRC.current_user || !GGRC.current_user.id){
+        return;
+      }
+      CMS.Models.Person.findOne({
+        id: GGRC.current_user.id
+      }).then(function(person){
+        $('.task-count').ggrc_controllers_mapping_count({
+          mapping: 'assigned_tasks',
+          instance: person
+        });
+      });
+    });
   };
 
   GGRC.register_hook(

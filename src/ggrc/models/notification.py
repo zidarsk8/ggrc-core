@@ -43,12 +43,21 @@ class Notification(Base, db.Model):
       'NotificationObject', backref='notification', cascade='all, delete-orphan')
 
 
-class NotificationObject(Base, db.Model):
+class NotificationObject(Base, Stateful, db.Model):
   __tablename__ = 'notification_objects'
+
+  VALID_STATES = [
+    None, 
+    "InProgress", 
+    "Assigned", 
+    "Finished", 
+    "Declined", 
+    "Verified",
+  ]
+
   notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), nullable=False)
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
-
 
 class NotificationRecipient(Base, Stateful, db.Model):
   __tablename__ = 'notification_recipients'
@@ -57,6 +66,7 @@ class NotificationRecipient(Base, Stateful, db.Model):
     "InProgress",
     "Successful",
     "NotificationDisabled",
+    "Skipped",
     "Failed",
   ]
 
