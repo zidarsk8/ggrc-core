@@ -74,10 +74,8 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
           + "Click <a href='" + window.location.href.replace("#.*$", "#") 
           + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
         context: that.original_object.context
-      }).save(),
-      CMS.Models.Task.findAll({title : "Object review"})
+      }).save()
     ).then(function(wf, tasks) {
-      if (tasks.length < 1) {
         return $.when(
           wf,
           new CMS.Models.Task({
@@ -87,9 +85,6 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
             context: {id : null}
           }).save()
         );
-      } else {
-        return $.when(wf, tasks[0]);
-      }
     }).then(function(wf, task) {
       return $.when(
         wf,

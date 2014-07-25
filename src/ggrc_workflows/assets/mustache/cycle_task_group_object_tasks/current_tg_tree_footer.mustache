@@ -16,7 +16,7 @@
             "task_group": {{current_task_group_objects.0.instance.cycle.id}}, \
             "sort_index": "{{sort_index_at_end original_list}}", \
             "contact": { "id" : {{parent_instance.owners.0.id}} , "type": "Person" }, \
-            "owners": [{ "id" : {{parent_instance.owners.0.id}} , "type": "Person" }], \
+            "owners": [{ "id" : {{firstexist parent_instance.owners.0.id "null"}} , "type": "Person" }], \
             "modal_title": "Add Task" }'>
             <strong>Add Task</strong>
           </a>
