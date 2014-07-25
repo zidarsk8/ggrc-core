@@ -74,17 +74,6 @@
     new GGRC.WidgetList("ggrc_risk_assessments", descriptor);
   }
 
-  // Initialize controller -- probably this should go in a separate
-  // initialization area
-  // $(function() {
-    //$(document.body).ggrc_controllers_risk_assessment_page();
-  // });
-
-  // GGRC.register_hook("LHN.Sections", GGRC.mustache_path + "/dashboard/lhn_risk_assessments");
-  // GGRC.register_hook(
-  //     "ObjectNav.Actions",
-  //     GGRC.mustache_path + "/dashboard/object_nav_actions");
-
   RiskAssessmentsExtension.init_mappings();
   RiskAssessmentsExtension.init_widgets();
 
