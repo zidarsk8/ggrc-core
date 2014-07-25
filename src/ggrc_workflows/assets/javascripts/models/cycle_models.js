@@ -248,6 +248,7 @@
           if (object.selfLink) {
             object.refresh();
             refresh_attr(object, "cycle_task_group");
+            refresh_attr(object, "cycle");
           }
         }
       });
