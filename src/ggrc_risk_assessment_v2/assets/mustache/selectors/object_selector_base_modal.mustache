@@ -1,0 +1,190 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+    <div class="modal-header">
+      <div class="pull-right">
+        <a class="btn btn-danger btn-mini" href="javascript://" data-dismiss="modal">
+          <i class="grcicon-x-white"></i>
+        </a>
+      </div>
+      <h2>
+        {{#if_equals option_type_count 1}}
+          {{#option_type_menu}}{{#items}}
+              Add {{model_display}} to {{selected_object.class.title_singular}}
+          {{/#items}}{{/option_type_menu}}
+        {{else}}
+          Map Object {{! modal_title }}
+        {{/if_equals}}
+      </h2>
+    </div>
+
+    <!-- the below block adds a options -->
+    <div class="modal-body choose-object-wrap">
+      
+      <div class="row-fluid">        
+        <div class="span12">
+          <div class="first-row">
+            <label>
+              <strong>Show all</strong>
+            </label>
+            {{#if option_type_menu}}
+              {{^if_equals option_type_count 1}}
+                <select class="input-medium option-type-selector">
+                  {{#option_type_menu}}
+                    <optgroup label="{{category}}">
+                      {{#items}}
+                      <option 
+                        value="{{model_name}}" 
+                        label="{{model_display}}" 
+                        {{#if_equals model_name selected_option_type}}selected="selected"
+                        {{/if_equals}}>
+                      </option>
+                      {{/items}}
+                    </optgroup>
+                  {{/option_type_menu}}
+                </select>
+              {{/if_equals}}
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!--  Add more filters for search-->
+      <div class="row-fluid">   
+        <div class="span12">
+          {{#each filter_list}}
+          <div class="indent-row">
+            <button type="submit" data-index="{{@index}}" class="remove_filter">
+              <i class="grcicon-deleted"></i>
+            </button>
+            <label>
+              <strong>{{#if @index}}AND&nbsp;{{/if}}Relevant to:</strong>
+            </label>
+            <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
+              {{#option_type_menu_2}}
+              <option
+                value="{{model_singular}}" 
+                label="{{title_singular}}">
+              </option>
+              {{/option_type_menu_2}}
+            </select>
+            {{#model_name}}
+            <div class="modal-search objective-selector">
+              <input 
+                id="search-filter{{@index}}"
+                class="input-large search-icon search-filter{{@index}}" 
+                placeholder="Enter text to search for {{model_name}}"
+                type="text" 
+                name="filter_list.{{@index}}.search_filter"
+                value="{{firstnonempty search_filter.name search_filter.email search_filter.title}}"
+                data-lookup="{{this}}"
+                data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache" 
+                {{ autocomplete_select }}
+                >
+            </div>
+            {{/model_name}}
+          </div>
+          {{/each}}
+          <div class="add-rule indent-row">
+            <!-- comment filters for initial checkin -->
+            <a href="javascript://" id="addFilterRule" class="addFilterRule">+ Add New Rule</a>
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="indent-row">
+            <strong>Matching terms:</strong>
+            <div class="modal-search objective-selector">
+              <input 
+                id="search" 
+                class="input-large search-icon" 
+                placeholder="Enter text to search for Object" 
+                value="{{option_search_term}}" 
+                type="text">
+            </div>
+            <a class="btn pull-right objectReview" href="javascript://" id="objectReview">Search</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="bar-h"></div>
+      <!-- Header line of the list -->
+      <ul class="new-tree multitype-tree">
+        <li class="tree-item object-filter">
+          <div class="item-main">
+            <div class="row-fluid">
+              
+              <div class="span9">
+                <div class="item-data">
+                  <div class="tree-title-area">
+                    <span>
+                      <strong>
+                        {{ options.length }} Objects found
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="span3">
+                <div class="object-check all-check">
+                  <label>
+                    Select all
+                    <input type="checkbox" value="1" class="object-check-all" id='objectAll'>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </li>
+      </ul>
+
+
+      <div class="results-wrap">
+        <span class="info">Define search criteria above to start</span>
+
+        <div class="option_column" {{data 'options'}}>
+          {{#if option_column_view}}
+            {{{ renderLive option_column_view }}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    
+    <!-- footer add/cancel buttons-->
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="deny-buttons">
+            <a class="btn" data-dismiss="modal" href="javascript://">
+              Cancel
+            </a>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="confirm-buttons">
+            {{#is_page_instance}}
+              <span class="error">Can't map an object to itself<span>
+            {{/is_page_instance}}
+            <span>
+              <strong> {{items_selected}} objects selected </strong>
+            </span>
+            <a class="btn btn-primary preventdoubleclick 
+              {{#if_helpers '\
+                ^if' item_selected '\
+                or #if' is_page_instance}} disabled {{/if_helpers}}map-button" href="javascript://">
+                    Add Selected
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+{{!</div>}}

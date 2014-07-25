@@ -1,0 +1,78 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+{{#each options}}
+<li class="tree-item control governance task-item" 
+  data-object-type="{{instance.class.table_singular}}"
+  {{#instance}}{{ data 'option' }}{{/instance}} 
+  data-id="{{ instance.id }}">
+    <div class="item-main">
+      <div class="openclose">
+      <a href="javascript://" class="openclose-placeholder">
+           
+        <div class="row-fluid">
+
+          <div class="span10">
+            <span class="tier-trigger">
+            </span>
+            <div class="item-data">
+              <div class="tree-title-area">
+                <i class="grcicon-{{instance.class.table_singular}}-color"></i>                 
+                {{instance.title}}
+                <span class="url-link">
+                  {{instance.link}}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="span1">
+            &nbsp;
+          </div>
+
+          <div class="span1">
+            <div class="object-check" align="left">
+              {{#if mappings.length}}
+                {{#result_direct_mappings bindings_compute selected_object}}
+                  <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
+                {{/result_direct_mappings}}
+              {{else}}
+                <input type="checkbox" value="{{instance.title}}" class="object-check-single">
+              {{/if}}
+            </div>
+          </div>
+          
+        </div>    
+      
+      </a>
+      </div>
+    </div>
+
+    {{! #if expanded}}
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        {{#pack instance=this}}
+          {{#find_template 'tier2_content' instance}}
+            {{{renderLive template}}}
+          {{else}}
+            <div class="show-description">
+              <div class="row-fluid">
+                <div class="span12">
+                  <div class="tree-description short">
+                    {{{instance.description}}}
+                  </div>
+                  {{{show_long}}}
+                </div>
+              </div>
+            </div>
+          {{/find_template}}
+        {{/pack}}
+      </div>
+    </div>
+    {{!/if}}
+</li>
+{{/each}}

@@ -36,6 +36,24 @@ blueprint = Blueprint(
 )
 
 
+from ggrc.models import all_models
+
+_risk_object_types = [
+    "Program",
+    "Regulation", "Standard", "Policy", "Contract",
+    "Objective", "Control", "Section", "Clause",
+    "System", "Process",
+    "DataAsset", "Facility", "Market", "Product", "Project"
+    ]
+
+for type_ in _risk_object_types:
+  model = getattr(all_models, type_)
+  model.__bases__ = (
+    models.risk_object.Riskable,
+    ) + model.__bases__
+  model.late_init_riskable()
+
+
 def get_public_config(current_user):
   """Expose additional permissions-dependent config to client.
   """
@@ -45,6 +63,7 @@ def get_public_config(current_user):
 def contributed_services():
   return [
       service('risks', models.Risk),
+      service('risk_objects', models.RiskObject),
       ]
 
 

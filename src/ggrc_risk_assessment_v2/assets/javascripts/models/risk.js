@@ -22,7 +22,9 @@
       context : "CMS.Models.Context.stub",
       contact : "CMS.Models.Person.stub",
       owners : "CMS.Models.Person.stubs",
-      modified_by : "CMS.Models.Person.stub"
+      modified_by : "CMS.Models.Person.stub",
+      objects : "CMS.Models.get_stubs",
+      risk_objects: "CMS.Models.RiskObject.stubs"
     },
     tree_view_options: {},
 

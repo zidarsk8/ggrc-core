@@ -6,8 +6,11 @@
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
+from ggrc.models.associationproxy import association_proxy
 from ggrc.models.object_owner import Ownable
 from ggrc.models.mixins import Base, Described, Slugged, Titled, WithContact, deferred
+from ggrc.models.reflection import PublishOnly
+
 
 
 class Risk(Described, Ownable, WithContact, Titled, Slugged, Base, db.Model):
@@ -17,3 +20,13 @@ class Risk(Described, Ownable, WithContact, Titled, Slugged, Base, db.Model):
   @declared_attr
   def description(cls):
     return deferred(db.Column(db.Text, nullable=False), cls.__name__)
+
+  risk_objects = db.relationship(
+      'RiskObject', backref='risk', cascade='all, delete-orphan')
+  objects = association_proxy(
+      'risk_objects', 'object', 'RiskObject')
+
+  _publish_attrs = [
+      'risk_objects',
+      PublishOnly('objects'),
+      ]
