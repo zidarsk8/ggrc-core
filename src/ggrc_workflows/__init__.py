@@ -249,6 +249,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         end_date=obj.end_date,
         modified_by=current_user,
         contact=task_group.contact,
+        sort_index=task_group.sort_index,
         )
 
     for task_group_object in task_group.task_group_objects:

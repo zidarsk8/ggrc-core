@@ -630,6 +630,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          $items.each(function(i, item) {
             var j, $item = $(item);
             for(j = $existing.length - 1; j >= 0; j--) {
+              if($existing.eq(j).hasClass('tree-header')){
+                compare = false;
+              }
               var old_item = $existing.eq(j).control().options.instance,
                   new_item = $item.control().options.instance;
               if (sort_function){

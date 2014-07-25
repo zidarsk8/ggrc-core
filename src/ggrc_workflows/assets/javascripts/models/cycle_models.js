@@ -144,6 +144,7 @@
     },
 
     tree_view_options: {
+      sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
