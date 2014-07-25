@@ -10,9 +10,10 @@
       <i class="grcicon-attach"></i>
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
-    <!-- FIXME: This probably should be restricted to ProgramOwner. Will verify and figure out how to restrict it. -->
+    {{#is_allowed 'update'}}
     <a href="javascript://" class="info-action unmap" data-toggle="unmap">
       {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
       <i class="grcicon-deleted"></i>
     </a>
+    {{/is_allowed}}
   </li>

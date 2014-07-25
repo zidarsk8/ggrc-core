@@ -36,8 +36,7 @@
       </ul>
     {{/child_options}}
 
-    {{#is_allowed "update"}}
-    <!-- FIXME: This probably should be restricted to ProgramOwner. Will verify and figure out how to restrict it. -->
+    {{#is_allowed 'update'}}
     <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
       data-model="{{instance.type}}" data-id="{{instance.id}}">
       <i class="grcicon-attach-color"></i><span>Attach supporting file
@@ -56,4 +55,3 @@
   {{/is_allowed}}
 
 </div>
-
