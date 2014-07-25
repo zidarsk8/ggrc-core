@@ -975,3 +975,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
       return this.expand();
     }
 });
+
+CMS.Controllers.TreeView("CMS.Controllers.SortableTreeView", {}, {
+  draw_items: function(options_list){
+    if (typeof this._super === "function") {
+      this._super.apply(this, [options_list]);
+    }
+    var $el = $(this.element);
+    $el.sortable({element: 'li.tree-item', handle: '.drag'})
+  },
+});
