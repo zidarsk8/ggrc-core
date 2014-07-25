@@ -1507,22 +1507,22 @@
           for(var i = 0; i < its; i++){
             //We have multiple join_instances
             ajd = join_instance[i].save().done(function(obj) {
-				if(that.options.mapTaskGroup) {
-				  //Modify the object to map to task group
-				  var id = obj.object.id, 
-					shortName = obj.object.type,
-					new_obj = {};
-					new_obj.id = id;
-					new_obj.constructor.shortName = shortName;
+              if(that.options.mapTaskGroup) {
+                //Modify the object to map to task group
+                var id = obj.object.id, 
+                    shortName = obj.object.type,
+                    new_obj = {};
+                    new_obj.id = id;
+                    new_obj.constructor.shortName = shortName;
 
-				  obj_arr.push(new_obj);
-                }
-				else {
-				  $(document.body).trigger('ajax:flash', 
-				  { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
-                }
-                pass += 1;
-                if(pass == its){
+                obj_arr.push(new_obj);
+              }
+              else {
+                $(document.body).trigger('ajax:flash', 
+                 { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              }
+              pass += 1;
+              if(pass == its){
                   if(obj_arr.length >= 1){ 
                     var obj = {};
                     obj.multi_map = true;
@@ -1533,8 +1533,8 @@
                   }
                   $(that.element).modal_form('hide');
                 }
-              })
-              .fail(function(xhr) {
+            })
+            .fail(function(xhr) {
                 // Currently, the only error we encounter here is uniqueness
                 // constraint violations.  Let's use a nicer message!
                 //that.element.trigger("ajax:flash", { error : xhr.responseText });

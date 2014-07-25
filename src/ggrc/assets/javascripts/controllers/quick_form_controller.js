@@ -235,18 +235,18 @@ can.Component.extend({
       
       
       else{  
-				GGRC.Mappings.make_join_object(
-					this.scope.parent_instance,
-					data,
-					$.extend({
-						context : this.scope.parent_instance.context
-											|| new CMS.Models.Context({id : null})
-										},
-										this.scope.attributes.serialize())
-				).save().done(function() {
-					that.element.find("a[data-toggle=submit]").trigger("modal:success");
-				});
-			}
+        GGRC.Mappings.make_join_object(
+          this.scope.parent_instance,
+          data,
+          $.extend({
+            context : this.scope.parent_instance.context
+                      || new CMS.Models.Context({id : null})
+                    },
+                    this.scope.attributes.serialize())
+        ).save().done(function() {
+           that.element.find("a[data-toggle=submit]").trigger("modal:success");
+        });
+      }
     }
   },
   helpers: {
