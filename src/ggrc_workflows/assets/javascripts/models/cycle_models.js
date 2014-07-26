@@ -73,7 +73,16 @@
       this._super.apply(this, arguments);
       this.bind("created", refresh_attr_wrap('workflow').bind(this));
     }
-  }, {});
+  }, {
+    init: function() {
+      this._super.apply(this, arguments);
+      this.bind("status", function(ev, newVal) {
+        if(newVal === 'Verified' && this.workflow.reify().object_approval) {
+          this.attr("is_current", false);
+        }
+      });
+    }
+  });
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
   can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
