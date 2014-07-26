@@ -4,7 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
-from flask import current_app, request, redirect, session
+from flask import current_app, request
 from ggrc.app import app
 import ggrc_workflows.models as models
 from ggrc.notification import EmailNotification, EmailDigestNotification
@@ -15,12 +15,11 @@ from ggrc.services.common import Resource
 from ggrc.models import Person
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
+from ggrc import settings
 from ggrc_workflows import status_change, workflow_cycle_start
 from ggrc_workflows import calc_start_date
 from datetime import datetime
-from oauth2client.client import OAuth2WebServerFlow
-from ggrc import settings
-from ggrc.services.common import Resource
+from werkzeug.exceptions import Forbidden
 
 PRI_TASK_OVERDUE=1
 PRI_TASK_DUE=2
@@ -245,12 +244,14 @@ def handle_end_cycle(sender, obj=None, src=None, service=None):
 
 @workflow_cycle_start.connect_via(models.Cycle)
 def handle_start_cycle(sender, obj=None, new_status=None, old_status=None):
+  current_app.logger.info("Workflow cycle started")
   if obj is None:
     current_app.logger.warn("Trigger: Unable to get cycle object")
     return
   notify_custom_message=True
   subject="Workflow Cycle " + "'" + obj.title + "' started"
   prepare_notification_for_cycle(obj, subject, PRI_CYCLE, notify_custom_message)
+  handle_cycle_calendar_request(obj)
 
 @status_change.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status=None):
@@ -530,57 +531,11 @@ def notify_email_digest():
   email_digest_notification.notify()
   db.session.commit()
 
-GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID')
-GOOGLE_SECRET_KEY= getattr(settings, 'SECRET_KEY')
-
-def handle_calendar_request(resource, id):
-  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
-    client_secret=GOOGLE_SECRET_KEY,
-    scope='https://www.googleapis.com/auth/calendar',
-    redirect_uri=request.url_root + 'oauth2callback/calendar') 
-  auth_uri=flow.step1_get_authorize_url()
-  current_app.logger.info("auth uri: " + auth_uri + " redirect uri: " + request.url_root + \
-        "oauth2callback/calendar") 
-  if session.has_key('calendar_resource'):
-    current_app.logger.error("Calendar resource is currently is in use for the session, please retry")
-    return 'Error'
-  session['calendar_resource']=(resource, id)
-  return redirect(auth_uri)
-
-def handle_calendar_flow_auth():
-  if not session.has_key('calendar_resource'):
-    current_app.logger.error("Calendar resource not found in session")
-    return 'Error'
-  resource=session['calendar_resource'][0]
-  resource_id=session['calendar_resource'][1]
-  del session['calendar_resource']
-  error_return=request.args.get("error")
-  code=request.args.get("code")
-  if error_return is not None:
-    current_app.logger.error("Error occured in Calendar flow authorization: " + error_return)
-    return 'Error'
-  if resource not in ['workflow', 'taskgroup']:
-    current_app.logger.error("Resource: " + resource + " is not supported")
-    return 'Error' 
-  if resource in ['workflow']:
-    model_object=get_cycle_by_id(resource_id)
-  else:
-    model_object=get_taskgroup_by_id(resource_id)
-  if model_object is None:
-    current_app.logger.error("Error occured in getting resource: " + resource + " id: " + str(resource_id))
-    return 'Error'
-  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
-    client_secret=GOOGLE_SECRET_KEY,
-    scope='https://www.googleapis.com/auth/calendar',
-    redirect_uri=request.url_root + 'oauth2callback/calendar')
-  credentials=flow.step2_exchange(code)
-  calendar_service=WorkflowCalendarService(credentials)
-  if resource in ['workflow']:
-    calendar_service.handle_cycle_create(model_object)
-  else:
-    calendar_service.handle_taskgroup_create(model_object)
-  db.session.commit()
-  return 'Ok'
+def handle_cycle_calendar_request(cycle):
+  if request.oauth_credentials is None:
+    raise Forbidden()
+  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  calendar_service.handle_cycle_create(cycle)
 
 def notify_email_deferred():
   """ Processing of deferred emails in particular handling Task/Undo 

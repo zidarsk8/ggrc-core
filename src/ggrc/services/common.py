@@ -49,7 +49,25 @@ from sqlalchemy.ext.associationproxy import AssociationProxy
 
 
 CACHE_EXPIRY_COLLECTION=60
+GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID')
+GOOGLE_SECRET_KEY= getattr(settings, 'SECRET_KEY')
 
+def get_oauth_credentials():
+  from oauth2client.client import OAuth2WebServerFlow
+  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_SECRET_KEY,
+    scope='https://www.googleapis.com/auth/calendar',
+    redirect_uri=request.url_root + 'oauth2callback/calendar')
+  from flask import session
+  if not session.has_key('oauth_code'):
+    return None
+  else:
+    try:
+      credentials=flow.step2_exchange(session['oauth_code'])
+      return credentials
+    except Exception as e:
+      current_app.logger.warn("Exception occured in getting oAuth credentials: " + str(e))
+      return None
 
 def _get_cache_manager():
   from ggrc.cache import CacheManager, MemCache
@@ -616,6 +634,18 @@ class Resource(ModelView):
     if method in ('POST', 'PUT', 'DELETE')\
         and 'X-Requested-By' not in request.headers:
       raise BadRequest('X-Requested-By header is REQUIRED.')
+
+    if method in ('POST'):
+      oauth_credentials=get_oauth_credentials() 
+      if oauth_credentials is None:
+        oauth_uri=request.url_root + 'calendar_oauth_request'
+        return current_app.make_response((
+          'Start oAuth flow for getting credentials', 
+          401, 
+           [('X-GGRC-NEEDS-OAUTH', 'True'), ('X-GGRC-OAUTH-URI', oauth_uri)]
+        ))
+      else:
+        request.oauth_credentials=oauth_credentials
 
     try:
       if method == 'GET':

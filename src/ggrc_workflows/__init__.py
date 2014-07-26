@@ -238,13 +238,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     obj.start_date
     )
 
-  workflow_cycle_start.send(
-      obj.__class__,
-      obj=obj,
-      new_status=obj.status,
-      old_status=None
-      )
-
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
     cycle_task_group = models.CycleTaskGroup(
@@ -289,6 +282,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           modified_by=current_user,
           )
 
+  from ggrc_workflows.notification import *
+  workflow_cycle_start.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None
+      )
 
 # 'InProgress' states propagate via these links
 _cycle_object_parent_attr = {
@@ -529,14 +529,6 @@ ROLE_IMPLICATIONS = WorkflowRoleImplications()
 def notify_email_digest():
   import ggrc_workflows.notification as notification
   notification.notify_email_digest()
-
-def handle_calendar_request(resource, id):
-  import ggrc_workflows.notification as notification
-  return notification.handle_calendar_request(resource, id)
-  
-def handle_calendar_flow_auth():
-  import ggrc_workflows.notification as notification
-  return notification.handle_calendar_flow_auth()
 
 def notify_email_deferred():
   import ggrc_workflows.notification as notification
