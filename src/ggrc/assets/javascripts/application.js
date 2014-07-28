@@ -990,14 +990,20 @@ $(window).load(function(){
   // The popover disappears if the show/hide isn't controlled manually
   var last_popover;
   $('body').on('mouseenter', '.person-tooltip-trigger', function(ev) {
-    var target = $(ev.currentTarget);
+    var target = $(ev.currentTarget),
+        content = target.closest('.person-holder').find('.custom-popover-content').html();
+
+    if (!content) {
+      // Don't show tooltip if there is no content
+      return;
+    }
     if (!target.data('popover')) {
       target.popover({
           html: true
         , delay: { show: 400, hide: 200 }
         , trigger: 'manual'
         , content: function() {
-            return $(this).closest('.person-holder').find('.custom-popover-content').html();
+            return content;
           }
       });
       target.data('popover').tip().addClass('person-tooltip').css("z-index", 2000);
@@ -1305,8 +1311,8 @@ jQuery(function($){
 
       _setup_menu_context : function(items) {
           var model_class = this.element.data("lookup")
-            
-            , model = CMS.Models[model_class || this.element.data("model")] 
+
+            , model = CMS.Models[model_class || this.element.data("model")]
                       || GGRC.Models[model_class || this.element.data("model")]
             ;
 

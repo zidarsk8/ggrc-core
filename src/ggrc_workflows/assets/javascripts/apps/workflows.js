@@ -14,7 +14,15 @@
         "Objective", "Control", "Section", "Clause",
         "System", "Process",
         "DataAsset", "Facility", "Market", "Product", "Project"
-      ];
+      ],
+      _task_sort_function = function(a, b){
+        var date_a = +new Date(a.end_date),
+            date_b = +new Date(b.end_date);
+        if(date_a === date_b){
+          return a.id < b.id;
+        }
+        return date_a < date_b;
+      };
 
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
@@ -195,6 +203,13 @@
         "WorkflowObject", "object", "workflow", "workflow_objects", null);
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
+      mappings[type].object_tasks = Search(function(binding) {
+        return CMS.Models.CycleTaskGroupObjectTask.findAll({
+          'cycle_task_group_object.object_id': binding.instance.id,
+          'cycle_task_group_object.object_type': binding.instance.type,
+          'cycle.is_current': true
+        });
+      });
       mappings[type]._canonical = {
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
@@ -238,10 +253,38 @@
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
           }
+        },
+        task: {
+          widget_id: 'task',
+          widget_name: "Workflow Tasks",
+          content_controller: GGRC.Controllers.TreeView,
+          content_controller_options: {
+            mapping: "object_tasks",
+            parent_instance: page_instance,
+            model: CMS.Models.CycleTaskGroupObjectTask,
+            show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+            sort_property: null,
+            sort_function: _task_sort_function,
+            content_controller_options: {
+              child_options: [
+                {
+                  model: can.Model.Cacheable,
+                  mapping: "cycle_task_entries",
+                  show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                  footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                  draw_children: true,
+                  allow_creating: true
+                },
+              ]
+            }
+          }
         }
       };
     }
-    new GGRC.WidgetList("ggrc_workflows", descriptor);
+    new GGRC.WidgetList("ggrc_workflows", descriptor, [
+      "info_widget",
+      "task_widget"
+    ]);
   };
 
   WorkflowExtension.init_widgets_for_task_page =
@@ -459,14 +502,7 @@
           mapping: "assigned_tasks",
           draw_children: true,
           sort_property: null,
-          sort_function: function(a, b){
-            var date_a = +new Date(a.end_date),
-                date_b = +new Date(b.end_date);
-            if(date_a === date_b){
-              return a.id < b.id;
-            }
-            return date_a < date_b;
-          },
+          sort_function: _task_sort_function,
           content_controller_options: {
             child_options: [
               {
