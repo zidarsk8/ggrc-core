@@ -27,6 +27,13 @@ status_change = signals.signal(
   attribute
   """)
 
+workflow_cycle_start = signals.signal(
+  'Workflow Cycle Started ',
+  """
+  This is used to signal any listeners of any workflow cycle start
+  attribute
+  """)
+
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
   'ggrc_workflows',
@@ -231,13 +238,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     obj.start_date
     )
 
-  status_change.send(
-      obj.__class__,
-      obj=obj,
-      new_status=obj.status,
-      old_status=None
-      )
-
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
     cycle_task_group = models.CycleTaskGroup(
@@ -282,6 +282,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           modified_by=current_user,
           )
 
+  from ggrc_workflows.notification import *
+  workflow_cycle_start.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None
+      )
 
 # 'InProgress' states propagate via these links
 _cycle_object_parent_attr = {
@@ -518,3 +525,11 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
+
+def notify_email_digest():
+  import ggrc_workflows.notification as notification
+  notification.notify_email_digest()
+
+def notify_email_deferred():
+  import ggrc_workflows.notification as notification
+  notification.notify_email_deferred()
