@@ -73,3 +73,9 @@ def contributed_object_views():
   return [
       object_view(models.Risk),
       ]
+
+# Initialize non-RESTful views
+import ggrc_risk_assessment_v2.views
+
+def init_extra_views(app):
+  ggrc_risk_assessment_v2.views.init_extra_views(app)
