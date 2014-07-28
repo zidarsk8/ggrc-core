@@ -139,17 +139,34 @@ function report_progress(str, xhr) {
 }
 
 var permissions_by_type = {
-  "Program" : {
-    "owners" : "writer"
-    , "contact" : "writer"
-  }
-  , "Audit" : {
-    "contact" : "writer"
-    , "findAuditors" : "reader"
-  }
-  , "Request" : {
-    "assignee" : "writer"
-  }
+  "Program" : [{
+    role: "writer",
+    value: "owners"
+  }, {
+    role: "writer",
+    value: "contact"
+  }],
+  "Audit" : [{
+    role: "writer",
+    value: "contact",
+  }, {
+    role: "reader",
+    value: "findAuditors"
+  }, {
+    role: "writer",
+    value: function() {
+      return new RefreshQueue().enqueue(this.requests.reify())
+      .trigger().then(function(reqs) {
+        return new RefreshQueue().enqueue(can.map(reqs, function(req) {
+          return req.assignee.reify();
+        })).trigger();
+      });
+    }
+  }],
+  "Request" : [{
+    value: "assignee",
+    role: "writer"
+  }]
 };
 
 can.Control("GGRC.Controllers.GDriveWorkflow", {
@@ -278,8 +295,18 @@ can.Control("GGRC.Controllers.GDriveWorkflow", {
       }
     };
 
-    can.each(permissions_by_type[instance.constructor.model_singular], function(role, key) {
-      var people = instance[key];
+    // Special case: for requests with no objective, the folder is the same
+    //  as the Audit folder and *must* use the Audit permissions structure
+    //  instead of the Request structure.
+    if(instance instanceof CMS.Models.Request && !instance.objective) {
+      return instance.audit.reify().refresh().then(function(audit) {
+        return that.resolve_permissions(folder, audit);
+      });
+    }
+
+    can.each(permissions_by_type[instance.constructor.model_singular], function(entry) {
+      var role = entry.role;
+      var people = typeof entry.value === "string" ? instance[entry.value] : entry.value;
       var pdfd = [];
       if(typeof people === "function") {
         people = people.call(instance);
