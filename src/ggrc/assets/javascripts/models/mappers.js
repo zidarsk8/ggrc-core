@@ -1480,7 +1480,7 @@
         }
       }
 
-    , refresh_list: function() {
+    , refresh_list: function(binding) {
         return this._refresh_stubs(binding);
       }
   });
