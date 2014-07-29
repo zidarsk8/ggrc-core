@@ -19,7 +19,7 @@ class TaskGroupTask(Timeboxed, Mapping, db.Model):
   task_id = db.Column(
       db.Integer, db.ForeignKey('tasks.id'), nullable=False)
   sort_index = db.Column(
-      db.String(length=250), nullable=False)
+      db.String(length=250), default="", nullable=False)
 
   @staticmethod
   def _extra_table_args(cls):

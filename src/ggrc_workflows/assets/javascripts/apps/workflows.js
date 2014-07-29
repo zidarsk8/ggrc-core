@@ -415,7 +415,9 @@
           widget_id: "task_group",
           widget_name: "Task Groups",
           widget_icon: "task_group",
-          content_controller: GGRC.Controllers.TreeView,
+          content_controller: CMS.Controllers.SortableTreeView,
+          content_controller_selector: "ul",
+          widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.TaskGroup,
