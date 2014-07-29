@@ -9,7 +9,8 @@ from ggrc.app import app
 import ggrc_workflows.models as models
 from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
-from ggrc.notification import CalendarNotification, CalendarService, get_calendar_event
+from ggrc.notification import CalendarNotification, CalendarService
+from ggrc.notification import get_calendar_event, get_calendar, GGRC_CALENDAR
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
@@ -20,6 +21,7 @@ from ggrc_workflows import status_change, workflow_cycle_start
 from ggrc_workflows import calc_start_date
 from datetime import datetime
 from werkzeug.exceptions import Forbidden
+from ggrc.login import get_current_user
 
 PRI_TASK_OVERDUE=1
 PRI_TASK_DUE=2
@@ -244,14 +246,13 @@ def handle_end_cycle(sender, obj=None, src=None, service=None):
 
 @workflow_cycle_start.connect_via(models.Cycle)
 def handle_start_cycle(sender, obj=None, new_status=None, old_status=None):
-  current_app.logger.info("Workflow cycle started")
   if obj is None:
     current_app.logger.warn("Trigger: Unable to get cycle object")
     return
   notify_custom_message=True
   subject="Workflow Cycle " + "'" + obj.title + "' started"
   prepare_notification_for_cycle(obj, subject, PRI_CYCLE, notify_custom_message)
-  handle_cycle_calendar_request(obj)
+  prepare_calendar_for_cycle(obj)
 
 @status_change.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status=None):
@@ -282,8 +283,14 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   notif_pri=PRI_TASK_CHANGES
   if obj.status in ['InProgress']:
     notif_pri=PRI_TASK_ASSIGNMENT
+  user=get_current_user()
   if obj.status in ['InProgress', 'Finished', 'Assigned', 'Declined', 'Verified']: 
-    prepare_notification_for_task(obj, workflow_owner, assignee, subject, notif_pri)
+    prepare_notification_for_task(obj, user, assignee, subject, notif_pri)
+    taskgroup=get_taskgroup(obj)
+    if taskgroup is not None:
+      prepare_calendar_for_taskgroup(taskgroup)
+    else:
+      current_app.logger.warn("Trigger: Unable to get task group for task " + obj.title)
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
@@ -338,6 +345,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
       workflow_owner, recipients, notify_custom_message=notify_custom_message, override=override_flag)
     prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
         workflow_owner, recipients, override=override_flag)
+    prepare_calendar_for_workflow_member(workflow)
 
 def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
@@ -450,7 +458,7 @@ class WorkflowCalendarService(CalendarService):
   def __init__(self, credentials=None):
     super(WorkflowCalendarService, self).__init__(credentials)
 
-  def handle_cycle_create(self, cycle):
+  def handle_cycle_calendar_update(self, cycle):
     workflow=get_cycle_workflow(cycle)
     if workflow is None:
       current_app.logger.warn("Workflow not found for cycle " + cycle.title)
@@ -459,11 +467,11 @@ class WorkflowCalendarService(CalendarService):
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
       return
-    calendar_event = get_calendar_event(self.calendar_service, workflow_owner.email, cycle.title)
-    if calendar_event is not None:
-      current_app.logger.warn("Calendar event is already created for cycle " + cycle.title)
-      return
-    # Prepare the calendar event to be sent
+    calendar=get_calendar(self.calendar_service, GGRC_CALENDAR)
+    if calendar is None:
+      calendar_event=None
+    else:
+      calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
     subject=cycle.title
     content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
       '/' + str(workflow.id) + '#current_widget'
@@ -472,14 +480,16 @@ class WorkflowCalendarService(CalendarService):
     notif.end_date=cycle.end_date
     notif.notif_pri=PRI_OTHERS
     notif.calendar_service=self.calendar_service
+    notif.calendar_event=calendar_event
+    notif.calendar=calendar
     calendar_notification = notif.prepare([cycle], workflow_owner, workflow.people, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
     # create task group related events during start of workflow
     for task_group in cycle.cycle_task_groups:
-      self.handle_taskgroup_create(task_group)
+      self.handle_taskgroup_calendar_update(task_group)
 
-  def handle_taskgroup_create(self, task_group):
+  def handle_taskgroup_calendar_update(self, task_group):
     workflow=get_taskgroup_workflow(task_group)
     if workflow is None:
       current_app.logger.warn("Workflow not found for task group " + task_group.title)
@@ -500,11 +510,11 @@ class WorkflowCalendarService(CalendarService):
     assignees=[]
     for id, contact in recipient_contacts.items():
       assignees.append(contact)
-    calendar_event = get_calendar_event(self.calendar_service, workflow_owner.email, task_group.title)
-    if calendar_event is not None:
-      current_app.logger.warn("Calendar event is already created for task group " + task_group.title)
-      return
-    # Prepare the calendar event to be sent
+    calendar=get_calendar(self.calendar_service, GGRC_CALENDAR)
+    if calendar is None:
+      calendar_event=None
+    else:
+      calendar_event = get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
     subject=task_group.title
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
       '/' + str(workflow.id) + '#task_group_widget'
@@ -513,6 +523,8 @@ class WorkflowCalendarService(CalendarService):
     notif.end_date=task_group.end_date
     notif.notif_pri=PRI_OTHERS
     notif.calendar_service=self.calendar_service
+    notif.calendar_event=calendar_event
+    notif.calendar=calendar
     calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
@@ -531,12 +543,6 @@ def notify_email_digest():
   email_digest_notification.notify()
   db.session.commit()
 
-def handle_cycle_calendar_request(cycle):
-  if request.oauth_credentials is None:
-    raise Forbidden()
-  calendar_service=WorkflowCalendarService(request.oauth_credentials)
-  calendar_service.handle_cycle_create(cycle)
-
 def notify_email_deferred():
   """ Processing of deferred emails in particular handling Task/Undo 
   """
@@ -550,3 +556,31 @@ def notify_email_deferred():
   email_digest_deferred=EmailDigestDeferredNotification()
   email_digest_deferred.notify()
   db.session.commit()
+
+def prepare_calendar_for_cycle(cycle):
+  if request.oauth_credentials is None:
+    raise Forbidden()
+  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  calendar_service.handle_cycle_calendar_update(cycle)
+
+def prepare_calendar_for_workflow_member(workflow):
+  if request.oauth_credentials is None:
+    raise Forbidden()
+  found_cycle=False
+  for cycle in workflow.cycles:
+    if cycle.status not in ['InProgress', 'Finished', 'Verified']:
+      continue
+    else:
+      found_cycle=True
+      break
+  if not found_cycle:
+    current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
+    return
+  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  calendar_service.handle_cycle_calendar_update(cycle)
+
+def prepare_calendar_for_taskgroup(taskgroup):
+  if request.oauth_credentials is None:
+    raise Forbidden()
+  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  calendar_service.handle_taskgroup_calendar_update(taskgroup)

@@ -17,11 +17,17 @@ from ggrc.notification import NotificationBase, isNotificationEnabled
 from ggrc.models import Person, Notification, NotificationObject, NotificationRecipient
 from datetime import datetime
 from ggrc import db
+from ggrc import settings
+from ggrc.login import get_current_user
+
+GGRC_CALENDAR='GGRC Calendar'
 
 class CalendarNotification(NotificationBase):
   start_date=None
   end_date=None
   calendar_service=None
+  calendar_event=None
+  calendar=None
   def __init__(self, notif_type='Calendar'):
     super(CalendarNotification, self).__init__(notif_type)
 
@@ -109,31 +115,53 @@ class CalendarNotification(NotificationBase):
         'date': str(self.end_date)
       },
       'description':  notification.content,
+      'anyoneCanAddSelf': True,
     }
-    calendar_event=create_calendar_event(self.calendar_service, sender.email, event_details)
-    if calendar_event is None:
-      current_app.logger.error("Error occured in creating calendar event, id: " +\
-        sender.email + " event: " + event_details['summary'])
-    # ToDo(Mouli): Prepare Acls to allow assignees with writer role
-    # ToDo(Mouli): Handling of Reminders 
-    if len(assignees) > 0:
-      for id, assignee in assignees.items():
-        if not calendar_event.has_key('attendees'):
-          calendar_event['attendees']=[]
-        calendar_event['attendees'].append(assignee)
-      updated_event=update_calendar_event(self.calendar_service, sender.email, calendar_event['id'], calendar_event)
-      if updated_event is None:
-       current_app.logger.error("Error occured in updating calendar: " + \
-         sender.email + " for event: " + calendar_event['summary'])
-    else:
-       current_app.logger.info("There are no recipients to update calendar: " + \
-         sender.email + " for event: " + calendar_event['summary'])
+    notify_error=False
+    calendar_event=self.calendar_event
+    calendar=self.calendar
+    if len(assignees)> 0:
+      if calendar is None:
+        calendar=create_calendar(self.calendar_service, GGRC_CALENDAR)
+        if calendar is None:
+          notify_error=True
+          notify_error_text="Error occured in creating calendar"
+      if calendar is not None:
+        if calendar_event is None:
+         calendar_acls=create_calendar_acls(self.calendar_service, calendar['id'], assignees, 'writer')
+         if calendar_acls is None:
+           notify_error=True
+           notify_error_text="Error occured in creating calendar ACLs"
+         else:
+           calendar_event=create_calendar_event(self.calendar_service, calendar['id'], event_details)
+           if calendar_event is None:
+             notify_error=True
+             notify_error_text="Error occured in creating calendar event, id: " +\
+               sender.email + " event: " + event_details['summary']
+             current_app.logger.error(notify_error_text)
+      if calendar is not None and calendar_event is not None: 
+        calendar_event['attendees']=[]
+        for id, assignee in assignees.items():
+          recipient_email=assignee['email']
+          user=get_current_user()
+          if recipient_email in [user.email]:
+            continue
+          calendar_event['attendees'].append(assignee)
+        if len(calendar_event['attendees']) > 0:
+          updated_event=update_calendar_event(self.calendar_service, calendar['id'], calendar_event['id'], calendar_event)
+          if updated_event is None:
+            notify_error=True
+            notify_error_text="Error occured in updating calendar: " + \
+              sender.email + " for event: " + calendar_event['summary']
+            current_app.logger.error(notify_error_text)
 
-    # ToDo(Mouli): Handle error scenarios gracefully by setting notification recipient status to Error with error text
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
         continue
-      if enable_notif.has_key(notify_recipient.recipient_id) and \
+      if notify_error:
+        notify_recipient.status="Failed"
+        notify_recipient.error_text=notify_error_text
+      elif enable_notif.has_key(notify_recipient.recipient_id) and \
          enable_notif[notify_recipient.recipient_id]:
         notify_recipient.status="Successful"
       else:
@@ -151,6 +179,40 @@ class CalendarService(object):
       http = httplib2.Http()
       http = self.credentials.authorize(http)
       self.calendar_service=build(serviceName='calendar', version='v3', http=http)
+
+def create_calendar(calendar_service, calendar_id):
+  calendar=None
+  calendar_entry = {
+    'summary': GGRC_CALENDAR
+  }
+  try:
+    calendar=calendar_service.calendars().insert(
+      body=calendar_entry).execute()
+  except errors.HttpError, error:
+    current_app.logger.error("HTTP Error occured in creating calendar with ID: " + calendar_id + " " +  str(error))
+  except Exception, error:
+    current_app.logger.error("Exception occured in creating calendar with ID: " + calendar_id + " " +  str(error))
+  return calendar
+
+def get_calendar(calendar_service, calendar_id):
+  page_token = None
+  while True:
+    try:
+      calendars=calendar_service.calendarList().list(pageToken=page_token).execute()
+    except errors.HttpError, error:
+      current_app.logger.error("HTTP Error occured in getting calendar for ID: " + calendar_id + " " +  str(error))
+      break
+    except Exception, error:
+      current_app.logger.error("Exception occured in getting calendar for ID: " + calendar_id + " " +  str(error))
+      break
+    for calendar in calendars['items']:
+      if calendar.has_key('summary'):
+        if calendar['summary'] in [calendar_id]:
+          return calendar 
+    page_token = calendars.get('nextPageToken')
+    if not page_token:
+      break
+  return None
 
 def create_calendar_event(calendar_service, calendar_id, event_details):
   calendar_event=None
@@ -170,10 +232,10 @@ def get_calendar_event(calendar_service, calendar_id, event_id):
     try:
       events=calendar_service.events().list(calendarId=calendar_id, q=event_id, pageToken=page_token).execute()
     except errors.HttpError, error:
-      current_app.logger.info("HTTP Error occured in getting calendar events: " + str(error))
+      current_app.logger.error("HTTP Error occured in getting calendar events: " + str(error))
       break
     except Exception, error:
-      current_app.logger.info("Exception occured in getting calendar events: " + str(error))
+      current_app.logger.error("Exception occured in getting calendar events: " + str(error))
       break
     for event in events['items']:
       if event.has_key('summary'):
@@ -191,19 +253,67 @@ def update_calendar_event(calendar_service, calendar_id, event_id, event_details
       calendarId=calendar_id,
       eventId=event_id,
       body=event_details).execute()
-    current_app.logger.info("Update Calendar event id: " + calendar_event['id'] +\
-      " summary: " + calendar_event['summary'])
   except errors.HttpError, error:
-    current_app.logger.info("HTTP Error occured in updating calendar event: " + str(error))
+    current_app.logger.error("HTTP Error occured in updating calendar event: " + str(error))
   except Exception, error:
-    current_app.logger.info("Exception occured in updating calendar event: " + str(error))
+    current_app.logger.error("Exception occured in updating calendar event: " + str(error))
   return calendar_event 
 
-# ToDo(Mouli) Add Acl writer roles all members of the workflow
-def create_calendar_acls(calendar_service, calendar_id, acls):
-  pass
+def create_calendar_acl(calendar_service, calendar_id, recipient_email, role):
+  calendar_acl=None
+  rule={
+    'scope': {
+      'type': 'user',
+      'value': recipient_email,
+    },
+    'role': role,
+  }
+  try:
+    calendar_acl=calendar_service.acl().insert(
+      calendarId=calendar_id,
+      body=rule).execute()
+  except errors.HttpError, error:
+    current_app.logger.error("HTTP Error occured in creating calendar ACL: " + str(error))
+  except Exception, error:
+    current_app.logger.error("Exception occured in creating calendar ACL: " + str(error))
+  return calendar_acl
 
-# ToDo(Mouli) Get Acl roles for specified calendar
-def get_calendar_acls(calendar_service, calendar_id):
-  pass
+def create_calendar_acls(calendar_service, calendar_id, assignees, role):
+   calendar_acls=[]
+   for id, assignee in assignees.items(): 
+     recipient_email=assignee['email']
+     user=get_current_user()
+     if recipient_email in [user.email]:
+       continue
+     calendar_acl=get_calendar_acl(calendar_service, calendar_id, recipient_email, role)
+     if calendar_acl is None:
+       calendar_acl=create_calendar_acl(calendar_service, calendar_id, recipient_email, role)
+       if calendar_acl is None:
+         return None
+     calendar_acls.append(calendar_acl)
+   return calendar_acls
 
+def get_calendar_acl(calendar_service, calendar_id, recipient_email, role):
+  page_token = None
+  while True:
+    try:
+      acls=calendar_service.acl().list(calendarId=calendar_id, pageToken=page_token).execute()
+    except errors.HttpError, error:
+      current_app.logger.error("HTTP Error occured in getting calendar acl: " + str(error))
+      break
+    except Exception, error:
+      current_app.logger.error("Exception occured in getting calendar acl: " + str(error))
+      break
+    for rule in acls['items']:
+      if rule['role'] != 'writer':
+        continue
+      if ['scope']['type'] != 'user':
+        continue
+      if ['scope']['value'] != recipient_email:
+        continue
+      else:
+        return acl
+    page_token = acls.get('nextPageToken')
+    if not page_token:
+      break
+  return None

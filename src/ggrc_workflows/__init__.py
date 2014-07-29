@@ -282,7 +282,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           modified_by=current_user,
           )
 
-  from ggrc_workflows.notification import *
   workflow_cycle_start.send(
       obj.__class__,
       obj=obj,
@@ -533,3 +532,5 @@ def notify_email_digest():
 def notify_email_deferred():
   import ggrc_workflows.notification as notification
   notification.notify_email_deferred()
+
+from ggrc_workflows.notification import *
