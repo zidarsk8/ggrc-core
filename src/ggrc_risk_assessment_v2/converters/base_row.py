@@ -30,6 +30,14 @@ class RiskObjectsHandler(LinksHandler):
       obj_class = ggrc.models.__getattribute__(obj_type_str)
       return {'obj_class': obj_class, 'slug': slug}
 
+  def export(self):
+    obj = self.importer.obj
+    mapped_objs = getattr(obj, self.key, [])
+    # funcion for the pattern <object type>:<slug>
+    def obj_string(o):
+      return u"{0}:{1}".format(o.__class__.__name__, o.slug)
+    return u"\n".join([obj_string(o) for o in mapped_objs])
+
   def create_item(self, data):
     model_class = data.get('obj_class')
     self.add_link_warning(u"{} with code '{}' doesn't exist.".format(

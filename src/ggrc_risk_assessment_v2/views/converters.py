@@ -55,12 +55,30 @@ def import_risks():
   #return tq.make_response(import_dump({"id": tq.id, "status": tq.status}))
   return import_risk_task(parameters)
 
+
 def risk_import_template():
   from flask import current_app
   filename = "Risk_Import_Template.csv"
   headers = [('Content-Type', 'text/csv'), ('Content-Disposition', 'attachment; filename="{}"'.format(filename))]
   body = render_template("csv_files/" + filename)
   return current_app.make_response((body, 200, headers))
+
+
+# Doesn't work yet
+def export_risk_task():
+  from ggrc.converters.import_helper import handle_converter_csv_export
+  from ggrc_risk_assessment_v2.converters.risks import RiskConverter
+  from ggrc_risk_assessment_v2.models import Risk
+
+  options = {}
+  options['export'] = True
+  risks = Risk.query.all()
+  filename = "RISKS.csv"
+  return handle_converter_csv_export(filename, risks, RiskConverter, **options)
+
+
+def export_risk():
+  return export_risk_task()
 
 
 def init_extra_views(app):
@@ -71,3 +89,6 @@ def init_extra_views(app):
   app.add_url_rule(
       "/risks/import_template", "risk_import_template",
       view_func=login_required(risk_import_template))
+  app.add_url_rule(
+      "/admin/export/risk", "export_risk",
+      view_func=login_required(export_risk))
