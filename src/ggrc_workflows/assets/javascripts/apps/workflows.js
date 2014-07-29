@@ -53,6 +53,7 @@
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
         Reify = GGRC.MapperHelpers.Reify,
         Search = GGRC.MapperHelpers.Search;
+
     // Add mappings for basic workflow objects
     var mappings = {
         Task: {
@@ -236,11 +237,11 @@
       CMS.Models[type].attributes.task_group_objects =
         "CMS.Models.TaskGroupObject.stubs";
 
-    // Also register a render hook for object approval      
-    GGRC.register_hook(
-      type + ".info_widget_actions",
-      GGRC.mustache_path + "/base_objects/approval_link.mustache"
-      );
+      // Also register a render hook for object approval
+      GGRC.register_hook(
+        type + ".info_widget_actions",
+        GGRC.mustache_path + "/base_objects/approval_link.mustache"
+        );
 
     });
     new GGRC.Mappings("ggrc_workflows", mappings);
