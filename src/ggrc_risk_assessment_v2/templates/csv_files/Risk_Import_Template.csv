@@ -1,7 +1,7 @@
-Type,,,
-Risks,,,
+Type,,,,
+Risks,,,,
 *Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type is very important.  
-For Risks import, Type should be ""Risks"". (in cell A2)",,
+For Risks import, Type should be ""Risks"". (in cell A2)",,,
 "*Required
 
 If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
@@ -14,5 +14,11 @@ Map a person to be the Person of Contact for the Risk by entering an email addre
 Example:
 
 ken@reciprocitylabs.com
-"
-Risk Code,Title,Description,Map:Person of Contact
+","*Optional.  
+
+You can link gGRC objects to Risks on import by specifying the type and that object's code, separated by a colon.  Use <option><return> to deliniate between object codes.
+Example:
+
+System:SYSTEM-1
+Standard:PCI-1.2"
+Risk Code,Title,Description,Map:Person of Contact,Map:Objects

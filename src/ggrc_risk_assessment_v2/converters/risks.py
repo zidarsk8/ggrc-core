@@ -8,6 +8,7 @@ from ggrc.models.all_models import OrgGroup, Person, Relationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.converters.base_row import *
 from ggrc_risk_assessment_v2.models import Risk
+from ggrc_risk_assessment_v2.converters.base_row import *
 from collections import OrderedDict
 
 class RiskRowConverter(BaseRowConverter):
@@ -26,6 +27,7 @@ class RiskRowConverter(BaseRowConverter):
     self.handle_title('title', is_required=True)
     self.handle_text_or_html('description')
     self.handle('contact', ContactEmailHandler, person_must_exist=True)
+    self.handle('objects', RiskObjectsHandler)
     # Owner is more complicated; hold off on first iteration
     #self.handle('owners', ContactEmailHandler, person_must_exist=True, is_required=True)
 
@@ -52,13 +54,14 @@ class RiskConverter(BaseConverter):
     ('Title', 'title'),
     ('Description' , 'description'),
     ('Map:Person of Contact', 'contact'),
+    ('Map:Objects', 'objects'),
   ])
 
   row_converter = RiskRowConverter
 
   def do_export_metadata(self):
     yield self.metadata_map.keys()
-    yield ['Help']
+    yield ['Risks']
     yield []
     yield []
     yield self.object_map.keys()
