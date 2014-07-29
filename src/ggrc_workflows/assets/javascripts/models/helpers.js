@@ -15,6 +15,15 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
   },
   save : function() {
     var that = this;
+    // FIXME: temporary fix for 'Could not get any raw data while
+    // converting using .models'
+    this._data.owners = $.map(this._data.owners, function(owner){
+      return {
+        id: owner.id,
+        type: owner.type,
+      };
+    });
+
     return new CMS.Models.Task(this._data).save().then(function(task) {
       return new CMS.Models.TaskGroupTask({
         task_group: that.task_group,
