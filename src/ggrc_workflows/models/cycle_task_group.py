@@ -27,7 +27,7 @@ class CycleTaskGroup(
       cascade='all, delete-orphan'
       )
   sort_index = db.Column(
-      db.String(length=250), nullable=False)
+      db.String(length=250), default="", nullable=False)
 
   _publish_attrs = [
       'cycle',
