@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: dan@reciprocitylabs.com
     Maintained By: dan@reciprocitylabs.com
@@ -73,7 +73,16 @@
       this._super.apply(this, arguments);
       this.bind("created", refresh_attr_wrap('workflow').bind(this));
     }
-  }, {});
+  }, {
+    init: function() {
+      this._super.apply(this, arguments);
+      this.bind("status", function(ev, newVal) {
+        if(newVal === 'Verified' && this.workflow.reify().object_approval) {
+          this.attr("is_current", false);
+        }
+      });
+    }
+  });
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
   can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
@@ -144,6 +153,7 @@
     },
 
     tree_view_options: {
+      sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
@@ -247,8 +257,8 @@
           var object = instance.cycle_task_group_object.reify();
           if (object.selfLink) {
             object.refresh();
-            refresh_attr(object, "cycle_task_group");
-            refresh_attr(object, "cycle");
+            object.refresh_all("cycle_task_group", "cycle", "workflow");
+            object.refresh_all("task_group_object", "object");
           }
         }
       });

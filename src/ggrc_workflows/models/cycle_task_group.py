@@ -26,9 +26,12 @@ class CycleTaskGroup(
       backref='cycle_task_group',
       cascade='all, delete-orphan'
       )
+  sort_index = db.Column(
+      db.String(length=250), default="", nullable=False)
 
   _publish_attrs = [
       'cycle',
       'task_group',
       'cycle_task_group_objects',
+      'sort_index',
       ]

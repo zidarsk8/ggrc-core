@@ -34,13 +34,17 @@ class TaskGroup(
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='task_group', cascade='all, delete-orphan')
 
+  sort_index = db.Column(
+      db.String(length=250), default="", nullable=False)
+
   _publish_attrs = [
       'workflow',
       'task_group_objects',
       PublishOnly('objects'),
       'task_group_tasks',
       PublishOnly('tasks'),
-      'lock_task_order'
+      'lock_task_order',
+      'sort_index',
       # Intentionally do not include `cycle_task_groups`
       #'cycle_task_groups',
       ]

@@ -9,9 +9,12 @@
       <div class="openclose">
         <div class="row-fluid">
           <div class="span12">
-            <div class="item-data">
-              <div class="span3">
-                {{instance.title}}
+            <div class="item-data ordered-item-data">
+              <div class="span6">
+                <div class="oneline">
+                  <span class="drag"><i class="grcicon-drag"></span></i>
+                  {{instance.title}}
+                </div>
               </div>
               <div class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('[data-model]').data('model')}); }}>
                 <i class="grcicon-person-green pull-left"></i>
@@ -28,9 +31,6 @@
                   </div>
                 {{/if}}
                 {{/using}}
-              </div>
-              <div class="span3">
-                &nbsp;
               </div>
               <div class="span1">
                 {{#with_mapping 'objects' instance}}
