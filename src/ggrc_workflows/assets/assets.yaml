@@ -6,13 +6,16 @@ dashboard-js-files:
   - models/task_group.js
   - models/workflow.js
   - models/workflow_join_models.js
+  - models/helpers.js
   - workflow_mustache_helpers.js
+  - controllers/approval_workflow_controller.js
 
 dashboard-js-spec-files:
 
 dashboard-js-template-files:
   - base_objects/task_group_subtree_footer.mustache
   - base_objects/task_group_subtree.mustache
+  - base_objects/approval_link.mustache
   - cycles/tree.mustache
   - cycle_task_entries/tree.mustache
   - cycle_task_entries/tree_footer.mustache
@@ -23,6 +26,7 @@ dashboard-js-template-files:
   - cycle_task_groups/tree.mustache
   - cycle_task_group_objects/tree.mustache
   - cycle_task_group_object_tasks/tree.mustache
+  - cycle_task_group_object_tasks/modal_content.mustache
   - dashboard/lhn_workflows.mustache
   - dashboard/object_nav_actions.mustache
   - tasks/modal_content.mustache
@@ -44,6 +48,7 @@ dashboard-js-template-files:
   - workflows/search_result.mustache
   - workflows/extended_info.mustache
   - wf_objects/tree_footer.mustache
+  - wf_objects/autocomplete_result.mustache 
   - selectors/object_selector_base_modal.mustache
   - selectors/object_selector_option_column.mustache
   - selectors/object_selector_option_items.mustache
@@ -55,3 +60,5 @@ dashboard-js-template-files:
   - task_groups/tier2_content.mustache
   - tasks/tier2_content.mustache
   - workflows/tier2_content.mustache
+  - wf_objects/approval_modal_content.mustache
+  - cycle_task_group_object_tasks/current_tg_tree_footer.mustache

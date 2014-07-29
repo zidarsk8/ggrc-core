@@ -2,14 +2,14 @@
 """Add sort index to task_groups and cycle_task_groups
 
 Revision ID: 468290d5494f
-Revises: 4b3316aa1acf
+Revises: 1f1ab1d371b6
 Create Date: 2014-07-25 08:25:39.074611
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '468290d5494f'
-down_revision = '4b3316aa1acf'
+down_revision = '1f1ab1d371b6'
 
 from alembic import op
 import sqlalchemy as sa
