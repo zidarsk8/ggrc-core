@@ -65,7 +65,9 @@ Mustache.registerHelper("sort_index_at_end", function(list, options) {
       list_max = "0";
   list = Mustache.resolve(list);
   can.each(list, function(item) {
-    item = item.reify();
+    if (item.reify) {
+      item = item.reify();
+    }
     var idx = item.attr
               ? (item.attr("sort_index") || item.attr("instance.sort_index"))
               : item.sort_index || item.instance && (item.instance.attr
