@@ -231,6 +231,11 @@
        "task_groups": "TaskGroup"
       };
 
+      CMS.Models[type].attributes.workflow_objects =
+        "CMS.Models.WorkflowObject.stubs";
+      CMS.Models[type].attributes.task_group_objects =
+        "CMS.Models.TaskGroupObject.stubs";
+
     // Also register a render hook for object approval      
     GGRC.register_hook(
       type + ".info_widget_actions",
