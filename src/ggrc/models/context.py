@@ -9,8 +9,15 @@ from ggrc import db
 from ggrc.models.mixins import deferred, Base, Described
 
 
-class Context(Described, Base, db.Model):
+class Context(Base, db.Model):
   __tablename__ = 'contexts'
+
+  # This block and the 'description' attrs are taken from the Described mixin
+  #  which we do not use for Context because indexing Context descriptions
+  #  for fulltext search leads to undesirable results
+  @declared_attr
+  def description(cls):
+    return deferred(db.Column(db.Text), cls.__name__)
 
   name = deferred(db.Column(db.String(128), nullable=True), 'Context')
   related_object_id = deferred(
@@ -33,8 +40,8 @@ class Context(Described, Base, db.Model):
         else None
     return setattr(self, self.related_object_attr, value)
 
-  _publish_attrs = ['name', 'related_object',]
-  _sanitize_html = ['name',]
+  _publish_attrs = ['name', 'related_object','description',]
+  _sanitize_html = ['name','description',]
   _include_links = []
 
 
