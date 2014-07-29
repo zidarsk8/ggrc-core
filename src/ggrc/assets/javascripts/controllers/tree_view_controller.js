@@ -623,7 +623,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var that = this
         , $footer = this.element.children('.tree-footer').first()
         , $items = $()
-        , $existing = this.element.children('li:not(.tree-header, .tree-footer)')
+        , $existing = this.element.children('li:not(.tree-footer)')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
@@ -639,8 +639,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          $items.each(function(i, item) {
             var j, $item = $(item);
             for(j = $existing.length - 1; j >= 0; j--) {
-              if($existing.eq(j).hasClass('tree-header')){
+              if ($existing.eq(j).hasClass('sticky-clone')) {
                 compare = false;
+                continue;
               }
               var old_item = $existing.eq(j).control().options.instance,
                   new_item = $item.control().options.instance;
@@ -681,8 +682,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
       $item = $(ui.item),
-      $before = $item.prev("li:not(.tree-header, .tree-footer)"),
-      $after = $item.next("li:not(.tree-header, .tree-footer)"),
+      $before = $item.prev("li:not(.tree-footer)"),
+      $after = $item.next("li:not(.tree-footer)"),
       before_index = $before.length
                      ? $before.control().options.instance[this.options.sort_property]
                      : "0",

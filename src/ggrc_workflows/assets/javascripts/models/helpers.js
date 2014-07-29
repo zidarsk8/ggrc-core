@@ -15,6 +15,15 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
   },
   save : function() {
     var that = this;
+    // FIXME: temporary fix for 'Could not get any raw data while
+    // converting using .models'
+    this._data.owners = $.map(this._data.owners, function(owner){
+      return {
+        id: owner.id,
+        type: owner.type,
+      };
+    });
+
     return new CMS.Models.Task(this._data).save().then(function(task) {
       return new CMS.Models.TaskGroupTask({
         task_group: that.task_group,
@@ -67,11 +76,11 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
         object_approval: true,
         notify_on_change: true,
         notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
-          + GGRC.current_user.name + " (" + GGRC.current_user.email 
+          + GGRC.current_user.name + " (" + GGRC.current_user.email
           + ") asked you to review newly created "
           + this.original_object.constructor.model_singular + ' "' + this.original_object.title
           + '" before ' + moment(this.end_date).format("MM/DD/YYYY") + ". "
-          + "Click <a href='" + window.location.href.replace("#.*$", "#") 
+          + "Click <a href='" + window.location.href.replace("#.*$", "#")
           + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
         context: that.original_object.context
       }).save()
