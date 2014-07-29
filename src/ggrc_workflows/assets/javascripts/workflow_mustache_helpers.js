@@ -66,7 +66,11 @@ Mustache.registerHelper("sort_index_at_end", function(list, options) {
   list = Mustache.resolve(list);
 
   can.each(list, function(item) {
-    var idx = item.sort_index || item.instance && item.instance.sort_index;
+    var idx = item.attr
+              ? (item.attr("sort_index") || item.attr("instance.sort_index"))
+              : item.sort_index || item.instance && (item.instance.attr
+                                                    ? item.instance.attr("sort_index")
+                                                    : item.instance.sort_index);
     if (typeof idx !== "undefined") {
       list_max = GGRC.Math.string_max(idx, list_max);
     }

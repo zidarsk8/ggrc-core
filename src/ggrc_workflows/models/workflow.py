@@ -53,6 +53,9 @@ class Workflow(
     'Workflow'
     )
 
+  object_approval = deferred(
+    db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
+
   workflow_objects = db.relationship(
       'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
   objects = association_proxy(
@@ -101,6 +104,7 @@ class Workflow(
       'notify_on_change',
       'notify_custom_message',
       'cycles',
+      'object_approval'
       ]
   _stub_attrs = ['workflow_state']
 

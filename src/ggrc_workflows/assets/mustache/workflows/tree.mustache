@@ -60,14 +60,16 @@
         {{> '/static/mustache/workflows/tier2_content.mustache'}}
       </div>
 
-      {{#if draw_children}}
+      {{#if_helpers '\
+        #if' draw_children '\
+        and ^if_equals' instance.workflow_state 'Verified'}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
             {{#child_options}}
               <div class="inner-tree">
                 <h6>{{firstnonempty title_plural model.title_plural}} ({{list.length}})
                 {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance model=model multiple_mapping_case=true}}}
                 </h6>
-                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                <ul class="tree-structure new-tree colored-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}></ul>
               </div>
             {{/child_options}}
         {{/prune_context}}

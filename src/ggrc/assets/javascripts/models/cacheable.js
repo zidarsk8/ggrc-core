@@ -430,6 +430,9 @@ can.Model("can.Model.Cacheable", {
     }
 
   , stubs : function(params) {
+      if(params instanceof can.Observe || !(params instanceof this.List)) {
+        params = new this.List(params);
+      }
       return new can.List(can.map(this.models(params), function(instance) {
         return instance.stub();
       }));
