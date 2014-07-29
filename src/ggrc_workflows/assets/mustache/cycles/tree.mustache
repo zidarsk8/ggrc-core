@@ -11,7 +11,7 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="span12">
+        <div class="span8">
 
           <div class="item-data">
             <div class="tree-title-area">
@@ -19,6 +19,18 @@
             </div>
           </div>
 
+        </div>
+
+        <div class="span2">
+          Due {{localize_date instance.end_date}}
+        </div>
+
+        <div class="span2">
+          <cycle-end-cycle cycle="instance">
+            {{#if cycle.is_current}}
+              <button class="btn end-cycle">End Cycle</button>
+            {{/if}}
+          </cycle-end-cycle>
         </div>
       </div>
     </div>

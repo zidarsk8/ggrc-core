@@ -46,35 +46,6 @@
       });
     },
 
-    "[data-ggrc-action=end-cycle] click": function(el) {
-      var $this = $(this)
-        , options = $this.data('modal-selector-options');
-      var workflow = $('button.end-cycle').closest('ul').control().options.parent_instance;
-      var current_cycles = workflow.get_mapping('current_cycle');
-      this.bindXHRToButton(function() {
-        var dfds = [];
-        if(current_cycles && current_cycles.length > 0) {
-          for(var i = 0; i < current_cycles.length; i++) {
-            dfds.push(current_cycles[i].instance.refresh().then(function(c) {
-              return c.attr('is_current', false).save();
-            }));
-          }
-        }
-        return $.when.apply($, dfds).done(function() {
-          return GGRC.page_instance().refresh();
-        }).then(function(){
-          // We need to update person's assigned_tasks mapping manually
-          var person_id = GGRC.current_user.id,
-              person = CMS.Models.Person.cache[person_id];
-              binding = person.get_binding('assigned_tasks');
-
-          // FIXME: Find a better way of removing stagnant items from the list.
-          binding.list.splice(0, binding.list.length);
-          return binding.loader.refresh_list(binding);
-        });
-      }(), el);
-    },
-
     //  FIXME: This should trigger expansion of the TreeNode, without using
     //    global event listeners or routes or timeouts, but currently object
     //    creation and tree insertion is disconnected.
@@ -84,6 +55,29 @@
           window.location.hash =
             'task_group_widget/task_group/' + instance.id;
         }, 250);
+      }
+    }
+  });
+
+  can.Component.extend({
+    tag: "cycle-end-cycle",
+    template: "<content/>",
+    events: {
+      click: function() {
+        this.scope.cycle.refresh().then(function(cycle) {
+          cycle.attr('is_current', false).save().then(function() {
+            return GGRC.page_instance().refresh();
+          }).then(function(){
+            // We need to update person's assigned_tasks mapping manually
+            var person_id = GGRC.current_user.id,
+                person = CMS.Models.Person.cache[person_id];
+                binding = person.get_binding('assigned_tasks');
+
+            // FIXME: Find a better way of removing stagnant items from the list.
+            binding.list.splice(0, binding.list.length);
+            return binding.loader.refresh_list(binding);
+          });
+        });
       }
     }
   });

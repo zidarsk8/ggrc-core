@@ -100,6 +100,9 @@
           previous_cycles: CustomFilter("cycles", function(result) {
               return !result.instance.is_current;
             }),
+          current_cycles: CustomFilter("cycles", function(result) {
+              return result.instance.is_current;
+            }),
           current_cycle: CustomFilter("cycles", function(result) {
               return result.instance.is_current;
             }),
@@ -490,13 +493,11 @@
       widget_id: "current",
       widget_name: "Current Cycle",
       widget_icon: "cycle",
-      //object_category: "history",
       content_controller_options: {
         draw_children: true,
         parent_instance: object,
-        model: "CycleTaskGroup",
-        mapping: "current_task_groups",
-        header_view: GGRC.mustache_path + "/cycle_task_groups/current_cycle_header.mustache"
+        model: "Cycle",
+        mapping: "current_cycles",
       }
     };
     new_widget_descriptors.objects = objects_widget_descriptor;
