@@ -307,9 +307,9 @@ def get_calendar_acl(calendar_service, calendar_id, recipient_email, role):
     for rule in acls['items']:
       if rule['role'] != 'writer':
         continue
-      if ['scope']['type'] != 'user':
+      if rule['scope']['type'] != 'user':
         continue
-      if ['scope']['value'] != recipient_email:
+      if rule['scope']['value'] != recipient_email:
         continue
       else:
         return acl
