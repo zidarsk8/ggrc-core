@@ -1,0 +1,157 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+-extends 'layouts/base.haml'
+
+-block extra_javascript
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.current_user = ={ current_user_json()|safe };
+  GGRC.config = ={ config_json()|safe };
+
+-block page_help scoped
+  dashboard
+
+-block body
+  %body
+
+    %header.header.main
+      .header-bar
+        .container-fluid
+          .row-fluid
+            .span12
+              .logo.pull-left
+                %a{ 'href': "/dashboard" }
+                  -set logo_url = config.get("COMPANY_LOGO")
+                  -set logo_text = config.get("COMPANY_LOGO_TEXT")
+                  -if logo_url
+                    %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+                  -elif logo_text != None
+                    =logo_text
+                  -else
+                    Google GRC
+              %ul.menu
+                %li.black-link
+                  %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax', 'data-modal-type': 'helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+                    %i.grcicon-help
+                    %span
+                      Help
+                %li.black-link
+                  %a#page-help{ 'href': "/dashboard#task_widget" }
+                    %i.grcicon-task
+                    %span
+                      My Tasks
+                      %span.task-count
+                %li.user.dropdown.dropdown-black.black-link
+                  %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
+                    %i.grcicon-user
+                    %span
+                      %strong
+                        =current_user.email
+                    %i.grcicon-carot-white
+                  %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+                    %li
+                      %a{'href': "/dashboard"}
+                        %i.grcicon-dashboard
+                        My Work ({{current_user.system_wide_role}})
+                    -if permissions.is_allowed_read('/admin', 1)
+                      %li
+                        %a{'href': "/admin#people_list_widget"}
+                          %i.grcicon-admin
+                          Admin Dashboard
+                    %li.notify-wrap
+                      %span
+                        %i.grcicon-alarm
+                        Notifications
+                      %div.inner-list
+                        %label
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
+                            'value': 'Email_Now'
+                          }
+                          Email notifications
+                        %label
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
+                            'value': 'Email_Digest'
+                          }
+                          Daily email digest
+                        %label
+                          %input{
+                            'type': 'checkbox',
+                            'name': 'notifications',
+                            'value': 'Calendar'
+                          }
+                          Calendar notifications
+                    %li.layout-wrap
+                      %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
+                        %i.grcicon-desktop
+                        Save Layout
+                      %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
+                        %i.grcicon-reset
+                        Reset Layout
+                    %li.logout-wrap
+                      %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
+                        %i.grcicon-logout
+                        Logout
+
+    .area{ 'class': '={ model_display_class }' }
+      .header-content
+        .row-fluid
+          #page-header.span9
+            -block header
+          .span3
+            -block subheader_extras
+
+      %section.content
+        .flash
+          -with messages = get_flashed_messages(with_categories=True)
+            -if messages
+              -for category, message in messages
+                %div{ 'class': "{{category}}" }
+                  %a.close{'href': "#", 'data-dismiss': "alert" }
+                    x
+                  %p
+                    {{message}}
+          -#FIXME: Flash messages
+          -#flash.each do |type, value|
+            -value = [value] unless value.is_a?(Array)
+            -value = value.map(:presence).compact
+            -if value.size > 0
+              %div{ 'class': type }
+                %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                  &times;
+                -value.each do |message|
+                  %p=message
+        -block main
+          .clearfix
+            .objnav.bar-v
+            .inner-nav
+              .object-nav
+                %ul.nav{ 'class': "internav ={ model_display_class }" }
+            .object-area
+              #show_columns.column-set{ 'data-resize': "true" }
+                #middle_column.widget-area
+                  -block widget_area
+
+    %section.footer
+      .row-fluid
+        .span12
+          %ul.bottom-nav.pull-left
+          %p
+            -#FIXME: Copyright footer
+            -#=CMS_CONFIG['COMPANY']
+            =config.get('COPYRIGHT')
+            -#=Time.now.year
+            =config.get('COMPANY')
+            Version
+            =config.get('VERSION')
+
+    #lhn
+      .bar-v
+      .lhs-holder
+        .affix-holder
+          #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
