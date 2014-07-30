@@ -481,7 +481,7 @@
     $(function() {
       $('body').on(
         'click.modal-ajax.data-api keydown.modal-ajax.data-api',
-        toggle ? "[data-modal-type=" + toggle + "], [data-toggle=modal-ajax-" + toggle + "]" : "[data-toggle=modal-ajax]",
+        toggle ? "[data-toggle=modal-ajax-" + toggle + "]" : "[data-toggle=modal-ajax]",
         function(e) {
 
         var $this = $(this)
