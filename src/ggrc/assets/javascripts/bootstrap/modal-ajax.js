@@ -533,6 +533,7 @@
     can.each({
         "": handlers["modal"],
         "form": handlers["form"],
+        "helpform": handlers["helpform"],
         "listform": handlers["listform"],
         "listnewform": handlers["listnewform"],
         "listeditform": handlers["listeditform"],
