@@ -19,6 +19,8 @@
       , context: "CMS.Models.Context.stub"
       , documents : "CMS.Models.Document.stubs"
       , program: "CMS.Models.Program.stub"
+      , modified_by: "CMS.Models.Person.stub"
+      , object_documents: "CMS.Models.ObjectDocument.stubs"
     }
     , tree_view_options: {
       show_view: _mustache_path + "/tree.mustache",
