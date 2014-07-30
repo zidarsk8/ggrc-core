@@ -10,20 +10,27 @@ from ggrc.models.object_document import Documentable
 class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db.Model):
   __tablename__ = 'risk_assessments'
 
-  ra_manager_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
-  ra_manager = db.relationship('Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
+  ra_manager_id = deferred(
+    db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+  ra_manager = db.relationship(
+    'Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
   
-  ra_counsel_id = deferred(db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
-  ra_counsel = db.relationship('Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
+  ra_counsel_id = deferred(
+    db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
+  ra_counsel = db.relationship(
+    'Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
   
-  program_id = deferred(db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
-  program = db.relationship('Program', backref='risk_assessments', uselist=False, foreign_keys='RiskAssessment.program_id')
-  
+  program_id = deferred(
+    db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
+  program = db.relationship(
+    'Program',
+    backref='risk_assessments',
+    uselist=False, 
+    foreign_keys='RiskAssessment.program_id')
 
   _fulltext_attrs = [
     'title',
     'description',
-    'notes',
     ]
 
   _publish_attrs = [
@@ -32,5 +39,4 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db
     'ra_counsel',
     'program',
     'description',
-    'notes',
     ]
