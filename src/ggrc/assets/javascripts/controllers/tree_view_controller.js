@@ -623,7 +623,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var that = this
         , $footer = this.element.children('.tree-footer').first()
         , $items = $()
-        , $existing = this.element.children('li:not(.tree-footer)')
+        , $existing = this.element.children('li.cms_controllers_tree_view_node')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
@@ -639,10 +639,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
          $items.each(function(i, item) {
             var j, $item = $(item);
             for(j = $existing.length - 1; j >= 0; j--) {
-              if ($existing.eq(j).hasClass('sticky-clone')) {
-                compare = false;
-                continue;
-              }
               var old_item = $existing.eq(j).control().options.instance,
                   new_item = $item.control().options.instance;
               if (sort_function){
