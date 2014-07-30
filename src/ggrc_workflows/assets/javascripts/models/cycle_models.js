@@ -254,12 +254,19 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var object = instance.cycle_task_group_object.reify();
-          if (object.selfLink) {
-            object.refresh();
-            object.refresh_all("cycle_task_group", "cycle", "workflow");
-            object.refresh_all("task_group_object", "object");
+          var object = instance.cycle_task_group_object.reify(),
+              dfd = object.refresh(),
+              rq = new RefreshQueue();
+
+          function force_refresh_chain(chain) {
+            can.reduce(chain, function(a, b) {
+              return a.then(function(obj) {
+                  return obj[b].reify().refresh();
+              });
+            }, dfd);
           }
+          force_refresh_chain(["cycle_task_group", "cycle", "workflow"]);
+          force_refresh_chain(["task_group_object", "object"]);
         }
       });
     }
