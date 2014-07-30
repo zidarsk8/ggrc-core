@@ -13,10 +13,10 @@
         </div>
       </div>
     </div>
-    
+
     <section class="content">
       <div class="clearfix">
-        
+
         <div class="inner-nav">
           <div class="object-nav">
             <ul class="nav internav program cms_controllers_inner_nav ui-sortable">
@@ -41,8 +41,8 @@
             </ul>
           </div>
         </div>
-        
-          
+
+
         <div class="object-area" style="margin-left: 200px;">
           <div id="show_columns" class="column-set">
             <div id="middle_column" class="widget-area ui-sortable">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="span3">
                       <div class="widget-action pull-right widget-action-help">
-                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                        <a data-placement="top" data-toggle="modal-ajax-helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
                           <i class="grcicon-help-black"></i>
                         </a>
                       </div>
@@ -77,7 +77,7 @@
                       </div>
                       <div class="span6">&nbsp;</div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span6">
                         <div class="rtf-block">
@@ -86,7 +86,7 @@
                       </div>
                       <div class="span6">
                         <div class="row-fluid">
-                          <div>   
+                          <div>
                             <p>
                               <strong>Status:</strong><br>
                               {{assessment.status}}
@@ -95,7 +95,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="rtf-block">
@@ -104,7 +104,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <p>
@@ -126,7 +126,7 @@
                         </p>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="info-utility-link">
@@ -137,7 +137,7 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="row-fluid">
                       <div class="span12">
                         <div class="workflow-wrap">
@@ -161,7 +161,7 @@
                               <ul>
                                 {{#each workflow.reviews}}
                                 <li>{{title}} (<a href="#">{{reviewer}}</a>)</li>
-                                {{/each}} 
+                                {{/each}}
                              </ul>
                             </li>
                             <li>
@@ -186,9 +186,9 @@
                             </a>
                             {{/workflow}}
                           </div>
-                          
+
                         </div>
-                        
+
                       </div>
                     </div>
                     {{^if assessment.started}}
@@ -226,7 +226,7 @@
                     </div>
                     <div class="span3">
                       <div class="widget-action pull-right widget-action-help">
-                        <a data-placement="top" data-toggle="modal-ajax" data-modal-type="helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
+                        <a data-placement="top" data-toggle="modal-ajax-helpform" data-help-slug="info" href="javascript://" rel="tooltip" data-original-title="Help">
                           <i class="grcicon-help-black"></i>
                         </a>
                       </div>
@@ -235,7 +235,7 @@
                 </header>
                 <section class="content">
                   <div class="object-step" id="filters">
-                    {{#if filter}} 
+                    {{#if filter}}
                     <div class="choose-object-wrap">
                       <div class="choose-object-content">
                         <div class="row-fluid">
@@ -444,7 +444,7 @@
 	                                  </div>
 	                                </a>
 	                              </div>
-	                              
+
 	                              <div class="tier-2-info item-content">
 	                                <div class="tier-2-info-content">
 	                                  <div class="show-description">
@@ -460,7 +460,7 @@
 	                                  <div class="row-fluid">
 	                                    <div class="span11">
 	                                      <div class="inner-row">
-	                                      
+
 	                                        <strong>Entries (<span id="entriesCount">{{entries.length}}</span>)</strong>
 	                                        <ul class="entry-list">
 	                                          {{#each entries}}
@@ -469,13 +469,13 @@
 	                                            <ul class="attachment-list">
 	                                              <li>
 	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>supportingwalkthroughevidence.pdf</span>
 	                                                </a>
 	                                              </li>
 	                                              <li>
 	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>screenshot.pdf</span>
 	                                                </a>
 	                                              </li>
@@ -517,7 +517,7 @@
 	                            {{/if}}
 	                          </ul>
 	                        </div>
-	                        
+
 	                        <div class="assessment-review">
 	                          <p>
 	                            <strong>Reviews</strong>
@@ -548,7 +548,7 @@
 	                                            <ul class="attachment-list">
 	                                              <li>
 	                                                <a href="#">
-	                                                  <i class="grcicon-attach"></i> 
+	                                                  <i class="grcicon-attach"></i>
 	                                                  <span>screenshot.pdf</span>
 	                                                </a>
 	                                              </li>
@@ -589,7 +589,7 @@
 	                          </label>
 	                          {{/each}}
 	                        </div>
-	                        
+
 	                      </div>
 	                    </li>
 	                    {{/each}}
@@ -682,7 +682,7 @@
       </div>
     </section>
   </div>
-  
+
   <div id="editAssessmentStandAlone" class="modal hide fade modal-wide ui-draggable" tabindex="-1" role="dialog" aria-labelledby="newAssessmentStandAloneLabel" aria-hidden="true">
     <div class="modal-header">
       <a class="btn btn-mini btn-danger pull-right" href="#" data-dismiss="modal">
@@ -714,7 +714,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span6">
             <label>
@@ -728,7 +728,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span3">
             <label>
@@ -746,14 +746,14 @@
             <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="end_date" placeholder="MM/DD/YYYY" type="text" value="{{assessment.end_date}}">
           </div>
         </div>
-        
+
         <div class="row-fluid">
           <div class="span12">
             <div class="expand-link">
               <a class="show-hidden-fields" href="javascript://">
                 <span class="out">
                   <i class="grcicon-show"></i>
-                  Show 
+                  Show
                 </span>
                 <span class="in">
                   <i class="grcicon-hide"></i>
@@ -767,7 +767,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="hidden-fields-area" style="display:none">
           <div class="row-fluid">
             <div class="span6">
@@ -790,7 +790,7 @@
             </div>
           </div>
         </div>
-        
+
       </form>
     </div>
     <div class="modal-footer">
@@ -822,7 +822,7 @@
     </div>
     <div class="modal-body">
       <p>
-        Assessment tasks and review will be applied to <strong>{{assessment.objects.length}} selected objects</strong>, each of them will have {{assessment.workflow.tasks.length}} tasks 
+        Assessment tasks and review will be applied to <strong>{{assessment.objects.length}} selected objects</strong>, each of them will have {{assessment.workflow.tasks.length}} tasks
         and {{assessment.workflow.reviews.length}} review cycles attached.
       </p>
       <p>
@@ -832,7 +832,7 @@
       <a class="btn btn-large" data-dismiss="modal" href="#">Cancel</a>
     </div>
   </div>
-  
-  
-  
+
+
+
 </workflow>

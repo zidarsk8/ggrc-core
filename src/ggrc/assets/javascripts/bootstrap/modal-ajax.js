@@ -135,7 +135,7 @@
         }).fail(function(){
           delete_counts.attr('loading', false);
       });
-      
+
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_delete({
@@ -238,7 +238,7 @@
       if (object_params.section) {
         modal_title = "Map " + modal_title + " to " + object_params.section.title;
       }
-      
+
       var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
 
       $target
@@ -316,7 +316,7 @@
       , 'position' : "absolute"
     })
     modals.off("scroll.modalajax");
-    modals.on("scroll.modalajax", function() { 
+    modals.on("scroll.modalajax", function() {
         $(this).scrollTop(0); //fix for Chrome rendering bug when resizing block elements containing CSS sprites.
     });
   }
@@ -330,17 +330,17 @@
 
     var offsetParent = modal.offsetParent();
     var _scrollY = 0;
-    var _top = 0;    
+    var _top = 0;
     var _left = modal.position().left;
     if(!offsetParent.length || offsetParent.is("html, body")) {
       offsetParent = $(window);
       _scrollY = window.scrollY;
-      _top = _scrollY 
-        + (offsetParent.height() 
-          - modal.height()) / 5 
+      _top = _scrollY
+        + (offsetParent.height()
+          - modal.height()) / 5
         + header_height / 5
 
-        window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height()) 
+        window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height())
     } else {
       _top = offsetParent.closest(".modal").offset().top - offsetParent.offset().top + header_height;
       _left = offsetParent.closest(".modal").offset().left + offsetParent.closest(".modal").width() / 2 - offsetParent.offset().left;
@@ -359,8 +359,8 @@
     var $el = this.$element;
     var shownevents, keyevents;
     if(!(shownevents = $._data($el[0], "events").shown)
-        || $(shownevents).filter(function() { 
-            return $.inArray("arrange", this.namespace.split(".")) > -1; 
+        || $(shownevents).filter(function() {
+            return $.inArray("arrange", this.namespace.split(".")) > -1;
         }).length < 1) {
           $el.on("shown.arrange, loaded.arrange", function(ev) {
             if(ev.target === ev.currentTarget)
@@ -381,10 +381,10 @@
       }).removeAttr("id");
 
       $el.on(["click", "mouseup", "keypress", "keydown", "keyup", "show", "shown", "hide", "hidden"].join(".clone ") + ".clone", function(e) {
-        that.$cloneEl 
+        that.$cloneEl
         ? that.$cloneEl.find("[data-original-id=" + e.target.id + "]").trigger(new $.Event(e))
         : $el.off(".clone");
-      }); 
+      });
     }
 
 
@@ -433,7 +433,7 @@
     modals.each(function(i) {
         var parent = this.parentNode;
         if(parent !== document.body)
-        { 
+        {
             modal_backdrops
             .eq(i)
             .detach()
@@ -481,7 +481,7 @@
     $(function() {
       $('body').on(
         'click.modal-ajax.data-api keydown.modal-ajax.data-api',
-        toggle ? "[data-modal-type=" + toggle + "], [data-toggle=modal-ajax-" + toggle + "]" : "[data-toggle=modal-ajax]",
+        toggle ? "[data-toggle=modal-ajax-" + toggle + "]" : "[data-toggle=modal-ajax]",
         function(e) {
 
         var $this = $(this)
@@ -533,6 +533,7 @@
     can.each({
         "": handlers["modal"],
         "form": handlers["form"],
+        "helpform": handlers["helpform"],
         "listform": handlers["listform"],
         "listnewform": handlers["listnewform"],
         "listeditform": handlers["listeditform"],
