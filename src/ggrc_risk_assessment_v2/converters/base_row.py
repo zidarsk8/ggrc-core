@@ -25,6 +25,7 @@ class RiskObjectsHandler(LinksHandler):
     obj_type_str, slug = tuple([v.strip() for v in value.split(":")])
     if obj_type_str not in _risk_object_types:
       self.add_link_error(u"'{}' is not a valid type.".format(obj_type_str))
+      return
     else:
       import ggrc.models
       obj_class = ggrc.models.__getattribute__(obj_type_str)
@@ -39,11 +40,15 @@ class RiskObjectsHandler(LinksHandler):
     return u"\n".join([obj_string(o) for o in mapped_objs])
 
   def create_item(self, data):
+    if not data:
+      return
     model_class = data.get('obj_class')
     self.add_link_warning(u"{} with code '{}' doesn't exist.".format(
       model_class.__name__, data.get('slug')))
 
   def find_existing_item(self, data):
+    if not data:
+      return None
     where_params = {'slug': data.get('slug')}
     model_class = data.get('obj_class')
     return model_class.query.filter_by(**where_params).first() or None
