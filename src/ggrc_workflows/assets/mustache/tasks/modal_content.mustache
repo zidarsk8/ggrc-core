@@ -17,12 +17,12 @@
       <br>
     </div>
     <div class="span4">
-      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#using owner=instance.contact model_singular=model.model_singular}}
       <label>
-        Owner
+        Assignee
         <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
       </label>
-      <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
+      <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" data-list="true" placeholder="Enter email address" type="text" value="{{firstexist owner.email ''}}" />
       {{/using}}
       <br>
     </div>

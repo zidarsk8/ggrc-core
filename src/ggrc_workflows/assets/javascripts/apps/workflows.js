@@ -121,7 +121,16 @@
           authorized_people: Cross(
             "authorization_contexts", "authorized_people"),
           mapped_and_or_authorized_people: Multi([
-            "people", "authorized_people"])
+            "people", "authorized_people"]),
+          roles: Cross("authorizations", "role"),
+          // This is a dummy mapping that ensures the WorkflowOwner role is loaded
+          //  before we do the custom filter for owner_authorizations.
+          authorizations_and_roles: Multi(["authorizations", "roles"]),
+          owner_authorizations: CustomFilter("authorizations_and_roles", function(binding) {
+            return binding.instance instanceof CMS.Models.UserRole
+                   && binding.instance.role.reify().attr("name") === "WorkflowOwner";
+          }),
+          owners: Cross("owner_authorizations", "person")
         },
 
         Cycle: {
