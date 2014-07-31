@@ -1,4 +1,4 @@
-scope = "Private Program"
+scope = "Program"
 description = """
   A user with authorization to read mapping objects related to an access
   controlled Program.<br/><br/>This is essentially a view only role. A person
@@ -7,20 +7,10 @@ description = """
   """
 permissions = {
     "read": [
-        "ObjectDocument",
-        "ObjectObjective",
-        "ObjectPerson",
-        "ObjectSection",
-        "Program",
-        "ProgramControl",
-        "ProgramDirective",
-        "Relationship",
-        "UserRole",
-        "Context",
+        "Document"
     ],
     "create": [],
     "view_object_page": [
-        "__GGRC_ALL__"
     ],
     "update": [],
     "delete": []
