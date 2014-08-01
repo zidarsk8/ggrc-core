@@ -510,16 +510,17 @@ CMS.Models.Response("CMS.Models.InterviewResponse", {
   }
 }, {
   save : function() {
+    var that = this;
     if(this.isNew()) {
       var audit = this.request.reify().audit.reify()
         , auditors_dfd = audit.findAuditors();
 
       return auditors_dfd.then(function(auditors) {
         if(auditors.length > 0){
-          this.mark_for_addition("people", auditors[0].person);
+          that.mark_for_addition("people", auditors[0].person);
         }
-        this.mark_for_addition("people", this.contact);
-        return this._super.apply(this, arguments);
+        that.mark_for_addition("people", that.contact);
+        return that._super.apply(that, arguments);
       });
     } else {
       return this._super.apply(this, arguments);
