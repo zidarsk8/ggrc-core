@@ -227,6 +227,7 @@
         "workflows", function(binding) {
           return binding.instance.object_approval;
         });
+      mappings[type].current_approval_cycles = Cross("approval_workflows", "current_cycles");
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
       mappings[type].object_tasks = Search(function(binding) {
@@ -587,5 +588,19 @@
       "LHN.Sections_workflow", GGRC.mustache_path + "/dashboard/lhn_workflows");
 
   WorkflowExtension.init_mappings();
+
+  
+
+  var draft_on_update_mixin = can.Model.Mixin({
+
+  }, {
+    before_update: function() {
+      this.status && this.attr("status", "Draft");
+    }
+  });
+  can.each(_workflow_object_types, function(model_name) {
+    draft_on_update_mixin.add_to(CMS.Models[model_name]);
+  });
+
 
 })(this.can.$, this.CMS, this.GGRC);

@@ -64,81 +64,105 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
   }
 }, {
   save : function() {
-    var that = this;
-    return $.when(
-      new CMS.Models.Workflow({
-        frequency: "one_time",
-        title: "Object review for "
-                + this.original_object.constructor.title_singular
-                + ' "' + this.original_object.title + '"',
-        start_date: new Date(),
-        end_date: this.end_date,
-        object_approval: true,
-        notify_on_change: true,
-        notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
-          + GGRC.current_user.name + " (" + GGRC.current_user.email
-          + ") asked you to review newly created "
-          + this.original_object.constructor.model_singular + ' "' + this.original_object.title
-          + '" before ' + moment(this.end_date).format("MM/DD/YYYY") + ". "
-          + "Click <a href='" + window.location.href.replace("#.*$", "#")
-          + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
-        context: that.original_object.context
-      }).save()
-    ).then(function(wf, tasks) {
+    var ret,
+        that = this
+        aws = this.original_object.get_mapping("approval_workflows");
+    
+    if(aws.length < 1) {
+      ret = $.when(
+        new CMS.Models.Workflow({
+          frequency: "one_time",
+          title: "Object review for "
+                  + this.original_object.constructor.title_singular
+                  + ' "' + this.original_object.title + '"',
+          start_date: new Date(),
+          end_date: this.end_date,
+          object_approval: true,
+          notify_on_change: true,
+          notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
+            + GGRC.current_user.name + " (" + GGRC.current_user.email
+            + ") asked you to review newly created "
+            + this.original_object.constructor.model_singular + ' "' + this.original_object.title
+            + '" before ' + moment(this.end_date).format("MM/DD/YYYY") + ". "
+            + "Click <a href='" + window.location.href.replace("#.*$", "#")
+            + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
+          context: that.original_object.context
+        }).save()
+      ).then(function(wf, tasks) {
+          return $.when(
+            wf,
+            new CMS.Models.Task({
+              title: "Object review for "
+                      + that.original_object.constructor.title_singular
+                      + ' "' + that.original_object.title + '"',
+              context: {id : null}
+            }).save()
+          );
+      }).then(function(wf, task) {
         return $.when(
           wf,
-          new CMS.Models.Task({
+          task,
+          new CMS.Models.TaskGroup({
+            workflow : wf,
             title: "Object review for "
                     + that.original_object.constructor.title_singular
                     + ' "' + that.original_object.title + '"',
-            context: {id : null}
+            contact: that.contact,
+            context: wf.context
+          }).save(),
+          new CMS.Models.WorkflowObject({
+            workflow: wf,
+            object: that.original_object,
+            context: wf.context
+          }).save(),
+          new CMS.Models.WorkflowTask({
+            workflow: wf,
+            task: task,
+            context: wf.context
+          }).save(),
+          new CMS.Models.WorkflowPerson({
+            workflow: wf,
+            person: that.contact,
+            context: wf.context
           }).save()
         );
-    }).then(function(wf, task) {
-      return $.when(
-        wf,
-        task,
-        new CMS.Models.TaskGroup({
-          workflow : wf,
-          title: "Object review for "
-                  + that.original_object.constructor.title_singular
-                  + ' "' + that.original_object.title + '"',
-          contact: that.contact,
-          context: wf.context
-        }).save(),
-        new CMS.Models.WorkflowObject({
-          workflow: wf,
-          object: that.original_object,
-          context: wf.context
-        }).save(),
-        new CMS.Models.WorkflowTask({
-          workflow: wf,
-          task: task,
-          context: wf.context
-        }).save(),
-        new CMS.Models.WorkflowPerson({
-          workflow: wf,
-          person: that.contact,
-          context: wf.context
-        }).save()
+      }).then(function(wf, task, tg) {
+        return $.when(
+          wf,
+          new CMS.Models.TaskGroupTask({
+            task_group: tg,
+            task: task,
+            object_approval: true,
+            sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
+            contact: that.contact,
+            context: wf.context
+          }).save(),
+          new CMS.Models.TaskGroupObject({
+            task_group: tg,
+            object: that.original_object,
+            context: wf.context
+          }).save()
+        );
+      });
+    } else {
+      ret = $.when(
+        aws[0].instance.refresh().then(function(wf) {
+          return wf.attr("end_date", that.end_date).save();
+        }),
+        $.when.apply(
+          $,
+          can.map(aws[0].instance.task_groups.reify(), function(tg) {
+            return tg.refresh();
+          })
+        ).then(function() {
+          return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
+            return tg.attr("contact", that.contact).save();
+          }));
+        })
       );
-    }).then(function(wf, task, tg) {
-      return $.when(
-        wf,
-        new CMS.Models.TaskGroupTask({
-          task_group: tg,
-          task: task,
-          sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
-          contact: that.contact,
-          context: wf.context
-        }).save(),
-        new CMS.Models.TaskGroupObject({
-          task_group: tg,
-          object: that.original_object,
-          context: wf.context
-        }).save()
-      );
-    }).then(function(wf, tgt) {
+    }
+
+    return ret.then(function(wf) {
       return new CMS.Models.Cycle({
         workflow: wf,
         autogenerate: true,

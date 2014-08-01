@@ -20,6 +20,8 @@ class TaskGroupTask(Timeboxed, Mapping, db.Model):
       db.Integer, db.ForeignKey('tasks.id'), nullable=False)
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
+  object_approval = db.Column(
+      db.Boolean, nullable=False, default=False)
 
   @staticmethod
   def _extra_table_args(cls):
@@ -32,7 +34,8 @@ class TaskGroupTask(Timeboxed, Mapping, db.Model):
   _publish_attrs = [
       'task_group',
       'task',
-      'sort_index'
+      'sort_index',
+      'object_approval'
       ]
   _sanitize_html = []
 
