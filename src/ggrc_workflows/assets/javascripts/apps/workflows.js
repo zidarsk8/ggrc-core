@@ -128,6 +128,7 @@
           authorizations_and_roles: Multi(["authorizations", "roles"]),
           owner_authorizations: CustomFilter("authorizations_and_roles", function(binding) {
             return binding.instance instanceof CMS.Models.UserRole
+                   && binding.instance.attr("role")
                    && binding.instance.role.reify().attr("name") === "WorkflowOwner";
           }),
           owners: Cross("owner_authorizations", "person")
