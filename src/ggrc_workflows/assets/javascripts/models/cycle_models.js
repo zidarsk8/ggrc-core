@@ -119,6 +119,7 @@
       this._super.apply(this, arguments);
       this.bind("created",
         refresh_attr_wrap("cycle_task_group_object_task").bind(this));
+      this.validatePresenceOf("description");
     }
   }, {
     workflowFolder: function() {
