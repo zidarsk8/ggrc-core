@@ -935,3 +935,8 @@ a {
     color: $text;
   }
 }
+
+.top-separator {
+  border-top:1px dotted #ccc;
+  padding-top:20px;
+}
