@@ -98,7 +98,7 @@
           <input 
             id="search" 
             class="input-medium search-icon" 
-            placeholder="Enter text to search for Object" 
+            placeholder="Enter text to search..." 
             value="{{option_search_term}}" 
             type="text">
         </div>
@@ -109,7 +109,7 @@
           <input 
             id="search-by-owner"
             class="search-by-owner input-medium search-icon" 
-            placeholder="Enter text to search for contact"
+            placeholder="Choose owner"
             type="text" 
             name="owner"
             value="{{firstnonempty owner.name owner.email owner.title}}"
@@ -125,7 +125,7 @@
           <input 
             id="search-by-contact"
             class="search-by-contact input-medium search-icon" 
-            placeholder="Enter text to search for contact"
+            placeholder="Choose contact"
             type="text" 
             name="contact"
             value="{{firstnonempty contact.name contact.email contact.title}}"
