@@ -538,10 +538,4 @@ ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()
 ROLE_IMPLICATIONS = WorkflowRoleImplications()
 
-def notify_email_digest():
-  import ggrc_workflows.notification as notification
-  notification.notify_email_digest()
-
-def notify_email_deferred():
-  import ggrc_workflows.notification as notification
-  notification.notify_email_deferred()
+from ggrc_workflows.notification import *
