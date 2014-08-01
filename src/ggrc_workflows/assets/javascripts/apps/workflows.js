@@ -367,9 +367,7 @@
 
     var new_widget_descriptors = {},
         new_default_widgets = [
-          "info",
-          "objects", "task", "person", "task_group",
-          "history", "current"
+          "info", "person", "task_group", "current", "history"
         ],
         objects_widget_descriptor,
         history_widget_descriptor,
@@ -402,18 +400,6 @@
             widget_view: GGRC.mustache_path + "/workflows/info.mustache"
           }
         },
-        task: {
-          widget_id: "task",
-          widget_name: "Tasks",
-          widget_icon: "task",
-          content_controller: GGRC.Controllers.TreeView,
-          content_controller_options: {
-            parent_instance: object,
-            model: CMS.Models.Task,
-            show_view: GGRC.mustache_path + "/tasks/tree.mustache",
-            mapping: "tasks"
-          }
-        },
         person: {
           widget_id: "person",
           widget_name: "People",
@@ -430,7 +416,7 @@
         },
         task_group: {
           widget_id: "task_group",
-          widget_name: "Templates",
+          widget_name: "Setup",
           widget_icon: "task_group",
           content_controller: CMS.Controllers.TreeView,
           content_controller_selector: "ul",
@@ -468,25 +454,6 @@
       }
     );
 
-    objects_widget_descriptor = {
-      content_controller: CMS.Controllers.TreeView,
-      content_controller_selector: "ul",
-      widget_initial_content: '<ul class="tree-structure new-tree multitype-tree"></ul>',
-      widget_id: "objects",
-      widget_name: "Objects",
-      widget_icon: "object",
-      //object_category: "objects",
-      //model: can.Model.Cacheable //far_model,
-      content_controller_options: {
-        child_options: [],
-        draw_children: false,
-        parent_instance: object,
-        model: can.Model.Cacheable,
-        mapping: "objects",
-        //show_view: GGRC.mustache_path + "/sections/tree.mustache",
-        footer_view: GGRC.mustache_path + "/wf_objects/tree_footer.mustache"
-      }
-    };
     history_widget_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
@@ -507,7 +474,7 @@
       content_controller_selector: "ul",
       widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
       widget_id: "current",
-      widget_name: "Current Cycle",
+      widget_name: "Active Cycles",
       widget_icon: "cycle",
       content_controller_options: {
         draw_children: true,
@@ -516,7 +483,6 @@
         mapping: "current_cycles",
       }
     };
-    new_widget_descriptors.objects = objects_widget_descriptor;
     new_widget_descriptors.history = history_widget_descriptor;
     new_widget_descriptors.current = current_widget_descriptor;
 
