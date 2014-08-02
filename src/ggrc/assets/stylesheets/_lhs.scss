@@ -12,8 +12,6 @@
 
 .lhs {
   position:relative;
-  //width:220px;
-  //margin-right: 8px;
   .lhs-bg {
     margin-top:5px;
     display:none;
@@ -761,5 +759,18 @@
 .accordion-group-inner {
   .sub-level {
     display: none;
+  }
+}
+
+// advanced search
+
+.advanced-search {
+  a {
+    margin-top:-8px;
+  	text-align:center;
+  	font-size:12px;
+  	text-decoration:underline;
+  	display:block;
+  	line-height:16px;
   }
 }
