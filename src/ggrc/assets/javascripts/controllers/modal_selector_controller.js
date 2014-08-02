@@ -1841,6 +1841,7 @@
         self = this,
         loader,
         term = $("#search").val() || "",
+        re = new RegExp("^.*" + term + ".*","gi"),
       //Get the filter_list length, for each select get the value for type, 
       //for each search, find the search text
         f_len = this.context.filter_list.length,
@@ -1873,31 +1874,49 @@
         //User need to make their selection again
         this.reset_selection_count();
 
-        if(filters.length === 1 && !term) {
-          //don't bother making an intersecting filter when there's only one source
+        
+        //if(filters.length === 1 && !term) {
+        //  //don't bother making an intersecting filter when there's only one source
+        //  loader = filters[0];
+        //} else {
+        //  // make an intersecting loader, that only shows the results that 
+        //  //  show up in all sources.
+        //  if(term) {
+        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
+        //  }
+        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        //}
+        
+        if (filters.length === 1){
           loader = filters[0];
-        } else {
-          // make an intersecting loader, that only shows the results that 
-          //  show up in all sources.
-          if(term) {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
-          }
+        }
+        else {
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
-        this.last_loader = loader;
+        //Title search
+        custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
+          if(term){
+            if(result.instance.title.match(re)) { return true; }  
+            else { return false; }    
+          }          
+          return true;
+        }).attach(CMS.Models.get_instance(GGRC.current_user));
+
+        this.last_loader = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        loader.refresh_instances().then(function(options) {
+        custom_filter.refresh_instances().then(function(options) {
           var active_fn = function() {
             return self.element &&
-                   self.last_loader === loader;
+                   self.last_loader === custom_filter;
           };
 
           var draw_fn = function(options) {
             self.insert_options(options);
           };
 
+          self.option_list.push.apply(self.option_list, options);
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);
