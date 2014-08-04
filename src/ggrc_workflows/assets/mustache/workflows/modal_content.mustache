@@ -62,9 +62,9 @@
       <div id="one-time" class="frequency-wrap" style="display:block">
         <label>
           <span class="start-text">Start Date</span>
-          <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+          <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
           <span>End Date</span>
-          <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+          <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
         </label>
       </div>
       {{/case}}
