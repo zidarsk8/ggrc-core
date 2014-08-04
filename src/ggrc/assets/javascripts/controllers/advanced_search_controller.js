@@ -64,7 +64,7 @@
       //hard code some of the submenu
       this.options.option_type_menu_2 = can.map([
             "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-            "Person", "System", "Process", "DataAsset", "Product", "Facility" , "Market"
+            "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
             ],
             function(key) {
               return CMS.Models[key];
