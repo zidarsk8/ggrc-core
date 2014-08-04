@@ -39,12 +39,6 @@
   .lhs-search {
     padding:10px;
     > input {
-         -webkit-border-top-left-radius: 10px;
-             -moz-border-radius-topleft: 10px;
-                 border-top-left-radius: 10px;
-      -webkit-border-bottom-left-radius: 10px;
-          -moz-border-radius-bottomleft: 10px;
-              border-bottom-left-radius: 10px;
       margin-bottom: 0;
       background-image: image-url("grcicons/icons.png");
       background-repeat: no-repeat;
@@ -52,7 +46,6 @@
       background-position:-268px -195px;
       padding-left: 23px;
       font-size:12px;
-      width: 105px;
     }
     .checkbox.btn {
       position: absolute;
@@ -772,5 +765,14 @@
   	text-decoration:underline;
   	display:block;
   	line-height:16px;
+  }
+}
+
+//
+
+label {
+  &.my-work-label {
+    font-size:12px;
+    font-weight:normal;
   }
 }

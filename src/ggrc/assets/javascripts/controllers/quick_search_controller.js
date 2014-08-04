@@ -241,7 +241,7 @@ can.Control("CMS.Controllers.LHN", {
       if (target.is('input.my-work')) {
         var checked = target.prop("checked");
         this.obs.attr("my_work", checked);
-        target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+        //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
         this.options.display_prefs.setLHNState("my_work", checked);
       }
     }
@@ -334,7 +334,6 @@ can.Control("CMS.Controllers.LHN", {
         , $area = $(".area")
         , $bar = $("#lhn > .bar-v")
         , $obj_bar = $(".objnav.bar-v")
-        , $search = $('.widgetsearch')
         ;
       if($lhs.hasClass("lhs-closed")) {
         $lhs.removeClass("lhs-closed");
@@ -342,7 +341,6 @@ can.Control("CMS.Controllers.LHN", {
         $lhsHolder.css("width", this.size + "px");
         $area.css("margin-left", (this.size + 8) + "px");
         $bar.css("left", this.size + "px");
-        $search.width(this.size - 100);
       } else {
         $lhs.addClass("lhs-closed");
         $bar.addClass("bar-closed");
@@ -382,7 +380,7 @@ can.Control("CMS.Controllers.LHN", {
 
     $bar.css("left", a)
 
-    $search.width(resize - 100);
+    $search.width(resize - 120);
     window.resize_areas();
     $(window).trigger('resize');
     $obj_bar.css("left", (this.objnav_size + this.lhn_width()) + "px");
@@ -448,6 +446,7 @@ can.Control("CMS.Controllers.LHN", {
 
   , resize_search: function() {
       // Resize search input as necessary
+      /*
       var input = this.element.find('#lhs input.widgetsearch')
         , width;
 
@@ -457,6 +456,7 @@ can.Control("CMS.Controllers.LHN", {
         - input.next().outerWidth() - input.outerWidth() + input.width();
 
       input.css('width', width + 'px');
+      */
     }
 
   , "#lhs input.widgetsearch focus": function(el, ev) {
