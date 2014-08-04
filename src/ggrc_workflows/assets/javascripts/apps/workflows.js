@@ -431,7 +431,7 @@
         },
         task_group: {
           widget_id: "task_group",
-          widget_name: "Task Groups",
+          widget_name: "Templates",
           widget_icon: "task_group",
           content_controller: CMS.Controllers.SortableTreeView,
           content_controller_selector: "ul",
