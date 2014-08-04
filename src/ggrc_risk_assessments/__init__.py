@@ -89,16 +89,16 @@ from ggrc_basic_permissions.contributed_roles import (
 class RiskAssessmentRoleContributions(RoleContributions):
   contributions = {
     'ProgramOwner': {
-      'create': ['RiskAssessment'],
-      'read': ['RiskAssessment'],
-      'update': ['RiskAssessment'],
-      'delete': ['RiskAssessment'],
+      'create': ['RiskAssessment','Document'],
+      'read': ['RiskAssessment','Document'],
+      'update': ['RiskAssessment','Document'],
+      'delete': ['RiskAssessment','Document'],
       },
     'ProgramEditor': {
-      'read': ['RiskAssessment']
+      'read': ['RiskAssessment','Document']
       },
     'ProgramReader': {
-      'read': ['RiskAssessment']
+      'read': ['RiskAssessment','Document']
       }
     }
     
