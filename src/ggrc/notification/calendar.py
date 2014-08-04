@@ -10,11 +10,9 @@
 
 
 from flask import current_app
-from apiclient import errors
-from apiclient.discovery import build
-import httplib2
 from ggrc.notification import NotificationBase, isNotificationEnabled
 from ggrc.models import Person, Notification, NotificationObject, NotificationRecipient
+from ggrc.models import CalendarEntry
 from datetime import datetime
 from ggrc import db
 from ggrc import settings
@@ -28,6 +26,7 @@ class CalendarNotification(NotificationBase):
   calendar_service=None
   calendar_event=None
   calendar=None
+  owner_id=None
   def __init__(self, notif_type='Calendar'):
     super(CalendarNotification, self).__init__(notif_type)
 
@@ -121,34 +120,41 @@ class CalendarNotification(NotificationBase):
     calendar_event=self.calendar_event
     calendar=self.calendar
     if len(assignees)> 0:
-      if calendar is None:
-        calendar=create_calendar(self.calendar_service, GGRC_CALENDAR)
-        if calendar is None:
-          notify_error=True
-          notify_error_text="Error occured in creating calendar"
-      if calendar is not None:
+      calendar_acls=create_calendar_acls(
+        self.calendar_service, 
+        calendar['id'],
+        assignees, 
+        'writer')
+      if calendar_acls is None:
+        notify_error=True
+        notify_error_text="Error occured in creating calendar ACLs"
+      else:
         if calendar_event is None:
-         calendar_acls=create_calendar_acls(self.calendar_service, calendar['id'], assignees, 'writer')
-         if calendar_acls is None:
-           notify_error=True
-           notify_error_text="Error occured in creating calendar ACLs"
-         else:
-           calendar_event=create_calendar_event(self.calendar_service, calendar['id'], event_details)
-           if calendar_event is None:
-             notify_error=True
-             notify_error_text="Error occured in creating calendar event, id: " +\
-               sender.email + " event: " + event_details['summary']
-             current_app.logger.error(notify_error_text)
-      if calendar is not None and calendar_event is not None: 
+          calendar_event =create_calendar_event(
+            self.calendar_service, 
+            calendar['id'], 
+            event_details)
+        if calendar_event is None:
+          notify_error=True
+          notify_error_text="Error occured in creating calendar event, id: " +\
+            sender.email + " event: " + event_details['summary']
+          current_app.logger.error(notify_error_text)
+      if calendar_event is not None: 
         calendar_event['attendees']=[]
         for id, assignee in assignees.items():
           recipient_email=assignee['email']
           user=get_current_user()
           if recipient_email in [user.email]:
             continue
+          if not enable_notif.has_key(id):
+            continue
           calendar_event['attendees'].append(assignee)
         if len(calendar_event['attendees']) > 0:
-          updated_event=update_calendar_event(self.calendar_service, calendar['id'], calendar_event['id'], calendar_event)
+          updated_event=update_calendar_event(
+            self.calendar_service, 
+            calendar['id'], 
+            calendar_event['id'], 
+            calendar_event)
           if updated_event is None:
             notify_error=True
             notify_error_text="Error occured in updating calendar: " + \
@@ -176,45 +182,60 @@ class CalendarService(object):
   def __init__(self, credentials=None):
     if credentials is not None:
       self.credentials=credentials
+      from apiclient.discovery import build
+      import httplib2
       http = httplib2.Http()
       http = self.credentials.authorize(http)
       self.calendar_service=build(serviceName='calendar', version='v3', http=http)
 
-def create_calendar(calendar_service, calendar_id):
+def create_calendar_entry(calendar_service, calendar_name, owner_id):
+  from apiclient import errors
   calendar=None
+  calendar_object=None
   calendar_entry = {
-    'summary': GGRC_CALENDAR
+    'summary': calendar_name
   }
   try:
     calendar=calendar_service.calendars().insert(
       body=calendar_entry).execute()
   except errors.HttpError, error:
-    current_app.logger.error("HTTP Error occured in creating calendar with ID: " + calendar_id + " " +  str(error))
+    current_app.logger.error("HTTP Error occured in creating calendar with ID: " + calendar_name + " " +  str(error))
   except Exception, error:
-    current_app.logger.error("Exception occured in creating calendar with ID: " + calendar_id + " " +  str(error))
+    current_app.logger.error("Exception occured in creating calendar with ID: " + calendar_name + " " +  str(error))
+  if calendar is not None:
+    calendar_object=CalendarEntry(
+      owner_id=owner_id,
+      name=calendar_name,
+      calendar_id=calendar['id'])
+    db.session.add(calendar_object)
+    db.session.flush()
   return calendar
 
 def get_calendar(calendar_service, calendar_id):
-  page_token = None
-  while True:
-    try:
-      calendars=calendar_service.calendarList().list(pageToken=page_token).execute()
-    except errors.HttpError, error:
-      current_app.logger.error("HTTP Error occured in getting calendar for ID: " + calendar_id + " " +  str(error))
-      break
-    except Exception, error:
-      current_app.logger.error("Exception occured in getting calendar for ID: " + calendar_id + " " +  str(error))
-      break
-    for calendar in calendars['items']:
-      if calendar.has_key('summary'):
-        if calendar['summary'] in [calendar_id]:
-          return calendar 
-    page_token = calendars.get('nextPageToken')
-    if not page_token:
-      break
-  return None
+  from apiclient import errors
+  try:
+    calendar=calendar_service.calendars().get(calendarId=calendar_id).execute()
+  except errors.HttpError, error:
+    current_app.logger.error("HTTP Error occured in getting calendar for ID: " + calendar_id + " " +  str(error))
+    return None
+  except Exception, error:
+    current_app.logger.error("Exception occured in getting calendar for ID: " + calendar_id + " " +  str(error))
+    return None
+  return calendar
+
+def find_calendar_entry(calendar_service, calendar_name, owner_id):
+  calendar=None
+  calendar_entries=db.session.query(CalendarEntry).\
+    filter(CalendarEntry.name== calendar_name).\
+    filter(CalendarEntry.owner_id == owner_id).all()
+  for calendar_entry in calendar_entries:
+   calendar=get_calendar(calendar_service, calendar_entry.calendar_id)
+   if calendar is not None:
+     break
+  return calendar
 
 def create_calendar_event(calendar_service, calendar_id, event_details):
+  from apiclient import errors
   calendar_event=None
   try:
     calendar_event=calendar_service.events().insert(
@@ -224,9 +245,10 @@ def create_calendar_event(calendar_service, calendar_id, event_details):
     current_app.logger.error("HTTP Error occured in creating calendar event: " + str(error))
   except Exception, error:
     current_app.logger.error("Exception occured in creating calendar event: " + str(error))
-  return calendar_event 
+  return calendar_event
 
 def get_calendar_event(calendar_service, calendar_id, event_id):
+  from apiclient import errors
   page_token = None
   while True:
     try:
@@ -245,8 +267,9 @@ def get_calendar_event(calendar_service, calendar_id, event_id):
     if not page_token:
       break
   return None
-  
+
 def update_calendar_event(calendar_service, calendar_id, event_id, event_details):
+  from apiclient import errors
   calendar_event=None
   try:
     calendar_event=calendar_service.events().update(
@@ -285,15 +308,17 @@ def create_calendar_acls(calendar_service, calendar_id, assignees, role):
      user=get_current_user()
      if recipient_email in [user.email]:
        continue
-     calendar_acl=get_calendar_acl(calendar_service, calendar_id, recipient_email, role)
+     calendar_acl=get_calendar_acl(calendar_service, calendar_id, assignee['email'], 'writer')
      if calendar_acl is None:
        calendar_acl=create_calendar_acl(calendar_service, calendar_id, recipient_email, role)
-       if calendar_acl is None:
+       if calendar_acl is not None:
+         calendar_acls.append(calendar_acl)
+       else:
          return None
-     calendar_acls.append(calendar_acl)
    return calendar_acls
 
 def get_calendar_acl(calendar_service, calendar_id, recipient_email, role):
+  from apiclient import errors
   page_token = None
   while True:
     try:
@@ -305,7 +330,7 @@ def get_calendar_acl(calendar_service, calendar_id, recipient_email, role):
       current_app.logger.error("Exception occured in getting calendar acl: " + str(error))
       break
     for rule in acls['items']:
-      if rule['role'] != 'writer':
+      if rule['role'] != role:
         continue
       if rule['scope']['type'] != 'user':
         continue

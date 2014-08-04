@@ -8,7 +8,6 @@ from ggrc.app import app
 from ggrc.extensions import get_extension_modules
 from ggrc.login import login_required
 from ggrc import settings
-from oauth2client.client import OAuth2WebServerFlow
 from flask import current_app, request, session, redirect
 
 GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID')
@@ -29,6 +28,7 @@ def notify_emaildigest():
 @app.route("/calendar_oauth_request", methods=["GET", "POST"])
 @login_required
 def handle_calendar_oauth():
+  from oauth2client.client import OAuth2WebServerFlow
   flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
     client_secret=GOOGLE_SECRET_KEY,
     scope='https://www.googleapis.com/auth/calendar',

@@ -635,8 +635,7 @@ class Resource(ModelView):
         and 'X-Requested-By' not in request.headers:
       raise BadRequest('X-Requested-By header is REQUIRED.')
 
-    #if method in ('POST', 'PUT', 'DELETE'):
-    if method in ('POST'):
+    if method in ('POST', 'PUT', 'DELETE'):
       oauth_credentials=get_oauth_credentials() 
       if oauth_credentials is None:
         oauth_uri=request.url_root + 'calendar_oauth_request'

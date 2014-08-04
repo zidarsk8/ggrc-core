@@ -9,8 +9,8 @@ from ggrc.app import app
 import ggrc_workflows.models as models
 from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
-from ggrc.notification import CalendarNotification, CalendarService
-from ggrc.notification import get_calendar_event, get_calendar, create_calendar_acl, GGRC_CALENDAR
+from ggrc.notification import CalendarNotification, CalendarService, GGRC_CALENDAR
+from ggrc.notification import create_calendar_entry, find_calendar_entry, get_calendar_event
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
@@ -286,11 +286,11 @@ def handle_task_put(sender, obj=None, src=None, service=None):
   user=get_current_user()
   if obj.status in ['InProgress', 'Finished', 'Assigned', 'Declined', 'Verified']: 
     prepare_notification_for_task(obj, user, assignee, subject, notif_pri)
-    #taskgroup=get_taskgroup(obj)
-    #if taskgroup is not None:
-    #prepare_calendar_for_taskgroup(taskgroup)
-    #else:
-    #current_app.logger.warn("Trigger: Unable to get task group for task " + obj.title)
+    taskgroup=get_taskgroup(obj)
+    if taskgroup is not None:
+      prepare_calendar_for_taskgroup(taskgroup)
+    else:
+      current_app.logger.warn("Trigger: Unable to get task group for task " + obj.title)
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
@@ -345,7 +345,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
       workflow_owner, recipients, notify_custom_message=notify_custom_message, override=override_flag)
     prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
         workflow_owner, recipients, override=override_flag)
-    #prepare_calendar_for_workflow_member(workflow)
+    prepare_calendar_for_workflow_member(workflow)
 
 def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
@@ -467,11 +467,16 @@ class WorkflowCalendarService(CalendarService):
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
       return
-    calendar=get_calendar(self.calendar_service, GGRC_CALENDAR)
+    user=get_current_user()
+    calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
     if calendar is None:
-      calendar_event=None
-    else:
-      calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
+      if user.id != workflow_owner.id: 
+        current_app.logger.warn("Calendar entry can be created by Workflow owner")
+        return 
+      calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      if calendar is None:
+       return
+    calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
     subject=cycle.title
     content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
       '/' + str(workflow.id) + '#current_widget'
@@ -482,14 +487,19 @@ class WorkflowCalendarService(CalendarService):
     notif.calendar_service=self.calendar_service
     notif.calendar_event=calendar_event
     notif.calendar=calendar
-    calendar_notification = notif.prepare([cycle], workflow_owner, workflow.people, subject, content)
+    calendar_notification = notif.prepare(
+      [cycle], 
+      workflow_owner, 
+      workflow.people, 
+      subject, 
+      content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
     # create task group related events during start of workflow
     for task_group in cycle.cycle_task_groups:
-      self.handle_taskgroup_calendar_update(task_group)
+      self.handle_taskgroup_calendar_update(task_group, calendar)
 
-  def handle_taskgroup_calendar_update(self, task_group):
+  def handle_taskgroup_calendar_update(self, task_group, calendar=None):
     workflow=get_taskgroup_workflow(task_group)
     if workflow is None:
       current_app.logger.warn("Workflow not found for task group " + task_group.title)
@@ -510,11 +520,16 @@ class WorkflowCalendarService(CalendarService):
     assignees=[]
     for id, contact in recipient_contacts.items():
       assignees.append(contact)
-    calendar=get_calendar(self.calendar_service, GGRC_CALENDAR)
+    user=get_current_user()
     if calendar is None:
-      calendar_event=None
-    else:
-      calendar_event = get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
+      calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      if calendar is None and user.id != workflow_owner.id: 
+        current_app.logger.warn("Calendar entry can be created by Workflow owner")
+        return 
+      calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      if calendar is None:
+       return
+    calendar_event=get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
     subject=task_group.title
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
       '/' + str(workflow.id) + '#task_group_widget'

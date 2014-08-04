@@ -8,7 +8,7 @@
 """
 
 from ggrc.app import db
-from .mixins import Base, Stateful
+from .mixins import Base, Stateful 
 
 
 class NotificationConfig(Base, db.Model):
@@ -75,3 +75,8 @@ class NotificationRecipient(Base, Stateful, db.Model):
   recipient_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
   error_text = db.Column(db.Text)
 
+class CalendarEntry(Base, db.Model):
+  __tablename__='calendar_entries'
+  name=db.Column(db.String, nullable=False)
+  calendar_id = db.Column(db.String, nullable=False)
+  owner_id=db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
