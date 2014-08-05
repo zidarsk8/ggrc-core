@@ -56,20 +56,10 @@ class Workflow(
   object_approval = deferred(
     db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
-  workflow_objects = db.relationship(
-      'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
-  objects = association_proxy(
-      'workflow_objects', 'object', 'WorkflowObject')
-
   workflow_people = db.relationship(
       'WorkflowPerson', backref='workflow', cascade='all, delete-orphan')
   people = association_proxy(
       'workflow_people', 'person', 'WorkflowPerson')
-
-  workflow_tasks = db.relationship(
-      'WorkflowTask', backref='workflow', cascade='all, delete-orphan')
-  tasks = association_proxy(
-      'workflow_tasks', 'task', 'WorkflowTask')
 
   task_groups = db.relationship(
       'TaskGroup', backref='workflow', cascade='all, delete-orphan')
@@ -92,12 +82,8 @@ class Workflow(
       ]
 
   _publish_attrs = [
-      'workflow_objects',
-      PublishOnly('objects'),
       'workflow_people',
       PublishOnly('people'),
-      'workflow_tasks',
-      PublishOnly('tasks'),
       'task_groups',
       'frequency',
       PublishOnly('workflow_state'),

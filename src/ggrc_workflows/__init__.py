@@ -57,12 +57,12 @@ _workflow_object_types = [
 for type_ in _workflow_object_types:
   model = getattr(all_models, type_)
   model.__bases__ = (
-    models.workflow_object.Workflowable,
+    #models.workflow_object.Workflowable,
     models.task_group_object.TaskGroupable,
     models.cycle_task_group_object.CycleTaskGroupable,
     models.workflow.WorkflowState,
     ) + model.__bases__
-  model.late_init_workflowable()
+  #model.late_init_workflowable()
   model.late_init_task_groupable()
   model.late_init_cycle_task_groupable()
 
@@ -83,10 +83,7 @@ def get_public_config(current_user):
 def contributed_services():
   return [
       service('workflows', models.Workflow),
-      service('workflow_objects', models.WorkflowObject),
       service('workflow_people', models.WorkflowPerson),
-      service('tasks', models.Task),
-      service('workflow_tasks', models.WorkflowTask),
       service('task_groups', models.TaskGroup),
       service('task_group_tasks', models.TaskGroupTask),
       service('task_group_objects', models.TaskGroupObject),
@@ -104,7 +101,6 @@ def contributed_object_views():
 
   return [
       object_view(models.Workflow),
-      object_view(models.Task),
       ]
 
 
@@ -274,15 +270,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           )
 
       for task_group_task in task_group.task_group_tasks:
-        task = task_group_task.task
-
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
           context=obj.context,
           cycle=obj,
           cycle_task_group_object=cycle_task_group_object,
           task_group_task=task_group_task,
-          title=task.title,
-          description=task.description,
+          title=task_group_task.title,
+          description=task_group_task.description,
           sort_index=task_group_task.sort_index,
           end_date=obj.end_date,
           contact=task_group.contact,

@@ -41,10 +41,10 @@
                 {{/with_mapping}}
               </div>
               <div class="span1">
-                {{#with_mapping 'tasks' instance}}
+                {{#with_mapping 'task_group_tasks' instance}}
                 <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                   <i class="grcicon-task-black"></i>
-                  <strong class="error">{{tasks.length}}</strong>
+                  <strong class="error">{{task_group_tasks.length}}</strong>
                 </span>
                 {{/with_mapping}}
               </div>
@@ -70,6 +70,7 @@
         </div>
       </div>
     </div>
+
     <div class="tier-2-info item-content" style="display: none;">
       <div class="tier-2-info-content">
         <div class="show-description">
@@ -79,17 +80,8 @@
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
 
           <div class="row-fluid">
-            {{#child_options.0}}
-            <div class="span6">
-              <strong>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
-              <ul class="items-list tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              </ul>
-            </div>
-            {{/child_options.0}}
-
-
             {{#child_options.1}}
-            <div class="span6 task-list">
+            <div class="span9 task-list">
               {{#if list.length}}
               {{^if_equals list.length 1}}
               <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance: $(el).data("instance") }); }}>
@@ -103,10 +95,18 @@
               <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
               <ul class="tree-structure new-tree" {{data 'options'}}
                 {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
-                {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}></ul>
-
+                {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
+              </ul>
             </div>
             {{/child_options.1}}
+
+            {{#child_options.0}}
+            <div class="span3">
+              <strong>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
+              <ul class="items-list tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+              </ul>
+            </div>
+            {{/child_options.0}}
           </div>
         {{/prune_context}}
       {{/if}}

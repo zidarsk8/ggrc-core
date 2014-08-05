@@ -2,7 +2,6 @@ dashboard-js-files:
   - apps/workflows.js
   - controllers/workflow_page.js
   - models/cycle_models.js
-  - models/task.js
   - models/task_group.js
   - models/workflow.js
   - models/workflow_join_models.js
@@ -29,8 +28,6 @@ dashboard-js-template-files:
   - dashboard/lhn_workflows.mustache
   - dashboard/object_nav_actions.mustache
   - tasks/modal_content.mustache
-  - tasks/task_group_subtree_footer.mustache
-  - tasks/task_group_subtree.mustache
   - tasks/tree_footer.mustache
   - tasks/info.mustache
   - tasks/extended_info.mustache
@@ -39,6 +36,9 @@ dashboard-js-template-files:
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
   - task_groups/tree_footer.mustache
+  - task_group_tasks/modal_content.mustache
+  - task_group_tasks/task_group_subtree_footer.mustache
+  - task_group_tasks/task_group_subtree.mustache
   - workflows/confirm_start.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache

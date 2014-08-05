@@ -38,7 +38,6 @@
       "cycle_task_group_object": CMS.Models.CycleTaskGroupObject,
       "cycle_task_group_object_task": CMS.Models.CycleTaskGroupObjectTask,
 
-      "task": CMS.Models.Task,
       "task_group": CMS.Models.TaskGroup,
       "workflow": CMS.Models.Workflow
     };
@@ -56,41 +55,44 @@
 
     // Add mappings for basic workflow objects
     var mappings = {
-        Task: {
+        /*Task: {
           _canonical: {
             subtasks: "Task",
             task_groups: "TaskGroup"
           },
           task_groups: Proxy(
             "TaskGroup", "task_group", "TaskGroupTask", "task", "task_group_tasks"),
-        },
+        },*/
 
         TaskGroup: {
           _canonical: {
-            tasks: "Task",
-            objects: _workflow_object_types
+            //tasks: "Task",
+            //objects: _workflow_object_types
+            objects: _workflow_object_types.concat(["Cacheable"])
           },
           task_group_tasks: Direct(
             "TaskGroupTask", "task_group", "task_group_tasks"),
-          tasks: Proxy(
-            "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
+          //tasks: Proxy(
+          //  "Task", "task", "TaskGroupTask", "task_group", "task_group_tasks"),
           objects: Proxy(
-            null, "object", "TaskGroupObject", "task_group", "task_group_objects")
+            null, "object", "TaskGroupObject", "task_group", "task_group_objects"),
+          workflow: Direct(
+            "Workflow", "task_groups", "workflow")
         },
 
         Workflow: {
           _canonical: {
-            objects: _workflow_object_types.concat(["Cacheable"]),
-            tasks: "Task",
+            //objects: _workflow_object_types.concat(["Cacheable"]),
+            //tasks: "Task",
             task_groups: "TaskGroup",
             people: "Person",
             folders: "GDriveFolder",
             context: "Context"
           },
-          objects: Proxy(
-            null, "object", "WorkflowObject", "workflow", "workflow_objects"),
-          tasks: Proxy(
-            "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
+          //objects: Proxy(
+          //  null, "object", "WorkflowObject", "workflow", "workflow_objects"),
+          //tasks: Proxy(
+          //  "Task", "task", "WorkflowTask", "workflow", "workflow_tasks"),
 
           task_groups: Direct(
             "TaskGroup", "workflow", "task_groups"),
@@ -221,12 +223,6 @@
     // Insert `workflows` mappings to all business object types
     can.each(_workflow_object_types, function(type) {
       mappings[type] = {};
-      mappings[type].workflows = new GGRC.ListLoaders.ProxyListLoader(
-        "WorkflowObject", "object", "workflow", "workflow_objects", null);
-      mappings[type].approval_workflows = CustomFilter(
-        "workflows", function(binding) {
-          return binding.instance.object_approval;
-        });
       mappings[type].task_groups = new GGRC.ListLoaders.ProxyListLoader(
         "TaskGroupObject", "object", "task_group", "task_group_objects", null);
       mappings[type].object_tasks = Search(function(binding) {
@@ -236,13 +232,18 @@
           'cycle.is_current': true
         });
       });
+      mappings[type].workflows = Cross("task_groups", "workflow");
+      mappings[type].approval_workflows = CustomFilter(
+        "workflows", function(binding) {
+          return binding.instance.object_approval;
+        });
       mappings[type]._canonical = {
        "workflows": "Workflow",
        "task_groups": "TaskGroup"
       };
 
-      CMS.Models[type].attributes.workflow_objects =
-        "CMS.Models.WorkflowObject.stubs";
+      //CMS.Models[type].attributes.workflow_objects =
+      //  "CMS.Models.WorkflowObject.stubs";
       CMS.Models[type].attributes.task_group_objects =
         "CMS.Models.TaskGroupObject.stubs";
 
@@ -333,35 +334,6 @@
     ]);
   };
 
-  WorkflowExtension.init_widgets_for_task_page =
-      function init_widgets_for_task_page() {
-
-    var task_widget_descriptors = {},
-        new_default_widgets = [
-          "info"
-        ];
-
-    can.each(GGRC.WidgetList.get_current_page_widgets(), function(descriptor, name) {
-      if (~new_default_widgets.indexOf(name))
-        task_widget_descriptors[name] = descriptor;
-    });
-
-    $.extend(
-      true,
-      task_widget_descriptors,
-      {
-        info: {
-          content_controller: GGRC.Controllers.InfoWidget,
-          content_controller_options: {
-            widget_view: GGRC.mustache_path + "/tasks/info.mustache"
-          }
-        }
-      }
-    );
-
-    new GGRC.WidgetList("ggrc_workflows", { Task: task_widget_descriptors });
-  };
-
   WorkflowExtension.init_widgets_for_workflow_page =
       function init_widgets_for_workflow_page() {
 
@@ -441,10 +413,10 @@
                 footer_view: GGRC.mustache_path + "/base_objects/task_group_subtree_footer.mustache"
               },
               {
-                model: CMS.Models.Task,
+                model: CMS.Models.TaskGroupTask,
                 mapping: "task_group_tasks",
-                show_view: GGRC.mustache_path + "/tasks/task_group_subtree.mustache",
-                footer_view: GGRC.mustache_path + "/tasks/task_group_subtree_footer.mustache",
+                show_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree.mustache",
+                footer_view: GGRC.mustache_path + "/task_group_tasks/task_group_subtree_footer.mustache",
                 sort_property: 'sort_index',
                 allow_creating: true
               }

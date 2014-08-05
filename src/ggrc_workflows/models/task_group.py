@@ -28,8 +28,6 @@ class TaskGroup(
 
   task_group_tasks = db.relationship(
       'TaskGroupTask', backref='task_group', cascade='all, delete-orphan')
-  tasks = association_proxy(
-      'task_group_tasks', 'task', 'TaskGroupTask')
 
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='task_group', cascade='all, delete-orphan')
@@ -42,7 +40,6 @@ class TaskGroup(
       'task_group_objects',
       PublishOnly('objects'),
       'task_group_tasks',
-      PublishOnly('tasks'),
       'lock_task_order',
       'sort_index',
       # Intentionally do not include `cycle_task_groups`
