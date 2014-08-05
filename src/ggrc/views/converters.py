@@ -138,7 +138,7 @@ def import_people_task(task):
 
 @app.route("/admin/help_redirect/<count>", methods=["GET"])
 def help_redirect(count):
-  flash(u'Successfully imported {} help page{}'.format(count, 's' if count > 1 else ''), 'notice')
+  flash(u'Successfully imported {} help page{}'.format(count, 's' if count > 1 else ''), 'notice alert-success')
   return redirect("/admin")
 
 @app.route("/_background_tasks/import_help", methods=['POST'])
@@ -490,7 +490,7 @@ def import_system_task(task):
       return render_template("systems/import_result.haml", converter=converter, results=converter.objects, heading_map=converter.object_map)
     else:
       count = len(converter.objects)
-      flash(u'Successfully imported {} {}'.format(count, kind_lookup[object_kind]), 'notice')
+      flash(u'Successfully imported {} {}'.format(count, kind_lookup[object_kind]), 'notice alert-success')
       return import_redirect("/admin")
 
   except ImportException as e:
@@ -550,7 +550,7 @@ def export_system_task(task):
 
 @app.route("/admin/people_redirect/<count>", methods=["GET"])
 def people_redirect(count):
-  flash(u'Successfully imported {} {}'.format(count, 'people' if count > 1 else 'person'), 'notice')
+  flash(u'Successfully imported {} {}'.format(count, 'people' if count > 1 else 'person'), 'notice alert-success')
   return redirect("/admin")
 
 @app.route("/admin/import/<import_type>", methods=['GET', 'POST'])
