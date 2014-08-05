@@ -11,6 +11,7 @@ from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
 from ggrc.notification import CalendarNotification, CalendarService, GGRC_CALENDAR
 from ggrc.notification import create_calendar_entry, find_calendar_entry, get_calendar_event
+from ggrc.notification import create_calendar_acl
 from datetime import date, timedelta
 from ggrc.services.common import Resource
 from ggrc.models import Person
@@ -470,12 +471,13 @@ class WorkflowCalendarService(CalendarService):
     user=get_current_user()
     calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
     if calendar is None:
-      if user.id != workflow_owner.id: 
-        current_app.logger.warn("Calendar entry can be created by Workflow owner")
-        return 
-      calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
       if calendar is None:
-       return
+        calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+        if calendar is None:
+         return
+        if user.id != workflow_owner.id:
+          create_calendar_acl(self.calendar_service, calendar['id'], workflow_owner.email, 'Owner')
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
     subject=cycle.title
     content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
@@ -523,12 +525,12 @@ class WorkflowCalendarService(CalendarService):
     user=get_current_user()
     if calendar is None:
       calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
-      if calendar is None and user.id != workflow_owner.id: 
-        current_app.logger.warn("Calendar entry can be created by Workflow owner")
-        return 
-      calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
       if calendar is None:
-       return
+        calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+        if calendar is None:
+         return
+        if user.id != workflow_owner.id:
+          create_calendar_acl(self.calendar_service, calendar['id'], workflow_owner.email, 'Owner')
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
     subject=task_group.title
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \

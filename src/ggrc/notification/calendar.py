@@ -308,7 +308,7 @@ def create_calendar_acls(calendar_service, calendar_id, assignees, role):
      user=get_current_user()
      if recipient_email in [user.email]:
        continue
-     calendar_acl=get_calendar_acl(calendar_service, calendar_id, assignee['email'], 'writer')
+     calendar_acl=get_calendar_acl(calendar_service, calendar_id, assignee['email'], role)
      if calendar_acl is None:
        calendar_acl=create_calendar_acl(calendar_service, calendar_id, recipient_email, role)
        if calendar_acl is not None:
