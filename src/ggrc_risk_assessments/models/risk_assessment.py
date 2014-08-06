@@ -14,12 +14,12 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db
     db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
   ra_manager = db.relationship(
     'Person', uselist=False, foreign_keys='RiskAssessment.ra_manager_id')
-  
+
   ra_counsel_id = deferred(
     db.Column(db.Integer, db.ForeignKey('people.id')), 'RiskAssessment')
   ra_counsel = db.relationship(
     'Person', uselist=False, foreign_keys='RiskAssessment.ra_counsel_id')
-  
+
   program_id = deferred(
     db.Column(db.Integer, db.ForeignKey('programs.id')), 'RiskAssessment')
   program = db.relationship(

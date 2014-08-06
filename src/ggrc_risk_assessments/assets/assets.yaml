@@ -15,4 +15,3 @@ dashboard-js-template-files:
   - risk_assessments/modal_content.mustache
   - risk_assessments/documents.mustache
   - risk_assessments/documents_footer.mustache
-  

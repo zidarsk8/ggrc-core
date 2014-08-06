@@ -9,7 +9,7 @@
   var RiskAssessmentsExtension = {},
       _risk_assessments_object_types = ["Program"];
   GGRC.extensions.push(RiskAssessmentsExtension);
-  
+
   RiskAssessmentsExtension.name = "risk_assessments";
 
   // Register RA models for use with `infer_object_type`
@@ -53,7 +53,7 @@
     var descriptor = {},
         page_instance = GGRC.page_instance();
     var _mustache_path = GGRC.mustache_path + "/risk_assessments";
-  
+
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {
         risk_assessments: {

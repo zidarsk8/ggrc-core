@@ -85,7 +85,7 @@ program_type.mix_risk_assessments_into_program()
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, RoleImplications
     )
-    
+
 class RiskAssessmentRoleContributions(RoleContributions):
   contributions = {
     'ProgramOwner': {
@@ -101,5 +101,5 @@ class RiskAssessmentRoleContributions(RoleContributions):
       'read': ['RiskAssessment','Document']
       }
     }
-    
+
 ROLE_CONTRIBUTIONS = RiskAssessmentRoleContributions()
