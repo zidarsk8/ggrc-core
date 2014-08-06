@@ -135,7 +135,7 @@
         }).fail(function(){
           delete_counts.attr('loading', false);
       });
-      
+
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_delete({
@@ -175,7 +175,7 @@
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
       if (object_params) {
-        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\n"));
       } else {
         object_params = {};
       }
@@ -219,7 +219,7 @@
     'form': function($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
-      , model = CMS.Models[$trigger.attr("data-object-singular")]
+      , model = CMS.Models[$trigger.attr("data-object-singular")] || CMS.ModelHelpers[$trigger.attr("data-object-singular")]
       , mapping = $trigger.data('mapping')
       , instance;
       if($trigger.attr('data-object-id') === "page") {
@@ -228,7 +228,7 @@
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
       if (object_params) {
-        object_params = JSON.parse(object_params.replace(/\\n/g, "\\n"));
+        object_params = JSON.parse(object_params.replace(/\\n/g, "\n"));
       } else {
         object_params = {};
       }
@@ -238,7 +238,7 @@
       if (object_params.section) {
         modal_title = "Map " + modal_title + " to " + object_params.section.title;
       }
-      
+
       var content_view = $trigger.data('template') || GGRC.mustache_path + "/" + $trigger.attr("data-object-plural") + "/modal_content.mustache";
 
       $target
@@ -316,7 +316,7 @@
       , 'position' : "absolute"
     })
     modals.off("scroll.modalajax");
-    modals.on("scroll.modalajax", function() { 
+    modals.on("scroll.modalajax", function() {
         $(this).scrollTop(0); //fix for Chrome rendering bug when resizing block elements containing CSS sprites.
     });
   }
@@ -330,17 +330,17 @@
 
     var offsetParent = modal.offsetParent();
     var _scrollY = 0;
-    var _top = 0;    
+    var _top = 0;
     var _left = modal.position().left;
     if(!offsetParent.length || offsetParent.is("html, body")) {
       offsetParent = $(window);
       _scrollY = window.scrollY;
-      _top = _scrollY 
-        + (offsetParent.height() 
-          - modal.height()) / 5 
+      _top = _scrollY
+        + (offsetParent.height()
+          - modal.height()) / 5
         + header_height / 5
 
-        window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height()) 
+        window.scrollY + ($(window).height() - modal.height()) / 2 + (modals.length - 1) * parseInt(modal.find(".modal-header").height())
     } else {
       _top = offsetParent.closest(".modal").offset().top - offsetParent.offset().top + header_height;
       _left = offsetParent.closest(".modal").offset().left + offsetParent.closest(".modal").width() / 2 - offsetParent.offset().left;
@@ -359,8 +359,8 @@
     var $el = this.$element;
     var shownevents, keyevents;
     if(!(shownevents = $._data($el[0], "events").shown)
-        || $(shownevents).filter(function() { 
-            return $.inArray("arrange", this.namespace.split(".")) > -1; 
+        || $(shownevents).filter(function() {
+            return $.inArray("arrange", this.namespace.split(".")) > -1;
         }).length < 1) {
           $el.on("shown.arrange, loaded.arrange", function(ev) {
             if(ev.target === ev.currentTarget)
@@ -381,10 +381,10 @@
       }).removeAttr("id");
 
       $el.on(["click", "mouseup", "keypress", "keydown", "keyup", "show", "shown", "hide", "hidden"].join(".clone ") + ".clone", function(e) {
-        that.$cloneEl 
+        that.$cloneEl
         ? that.$cloneEl.find("[data-original-id=" + e.target.id + "]").trigger(new $.Event(e))
         : $el.off(".clone");
-      }); 
+      });
     }
 
 
@@ -433,7 +433,7 @@
     modals.each(function(i) {
         var parent = this.parentNode;
         if(parent !== document.body)
-        { 
+        {
             modal_backdrops
             .eq(i)
             .detach()
@@ -477,63 +477,72 @@
     if(ev) ev.modal_hidden = true; //mark that we've hidden one
   };
 
-  $(function() {
-    $('body').on('click.modal-ajax.data-api keydown.modal-ajax.data-api', '[data-toggle="modal-ajax"], [data-toggle="modal-ajax-form"], [data-toggle="modal-ajax-listform"], [data-toggle="modal-ajax-listnewform"], [data-toggle="modal-ajax-listeditform"], [data-toggle="modal-ajax-deleteform"], [data-toggle="modal-ajax-unmapform"]', function(e) {
+  GGRC.register_modal_hook = function(toggle, launch_fn) {
+    $(function() {
+      $('body').on(
+        'click.modal-ajax.data-api keydown.modal-ajax.data-api',
+        toggle ? "[data-toggle=modal-ajax-" + toggle + "]" : "[data-toggle=modal-ajax]",
+        function(e) {
 
-      var $this = $(this)
-        , toggle_type = $(this).data('toggle')
-        , modal_id, target, $target, option, href, new_target, modal_type;
+        var $this = $(this)
+          , toggle_type = $(this).data('toggle')
+          , modal_id, target, $target, option, href, new_target, modal_type;
 
-      if(e.type === "keydown" && e.which !== 13)
-        return;  //activate for keydown on Enter/Return only.
+        if(e.type === "keydown" && e.which !== 13)
+          return;  //activate for keydown on Enter/Return only.
 
-      href = $this.attr('data-href') || $this.attr('href');
-      modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
-      target = $this.attr('data-target') || $('#' + modal_id);
+        href = $this.attr('data-href') || $this.attr('href');
+        modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
+        target = $this.attr('data-target') || $('#' + modal_id);
 
-      //if ($this.data('modal-reset') == 'reset')
-      //  $(target).remove();
+        //if ($this.data('modal-reset') == 'reset')
+        //  $(target).remove();
 
-      $target = $(target);
-      new_target = $target.length == 0
+        $target = $(target);
+        new_target = $target.length === 0;
 
-      if (new_target) {
-        $target = $('<div id="' + modal_id + '" class="modal hide"></div>');
-        $target.addClass($this.attr('data-modal-class'));
-        $this.attr('data-target', '#' + modal_id);
-      }
-
-      $target.on('hidden', function(ev) {
-        if(ev.target === ev.currentTarget)
-            $target.remove();
-      });
-
-      if (new_target || $this.data('modal-reset') === 'reset') {
-        $target.html(preload_content());
-        if($this.prop("protocol") === window.location.protocol) {
-          $target.load(href, emit_loaded);
+        if (new_target) {
+          $target = $('<div id="' + modal_id + '" class="modal hide"></div>');
+          $target.addClass($this.attr('data-modal-class'));
+          $this.attr('data-target', '#' + modal_id);
         }
-      }
 
-      option = $target.data('modal-help') ? 'toggle' : $.extend({}, $target.data(), $this.data());
+        $target.on('hidden', function(ev) {
+          if(ev.target === ev.currentTarget)
+              $target.remove();
+        });
 
-      e.preventDefault();
-      e.originalEvent && e.originalEvent.preventDefault();
-      e.stopPropagation();
+        if (new_target || $this.data('modal-reset') === 'reset') {
+          $target.html(preload_content());
+          if($this.prop("protocol") === window.location.protocol) {
+            $target.load(href, emit_loaded);
+          }
+        }
 
-      modal_type = $this.data('modal-type');
-      if (!modal_type) {
-        if (toggle_type == 'modal-ajax-form') modal_type = 'form';
-        if (toggle_type == 'modal-ajax-listform') modal_type = 'listform';
-        if (toggle_type == 'modal-ajax-listnewform') modal_type = 'listnewform';
-        if (toggle_type == 'modal-ajax-listeditform') modal_type = 'listeditform';
-        if (toggle_type == 'modal-ajax') modal_type = 'modal';
-        if (toggle_type == 'modal-ajax-deleteform') modal_type = 'deleteform';
-        if (toggle_type == 'modal-ajax-unmapform') modal_type = 'unmapform';
-        if (!modal_type) modal_type = 'modal';
-      }
+        option = $target.data('modal-help') ? 'toggle' : $.extend({}, $target.data(), $this.data());
 
-      handlers[modal_type].apply($target, [$target, $this, option]);
+        e.preventDefault();
+        e.originalEvent && e.originalEvent.preventDefault();
+        e.stopPropagation();
+
+        launch_fn.apply($target, [$target, $this, option]);
+      });
     });
+  };
+  $(function() {
+    can.each({
+        "": handlers["modal"],
+        "form": handlers["form"],
+        "helpform": handlers["helpform"],
+        "listform": handlers["listform"],
+        "listnewform": handlers["listnewform"],
+        "listeditform": handlers["listeditform"],
+        "deleteform": handlers["deleteform"],
+        "unmapform": handlers["unmapform"],
+      },
+      function(launch_fn, toggle) {
+        GGRC.register_modal_hook(toggle, launch_fn);
+      }
+    );
   });
 }(window.jQuery);

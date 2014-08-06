@@ -408,12 +408,34 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$footer} a.btn[data-toggle='modal-submit'] click" : function(el, ev) {
+    var ajd;
+    // Normal saving process
+    if (el.is(':not(.disabled)')) {
+      ajd = this.save_instance(el, ev);
+      if(ajd) {
+        this.bindXHRToButton(ajd, el, "Saving, please wait...");
+      }
+    }
+    // Queue a save if clicked after verifying the email address
+    else if (this._email_check) {
+      this._email_check.done(function(data) {
+        if (data.length != null)
+          data = data[0];
+        if (data) {
+          setTimeout(function() {
+            delete that._email_check;
+            el.trigger('click');
+          }, 0);
+        }
+      });
+    }
+  }
+
+  , "save_instance" : function(el, ev) {
     var that = this
     , instance = this.options.instance
     , ajd;
 
-    // Normal saving process
-    if (el.is(':not(.disabled)')) {
 
       if(instance.errors()) {
         instance.removeAttr("_suppress_errors");
@@ -433,7 +455,7 @@ can.Control("GGRC.Controllers.Modals", {
         function finish() {
           delete that.disable_hide;
           that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
-        };
+        }
 
         // If this was an Objective created directly from a Section, create a join
         var params = that.options.object_params;
@@ -456,21 +478,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
         delete that.disable_hide;
       });
-      this.bindXHRToButton(ajd, el, "Saving, please wait...");
-    }
-    // Queue a save if clicked after verifying the email address
-    else if (this._email_check) {
-      this._email_check.done(function(data) {
-        if (data.length != null)
-          data = data[0];
-        if (data) {
-          setTimeout(function() {
-            delete that._email_check;
-            el.trigger('click');
-          }, 0);
-        }
-      });
-    }
+      return ajd;
   }
   , " ajax:flash" : function(el, ev, mesg) {
     var that = this;

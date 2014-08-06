@@ -14,37 +14,36 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="item-data span3">
+        <div class="item-data span{{#is_dashboard}}3{{else}}5{{/is_dashboard}}" style="padding-left:0px;">
           <div class="tree-title-area">
             <span class="tier-trigger"></span>{{instance.title}}
           </div>
         </div>
-        <div class="span3 item-data">
         {{#is_dashboard}}
+        <div class="span2 item-data" style="padding-left:0px;">
+
         {{#defer 'object' instance.object}}
           <div class="tree-title-area">
             <i class="grcicon-{{object.class.table_singular}}-color"></i>
             <a class="object-title" href="{{object.viewLink}}" target="_blank">{{object.title}}</a>
           </div>
         {{/defer}}
-        {{/is_dashboard}}
+
         </div>
-        <div class="span6">
+        {{/is_dashboard}}
+        <div class="span7">
           <ul class="tree-action-list">
             <li>
               <span rel="tooltip" data-placement="top" data-original-title="Last edit">
-                Edited: {{localize_date instance.updated_at}}
+                <i class="grcicon-updated"></i> {{localize_date instance.updated_at}}
               </span>
             </li>
             <li>
               <div class="date">
-                <span rel="tooltip" data-placement="top" {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}class="error"{{/is_overdue}}{{/if}} data-original-title="Due On">
-                  Due: {{localize_date instance.end_date}}
+                <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
+                  <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/if overdue_warning}}"></i> {{localize_date instance.end_date}}
                 </span>
               </div>
-            </li>
-            <li>
-            {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}<span class="error"><em>Overdue</em></span>{{/is_overdue}}{{/if}}
             </li>
             <li>
               {{#with_mapping_count instance 'cycle_task_entries'}}
@@ -54,31 +53,35 @@
               </span>
               {{/with_mapping_count}}
             </li>
-            <li>
-              <div class="request-control" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }}>
-                {{#if_equals instance.status 'Assigned'}}
-                  <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
-                {{/status}}
-                {{#if_equals instance.status 'InProgress'}}
-                  <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
-                {{/if_equals}}
-                {{#if_equals instance.status 'Declined'}}
-                  <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
-                {{/if_equals}}
-                {{#if_equals instance.status 'Finished'}}
-                  <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
-                  <button class="btn btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
-                {{/status}}
-                {{#if_equals instance.status 'Verified'}}
-                  <span class="task-done">
-                    <em>Verified</em>
-                  </span>
-                {{/if_equals}}
-                {{#instance._undo.0}}
-                  <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
-                {{/instance._undo.0}}
-              </div>
-            </li>
+            {{#using cycle=instance.cycle}}
+              {{#if_equals cycle.is_current true}}
+              <li>
+                <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
+                  {{#if_equals instance.status 'Assigned'}}
+                    <button class="btn btn-primary change-task-status {{instance._disabled}}" data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                  {{/status}}
+                  {{#if_equals instance.status 'InProgress'}}
+                    <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                  {{/if_equals}}
+                  {{#if_equals instance.status 'Declined'}}
+                    <button class="btn change-task-status {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+                  {{/if_equals}}
+                  {{#if_equals instance.status 'Finished'}}
+                    <button class="btn btn-danger change-task-status {{instance._disabled}}" data-name="status" data-value="Declined">Decline</button>
+                    <button class="btn btn-success change-task-status {{instance._disabled}}" data-openclose="close" data-name="status" data-value="Verified">Verify</button>
+                  {{/status}}
+                  {{#if_equals instance.status 'Verified'}}
+                    <span class="task-done">
+                      <em>Verified</em>
+                    </span>
+                  {{/if_equals}}
+                  {{#instance._undo.0}}
+                    <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+                  {{/instance._undo.0}}
+                </div>
+              </li>
+              {{/if_equals}}
+            {{/using}}
           </ul>
         </div>
       </div>

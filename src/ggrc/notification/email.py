@@ -12,7 +12,7 @@
 from flask import current_app
 from google.appengine.api import mail
 from ggrc.models import Person, NotificationConfig, Notification, NotificationObject, NotificationRecipient
-from datetime import datetime
+from datetime import datetime, timedelta
 from ggrc import db
 from ggrc import settings
 
@@ -24,9 +24,11 @@ def getAppEngineEmail():
   else:
     return None
    
-#ToDo(Mouli): Add settings flag similar to memcache to prevent email in 
-#scenarios such as performance testing, true, false with regular expression
 def isNotificationEnabled(person_id, notif_type):
+  if notif_type == 'Email_Deferred':
+    notif_type='Email_Now'
+  elif notif_type == 'Email_Digest_Deferred':
+    notif_type='Email_Digest'
   notification_config=NotificationConfig.query.\
     filter(NotificationConfig.person_id==person_id).\
     filter(NotificationConfig.notif_type==notif_type).\
@@ -61,6 +63,84 @@ class NotificationBase(object):
 class EmailNotification(NotificationBase):
   def __init__(self, notif_type='Email_Now'):
     super(EmailNotification, self).__init__(notif_type)
+
+  def get_ignored_notifications(self, notifs):
+    ignored_notifs={}
+    #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
+    ignored_states={
+      'CycleTaskGroupObjectTask': ['Finished'],
+      'CycleTaskGroup': ['InProgress', 'Verified'],
+    }
+    for notif in notifs:
+      for notif_object in notif.notification_object:
+        if ignored_states.has_key(notif_object.object_type):
+          states=ignored_states[notif_object.object_type]
+          if notif_object.status in states:
+            ignored_notifs[notif.id]=notif
+
+    return ignored_notifs
+
+  def get_skipped_notifications(self, notifs_by_target):
+    skipped_notifs={}
+    #ToDo(Mouli): The valid states mapping must be set outside the generic email notification module
+    valid_states={
+      'CycleTaskGroupObjectTask': ['Assigned', 'InProgress', 'Finished', 'Verified', 'Declined'],
+      'CycleTaskGroup': ['InProgress', 'Finished', 'Verified'],
+    }
+    valid_transition_task={
+     'Assigned': 'InProgress',
+     'InProgress': 'Finished',
+     'Finished': 'Declined',
+     'Finished': 'Verified',
+    }
+    valid_transition_taskgroup={
+     'InProgress': 'Finished',
+     'Finished': 'Verified',
+    }
+    valid_transition={
+      'CycleTaskGroupObjectTask': valid_transition_task,
+      'CycleTaskGroup': valid_transition_taskgroup,
+    }
+    undo_transition_task={
+     'InProgress': 'Assigned',
+     'Finished': 'InProgress',
+     'Declined':'Finished',
+     'Verified': 'Finished',
+    }
+    undo_transition_taskgroup={
+     'Finished': 'InProgress',
+     'Verified': 'Finished',
+    }
+    undo_transition={
+      'CycleTaskGroupObjectTask': undo_transition_task,
+      'CycleTaskGroup': undo_transition_taskgroup,
+    }
+    for key, target_notifs in notifs_by_target.items():
+      type=key[0]
+      cnt = 0
+      if not valid_states.has_key(type):
+        current_app.logger.error("EmailDeferredNotification: Error occured in handling state transitions")
+        for notif in target_notifs:
+          skipped_notifs[notif.id]=notif
+        continue
+
+      for valid_state in valid_states[type]:
+        next_cnt=find_matching_entry(target_notifs, cnt, valid_state, valid_state)
+        if cnt != next_cnt:
+          for index_cnt in range(next_cnt-cnt):
+            notif=target_notifs[cnt+index_cnt][0]
+            skipped_notifs[notif.id]=notif
+        cnt=next_cnt
+        if undo_transition[type].has_key(valid_state):
+          next_cnt=find_matching_entry(target_notifs, cnt, valid_state, undo_transition[type][valid_state])
+          if cnt != next_cnt:
+            for index_cnt in range(next_cnt-cnt):
+              notif=target_notifs[cnt+index_cnt][0]
+              skipped_notifs[notif.id]=notif
+        cnt=next_cnt
+        if valid_transition[type].has_key(valid_state):
+          cnt=find_matching_entry(target_notifs, cnt, valid_state, valid_transition[type][valid_state])
+    return skipped_notifs
 
   def prepare(self, target_objs, sender, recipients, subject, content, override=False):
     if self.appengine_email is None:
@@ -102,10 +182,16 @@ class EmailNotification(NotificationBase):
     db.session.flush()
 
     for obj in target_objs:
+      if hasattr(obj, 'status'):
+        status=obj.status
+      else:
+        status='InProgress'
       notification_object=NotificationObject(
         created_at=datetime.now(),
         object_id=obj.id, 
         object_type=obj.type,
+        modified_by_id=sender.id,
+        status=status,
         notification=notification
       )
       db.session.add(notification_object)
@@ -214,7 +300,9 @@ class EmailDigestNotification(EmailNotification):
       join(Notification.recipients).\
       filter(NotificationRecipient.status == 'InProgress').\
       filter(NotificationRecipient.notif_type == self.notif_type)
+    self.notify_pending(pending_notifications)
 
+  def notify_pending(self, pending_notifications):
     pending_notifications_by_date={}
     for notification in pending_notifications:
       notif_date=notification.notif_date.strftime('%Y/%m/%d')
@@ -300,4 +388,107 @@ class EmailDigestNotification(EmailNotification):
           else:
             notify_recipient.status="Failed"
           db.session.add(notify_recipient)
+        db.session.flush()
+
+class EmailDeferredNotification(EmailNotification):
+  def __init__(self, notif_type='Email_Deferred'):
+    super(EmailDeferredNotification, self).__init__(notif_type)
+
+  def notify(self):
+    deferred_notifs=db.session.query(Notification).\
+      join(Notification.recipients).\
+      filter(Notification.notif_date < (datetime.utcnow() - timedelta(minutes=10))).\
+      filter(NotificationRecipient.status == 'InProgress').\
+      filter(NotificationRecipient.notif_type == self.notif_type)
+    notifs_by_target={}
+    for notification in deferred_notifs: 
+      for notify_recipient in notification.recipients:
+        user_id=notify_recipient.id
+        break
+      for notif_object in notification.notification_object:
+        object_id=notif_object.object_id
+        object_type=notif_object.object_type
+        if not notifs_by_target.has_key(object_id):
+          notifs_by_target[(object_type, object_id, user_id)]=[]
+        notifs_by_target[(object_type, object_id, user_id)].append((notification, notif_object))
+    skipped_notifs=self.get_skipped_notifications(notifs_by_target)
+    ignored_notifs=self.get_ignored_notifications(deferred_notifs)
+    for notif in deferred_notifs:
+      if not skipped_notifs.has_key(notif.id) and not ignored_notifs.has_key(notif.id):
+        self.notify_one(notif) 
+    for id, notif in skipped_notifs.items():
+      for notify_recipient in notif.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
+        notify_recipient.status="Skipped"
+        db.session.add(notify_recipient)
+        db.session.flush()
+    for id, notif in ignored_notifs.items():
+      for notify_recipient in notif.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
+        notify_recipient.status="Skipped"
+        db.session.add(notify_recipient)
+        db.session.flush()
+
+class EmailDigestDeferredNotification(EmailDigestNotification):
+  def __init__(self, notif_type='Email_Digest_Deferred'):
+    super(EmailDigestDeferredNotification, self).__init__(notif_type)
+
+  def notify(self):
+    deferred_notifs=db.session.query(Notification).\
+      join(Notification.recipients).\
+      filter(Notification.notif_date < (datetime.utcnow() - timedelta(minutes=10))).\
+      filter(NotificationRecipient.status == 'InProgress').\
+      filter(NotificationRecipient.notif_type == self.notif_type)
+    notifs_by_target={}
+    for notification in deferred_notifs: 
+      # ToDO(Mouli): The design supports only 1 recipient for notification object for handling deferred notification 
+      for notify_recipient in notification.recipients:
+        user_id=notify_recipient.id
+        break
+      for notif_object in notification.notification_object:
+        object_id=notif_object.object_id
+        object_type=notif_object.object_type
+        if not notifs_by_target.has_key(object_id):
+          notifs_by_target[(object_type, object_id, user_id)]=[]
+        notifs_by_target[(object_type, object_id, user_id)].append((notification, notif_object))
+    skipped_notifs=self.get_skipped_notifications(notifs_by_target)
+    ignored_notifs=self.get_ignored_notifications(deferred_notifs)
+    emaildigest_notif=[]
+    for notif in deferred_notifs:
+      if not skipped_notifs.has_key(notif.id) and not ignored_notifs.has_key(notif.id):
+        emaildigest_notif.append(notif)
+    if len(emaildigest_notif) > 0:
+      for notif in emaildigest_notif:
+        for notify_recipient in notif.recipients:
+          if notify_recipient.notif_type != self.notif_type:
+            continue
+          notify_recipient.notif_type="Email_Digest"
+          db.session.add(notify_recipient)
           db.session.flush()
+    for id, notif in skipped_notifs.items():
+      for notify_recipient in notif.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
+        notify_recipient.status="Skipped"
+        db.session.add(notify_recipient)
+        db.session.flush()
+    for id, notif in ignored_notifs.items():
+      for notify_recipient in notif.recipients:
+        if notify_recipient.notif_type != self.notif_type:
+          continue
+        notify_recipient.status="Skipped"
+        db.session.add(notify_recipient)
+        db.session.flush()
+
+def find_matching_entry(notif_objects, start, start_state, end_state):
+  if notif_objects[start][1].status != start_state:
+    return start
+  cnt=start
+  matching_cnt=cnt
+  while cnt < len(notif_objects):
+    if notif_objects[cnt][1].status == end_state:
+      matching_cnt=cnt
+    cnt=cnt+1
+  return matching_cnt

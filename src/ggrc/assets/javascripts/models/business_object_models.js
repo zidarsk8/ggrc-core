@@ -83,8 +83,6 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
     this.tree_view_options.child_options[1].model = this;
-    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
-    this.risk_tree_options.child_options[1].create_link = false;
 
     this.validatePresenceOf("title");
   }
@@ -148,7 +146,6 @@ can.Model.Cacheable("CMS.Models.Project", {
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
-    this.risk_tree_options.child_options.splice(1, 1);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
@@ -233,8 +230,6 @@ can.Model.Cacheable("CMS.Models.Facility", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
     this.tree_view_options.child_options[1].model = this;
-    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
-    this.risk_tree_options.child_options[1].create_link = false;
 
     this.validatePresenceOf("title");
   }
@@ -321,8 +316,6 @@ can.Model.Cacheable("CMS.Models.Product", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
     this.tree_view_options.child_options[1].model = this;
-    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
-    this.risk_tree_options.child_options[1].create_link = false;
 
     this.validatePresenceOf("title");
   }
@@ -405,8 +398,6 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });
     this.tree_view_options.child_options[1].model = this;
-    this.risk_tree_options.child_options[1] = can.extend(true, {}, this.tree_view_options.child_options[1]);
-    this.risk_tree_options.child_options[1].create_link = false;
 
     this.validatePresenceOf("title");
   }
@@ -470,7 +461,6 @@ can.Model.Cacheable("CMS.Models.Market", {
   , init : function() {
     var that = this;
     this._super && this._super.apply(this, arguments);
-    this.risk_tree_options.child_options.splice(1, 1);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
     });

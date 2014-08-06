@@ -94,7 +94,7 @@ $.ajaxTransport("text", function(options, _originalOptions, _jqXHR) {
           for(var j = 0; j < spl.length - 1; j ++) {
             var inverse = spl[j].trim()[0] === "!"
             , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
-            
+
             arr.push({attr : attr_name, inverse : inverse});
           }
           arr.value = spl[spl.length - 1];
@@ -246,7 +246,7 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
     if(_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
-    if(typeof val1 === "function") { 
+    if(typeof val1 === "function") {
       if(val1.isComputed) {
         val1.bind("change", function(ev, newVal, oldVal) {
           _val1 = newVal;
@@ -257,7 +257,7 @@ Mustache.registerHelper("if_equals", function(val1, val2, options) {
     } else {
       _val1 = val1;
     }
-    if(typeof val2 === "function") { 
+    if(typeof val2 === "function") {
       if(val2.isComputed) {
         val2.bind("change", function(ev, newVal, oldVal) {
           _val2 = newVal;
@@ -297,7 +297,7 @@ Mustache.registerHelper("if_null", function(val1, options) {
     if(_val1 == null) return options.fn(that);
     else return options.inverse(that);
   }
-    if(typeof val1 === "function") { 
+    if(typeof val1 === "function") {
       if(val1.isComputed) {
         val1.bind("change", function(ev, newVal, oldVal) {
           _val1 = newVal;
@@ -426,7 +426,11 @@ Mustache.registerHelper("renderLive", function(template, context, options) {
   return can.view.render(template, options.contexts);
 });
 
-Mustache.registerHelper("render_hooks", function(hook, options) {
+Mustache.registerHelper("render_hooks", function() {
+  var args = can.makeArray(arguments),
+      options = args.splice(args.length - 1, 1)[0],
+      hook = can.map(args, Mustache.resolve).join(".");
+
   return can.map(can.getObject(hook, GGRC.hooks) || [], function(hook_tmpl) {
     return can.Mustache.getHelper("renderLive", options.contexts).fn(hook_tmpl, options.contexts, options);
   }).join("\n");
@@ -565,7 +569,7 @@ Mustache.registerHelper("all", function(type, params, options) {
       });
       $el.remove();
       //since we are removing the original live bound element, replace the
-      // live binding reference to it, with a reference to the new 
+      // live binding reference to it, with a reference to the new
       // child nodes. We assume that at least one new node exists.
       can.view.nodeLists.update($el.get(), $parent.children().get());
     });
@@ -822,6 +826,8 @@ Mustache.registerHelper("with_mapping", function(binding, options) {
     return;
 
   loader = context.get_binding(binding);
+  if(!loader)
+    return;
   frame.attr(binding, loader.list);
 
   options = arguments[2] || options;
@@ -965,9 +971,9 @@ Mustache.registerHelper("result_direct_mappings", function(
       }
     }
   }
-  mappings_type = has_direct_mappings ? 
+  mappings_type = has_direct_mappings ?
       (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
-  options.context.mappings_type = mappings_type 
+  options.context.mappings_type = mappings_type
   return options.fn(options.contexts);
 });
 
@@ -1211,7 +1217,12 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
 
   context_id = source.context ? source.context.id : null;
 
-  if (target_type === 'Cacheable') {
+  resource_type = GGRC.Mappings.join_model_name_for(
+    source.constructor.shortName, target_type);
+
+  // The special case for `Cacheable` should no longer be necessary given
+  // correct definition of the canonical mapping for Cacheable.
+  if (!resource_type && target_type === 'Cacheable') {
     //  FIXME: This will *not* work for customizable roles -- this *only* works
     //    for the limited default roles as of 2013-10-07, and assumes that:
     //    1.  All `Cacheable` mappings (e.g. where you might map multiple types
@@ -1220,14 +1231,11 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
     //        the `null` context, they have permission for creating all mapping
     //        objects in `null` context.
     //  UPDATE 2013-03-05: Passing source context solved the issue where user
-    //    with reader sys-wide role and program owner role was unable to map 
+    //    with reader sys-wide role and program owner role was unable to map
     //    objects.
     can_map = Permission.is_allowed('create', 'Relationship', context_id);
   }
   else {
-    resource_type = GGRC.Mappings.join_model_name_for(
-      source.constructor.shortName, target_type);
-
     if (!(source instanceof CMS.Models.Program)
         && target instanceof CMS.Models.Program)
       context_id = target.context ? target.context.id : null;
@@ -1243,7 +1251,7 @@ Mustache.registerHelper("is_allowed_to_map", function(source, target, options) {
 });
 
 function resolve_computed(maybe_computed, always_resolve) {
-  return (typeof maybe_computed === "function" 
+  return (typeof maybe_computed === "function"
     && (maybe_computed.isComputed || always_resolve)) ? resolve_computed(maybe_computed(), always_resolve) : maybe_computed;
 }
 
@@ -1485,7 +1493,7 @@ Mustache.registerHelper("infer_roles", function(instance, options) {
     options.context.attr("__infer_roles", state);
   }
 
-  if (!state.attr('status')) {  
+  if (!state.attr('status')) {
     if (person) {
       init_state();
 
@@ -1718,19 +1726,19 @@ Mustache.registerHelper("default_audit_title", function(title, program, options)
     , default_title
     , index = 1
     ;
-  
+
   if(typeof computed_program === 'undefined'){
     // Mark the title to be populated when computed_program is defined,
     // returning an empty string here would disable the save button.
-    return 'undefined'; 
+    return 'undefined';
   }
   if(typeof computed_title !== 'undefined' && computed_title !== 'undefined'){
     return computed_title;
   }
   program = resolve_computed(program) || {title : "program"};
-  
-  default_title = new Date().getFullYear() + ": " + program.title + " - Audit";  
-  
+
+  default_title = new Date().getFullYear() + ": " + program.title + " - Audit";
+
   // Count the current number of audits with default_title
   $.map(CMS.Models['Audit'].cache, function(audit){
     if(audit.title && audit.title.indexOf(default_title) === 0){
@@ -1760,16 +1768,16 @@ Mustache.registerHelper("to_class", function(prop, delimiter, options) {
 
 /*
   Evaluates multiple helpers as if they were a single condition
-  
-  Each new statement is begun with a newline-prefixed string. The type of logic 
-  to apply as well as whether it should be a truthy or falsy evaluation may also 
+
+  Each new statement is begun with a newline-prefixed string. The type of logic
+  to apply as well as whether it should be a truthy or falsy evaluation may also
   be included with the statement in addition to the helper name.
 
-  Currently, if_helpers only supports Disjunctive Normal Form. All "and" statements are grouped, 
+  Currently, if_helpers only supports Disjunctive Normal Form. All "and" statements are grouped,
   groups are split by "or" statements.
 
-  All hash arguments (some_val=37) must go in the last line and should be prefixed by the 
-  zero-based index of the corresponding helper. This is necessary because all hash arguments 
+  All hash arguments (some_val=37) must go in the last line and should be prefixed by the
+  zero-based index of the corresponding helper. This is necessary because all hash arguments
   are required to be the final arguments for a helper. Here's an example:
     _0_some_val=37 would pass some_val=37 to the first helper.
 
@@ -1842,7 +1850,7 @@ Mustache.registerHelper("if_helpers", function() {
             for (prop in hash) {
               statement.hash = hash;
               break;
-            } 
+            }
           }
         }
         else
@@ -2004,7 +2012,7 @@ Mustache.registerHelper("mixed_content_check", function(url, options) {
 
 /**
   scriptwrap - create live-bound content contained within a <script> tag as CDATA
-  to prevent, e.g. iframes being rendered in hidden fields, or temporary storage 
+  to prevent, e.g. iframes being rendered in hidden fields, or temporary storage
   of markup being found by $().
 
   Usage
@@ -2063,7 +2071,7 @@ Mustache.registerHelper("is_page_instance", function(instance, options){
   var instance = resolve_computed(instance)
     , page_instance = GGRC.page_instance()
     ;
-  
+
   if(instance && instance.type === page_instance.type && instance.id === page_instance.id){
     return options.fn(options.contexts);
   }
@@ -2088,7 +2096,7 @@ Mustache.registerHelper("if_auditor", function(instance, options){
     return "";
 
   audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
-  
+
   if(!audit)
     return "";  //take no action until audit is available
 
@@ -2103,24 +2111,24 @@ Mustache.registerHelper("if_auditor", function(instance, options){
 });
 
 Mustache.registerHelper("if_can_edit_request", function(instance, options){
-  
+
     var instance, audit, auditors, accepted
     , admin = Permission.is_allowed("__GGRC_ADMIN__");
-    
+
     instance = resolve_computed(instance);
     instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
-    
-    if(!instance) 
+
+    if(!instance)
       return "";
 
     audit = instance.attr("audit");
-    
+
     if(!audit)
       return "";  //take no action until audit is available
 
     audit = audit.reify();
     auditors_dfd = audit.findAuditors();
-    
+
     return defer_render("span", function(auditors) {
       var accepted = instance.status === "Accepted"
         , update = Permission.is_allowed("update", instance)
@@ -2157,8 +2165,8 @@ Mustache.registerHelper("switch", function(value, options) {
   value = resolve_computed(value);
   frame.attr(value || "default", true);
   frame.attr("default", true);
-  return options.fn(options.contexts.add(frame), { 
-    helpers : { 
+  return options.fn(options.contexts.add(frame), {
+    helpers : {
       case : function(val, options) {
         val = resolve_computed(val);
         if(options.context[val]) {
@@ -2257,9 +2265,11 @@ Mustache.registerHelper("with_mapping_count", function(instance, mapping_names, 
       instance.get_list_counter(mapping_name))
 });
 
-Mustache.registerHelper("is_overdue", function(_date, options){
+Mustache.registerHelper("is_overdue", function(_date, status, options){
+  options = arguments.length === 2 ? arguments[1] : options;
+  status = arguments.length === 2 ? "" : resolve_computed(status);
   var date = moment(resolve_computed(_date));
-  if(date && date.isBefore(new Date())){
+  if(status !== 'Verified' && date && date.isBefore(new Date())){
     return options.fn(options.contexts);
   }
   else{
@@ -2378,7 +2388,7 @@ Mustache.registerHelper("autocomplete_select", function(options) {
       var $ctl = $(this).parents(":data(controls)");
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
         controller : cls ? $ctl.control(cls) : $ctl.control()
-      })); 
+      }));
     });
   };
 });

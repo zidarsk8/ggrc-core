@@ -497,33 +497,6 @@
         join_object: CMS.Models.Section.findInCacheById(data.join_object_id)
       }
 
-      , risk_controls : {
-        option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
-        active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
-        option_detail_view: GGRC.mustache_path + "/selectors/option_detail.mustache",
-
-        new_object_title: data.related_title_singular,
-        modal_title: "Select " + data.related_title_plural,
-
-        related_model_singular: "Risk",
-        related_table_plural: "risks",
-        related_table_singular: "risk",
-        related_title_singular: "Risk",
-        related_title_plural: "Risks",
-
-        option_model: CMS.Models.Control,
-        join_model: CMS.Models.RiskControl,
-
-        option_attr: 'control',
-        join_attr: 'risk',
-        option_id_field: 'control_id',
-        option_type_field: 'control_type',
-        join_id_field: 'risk_id',
-        join_type_field: null,
-
-        join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
-      }
-
       , section_controls : {
         option_column_view: GGRC.mustache_path + "/selectors/option_column.mustache",
         active_column_view: GGRC.mustache_path + "/selectors/active_column.mustache",
@@ -550,7 +523,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
 
       , program_controls : {
@@ -579,7 +551,6 @@
 
         join_object_id: data.join_object_id,
         join_object_type: data.join_object_type
-        //join_object: CMS.Models.Risk.findInCacheById(data.join_object_id)
       }
     };
 
@@ -1391,6 +1362,34 @@
       }
       return this.context;
     }
+
+    , init_view: function() {
+        var self = this
+          , deferred = $.Deferred()
+          ;
+
+        can.view(
+          this.options.base_modal_view,
+          this.context,
+          function(frag) {
+            self.element.html(frag);
+            self.options.$header = self.element.find('.modal-header');
+            deferred.resolve();
+            self.element.trigger('loaded');
+            self.element.find(".results-wrap").cms_controllers_infinite_scroll();
+            setTimeout(function() {
+              self.element.find('#search').focus();
+            }, 200);
+          });
+
+        // Start listening for events
+        this.on();
+
+        return deferred;
+    }
+
+    , ".results-wrap scrollNext": "show_next_page"
+
     , move_option_to_top_and_select: function(option) {
 
         // If element is null, the modal was closed and we don't need to do anything
@@ -1490,7 +1489,7 @@
       }
 
     , on_map: $.debounce(500, true, function(el, ev) {
-        var that = this; 
+        var that = this, ajd; 
 
         if(el.hasClass('disabled')){
           return;
@@ -1498,6 +1497,7 @@
         var join_instance = this.create_join();
         var its = join_instance.length;
         var pass = 0;
+        var obj_arr = [];
 
         if (!(its > 0)) {
           $(document.body).trigger("ajax:flash", {
@@ -1506,16 +1506,35 @@
         else {
           for(var i = 0; i < its; i++){
             //We have multiple join_instances
-            join_instance[i].save()
-              .done(function() {
+            ajd = join_instance[i].save().done(function(obj) {
+              if(that.options.mapTaskGroup) {
+                //Modify the object to map to task group
+                var id = obj.object.id, 
+                    shortName = obj.object.type,
+                    new_obj = {};
+                    new_obj.id = id;
+                    new_obj.constructor.shortName = shortName;
+
+                obj_arr.push(new_obj);
+              }
+              else {
                 $(document.body).trigger('ajax:flash', 
-                    { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
-                pass += 1;
-                if(pass == its){
+                 { success: that.context.selected_options[0].constructor.shortName + " mapped successfully."});
+              }
+              pass += 1;
+              if(pass == its){
+                  if(obj_arr.length >= 1){ 
+                    var obj = {};
+                    obj.multi_map = true;
+                    obj.arr = obj_arr;
+                    
+                    ////trigger the to add selected objects to task group;
+                    that.element.trigger("modal:success", [obj, {map_and_save: true}])
+                  }
                   $(that.element).modal_form('hide');
                 }
-              })
-              .fail(function(xhr) {
+            })
+            .fail(function(xhr) {
                 // Currently, the only error we encounter here is uniqueness
                 // constraint violations.  Let's use a nicer message!
                 //that.element.trigger("ajax:flash", { error : xhr.responseText });
@@ -1529,6 +1548,7 @@
                   }
                 }
               });
+            this.bindXHRToButton(ajd, el, "Saving, please wait...");
           }        
         } //End else
 
@@ -1599,9 +1619,13 @@
     }
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
+      //  If the resource type doesn't exist, short-circuit
+      if (!CMS.Models[far_model_name]) {
+        return;
+      }
+
       var option_model_name = descriptor.option_model_name || far_model_name
         , extra_options = multiselect_descriptor_view_option[option_model_name];
-      
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.
@@ -1633,6 +1657,7 @@
           , extra_options);
     });
 
+	option_set.mapTaskGroup = data.mapTaskGroup;
     option_set.option_descriptors = option_descriptors;
     return option_set;
   }
@@ -1707,7 +1732,7 @@
           , lookup = {
               governance: 0
             , business: 1
-            , entities: 2
+            //, entities: 2
             };
 
         if (!this.options.option_type_menu) {
@@ -1718,15 +1743,22 @@
             , { category: "Assets/Business"
               , items: []
               }
-            , { category: "People/Groups"
-              , items: []
-              }
+            //, { category: "People/Groups"
+            //  , items: []
+            //  }
             ];
           can.each(this.options.option_descriptors, function(descriptor) {
-            menu[lookup[descriptor.model.category] || 0].items.push({
-                model_name: descriptor.model.shortName
-              , model_display: descriptor.model.title_plural
-            })
+            if (descriptor.model.category == "workflow" || 
+                descriptor.model.category == "undefined" ||
+                descriptor.model.category == "entities"){
+              return false;
+            }
+            else{
+              menu[lookup[descriptor.model.category] || 0].items.push({
+                  model_name: descriptor.model.shortName
+                , model_display: descriptor.model.title_plural
+              })
+            }
           })
 
           this.options.option_type_menu = menu;
@@ -1735,7 +1767,7 @@
         //this.options.option_type_menu_2 = this.options.option_type_menu;
         this.options.option_type_menu_2 = can.map([
               "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-              "Person", "System", "Process", "DataAsset", "Product", "Facility" , "Market"
+              "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
               ],
               function(key) {
                 return CMS.Models[key];
@@ -1809,6 +1841,7 @@
         self = this,
         loader,
         term = $("#search").val() || "",
+        re = new RegExp("^.*" + term + ".*","gi"),
       //Get the filter_list length, for each select get the value for type, 
       //for each search, find the search text
         f_len = this.context.filter_list.length,
@@ -1841,31 +1874,49 @@
         //User need to make their selection again
         this.reset_selection_count();
 
-        if(filters.length === 1 && !term) {
-          //don't bother making an intersecting filter when there's only one source
+        
+        //if(filters.length === 1 && !term) {
+        //  //don't bother making an intersecting filter when there's only one source
+        //  loader = filters[0];
+        //} else {
+        //  // make an intersecting loader, that only shows the results that 
+        //  //  show up in all sources.
+        //  if(term) {
+        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
+        //  }
+        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        //}
+        
+        if (filters.length === 1){
           loader = filters[0];
-        } else {
-          // make an intersecting loader, that only shows the results that 
-          //  show up in all sources.
-          if(term) {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
-          }
+        }
+        else {
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
-        this.last_loader = loader;
+        //Title search
+        custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
+          if(term){
+            if(result.instance.title.match(re)) { return true; }  
+            else { return false; }    
+          }          
+          return true;
+        }).attach(CMS.Models.get_instance(GGRC.current_user));
+
+        this.last_loader = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        loader.refresh_instances().then(function(options) {
+        custom_filter.refresh_instances().then(function(options) {
           var active_fn = function() {
             return self.element &&
-                   self.last_loader === loader;
+                   self.last_loader === custom_filter;
           };
 
           var draw_fn = function(options) {
             self.insert_options(options);
           };
 
+          self.option_list.push.apply(self.option_list, options);
           self._start_pager(can.map(options, function(op) {
               return op.instance;
             }), 20, active_fn, draw_fn);

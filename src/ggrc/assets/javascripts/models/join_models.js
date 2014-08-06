@@ -370,26 +370,6 @@ can.Model.Join("CMS.Models.ControlControl", {
 
 });
 
-can.Model.Join("CMS.Models.ControlRisk", {
-  root_collection : "control_risks"
-  , root_object : "control_risk"
-  , join_keys : {
-      control : CMS.Models.Control
-    , risk : CMS.Models.Risk
-  }
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , control : "CMS.Models.Control.stub"
-    , risk : "CMS.Models.Risk.stub"
-  }
-  , findAll : "GET /api/control_risks"
-  , create : "POST /api/control_risks"
-  , destroy : "DELETE /api/control_risks/{id}"
-}, {
-
-});
-
 can.Model.Join("CMS.Models.ObjectPerson", {
   root_object : "object_person"
   , root_collection : "object_people"

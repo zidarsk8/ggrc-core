@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: dan@reciprocitylabs.com
     Maintained By: dan@reciprocitylabs.com
@@ -73,7 +73,16 @@
       this._super.apply(this, arguments);
       this.bind("created", refresh_attr_wrap('workflow').bind(this));
     }
-  }, {});
+  }, {
+    init: function() {
+      this._super.apply(this, arguments);
+      this.bind("status", function(ev, newVal) {
+        if(newVal === 'Verified' && this.workflow.reify().object_approval) {
+          this.attr("is_current", false);
+        }
+      });
+    }
+  });
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
   can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
@@ -90,7 +99,8 @@
       cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
-      documents : "CMS.Models.Document.stubs",
+      object_documents: "CMS.Models.ObjectDocument.stubs",
+      documents: "CMS.Models.Document.stubs",
       cycle: "CMS.Models.Cycle.stub",
     },
 
@@ -109,6 +119,7 @@
       this._super.apply(this, arguments);
       this.bind("created",
         refresh_attr_wrap("cycle_task_group_object_task").bind(this));
+      this.validatePresenceOf("description");
     }
   }, {
     workflowFolder: function() {
@@ -143,6 +154,7 @@
     },
 
     tree_view_options: {
+      sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
       //footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
@@ -243,11 +255,19 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var object = instance.cycle_task_group_object.reify();
-          if (object.selfLink) {
-            object.refresh();
-            refresh_attr(object, "cycle_task_group");
+          var object = instance.cycle_task_group_object.reify(),
+              dfd = object.refresh(),
+              rq = new RefreshQueue();
+
+          function force_refresh_chain(chain) {
+            can.reduce(chain, function(a, b) {
+              return a.then(function(obj) {
+                  return obj[b].reify().refresh();
+              });
+            }, dfd);
           }
+          force_refresh_chain(["cycle_task_group", "cycle", "workflow"]);
+          force_refresh_chain(["task_group_object", "object"]);
         }
       });
     }

@@ -199,11 +199,17 @@
     */
     get_current_page_widgets : function() {
       return this.get_widget_list_for(GGRC.page_instance().constructor.shortName);
-    }
+    },
+    get_default_widget_sort: function(){
+      return this.sort;
+    },
   }, {
-    init : function(name, opts) {
+    init : function(name, opts, sort) {
       this.constructor.modules[name] = this;
       can.extend(this, opts);
+      if (sort && sort.length) {
+        this.constructor.sort = sort;
+      }
     },
     /*
       Here instead of using the object format described in the class comments, you may instead

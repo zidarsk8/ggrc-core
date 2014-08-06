@@ -119,6 +119,8 @@
         <span>Edit {{model.model_title}}</span>
       </a>
     </p>
+
+    {{{render_hooks 'Policy.info_widget_actions'}}}
     {{/is_allowed}}
     <p>
       <small>

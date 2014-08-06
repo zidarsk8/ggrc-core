@@ -38,7 +38,7 @@
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
    *  For CrossListLoader, the mappings are (`result`, `binding`), where
-   *    `binding` is the "remote binding" which 
+   *    `binding` is the "remote binding" which
    */
   can.Construct("GGRC.ListLoaders.MappingResult", {
   }, {
@@ -492,7 +492,11 @@
     , init_listeners: function(binding) {
         var self = this;
 
-        binding.source_binding = binding.instance.get_binding(this.source);
+        if (typeof this.source === "string") {
+          binding.source_binding = binding.instance.get_binding(this.source);
+        } else {
+          binding.source_binding = this.source;
+        }
 
         binding.source_binding.list.bind("add", function(ev, results) {
           if (binding._refresh_stubs_deferred) {
@@ -834,7 +838,7 @@
 
         can.each(this.sources, function(source) {
           var source_binding = null;
-          /// Here is a deviation from the norm, since we want to 
+          /// Here is a deviation from the norm, since we want to
           ///  allow source bindings from possibly several disparate
           ///  instances.  Pass them in as already created objects
           ///  and we won't try to find them on the binding instance.
@@ -1213,7 +1217,7 @@
   });
 
   /*  IndirectListLoader
-   *  - handles indirect relationships 
+   *  - handles indirect relationships
    *  (zero-to-many, no local join but has a direct mapping in another object)
    *
    *  - listens to:
@@ -1333,7 +1337,7 @@
           , object_attr = this.object_attr + (this.object_attr !== 'context' && model.attributes[this.object_attr].indexOf('stubs') > -1 ?  '.id' : '_id')
           , self = this
           ;
-        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id; 
+        params[object_attr] = this.object_attr === 'context' ? binding.instance.context && binding.instance.context.id : binding.instance.id;
         if (mappings || !params[object_attr]) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
@@ -1352,7 +1356,7 @@
   });
 
   /*  SearchListLoader
-   *  - handles search relationships 
+   *  - handles search relationships
    *
    *  - listens to:
    *      - model.created
@@ -1363,12 +1367,10 @@
 
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.SearchListLoader", {
   }, {
-      init: function(term, types, params) {
+      init: function(query_function) {
         this._super();
 
-        this.term = term || '';
-        this.types = types;
-        this.params = params || {};
+        this.query_function = query_function;
       }
 
     , init_listeners: function(binding) {
@@ -1392,16 +1394,6 @@
           if (mapping instanceof model)
             that.remove_instance_from_mapping(binding, mapping);
         });
-      }
-
-    , get_params: function(binding) {
-        var params = can.extend({}, this.params);
-        for (var prop in params) {
-          if (params[prop] && binding.instance[params[prop]]) {
-            params[prop] = binding.instance[params[prop]];
-          }
-        }
-        return params;
       }
 
     , is_valid_mapping: function(binding, mapping) {
@@ -1468,30 +1460,31 @@
       }
 
     , _refresh_stubs: function(binding) {
-        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural))
-          , mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify()
-          , self = this
-          ;
+        var object_join_attr = ('search_' + (this.object_join_attr || binding.instance.constructor.table_plural)),
+            mappings = binding.instance[object_join_attr] && binding.instance[object_join_attr].reify(),
+            self = this,
+            result;
 
         if (mappings) {
           this.insert_instances_from_mappings(binding, mappings);
           return new $.Deferred().resolve(mappings);
         }
         else {
-          return GGRC.Models.Search.search_for_types(this.term, this.types, this.get_params(binding)).pipe(function(mappings) {
-            can.each(mappings.entries, function(entry, i) {
+          result = this.query_function(binding);
+          return result.pipe(function(mappings) {
+            can.each(mappings, function(entry, i) {
               var _class = (can.getObject("CMS.Models." + entry.type) || can.getObject("GGRC.Models." + entry.type));
-              mappings.entries[i] = new _class({ id: entry.id });
+              mappings[i] = new _class({ id: entry.id });
             });
 
-            //binding.instance.attr(object_join_attr, mappings.entries);
-            self.insert_instances_from_mappings(binding, mappings.entries.reify());
-            return mappings.entries;
+            //binding.instance.attr(object_join_attr, mappings);
+            self.insert_instances_from_mappings(binding, mappings.reify());
+            return mappings;
           });
         }
       }
 
-    , refresh_list: function() {
+    , refresh_list: function(binding) {
         return this._refresh_stubs(binding);
       }
   });
@@ -1571,8 +1564,8 @@
       instance_model_name, option_join_attr);
   }
 
-  GGRC.MapperHelpers.Search = function Search(term, types, params) {
-    return new GGRC.ListLoaders.SearchListLoader(term, types, params);
+  GGRC.MapperHelpers.Search = function Search(query_function) {
+    return new GGRC.ListLoaders.SearchListLoader(query_function);
   }
 
   GGRC.MapperHelpers.Multi = function Multi(sources) {

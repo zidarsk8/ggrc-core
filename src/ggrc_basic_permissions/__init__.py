@@ -351,7 +351,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
     modified_by=get_current_user(),
     ))
 
-  #Create the audit -> program implicaiton
+  #Create the audit -> program implication
   db.session.add(ContextImplication(
     source_context=context,
     context=obj.context,

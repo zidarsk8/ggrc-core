@@ -11,6 +11,7 @@ from ggrc.models.mixins import (
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
+from ggrc.models.context import HasOwnContext
 from sqlalchemy.orm import validates
 from ggrc.models.computed_property import computed_property
 from .task_group_object import TaskGroupObject
@@ -20,7 +21,8 @@ from collections import OrderedDict
 from datetime import date
 
 
-class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+class Workflow(
+    HasOwnContext, Timeboxed, Described, Titled, Slugged, Base, db.Model):
   __tablename__ = 'workflows'
 
   #Use these states for WorkflowCycle when it is implemented
@@ -50,6 +52,9 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
     db.Column(db.String, nullable=True, default=default_frequency),
     'Workflow'
     )
+
+  object_approval = deferred(
+    db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
   workflow_objects = db.relationship(
       'WorkflowObject', backref='workflow', cascade='all, delete-orphan')
@@ -99,6 +104,7 @@ class Workflow(Ownable, Timeboxed, Described, Titled, Slugged, Base, db.Model):
       'notify_on_change',
       'notify_custom_message',
       'cycles',
+      'object_approval'
       ]
   _stub_attrs = ['workflow_state']
 

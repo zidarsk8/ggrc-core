@@ -232,7 +232,7 @@
     a {
       color:$gray;
       &:hover {
-       color:$error; 
+       color:$error;
       }
     }
     i {
@@ -262,9 +262,6 @@
   }
   &.person-tooltip {
     .popover-inner,
-    .popover-content {
-      overflow: visible;
-    }
     .popover-content {
       margin: -10px 0;
     }

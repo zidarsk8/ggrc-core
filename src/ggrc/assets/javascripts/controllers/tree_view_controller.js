@@ -234,19 +234,28 @@ can.Control("CMS.Controllers.TreeLoader", {
         if (!that._pending_items) {
           return;
         }
-        var chunk = that._pending_items.splice(0, 5);
-        that.insert_items(chunk);
-        if (that._pending_items.length > 0) {
-          setTimeout(that._ifNotRemoved(processChunk), 100);
-        }
-        else {
-          that._pending_items = null;
-          setTimeout(that._ifNotRemoved(function() {
-            if (!that._pending_items) {
-              that._loading_finished();
-            }
-          }), 200);
-        }
+        var chunk = that._pending_items.splice(0, 5),
+            to_refresh = can.map(chunk, function(item) {
+              item = item.instance || item;
+              return item.selfLink ? undefined : item;
+            })
+            ;
+
+        new RefreshQueue().enqueue(to_refresh).trigger().then(function() {
+
+          that.insert_items(chunk);
+          if (that._pending_items && that._pending_items.length > 0) {
+            setTimeout(that._ifNotRemoved(processChunk), 100);
+          }
+          else {
+            that._pending_items = null;
+            setTimeout(that._ifNotRemoved(function() {
+              if (!that._pending_items) {
+                that._loading_finished();
+              }
+            }), 200);
+          }
+        });
       };
 
       setTimeout(this._ifNotRemoved(processChunk), 100);
@@ -614,7 +623,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       var that = this
         , $footer = this.element.children('.tree-footer').first()
         , $items = $()
-        , $existing = this.element.children('li:not(.tree-header, .tree-footer)')
+        , $existing = this.element.children('li.cms_controllers_tree_view_node')
         , draw_items_dfds = []
         , sort_prop = this.options.sort_property
         , sort_function = this.options.sort_function
@@ -669,8 +678,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
       $item = $(ui.item),
-      $before = $item.prev("li:not(.tree-header, .tree-footer)"),
-      $after = $item.next("li:not(.tree-header, .tree-footer)"),
+      $before = $item.prev("li:not(.tree-footer)"),
+      $after = $item.next("li:not(.tree-footer)"),
       before_index = $before.length
                      ? $before.control().options.instance[this.options.sort_property]
                      : "0",
@@ -974,4 +983,14 @@ can.Control("CMS.Controllers.TreeViewNode", {
         $expand_el.trigger("click");
       return this.expand();
     }
+});
+
+CMS.Controllers.TreeView("CMS.Controllers.SortableTreeView", {}, {
+  draw_items: function(options_list){
+    if (typeof this._super === "function") {
+      this._super.apply(this, [options_list]);
+    }
+    var $el = $(this.element);
+    $el.sortable({element: 'li.tree-item', handle: '.drag'})
+  },
 });
