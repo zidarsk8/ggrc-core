@@ -45,7 +45,19 @@ def handle_calendar_flow_auth():
   if error_return is not None:
     current_app.logger.error("Error occured in Calendar flow authorization: " + error_return)
     return 'Error'
-  session['oauth_code']=code
+  from oauth2client.client import OAuth2WebServerFlow
+  flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
+    client_secret=GOOGLE_SECRET_KEY,
+    scope='https://www.googleapis.com/auth/calendar',
+    redirect_uri=request.url_root + 'oauth2callback/calendar') 
+  try:
+    credentials=flow.step2_exchange(code)
+  except Exception as e:
+    current_app.logger.warn("Exception occured in getting oAuth credentials: " + str(e))
+    if session.has_key('oauth_credentials'):
+      del session['oauth_credentials']
+    return 'Error'
+  session['oauth_credentials']=credentials.to_json()
   current_app.logger.info("oauth_credentials is set")
   return 'Ok'
 

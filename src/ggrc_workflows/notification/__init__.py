@@ -11,10 +11,10 @@ from ggrc.notification import EmailNotification, EmailDigestNotification
 from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
 from ggrc.notification import CalendarNotification, CalendarService, GGRC_CALENDAR
 from ggrc.notification import create_calendar_entry, find_calendar_entry, get_calendar_event
-from ggrc.notification import create_calendar_acl
+from ggrc.notification import create_calendar_acl, delete_calendar_event
 from datetime import date, timedelta
 from ggrc.services.common import Resource
-from ggrc.models import Person
+from ggrc.models import Person, NotificationConfig
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc import settings
@@ -232,6 +232,33 @@ def handle_tasks_due(num_days):
     subject="Task " + "'" + task.title + "' is due in " + str(num_days) + " days"
     prepare_notification_for_task(task, workflow_owner, assignee, subject, PRI_TASK_DUE)
 
+@Resource.model_posted.connect_via(NotificationConfig)
+def handle_notification_config_post(sender, obj=None, src=None, service=None):
+  if obj.notif_type != 'Calendar':
+    return
+  cycles=db.session.query(models.Cycle).all()
+  for cycle in cycles:
+    workflow=get_cycle_workflow(cycle)
+    workflow=get_cycle_workflow(cycle)
+    workflow_owner=get_workflow_owner(workflow)
+    for person in workflow.people:
+      if person.id in [obj.person_id, workflow_owner.id]:
+        prepare_calendar_for_cycle(cycle, person, obj.enable_flag)
+        break
+
+@Resource.model_put.connect_via(NotificationConfig)
+def handle_notification_config_put(sender, obj=None, src=None, service=None):
+  if obj.notif_type != 'Calendar':
+    return
+  cycles=db.session.query(models.Cycle).all()
+  for cycle in cycles:
+    workflow=get_cycle_workflow(cycle)
+    workflow_owner=get_workflow_owner(workflow)
+    for person in workflow.people:
+      if person.id in [obj.person_id, workflow_owner.id]:
+        prepare_calendar_for_cycle(cycle, person, obj.enable_flag)
+        break
+
 @Resource.model_put.connect_via(models.Cycle)
 def handle_end_cycle(sender, obj=None, src=None, service=None):
   if obj is None:
@@ -268,6 +295,14 @@ def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status
   assignee=contact[1]
   subject="Task Group " + "'" + obj.title + "' status changed to "  + new_status
   prepare_notification_for_taskgroup(obj, workflow_owner, assignee, subject, PRI_TASKGROUP)
+
+@Resource.model_deleted.connect_via(models.CycleTaskGroup)
+def handle_taskgroup_deleted(sender, obj=None, service=None):
+  if request.oauth_credentials is None:
+    raise Forbidden()
+  from oauth2client.client import Credentials
+  calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
+  calendar_service.handle_taskgroup_calendar_delete(taskgroup)
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_task_put(sender, obj=None, src=None, service=None):
@@ -459,7 +494,7 @@ class WorkflowCalendarService(CalendarService):
   def __init__(self, credentials=None):
     super(WorkflowCalendarService, self).__init__(credentials)
 
-  def handle_cycle_calendar_update(self, cycle):
+  def handle_cycle_calendar_update(self, cycle, person=None, enable_flag=None):
     workflow=get_cycle_workflow(cycle)
     if workflow is None:
       current_app.logger.warn("Workflow not found for cycle " + cycle.title)
@@ -472,12 +507,14 @@ class WorkflowCalendarService(CalendarService):
     calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
     if calendar is None:
       calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      if calendar is None and user.id != workflow_owner.id:
+        current_app.logger.warn("Workflow owner can only create Calendar entry")
+        return
       if calendar is None:
         calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
         if calendar is None:
-         return
-        if user.id != workflow_owner.id:
-          create_calendar_acl(self.calendar_service, calendar['id'], workflow_owner.email, 'Owner')
+          current_app.logger.error("Unable to create calendar entry for workflow " + workflow.title)
+          raise Forbidden()
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
     subject=cycle.title
     content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
@@ -489,19 +526,22 @@ class WorkflowCalendarService(CalendarService):
     notif.calendar_service=self.calendar_service
     notif.calendar_event=calendar_event
     notif.calendar=calendar
-    calendar_notification = notif.prepare(
-      [cycle], 
-      workflow_owner, 
-      workflow.people, 
-      subject, 
-      content)
+    notif.enable_flag=enable_flag
+    if person is not None:
+      assignees=[person]
+    else:
+      assignees=[]
+      for person in workflow.people:
+        assignees.append(person)
+      assignees.append(workflow_owner)
+    calendar_notification = notif.prepare([cycle], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
     # create task group related events during start of workflow
     for task_group in cycle.cycle_task_groups:
-      self.handle_taskgroup_calendar_update(task_group, calendar)
+      self.handle_taskgroup_calendar_update(task_group, calendar, person, enable_flag)
 
-  def handle_taskgroup_calendar_update(self, task_group, calendar=None):
+  def handle_taskgroup_calendar_update(self, task_group, calendar=None, person=None, enable_flag=None):
     workflow=get_taskgroup_workflow(task_group)
     if workflow is None:
       current_app.logger.warn("Workflow not found for task group " + task_group.title)
@@ -514,23 +554,30 @@ class WorkflowCalendarService(CalendarService):
     if workflow_owner is None:
       current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
       return
-    recipient_contacts={}
-    for task_group_object in task_group.cycle_task_group_objects:
-      for task in task_group_object.cycle_task_group_object_tasks:
-         if task.contact is not None:
-           recipient_contacts[task.contact.id] = task.contact
     assignees=[]
-    for id, contact in recipient_contacts.items():
-      assignees.append(contact)
+    recipient_contacts={}
+    if person is not None:
+      assignees=[person]
+    else:
+      for task_group_object in task_group.cycle_task_group_objects:
+        for task in task_group_object.cycle_task_group_object_tasks:
+           if task.contact is not None:
+             recipient_contacts[task.contact.id] = task.contact
+      for id, contact in recipient_contacts.items():
+        assignees.append(contact)
+      if not recipient_contacts.has_key(workflow_owner.id):
+        assignees.append(workflow_owner)
     user=get_current_user()
     if calendar is None:
       calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+      if calendar is None and user.id != workflow_owner.id:
+        current_app.logger.warn("Workflow owner can only create Calendar entry")
+        return
       if calendar is None:
         calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
         if calendar is None:
-         return
-        if user.id != workflow_owner.id:
-          create_calendar_acl(self.calendar_service, calendar['id'], workflow_owner.email, 'Owner')
+          current_app.logger.error("Unable to create calendar entry for workflow " + workflow.title)
+          raise Forbidden()
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
     subject=task_group.title
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
@@ -542,9 +589,31 @@ class WorkflowCalendarService(CalendarService):
     notif.calendar_service=self.calendar_service
     notif.calendar_event=calendar_event
     notif.calendar=calendar
+    notif.enable_flag=enable_flag
     calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
+
+  def handle_taskgroup_calendar_delete(self, task_group):
+    workflow=get_taskgroup_workflow(task_group)
+    if workflow is None:
+      current_app.logger.warn("Workflow not found for task group " + task_group.title)
+      return 
+    workflow_owner=get_workflow_owner(workflow)
+    if workflow_owner is None:
+      current_app.logger.warn("Workflow owner not found for workflow " + workflow.title)
+      return
+    calendar=find_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
+    user=get_current_user()
+    if calendar is None and user.id != workflow_owner.id:
+      current_app.logger.warn("Workflow owner can only create Calendar entry")
+      return
+    calendar_event=get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
+    if calendar_event is None:
+      current_app.logger.warn("Calendar event could not be found for task group " + task_group.title)
+      return
+    #ToDo(Mouli): Create notification object similar to other calendar events such as create, update
+    delete_calendar_event(self.calendar_service, calendar['id'], calendar_event['id'])
 
 def notify_email_digest():
   """ Preprocessing of tasks, cycles prior to generating email digest
@@ -574,11 +643,12 @@ def notify_email_deferred():
   email_digest_deferred.notify()
   db.session.commit()
 
-def prepare_calendar_for_cycle(cycle):
+def prepare_calendar_for_cycle(cycle, person=None, enable_flag=None):
   if request.oauth_credentials is None:
     raise Forbidden()
-  calendar_service=WorkflowCalendarService(request.oauth_credentials)
-  calendar_service.handle_cycle_calendar_update(cycle)
+  from oauth2client.client import Credentials
+  calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
+  calendar_service.handle_cycle_calendar_update(cycle, person=person, enable_flag=enable_flag)
 
 def prepare_calendar_for_workflow_member(workflow):
   if request.oauth_credentials is None:
@@ -593,11 +663,13 @@ def prepare_calendar_for_workflow_member(workflow):
   if not found_cycle:
     current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
     return
-  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  from oauth2client.client import Credentials
+  calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_cycle_calendar_update(cycle)
 
 def prepare_calendar_for_taskgroup(taskgroup):
   if request.oauth_credentials is None:
     raise Forbidden()
-  calendar_service=WorkflowCalendarService(request.oauth_credentials)
+  from oauth2client.client import Credentials
+  calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_taskgroup_calendar_update(taskgroup)
