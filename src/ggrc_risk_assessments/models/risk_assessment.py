@@ -25,18 +25,14 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described, Titled, Base, db
   program = db.relationship(
     'Program',
     backref='risk_assessments',
-    uselist=False, 
+    uselist=False,
     foreign_keys='RiskAssessment.program_id')
 
   _fulltext_attrs = [
-    'title',
-    'description',
     ]
 
   _publish_attrs = [
-    'title',
     'ra_manager',
     'ra_counsel',
     'program',
-    'description',
     ]
