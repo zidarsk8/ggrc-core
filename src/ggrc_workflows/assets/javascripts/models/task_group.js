@@ -73,8 +73,17 @@
     },
 
     init: function() {
+      var that = this;
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");
+
+      this.bind("created", function(ev, instance) {
+        if (instance instanceof that) {
+          if (instance.task_group.reify().selfLink) {
+            instance.task_group.reify().refresh();
+          }
+        }
+      });
     }
   }, {
   });
