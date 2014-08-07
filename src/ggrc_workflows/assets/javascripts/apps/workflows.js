@@ -312,18 +312,17 @@
             show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
             sort_property: null,
             sort_function: _task_sort_function,
-            content_controller_options: {
-              child_options: [
-                {
-                  model: can.Model.Cacheable,
-                  mapping: "cycle_task_entries",
-                  show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-                  footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-                  draw_children: true,
-                  allow_creating: true
-                },
-              ]
-            }
+            draw_children: true,
+            child_options: [
+              {
+                model: can.Model.Cacheable,
+                mapping: "cycle_task_entries",
+                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                draw_children: true,
+                allow_creating: true
+              },
+            ]
           }
         }
       };
@@ -550,18 +549,16 @@
           draw_children: true,
           sort_property: null,
           sort_function: _task_sort_function,
-          content_controller_options: {
-            child_options: [
-              {
-                model: can.Model.Cacheable,
-                mapping: "cycle_task_entries",
-                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-                draw_children: true,
-                allow_creating: true
-              },
-            ]
-          }
+          draw_children: true,
+          child_options: [
+            {
+              model: can.Model.Cacheable,
+              mapping: "cycle_task_entries",
+              show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+              footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+              allow_creating: true
+            },
+          ]
         }
       }
     };
