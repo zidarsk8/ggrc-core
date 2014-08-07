@@ -22,6 +22,22 @@ class TaskGroupTask(
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
 
+  # Frequencies and offset:
+  #   annual:
+  #     month is the 1-indexed month (1 is January)
+  #     day is the one-indexed offset day
+  #   quarterly:
+  #     month is in [0,1,2], as the offset within the quarter
+  #     day is same as annual
+  #   weekly:
+  #     month is ignored
+  #     day is in [0,1,2,3,4] where 0 is Monday
+
+  relative_start_month = db.Column(db.Integer, nullable=True)
+  relative_start_day = db.Column(db.Integer, nullable=True)
+  relative_end_month = db.Column(db.Integer, nullable=True)
+  relative_end_day = db.Column(db.Integer, nullable=True)
+
   @staticmethod
   def _extra_table_args(cls):
     return (
@@ -32,7 +48,11 @@ class TaskGroupTask(
 
   _publish_attrs = [
       'task_group',
-      'sort_index'
+      'sort_index',
+      'relative_start_month',
+      'relative_start_day',
+      'relative_end_month',
+      'relative_end_day',
       ]
   _sanitize_html = []
 

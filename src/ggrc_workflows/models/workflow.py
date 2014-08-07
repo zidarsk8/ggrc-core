@@ -67,6 +67,9 @@ class Workflow(
   cycles = db.relationship(
       'Cycle', backref='workflow', cascade='all, delete-orphan')
 
+  next_cycle_start_date = deferred(
+      db.Column(db.Date, nullable=True), 'Workflow')
+
   @computed_property
   def workflow_state(self):
     cycles = db.session.query(Cycle)\
