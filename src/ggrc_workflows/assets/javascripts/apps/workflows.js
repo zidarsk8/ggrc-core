@@ -263,8 +263,6 @@
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
-    } else if (page_instance instanceof CMS.Models.Task) {
-      WorkflowExtension.init_widgets_for_task_page();
     } else if (page_instance instanceof CMS.Models.Person) {
       WorkflowExtension.init_widgets_for_person_page();
     } else {
