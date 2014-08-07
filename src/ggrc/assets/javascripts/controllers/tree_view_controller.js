@@ -293,6 +293,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
+    , sortable : false
     , sort_property : null
     , sort_function : null
     , start_expanded : false //true
@@ -665,6 +666,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             }
             $existing.splice(0, 0, item);
          });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'})
+        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);
@@ -983,14 +987,4 @@ can.Control("CMS.Controllers.TreeViewNode", {
         $expand_el.trigger("click");
       return this.expand();
     }
-});
-
-CMS.Controllers.TreeView("CMS.Controllers.SortableTreeView", {}, {
-  draw_items: function(options_list){
-    if (typeof this._super === "function") {
-      this._super.apply(this, [options_list]);
-    }
-    var $el = $(this.element);
-    $el.sortable({element: 'li.tree-item', handle: '.drag'})
-  },
 });
