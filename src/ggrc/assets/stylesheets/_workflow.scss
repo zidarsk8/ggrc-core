@@ -349,12 +349,6 @@ ul.new-tree {
   }
 }
 
-.lock-wrap {
-  margin-right: 22%;
-  label {
-    margin-bottom: 0;
-  }
-}
 
 .task-list {
   .objective-selector {
@@ -369,5 +363,19 @@ ul.new-tree {
 .edit-field {
   .btn {
     margin-left: 10px;
+  }
+}
+
+.template-setup {
+  h3 {
+    font-size:14px;
+    font-weight:bold;
+    border-bottom:1px solid #eee;
+  }
+}
+
+.lock-wrap {
+  label {
+    margin-bottom: 0;
   }
 }
