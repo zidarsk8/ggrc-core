@@ -52,7 +52,6 @@
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
     var descriptor = {},
         page_instance = GGRC.page_instance();
-    var _mustache_path = GGRC.mustache_path + "/risk_assessments";
 
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {
@@ -75,6 +74,5 @@
   }
 
   RiskAssessmentsExtension.init_mappings();
-  RiskAssessmentsExtension.init_widgets();
 
 })(this.can.$, this.CMS, this.GGRC);
