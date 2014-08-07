@@ -481,15 +481,27 @@ select.input-block-level {
 
 // autocomplete scrolling
 .ui-widget.ui-autocomplete {
-  font-size: $baseFontSize;
+  font-size: 12px;
   max-height: 7 * $baseFontSize * 1.5;
   overflow-y: auto;
   overflow-x: hidden;
   li a {
-    color:$business;
+    color:$link;
+    border:0;
+    span.small {
+      color:#777;
+      font-size:11px;    
+    }
     .url-link {
       color:#777;
       font-size:11px;
+    }
+    &:hover {
+      background:$link;
+      color:$white;
+      span.small {
+        color:#eee;
+      }
     }
   }
 }

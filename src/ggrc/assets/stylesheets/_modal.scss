@@ -1028,8 +1028,9 @@ p.modal-value {
     }
     &.add-new {
       a {
-        background: $dropPlaceholder;
-        color: $text;
+        color: $link;
+        font-size:11px;
+        background:$white;
       }
     }
   }
