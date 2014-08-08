@@ -50,3 +50,22 @@ GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {
 });
 
 })(this.can, this.can.$, this.GGRC, this.CMS);
+
+
+//Calendar authentication
+
+jQuery(function($){
+  $('body').on('click', '.calendar-auth', function(e) {
+    var calenderAuthWin = null,
+      href = window.location.origin + "/calendar_oauth_request", //"https://ggrc-dev.googleplex.com/calendar_oauth_request"
+      name = "Calendar Authentication";
+    
+    if(calenderAuthWin === null || calenderAuthWin.closed){
+      calenderAuthWin = window.open(href, name);
+      calenderAuthWin.focus();
+    }
+    else{
+      calenderAuthWin.focus();
+    }
+  }); 
+});
