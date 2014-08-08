@@ -9,43 +9,8 @@
 
   can.Control("GGRC.Controllers.WorkflowPage", {
     defaults: {
-    },
-
-    init: function() {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
     }
   }, {
-    init: function() {
-      this._super.apply(this, arguments);
-    },
-
-    "[data-ggrc-action=start-cycle] click": function() {
-      var page_instance = GGRC.page_instance(),
-          that = this,
-          cycle;
-
-      GGRC.Controllers.Modals.confirm({
-        modal_title : "Confirm",
-        modal_confirm : "Proceed",
-        skip_refresh : true,
-        button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
-        content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
-        instance : GGRC.page_instance()
-      }, function() {
-        cycle = new CMS.Models.Cycle({
-          context: page_instance.context.stub(),
-          workflow: { id: page_instance.id, type: "Workflow" },
-          autogenerate: true
-        });
-
-        cycle.save().then(function(cycle) {
-          // Cycle created. Workflow started.
-        });
-      });
-    },
-
     //  FIXME: This should trigger expansion of the TreeNode, without using
     //    global event listeners or routes or timeouts, but currently object
     //    creation and tree insertion is disconnected.
@@ -55,6 +20,40 @@
           window.location.hash =
             'task_group_widget/task_group/' + instance.id;
         }, 250);
+      }
+    }
+  });
+
+  can.Component.extend({
+    tag: "workflow-start-cycle",
+    content: "<content/>",
+    events: {
+      click: function() {
+        var page_instance = GGRC.page_instance(),
+            that = this,
+            cycle;
+
+        GGRC.Controllers.Modals.confirm({
+          modal_title : "Confirm",
+          modal_confirm : "Proceed",
+          skip_refresh : true,
+          button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
+          content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
+          instance : GGRC.page_instance()
+        }, function() {
+          cycle = new CMS.Models.Cycle({
+            context: page_instance.context.stub(),
+            workflow: { id: page_instance.id, type: "Workflow" },
+            autogenerate: true
+          });
+
+          cycle.save().then(function(cycle) {
+            // Cycle created. Workflow started.
+            setTimeout(function() {
+              window.location.hash = 'current_widget/cycle/' + cycle.id;
+            }, 250);
+          });
+        });
       }
     }
   });

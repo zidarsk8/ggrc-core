@@ -8,9 +8,11 @@
 {{#with_mapping_count instance 'current_cycle'}}
 {{^count}}
 <li class="inner-nav-button">
-  <button type="submit" href="#workflowStart" data-ggrc-action="start-cycle" data-toggle="modal" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-    Activate Workflow
-  </button>
+  <workflow-start-cycle workflow="instance">
+    <button type="submit" href="#workflowStart" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+      Activate Workflow
+    </button>
+  </workflow-start-cycle>
 </li>
 {{/count}}
 {{/with_mapping_count}}
