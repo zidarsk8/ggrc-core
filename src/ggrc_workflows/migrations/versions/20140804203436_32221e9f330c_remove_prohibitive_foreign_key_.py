@@ -17,6 +17,10 @@ import sqlalchemy as sa
 
 def upgrade():
     op.drop_constraint(
+        'uq_t_workflows', table_name='workflows', type_='unique')
+    op.drop_constraint(
+        'uq_t_task_groups', table_name='task_groups', type_='unique')
+    op.drop_constraint(
         'cycle_task_group_object_tasks_ibfk_4',
         table_name='cycle_task_group_object_tasks',
         type_='foreignkey'
