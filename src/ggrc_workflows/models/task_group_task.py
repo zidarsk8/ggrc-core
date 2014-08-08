@@ -67,3 +67,15 @@ class TaskGroupTask(
 
   def _display_name(self):
     return self.title + '<->' + self.task_group.display_name
+
+  def copy(self, _other=None, **kwargs):
+    columns = [
+        'title', 'description',
+        'task_group', 'sort_index',
+        'relative_start_month', 'relative_start_day',
+        'relative_end_month', 'relative_end_day',
+        'start_date', 'end_date',
+        'contact',
+        ]
+    target = self.copy_into(_other, columns, **kwargs)
+    return target

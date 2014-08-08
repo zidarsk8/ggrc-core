@@ -409,6 +409,17 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):
+
+  if src.get('clone'):
+    source_workflow_id = src.get('clone')
+    source_workflow = models.Workflow.query.filter_by(
+        id=source_workflow_id
+        ).first()
+    source_workflow.copy(obj)
+    db.session.add(obj)
+    db.session.flush()
+    obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
+
   db.session.flush()
   # get the personal context for this logged in user
   user = get_current_user()

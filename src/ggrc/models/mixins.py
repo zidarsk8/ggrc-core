@@ -92,6 +92,22 @@ class Identifiable(object):
       table_args.append(table_dict)
     return tuple(table_args,)
 
+  # FIXME: This is not the right place, but there is no better common base
+  #   class
+  def copy_into(self, _other, columns, **kwargs):
+    target = _other or type(self)()
+
+    columns = set(columns).union(kwargs.keys())
+    for name in columns:
+      if name in kwargs:
+        value = kwargs[name]
+      else:
+        value = getattr(self, name)
+      setattr(target, name, value)
+
+    return target
+
+
 def created_at_args():
   """Sqlite doesn't have a server, per se, so the server_* args are useless."""
   return {'default': db.text('current_timestamp'),}

@@ -97,6 +97,18 @@ class Workflow(
       ]
   _stub_attrs = ['workflow_state']
 
+  def copy(self, _other=None, **kwargs):
+    columns = [
+        'title', 'description', 'notify_on_change', 'notify_custom_message',
+        'frequency', 'end_date', 'start_date'
+        ]
+    target = self.copy_into(_other, columns, **kwargs)
+
+    for task_group in self.task_groups:
+      target.task_groups.append(task_group.copy(workflow=target))
+
+    return target
+
 
 class WorkflowState(object):
 

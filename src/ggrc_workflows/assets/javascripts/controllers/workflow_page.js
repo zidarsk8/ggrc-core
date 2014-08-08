@@ -59,6 +59,25 @@
   });
 
   can.Component.extend({
+    tag: "workflow-clone",
+    template: "<content/>",
+    events: {
+      click: function() {
+        var workflow;
+
+        workflow = new CMS.Models.Workflow({
+          clone: this.scope.workflow.id,
+          context: null
+        });
+
+        workflow.save().then(function(workflow) {
+          window.location.href = workflow.viewLink;
+        });
+      }
+    }
+  });
+
+  can.Component.extend({
     tag: "cycle-end-cycle",
     template: "<content/>",
     events: {
