@@ -448,6 +448,12 @@
       text-transform:uppercase;
       @include opacity(0.4);
       @include transition(opacity 0.2s);
+      &.non-transparent {
+        @include opacity(1);
+        &:hover {
+          text-decoration:underline;
+        }
+      }
       &:hover {
         @include opacity(1);
         text-decoration:none;

@@ -5,13 +5,13 @@
       {{#person_owned instance.owner.id}}
         {{#with_mapping_count instance 'approval_workflows'}}
           {{#if_equals count 0}}
-          <a href="javascript://" class="info-edit" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
+          <a href="javascript://" class="info-edit non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{model.model_singular}}" data-object-id="page">
             <i class="grcicon-review-color"></i>
             <span class="text-business">Submit For Review</span>
           </a>
           {{else}}
           <i class="grcicon-review"></i>
-          <span class="setup-link">Submitted for Review</span>
+          <span class="setup-link">Under review</span>
           {{/if}}
         {{/with_mapping}}
       {{/person_owned}}
