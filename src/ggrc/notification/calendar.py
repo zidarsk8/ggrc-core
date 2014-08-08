@@ -17,7 +17,6 @@ from ggrc.models import CalendarEntry
 from datetime import datetime
 from ggrc import db
 from ggrc import settings
-from ggrc.login import get_current_user
 
 GGRC_CALENDAR='GGRC Calendar'
 
@@ -94,8 +93,8 @@ class CalendarNotification(NotificationBase):
       recipient_id=notify_recipient.recipient_id
       if recipient_id is None:
         continue
-      if self.enable_flag:
-        enable_notif[recipient_id]=self.enable_flag
+      if self.enable_flag and self.enable_flag.has_key(recipient_id):
+        enable_notif[recipient_id]=self.enable_flag[recipient_id]
       else:
         if not enable_notif.has_key(recipient_id):
           if override:
@@ -123,20 +122,11 @@ class CalendarNotification(NotificationBase):
     calendar_event=self.calendar_event
     calendar=self.calendar
     if len(assignees)> 0:
-      calendar_acls=create_calendar_acls(
-        self.calendar_service, 
-        calendar['id'],
-        assignees, 
-        'writer')
-      if calendar_acls is None:
-        notify_error=True
-        notify_error_text="Error occured in creating calendar ACLs"
-      else:
-        if calendar_event is None:
-          calendar_event =create_calendar_event(
-            self.calendar_service, 
-            calendar['id'], 
-            event_details)
+      if calendar_event is None:
+        calendar_event =create_calendar_event(
+          self.calendar_service, 
+          calendar['id'], 
+          event_details)
         if calendar_event is None:
           notify_error=True
           notify_error_text="Error occured in creating calendar event, id: " +\
@@ -146,24 +136,20 @@ class CalendarNotification(NotificationBase):
         calendar_event['attendees']=[]
         for id, assignee in assignees.items():
           recipient_email=assignee['email']
-          user=get_current_user()
-          if recipient_email in [user.email]:
-            continue
           if enable_notif.has_key(id) and enable_notif[id]:
             calendar_event['attendees'].append(assignee)
           else:
             continue
-        if len(calendar_event['attendees']) > 0:
-          updated_event=update_calendar_event(
-            self.calendar_service, 
-            calendar['id'], 
-            calendar_event['id'], 
-            calendar_event)
-          if updated_event is None:
-            notify_error=True
-            notify_error_text="Error occured in updating calendar: " + \
-              sender.email + " for event: " + calendar_event['summary']
-            current_app.logger.error(notify_error_text)
+        updated_event=update_calendar_event(
+          self.calendar_service, 
+          calendar['id'], 
+          calendar_event['id'], 
+          calendar_event)
+        if updated_event is None:
+          notify_error=True
+          notify_error_text="Error occured in updating calendar: " + \
+            sender.email + " for event: " + calendar_event['summary']
+          current_app.logger.error(notify_error_text)
 
     for notify_recipient in notification.recipients:
       if notify_recipient.notif_type != self.notif_type:
@@ -328,14 +314,12 @@ def create_calendar_acl(calendar_service, calendar_id, recipient_email, role):
     raise Forbidden()
   return calendar_acl
 
-def create_calendar_acls(calendar_service, calendar_id, assignees, role):
+def create_calendar_acls(calendar_service, calendar_id, assignee_emails, skip_emails, role):
    calendar_acls=[]
-   for id, assignee in assignees.items(): 
-     recipient_email=assignee['email']
-     user=get_current_user()
-     if recipient_email in [user.email]:
+   for recipient_email in assignee_emails:
+     if recipient_email in skip_emails:
        continue
-     calendar_acl=get_calendar_acl(calendar_service, calendar_id, assignee['email'], role)
+     calendar_acl=get_calendar_acl(calendar_service, calendar_id, recipient_email, role)
      if calendar_acl is None:
        calendar_acl=create_calendar_acl(calendar_service, calendar_id, recipient_email, role)
        if calendar_acl is not None:
