@@ -263,8 +263,6 @@
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
-    } else if (page_instance instanceof CMS.Models.Task) {
-      WorkflowExtension.init_widgets_for_task_page();
     } else if (page_instance instanceof CMS.Models.Person) {
       WorkflowExtension.init_widgets_for_person_page();
     } else {
@@ -312,18 +310,17 @@
             show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
             sort_property: null,
             sort_function: _task_sort_function,
-            content_controller_options: {
-              child_options: [
-                {
-                  model: can.Model.Cacheable,
-                  mapping: "cycle_task_entries",
-                  show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-                  footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-                  draw_children: true,
-                  allow_creating: true
-                },
-              ]
-            }
+            draw_children: true,
+            child_options: [
+              {
+                model: can.Model.Cacheable,
+                mapping: "cycle_task_entries",
+                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+                draw_children: true,
+                allow_creating: true
+              },
+            ]
           }
         }
       };
@@ -433,13 +430,15 @@
           widget_id: "task_group",
           widget_name: "Templates",
           widget_icon: "task_group",
-          content_controller: CMS.Controllers.SortableTreeView,
+          content_controller: CMS.Controllers.TreeView,
           content_controller_selector: "ul",
           widget_initial_content: '<ul class="tree-structure new-tree colored-list"></ul>',
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.TaskGroup,
             show_view: GGRC.mustache_path + "/task_groups/tree.mustache",
+            sortable: true,
+            sort_property: "sort_index",
             mapping: "task_groups",
             draw_children: true,
             //note that we are using special naming for the tree views here.
@@ -550,18 +549,16 @@
           draw_children: true,
           sort_property: null,
           sort_function: _task_sort_function,
-          content_controller_options: {
-            child_options: [
-              {
-                model: can.Model.Cacheable,
-                mapping: "cycle_task_entries",
-                show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-                footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-                draw_children: true,
-                allow_creating: true
-              },
-            ]
-          }
+          draw_children: true,
+          child_options: [
+            {
+              model: can.Model.Cacheable,
+              mapping: "cycle_task_entries",
+              show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
+              footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
+              allow_creating: true
+            },
+          ]
         }
       }
     };

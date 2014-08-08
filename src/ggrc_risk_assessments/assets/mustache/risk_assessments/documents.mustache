@@ -10,12 +10,10 @@
       <i class="grcicon-attach"></i>
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
-    {{#using cycle_task_group_object_task=parent_instance.cycle_task_group_object_task}}
-      {{^if_equals cycle_task_group_object_task.status 'Verified'}}
-        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-          {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-          <i class="grcicon-deleted"></i>
-        </a>
-      {{/if_equals}}
-    {{/using}}
+    {{#is_allowed 'update'}}
+    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+      {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+      <i class="grcicon-deleted"></i>
+    </a>
+    {{/is_allowed}}
   </li>
