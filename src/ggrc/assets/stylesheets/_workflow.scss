@@ -379,3 +379,26 @@ ul.new-tree {
     margin-bottom: 0;
   }
 }
+
+.inline-data-content {
+  display:inline-block;
+  line-height:30px;
+  text-overflow: ellipsis;
+}
+
+.inline-footer-link {
+  border-top:1px solid #eee;
+  display:block;
+  line-height:30px;
+  padding-top:0px;
+  color:$link;
+  font-weight:bold;
+}
+
+.inline-explanation {
+  color:#777;
+  font-style:italic;
+  line-height:30px;
+  font-size:12px;
+  
+}

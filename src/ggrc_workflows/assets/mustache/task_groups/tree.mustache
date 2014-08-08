@@ -66,20 +66,11 @@
           <div class="row-fluid">
             <div class="span8 task-list">
               {{#child_options.1}}
-                {{#if list.length}}
-                {{^if_equals list.length 1}}
-                <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance: $(el).data("instance") }); }}>
-                  <label>
-                    <input type="checkbox" name="lock_task_order" {{#instance.lock_task_order}}checked="checked"{{/instance.lock_task_order}}>
-                    Lock Task Order
-                  </label>
-                </span>
-                {{/if_equals}}
-                {{/if}}
                 
                 <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
                 
                 <ul class="tree-structure new-tree" {{data 'options'}}
+                  
                   {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
                   {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
                 </ul>
@@ -89,8 +80,9 @@
             <div class="span4">
               {{#child_options.0}}
                 <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-                <ul class="items-list tree-structure new-tree" {{data 'options'}}
+                <ul class="tree-structure new-tree" {{data 'options'}}
                   {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+                  <li class="inline-explanation">Objects that tasks will apply to</li>
                 </ul>
 
               {{/child_options.0}}
