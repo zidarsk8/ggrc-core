@@ -238,13 +238,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     obj.start_date
     )
 
-  workflow_cycle_start.send(
-      obj.__class__,
-      obj=obj,
-      new_status=obj.status,
-      old_status=None
-      )
-
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
     cycle_task_group = models.CycleTaskGroup(
@@ -290,6 +283,12 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           modified_by=current_user,
           )
 
+  workflow_cycle_start.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None
+      )
 
 # 'InProgress' states propagate via these links
 _cycle_object_parent_attr = {
