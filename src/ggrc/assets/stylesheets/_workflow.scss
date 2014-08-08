@@ -384,6 +384,8 @@ ul.new-tree {
   display:inline-block;
   line-height:30px;
   text-overflow: ellipsis;
+  word-wrap:no-wrap;
+  width:100%;
 }
 
 .inline-footer-link {
@@ -401,4 +403,11 @@ ul.new-tree {
   line-height:30px;
   font-size:12px;
   
+}
+
+
+
+.btn.end-cycle.pull-right {
+  margin-top:3px;
+  margin-right:4px;
 }
