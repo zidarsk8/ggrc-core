@@ -117,6 +117,19 @@ class CalendarNotification(NotificationBase):
       },
       'description':  notification.content,
       'anyoneCanAddSelf': True,
+      'reminders': {
+         'useDefault': False,
+         'overrides': [
+            {
+              'method': 'popup',
+              'minutes': 4320,
+            },
+            {
+              'method': 'popup',
+              'minutes': 1440,
+            },
+         ]
+       }
     }
     notify_error=False
     calendar_event=self.calendar_event
