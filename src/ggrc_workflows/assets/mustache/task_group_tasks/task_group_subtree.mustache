@@ -13,7 +13,7 @@
           <div class="oneline">
             {{#using assignee=instance.contact}}
               <span class="inline-data-content">
-                {{assignee.name}}
+                {{firstnonempty assignee.name assignee.email ''}}
               </span>
             {{/using}}
           </div>
