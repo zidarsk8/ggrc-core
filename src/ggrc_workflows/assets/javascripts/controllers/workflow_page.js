@@ -40,10 +40,17 @@
           button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
           content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
           instance : GGRC.page_instance()
-        }, function() {
+        }, function(params) {
+          var data = {};
+
+          can.each(params, function(item) {
+            data[item.name] = item.value;
+          });
+
           cycle = new CMS.Models.Cycle({
             context: page_instance.context.stub(),
             workflow: { id: page_instance.id, type: "Workflow" },
+            start_date: data.base_date || null,
             autogenerate: true
           });
 
