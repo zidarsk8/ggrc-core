@@ -21,7 +21,86 @@
         <div class="span3">
           <div class="oneline">
             <span class="inline-data-content">
-              Relative dates
+              {{#using task_group=instance.task_group}}
+              {{#using workflow=task_group.workflow}}
+              {{#switch workflow.frequency}}
+              {{#case "one_time"}}
+                {{localize_date instance.start_date}} - {{localize_date instance.end_date}}
+              {{/case}}
+              {{#case "weekly"}}
+                {{#switch instance.relative_start_day}}
+                {{#case 1}}Monday{{/case}}
+                {{#case 2}}Tuesday{{/case}}
+                {{#case 3}}Wednesday{{/case}}
+                {{#case 4}}Thursday{{/case}}
+                {{#case 5}}Friday{{/case}}
+                {{/switch}}
+                -
+                {{#switch instance.relative_end_day}}
+                {{#case 1}}Monday{{/case}}
+                {{#case 2}}Tuesday{{/case}}
+                {{#case 3}}Wednesday{{/case}}
+                {{#case 4}}Thursday{{/case}}
+                {{#case 5}}Friday{{/case}}
+                {{/switch}}
+              {{/case}}
+              {{#case "monthly"}}
+                Monthly {{instance.relative_start_day}} - {{instance.relative_end_day}}
+              {{/case}}
+              {{#case "quarterly"}}
+                {{#switch instance.relative_start_month}}
+                {{#case 1}}Jan/Apr/Jul/Oct{{/case}}
+                {{#case 2}}Feb/May/Aug/Nov{{/case}}
+                {{#case 3}}Mar/Jun/Sep/Dec{{/case}}
+                {{/switch}}
+                {{instance.relative_start_day}}
+                -
+                {{#switch instance.relative_end_month}}
+                {{#case 1}}Jan/Apr/Jul/Oct{{/case}}
+                {{#case 2}}Feb/May/Aug/Nov{{/case}}
+                {{#case 3}}Mar/Jun/Sep/Dec{{/case}}
+                {{/switch}}
+                {{instance.relative_end_day}}
+              {{/case}}
+              {{#case "annually"}}
+                {{#switch instance.relative_start_month}}
+                {{#case 1}}Jan{{/case}}
+                {{#case 2}}Apr{{/case}}
+                {{#case 3}}Jul{{/case}}
+                {{#case 4}}Oct{{/case}}
+                {{#case 5}}Feb{{/case}}
+                {{#case 6}}May{{/case}}
+                {{#case 7}}Aug{{/case}}
+                {{#case 8}}Nov{{/case}}
+                {{#case 9}}Mar{{/case}}
+                {{#case 10}}Jun{{/case}}
+                {{#case 11}}Sep{{/case}}
+                {{#case 12}}Dec{{/case}}
+                {{/switch}}
+                {{instance.relative_start_day}}
+                -
+                {{#switch instance.relative_end_month}}
+                {{#case 1}}Jan{{/case}}
+                {{#case 2}}Apr{{/case}}
+                {{#case 3}}Jul{{/case}}
+                {{#case 4}}Oct{{/case}}
+                {{#case 5}}Feb{{/case}}
+                {{#case 6}}May{{/case}}
+                {{#case 7}}Aug{{/case}}
+                {{#case 8}}Nov{{/case}}
+                {{#case 9}}Mar{{/case}}
+                {{#case 10}}Jun{{/case}}
+                {{#case 11}}Sep{{/case}}
+                {{#case 12}}Dec{{/case}}
+                {{/switch}}
+                {{instance.relative_end_day}}
+              {{/case}}
+              {{#case "continuous"}}
+                continuous
+              {{/case}}
+              {{/switch}}
+              {{/using}}
+              {{/using}}
             </span>
           </div>
         </div>
