@@ -14,24 +14,13 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="item-data span{{#is_dashboard}}3{{else}}5{{/is_dashboard}}" style="padding-left:0px;">
+        <div class="item-data span6" style="padding-left:0px;">
           <div class="tree-title-area">
             <span class="tier-trigger"></span>{{instance.title}}
           </div>
         </div>
-        {{#is_dashboard}}
-        <div class="span2 item-data" style="padding-left:0px;">
 
-        {{#defer 'object' instance.object}}
-          <div class="tree-title-area">
-            <i class="grcicon-{{object.class.table_singular}}-color"></i>
-            <a class="object-title" href="{{object.viewLink}}" target="_blank">{{object.title}}</a>
-          </div>
-        {{/defer}}
-
-        </div>
-        {{/is_dashboard}}
-        <div class="span7">
+        <div class="span6">
           <ul class="tree-action-list">
             <li>
               <span rel="tooltip" data-placement="top" data-original-title="Last edit">
@@ -92,18 +81,51 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
 
+      {{#is_dashboard}}
       <div class="row-fluid">
-        <div class="span9">
-          {{#is_dashboard}}
+        <div class="span12">
+
           {{#defer 'workflow' instance.workflow}}
             <a href="{{workflow.viewLink}}" class="info-action">
               View Workflow
               <i class="grcicon-goto"></i>
             </a>
+            &nbsp;&nbsp;&nbsp;
           {{/defer}}
           {{/is_dashboard}}
+          {{#is_dashboard}}      
+            {{#defer 'object' instance.object}}
+              <a href="{{object.viewLink}}" class="info-action">
+                View task on {{object.class.table_singular}} page
+                <i class="grcicon-goto"></i>
+              </a>
+            {{/defer}}
+        </div>
+      </div>
+      {{/is_dashboard}}
+
+      <div class="row-fluid" style="padding-top:6px">
+        <div class="span7">
+          {{#is_dashboard}}      
+            {{#defer 'object' instance.object}}
+              <div class="tree-title-area">
+                Task for: 
+                <i class="grcicon-{{object.class.table_singular}}-color"></i>
+                <a class="object-title" href="{{object.viewLink}}" target="_blank">{{object.title}}</a>
+              </div>
+            {{/defer}}
+          {{/is_dashboard}}
+        </div>
+        <div class="span2 text-right">
+          Assignee:
         </div>
         <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+          {{#is_allowed 'update' instance context='for'}}
+            <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit Task
+            </a>
+          {{/is_allowed}}
           <i class="grcicon-person-green pull-left icon-field"></i>
           {{#using contact=instance.contact}}
           <div class="objective-selector">
@@ -111,6 +133,7 @@
           </div>
           {{/using}}
         </div>
+        
       </div>
 
       <div class="show-description">
@@ -130,7 +153,7 @@
             <div class="row-fluid">
               <div class="span11">
                 <div class="inner-row">
-                  <strong>Entries ({{list.length}})</strong>
+                  <strong>Comments ({{list.length}})</strong>
                   <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
                 </div>
               </div>

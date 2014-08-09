@@ -24,15 +24,14 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
       };
     });
 
-    return new CMS.Models.Task(this._data).save().then(function(task) {
-      return new CMS.Models.TaskGroupTask({
-        task_group: that.task_group,
-        task: task,
-        sort_index: Number.MAX_SAFE_INTEGER / 2,
-        contact: that.contact,
-        context: that.context
-      }).save();
-    }).then(function(task_group_task) {
+    return new CMS.Models.TaskGroupTask({
+      task_group: that.task_group,
+      title: that.title,
+      description: that.description,
+      sort_index: Number.MAX_SAFE_INTEGER / 2,
+      contact: that.contact,
+      context: that.context
+    }).save().then(function(task_group_task) {
       return new CMS.Models.CycleTaskGroupObjectTask({
         cycle: that.cycle,
         start_date: that.cycle.reify().start_date,
@@ -84,20 +83,9 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
           + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
         context: that.original_object.context
       }).save()
-    ).then(function(wf, tasks) {
-        return $.when(
-          wf,
-          new CMS.Models.Task({
-            title: "Object review for "
-                    + that.original_object.constructor.title_singular
-                    + ' "' + that.original_object.title + '"',
-            context: {id : null}
-          }).save()
-        );
-    }).then(function(wf, task) {
+    ).then(function(wf) {
       return $.when(
         wf,
-        task,
         new CMS.Models.TaskGroup({
           workflow : wf,
           title: "Object review for "
@@ -106,31 +94,23 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
           contact: that.contact,
           context: wf.context
         }).save(),
-        new CMS.Models.WorkflowObject({
-          workflow: wf,
-          object: that.original_object,
-          context: wf.context
-        }).save(),
-        new CMS.Models.WorkflowTask({
-          workflow: wf,
-          task: task,
-          context: wf.context
-        }).save(),
         new CMS.Models.WorkflowPerson({
           workflow: wf,
           person: that.contact,
           context: wf.context
         }).save()
       );
-    }).then(function(wf, task, tg) {
+    }).then(function(wf, tg) {
       return $.when(
         wf,
         new CMS.Models.TaskGroupTask({
           task_group: tg,
-          task: task,
           sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
           contact: that.contact,
-          context: wf.context
+          context: wf.context,
+          title: "Object review for "
+                  + that.original_object.constructor.title_singular
+                  + ' "' + that.original_object.title + '"',
         }).save(),
         new CMS.Models.TaskGroupObject({
           task_group: tg,

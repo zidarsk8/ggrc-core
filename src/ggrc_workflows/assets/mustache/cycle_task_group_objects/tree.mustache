@@ -28,11 +28,7 @@
           <span class="tier-trigger"></span>
           <div class="item-data">
             <div class="tree-title-area">
-              {{#using task_group_object=instance.task_group_object}}
-              {{#using object=task_group_object.object}}
-                <i class="grcicon-{{object.class.table_singular}}-color"></i>
-              {{/using}}
-              {{/using}}
+              <i class="grcicon-{{instance.object.reify.class.table_singular}}-color"></i>
               {{instance.title}}
             </div>
           </div>
@@ -45,8 +41,7 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      {{#using task_group_object=instance.task_group_object}}
-      {{#using object=task_group_object.object}}
+      {{#using object=instance.object}}
 
       <div class="row-fluid">
         <div class="span6">
@@ -57,6 +52,8 @@
                 <i class="grcicon-goto"></i>
               </a>
             {{/is_allowed}}
+          {{else}}
+            Object deleted or inaccessible
           {{/if}}
         </div>
       </div>
@@ -65,15 +62,13 @@
         <div class="row-fluid">
           <div class="span12">
             <div class="tree-description">
-              <h5>{{object.title}}</h5>
-              {{{object.description}}}
+              <h5>{{firstnonempty object.title instance.title}}</h5>
+              {{{firstnonempty object.description instance.description}}}
             </div>
-            
           </div>
         </div>
       </div>
 
-      {{/using}}
       {{/using}}
     </div>
 

@@ -19,10 +19,10 @@ from ggrc_basic_permissions.models import Role, UserRole
 from ggrc import db
 from ggrc import settings
 from ggrc_workflows import status_change, workflow_cycle_start
-from ggrc_workflows import calc_start_date
 from datetime import datetime
 from werkzeug.exceptions import Forbidden
 from ggrc.login import get_current_user
+#from ggrc_workflows import calc_start_date
 
 PRI_TASK_OVERDUE=1
 PRI_TASK_DUE=2
@@ -444,9 +444,10 @@ def handle_workflow_cycle_due(num_days):
 def handle_workflow_cycle_starting(num_days):
   workflows=db.session.query(models.Workflow)
   for workflow in workflows:
-    next_start_date=calc_start_date(
-      workflow.frequency, 
-      workflow.start_date)
+    next_start_date = workflow.next_cycle_start_date
+    #next_start_date=calc_start_date(
+    #  workflow.frequency, 
+    #  workflow.start_date)
     starting_date=date.today() + timedelta(num_days)
     if next_start_date == starting_date:
       subject="Workflow " + "'" + workflow.title + "' will start in " + str(num_days) + " days"

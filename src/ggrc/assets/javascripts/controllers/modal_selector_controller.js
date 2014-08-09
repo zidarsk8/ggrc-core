@@ -1751,7 +1751,7 @@
             if (descriptor.model.category == "workflow" || 
                 descriptor.model.category == "undefined" ||
                 descriptor.model.category == "entities"){
-              return false;
+              return;
             }
             else{
               menu[lookup[descriptor.model.category] || 0].items.push({

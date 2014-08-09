@@ -7,7 +7,27 @@
 
 <div class="centered">
 {{#instance}}
-<p>By clicking "Proceed", {{instance.task_groups.length}} task groups will be started, tasks will be assigned and notifications will be sent.</p>
-<p>Are you sure you want to proceed?</p>
+<form>
+  <p>By clicking "Proceed", {{instance.task_groups.length}} task groups will be started, tasks will be assigned and notifications will be sent.</p>
+
+  {{^if_equals instance.frequency "one_time"}}
+  {{^if_equals instance.frequency "continuous"}}
+  <p>The cycle will be started for the
+    <b>
+    {{#switch instance.frequency}}
+    {{#case "weekly"}}week{{/case}}
+    {{#case "monthly"}}month{{/case}}
+    {{#case "quarterly"}}quarter{{/case}}
+    {{#case "annually"}}year{{/case}}
+    {{/switch}}
+    </b>
+    including this date:
+    {{! FIXME: Better way of initializing this date? }}
+    <input tabindex="4" class="date input-small" name="base_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="" {{ (el) -> d = new Date(); el.val("" + d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear()) }}></input>
+  </p>
+  {{/if_equals}}
+  {{/if_equals}}
+  <p>Are you sure you want to proceed?</p>
+</form>
 {{/instance}}
 </div>

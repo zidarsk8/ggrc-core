@@ -20,7 +20,7 @@ can.Control("StickyHeader", {
                       +", .advanced-filters"
         // A selector for all sticky-able footers
         // FIXME: This should not have to specifically ignore .tree-spinner
-      , footer_selector: ".tree-footer:not(.tree-spinner)"
+      , footer_selector: ".tree-footer:not(.tree-spinner):not(.non-stick)"
         // A selector for counting the depth
         // Generally this should be header_selector with the final element in each selector removed
       , depth_selector: ".tree-open > .item-open"
