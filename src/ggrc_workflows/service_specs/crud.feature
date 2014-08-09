@@ -21,9 +21,6 @@ Feature: Basic RESTful CRUD Support
       | resource_type             |
       | Workflow                  |
       | TaskGroup                 |
-      | Task                      |
-      | WorkflowObject            |
-      | WorkflowTask              |
       | WorkflowPerson            |
       | TaskGroupObject           |
       | TaskGroupTask             |
