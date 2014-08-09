@@ -1,20 +1,29 @@
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
-      <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
-        <i class="grcicon-drag"></i>
-      </a>
-
+    <div class="objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
       <div class="row-fluid">
-        <div class="span4">
-          {{instance.title}}
+        <div class="span5">
+          <div class="oneline">
+            <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
+              <i class="grcicon-drag"></i>
+            </a>
+            <span class="inline-data-content">{{instance.title}}</span>
+          </div>
         </div>
         <div class="span3">
-          {{#using assignee=instance.contact}}
-          {{assignee.email}}
-          {{/using}}
+          <div class="oneline">
+            {{#using assignee=instance.contact}}
+              <span class="inline-data-content">
+                {{firstnonempty assignee.name assignee.email ''}}
+              </span>
+            {{/using}}
+          </div>
         </div>
         <div class="span3">
-          <!--relative dates-->
+          <div class="oneline">
+            <span class="inline-data-content">
+              Relative dates
+            </span>
+          </div>
         </div>
         <div class="span1">
           {{#is_allowed 'update' instance context='for'}}
