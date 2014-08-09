@@ -588,8 +588,14 @@ class WorkflowCalendarService(CalendarService):
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
       '/' + str(workflow.id) + '#task_group_widget'
     notif=CalendarNotification()
-    notif.start_date=cycle.start_date
-    notif.end_date=task_group.end_date
+    if task_group.start_date is None:
+      notif.start_date=cycle.start_date
+    else:
+      notif.start_date=task_group.start_date
+    if task_group.end_date is None:
+      notif.end_date=cycle.end_date
+    else:
+      notif.end_date=task_group.end_date
     notif.notif_pri=PRI_OTHERS
     notif.calendar_service=self.calendar_service
     notif.calendar_event=calendar_event
