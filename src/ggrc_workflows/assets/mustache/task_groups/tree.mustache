@@ -10,7 +10,7 @@
         <div class="row-fluid">
           <div class="span12">
             <div class="item-data ordered-item-data">
-              <div class="span6">
+              <div class="span7">
                 <div class="oneline">
                   <span class="drag"><i class="grcicon-drag"></span></i>
                   {{instance.title}}
@@ -41,35 +41,19 @@
                 {{/with_mapping}}
               </div>
               <div class="span1">
-                {{#with_mapping 'tasks' instance}}
+                {{#with_mapping 'task_group_tasks' instance}}
                 <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
                   <i class="grcicon-task-black"></i>
-                  <strong class="error">{{tasks.length}}</strong>
+                  <strong class="error">{{task_group_tasks.length}}</strong>
                 </span>
                 {{/with_mapping}}
-              </div>
-              <div class="span1">
-                {{#is_allowed 'delete' instance context='for'}}
-                <span class="counter removeTaskGroup">
-                  <a href="javascript://"
-                    class="info-action delete"
-                    data-toggle="modal-ajax-deleteform"
-                    data-object-plural="{{model.table_plural}}"
-                    data-object-singular="{{model.model_singular}}"
-                    data-modal-reset="reset"
-                    data-modal-class="modal"
-                    data-refresh="true"
-                    data-object-id="{{instance.id}}">
-                    <i class="grcicon-deleted"></i>
-                  </a>
-                </span>
-                {{/is_allowed}}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <div class="tier-2-info item-content" style="display: none;">
       <div class="tier-2-info-content">
         <div class="show-description">
@@ -78,36 +62,46 @@
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
 
+        <div class="template-setup">
           <div class="row-fluid">
-            {{#child_options.0}}
-            <div class="span6">
-              <strong>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
-              <ul class="items-list tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-              </ul>
+            <div class="span8 task-list">
+              {{#child_options.1}}
+                
+                <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+                
+                <ul class="tree-structure new-tree" {{data 'options'}}
+                  
+                  {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
+                  {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
+                  <li class="inline-explanation">
+                    <div class="oneline">
+                      Define and reorder tasks
+                    </div>
+                  </li>
+                  
+                </ul>
+                
+              {{/child_options.1}}
             </div>
-            {{/child_options.0}}
+            <div class="span4">
+              {{#child_options.0}}
+                <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+                <ul class="tree-structure new-tree" {{data 'options'}}
+                  {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+                  <li class="inline-explanation">
+                    <div class="oneline">
+                      Choose objects that tasks will apply to
+                    </div>
+                  </li>
+                </ul>
 
-
-            {{#child_options.1}}
-            <div class="span6 task-list">
-              {{#if list.length}}
-              {{^if_equals list.length 1}}
-              <span class="pull-right lock-wrap" {{#instance}}{{data 'instance'}}{{/instance}} {{ (el) -> $(el).ggrc_controllers_quick_form({ instance: $(el).data("instance") }); }}>
-                <label>
-                  <input type="checkbox" name="lock_task_order" {{#instance.lock_task_order}}checked="checked"{{/instance.lock_task_order}}>
-                  Lock Task Order
-                </label>
-              </span>
-              {{/if_equals}}
-              {{/if}}
-              <strong>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</strong><br>
-              <ul class="tree-structure new-tree" {{data 'options'}}
-                {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
-                {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}></ul>
-
+              {{/child_options.0}}
+              
+              
             </div>
-            {{/child_options.1}}
-          </div>
+          </div>  
+        </div>
+
         {{/prune_context}}
       {{/if}}
 

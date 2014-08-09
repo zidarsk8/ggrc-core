@@ -20,12 +20,8 @@
     destroy: "DELETE /api/workflows/{id}",
 
     attributes: {
-      objects: "CMS.Models.get_stubs",
-      workflow_objects: "CMS.Models.WorkflowObject.stubs",
       people: "CMS.Models.Person.stubs",
       workflow_people: "CMS.Models.WorkflowPerson.stubs",
-      tasks: "CMS.Models.Task.stubs",
-      workflow_tasks: "CMS.Models.WorkflowTask.stubs",
       task_groups: "CMS.Models.TaskGroup.stubs",
       cycles: "CMS.Models.Cycle.stubs",
       start_date: "date",

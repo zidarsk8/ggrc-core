@@ -1,30 +1,16 @@
-  {{#toggle show_new_object_form}}
-    {{#with_page_object_as 'page_instance'}}
-    {{#with_mapping 'objects' page_instance}}
-    <li class="tree-footer">
-      <ggrc-quick-add parent_instance="parent_instance" source_mapping="objects">
-        <div class="objective-selector field-wrap">
-          <input 
-            tabindex="3" 
-            type="text" 
-            name="instance" 
-            null-if-empty="true" 
-            data-mapping="objects" 
-            class="search-icon" 
-            placeholder="Add Object" {{mapping_autocomplete}} 
-            value="{{instance.title}}"
-            data-template="/wf_objects/autocomplete_result.mustache" 
-            >       
-          <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-
-          <a href="javascript://" class="btn btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Save</a>
-        </div>
-      </ggrc-quick-add>
-    </li>
-    {{/with_mapping}}
-    {{/with_page_instance_as}}
-  {{else}}
-    <li class="tree-footer">
-      <a href="javascript://" class="btn" {{toggle_button}}>Add Object</a>
-    </li>
-  {{/toggle}}
+<li class="tree-footer non-stick">
+  <a
+    href="javascript://"
+    class="inline-footer-link"
+    data-toggle="multitype-object-modal-selector"
+    data-modal-class="modal-wide"
+    data-modal-reset="reset"
+    data-placement="left"
+    data-join-mapping="objects"
+    data-join-object-id="{{parent_instance.id}}"
+    data-join-object-type="TaskGroup"
+    data-exclude-option-types=""
+    >
+    + Add Object
+  </a>
+</li>

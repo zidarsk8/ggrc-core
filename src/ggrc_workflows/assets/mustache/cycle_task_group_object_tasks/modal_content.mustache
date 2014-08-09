@@ -1,8 +1,62 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+}}
+
 <form action="javascript://">
-{{> /static/mustache/tasks/modal_content.mustache}}
-<input type="hidden" name="cycle" model="Cycle" value="{{object_params.cycle}}" />
-<input type="hidden" name="task_group" model="TaskGroup" value="{{object_params.task_group}}" />
-<input type="hidden" name="cycle_task_group_object" model="CycleTaskGroupObject" value="{{object_params.cycle_task_group_object}}" />
-<input type="hidden" name="sort_index" value="{{object_params.sort_index}}" />
-<input type="hidden" name="contact.id" value="{{object_params.contact.id}}" />
+  <div class="row-fluid">
+    <div class="span8">
+      <label>
+        Summary
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+      </label>
+      <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
+      <br>
+    </div>
+    <div class="span4">
+      {{#using contact=instance.contact model_singular=model.model_singular}}
+      <label>
+        Assignee
+        <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
+      </label>
+      <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+      {{/using}}
+      <br>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span8">
+      <label>
+        Task Details
+        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
+      </div>
+    </div>
+
+    <div class="span4" id="frequency-div">
+      <div id="one-time" class="frequency-wrap" style="display:block">
+        <label>
+          One Time
+        </label>
+        <label>
+          <span class="start-text">Start Date</span>
+          <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+        </label>
+        <label>
+          <span class="start-text">End Date</span>
+          <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+        </label>
+      </div>
+    </div>
+    <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
+    <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
+    <input type="hidden" name="sort_index" value="{{firstnonempty object_params.sort_index instance.sort_index}}" />
+    <input type="hidden" name="cycle" model="Cycle" value="{{instance.cycle.id}}" />
+    <input type="hidden" name="cycle_task_group_object" model="CycleTaskGroupObject" value="{{instance.cycle_task_group_object.id}}" />
+  </div>
 </form>

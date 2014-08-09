@@ -427,8 +427,8 @@ $.extend(GGRC.Math, {
   */
   string_less_than: function(a, b) {
     var i,
-        _a = a.replace(/^0*/, ""),
-        _b = b.replace(/^0*/, ""),
+        _a = ("" + a).replace(/^0*/, ""),
+        _b = ("" + b).replace(/^0*/, ""),
         adi = _a.indexOf("."),
         bdi = _b.indexOf(".");
 

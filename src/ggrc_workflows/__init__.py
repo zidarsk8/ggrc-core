@@ -57,12 +57,12 @@ _workflow_object_types = [
 for type_ in _workflow_object_types:
   model = getattr(all_models, type_)
   model.__bases__ = (
-    models.workflow_object.Workflowable,
+    #models.workflow_object.Workflowable,
     models.task_group_object.TaskGroupable,
     models.cycle_task_group_object.CycleTaskGroupable,
     models.workflow.WorkflowState,
     ) + model.__bases__
-  model.late_init_workflowable()
+  #model.late_init_workflowable()
   model.late_init_task_groupable()
   model.late_init_cycle_task_groupable()
 
@@ -83,10 +83,7 @@ def get_public_config(current_user):
 def contributed_services():
   return [
       service('workflows', models.Workflow),
-      service('workflow_objects', models.WorkflowObject),
       service('workflow_people', models.WorkflowPerson),
-      service('tasks', models.Task),
-      service('workflow_tasks', models.WorkflowTask),
       service('task_groups', models.TaskGroup),
       service('task_group_tasks', models.TaskGroupTask),
       service('task_group_objects', models.TaskGroupObject),
@@ -104,110 +101,28 @@ def contributed_object_views():
 
   return [
       object_view(models.Workflow),
-      object_view(models.Task),
       ]
 
+def update_cycle_date_range(cycle):
+  start_date = None
+  end_date = None
 
-def next_weekday(_date, direction='up'):
-  '''
-  _date.weekday() is 0 for Monday and 6 for Sunday.
-  Must adjust any weekday that is larger than 4 (Friday)
-  up to Monday or down to Friday
-  '''
-  if _date.weekday() > 4:
-    return _date + timedelta(
-      days=7 - _date.weekday() if direction == 'up' else 4 - _date.weekday()
-      )
-  else:
-    return _date
+  for ctg in cycle.cycle_task_groups:
+    for ctgo in ctg.cycle_task_group_objects:
+      for task in ctgo.cycle_task_group_object_tasks:
+        task_start_date = task.start_date
+        if isinstance(task_start_date, datetime):
+          task_start_date = task_start_date.date()
+        task_end_date = task.end_date
+        if isinstance(task_end_date, datetime):
+          task_end_date = task_end_date.date()
+        if start_date is None or start_date > task_start_date:
+          start_date = task_start_date
+        if end_date is None or end_date < task_end_date:
+          end_date = task_end_date
 
-
-def calc_start_date(frequency, _date, base_date=None):
-  if base_date is None:
-    base_date = date.today()
-  direction = 'up'
-  ret = None
-  if frequency == "one_time":
-    return next_weekday(_date, direction=direction)
-  if frequency == "annually":
-    ret = adjust_days(base_date.year, _date.month, _date.day)
-  if frequency == "monthly":
-    ret = adjust_days(
-        base_date.year,
-        base_date.month,
-        _date.day
-      )
-  if frequency == "quarterly":
-    ret = adjust_days(
-        base_date.year,
-        (base_date.month - 1) / 3 * 3 + 1 + (_date.month - 1) % 3,
-        _date.day
-      )
-  if frequency == "weekly":
-    if base_date.weekday() == _date.weekday():
-      ret = base_date
-    else:
-      ret = base_date \
-            - timedelta(days=base_date.weekday()) \
-            + timedelta(days=_date.weekday())
-
-  return next_weekday(ret, direction=direction)
-
-
-def adjust_days(year, month, day):
-  if(month > 12):
-    year = year + 1
-    month = month - 12
-  if(calendar.monthrange(year, month)[1] < day):
-    day = calendar.monthrange(year, month)[1]
-  return date(year, month, day)
-
-
-def calc_end_date(frequency, _date, start_date):
-  direction = 'down'
-  ret = None
-  if frequency == "one_time":
-    ret = _date
-  if frequency == "annually":
-    if start_date.month > _date.month \
-       or (start_date.month == _date.month \
-           and start_date.day >= _date.day):
-      ret = adjust_days(start_date.year + 1, _date.month, _date.day)
-    else:
-      ret = adjust_days(start_date.year, _date.month, _date.day)
-  if frequency == "monthly":
-    ret = adjust_days(
-        start_date.year,
-        start_date.month \
-          + 1 if start_date.day >= _date.day else start_date.month,
-        _date.day
-        )
-  if frequency == "quarterly":
-    month_in_quarter = (_date.month - 1) % 3 + 1
-    start_month_in_quarter = (start_date.month - 1) % 3 + 1
-    ret = adjust_days(
-        start_date.year,
-        ((start_date.month - 1) / 3 \
-          + (1 if start_month_in_quarter > month_in_quarter
-                  or start_month_in_quarter == month_in_quarter
-                  and start_date.day > _date.day
-              else 0)) \
-          * 3 + month_in_quarter,
-        _date.day
-        )
-  if frequency == "weekly":
-    if _date.weekday() == start_date.weekday():
-      ret = start_date + timedelta(days=7)
-    elif start_date.weekday() < _date.weekday():
-      ret = start_date \
-            - timedelta(days=start_date.weekday()) \
-            + timedelta(days=_date.weekday())
-    else:
-      ret = start_date \
-            + timedelta(days=7 - start_date.weekday()) \
-            + timedelta(days=_date.weekday())
-
-  return next_weekday(ret, direction=direction)
+  cycle.start_date = start_date
+  cycle.end_date = end_date
 
 
 from ggrc.services.common import Resource
@@ -228,15 +143,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   obj.description = workflow.description
   obj.status = 'InProgress'
 
-  obj.start_date = calc_start_date(
-    workflow.frequency,
-    workflow.start_date
-    )
-  obj.end_date = calc_end_date(
-    workflow.frequency,
-    workflow.end_date,
-    obj.start_date
-    )
+  # Find the starting date of the period containing the start date or today
+  if obj.start_date:
+    base_date = obj.start_date
+  elif workflow.next_cycle_start_date:
+    base_date = workflow.next_cycle_start_date
+  else:
+    base_date = date.today()
 
   workflow_cycle_start.send(
       obj.__class__,
@@ -272,23 +185,30 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           end_date=obj.end_date,
           object=object,
           )
+      cycle_task_group.cycle_task_group_objects.append(
+          cycle_task_group_object)
 
       for task_group_task in task_group.task_group_tasks:
-        task = task_group_task.task
-
         cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
           context=obj.context,
           cycle=obj,
-          cycle_task_group_object=cycle_task_group_object,
+          #cycle_task_group_object=cycle_task_group_object,
           task_group_task=task_group_task,
-          title=task.title,
-          description=task.description,
+          title=task_group_task.title,
+          description=task_group_task.description,
           sort_index=task_group_task.sort_index,
-          end_date=obj.end_date,
+          start_date=task_group_task.calc_start_date(base_date),
+          end_date=task_group_task.calc_end_date(base_date),
           contact=task_group.contact,
           status="Assigned",
           modified_by=current_user,
           )
+        cycle_task_group_object.cycle_task_group_object_tasks.append(
+            cycle_task_group_object_task)
+
+      #update_cycle_task_group_object_date_rang(cycle_task_group_object)
+    #update_cycle_task_group_date_range(cycle_task_group)
+  update_cycle_date_range(obj)
 
 
 # 'InProgress' states propagate via these links
@@ -365,11 +285,15 @@ def update_cycle_object_parent_state(obj):
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.start_date.history.has_changes() \
+      or inspect(obj).attrs.end_date.history.has_changes():
+    update_cycle_date_range(obj.cycle)
+
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
 
     if obj.cycle.workflow.object_approval \
-       and obj.cycle.status == 'Verified':
+        and obj.cycle.status == 'Verified':
       for tgobj in obj.task_group_task.task_group.objects:
         old_status = tgobj.status
         tgobj.status = 'Final'
@@ -415,6 +339,17 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
 
 @Resource.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):
+
+  if src.get('clone'):
+    source_workflow_id = src.get('clone')
+    source_workflow = models.Workflow.query.filter_by(
+        id=source_workflow_id
+        ).first()
+    source_workflow.copy(obj)
+    db.session.add(obj)
+    db.session.flush()
+    obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
+
   db.session.flush()
   # get the personal context for this logged in user
   user = get_current_user()

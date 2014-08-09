@@ -30,14 +30,17 @@
   {{/child_options.0}}
   {{^if_equals parent_instance.status 'Verified'}}
   {{#defer 'workflowFolder' instance.workflowFolder}}
-    <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
-      data-model="{{instance.type}}" data-id="{{instance.id}}" data-folder-id="{{workflowFolder.id}}">
-      <i class="grcicon-attach-color"></i><span>Attach supporting file
-      </span>
-    </a>
-    {{^if workflowFolder}}
-    (Warning: Workflow folder is not set, files will be placed in your gdrive root folder)
-    {{/if}}
+    <div class="oneline">
+      <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+        data-model="{{instance.type}}" data-id="{{instance.id}}" data-folder-id="{{workflowFolder.id}}">
+        <i class="grcicon-attach-color"></i><span>Attach supporting file</span>
+      </a>
+      {{^if workflowFolder}}
+      <small class="error-inline">
+        <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
+      </small>
+      {{/if}}
+    </div>
   {{/defer}}
   {{/if_equals}}
   <span class="entry-author">Modified by {{#using person=parent_instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
