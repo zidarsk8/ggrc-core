@@ -120,6 +120,12 @@
           Assignee:
         </div>
         <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+          {{#is_allowed 'update' instance context='for'}}
+            <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+              <i class="grcicon-edit"></i>
+              Edit Task
+            </a>
+          {{/is_allowed}}
           <i class="grcicon-person-green pull-left icon-field"></i>
           {{#using contact=instance.contact}}
           <div class="objective-selector">
