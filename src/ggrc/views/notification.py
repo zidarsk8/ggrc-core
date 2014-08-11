@@ -10,8 +10,10 @@ from ggrc.login import login_required
 from ggrc import settings
 from flask import current_app, request, session, redirect
 
-GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID')
-GOOGLE_SECRET_KEY= getattr(settings, 'SECRET_KEY')
+
+# FIXME: Adds dependency on `ggrc_gdrive_integration`
+GOOGLE_CLIENT_ID= getattr(settings, 'GAPI_CLIENT_ID', '')
+GOOGLE_SECRET_KEY= getattr(settings, 'GAPI_CLIENT_SECRET', '')
 
 """
 This contains the endpoint for gGRC notifications and can be invoked from UI or Cron 
