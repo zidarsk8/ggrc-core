@@ -412,10 +412,9 @@
     var extra_options = {
             column_view : column_view
           , items_view  : item_view
-    }; 
-    option_descriptors["Task"] = ModalOptionDescriptor.from_join_model("WorkflowTask", "task", "Task", extra_options );
-    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("WorkflowObject", "object", "Clause", extra_options );
-    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("WorkflowObject", "object", "Section", extra_options );
+    };
+    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Clause", extra_options );
+    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Section", extra_options );
 
     option_set.option_descriptors = option_descriptors;
     return option_set;
