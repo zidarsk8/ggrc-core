@@ -68,11 +68,11 @@
           <div class="row-fluid">
             <div class="span8 task-list">
               {{#child_options.1}}
-                
+
                 <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-                
+
                 <ul class="tree-structure new-tree" {{data 'options'}}
-                  
+
                   {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
                   {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
                   <li class="inline-explanation">
@@ -80,9 +80,9 @@
                       Define and reorder tasks
                     </div>
                   </li>
-                  
+
                 </ul>
-                
+
               {{/child_options.1}}
             </div>
             <div class="span4">
@@ -98,10 +98,10 @@
                 </ul>
 
               {{/child_options.0}}
-              
-              
+
+
             </div>
-          </div>  
+          </div>
         </div>
 
         {{/prune_context}}
