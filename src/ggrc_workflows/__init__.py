@@ -439,7 +439,13 @@ class WorkflowRoleContributions(RoleContributions):
         },
       'Reader': {
         'read': ['Task']
-        }
+        },
+      'ProgramEditor': {
+        'create': ['Workflow', 'Task']
+        },
+      'ProgramOwner': {
+        'create': ['Workflow', 'Task']
+        },
       }
 
 
