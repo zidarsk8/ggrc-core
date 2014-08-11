@@ -887,5 +887,18 @@
     , Meeting : {
       _mixins : ["personable"]
     }
+    , MultitypeSearch: {
+        _mixins: ['directive_object'],
+        _canonical: {
+          'audits': 'Audit',
+          'workflows': 'Workflow'
+        },
+        audits: Proxy(
+            "Audit", "audit", "MultitypeSearchJoin"),
+        workflows: Proxy(
+            "Workflow", "workflow", "MultitypeSearchJoin"),
+        sections: Proxy(
+            "Section", "section", "MultitypeSearchJoin"),
+      }
   });
 })(GGRC, can);

@@ -351,16 +351,18 @@
         column_view : GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
         items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
     }
-  }
+  };
 
-  function get_search_multitype_option_set(object_model_name, option_model_name, data, column_view, item_view) {
+  function get_search_multitype_option_set(data, column_view, item_view) {
 
-    var join_descriptors = null
-      , option_descriptors = {}
-      , option_set = {
+    var join_descriptors = null,
+        object_model_name = data.join_object_type,
+        option_model_name = data.join_option_type,
+        option_descriptors = {},
+        option_set = {
             object_model: object_model_name
-        }
-      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
+        },
+        exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
       ;
 
     if (!option_model_name) {
@@ -408,14 +410,6 @@
 
     });
 
-    //Fixme later , temporary fix for missing objects
-    var extra_options = {
-            column_view : column_view
-          , items_view  : item_view
-    };
-    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Clause", extra_options );
-    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Section", extra_options );
-
     option_set.option_descriptors = option_descriptors;
     return option_set;
   }
@@ -439,9 +433,7 @@
       var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
       item_view =  GGRC.mustache_path + "/search/advanced_search_option_items.mustache" ;
 
-      data_set.join_object_type = "Program";
-      options = get_search_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
+      options = get_search_multitype_option_set(data_set, column_view, item_view);
 
 
       //options.selected_object = CMS.Models.get_instance(
