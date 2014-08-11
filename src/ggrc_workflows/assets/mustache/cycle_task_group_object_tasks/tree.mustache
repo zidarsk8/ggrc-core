@@ -14,13 +14,13 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="item-data span6" style="padding-left:0px;">
+        <div class="item-data span4" style="padding-left:0px;">
           <div class="tree-title-area">
             <span class="tier-trigger"></span>{{instance.title}}
           </div>
         </div>
 
-        <div class="span6">
+        <div class="span8">
           <ul class="tree-action-list">
             <li>
               <span rel="tooltip" data-placement="top" data-original-title="Last edit">
@@ -81,18 +81,19 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
 
-      {{#is_dashboard}}
+      
       <div class="row-fluid">
-        <div class="span12">
-
-          {{#defer 'workflow' instance.workflow}}
-            <a href="{{workflow.viewLink}}" class="info-action">
-              View Workflow
-              <i class="grcicon-goto"></i>
-            </a>
-            &nbsp;&nbsp;&nbsp;
-          {{/defer}}
+        <div class="span9">
+          {{#is_dashboard}}
+            {{#defer 'workflow' instance.workflow}}
+              <a href="{{workflow.viewLink}}" class="info-action">
+                View Workflow
+                <i class="grcicon-goto"></i>
+              </a>
+              &nbsp;&nbsp;&nbsp;
+            {{/defer}}
           {{/is_dashboard}}
+          
           {{#is_dashboard}}      
             {{#defer 'object' instance.object}}
               <a href="{{object.viewLink}}" class="info-action">
@@ -100,9 +101,21 @@
                 <i class="grcicon-goto"></i>
               </a>
             {{/defer}}
+          {{/is_dashboard}}
+        </div>
+        <div class="span3">
+        {{#is_allowed 'update' instance context='for'}}
+          <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            Edit Task
+          </a>
+        {{/is_allowed}}
         </div>
       </div>
-      {{/is_dashboard}}
+
+
+
+
 
       <div class="row-fluid" style="padding-top:6px">
         <div class="span7">
@@ -120,12 +133,6 @@
           Assignee:
         </div>
         <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-          {{#is_allowed 'update' instance context='for'}}
-            <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-              <i class="grcicon-edit"></i>
-              Edit Task
-            </a>
-          {{/is_allowed}}
           <i class="grcicon-person-green pull-left icon-field"></i>
           {{#using contact=instance.contact}}
           <div class="objective-selector">

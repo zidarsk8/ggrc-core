@@ -70,17 +70,10 @@
               {{#child_options.1}}
 
                 <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-
+                <h4 class="inline-explanation">Define and reorder tasks</h4>
                 <ul class="tree-structure new-tree" {{data 'options'}}
-
                   {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
                   {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
-                  <li class="inline-explanation">
-                    <div class="oneline">
-                      Define and reorder tasks
-                    </div>
-                  </li>
-
                 </ul>
 
               {{/child_options.1}}
@@ -88,13 +81,10 @@
             <div class="span4">
               {{#child_options.0}}
                 <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+                <h4 class="inline-explanation">Choose objects that tasks will apply to</h4>
+
                 <ul class="tree-structure new-tree" {{data 'options'}}
                   {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
-                  <li class="inline-explanation">
-                    <div class="oneline">
-                      Choose objects that tasks will apply to
-                    </div>
-                  </li>
                 </ul>
 
               {{/child_options.0}}
