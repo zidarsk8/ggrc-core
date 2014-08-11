@@ -491,6 +491,10 @@
   &.risk {
     background-position: 0 -108px;
   }
+  &.risk_assessment {
+    background-position: 0 -108px;
+  }
+
   &.objectives {
     background-position: 0 -144px;
   }
@@ -619,6 +623,10 @@
 .grcicon-risk { background-position:-198px -248px }
 .grcicon-risk-black { background-position:-198px -224px; }
 .grcicon-risk-color { background-position:-78px -320px; }
+.grcicon-risk_assessment { background-position:-198px -248px }
+.grcicon-risk_assessment-black { background-position:-198px -224px; }
+.grcicon-risk_assessment-color { background-position:-78px -320px; }
+
 .grcicon-attribute { background-position:-222px -248px }
 .grcicon-riskyattribute, .grcicon-risky_attribute { background-position:-222px -248px }
 .grcicon-attribute-black { background-position:-222px -224px; }
@@ -694,6 +702,7 @@ i.short {
   .grcicon-standard-color { background-position:-198px -368px; }
   .grcicon-objective-color { background-position:-150px -56px; }
   .grcicon-risk-color { background-position:-198px -224px; }
+  .grcicon-risk_assessment-color { background-position:-198px -224px; }
   .grcicon-risky_attribute-color { background-position:-222px -224px; }
   .grcicon-audit { background-position:-270px -8px; }
   .grcicon-audit-color { background-position:-270px -8px; }
@@ -739,6 +748,7 @@ i.short {
       .grcicon-standard-color { background-position:-222px -368px; }
       .grcicon-objective-color { background-position:-150px -80px; }
       .grcicon-risk-color { background-position:-198px -248px; }
+      .grcicon-risk_assessment-color { background-position:-198px -248px; }
       .grcicon-risky_attribute-color { background-position:-222px -248px; }
       .grcicon-audit { background-position:-270px -32px; }
       .grcicon-audit-color { background-position:-270px -32px; }
@@ -789,6 +799,7 @@ i.short {
           .grcicon-process-color { background-position:-270px -296px; }
           .grcicon-control-color { background-position:-30px -320px; }
           .grcicon-risk-color { background-position:-78px -320px; }
+          .grcicon-risk_assessment-color { background-position:-78px -320px; }
         }
       }
     }
@@ -822,6 +833,7 @@ i.short {
     .grcicon-standard-color { background-position:-222px -368px; }
     .grcicon-objective-color { background-position:-150px -80px; }
     .grcicon-risk-color { background-position:-198px -248px; }
+    .grcicon-risk_assessment-color { background-position:-198px -248px; }
     .grcicon-risky_attribute-color { background-position:-222px -248px; }
     .grcicon-audit { background-position:-270px -32px; }
     .grcicon-audit-color { background-position:-270px -32px; }
@@ -870,6 +882,7 @@ i.short {
     .grcicon-standard-color { background-position:-198px -368px; }
     .grcicon-objective-color { background-position:-150px -56px; }
     .grcicon-risk-color { background-position:-198px -224px; }
+    .grcicon-risk_assessment-color { background-position:-198px -224px; }
     .grcicon-risky_attribute-color { background-position:-222px -224px; }
     .grcicon-audit { background-position:-270px -8px; }
     .grcicon-audit-color { background-position:-270px -8px; }
