@@ -26,14 +26,14 @@
     system to build widgets, map and unmap objects, etc.
 
     To configure a new Mappings instance, use the following format :
-    { <mixin name or source object type> : { 
+    { <mixin name or source object type> : {
         _mixins : [ <mixin name>, ... ],
         _canonical : { <option type> : <name of mapping in parent object>, ... }
-        <mapping name> : GGRC.Mappings.Proxy(...) | GGRC.Mappings.Direct(...) | GGRC.Mappings.Indirect(...) 
+        <mapping name> : GGRC.Mappings.Proxy(...) | GGRC.Mappings.Direct(...) | GGRC.Mappings.Indirect(...)
                         | GGRC.Mappings.Multi(...) | GGRC.Mappings.TypeFilter(...) | GGRC.Mappings.Cross(...)
                         | GGRC.Mappings.CustomFilter(...),
         ...
-      } 
+      }
     }
   */
   can.Construct("GGRC.Mappings", {
