@@ -1,57 +1,57 @@
-<div class="row-fluid">
-  <div class="span12">
-    <span class="span6">
-      <strong>Title:</strong>
-         {{{instance.title}}}
-    </span>
-    <span class="span3">
-      <strong>Started:</strong>
-      {{{localize_date instance.start_date}}}
-    </span>
-    <span class="span3">
-      <strong>Completed:</strong>
-      {{{localize_date instance.end_date}}}
-    </span>
-  </div>
-  <div class="span12">
-    <strong>Description:</strong>
-    {{{instance.description}}}
-  </div>
-  <div class="span6">
-    <strong>Risk Manager:</strong>
-    {{#using person=instance.ra_manager}}{{{render '/static/mustache/people/popover.mustache'}}}{{/using}}
-  </div>
-  <div class="span6">
-    <strong>Risk Counsel:</strong>
-    {{#using person=instance.ra_counsel}}{{{render '/static/mustache/people/popover.mustache'}}}{{/using}}
-  </div>
-  <div class="span12">
-    <strong>Notes:</strong>
-    {{{instance.notes}}}
-  </div>
-  <div class="span12">
-    <strong>Files:</strong>
-    {{#child_options}}
-      <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
-      </ul>
-    {{/child_options}}
 
-    {{#is_allowed 'update'}}
-    <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
-      data-model="{{instance.type}}" data-id="{{instance.id}}">
-      <i class="grcicon-attach-color"></i><span>Attach supporting file
-      </span>
-    </a>
-    {{/is_allowed}}
+<div class="new-tier">
+
+  <div class="row-fluid">
+    <div class="span9">
+      <h3>{{{instance.title}}}</h3>
+      {{{firstnonempty instance.description '<span class="no-data">No description</span>'}}}
+    </div>
+    <div class="span3">
+      {{#is_allowed 'update'}}
+        <div class="span12">
+          <a href="javascript://" class="pull-right info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            <span>Edit risk assessment</span>
+          </a>
+        </div>
+      {{/is_allowed}}
+    </div>
   </div>
 
-  {{#is_allowed 'update'}}
-  <div class="span12">
-    <a href="javascript://" class="info-edit" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-      <i class="grcicon-edit"></i>
-      <span>Edit {{model.model_title}}</span>
-    </a>
+  <div class="row-fluid">
+    <div class="span6">
+      <h4>Supporting files</h4>
+      {{#child_options}}
+        <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+        </ul>
+      {{/child_options}}
+      {{#is_allowed 'update'}}
+      <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
+        data-model="{{instance.type}}" data-id="{{instance.id}}">
+        <i class="grcicon-attach-color"></i><span>Attach supporting file
+        </span>
+      </a>
+      {{/is_allowed}}
+    </div>
+    <div class="span3">
+      <h4>Risk Manager</h4>
+      {{#using person=instance.ra_manager}}
+        {{{render '/static/mustache/people/popover.mustache'}}}
+      {{/using}}
+    </div>
+    <div class="span3">
+      <h4>Risk Counsel</h4>
+      {{#using person=instance.ra_counsel}}
+        {{{render '/static/mustache/people/popover.mustache'}}}
+      {{/using}}
+    </div>
   </div>
-  {{/is_allowed}}
+
+  <div class="row-fluid">
+    <div class="span12">
+      <h4>Additional notes</h4>
+      {{{firstnonempty instance.notes '<span class="no-data">No additional notes</span>'}}}
+    </div>
+  </div>
 
 </div>
