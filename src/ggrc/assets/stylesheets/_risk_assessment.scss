@@ -1,0 +1,21 @@
+.tree-title-area {
+  &.title-minor {
+    font-size:12px;
+    font-style:italic;
+    color:#777;
+  }
+}
+
+.new-tier {
+  padding-top:20px;
+  h4 {
+    padding-top:15px;
+    font-weight:bold;
+    font-size:13px;
+  }
+  .info-action {
+    i {
+      margin-top:7px;
+    }
+  }
+}
