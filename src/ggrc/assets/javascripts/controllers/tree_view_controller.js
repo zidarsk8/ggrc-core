@@ -682,8 +682,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
       $item = $(ui.item),
-      $before = $item.prev("li:not(.tree-footer)"),
-      $after = $item.next("li:not(.tree-footer)"),
+      $before = $item.prev("li.cms_controllers_tree_view_node"),
+      $after = $item.next("li.cms_controllers_tree_view_node"),
       before_index = $before.length
                      ? $before.control().options.instance[this.options.sort_property]
                      : "0",
