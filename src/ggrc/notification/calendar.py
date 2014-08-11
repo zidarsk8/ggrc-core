@@ -307,6 +307,7 @@ def update_calendar_event(calendar_service, calendar_id, event_id, event_details
   return calendar_event 
 
 def create_calendar_acl(calendar_service, calendar_id, recipient_email, role):
+  from apiclient import errors
   calendar_acl=None
   rule={
     'scope': {

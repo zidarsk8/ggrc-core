@@ -647,6 +647,9 @@ class Resource(ModelView):
       message = translate_message(v)
       current_app.logger.warn(message)
       return ((message, 403, []))
+    except Exception as e:
+      current_app.logger.exception(e)
+      raise
 
   def post(*args, **kwargs):
     raise NotImplementedError()
