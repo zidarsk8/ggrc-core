@@ -11,3 +11,4 @@ GAPI_KEY = os.environ.get('GGRC_GAPI_KEY', "AIzaSyAndAzs1E-8brJdESH7YSuvrj3A8Y-M
 GAPI_CLIENT_ID = os.environ.get('GGRC_GAPI_CLIENT_ID', "831270113958.apps.googleusercontent.com")
 #Admin group gets writer access to all
 GAPI_ADMIN_GROUP = os.environ.get('GGRC_GAPI_ADMIN_GROUP', "ggrc-dev@reciprocitylabs.com")
+GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "no-default")

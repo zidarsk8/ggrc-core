@@ -50,6 +50,12 @@ from sqlalchemy.ext.associationproxy import AssociationProxy
 
 CACHE_EXPIRY_COLLECTION=60
 
+def get_oauth_credentials():
+  from flask import session
+  if session.has_key('oauth_credentials'):
+    return session['oauth_credentials']
+  else:
+    return None
 
 def _get_cache_manager():
   from ggrc.cache import CacheManager, MemCache
@@ -617,6 +623,9 @@ class Resource(ModelView):
         and 'X-Requested-By' not in request.headers:
       raise BadRequest('X-Requested-By header is REQUIRED.')
 
+    if method in ('POST', 'PUT', 'DELETE'):
+      request.oauth_credentials=get_oauth_credentials()
+
     try:
       if method == 'GET':
         if self.pk in kwargs and kwargs[self.pk] is not None:
@@ -638,6 +647,9 @@ class Resource(ModelView):
       message = translate_message(v)
       current_app.logger.warn(message)
       return ((message, 403, []))
+    except Exception as e:
+      current_app.logger.exception(e)
+      raise
 
   def post(*args, **kwargs):
     raise NotImplementedError()
