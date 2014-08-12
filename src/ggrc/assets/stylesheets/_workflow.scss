@@ -386,6 +386,9 @@ ul.new-tree {
   text-overflow: ellipsis;
   word-wrap:no-wrap;
   width:100%;
+  &.inline-data-content-small {
+    font-size:11px;
+  }
 }
 
 .inline-footer-link {
