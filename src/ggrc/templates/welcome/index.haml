@@ -7,15 +7,12 @@
 -extends "layouts/base.haml"
 
 -block body
-  .container-fluid
+  .container-fluid.welcome
     .row-fluid
-      .span3
-      .span6
-        %h2
-          Welcome to
+      .span12
         %h1
-          Governance, Risk and Compliance
-        %p
-          %a.btn.btn-large{:href => "https://sites.google.com/a/google.com/ggrc", :target => "_blank"} About this Project
+          gGRC
+        %p.centered
           %a.btn.btn-large.btn-primary{:href => "/dashboard#task_widget"} Login
-      .span3
+          %br
+          %a{:href => "https://sites.google.com/a/google.com/ggrc", :target => "_blank"} About this Project
