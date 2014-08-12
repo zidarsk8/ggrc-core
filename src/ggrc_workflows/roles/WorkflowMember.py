@@ -4,10 +4,7 @@ description = """
 permissions = {
     "read": [
         "Workflow",
-        "WorkflowObject",
         "WorkflowPerson",
-        "WorkflowTask",
-        "Task",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",
@@ -24,10 +21,7 @@ permissions = {
         "ObjectFile",
     ],
     "create": [
-        "WorkflowObject",
         "WorkflowPerson",
-        "WorkflowTask",
-        "Task",
         "CycleTaskEntry",
         "Document",
         "ObjectDocument",
@@ -35,10 +29,7 @@ permissions = {
         "ObjectFile",
     ],
     "update": [
-        "WorkflowObject",
         "WorkflowPerson",
-        "WorkflowTask",
-        "Task",
         "CycleTaskGroupObjectTask",
         "CycleTaskEntry",
         "Document",
@@ -47,10 +38,7 @@ permissions = {
         "ObjectFile",
     ],
     "delete": [
-        "WorkflowObject",
         "WorkflowPerson",
-        "WorkflowTask",
-        "Task",
         "CycleTaskEntry",
         "Document",
         "ObjectDocument",
@@ -59,6 +47,5 @@ permissions = {
     ],
     "view_object_page": [
         "Workflow",
-        "Task",
     ],
 }

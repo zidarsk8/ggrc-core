@@ -426,25 +426,19 @@ from ggrc_workflows.roles import (
 class WorkflowRoleContributions(RoleContributions):
   contributions = {
       'ProgramCreator': {
-        'create': ['Workflow', 'Task'],
-        'read': ['Task'],
-        'update': ['Task'],
-        'delete': ['Task'],
+        'create': ['Workflow'],
         },
       'ObjectEditor': {
-        'create': ['Workflow', 'Task'],
-        'read': ['Task'],
-        'update': ['Task'],
-        'delete': ['Task'],
+        'create': ['Workflow'],
         },
       'Reader': {
-        'read': ['Task']
+        'read': []
         },
       'ProgramEditor': {
-        'create': ['Workflow', 'Task']
+        'create': ['Workflow']
         },
       'ProgramOwner': {
-        'create': ['Workflow', 'Task']
+        'create': ['Workflow']
         },
       }
 

@@ -20,7 +20,6 @@ permissions = {
             },
             "condition": "is"
         },
-        "Task",
     ],
     "create": [],
     "update": [],
