@@ -556,7 +556,7 @@ class WorkflowCalendarService(CalendarService):
         [workflow_owner.email],
         'writer')
       if calendar_acls is None:
-        current.logger.error("Unable to create ACLs for workflow "  + workflow.title)
+        current_app.logger.error("Unable to create ACLs for workflow "  + workflow.title)
         return
         #raise Forbidden()
     calendar_notification = notif.prepare([cycle], workflow_owner, assignees, subject, content)
@@ -629,7 +629,7 @@ class WorkflowCalendarService(CalendarService):
         [workflow_owner.email],
         'writer')
       if calendar_acls is None:
-        current.logger.error("Unable to create ACLs for workflow "  + workflow.title)
+        current_app.logger.error("Unable to create ACLs for workflow "  + workflow.title)
         return 
         #raise Forbidden()
     calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
