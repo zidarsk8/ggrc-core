@@ -121,11 +121,7 @@
         <div class="span7">
           {{#is_dashboard}}      
             {{#defer 'object' instance.object}}
-              <div class="tree-title-area">
-                Task for: 
-                <i class="grcicon-{{object.class.table_singular}}-color"></i>
-                <a class="object-title" href="{{object.viewLink}}" target="_blank">{{object.title}}</a>
-              </div>
+              <ul {{data 'instance'}} {{data 'object'}} {{ (el) -> el.cms_controllers_tree_view_node({model: el.data("object").object.type, draw_children: false, instance: el.data("object").object, result:''}) }}></ul>
             {{/defer}}
           {{/is_dashboard}}
         </div>
