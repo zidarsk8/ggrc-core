@@ -192,7 +192,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           sort_index=task_group_task.sort_index,
           start_date=task_group_task.calc_start_date(base_date),
           end_date=task_group_task.calc_end_date(base_date),
-          contact=task_group.contact,
+          contact=task_group_task.contact,
           status="Assigned",
           modified_by=current_user,
           )
