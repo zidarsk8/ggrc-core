@@ -103,26 +103,47 @@ def contributed_object_views():
       object_view(models.Workflow),
       ]
 
+
+def _get_date_range(timeboxed_objects):
+  start_date = None
+  end_date = None
+
+  for obj in timeboxed_objects:
+    obj_start_date = obj.start_date
+    if isinstance(obj_start_date, datetime):
+      obj_start_date = obj_start_date.date()
+    obj_end_date = obj.end_date
+    if isinstance(obj_end_date, datetime):
+      obj_end_date = obj_end_date.date()
+    if obj_start_date is not None:
+      if start_date is None or start_date > obj_start_date:
+        start_date = obj_start_date
+    if obj_end_date is not None:
+      if end_date is None or end_date < obj_end_date:
+        end_date = obj_end_date
+
+  return (start_date, end_date)
+
+
 def update_cycle_date_range(cycle):
   start_date = None
   end_date = None
 
+  import sqlalchemy.orm
+  if cycle.id:
+    # If `cycle` is already in the database, then eager load required objects
+    cycle = models.Cycle.query.filter_by(id=cycle.id).\
+        options(sqlalchemy.orm.joinedload_all(
+          'cycle_task_groups.cycle_task_group_objects.cycle_task_group_object_tasks')).\
+        one()
+
   for ctg in cycle.cycle_task_groups:
     for ctgo in ctg.cycle_task_group_objects:
-      for task in ctgo.cycle_task_group_object_tasks:
-        task_start_date = task.start_date
-        if isinstance(task_start_date, datetime):
-          task_start_date = task_start_date.date()
-        task_end_date = task.end_date
-        if isinstance(task_end_date, datetime):
-          task_end_date = task_end_date.date()
-        if start_date is None or start_date > task_start_date:
-          start_date = task_start_date
-        if end_date is None or end_date < task_end_date:
-          end_date = task_end_date
-
-  cycle.start_date = start_date
-  cycle.end_date = end_date
+      ctgo.start_date, ctgo.end_date = _get_date_range(
+          ctgo.cycle_task_group_object_tasks)
+    ctg.start_date, ctg.end_date = _get_date_range(
+        ctg.cycle_task_group_objects)
+  cycle.start_date, cycle.end_date = _get_date_range(cycle.cycle_task_groups)
 
 
 from ggrc.services.common import Resource
@@ -199,8 +220,6 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)
 
-      #update_cycle_task_group_object_date_rang(cycle_task_group_object)
-    #update_cycle_task_group_date_range(cycle_task_group)
   update_cycle_date_range(obj)
 
   workflow_cycle_start.send(
