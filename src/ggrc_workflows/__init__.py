@@ -300,9 +300,55 @@ def update_cycle_object_parent_state(obj):
         update_cycle_object_parent_state(parent)
 
 
+def ensure_assignee_is_workflow_member(workflow, assignee):
+  if not assignee:
+    return
+
+  # Check if assignee is mapped to the Workflow
+  workflow_people = models.WorkflowPerson.query.filter(
+      models.WorkflowPerson.workflow_id == workflow.id,
+      models.WorkflowPerson.person_id == assignee.id).all()
+  if not workflow_people:
+    workflow_person = models.WorkflowPerson(
+        person=assignee,
+        workflow=workflow,
+        context=workflow.context
+        )
+    db.session.add(workflow_person)
+
+  # Check if assignee has a role assignment
+  from ggrc_basic_permissions.models import Role, UserRole
+  user_roles = UserRole.query.filter(
+      UserRole.context_id == workflow.context_id,
+      UserRole.person_id == assignee.id).all()
+  if not user_roles:
+    workflow_member_role = _find_role('WorkflowMember')
+    user_role = UserRole(
+        person=assignee,
+        role=workflow_member_role,
+        context=workflow.context,
+        modified_by=get_current_user(),
+        )
+    db.session.add(user_role)
+
+
+@Resource.model_put.connect_via(models.TaskGroupTask)
+def handle_task_group_task_put(sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+
+
+@Resource.model_posted.connect_via(models.TaskGroupTask)
+def handle_task_group_task_post(sender, obj=None, src=None, service=None):
+  ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+
+
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
+
   if inspect(obj).attrs.start_date.history.has_changes() \
       or inspect(obj).attrs.end_date.history.has_changes():
     update_cycle_date_range(obj.cycle)
