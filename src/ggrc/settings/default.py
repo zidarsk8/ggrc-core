@@ -38,3 +38,5 @@ MEMCACHE_MECHANISM = True
 
 # AppEngine Email
 APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
+
+CALENDAR_MECHANISM = False
