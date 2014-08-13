@@ -30,6 +30,8 @@ def notify_emaildigest():
 @app.route("/calendar_oauth_request", methods=["GET", "POST"])
 @login_required
 def handle_calendar_oauth():
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
+    return 'Calendar mechanism is not enabled'
   from oauth2client.client import OAuth2WebServerFlow
   flow = OAuth2WebServerFlow(client_id=GOOGLE_CLIENT_ID, 
     client_secret=GOOGLE_SECRET_KEY,
@@ -42,6 +44,8 @@ def handle_calendar_oauth():
 
 @app.route("/oauth2callback/calendar", methods=["GET", "POST"])
 def handle_calendar_flow_auth():
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
+    return 'Calendar mechanism is not enabled'
   error_return=request.args.get("error")
   code=request.args.get("code")
   if error_return is not None:

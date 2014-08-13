@@ -297,6 +297,8 @@ def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status
 
 @Resource.model_deleted.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_deleted(sender, obj=None, service=None):
+  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+    return
   if request.oauth_credentials is None:
     raise Forbidden()
   from oauth2client.client import Credentials
@@ -666,6 +668,8 @@ def notify_email_deferred():
   db.session.commit()
 
 def prepare_calendar_for_cycle(cycle, enable_flag=None):
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
+    return
   if request.oauth_credentials is None:
     raise Forbidden()
   from oauth2client.client import Credentials
@@ -673,6 +677,8 @@ def prepare_calendar_for_cycle(cycle, enable_flag=None):
   calendar_service.handle_cycle_calendar_update(cycle, enable_flag)
 
 def prepare_calendar_for_workflow_member(workflow, member):
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
+    return
   if request.oauth_credentials is None:
     raise Forbidden()
   found_cycle=False
@@ -690,6 +696,8 @@ def prepare_calendar_for_workflow_member(workflow, member):
   calendar_service.handle_cycle_calendar_update(cycle)
 
 def prepare_calendar_for_taskgroup(taskgroup, assignee=None):
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
+    return
   if request.oauth_credentials is None:
     raise Forbidden()
   from oauth2client.client import Credentials
