@@ -7,7 +7,7 @@
 from flask import current_app, request
 from ggrc.app import app
 import ggrc_workflows.models as models
-from ggrc.notification import EmailNotification, EmailDigestNotification
+from ggrc.notification import EmailNotification, EmailDigestNotification, isNotificationEnabled
 from ggrc.notification import EmailDeferredNotification, EmailDigestDeferredNotification
 from ggrc.notification import CalendarNotification, CalendarService, GGRC_CALENDAR
 from ggrc.notification import create_calendar_entry, find_calendar_entry, get_calendar_event
@@ -243,8 +243,14 @@ def handle_notification_config_put(sender, obj=None, src=None, service=None):
 def handle_notification_config_changes(sender, obj=None, src=None, service=None):
   if obj.notif_type != 'Calendar':
     return
-  cycles=db.session.query(models.Cycle).\
-    filter(models.Cycle.is_current==True).all()
+  if obj.enable_flag:
+    cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
+    filter(models.Cycle.start_date <= date.today()).all()
+  else:
+    cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
+    filter(models.Cycle.start_date > date.today()).all()
   user=get_current_user()
   for cycle in cycles:
     workflow=get_cycle_workflow(cycle)
@@ -299,8 +305,14 @@ def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status
 def handle_taskgroup_deleted(sender, obj=None, service=None):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
+  user=get_current_user()
+  if not isNotificationEnabled(user.id, 'Calendar'):
+    current_app.logger.info("Calendar Notification is not enabled for user: " + user.email)
+    return
   if request.oauth_credentials is None:
-    raise Forbidden()
+    current_app.logger.error("Authorization credentials is not set for user " + user.email)
+    return
+    #raise Forbidden()
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_taskgroup_calendar_delete(taskgroup)
@@ -514,7 +526,8 @@ class WorkflowCalendarService(CalendarService):
       calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
       if calendar is None:
         current_app.logger.error("Unable to create calendar entry for workflow " + workflow.title)
-        raise Forbidden()
+        return
+        #raise Forbidden()
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], cycle.title)
     subject=cycle.title
     content=cycle.title + ' ' + request.url_root + workflow._inflector.table_plural + \
@@ -532,6 +545,8 @@ class WorkflowCalendarService(CalendarService):
     for workflow_person in workflow.people:
       assignees.append(workflow_person)
       assignee_emails.append(workflow_person.email)
+    assignees.append(workflow_owner)
+    assignee_emails.append(workflow_owner.email)
     #ToDo(Mouli): WF owner and Super user can update Acl
     if user.id == workflow_owner.id:
       calendar_acls=create_calendar_acls(
@@ -542,7 +557,8 @@ class WorkflowCalendarService(CalendarService):
         'writer')
       if calendar_acls is None:
         current.logger.error("Unable to create ACLs for workflow "  + workflow.title)
-        raise Forbidden()
+        return
+        #raise Forbidden()
     calendar_notification = notif.prepare([cycle], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
@@ -584,7 +600,8 @@ class WorkflowCalendarService(CalendarService):
         calendar=create_calendar_entry(self.calendar_service, GGRC_CALENDAR, workflow_owner.id)
         if calendar is None:
           current_app.logger.error("Unable to create calendar entry for workflow " + workflow.title)
-          raise Forbidden()
+          return
+          #raise Forbidden()
     calendar_event=get_calendar_event(self.calendar_service, calendar['id'], task_group.title)
     subject=task_group.title
     content=task_group.title + ' ' + request.url_root + workflow._inflector.table_plural + \
@@ -613,7 +630,8 @@ class WorkflowCalendarService(CalendarService):
         'writer')
       if calendar_acls is None:
         current.logger.error("Unable to create ACLs for workflow "  + workflow.title)
-        raise Forbidden()
+        return 
+        #raise Forbidden()
     calendar_notification = notif.prepare([task_group], workflow_owner, assignees, subject, content)
     if calendar_notification is not None:
       notif.notify_one(calendar_notification)
@@ -670,8 +688,15 @@ def notify_email_deferred():
 def prepare_calendar_for_cycle(cycle, enable_flag=None):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
+  user=get_current_user()
+  if enable_flag is None:
+   if not isNotificationEnabled(user.id, 'Calendar'):
+     current_app.logger.info("Calendar Notification is not enabled for user: " + user.email)
+     return
   if request.oauth_credentials is None:
-    raise Forbidden()
+    current_app.logger.error("Authorization credentials is not set for user " + user.email)
+    return
+    #raise Forbidden()
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_cycle_calendar_update(cycle, enable_flag)
@@ -679,8 +704,14 @@ def prepare_calendar_for_cycle(cycle, enable_flag=None):
 def prepare_calendar_for_workflow_member(workflow, member):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
+  user=get_current_user()
+  if not isNotificationEnabled(user.id, 'Calendar'):
+    current_app.logger.info("Calendar Notification is not enabled for user: " + user.email)
+    return
   if request.oauth_credentials is None:
-    raise Forbidden()
+    current_app.logger.error("Authorization credentials is not set for user " + user.email)
+    return
+    #raise Forbidden()
   found_cycle=False
   for cycle in workflow.cycles:
     if cycle.status not in ['InProgress', 'Finished', 'Verified']:
@@ -698,8 +729,14 @@ def prepare_calendar_for_workflow_member(workflow, member):
 def prepare_calendar_for_taskgroup(taskgroup, assignee=None):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
+  user=get_current_user()
+  if not isNotificationEnabled(user.id, 'Calendar'):
+    current_app.logger.info("Calendar Notification is not enabled for user: " + user.email)
+    return
   if request.oauth_credentials is None:
-    raise Forbidden()
+    current_app.logger.error("Authorization credentials is not set for user " + user.email)
+    return
+    #raise Forbidden()
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_taskgroup_calendar_update(taskgroup, assignee=assignee)
