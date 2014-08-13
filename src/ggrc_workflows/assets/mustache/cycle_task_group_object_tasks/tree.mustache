@@ -83,19 +83,29 @@
       <div class="row-fluid">
         <div class="span9">
           {{#is_dashboard}}
-            {{#defer 'workflow' instance.workflow}}
+            {{#using cycle=instance.cycle}}
+            {{#using workflow=cycle.workflow}}
               <a href="{{workflow.viewLink}}" class="info-action">
                 View Workflow
                 <i class="grcicon-goto"></i>
               </a>
               &nbsp;&nbsp;&nbsp;
-            {{/defer}}
-            {{#defer 'object' instance.object}}
-              <a href="{{object.viewLink}}" class="info-action">
-                View task on {{object.class.table_singular}} page
-                <i class="grcicon-goto"></i>
-              </a>
-            {{/defer}}
+            {{/using}}
+            {{/using}}
+            {{#using instance=instance.cycle_task_group_object}}
+            {{#using object=instance.object}}
+              {{#if object.viewLink}}
+                {{#is_allowed "view_object_page" object}}
+                  <a href="{{object.viewLink}}" class="info-action">
+                    View {{object.class.title_singular}}
+                    <i class="grcicon-goto"></i>
+                  </a>
+                {{/is_allowed}}
+              {{else}}
+                Object deleted or inaccessible
+              {{/if}}
+            {{/using}}
+            {{/using}}
           {{/is_dashboard}}
         </div>
         <div class="span3">
@@ -110,9 +120,22 @@
       <div class="row-fluid" style="padding-top:6px">
         <div class="span7">
           {{#is_dashboard}}
-            {{#defer 'object' instance.object}}
-              <ul {{data 'instance'}} {{data 'object'}} {{ (el) -> el.cms_controllers_tree_view_node({model: el.data("object").object.type, draw_children: false, instance: el.data("object").object, result:''}) }}></ul>
-            {{/defer}}
+            {{#using instance=instance.cycle_task_group_object}}
+            {{#using object=instance.object}}
+              <div class="row-fluid">
+                <div class="span12">
+                  <div class="tree-title-area">
+                    Task for:
+                    <i class="grcicon-{{instance.object.reify.class.table_singular}}-color"></i>
+                    {{firstnonempty object.title instance.title}}
+                  </div>
+                  <div class="tree-description">
+                    {{{firstnonempty object.description instance.description}}}
+                  </div>
+                </div>
+              </div>
+            {{/using}}
+            {{/using}}
           {{/is_dashboard}}
         </div>
         <div class="span2 text-right">
@@ -132,7 +155,7 @@
         <div class="row-fluid">
           <div class="span12">
             <div class="tree-description">
-              <h5>{{instance.title}}</h5>
+              <h5>Task: {{instance.title}}</h5>
               {{{instance.description}}}
             </div>
           </div>
