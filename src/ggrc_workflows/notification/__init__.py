@@ -297,7 +297,7 @@ def handle_taskgroup_status_change(sender, obj=None, new_status=None, old_status
 
 @Resource.model_deleted.connect_via(models.CycleTaskGroup)
 def handle_taskgroup_deleted(sender, obj=None, service=None):
-  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+  if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
   if request.oauth_credentials is None:
     raise Forbidden()
