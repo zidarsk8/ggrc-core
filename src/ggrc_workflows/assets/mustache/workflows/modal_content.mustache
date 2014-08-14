@@ -18,17 +18,18 @@
       <br>
     </div>
     <div class="span4">
-      <label>
-        Workflow Owner
-        <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
-      </label>
-      <i class="grcicon-person-green pull-left icon-field"></i>
-      {{#using owner=instance.owners.0}}
-      <div class="people-autocomplete">
-        <input tabindex="2" type="text" name="owners.0.email" class="span11 search-icon required" value="{{firstnonempty owner.email}}" placeholder="Enter text to search for Workflow Owner" data-lookup="Person">
-      </div>
+      {{#with_mapping "authorizations" instance}}
+      {{#using owner=instance.owners.0 model_singular=model.model_singular}}
+      {{#with_current_user_as 'current_user'}}
+        <label>
+          Owner
+          <i class="grcicon-help-black" rel="tooltip" title="Workflow ownership is managed in the People widget."></i>
+        </label>
+        <input tabindex="3" class="input-block-level" name="owners.0.email" data-lookup="Person" placeholder="Enter email address" type="hidden" value="" />
+        <input tabindex="3" class="input-block-level" readonly="true" disabled="true" placeholder="Enter email address" type="text" value="{{workflow_owner instance modal_title}}" />
+      {{/with_current_user_as}}
       {{/using}}
+      {{/with_mapping}}
     </div>
   </div>
 

@@ -114,4 +114,21 @@ Mustache.registerHelper("sortable_if", function() {
   };
 });
 
+
+Mustache.registerHelper("workflow_owner", function(instance, modal_title, options) {
+  var state = options.contexts.attr('__workflow_owner');
+  if (resolve_computed(modal_title).indexOf('New ') === 0) {
+    return GGRC.current_user.email;
+  }
+  else {
+    var loader = resolve_computed(instance).get_binding('authorizations');
+    return $.map(loader.list, function(binding) {
+      if (binding.instance.role.reify().attr('name') === 'WorkflowOwner') {
+        return binding.instance.person.reify().attr('email');
+      }
+    }).join(', ');
+  }
+});
+
+
 })(this.can, this.can.$, this.Mustache);
