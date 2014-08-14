@@ -7,7 +7,7 @@
 
 {{#if allow_mapping_or_creating}}
 {{#if allow_creating}}
-{{!#is_allowed 'create' model.shortName context=null}}
+{{#is_allowed 'create' 'TaskGroup' context=parent_instance.context}}
 <li class="tree-footer tree-item tree-item-add">
   <div class="row-fluid">
     <div class="span12">
@@ -17,6 +17,6 @@
     </div>
   </div>
 </li>
-{{!/is_allowed}}
+{{/is_allowed}}
 {{/if}}
 {{/if}}
