@@ -936,7 +936,7 @@
         var permission_parms = { __permission_type: 'read' };
         // FIXME: Workflow context should override Program context
         // This is weird. Don't understand exactly how this should work.
-        if ('TaskGroupObject' == join_model && current_option_model_name == 'Program') {
+        if (join_model != 'TaskGroupObject' && current_option_model_name == 'Program') {
           permission_parms = {
             __permission_type: 'create'
             , __permission_model: join_model
