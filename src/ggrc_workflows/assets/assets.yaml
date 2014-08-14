@@ -55,7 +55,6 @@ dashboard-js-template-files:
   - selectors/multitype_multiselect_option_column.mustache
   - selectors/multitype_multiselect_option_items.mustache
   - wf_people/tree_footer.mustache
-  - wf_people/multiselect_option_items.mustache
   - task_groups/tier2_content.mustache
   - tasks/tier2_content.mustache
   - workflows/tier2_content.mustache

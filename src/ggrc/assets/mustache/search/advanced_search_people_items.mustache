@@ -40,7 +40,36 @@
     {{! #if expanded}}
     <div class="tier-2-info item-content">
       <div class="tier-2-info-content">
-        {{{renderLive '/static/mustache/people/tier2_content.mustache'}}}
+        <!--{{{renderLive '/static/mustache/people/tier2_content.mustache'}}}-->
+        <div class="row-fluid">
+          <div class="span6">
+            {{#if instance.viewLink}}
+              {{#is_allowed "view_object_page" instance}}
+                <a href="{{instance.viewLink}}" class="info-action">
+                  View {{instance.class.title_singular}}
+                  <i class="grcicon-goto"></i>
+                </a>
+              {{/is_allowed}}
+            {{/if}}
+          </div>
+          <div class="span6">
+          &nbsp;
+          </div>
+        </div>
+        
+        <div class="row-fluid">
+          <div class="span6">
+            {{#if instance.email}}
+            <div class="tree-info">
+              Email:
+              {{{render '/static/mustache/people/popover.mustache' person=instance show_email=true}}}
+            </div>
+            {{else}}
+              &nbsp;
+            {{/if}}
+          </div>
+        </div>
+
       </div>
     </div>
     {{!/if}}
