@@ -140,9 +140,43 @@ def load_permissions_for(user):
   """
   permissions = {}
 
-  # Add default `Help` permissions for everyone, always
-  help_permissions = { "read": [ "Help" ] }
-  collect_permissions(help_permissions, None, permissions)
+  # Add default `Help` and `NotificationConfig` permissions for everyone
+  # FIXME: This should be made into a global base role so it can be extended
+  #   from extensions
+  default_permissions = {
+      "read": [
+        "Help",
+        {
+          "type": "NotificationConfig",
+          "terms": {
+            "property_name": "person",
+            "value": "$current_user"
+            },
+          "condition": "is"
+        },
+        ],
+      "create": [
+        {
+          "type": "NotificationConfig",
+          "terms": {
+            "property_name": "person",
+            "value": "$current_user"
+            },
+          "condition": "is"
+        },
+        ],
+      "update": [
+        {
+          "type": "NotificationConfig",
+          "terms": {
+            "property_name": "person",
+            "value": "$current_user"
+            },
+          "condition": "is"
+        },
+        ]
+      }
+  collect_permissions(default_permissions, None, permissions)
 
   # Add `ADMIN_PERMISSION` for "bootstrap admin" users
   if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
