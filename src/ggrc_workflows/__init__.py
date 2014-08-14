@@ -461,6 +461,9 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     # Add role implication - all users can read a public workflow
     add_public_workflow_context_implication(context)
 
+  if src.get('clone'):
+    source_workflow.copy_task_groups(obj)
+
 
 def add_public_workflow_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\

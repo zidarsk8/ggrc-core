@@ -103,9 +103,12 @@ class Workflow(
         'frequency', 'end_date', 'start_date'
         ]
     target = self.copy_into(_other, columns, **kwargs)
+    return target
 
+  def copy_task_groups(self, target):
     for task_group in self.task_groups:
-      target.task_groups.append(task_group.copy(workflow=target))
+      target.task_groups.append(
+          task_group.copy(workflow=target, context=target.context))
 
     return target
 
