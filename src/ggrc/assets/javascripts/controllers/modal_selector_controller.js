@@ -935,6 +935,7 @@
               this.options.object_model, current_option_model_name);
         var permission_parms = { __permission_type: 'read' };
         // FIXME: Workflow context should override Program context
+        // FIXME: Extension isolation violation
         // This is weird. Don't understand exactly how this should work.
         if (join_model != 'TaskGroupObject' && current_option_model_name == 'Program') {
           permission_parms = {
@@ -1048,7 +1049,10 @@
           var context_id = null
             , context_object
             ;
-          if (this.context.selected_option.constructor.shortName == "Program") {
+          // FIXME: Extension isolation violation
+          if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+            context_object = this.context.selected_object;
+          } else if (this.context.selected_option.constructor.shortName == "Program") {
             context_object = this.context.selected_option;
           } else {
             context_object = this.context.selected_object;
@@ -1509,6 +1513,7 @@
           for(var i = 0; i < its; i++){
             //We have multiple join_instances
             ajd = join_instance[i].save().done(function(obj) {
+              // FIXME: Extension isolation violation
               if(that.options.mapTaskGroup) {
                 //Modify the object to map to task group
                 var id = obj.object.id, 
@@ -1576,7 +1581,10 @@
             var context_id = null
               , context_object;
   
-            if (this.context.selected_options[i].constructor.shortName == "Program") {
+            // FIXME: Extension isolation violation
+            if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+              context_object = this.context.selected_object;
+            } else if (this.context.selected_options[i].constructor.shortName == "Program") {
               context_object = this.context.selected_options[i];
             } else {
               context_object = this.context.selected_object;
