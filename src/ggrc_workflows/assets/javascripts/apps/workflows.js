@@ -316,7 +316,7 @@
             draw_children: true,
             child_options: [
               {
-                model: can.Model.Cacheable,
+                model: CMS.Models.CycleTaskEntry,
                 mapping: "cycle_task_entries",
                 show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
                 footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
@@ -492,7 +492,7 @@
           draw_children: true,
           child_options: [
             {
-              model: can.Model.Cacheable,
+              model: CMS.Models.CycleTaskEntry,
               mapping: "cycle_task_entries",
               show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
               footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
