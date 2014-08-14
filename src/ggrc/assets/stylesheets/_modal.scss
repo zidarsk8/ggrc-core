@@ -481,6 +481,9 @@
       right:4px;
       top:4px;
     }
+    i {
+      margin-top:6px;
+    }
   }
   .modal-header {
     background: $white;
@@ -1025,8 +1028,9 @@ p.modal-value {
     }
     &.add-new {
       a {
-        background: $dropPlaceholder;
-        color: $text;
+        color: $link;
+        font-size:11px;
+        background:$white;
       }
     }
   }
@@ -1103,27 +1107,6 @@ p.modal-value {
   }
 }
 
-.frequency-wrap {
-  label {
-    font-size: 14px !important;
-    i {
-      margin-top: 6px;
-    }
-  }
-  padding-top: 23px;
-  span {
-    display: inline-block;
-    padding: 0 5px;
-    &.start-text {
-      padding: 0 5px 0 0;
-    }
-  }
-  select,
-  input {
-    margin-bottom: 0;
-  }
-}
-
 .hidden-fields-area {
   small {
     font-size: $f-small;
@@ -1133,3 +1116,25 @@ p.modal-value {
     }
   }
 }
+
+.frequency-wrap {
+  label.smaller {
+    margin-top:16px;
+    font-size:14px;
+    span.start-text {
+      width:90px;
+      display:inline-block;
+      line-height:30px;
+      &.extrasmall {
+        width:70px;
+      }
+    }
+    input.date {
+      margin-bottom:0px;
+    }
+    select {
+      margin-bottom:0px;
+    }
+  }
+}
+

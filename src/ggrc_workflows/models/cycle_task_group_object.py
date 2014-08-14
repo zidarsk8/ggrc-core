@@ -80,7 +80,6 @@ class CycleTaskGroupable(object):
           'CycleTaskGroupObject',
           primaryjoin=joinstr,
           backref='{0}_object'.format(cls.__name__),
-          cascade='all, delete-orphan',
           #post_update=True
           )
     cls.cycle_task_group_objects = make_cycle_task_group_objects(cls)

@@ -73,17 +73,24 @@
         </a>
         {{/is_allowed}}
         <div class="dropdown pull-right">
-          <a class="dropdown-toggle info-edit" href="#" data-toggle="dropdown" role="button">
+          <a class="dropdown-toggle info-edit" href="javascript://" data-toggle="dropdown" role="button">
             More<i class="grcicon-carot"></i>
           </a>
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
             <li>
-              <a href="#cloneWorkflow" data-toggle="modal">
-                Clone Workflow...
-              </a>
+              <workflow-clone workflow="instance">
+                <a href="javascript://">
+                  Clone Workflow...
+                </a>
+              </workflow-clone>
             </li>
           </ul>
         </div>
+        <div class="pull-right">
+          <a href="javacript://" class="info-edit calendar-auth">Authenticate Calendar Service</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+
       </div>
     </div>
   </div>

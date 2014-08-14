@@ -119,6 +119,7 @@
       this._super.apply(this, arguments);
       this.bind("created",
         refresh_attr_wrap("cycle_task_group_object_task").bind(this));
+      this.validatePresenceOf("description");
     }
   }, {
     workflowFolder: function() {
@@ -261,7 +262,9 @@
           function force_refresh_chain(chain) {
             can.reduce(chain, function(a, b) {
               return a.then(function(obj) {
+                if (obj && obj[b]) {
                   return obj[b].reify().refresh();
+                }
               });
             }, dfd);
           }

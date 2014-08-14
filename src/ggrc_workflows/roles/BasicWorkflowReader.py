@@ -4,9 +4,7 @@ description = """
 permissions = {
     "read": [
         "Workflow",
-        "WorkflowObject",
         "WorkflowPerson",
-        "WorkflowTask",
         "TaskGroup",
         "TaskGroupObject",
         "TaskGroupTask",

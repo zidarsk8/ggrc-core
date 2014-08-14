@@ -293,6 +293,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     , list : null
     , single_object : false
     , find_params : {}
+    , sortable : false
     , sort_property : null
     , sort_function : null
     , start_expanded : false //true
@@ -665,6 +666,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
             }
             $existing.splice(0, 0, item);
          });
+        if (this.options.sortable) {
+          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'})
+        }
       } else {
         if($footer.length) {
           $items.insertBefore($footer);
@@ -678,8 +682,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
       $item = $(ui.item),
-      $before = $item.prev("li:not(.tree-footer)"),
-      $after = $item.next("li:not(.tree-footer)"),
+      $before = $item.prev("li.cms_controllers_tree_view_node"),
+      $after = $item.next("li.cms_controllers_tree_view_node"),
       before_index = $before.length
                      ? $before.control().options.instance[this.options.sort_property]
                      : "0",
@@ -983,14 +987,4 @@ can.Control("CMS.Controllers.TreeViewNode", {
         $expand_el.trigger("click");
       return this.expand();
     }
-});
-
-CMS.Controllers.TreeView("CMS.Controllers.SortableTreeView", {}, {
-  draw_items: function(options_list){
-    if (typeof this._super === "function") {
-      this._super.apply(this, [options_list]);
-    }
-    var $el = $(this.element);
-    $el.sortable({element: 'li.tree-item', handle: '.drag'})
-  },
 });

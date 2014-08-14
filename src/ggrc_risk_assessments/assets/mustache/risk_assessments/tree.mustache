@@ -1,0 +1,53 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: laran@reciprocitylabs.com
+    Maintained By: laran@reciprocitylabs.com
+}}
+
+<li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="risk_assessment">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+
+    <div class="openclose">
+      <a class="openclose-placeholder" href="javascript://"> </a>
+      <div class="row-fluid">
+
+        <div class="span6">
+          <div class="item-data">
+            <div class="tree-title-area">
+              {{instance.title}}
+            </div>
+          </div>
+        </div>
+
+        <div class="span3">
+          <div class="item-data">
+            <div class="tree-title-area title-minor">
+              Started on
+              {{{localize_date instance.start_date}}}
+            </div>
+          </div>
+        </div>
+
+        <div class="span3">
+          <div class="item-data">
+            <div class="tree-title-area title-minor">
+              Completed on
+              {{{localize_date instance.end_date}}}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+      {{> '/static/mustache/risk_assessments/tier2_content.mustache'}}
+    </div>
+  </div>
+  {{/if}}
+
+</li>

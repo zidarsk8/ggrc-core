@@ -59,6 +59,13 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
   def _display_name(self):
     return self.object.display_name + '<->' + self.task_group.display_name
 
+  def copy(self, _other=None, **kwargs):
+    columns = [
+        'task_group', 'object_id', 'object_type'
+        ]
+    target = self.copy_into(_other, columns, **kwargs)
+    return target
+
 
 class TaskGroupable(object):
   @classmethod

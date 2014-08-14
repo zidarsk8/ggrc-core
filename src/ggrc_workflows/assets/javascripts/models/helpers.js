@@ -24,15 +24,14 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
       };
     });
 
-    return new CMS.Models.Task(this._data).save().then(function(task) {
-      return new CMS.Models.TaskGroupTask({
-        task_group: that.task_group,
-        task: task,
-        sort_index: Number.MAX_SAFE_INTEGER / 2,
-        contact: that.contact,
-        context: that.context
-      }).save();
-    }).then(function(task_group_task) {
+    return new CMS.Models.TaskGroupTask({
+      task_group: that.task_group,
+      title: that.title,
+      description: that.description,
+      sort_index: Number.MAX_SAFE_INTEGER / 2,
+      contact: that.contact,
+      context: that.context
+    }).save().then(function(task_group_task) {
       return new CMS.Models.CycleTaskGroupObjectTask({
         cycle: that.cycle,
         start_date: that.cycle.reify().start_date,
@@ -67,7 +66,7 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
     var ret,
         that = this
         aws = this.original_object.get_mapping("approval_workflows");
-    
+
     if(aws.length < 1) {
       ret = $.when(
         new CMS.Models.Workflow({
@@ -75,8 +74,6 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
           title: "Object review for "
                   + this.original_object.constructor.title_singular
                   + ' "' + this.original_object.title + '"',
-          start_date: new Date(),
-          end_date: this.end_date,
           object_approval: true,
           notify_on_change: true,
           notify_custom_message: "Hello " + this.contact.reify().name + ",\n\n"
@@ -88,67 +85,48 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
             + "workflows_widget'>here</a> to perform a review.\n\nThanks,\ngGRC Team",
           context: that.original_object.context
         }).save()
-      ).then(function(wf, tasks) {
+      ).then(function(wf) {
           return $.when(
             wf,
-            new CMS.Models.Task({
+            new CMS.Models.TaskGroup({
+              workflow : wf,
               title: "Object review for "
                       + that.original_object.constructor.title_singular
                       + ' "' + that.original_object.title + '"',
-              context: {id : null}
+              contact: that.contact,
+              context: wf.context
+            }).save(),
+            new CMS.Models.WorkflowPerson({
+              workflow: wf,
+              person: that.contact,
+              context: wf.context
             }).save()
           );
-      }).then(function(wf, task) {
-        return $.when(
-          wf,
-          task,
-          new CMS.Models.TaskGroup({
-            workflow : wf,
-            title: "Object review for "
-                    + that.original_object.constructor.title_singular
-                    + ' "' + that.original_object.title + '"',
-            contact: that.contact,
-            context: wf.context
-          }).save(),
-          new CMS.Models.WorkflowObject({
-            workflow: wf,
-            object: that.original_object,
-            context: wf.context
-          }).save(),
-          new CMS.Models.WorkflowTask({
-            workflow: wf,
-            task: task,
-            context: wf.context
-          }).save(),
-          new CMS.Models.WorkflowPerson({
-            workflow: wf,
-            person: that.contact,
-            context: wf.context
-          }).save()
-        );
-      }).then(function(wf, task, tg) {
-        return $.when(
-          wf,
-          new CMS.Models.TaskGroupTask({
-            task_group: tg,
-            task: task,
-            object_approval: true,
-            sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
-            contact: that.contact,
-            context: wf.context
-          }).save(),
-          new CMS.Models.TaskGroupObject({
-            task_group: tg,
-            object: that.original_object,
-            context: wf.context
-          }).save()
-        );
+      }).then(function(wf, tg) {
+          return $.when(
+            wf,
+            new CMS.Models.TaskGroupTask({
+              task_group: tg,
+              start_date: moment().format('MM/DD/YYYY'),
+              end_date: that.end_date,
+              object_approval: true,
+              sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
+              contact: that.contact,
+              context: wf.context,
+              title: "Object review for "
+                      + that.original_object.constructor.title_singular
+                      + ' "' + that.original_object.title + '"',
+            }).save(),
+            new CMS.Models.TaskGroupObject({
+              task_group: tg,
+              object: that.original_object,
+              context: wf.context
+            }).save()
+          );
       });
     } else {
       ret = $.when(
-        aws[0].instance.refresh().then(function(wf) {
-          return wf.attr("end_date", that.end_date).save();
-        }),
+        aws[0].instance.refresh(),
         $.when.apply(
           $,
           can.map(aws[0].instance.task_groups.reify(), function(tg) {
@@ -156,7 +134,16 @@ can.Observe("CMS.ModelHelpers.ApprovalWorkflow", {
           })
         ).then(function() {
           return $.when.apply($, can.map(can.makeArray(arguments), function(tg) {
-            return tg.attr("contact", that.contact).save();
+            return tg.attr("contact", that.contact).save().then(function(tg) {
+              return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
+                return tgt.refresh().then(function(tgt) {
+                  return tgt.attr('contact', that.contact)
+                    .attr('end_date', that.end_date)
+                    .attr('start_date', moment().format('MM/DD/YYYY'))
+                    .save();
+                });
+              }));
+            });
           }));
         })
       );

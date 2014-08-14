@@ -33,10 +33,10 @@
                     Google GRC
               %ul.menu
                 %li.black-link
-                  %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                    %i.grcicon-help
+                  %a{ 'href': 'javascript://', 'data-toggle': 'multitype-search-modal-selector', 'data-join-mapping': 'objects', 'data-join-object-id': '1', 'data-join-object-type': 'Program', 'data-original-title': 'search items' }
+                    %i.grcicon-search-white
                     %span
-                      Help
+                      Advanced Search
                 %li.black-link
                   %a#page-help{ 'href': "/dashboard#task_widget" }
                     %i.grcicon-task
@@ -97,7 +97,11 @@
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
                         %i.grcicon-logout
                         Logout
-
+                %li.black-link
+                  %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+                    %i.grcicon-help
+                    %span
+                      Help
     .area{ 'class': '={ model_display_class }' }
       .header-content
         .row-fluid

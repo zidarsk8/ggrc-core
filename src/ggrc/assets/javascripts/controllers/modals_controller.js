@@ -43,8 +43,9 @@ can.Control("GGRC.Controllers.Modals", {
       , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
     }, options))
     .on('click', 'a.btn[data-toggle=confirm]', function(e) {
+      var params = $(e.target).closest('.modal').find('form').serializeArray();
       $target.modal('hide').remove();
-      success && success();
+      success && success(params);
     })
     .on('click.modal-form.close', '[data-dismiss="modal"]', function() {
       $target.modal('hide').remove();
@@ -286,6 +287,11 @@ can.Control("GGRC.Controllers.Modals", {
         , value = $el.val()
         , that = this;
         ;
+
+      // If no model is specified, short circuit setting values
+      // Used to support ad-hoc form elements in confirmation dialogs
+      if (!this.options.model)
+        return;
 
       if (name)
         this.set_value({ name: name, value: value });

@@ -12,7 +12,7 @@
 
 
 
-(function(can, $) {  
+(function(can, $) {
   GGRC.Controllers.MultitypeObjectModalSelector("GGRC.Controllers.AdvancedSearchSelector", {
     defaults: {
           option_type_menu: null
@@ -27,7 +27,7 @@
     }
   }, {
 
-  init_menu: function() {      
+  init_menu: function() {
       var menu
         , lookup = {
             governance: 0
@@ -47,7 +47,7 @@
             , items: []
             }
           ];
-        can.each(this.options.option_descriptors, function(descriptor) {          
+        can.each(this.options.option_descriptors, function(descriptor) {
           if ( descriptor.model.category === undefined ) {
             ;//do nothing
           }
@@ -64,12 +64,12 @@
       //hard code some of the submenu
       this.options.option_type_menu_2 = can.map([
             "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
-            "Person", "System", "Process", "DataAsset", "Product", "Facility" , "Market"
+            "Person", "System", "Process", "DataAsset", "Product", "Project", "Facility" , "Market"
             ],
             function(key) {
               return CMS.Models[key];
             }
-      ); 
+      );
   }
 
   , set_option_descriptor: function(option_type) {
@@ -144,11 +144,11 @@
               [current_option_model_name],
               permission_parms)
           .then(function(search_result) {
-            var options = [], 
+            var options = [],
               base_options ;
-            
+
             if (active_fn()) {
-              
+
               function match_object(result){
                 var owner_val = $('input.search-by-owner').val(),
                     contact_val = $('input.search-by-contact').val();
@@ -159,25 +159,25 @@
                   if (result.type == "Program") //FIXME after backend is done
                     return true;
 
-                  return (result.owners[0] && result.owners[0].id === self.context.owner.id) &&
-                    (result.contact && result.contact.id === self.context.contact.id);
+                  return (result.owners[0] && (result.owners[0].id === self.context.owner.id) &&
+                    result.contact && (result.contact.id === self.context.contact.id));
                 }
                 else if (self.context.owner && owner_val !== "") {
                   if (result.type == "Program") //FIXME after backend is done
                     return true;
-                  
+
                   return (result.owners[0] && owner_val !== "" && result.owners[0].id === self.context.owner.id);
                 }
                 else if (self.context.contact && contact_val !== "") {
                   return (result.contact && result.contact.id === self.context.contact.id);
                 }
-                else 
+                else
                   return true;
               }
 
               base_options = search_result.getResultsForType(current_option_model_name);
 
-              for (var i = 0 ; i < base_options.length; i++){                
+              for (var i = 0 ; i < base_options.length; i++){
                 if(match_object(base_options[i]))
                   options.push(base_options[i]);
               }
@@ -190,7 +190,7 @@
 
     //Search button click
     , ".objectReview click" : function(){
-      
+
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       var con = this.context;
@@ -199,14 +199,13 @@
 
       var selected = $("select.option-type-selector").val(),
         self = this,
-        loader, custom_filter, 
+        loader, custom_filter,
         term = $("#search").val() || "",
-      //Get the filter_list length, for each select get the value for type, 
-      //for each search, find the search text
+        re = new RegExp("^.*" + term + ".*","gi"),
         filters = [],
-        cancel_filter; 
+        cancel_filter;
 
-      
+
       this.set_option_descriptor(selected);
 
       this.context.filter_list.each(function(filter_obj) {
@@ -234,43 +233,75 @@
         //User need to make their selection again
         this.reset_selection_count();
 
-        if(filters.length === 1 && !term) {
-          //don't bother making an intersecting filter when there's only one source
+        //if(filters.length === 1 && !term) {
+        //  //don't bother making an intersecting filter when there's only one source
+        //  loader = filters[0];
+        //} else {
+        //  // make an intersecting loader, that only shows the results that
+        //  //  show up in all sources.
+        //  if(term) {
+        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
+        //  }
+        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
+        //}
+
+        if (filters.length === 1) {
           loader = filters[0];
-        } else {
-          // make an intersecting loader, that only shows the results that 
-          //  show up in all sources.
-          if(term) {
-            filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
-          }
+        }
+        else {
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
         custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
-          //FIXME: if user takes out owner or contact, the ui still remembers the old value, 
-          //Need to add handler to set it to undefined if user removes the value
-
-          if(result.type == "Person") { return true; } //Person is not mapped with owner or contact
-
-          var owner_val = $('input.search-by-owner').val(),
+          var model_type = result.instance.type,
+            owner_val = $('input.search-by-owner').val(),
             contact_val = $('input.search-by-contact').val();
 
-          if (self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
-            if(result.instance.type == "Program")
-              return true;
-            return (result.instance.owners[0] && result.instance.owners[0].id === self.context.owner.id) &&
-                (result.instance.contact && result.instance.contact.id === self.context.contact.id);
-          }
-          else if (self.context.owner && owner_val !== "") {
-            if(result.instance.type == "Program")
-              return true;
-            return (result.instance.owners[0] && result.instance.owners[0].id === self.context.owner.id);
-          }
-          else if (self.context.contact && contact_val !== "") {
-            return (result.instance.contact && result.instance.contact.id === self.context.contact.id);
-          }
-          else 
-            return true;
+          switch(model_type){
+
+            case "Person": //check for only search text, not owner or contact
+              if (term) { return (result.instance.name.match(re)); }
+              else { return true; }
+
+            case "Program": //Fixme, Currently Program is not filtered by owner
+              if ( term && self.context.contact && contact_val !== "" ) {
+                return (result.instance.title.match(re) &&
+                  result.instance.contact && result.instance.contact.id === self.context.contact.id);
+              }
+              else if (self.context.contact && contact_val !== "" ) {
+                return ( result.instance.contact && result.instance.contact.id === self.context.contact.id);
+              }
+              else if(term) { return (result.instance.title.match(re)); }
+              else { return true; }
+
+            default:
+              if (term && self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
+                return (result.instance.title.match(re) &&
+                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
+                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
+              }
+              else if( self.context.owner && self.context.contact && owner_val !== "" && contact_val !== ""){
+                return ( result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
+                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
+              }
+              else if (term && self.context.owner && owner_val !== "") {
+                return (result.instance.title.match(re) &&
+                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
+              }
+              else if (self.context.owner && owner_val !== "") {
+                return (result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
+              }
+              else if (term && self.context.contact && contact_val !== "") {
+                return (result.instance.title.match(re) &&
+                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
+              }
+              else if (self.context.contact && contact_val !== "") {
+                return ( result.instance.contact && (result.instance.contact.id === self.context.contact.id));
+              }
+              else {
+                return true;
+              }
+          }; //end switch
         }).attach(CMS.Models.get_instance(GGRC.current_user));
 
         this.last_loader = loader;
@@ -317,7 +348,7 @@
 
   search_descriptor_view_option = {
     "Person": {
-        column_view : GGRC.mustache_path + "/search/advanced_search_option_column.mustache", 
+        column_view : GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
         items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
     }
   }
@@ -341,14 +372,14 @@
     }
 
     can.each(join_descriptors, function(descriptor, far_model_name) {
-      var option_model_name = descriptor.option_model_name || far_model_name; 
+      var option_model_name = descriptor.option_model_name || far_model_name;
       var extra_options = search_descriptor_view_option[option_model_name];
-      
+
 
       //  If we have duplicate options, we want to use the first, so return
       //    early.
-      //  Also return now if the descriptor is explicitly excluded from the 
-      //    set of descriptors for this modal.      
+      //  Also return now if the descriptor is explicitly excluded from the
+      //    set of descriptors for this modal.
       if (option_descriptors[option_model_name]
           || ~can.inArray(option_model_name, exclude_option_types)
           //  For some recently-added join settings, there is no join model, so
@@ -356,7 +387,7 @@
           || !descriptor.model_name
           || !(descriptor instanceof GGRC.ListLoaders.ProxyListLoader))
         return;
-        
+
 
       if (!option_set.default_option_descriptor)
         option_set.default_option_descriptor = "Program";
@@ -381,10 +412,9 @@
     var extra_options = {
             column_view : column_view
           , items_view  : item_view
-    }; 
-    option_descriptors["Task"] = ModalOptionDescriptor.from_join_model("WorkflowTask", "task", "Task", extra_options );
-    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("WorkflowObject", "object", "Clause", extra_options );
-    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("WorkflowObject", "object", "Section", extra_options );
+    };
+    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Clause", extra_options );
+    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Section", extra_options );
 
     option_set.option_descriptors = option_descriptors;
     return option_set;
@@ -406,14 +436,14 @@
 
 
       //set up the options for new multitype Object  modal
-      var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache", 
+      var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
       item_view =  GGRC.mustache_path + "/search/advanced_search_option_items.mustache" ;
 
       data_set.join_object_type = "Program";
       options = get_search_multitype_option_set(
         data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
 
-      
+
       //options.selected_object = CMS.Models.get_instance(
       //    data_set.join_object_type, data_set.join_object_id);
 
@@ -439,5 +469,3 @@
   });
 
 })(window.can, window.can.$);
-
-

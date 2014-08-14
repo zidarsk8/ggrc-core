@@ -11,8 +11,8 @@ import tests.ggrc.behave.factories as factories
 
 from ggrc import models
 from ggrc_workflows.models import (
-    Workflow, TaskGroup, Task,
-    WorkflowObject, WorkflowTask, WorkflowPerson,
+    Workflow, TaskGroup,
+    WorkflowPerson,
     TaskGroupObject, TaskGroupTask,
     Cycle, CycleTaskEntry,
     CycleTaskGroup, CycleTaskGroupObject, CycleTaskGroupObjectTask
@@ -28,21 +28,6 @@ class TaskGroupFactory(factories.ModelFactory):
   MODEL = TaskGroup
 
 
-class TaskFactory(factories.ModelFactory):
-  MODEL = Task
-
-
-class WorkflowObjectFactory(factories.ModelFactory):
-  MODEL = WorkflowObject
-  object = factories.FactoryStubMarker(models.System)
-  status = FuzzyChoice(MODEL.VALID_STATES)
-
-
-class WorkflowTaskFactory(factories.ModelFactory):
-  MODEL = WorkflowTask
-  status = FuzzyChoice(MODEL.VALID_STATES)
-
-
 class WorkflowPersonFactory(factories.ModelFactory):
   MODEL = WorkflowPerson
   status = FuzzyChoice(MODEL.VALID_STATES)
@@ -56,7 +41,6 @@ class TaskGroupObjectFactory(factories.ModelFactory):
 
 class TaskGroupTaskFactory(factories.ModelFactory):
   MODEL = TaskGroupTask
-  status = FuzzyChoice(MODEL.VALID_STATES)
 
 
 class CycleFactory(factories.ModelFactory):
@@ -76,6 +60,7 @@ class CycleTaskGroupFactory(factories.ModelFactory):
 class CycleTaskGroupObjectFactory(factories.ModelFactory):
   MODEL = CycleTaskGroupObject
   status = FuzzyChoice(MODEL.VALID_STATES)
+  object = factories.FactoryStubMarker(models.System)
 
 
 class CycleTaskGroupObjectTaskFactory(factories.ModelFactory):
@@ -87,9 +72,6 @@ class CycleTaskGroupObjectTaskFactory(factories.ModelFactory):
 def workflow_factories_registration(context):
   factories.WorkflowFactory = WorkflowFactory
   factories.TaskGroupFactory = TaskGroupFactory
-  factories.TaskFactory = TaskFactory
-  factories.WorkflowObjectFactory = WorkflowObjectFactory
-  factories.WorkflowTaskFactory = WorkflowTaskFactory
   factories.WorkflowPersonFactory = WorkflowPersonFactory
   factories.TaskGroupObjectFactory = TaskGroupObjectFactory
   factories.TaskGroupTaskFactory = TaskGroupTaskFactory
