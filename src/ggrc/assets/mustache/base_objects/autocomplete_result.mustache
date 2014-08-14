@@ -1,10 +1,10 @@
-{{#items}}
+{{#each items}}
 <li class="ui-menu-item" {{data 'ui-autocomplete-item'}}>
   <a href="javascript://" class='show-extended' {{data 'model'}}>
     {{title}}
   </a>
 </li>
-{{/items}}
+{{/each}}
 {{^items}}
   {{#is_allowed "create" model.shortName context=null}}
   <li data-ui-autocomplete-item="">
@@ -16,6 +16,11 @@
   </li>
   {{/is_allowed}}
 {{/items}}
+{{#if items_loading}}
+  <li class="spinner ui-menu-item">
+    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+  </li>
+{{/if}}
 {{#if model}}
 {{#is_allowed "create" model.shortName context=null}}
 <li class="ui-menu-item add-new" data-ui-autocomplete-item="">

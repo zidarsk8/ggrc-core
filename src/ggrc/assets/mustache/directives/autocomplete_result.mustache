@@ -1,11 +1,11 @@
-{{#items}}
+{{#each items}}
 <li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
   <a href="javascript://" class='show-extended' {{data 'model'}}>
     <i class="grcicon-{{class.table_singular}}-color"></i>
     {{title}}
   </a>
 </li>
-{{/items}}
+{{/each}}
 {{^items}}
   {{#is_allowed "create" "Directive" context=null}}
   <li data-ui-autocomplete-item="">
@@ -17,6 +17,11 @@
   </li>
   {{/is_allowed}}
 {{/items}}
+{{#if items_loading}}
+  <li class="spinner ui-menu-item">
+    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+  </li>
+{{/if}}
 <!--
 {{#is_allowed "create" "Directive" context=null}}
 <li class="ui-menu-item add-new" data-ui-autocomplete-item="">
