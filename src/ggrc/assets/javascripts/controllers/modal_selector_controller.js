@@ -1048,7 +1048,9 @@
           var context_id = null
             , context_object
             ;
-          if (this.context.selected_option.constructor.shortName == "Program") {
+          if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+            context_object = this.context.selected_object;
+          } else if (this.context.selected_option.constructor.shortName == "Program") {
             context_object = this.context.selected_option;
           } else {
             context_object = this.context.selected_object;
@@ -1576,7 +1578,9 @@
             var context_id = null
               , context_object;
   
-            if (this.context.selected_options[i].constructor.shortName == "Program") {
+            if (this.context.selected_object instanceof CMS.Models.TaskGroup) {
+              context_object = this.context.selected_object;
+            } else if (this.context.selected_options[i].constructor.shortName == "Program") {
               context_object = this.context.selected_options[i];
             } else {
               context_object = this.context.selected_object;
