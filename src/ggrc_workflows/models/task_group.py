@@ -54,10 +54,10 @@ class TaskGroup(
 
     for task_group_task in self.task_group_tasks:
       target.task_group_tasks.append(
-          task_group_task.copy(task_group=target))
+          task_group_task.copy(task_group=target, context=target.context))
 
     for task_group_object in self.task_group_objects:
       target.task_group_objects.append(
-          task_group_object.copy(task_group=target))
+          task_group_object.copy(task_group=target, context=target.context))
 
     return target
