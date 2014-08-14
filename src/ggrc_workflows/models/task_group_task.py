@@ -131,6 +131,8 @@ class TaskGroupTask(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
+  object_approval = db.Column(
+      db.Boolean, nullable=False, default=False)
 
   @staticmethod
   def _extra_table_args(cls):
@@ -147,6 +149,7 @@ class TaskGroupTask(
       'relative_start_day',
       'relative_end_month',
       'relative_end_day',
+      'object_approval',
       ]
   _sanitize_html = []
 

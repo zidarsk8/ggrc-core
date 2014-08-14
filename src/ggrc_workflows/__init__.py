@@ -367,6 +367,8 @@ def handle_cycle_task_group_object_task_put(
             new_status=tgobj.status,
             old_status=old_status
             )
+        db.session.add(tgobj)
+      db.session.flush()
 
 # FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
 def _get_or_create_personal_context(user):
