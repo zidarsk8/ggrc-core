@@ -1,3 +1,4 @@
+{{#is_allowed 'create' 'TaskGroupTask' context=parent_instance.context}}
 <li class="tree-footer non-stick">
   <a
     class="inline-footer-link"
@@ -10,3 +11,4 @@
     + Create task
   </a>
 </li>
+{{/is_allowed}}

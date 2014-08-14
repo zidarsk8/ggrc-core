@@ -1,3 +1,4 @@
+{{#is_allowed 'create' 'TaskGroupObject' context=parent_instance.context}}
 <li class="tree-footer non-stick">
   <a
     href="javascript://"
@@ -14,3 +15,4 @@
     + Add Object
   </a>
 </li>
+{{/is_allowed}}
