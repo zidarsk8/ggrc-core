@@ -81,11 +81,30 @@
         if (instance instanceof that) {
           if (instance.task_group.reify().selfLink) {
             instance.task_group.reify().refresh();
+            instance._refresh_workflow_people();
           }
+        }
+      });
+
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          instance._refresh_workflow_people();
         }
       });
     }
   }, {
+    _refresh_workflow_people: function() {
+      //  TaskGroupTask assignment may add mappings and role assignments in
+      //  the backend, so ensure these changes are reflected.
+      var task_group, workflow;
+      task_group = this.task_group.reify();
+      if (task_group.selfLink) {
+        workflow = task_group.workflow.reify();
+        return workflow.refresh().then(function(workflow) {
+          return workflow.context.reify().refresh();
+        });
+      }
+    }
   });
 
 

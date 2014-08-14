@@ -103,26 +103,47 @@ def contributed_object_views():
       object_view(models.Workflow),
       ]
 
+
+def _get_date_range(timeboxed_objects):
+  start_date = None
+  end_date = None
+
+  for obj in timeboxed_objects:
+    obj_start_date = obj.start_date
+    if isinstance(obj_start_date, datetime):
+      obj_start_date = obj_start_date.date()
+    obj_end_date = obj.end_date
+    if isinstance(obj_end_date, datetime):
+      obj_end_date = obj_end_date.date()
+    if obj_start_date is not None:
+      if start_date is None or start_date > obj_start_date:
+        start_date = obj_start_date
+    if obj_end_date is not None:
+      if end_date is None or end_date < obj_end_date:
+        end_date = obj_end_date
+
+  return (start_date, end_date)
+
+
 def update_cycle_date_range(cycle):
   start_date = None
   end_date = None
 
+  import sqlalchemy.orm
+  if cycle.id:
+    # If `cycle` is already in the database, then eager load required objects
+    cycle = models.Cycle.query.filter_by(id=cycle.id).\
+        options(sqlalchemy.orm.joinedload_all(
+          'cycle_task_groups.cycle_task_group_objects.cycle_task_group_object_tasks')).\
+        one()
+
   for ctg in cycle.cycle_task_groups:
     for ctgo in ctg.cycle_task_group_objects:
-      for task in ctgo.cycle_task_group_object_tasks:
-        task_start_date = task.start_date
-        if isinstance(task_start_date, datetime):
-          task_start_date = task_start_date.date()
-        task_end_date = task.end_date
-        if isinstance(task_end_date, datetime):
-          task_end_date = task_end_date.date()
-        if start_date is None or start_date > task_start_date:
-          start_date = task_start_date
-        if end_date is None or end_date < task_end_date:
-          end_date = task_end_date
-
-  cycle.start_date = start_date
-  cycle.end_date = end_date
+      ctgo.start_date, ctgo.end_date = _get_date_range(
+          ctgo.cycle_task_group_object_tasks)
+    ctg.start_date, ctg.end_date = _get_date_range(
+        ctg.cycle_task_group_objects)
+  cycle.start_date, cycle.end_date = _get_date_range(cycle.cycle_task_groups)
 
 
 from ggrc.services.common import Resource
@@ -192,15 +213,13 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
           sort_index=task_group_task.sort_index,
           start_date=task_group_task.calc_start_date(base_date),
           end_date=task_group_task.calc_end_date(base_date),
-          contact=task_group.contact,
+          contact=task_group_task.contact,
           status="Assigned",
           modified_by=current_user,
           )
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)
 
-      #update_cycle_task_group_object_date_rang(cycle_task_group_object)
-    #update_cycle_task_group_date_range(cycle_task_group)
   update_cycle_date_range(obj)
 
   workflow_cycle_start.send(
@@ -281,9 +300,55 @@ def update_cycle_object_parent_state(obj):
         update_cycle_object_parent_state(parent)
 
 
+def ensure_assignee_is_workflow_member(workflow, assignee):
+  if not assignee:
+    return
+
+  # Check if assignee is mapped to the Workflow
+  workflow_people = models.WorkflowPerson.query.filter(
+      models.WorkflowPerson.workflow_id == workflow.id,
+      models.WorkflowPerson.person_id == assignee.id).all()
+  if not workflow_people:
+    workflow_person = models.WorkflowPerson(
+        person=assignee,
+        workflow=workflow,
+        context=workflow.context
+        )
+    db.session.add(workflow_person)
+
+  # Check if assignee has a role assignment
+  from ggrc_basic_permissions.models import Role, UserRole
+  user_roles = UserRole.query.filter(
+      UserRole.context_id == workflow.context_id,
+      UserRole.person_id == assignee.id).all()
+  if not user_roles:
+    workflow_member_role = _find_role('WorkflowMember')
+    user_role = UserRole(
+        person=assignee,
+        role=workflow_member_role,
+        context=workflow.context,
+        modified_by=get_current_user(),
+        )
+    db.session.add(user_role)
+
+
+@Resource.model_put.connect_via(models.TaskGroupTask)
+def handle_task_group_task_put(sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+
+
+@Resource.model_posted.connect_via(models.TaskGroupTask)
+def handle_task_group_task_post(sender, obj=None, src=None, service=None):
+  ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
+
+
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
     sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
+
   if inspect(obj).attrs.start_date.history.has_changes() \
       or inspect(obj).attrs.end_date.history.has_changes():
     update_cycle_date_range(obj.cycle)
@@ -395,6 +460,9 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   if not src.get('private'):
     # Add role implication - all users can read a public workflow
     add_public_workflow_context_implication(context)
+
+  if src.get('clone'):
+    source_workflow.copy_task_groups(obj)
 
 
 def add_public_workflow_context_implication(context, check_exists=False):

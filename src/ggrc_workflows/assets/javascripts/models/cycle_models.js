@@ -262,7 +262,9 @@
           function force_refresh_chain(chain) {
             can.reduce(chain, function(a, b) {
               return a.then(function(obj) {
+                if (obj && obj[b]) {
                   return obj[b].reify().refresh();
+                }
               });
             }, dfd);
           }
