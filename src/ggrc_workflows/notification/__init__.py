@@ -360,11 +360,11 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
     return
   found_cycle=False
   for cycle in workflow.cycles:
-    if cycle.status not in ['InProgress', 'Finished', 'Verified']:
-      continue
-    else:
+    if cycle.is_current:
       found_cycle=True
       break
+    else:
+      continue
   if not found_cycle:
     current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
     return
@@ -394,7 +394,7 @@ def prepare_notification_for_workflow_member(workflow, member, subject, notif_pr
       workflow_owner, recipients, notify_custom_message=notify_custom_message, override=override_flag)
     prepare_notification(workflow, 'Email_Digest', notif_pri, subject, content, \
         workflow_owner, recipients, override=override_flag)
-    prepare_calendar_for_workflow_member(workflow, member)
+    prepare_calendar_for_workflow_member(cycle, workflow, member, action)
 
 def prepare_notification_for_cycle(cycle, subject, notif_pri, notify_custom_message=False):
   workflow=get_cycle_workflow(cycle)
@@ -701,7 +701,7 @@ def prepare_calendar_for_cycle(cycle, enable_flag=None):
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
   calendar_service.handle_cycle_calendar_update(cycle, enable_flag)
 
-def prepare_calendar_for_workflow_member(workflow, member):
+def prepare_calendar_for_workflow_member(cycle, workflow, member, action):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
     return
   user=get_current_user()
@@ -712,19 +712,13 @@ def prepare_calendar_for_workflow_member(workflow, member):
     current_app.logger.error("Authorization credentials is not set for user " + user.email)
     return
     #raise Forbidden()
-  found_cycle=False
-  for cycle in workflow.cycles:
-    if cycle.status not in ['InProgress', 'Finished', 'Verified']:
-      continue
-    else:
-      found_cycle=True
-      break
-  if not found_cycle:
-    current_app.logger.warn("Trigger: No Cycle has been started for workflow " + workflow.title)
-    return
   from oauth2client.client import Credentials
   calendar_service=WorkflowCalendarService(Credentials.new_from_json(request.oauth_credentials))
-  calendar_service.handle_cycle_calendar_update(cycle)
+  if action in ['Remove']:
+    disable_notif={member.id: False}
+    calendar_service.handle_cycle_calendar_update(cycle, disable_notif)
+  else:
+    calendar_service.handle_cycle_calendar_update(cycle)
 
 def prepare_calendar_for_taskgroup(taskgroup, assignee=None):
   if getattr(settings, 'CALENDAR_MECHANISM', False) is False:
