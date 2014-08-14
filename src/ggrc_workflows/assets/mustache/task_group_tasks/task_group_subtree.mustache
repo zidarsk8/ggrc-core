@@ -3,7 +3,7 @@
       <div class="row-fluid">
         <div class="span4">
           <div class="oneline">
-            {{#is_allowed 'update' instance context=for}}
+            {{#is_allowed 'update' instance}}
             <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
               <i class="grcicon-drag"></i>
             </a>
