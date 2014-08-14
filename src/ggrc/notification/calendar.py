@@ -203,10 +203,12 @@ def create_calendar_entry(calendar_service, calendar_name, owner_id):
       body=calendar_entry).execute()
   except errors.HttpError, error:
     current_app.logger.error("HTTP Error occured in creating calendar with ID: " + calendar_name + " " +  str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in creating calendar with ID: " + calendar_name + " " +  str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   if calendar is not None:
     calendar_object=CalendarEntry(
       owner_id=owner_id,
@@ -218,14 +220,17 @@ def create_calendar_entry(calendar_service, calendar_name, owner_id):
 
 def get_calendar(calendar_service, calendar_id):
   from apiclient import errors
+  calendar=None
   try:
     calendar=calendar_service.calendars().get(calendarId=calendar_id).execute()
   except errors.HttpError, error:
     current_app.logger.error("HTTP Error occured in getting calendar for ID: " + calendar_id + " " +  str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in getting calendar for ID: " + calendar_id + " " +  str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   return calendar
 
 def find_calendar_entry(calendar_service, calendar_name, owner_id):
@@ -248,25 +253,26 @@ def create_calendar_event(calendar_service, calendar_id, event_details):
       body=event_details).execute()
   except errors.HttpError, error:
     current_app.logger.error("HTTP Error occured in creating calendar event: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in creating calendar event: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   return calendar_event
 
 def delete_calendar_event(calendar_service, calendar_id, event_id):
   from apiclient import errors
-  calendar_event=None
   try:
     calendar_service.events().delete(
       calendarId=calendar_id,
       eventId=event_id).execute()
   except errors.HttpError, error:
     current_app.logger.error("Exception occured in deleting calendar event: " + str(error))
-    raise Forbidden()
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in deleting calendar event: " + str(error))
-    raise Forbidden()
+    #raise Forbidden()
   return 
 
 def get_calendar_event(calendar_service, calendar_id, event_id):
@@ -277,10 +283,12 @@ def get_calendar_event(calendar_service, calendar_id, event_id):
       events=calendar_service.events().list(calendarId=calendar_id, q=event_id, pageToken=page_token).execute()
     except errors.HttpError, error:
       current_app.logger.error("HTTP Error occured in getting calendar events: " + str(error))
-      raise Forbidden()
+      return None 
+      #raise Forbidden()
     except Exception, error:
       current_app.logger.error("Exception occured in getting calendar events: " + str(error))
-      raise Forbidden()
+      return None
+      #raise Forbidden()
     for event in events['items']:
       if event.has_key('summary'):
         if event['summary'] in [event_id]:
@@ -300,10 +308,12 @@ def update_calendar_event(calendar_service, calendar_id, event_id, event_details
       body=event_details).execute()
   except errors.HttpError, error:
     current_app.logger.error("HTTP Error occured in updating calendar event: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in updating calendar event: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   return calendar_event 
 
 def create_calendar_acl(calendar_service, calendar_id, recipient_email, role):
@@ -322,10 +332,12 @@ def create_calendar_acl(calendar_service, calendar_id, recipient_email, role):
       body=rule).execute()
   except errors.HttpError, error:
     current_app.logger.error("HTTP Error occured in creating calendar ACL: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   except Exception, error:
     current_app.logger.error("Exception occured in creating calendar ACL: " + str(error))
-    raise Forbidden()
+    return None
+    #raise Forbidden()
   return calendar_acl
 
 def create_calendar_acls(calendar_service, calendar_id, assignee_emails, skip_emails, role):
@@ -347,24 +359,28 @@ def get_calendar_acl(calendar_service, calendar_id, recipient_email, role):
   from apiclient import errors
   page_token = None
   while True:
+    acls=None
     try:
       acls=calendar_service.acl().list(calendarId=calendar_id, pageToken=page_token).execute()
     except errors.HttpError, error:
       current_app.logger.error("HTTP Error occured in getting calendar acl: " + str(error))
-      raise Forbidden()
+      return None
+      #raise Forbidden()
     except Exception, error:
       current_app.logger.error("Exception occured in getting calendar acl: " + str(error))
-      raise Forbidden()
-    for rule in acls['items']:
-      if rule['role'] != role:
-        continue
-      if rule['scope']['type'] != 'user':
-        continue
-      if rule['scope']['value'] != recipient_email:
-        continue
-      else:
-        return rule
-    page_token = acls.get('nextPageToken')
-    if not page_token:
-      break
+      return None
+      #raise Forbidden()
+    if acls is not None:
+      for rule in acls['items']:
+        if rule['role'] != role:
+          continue
+        if rule['scope']['type'] != 'user':
+          continue
+        if rule['scope']['value'] != recipient_email:
+          continue
+        else:
+          return rule
+      page_token = acls.get('nextPageToken')
+      if not page_token:
+        break
   return None
