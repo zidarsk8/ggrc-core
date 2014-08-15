@@ -243,14 +243,9 @@ def handle_notification_config_put(sender, obj=None, src=None, service=None):
 def handle_notification_config_changes(sender, obj=None, src=None, service=None):
   if obj.notif_type != 'Calendar':
     return
-  if obj.enable_flag:
-    cycles=db.session.query(models.Cycle).\
+  cycles=db.session.query(models.Cycle).\
     filter(models.Cycle.is_current==True).\
-    filter(models.Cycle.start_date <= date.today()).all()
-  else:
-    cycles=db.session.query(models.Cycle).\
-    filter(models.Cycle.is_current==True).\
-    filter(models.Cycle.start_date > date.today()).all()
+    filter(models.Cycle.start_date >= date.today()).all()
   user=get_current_user()
   for cycle in cycles:
     workflow=get_cycle_workflow(cycle)
