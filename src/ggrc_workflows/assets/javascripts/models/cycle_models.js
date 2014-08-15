@@ -9,10 +9,7 @@
 (function(can) {
 
   var _mustache_path,
-      overdue_compute,
-      refresh_attr,
-      refresh_attr_wrap,
-      force_refresh_chain;
+      overdue_compute;
 
   overdue_compute = can.compute(function(val) {
     if (this.attr("status") === "Verified") {
@@ -25,29 +22,19 @@
     return "";
   });
 
-  refresh_attr = function(instance, attr){
+  function refresh_attr(instance, attr){
     if (instance.attr(attr).reify().selfLink) {
       instance.attr(attr).reify().refresh();
     }
-  };
+  }
 
-  refresh_attr_wrap = function(attr){
+  function refresh_attr_wrap(attr){
     return function(ev, instance) {
       if (instance instanceof this) {
         refresh_attr(instance, attr);
       }
     };
-  };
-
-  force_refresh_chain = function(chain, dfd) {
-    can.reduce(chain, function(a, b) {
-      return a.then(function(obj) {
-        if (obj && obj[b]) {
-          return obj[b].reify().refresh();
-        }
-      });
-    }, dfd);
-  };
+  }
 
   _mustache_path = GGRC.mustache_path + "/cycles";
   can.Model.Cacheable("CMS.Models.Cycle", {
@@ -281,11 +268,11 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var object = instance.cycle_task_group_object.reify(),
-              dfd = object.refresh();
-
-          force_refresh_chain(["cycle_task_group", "cycle", "workflow"], dfd);
-          force_refresh_chain(["task_group_object", "object"], dfd);
+          instance.refresh_all('cycle_task_group_object',
+              'cycle_task_group', 'cycle', 'workflow').then(function() {
+            var object = instance.cycle_task_group_object.reify();
+            object.refresh_all('task_group_object', 'object');
+          });
         }
       });
     }
