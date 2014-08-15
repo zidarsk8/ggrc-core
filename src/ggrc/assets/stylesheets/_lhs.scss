@@ -185,6 +185,17 @@
           color: $programs;
         }
       }
+      &.wf-inprogress{
+        a {
+
+          background: $rqStarted !important;
+        }
+      }
+      &.wf-verified{
+        a {
+          background: $rqAccepted !important;
+        }
+      }
     }
   }
   ul.sub-level,
@@ -267,7 +278,7 @@
       a {
         font-size:12px;
         color:#333;
-        
+
         padding-left: 10px;
         background: none;
         &:hover {
