@@ -184,9 +184,11 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var dfd = instance.refresh();
-          console.log('refreshing');
-          force_refresh_chain(["cycle", "workflow"], dfd);
+          var dfd = instance.refresh_all('cycle', 'workflow');
+          dfd.then(function(){
+            instance.refresh_all('cycle_task_group_objects',
+              'cycle_task_group_object_tasks');
+          });
         }
       });
     }
