@@ -192,8 +192,9 @@
             .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
             .first();
         }
-        if ($first_input.length > 0 && (!ev || that.$element.is(ev.target)))
-          setTimeout(function() { $first_input.get(0).focus(); }, 100);
+        if ($first_input.length > 0 && (!ev || that.$element.is(ev.target))) {
+          $first_input.get(0).focus();
+        }
       }, 100);
     }
   });
