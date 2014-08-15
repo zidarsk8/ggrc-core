@@ -370,6 +370,14 @@ def handle_cycle_task_group_object_task_put(
         db.session.add(tgobj)
       db.session.flush()
 
+
+@Resource.model_put.connect_via(models.CycleTaskGroup)
+def handle_cycle_task_group_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    update_cycle_object_parent_state(obj)
+
+
 # FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
 def _get_or_create_personal_context(user):
   personal_context = user.get_or_create_object_context(

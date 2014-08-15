@@ -11,7 +11,8 @@
   var _mustache_path,
       overdue_compute,
       refresh_attr,
-      refresh_attr_wrap;
+      refresh_attr_wrap,
+      force_refresh_chain;
 
   overdue_compute = can.compute(function(val) {
     if (this.attr("status") === "Verified") {
@@ -36,6 +37,16 @@
         refresh_attr(instance, attr);
       }
     };
+  };
+
+  force_refresh_chain = function(chain, dfd) {
+    can.reduce(chain, function(a, b) {
+      return a.then(function(obj) {
+        if (obj && obj[b]) {
+          return obj[b].reify().refresh();
+        }
+      });
+    }, dfd);
   };
 
   _mustache_path = GGRC.mustache_path + "/cycles";
@@ -165,6 +176,19 @@
           allow_creating: false
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          var dfd = instance.refresh();
+          console.log('refreshing');
+          force_refresh_chain(["cycle", "workflow"], dfd);
+        }
+      });
     }
   }, {
     overdue: overdue_compute,
@@ -256,20 +280,10 @@
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
           var object = instance.cycle_task_group_object.reify(),
-              dfd = object.refresh(),
-              rq = new RefreshQueue();
+              dfd = object.refresh();
 
-          function force_refresh_chain(chain) {
-            can.reduce(chain, function(a, b) {
-              return a.then(function(obj) {
-                if (obj && obj[b]) {
-                  return obj[b].reify().refresh();
-                }
-              });
-            }, dfd);
-          }
-          force_refresh_chain(["cycle_task_group", "cycle", "workflow"]);
-          force_refresh_chain(["task_group_object", "object"]);
+          force_refresh_chain(["cycle_task_group", "cycle", "workflow"], dfd);
+          force_refresh_chain(["task_group_object", "object"], dfd);
         }
       });
     }
