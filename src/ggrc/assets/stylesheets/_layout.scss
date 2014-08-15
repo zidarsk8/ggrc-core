@@ -59,9 +59,6 @@
 .object-area {
   position:fixed;
   top:80px;
-  padding-top:30px;
-  background:#ddd;
-  @include box-shadow(inset 0 0 12px #bbb);
   overflow-y:auto;
   overflow-x:hidden;
   margin-left:200px;

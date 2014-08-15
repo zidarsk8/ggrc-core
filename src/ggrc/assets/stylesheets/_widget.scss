@@ -8,8 +8,6 @@
 
 // widgets styles
 .widget {
-  @include border-radius();
-  @include box-shadow(0 0 5px lighten($gray,10%));
   .header {
     .widget-action {
       i {
@@ -29,10 +27,7 @@
       }
     }
   }
-  width:96%;
-  margin:0 2% 4% 2%;
-  border:1px solid #aaa;
-  @include transition(box-shadow 0.2s,border-color 0.2s);
+  margin:0 0 0 8px;
   &.workflow-info-widget {
     overflow-y: visible;
   }
