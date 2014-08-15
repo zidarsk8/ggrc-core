@@ -79,6 +79,7 @@
       this.bind("status", function(ev, newVal) {
         if(newVal === 'Verified' && this.workflow.reify().object_approval) {
           this.attr("is_current", false);
+          this.save();
         }
       });
     }
