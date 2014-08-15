@@ -184,12 +184,19 @@
     }
 
   , focus_first_input: function(ev) {
-      var $first_input = this.$element
-        .find('input[type="text"], input[type="checkbox"], select, textarea')
-        .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
-        .first();
-      if ($first_input.length > 0 && (!ev || this.$element.is(ev.target)))
-        setTimeout(function() { $first_input.get(0).focus(); }, 100);
+      var that = this;
+      setTimeout(function() {
+        var $first_input;
+        $first_input = that.$element.find('*[autofocus]');
+        if ($first_input.length == 0) {
+          $first_input = that.$element
+            .find('input[type="text"], input[type="checkbox"], select, textarea')
+            .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
+            .first();
+        }
+        if ($first_input.length > 0 && (!ev || that.$element.is(ev.target)))
+          setTimeout(function() { $first_input.get(0).focus(); }, 100);
+      }, 100);
     }
   });
 
