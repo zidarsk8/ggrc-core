@@ -16,12 +16,11 @@
 // placeholder for widgets drag and drop
 .drop-placeholder {
   background:$dropPlaceholder;
-  border:1px dashed $gray;
-  height:35px;
-  line-height:35px;
+  border:1px dotted $gray;
+  height:24px;
+  line-height:24px;
   font-size: $f-regular;
   font-weight: bold;
-  margin-bottom:20px;
   @include border-radius($default-border-radius);
   text-align: center;
   &:before {
