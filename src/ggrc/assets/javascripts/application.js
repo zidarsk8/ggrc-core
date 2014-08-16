@@ -1171,6 +1171,7 @@ jQuery(function($){
 });
 
 jQuery(function($){
+  var MAX_RESULTS = 20;
   $.widget(
     "ggrc.autocomplete",
     $.ui.autocomplete,
@@ -1187,27 +1188,41 @@ jQuery(function($){
 
         source: function(request, response) {
           // Search for the people based on the term
-          var query = request.term || ''
-            , queue = new RefreshQueue()
-            , that = this;
+          var query = request.term || '',
+              queue = new RefreshQueue(),
+              that = this,
+              is_next_page = request.start != null,
+              dfd;
 
           if (query.indexOf('@') > -1)
             query = '"' + query + '"';
 
+          this.last_request = request;
+          if(is_next_page) {
+            dfd = $.when(this.last_stubs);
+          } else {
+            request.start = 0;
+            dfd = this.options.source_for_refreshable_objects.call(this, request);
+          }
+
           this.options.controller.bindXHRToButton(
             // Retrieve full people data
-            this.options.source_for_refreshable_objects.call(this, request).then(function(objects) {
-            can.each(objects, function(object) {
+
+          dfd.then(function(objects) {
+            that.last_stubs = objects;
+            can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
               queue.enqueue(object);
             });
             queue.trigger().then(function(objs) {
               objs = that.options.apply_filter.call(that, objs, request);
-              if(objs.length) {
+              if(objs.length || is_next_page) {
                 // Envelope the object to not break model instance due to
                 // shallow copy done by jQuery in `response()`
                 objs = can.map(objs, function(obj) { return { item: obj }; });
                 response(objs);
               } else {
+                // show the no-results option iff no results come through here,
+                //  and not merely showing paging.
                 that._suggest( [] );
                 that._trigger( "open" );
               }
@@ -1273,6 +1288,7 @@ jQuery(function($){
         },
 
         close: function() {
+          delete this.scroll_op_in_progress;
           //$that.val($that.attr("value"));
         }
       },
@@ -1335,8 +1351,10 @@ jQuery(function($){
 
       _renderMenu: function(ul, items) {
         var template = this.element.data("template"),
-          context = this._setup_menu_context(items)
-          model = context.model
+          context = new can.Observe(this._setup_menu_context(items)),
+          model = context.model,
+          that = this,
+          $ul = $(ul)
           ;
 
         if (!template) {
@@ -1346,12 +1364,32 @@ jQuery(function($){
             template = '/base_objects/autocomplete_result.mustache';
           }
         }
+
+        $ul.unbind("scrollNext")
+        .bind("scrollNext", function(ev, data) {
+          if(that.scroll_op_in_progress) {
+            return;
+          }
+          that.scroll_op_in_progress = true;
+          that.last_request = that.last_request || {};
+          that.last_request.start = that.last_request.start || 0;
+          that.last_request.start += MAX_RESULTS;
+          context.attr("items_loading", true);
+          that.source(that.last_request, function(items) {
+            context.items.push.apply(context.items, can.map(items, function(item) { return item.item; }));
+            context.removeAttr("items_loading");
+            setTimeout(function() {
+              delete that.scroll_op_in_progress;
+            }, 10);
+          });
+        });
+
         can.view.render(
           GGRC.mustache_path + template,
           context,
           function(frag) {
-            $(ul).html(frag);
-            $(ul).cms_controllers_lhn_tooltips();
+            $ul.html(frag);
+            $ul.cms_controllers_lhn_tooltips().cms_controllers_infinite_scroll();
             can.view.hookup(ul);
           });
       }
