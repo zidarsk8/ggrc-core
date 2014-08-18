@@ -338,7 +338,6 @@
 // INNER NAV
 
 .inner-nav {
-  background:#fff;
   .object-nav {
     .add-nav-item {
       position:relative;
@@ -371,6 +370,7 @@
   }
   ul.internav {
     @include reset-list();
+    margin-top:10px;
     overflow-y:auto;
     li {
       background:$white;

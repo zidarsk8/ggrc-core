@@ -167,15 +167,11 @@
     }
   }
   .header {
-    background-color: $defaultWidget;
-    border-bottom:1px solid darken($lightGray, 10%);
-    @include transition(background-color 0.2s);
+    background-color: $white;
+    border-bottom:1px solid #eee;
     color:$text;
     height: 30px;
     padding-left: 16px;
-    &:hover {
-      cursor: move;
-    }
     .widget-action {
       height: 30px;
       width: 30px;
@@ -185,9 +181,9 @@
       }
     }
     h2 {
-      font-weight:normal;
+      font-weight:bold;
       line-height: 28px;
-      color: $white;
+      color: #444;
       margin-bottom:0;
       @include oneline();
       span {
@@ -227,42 +223,58 @@
   }
   &.governance {
     .header {
-      background-color:$governance;
+      h2 {
+      color:$governance;
+      }
     }
   }
   &.programs {
     .header {
-      background-color:$programs;
+      h2 {
+      color:$programs;
+      }
     }
   }
   &.risk {
     .header {
-      background-color:$risk;
+      h2 {
+      color:$risk;
+      }
     }
   }
   &.business {
     .header {
-      background-color:$business;
+      h2 {
+      color:$business;
+      }
     }
   }
   &.controls {
     .header {
-      background-color:$controls;
+      h2 {
+      color:$controls;
+      }
     }
   }
   &.objectives {
     .header {
-      background-color:$objectives;
+      h2 {
+      color:$objectives;
+      }
     }
   }
   &.entities {
     .header {
-      background-color:$entities;
+      h2 {
+      color:$entities;
+      }
     }
   }
   &.workflow {
     .header {
-      background-color:$programs;
+      h2 {
+      color:$programs;
+      }
     }
   }
   .filter {
