@@ -171,9 +171,9 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var dfd = instance.refresh_all('cycle', 'workflow');
+          var dfd = instance.refresh_all_force('cycle', 'workflow');
           dfd.then(function(){
-            instance.refresh_all('cycle_task_group_objects',
+            instance.refresh_all_force('cycle_task_group_objects',
               'cycle_task_group_object_tasks');
           });
         }
@@ -268,10 +268,10 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all('cycle_task_group_object',
+          instance.refresh_all_force('cycle_task_group_object',
               'cycle_task_group', 'cycle', 'workflow').then(function() {
             var object = instance.cycle_task_group_object.reify();
-            object.refresh_all('task_group_object', 'object');
+            object.refresh_all_force('task_group_object', 'object');
           });
         }
       });
