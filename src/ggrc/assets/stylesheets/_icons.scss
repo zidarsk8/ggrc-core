@@ -722,9 +722,7 @@ i.short {
   .grcicon-cycle-color { background-position: -342px -32px; }
 
   li {
-    &.active,
-    &:hover,
-    &.overdue {
+    &:hover {
       // turned icons to white
       .grcicon-info { background-position:-198px -80px; }
       .grcicon-role-color { background-position:-102px -32px; }
@@ -768,6 +766,8 @@ i.short {
       .grcicon-cycle-color { background-position: -342px -56px; }
     }
   }
+
+
   &.innernav-arrow {
     li.accordion-group-inner {
       .sub-level {
@@ -806,55 +806,6 @@ i.short {
   }
 }
 
-// icons for active widget state
-
-.widget {
-  .header {
-    // turned icons to white
-    .grcicon-info { background-position:-198px -80px; }
-    .grcicon-role-color { background-position:-102px -32px; }
-    .grcicon-authorization-color { background-position:-102px -32px; }
-    .grcicon-directive-color { background-position:-78px -200px; }
-    .grcicon-control-color { background-position:-150px -248px }
-    .grcicon-link { background-position:-30px -128px; }
-    .grcicon-user { background-position:-6px -32px; }
-    .grcicon-user-black { background-position:-6px -32px; }
-    .grcicon-data_asset-color { background-position:-174px -248px; }
-    .grcicon-facility-color { background-position:-222px -128px; }
-    .grcicon-market-color { background-position:-246px -128px; }
-    .grcicon-org_group-color { background-position:-78px -248px; }
-    .grcicon-process-color { background-position:-102px -248px }
-    .grcicon-product-color { background-position:-270px -128px; }
-    .grcicon-project-color { background-position:-54px -248px; }
-    .grcicon-system-color { background-position:-126px -248px; }
-    .grcicon-contract-color { background-position:-126px -128px; }
-    .grcicon-policy-color { background-position:-150px -128px; }
-    .grcicon-regulation-color { background-position:-174px -128px; }
-    .grcicon-standard-color { background-position:-222px -368px; }
-    .grcicon-objective-color { background-position:-150px -80px; }
-    .grcicon-risk-color { background-position:-198px -248px; }
-    .grcicon-risk_assessment-color { background-position:-198px -248px; }
-    .grcicon-risky_attribute-color { background-position:-222px -248px; }
-    .grcicon-audit { background-position:-270px -32px; }
-    .grcicon-audit-color { background-position:-270px -32px; }
-    .grcicon-section-color { background-position:-198px -128px; }
-    .grcicon-clause-color { background-position:-294px -80px; }
-    .grcicon-event-color { background-position:-198px -56px; }
-    .grcicon-help-black { background-position:-78px -32px; }
-    .grcicon-x-grey { background-position:-174px -176px; }
-    .grcicon-program-color { background-position:-102px -128px; }
-    .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
-    .grcicon-request-color { background-position:-54px -392px; }
-    .grcicon-response-color { background-position:-102px -392px; }
-    .grcicon-assessment-color { background-position:-174px -392px; }
-    .grcicon-object-color { background-position:-6px -368px; }
-    .grcicon-workflow-color { background-position:-6px -368px; }
-    .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -344px; }
-    .grcicon-task_group-color { background-position:-318px -32px; }
-    .grcicon-history-color { background-position: -318px -128px; }
-    .grcicon-cycle-color { background-position: -342px -56px; }
-  }
-}
 
 // icons for disabled tree object in object selector
 .tree-item {
