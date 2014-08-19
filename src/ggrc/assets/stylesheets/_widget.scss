@@ -426,6 +426,9 @@
   }
   .info {
     padding:5px 16px 0 16px;
+    h6 {
+      font-weight:normal;
+    }
     &.person-info {
       padding: 5px 0 0 0;
       > div {
@@ -438,7 +441,7 @@
     }
     h3 {
       font-weight:normal;
-      padding-bottom:6px;
+      padding-bottom:12px;
       i {
         cursor: pointer;
         @include opacity(0.2);
@@ -490,6 +493,9 @@
     .url {
       display: inline-block;
       @include oneline();
+    }
+    .error {
+      font-weight:normal;
     }
   }
   .risk-content {
@@ -957,6 +963,8 @@
 // Mockups Assessment Page V1.0
 .info-utility-link {
   margin: 10px 0 15px 0;
+  padding-top:6px;
+  border-top:1px solid #eee;
   i {
     margin-top: 1px;
   }
