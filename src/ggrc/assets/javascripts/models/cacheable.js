@@ -896,6 +896,11 @@ can.Model("can.Model.Cacheable", {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props);
+  },
+  refresh_all_force: function() {
+    var props = Array.prototype.slice.call(arguments, 0);
+
+    return RefreshQueue.refresh_all(this, props, true);
   }
 });
 
