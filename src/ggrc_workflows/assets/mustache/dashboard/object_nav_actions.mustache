@@ -5,6 +5,8 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
+
+{{#is_allowed 'update' instance context='for'}}
 {{#with_mapping_count instance 'current_cycle'}}
 {{^count}}
 <li class="inner-nav-button">
@@ -16,3 +18,4 @@
 </li>
 {{/count}}
 {{/with_mapping_count}}
+{{/is_allowed}}
