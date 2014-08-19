@@ -10,7 +10,10 @@
             {{/if}}
           </div>
           <div class="span6">
-          {{#if mappings}}
+          {{#if is_in_selector}}
+          <!-- no unmap link-->
+          {{else}}
+          {{#if mappings}}          
           {{#is_allowed_all 'delete' mappings}}
           {{^is_dashboard}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
@@ -20,6 +23,7 @@
             </a>
           {{/is_dashboard}}
           {{/is_allowed_all}}
+          {{/if}}
           {{/if}}
           </div>
         </div>
