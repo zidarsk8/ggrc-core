@@ -837,6 +837,7 @@
               instance: option
             , binding: null
             , mappings: []
+            , is_in_selector: true
             }
           ;
         if (self.results_lists[option_model_name]) {
