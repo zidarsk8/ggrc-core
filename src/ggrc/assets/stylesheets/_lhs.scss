@@ -185,17 +185,6 @@
           color: $programs;
         }
       }
-      &.wf-inprogress{
-        a {
-
-          background: $rqStarted !important;
-        }
-      }
-      &.wf-verified{
-        a {
-          background: $rqAccepted !important;
-        }
-      }
     }
   }
   ul.sub-level,
