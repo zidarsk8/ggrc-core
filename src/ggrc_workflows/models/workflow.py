@@ -7,7 +7,7 @@
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed
+    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
@@ -22,11 +22,11 @@ from datetime import date
 
 
 class Workflow(
-    HasOwnContext, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+    HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
 
-  #Use these states for WorkflowCycle when it is implemented
-  #VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
+  # Inactive state is computed
+  VALID_STATES = [u"Draft", u"Active", u"NoRecurrences"]
 
   VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
 
@@ -70,15 +70,23 @@ class Workflow(
   next_cycle_start_date = deferred(
       db.Column(db.Date, nullable=True), 'Workflow')
 
+  # Possible workflow_states: Draft, Inactive, Active
   @computed_property
   def workflow_state(self):
-    cycles = db.session.query(Cycle)\
-      .filter(
-        Cycle.workflow_id == self.id
-      )\
-      .all()
+    if self.status != 'NoRecurrences':
+      return self.status
 
-    return WorkflowState.get_state(cycles)
+    active_cycles = db.session.query(Cycle)\
+        .filter(Cycle.workflow_id == self.id,
+                Cycle.status != 'Verified',
+                Cycle.is_current == True)\
+        .all()
+
+    if len(active_cycles) == 0:
+      return 'Inactive'
+
+    # The workflow still has active cycles
+    return "Active"
 
   _fulltext_attrs = [
       'notify_custom_message',

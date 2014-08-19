@@ -7,6 +7,45 @@
 
 ;(function(CMS, GGRC, can, $) {
 
+  function _generate_cycle() {
+    var workflow = GGRC.page_instance(),
+        dfd = new $.Deferred(),
+        cycle;
+
+    GGRC.Controllers.Modals.confirm({
+      modal_title : "Confirm",
+      modal_confirm : "Proceed",
+      skip_refresh : true,
+      button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
+      content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
+      instance : workflow
+    }, function(params) {
+      var data = {};
+
+      can.each(params, function(item) {
+        data[item.name] = item.value;
+      });
+
+      cycle = new CMS.Models.Cycle({
+        context: workflow.context.stub(),
+        workflow: { id: workflow.id, type: "Workflow" },
+        start_date: data.base_date || null,
+        autogenerate: true
+      });
+
+      cycle.save().then(function(cycle) {
+        // Cycle created. Workflow started.
+        setTimeout(function() {
+          dfd.resolve();
+          window.location.hash = 'current_widget/cycle/' + cycle.id;
+        }, 250);
+      });
+    }, function() {
+      dfd.reject();
+    });
+    return dfd;
+  }
+
   can.Control("GGRC.Controllers.WorkflowPage", {
     defaults: {
     }
@@ -28,39 +67,38 @@
     tag: "workflow-start-cycle",
     content: "<content/>",
     events: {
+      click: _generate_cycle
+    }
+  });
+
+  can.Component.extend({
+    tag: "workflow-activate",
+    template: "<content/>",
+    events: {
       click: function() {
-        var page_instance = GGRC.page_instance(),
-            that = this,
-            cycle;
-
-        GGRC.Controllers.Modals.confirm({
-          modal_title : "Confirm",
-          modal_confirm : "Proceed",
-          skip_refresh : true,
-          button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
-          content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
-          instance : GGRC.page_instance()
-        }, function(params) {
-          var data = {};
-
-          can.each(params, function(item) {
-            data[item.name] = item.value;
+        var workflow = GGRC.page_instance();
+        if (workflow.frequency !== 'one_time') {
+          workflow.refresh().then(function() {
+            workflow.attr('status', "Active").save();
           });
-
-          cycle = new CMS.Models.Cycle({
-            context: page_instance.context.stub(),
-            workflow: { id: page_instance.id, type: "Workflow" },
-            start_date: data.base_date || null,
-            autogenerate: true
+        } else {
+          _generate_cycle().then(function() {
+            workflow.refresh().then(function() {
+              workflow.attr('status', "NoRecurrences").save();
+            });
           });
+        }
+      }
+    }
+  });
 
-          cycle.save().then(function(cycle) {
-            // Cycle created. Workflow started.
-            setTimeout(function() {
-              window.location.hash = 'current_widget/cycle/' + cycle.id;
-            }, 250);
-          });
-        });
+  can.Component.extend({
+    tag: "workflow-deactivate",
+    template: "<content/>",
+    events: {
+      click: function() {
+        var workflow = GGRC.page_instance();
+        workflow.attr('status', "NoRecurrences").save();
       }
     }
   });
