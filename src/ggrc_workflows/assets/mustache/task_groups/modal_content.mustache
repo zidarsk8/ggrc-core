@@ -13,7 +13,7 @@
         <span class="required">*</span>
         <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
       </label>
-      <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1">
+      <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <input id="context_id" name="context" type="hidden" model="Context" value="{{firstnonempty instance.context.id object_params.context}}">
       <br>
     </div>

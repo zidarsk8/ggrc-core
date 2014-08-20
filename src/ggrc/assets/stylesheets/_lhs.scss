@@ -304,43 +304,38 @@
   height:100%;
   z-index:100;
   width:6px;
-  background-color:#ddd;
-  border-left:1px solid #aaa;
-  border-right:1px solid #aaa;
+  background-color:#fff;
+  border-left:1px solid #ddd;
+  border-right:1px solid #ddd;
   background-image: image-url("bgnds/drag-v.png");
   @include background-size(2px 30px);
   background-repeat:no-repeat;
   background-position:2px 50%;
-  @include opacity(0.6);
   cursor:ew-resize;
   &:hover {
-    @include opacity(1);
     background-color:#fff;
   };
   &.bar-closed {
     left:40px;
     cursor:e-resize;
   }
-}
-// Show object nav bar-v below title
-.bar-v.objnav {
-  z-index: 1;
+  &.objnav {
+    z-index: 1;  // Show object nav bar-v below title
+  }
 }
 
 // INNER NAV
 
 .inner-nav {
-  background:#fff;
   .object-nav {
     .add-nav-item {
       position:relative;
       display:block;
-      border-bottom:1px solid #ddd;
       background:#fff;
       a.dropdown-toggle {
         padding-left:20px;
         display:block;
-        line-height:30px;
+        line-height:24px;
         font-size:12px;
         font-weight:bold;
       }
@@ -363,20 +358,26 @@
     }
   }
   ul.internav {
-    border-top:1px solid #ddd;
     @include reset-list();
+    margin-top:10px;
     overflow-y:auto;
     li {
       background:$white;
       position:relative;
       .drag {
         position:absolute;
-        @include opacity(0.5);
         top:0;
         left:0;
         width:16px;
-        height:30px;
+        height:24px;
+        line-height:24px;
         cursor:move;
+        &:hover {
+          background-image: image-url("grcicons/icons.png");
+          background-repeat: no-repeat;
+          @include background-size(368px 416px);
+          background-position: -270px -316px;
+        }
       }
       &.inner-nav-button {
         text-align: center;
@@ -405,16 +406,15 @@
     a {
       padding-left:20px;
       display:block;
-      line-height:30px;
+      line-height:24px;
       font-size:13px;
-      border-bottom:1px solid #ddd;
       color:#777;
       &:hover {
         background-color:#444;
         background-image: image-url("grcicons/icons.png");
         background-repeat: no-repeat;
         @include background-size(368px 416px);
-        background-position: -270px -313px;
+        background-position: -270px -316px;
         color:#fff;
         text-decoration:none;
       }
@@ -423,11 +423,19 @@
       }
     }
     i {
-      margin-top:6px;
+      margin-top:3px;
       margin-right:6px;
       @include opacity(0.3);
     }
-    li.active,
+    li.active {
+      a {
+        color:#000;
+        font-weight:bold;
+        i {
+          @include opacity(1);
+        }
+      }
+    }
     li:hover {
       a {
         background-color:#444;
@@ -444,112 +452,63 @@
       }
     }
     &.business {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$business;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
         }
       }
     }
     &.governance {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$governance;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.risk {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$risk;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.program {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$programs;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.objectives {
-      li.active,
       li:hover {
         a {
-          color:#fff;
           background-color:$objectives;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.controls {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$controls;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.entities {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$entities;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
-
         }
       }
     }
     &.workflow {
-      li.active,
       li:hover {
         a {
           color:#fff;
           background-color:$programs;
-          background-image: image-url("grcicons/icons.png");
-          background-repeat: no-repeat;
-          @include background-size(368px 416px);
-          background-position: -270px -313px;
         }
       }
     }

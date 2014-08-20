@@ -244,6 +244,29 @@ _cycle_object_children_attr = {
     }
 
 
+def update_cycle_object_child_state(obj):
+
+  status_order = (None, 'Assigned', 'InProgress',
+                  'Declined', 'Finished', 'Verified')
+  status = obj.status
+  children_attr = _cycle_object_children_attr.get(type(obj), None)
+  if children_attr:
+    children = getattr(obj, children_attr, None)
+    for child in children:
+      if status == 'Declined' or \
+         status_order.index(status) > status_order.index(child.status):
+        old_status = child.status
+        child.status = status
+        db.session.add(child)
+        status_change.send(
+            child.__class__,
+            obj=child,
+            new_status=child.status,
+            old_status=old_status
+        )
+        update_cycle_object_child_state(child)
+
+
 def update_cycle_object_parent_state(obj):
   parent_attr = _cycle_object_parent_attr.get(type(obj), None)
   if not parent_attr:
@@ -369,6 +392,15 @@ def handle_cycle_task_group_object_task_put(
             )
         db.session.add(tgobj)
       db.session.flush()
+
+
+@Resource.model_put.connect_via(models.CycleTaskGroup)
+def handle_cycle_task_group_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    update_cycle_object_parent_state(obj)
+    update_cycle_object_child_state(obj)
+
 
 # FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
 def _get_or_create_personal_context(user):
