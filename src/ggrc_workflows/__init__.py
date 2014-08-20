@@ -401,6 +401,42 @@ def handle_cycle_task_group_put(
     update_cycle_object_parent_state(obj)
     update_cycle_object_child_state(obj)
 
+def update_workflow_state(workflow):
+  if workflow.recurrences:
+    return
+
+  for cycle in workflow.cycles:
+    if cycle.is_current:
+      return
+
+  # No recurrences and no active cycles, workflow is now Inactive
+  workflow.status = 'Inactive'
+  db.session.add(workflow)
+  db.session.flush()
+
+# Check if workflow should be Inactive after end current cycle
+@Resource.model_put.connect_via(models.Cycle)
+def handle_cycle_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.is_current.history.has_changes():
+    update_workflow_state(obj.workflow)
+
+# Check if workflow should be Inactive after recurrence change
+@Resource.model_put.connect_via(models.Workflow)
+def handle_cycle_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.recurrences.history.has_changes():
+    update_workflow_state(obj)
+
+
+# Check if workflow should be Inactive after cycle status change
+@status_change.connect_via(models.Cycle)
+def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    if obj.status == 'Verified':
+      obj.is_current = False
+      db.session.add(obj)
+      update_workflow_state(obj.workflow)
 
 # FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
 def _get_or_create_personal_context(user):

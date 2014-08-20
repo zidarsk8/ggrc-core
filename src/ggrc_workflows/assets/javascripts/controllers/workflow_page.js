@@ -79,12 +79,14 @@
         var workflow = GGRC.page_instance();
         if (workflow.frequency !== 'one_time') {
           workflow.refresh().then(function() {
-            workflow.attr('status', "Active").save();
+            workflow.attr('recurrences', true);
+            workflow.attr('status', "Active");
+            workflow.save();
           });
         } else {
           _generate_cycle().then(function() {
             workflow.refresh().then(function() {
-              workflow.attr('status', "NoRecurrences").save();
+              workflow.attr('status', "Active").save();
             });
           });
         }
@@ -98,7 +100,9 @@
     events: {
       click: function() {
         var workflow = GGRC.page_instance();
-        workflow.attr('status', "NoRecurrences").save();
+        workflow.refresh().then(function(workflow) {
+          workflow.attr('recurrences', false).save();
+        });
       }
     }
   });

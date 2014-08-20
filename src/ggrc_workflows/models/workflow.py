@@ -25,8 +25,7 @@ class Workflow(
     HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
 
-  # Inactive state is computed
-  VALID_STATES = [u"Draft", u"Active", u"NoRecurrences"]
+  VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
   VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
 
@@ -56,6 +55,8 @@ class Workflow(
   object_approval = deferred(
     db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
+  recurrences = db.Column(db.Boolean, default=False, nullable=False)
+
   workflow_people = db.relationship(
       'WorkflowPerson', backref='workflow', cascade='all, delete-orphan')
   people = association_proxy(
@@ -70,24 +71,6 @@ class Workflow(
   next_cycle_start_date = deferred(
       db.Column(db.Date, nullable=True), 'Workflow')
 
-  # Possible workflow_states: Draft, Inactive, Active
-  @computed_property
-  def workflow_state(self):
-    if self.status != 'NoRecurrences':
-      return self.status
-
-    active_cycles = db.session.query(Cycle)\
-        .filter(Cycle.workflow_id == self.id,
-                Cycle.status != 'Verified',
-                Cycle.is_current == True)\
-        .all()
-
-    if len(active_cycles) == 0:
-      return 'Inactive'
-
-    # The workflow still has active cycles
-    return "Active"
-
   _fulltext_attrs = [
       'notify_custom_message',
       'status',
@@ -98,13 +81,12 @@ class Workflow(
       PublishOnly('people'),
       'task_groups',
       'frequency',
-      PublishOnly('workflow_state'),
       'notify_on_change',
       'notify_custom_message',
       'cycles',
-      'object_approval'
+      'object_approval',
+      'recurrences',
       ]
-  _stub_attrs = ['workflow_state']
 
   def copy(self, _other=None, **kwargs):
     columns = [

@@ -7,7 +7,7 @@
 
 
 {{#is_allowed 'update' instance context='for'}}
-{{#if_equals instance.status "Active"}}
+{{#if instance.recurrences}}
 <li class="inner-nav-button">
   <workflow-start-cycle workflow="instance">
     <button type="submit" href="#workflowStart" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
@@ -22,7 +22,7 @@
     </button>
   </workflow-deactivate>
 </li>
-{{/if_equals}}
+{{/if}}
 {{#if_equals instance.status "Draft"}}
 <li class="inner-nav-button">
   <workflow-activate workflow="instance">

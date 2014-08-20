@@ -19,9 +19,19 @@ def upgrade():
   op.add_column(u'workflows', sa.Column(u'status',
                 sa.String(length=250), nullable=True))
 
+  op.add_column(u'workflows',
+    sa.Column('recurrences', sa.Boolean(), nullable=False))
+
   op.execute("""
     UPDATE workflows
-    SET status='Draft'
+    SET status='Draft', recurrences=true
+    """)
+
+  # one_time workflows don't have recurrences
+  op.execute("""
+    UPDATE workflows
+    SET recurrences=false
+    WHERE frequency='one_time'
     """)
 
   # workflows with cycles are active
@@ -35,10 +45,11 @@ def upgrade():
   op.execute("""
     UPDATE workflows w
     INNER JOIN cycles c ON c.workflow_id = w.id
-    SET w.status='NoRecurrences'
+    SET w.status='Inactive'
     WHERE w.frequency='one_time'
     """)
 
 
 def downgrade():
   op.drop_column(u'workflows', u'status')
+  op.drop_column(u'workflows', u'recurrences')
