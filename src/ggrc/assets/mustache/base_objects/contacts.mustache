@@ -1,10 +1,9 @@
 {{#instance}}
 <div class="row-fluid">
-  <div {{^if stacked}}class="span6"{{/if}}>
-  {{#if is_program}}
+  <div class="span6">
+    <h6>Owner</h6>
     <p>
-      <strong>Owner:</strong>
-      <br>
+    {{#if is_program}}
       {{#with_mapping 'authorizations' instance}}
         {{#each authorizations}}
           <span>
@@ -18,42 +17,33 @@
           </span>
         {{/each}}
       {{/with_mapping}}
-    </p>
-  {{else}}
-    <p>
-      <strong>Owner:</strong>
-      <br>
-    {{#if owners.length}}
-      {{#using contacts=owners}}
-      {{#contacts}}
-        {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-      {{/contacts}}
-      {{/using}}
     {{else}}
-      <span class="error">
-        Not Assigned
-      </span>
-    {{/if}}
-    </p>
-  {{/if}}
-  </div>
-  {{#using person=contact}}
-    <div {{^if stacked}}class="span6"{{/if}}>
-    {{#if person}}
-      <p>
-        <strong>Contact</strong>
-        <br>
-        {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-      </p>
-    {{else}}
-      <p>
-        <strong>Contact</strong>
-        <br>
+      {{#if owners.length}}
+        {{#using contacts=owners}}
+        {{#contacts}}
+          {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+        {{/contacts}}
+        {{/using}}
+      {{else}}
         <span class="error">
           Not Assigned
         </span>
-      </p>
+      {{/if}}
     {{/if}}
+    </p>
+  </div>
+  {{#using person=contact}}
+    <div class="span6">
+      <h6>Contact</h6>
+      <p>
+      {{#if person}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
+      {{else}}
+        <span class="error">
+          Not Assigned
+        </span>      
+      {{/if}}
+      </p>
     </div>
   {{/using}}
 </div>
