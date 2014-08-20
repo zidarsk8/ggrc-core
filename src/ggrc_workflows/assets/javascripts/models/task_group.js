@@ -93,6 +93,48 @@
       });
     }
   }, {
+    init : function() {
+      this._super && this._super.apply(this, arguments);
+      this.bind("task_group", function(ev, newVal) {
+        var that = this;
+        if(!newVal)
+          return;
+
+        newVal = newVal.reify();
+
+        new RefreshQueue().enqueue(newVal).trigger().then(function() {
+          var tgt,
+              tgts = newVal.task_group_tasks.slice(0);
+
+          do {
+            tgt = tgts.splice(tgts.length - 1, 1)[0];
+            tgt = tgt && tgt.reify();
+          } while (tgt === that);
+
+          if(!tgt)
+            return new $.Deferred().reject("no existing task group task");
+          else
+            return new RefreshQueue().enqueue(tgt).trigger();
+        }).then(function(tgts) {
+          var tgt = tgts[0];
+
+          can.each(
+            ["relative_start_day",
+             "relative_start_month",
+             "relative_end_day",
+             "relative_end_month",
+             "start_date",
+             "end_date"],
+            function(prop) {
+              if(tgt[prop] && !that[prop]) {
+                that.attr(prop, tgt.attr(prop) instanceof Date ? new Date(tgt[prop]) : tgt[prop]);
+              }
+            }
+          );
+        });
+      });
+    },
+
     _refresh_workflow_people: function() {
       //  TaskGroupTask assignment may add mappings and role assignments in
       //  the backend, so ensure these changes are reflected.
