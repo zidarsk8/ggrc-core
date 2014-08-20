@@ -28,10 +28,12 @@ class CycleTaskGroup(
       )
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
+  next_due_date = db.Column(db.Date)
 
   _publish_attrs = [
       'cycle',
       'task_group',
       'cycle_task_group_objects',
       'sort_index',
+      'next_due_date',
       ]
