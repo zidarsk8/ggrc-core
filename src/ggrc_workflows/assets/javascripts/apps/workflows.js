@@ -291,7 +291,7 @@
             parent_instance: page_instance,
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
+            footer_view: null,
             draw_children: true,
             child_options: [{
               title_plural: "Current Tasks",
