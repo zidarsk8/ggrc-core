@@ -162,7 +162,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   obj.context = workflow.context
   obj.title = workflow.title
   obj.description = workflow.description
-  obj.status = None
+  obj.status = 'Assigned'
 
   # Find the starting date of the period containing the start date or today
   if obj.start_date:

@@ -15,7 +15,7 @@ class Cycle(
   __tablename__ = 'cycles'
   _title_uniqueness = False
 
-  VALID_STATES = (None, u'InProgress', u'Finished', u'Verified')
+  VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified')
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
