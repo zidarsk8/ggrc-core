@@ -254,7 +254,13 @@
           color:#666;
         }
       }
-
+      &.filters > a {
+        display: inline;
+        background-color:white;
+        &.active {
+          font-weight: bold;
+        }
+      }
     }
   }
   h2 {

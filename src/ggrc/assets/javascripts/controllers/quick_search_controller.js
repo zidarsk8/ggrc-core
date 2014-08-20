@@ -740,6 +740,8 @@ can.Control("CMS.Controllers.LHN_Search", {
     }
 
   , "{observer} my_work" : function(el, ev, newval) {
+    // TODO: my_work shouldn't clear filters:
+    this.element.find('.filters>a').removeClass('active');
     this.run_search(this.current_term, newval ? { "contact_id": GGRC.current_user.id } : null);
   }
 
@@ -1042,7 +1044,29 @@ can.Control("CMS.Controllers.LHN_Search", {
         if ($list.find(self.options.list_content_selector).hasClass('in'))
           return $list;
       });
+    },
+
+  ".filters a click" : function(el, ev) {
+    var term = this.options.display_prefs.getLHNState().search_text || ""
+        param = {},
+        key = el.data('key'),
+        value = el.data('value'),
+        for_model = el.parent().data('for');
+
+    if (this.options.observer.my_work) {
+      param = { "contact_id": GGRC.current_user.id };
     }
+
+    el.siblings().removeClass('active');
+    if (el.hasClass('active')) {
+      el.removeClass('active');
+      this.run_search(term, param);
+      return;
+    }
+    el.addClass('active');
+    param['extra_params'] = for_model + ":" + key + "=" + value;
+    this.run_search(term, param);
+  }
 });
 
 
