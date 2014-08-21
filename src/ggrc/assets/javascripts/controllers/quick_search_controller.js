@@ -579,7 +579,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       return can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).then(function(frag, xhr) {
         var lhn_prefs = prefs.getLHNState()
           , initial_term
-          , initial_params
+          , initial_params = {}
           ;
 
         self.element.html(frag);
@@ -594,6 +594,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         if (self.options.observer.my_work) {
           initial_params = { "contact_id": GGRC.current_user.id };
         }
+        initial_params.extra_params = "Workflow:status=Active";
         self.options.loaded_lists = [];
         self.run_search(initial_term, initial_params);
 
