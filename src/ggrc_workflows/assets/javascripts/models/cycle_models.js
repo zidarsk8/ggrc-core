@@ -9,9 +9,7 @@
 (function(can) {
 
   var _mustache_path,
-      overdue_compute,
-      refresh_attr,
-      refresh_attr_wrap;
+      overdue_compute;
 
   overdue_compute = can.compute(function(val) {
     if (this.attr("status") === "Verified") {
@@ -24,19 +22,19 @@
     return "";
   });
 
-  refresh_attr = function(instance, attr){
+  function refresh_attr(instance, attr){
     if (instance.attr(attr).reify().selfLink) {
       instance.attr(attr).reify().refresh();
     }
-  };
+  }
 
-  refresh_attr_wrap = function(attr){
+  function refresh_attr_wrap(attr){
     return function(ev, instance) {
       if (instance instanceof this) {
         refresh_attr(instance, attr);
       }
     };
-  };
+  }
 
   _mustache_path = GGRC.mustache_path + "/cycles";
   can.Model.Cacheable("CMS.Models.Cycle", {
@@ -166,6 +164,21 @@
           allow_creating: false
         }
       ]
+    },
+
+    init: function() {
+      var that = this;
+      this._super.apply(this, arguments);
+
+      this.bind("updated", function(ev, instance) {
+        if (instance instanceof that) {
+          var dfd = instance.refresh_all_force('cycle', 'workflow');
+          dfd.then(function(){
+            instance.refresh_all_force('cycle_task_group_objects',
+              'cycle_task_group_object_tasks');
+          });
+        }
+      });
     }
   }, {
     overdue: overdue_compute,
@@ -256,21 +269,11 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          var object = instance.cycle_task_group_object.reify(),
-              dfd = object.refresh(),
-              rq = new RefreshQueue();
-
-          function force_refresh_chain(chain) {
-            can.reduce(chain, function(a, b) {
-              return a.then(function(obj) {
-                if (obj && obj[b]) {
-                  return obj[b].reify().refresh();
-                }
-              });
-            }, dfd);
-          }
-          force_refresh_chain(["cycle_task_group", "cycle", "workflow"]);
-          force_refresh_chain(["task_group_object", "object"]);
+          instance.refresh_all_force('cycle_task_group_object',
+              'cycle_task_group', 'cycle', 'workflow').then(function() {
+            var object = instance.cycle_task_group_object.reify();
+            object.refresh_all_force('task_group_object', 'object');
+          });
         }
       });
     }

@@ -189,7 +189,15 @@
     }
 
     //Search button click
-    , ".objectReview click" : function(){
+    , ".objectReview click": "triggerSearch"
+
+    , "#search keyup": function(el, ev) {
+        if (ev.which == 13) {
+          this.triggerSearch();
+        }
+      }
+
+    , triggerSearch: function(){
 
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();

@@ -7,14 +7,15 @@
 
 <section class="info">
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span12">
+      <h6>Title</h6>
       <h3>{{instance.title}}</h3>
     </div>
-    <div class="span6">&nbsp;</div>
   </div>
 
   <div class="row-fluid">
     <div class="span12">
+      <h6>Description</h6>
       <div class="rtf-block">
         <p>{{{firstnonempty instance.description '<em>No description</em>'}}}</p>
       </div>
@@ -22,38 +23,42 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span12">
+    <div class="span6">
       <div class="rtf-block">
         {{{render '/static/mustache/workflows/contacts.mustache' instance=instance stacked=true}}}
       </div>
     </div>
+    <div class="span6">
+      <h6>
+        Frequency
+      </h6>
+      <p class="upp">
+        {{{instance.frequency}}}
+      </p>
+    </div>
+    
   </div>
 
   <div class="row-fluid">
     <div class="span12">
-      <p>
-        <!--
-        <strong>Due on:</strong>
-        {{#if instance.end_date}}{{instance.end_date}}{{else}}<em>not defined</em>{{/if}}
-      -->
-      </p>
-      <p>
-        <strong>Frequency:</strong>
-        <span style="text-transform:capitalize;">{{{instance.frequency}}}</span><!--<strong>Monthly</strong> - starts every <strong>7th</strong> due on every <strong>25th</strong>-->
-      </p>
-      <p>
-        <strong>gGRC Folder:</strong>
+      <h6>
+        gGRC Folder</strong>
+      </h6>
+      <p class="oneline">
         {{#with_mapping 'folders' instance}}
           {{#if folders.length}}
             <a href="{{folders.0.instance.alternateLink}}" target="_blank">
               {{folders.0.instance.title}}
             </a>
           {{else}}
-            No folder for this {{instance.class.title_singular}}.
+            <span class="error">
+              No folder for this {{instance.class.title_singular}}.
+            </span>
             <a href="javascript://" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
               data-model="{{instance.type}}" data-type="folders" data-id="{{instance.id}}">
-              <i class="grcicon-attach-color"></i> Attach folder
+              <i class="grcicon-attach-color"></i> Assign folder
             </a>
+
           {{/if}}
         {{else}}
           {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
@@ -62,7 +67,7 @@
       </p>
     </div>
   </div>
-
+  
   <div class="row-fluid">
     <div class="span12">
       <div class="info-utility-link">

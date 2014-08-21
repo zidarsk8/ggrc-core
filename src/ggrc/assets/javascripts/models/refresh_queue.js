@@ -149,7 +149,7 @@ can.Construct("RefreshQueueManager", {
 
 can.Construct("RefreshQueue", {
     refresh_queue_manager: new RefreshQueueManager(),
-    refresh_all: function(instance, props) {
+    refresh_all: function(instance, props, force) {
       var dfd = new $.Deferred();
 
       _refresh_all(instance, props, dfd);
@@ -164,7 +164,7 @@ can.Construct("RefreshQueue", {
             deferred;
 
         if (next) {
-          refresh_queue.enqueue(next);
+          refresh_queue.enqueue(next, force);
           deferred = refresh_queue.trigger();
         } else if (instance.get_binding) {
           next = instance.get_binding(prop);

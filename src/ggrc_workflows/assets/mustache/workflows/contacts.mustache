@@ -1,9 +1,8 @@
 {{#instance}}
 <div class="row-fluid">
-  <div {{^if stacked}}class="span6"{{/if}}>
-  <p>
-    <strong>Owner:</strong>
-    <br>
+  <div {{^if stacked}}class="span12"{{/if}}>
+    <h6>Owner</h6>
+    <p>
     {{#with_mapping 'authorizations' instance}}
       {{#each authorizations}}
         <span>
@@ -19,24 +18,5 @@
     {{/with_mapping}}
   </p>
   </div>
-  {{#using person=contact}}
-    <div {{^if stacked}}class="span6"{{/if}}>
-    {{#if person}}
-      <p>
-        <strong>Contact</strong>
-        <br>
-        {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-      </p>
-    {{else}}
-      <p>
-        <strong>Contact</strong>
-        <br>
-        <span class="error">
-          Not Assigned
-        </span>
-      </p>
-    {{/if}}
-    </div>
-  {{/using}}
 </div>
 {{/instance}}

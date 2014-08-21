@@ -24,7 +24,7 @@
   /* NOTE: MODAL_FORM EXTENDS BOOTSTRAP-MODAL.js
    * ========================================== */
 
-  ModalForm.prototype = new $.fn.modal.Constructor(null, { remote : false }); 
+  ModalForm.prototype = new $.fn.modal.Constructor(null, { remote : false });
 
   $.extend(ModalForm.prototype, {
 
@@ -42,8 +42,8 @@
         .on('click.modal-form.submit', 'input[type=submit], [data-toggle="modal-submit"]', $.proxy(this.submit, this))
         .on('shown.modal-form', $.proxy(this.focus_first_input, this))
         .on('loaded.modal-form', $.proxy(this.focus_first_input, this))
-        .on('loaded.modal-form', function(ev) { 
-          $("a[data-wysihtml5-command], a[data-wysihtml5-action]", ev.target).attr('tabindex', "-1"); 
+        .on('loaded.modal-form', function(ev) {
+          $("a[data-wysihtml5-command], a[data-wysihtml5-action]", ev.target).attr('tabindex', "-1");
           $form = that.$form();
           $(this).trigger("shown"); //this will reposition the modal stack
         })
@@ -113,7 +113,7 @@
   , submit: function(e) {
       var $form = this.$form()
       , that = this;
-      
+
       if(!$form.data("submitpending")) {
         $("[data-toggle=modal-submit]", $form)
           .each(function() { $(this).data("origText", $(this).text()); })
@@ -141,10 +141,8 @@
 
   , keyup_escape : function(e) {
      if($(document.activeElement).is("select, [data-toggle=datepicker]") && e.which === 27) {
-        
         this.$element.attr("tabindex", -1).focus();
         e.stopPropagation();
-
       }
     }
 
@@ -159,7 +157,7 @@
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop') && this.is_form_dirty()) {
-        // Copy some base options from the original modal, 
+        // Copy some base options from the original modal,
         // otherwise the form won't be properly reset on discard
         var options = that.$element.control().options;
 
@@ -184,12 +182,20 @@
     }
 
   , focus_first_input: function(ev) {
-      var $first_input = this.$element
-        .find('input[type="text"], input[type="checkbox"], select, textarea')
-        .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
-        .first();
-      if ($first_input.length > 0 && (!ev || this.$element.is(ev.target)))
-        setTimeout(function() { $first_input.get(0).focus(); }, 100);
+      var that = this;
+      setTimeout(function() {
+        var $first_input;
+        $first_input = that.$element.find('*[autofocus]');
+        if ($first_input.length == 0) {
+          $first_input = that.$element
+            .find('input[type="text"], input[type="checkbox"], select, textarea')
+            .not('[placeholder*=autofill], label:contains(autofill) + *, [disabled]')
+            .first();
+        }
+        if ($first_input.length > 0 && (!ev || that.$element.is(ev.target))) {
+          $first_input.get(0).focus();
+        }
+      }, 100);
     }
   });
 
@@ -251,8 +257,8 @@
             $("[data-toggle=modal-submit]", modal_form.$element)
             .removeAttr("disabled")
             .removeClass("disabled pending-ajax")
-            .each(function() {  
-              $(this).text($(this).data("origText")); 
+            .each(function() {
+              $(this).text($(this).data("origText"));
             });
             $("form", modal_form.$element).data("submitpending", false);
           }
@@ -299,7 +305,7 @@
 
       // Find or create the flash-message holder
       $target = $(e.target);
-      if($target.has(".modal-body").length < 1) 
+      if($target.has(".modal-body").length < 1)
         $target = $('body');
       $flash_holder = $target.find('.flash');
 
@@ -336,7 +342,7 @@
       $frag.filter(sel).add($frag.find(sel)).each(function() {
         $(this).remove();
         setTimeout($(this).html(), 10);
-      }); 
+      });
       $(this).find('.modal-body').html($frag);
     });
 

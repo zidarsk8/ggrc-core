@@ -15,7 +15,7 @@ class CycleTaskGroup(
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
-  VALID_STATES = (None, u'InProgress', u'Finished', u'Verified')
+  VALID_STATES = (None, u'InProgress', u'Finished', u'Verified', u'Declined')
 
   cycle_id = db.Column(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)

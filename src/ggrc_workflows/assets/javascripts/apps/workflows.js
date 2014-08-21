@@ -234,6 +234,12 @@
           'cycle.is_current': true
         });
       });
+      mappings[type].object_tasks_with_history = Search(function(binding) {
+        return CMS.Models.CycleTaskGroupObjectTask.findAll({
+          'cycle_task_group_object.object_id': binding.instance.id,
+          'cycle_task_group_object.object_type': binding.instance.type,
+        });
+      });
       mappings[type].workflows = Cross("task_groups", "workflow");
       mappings[type].approval_workflows = CustomFilter(
         "workflows", function(binding) {
@@ -291,7 +297,7 @@
             parent_instance: page_instance,
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
+            footer_view: null,
             draw_children: true,
             child_options: [{
               title_plural: "Current Tasks",
@@ -312,9 +318,16 @@
             parent_instance: page_instance,
             model: CMS.Models.CycleTaskGroupObjectTask,
             show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
+            header_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/filters.mustache",
             sort_property: null,
             sort_function: _task_sort_function,
             draw_children: true,
+            events: {
+              "show-history" : function(el, ev) {
+                this.options.attr("mapping", el.attr("mapping"));
+                this.reload_list();
+              }
+            },
             child_options: [
               {
                 model: CMS.Models.CycleTaskEntry,

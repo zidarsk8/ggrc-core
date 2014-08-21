@@ -1606,7 +1606,7 @@
   multiselect_descriptor_view_option = {
     "Person": {
         column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
-        items_view  : GGRC.mustache_path + "/wf_people/multiselect_option_items.mustache"
+        items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
     }
   }
 
@@ -1842,7 +1842,15 @@
     }
     
     //Search button click
-    , ".objectReview click" : function(){
+    , ".objectReview click": "triggerSearch"
+
+    , "#search keyup": function(el, ev) {
+        if (ev.which == 13) {
+          this.triggerSearch();
+        }
+      }
+
+    , triggerSearch: function(){
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
       //Get the selected object value
