@@ -32,6 +32,7 @@
       {{/with_mappable_instances_as}}
       {{else}}
       {{#with_direct_mappings_as 'mappings' page_instance instance}}
+        {{^if_equals page_instance instance}}
         {{#if mappings.length}}
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap">
@@ -48,6 +49,7 @@
           </a>
           {{/is_allowed_to_map}}
         {{/if}}
+        {{/if_equals}}
       {{/with_direct_mapping_as}}
       {{/if}}
     {{/if_equals}}
