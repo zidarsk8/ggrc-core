@@ -322,6 +322,12 @@
             sort_property: null,
             sort_function: _task_sort_function,
             draw_children: true,
+            events: {
+              "show-history" : function(el, ev) {
+                this.options.attr("mapping", el.attr("mapping"));
+                this.reload_list();
+              }
+            },
             child_options: [
               {
                 model: CMS.Models.CycleTaskEntry,

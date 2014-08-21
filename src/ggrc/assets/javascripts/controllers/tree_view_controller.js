@@ -763,16 +763,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     this.fetch_list().then(this.proxy("draw_list"));
     this.init_count();
   },
-
-  "button[type=show-history] click": function(el, ev, data) {
-    if (this.options.mapping === "object_tasks") {
-      this.options.attr('mapping', 'object_tasks_with_history');
+  "button[custom-event] click" : function(el, ev) {
+    var event_name = el.attr("custom-event");
+    if(this.options.events && typeof this.options.events[event_name] === "function") {
+      this.options.events[event_name].apply(this, arguments);
     }
-    else if (this.options.mapping === "object_tasks_with_history") {
-      this.options.attr('mapping', 'object_tasks');
-    }
-    this.reload_list();
-  }
+  },
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {
