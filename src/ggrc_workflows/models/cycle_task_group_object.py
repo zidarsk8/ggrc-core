@@ -34,6 +34,7 @@ class CycleTaskGroupObject(
       )
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
+  next_due_date = db.Column(db.Date)
 
   _publish_attrs = [
       'cycle',
@@ -41,6 +42,7 @@ class CycleTaskGroupObject(
       'task_group_object',
       'cycle_task_group_object_tasks',
       'object',
+      'next_due_date',
       ]
 
   @property
