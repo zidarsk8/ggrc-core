@@ -1850,6 +1850,14 @@
         }
       }
 
+    /* Advanced search and object multi-select is not triggered after a new object addition. There is
+     * no create button on this modal. So we donot have to re-set search. Modal success is triggered after
+     * editing an object.
+    */
+    , " modal:success" : function(el, ev, data, options) {
+      //no op
+    }
+
     , triggerSearch: function(){
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
