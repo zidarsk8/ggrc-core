@@ -198,6 +198,12 @@
         }
       }
 
+    , "input[null-if-empty] change" : function(el, ev) {
+      if(el.val() === "") {
+        this.context.attr(el.attr("name"), null);
+      }
+    }
+
     , triggerSearch: function(){
 
       // Remove Search Criteria text
@@ -245,7 +251,7 @@
           ).then(function(mappings) {
             return mappings.entries;
           });
-      }).attach(ctx.owner));
+      }).attach(ctx.owner || {}));
 
 
       if (filters.length > 0) {
