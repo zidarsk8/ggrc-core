@@ -11,7 +11,7 @@
   {{#instance}}{{ data 'option' }}{{/instance}} 
   data-id="{{ instance.id }}">
   <div class="item-main">
-    <div class="openclose">
+    <div class="openclose" {{data 'expandable'}}>
     <a href="javascript://" class="openclose-placeholder">       
       <div class="row-fluid">
         <div class="span10">
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  {{! #if expanded}}
+  {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       {{!#pack instance=this}}
@@ -53,6 +53,6 @@
       {{!/pack}}
     </div>
   </div>
-  {{!/if}}
+  {{/if}}
 </li>
 {{/each}}

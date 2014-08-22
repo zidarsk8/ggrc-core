@@ -858,7 +858,7 @@
         });
         context.options = options_results;
         context.selected_object = this.options.selected_object;
-        can.view(this.options.option_items_view, context, function(frag) {
+        can.view(this.options.option_items_view, new can.Map(context), function(frag) {
           if (self.element) {
             if (prepend)
               self.element.find('.option_column ul.new-tree').prepend(frag);
@@ -1468,6 +1468,14 @@
  
       $check.prop('checked', $el.prop('checked'));
       this.update_selected_items(el, ev);
+    }
+
+    , ".openclose:not(.active) click" : function(el, ev) {
+        //  Modifying the `result` object is bad, but here it can only affect
+        //  throwaway mapping results.
+        var expandable = el.data("expandable");
+        if (expandable)
+          expandable.attr("expanded", true);
     }
 
     , reset_selection_count: function(){
