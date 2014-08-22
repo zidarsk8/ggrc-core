@@ -6,7 +6,7 @@
 }}
 
 
-<li class="tree-item governance item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
+<li class="tree-item item-list" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}}
   data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}"
   {{#instance}}{{data 'model'}}{{/instance}}
   >
@@ -14,19 +14,45 @@
     <div class="openclose">
       <a class="openclose-placeholder" href="javascript://"> </a>
       <div class="row-fluid">
-        <div class="item-data span4" style="padding-left:0px;">
+
+        <div class="item-data {{#is_dashboard}}span3{{else}}span8{{/is_dashboard}}" style="padding-left:0px;">
           <div class="tree-title-area">
             <span class="tier-trigger"></span>{{instance.title}}
           </div>
         </div>
 
-        <div class="span8">
+        {{#is_dashboard}}
+
+          {{#using instance=instance.cycle_task_group_object}}
+            {{#using object=instance.object}}
+        
+              <div class="item-data span3">
+                <div class="oneline">
+                  <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
+                  {{firstnonempty object.title instance.title}}
+                </div>
+              </div>
+
+            {{/using}}
+          {{/using}}
+
+          {{#using cycle=instance.cycle}}
+            {{#using workflow=cycle.workflow}}
+
+
+              <div class="item-data span2">
+                <div class="oneline">
+                  {{workflow.title}}
+                </div> 
+              </div>
+          
+            {{/using}}
+          {{/using}}
+
+        {{/is_dashboard}}
+
+        <div class="span4">
           <ul class="tree-action-list">
-            <li>
-              <span rel="tooltip" data-placement="top" data-original-title="Start On">
-                <i class="grcicon-updated"></i> {{localize_date instance.start_date}}
-              </span>
-            </li>
             <li>
               <div class="date">
                 <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
@@ -80,97 +106,107 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      <div class="row-fluid">
-        <div class="span9">
-          {{#is_dashboard}}
-            {{#using cycle=instance.cycle}}
-            {{#using workflow=cycle.workflow}}
-              <a href="{{workflow.viewLink}}" class="info-action">
-                View Workflow
-                <i class="grcicon-goto"></i>
-              </a>
-              &nbsp;&nbsp;&nbsp;
-            {{/using}}
-            {{/using}}
-            {{#using instance=instance.cycle_task_group_object}}
-            {{#using object=instance.object}}
-              {{#if object.viewLink}}
-                {{#is_allowed "view_object_page" object}}
-                  <a href="{{object.viewLink}}" class="info-action">
-                    View {{object.class.title_singular}}
-                    <i class="grcicon-goto"></i>
-                  </a>
-                {{/is_allowed}}
-              {{else}}
-                Object deleted or inaccessible
-              {{/if}}
-            {{/using}}
-            {{/using}}
-          {{/is_dashboard}}
-        </div>
-        <div class="span3">
-        {{#is_allowed 'update' instance context='for'}}
-          <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            Edit Task
-          </a>
-        {{/is_allowed}}
-        </div>
-      </div>
-      <div class="row-fluid" style="padding-top:6px">
-        <div class="span7">
-          {{#is_dashboard}}
-            {{#using instance=instance.cycle_task_group_object}}
-            {{#using object=instance.object}}
-              <div class="row-fluid">
-                <div class="span12">
-                  <div class="tree-title-area">
-                    Task for:
-                    <i class="grcicon-{{instance.object.reify.class.table_singular}}-color"></i>
-                    {{firstnonempty object.title instance.title}}
-                  </div>
-                  <div class="tree-description">
-                    {{{firstnonempty object.description instance.description}}}
-                  </div>
-                </div>
-              </div>
-            {{/using}}
-            {{/using}}
-          {{/is_dashboard}}
-        </div>
-        <div class="span2 text-right">
-          Assignee:
-        </div>
-        <div {{#instance}}{{data 'model'}}{{/instance}} class="span3" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-          <i class="grcicon-person-green pull-left icon-field"></i>
-          {{#using contact=instance.contact}}
-          <div class="objective-selector">
-            <input type="text" name="contact.name" data-lookup="Person" class="span10 short-field search-icon" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
-          </div>
-          {{/using}}
-        </div>
-      </div>
-
-      <div class="show-description">
+      
+      <section class="info tier-info">
         <div class="row-fluid">
-          <div class="span12">
-            <div class="tree-description">
-              <h5>Task: {{instance.title}}</h5>
-              {{{instance.description}}}
+          <div class="span9">
+            <h6>Task</h6>
+            <h3>
+              {{instance.title}}
+              {{#is_allowed 'update' instance context='for'}}
+                <a class="btn btn-mini" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+                  Edit Task
+                </a>
+              {{/is_allowed}}
+              
+            </h3>
+          </div>
+          <div class="span3">
+            <h6>Assignee</h6>
+            <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+              {{#using contact=instance.contact}}
+                <div class="objective-selector">
+                  <input type="text" name="contact.name" data-lookup="Person" class="search-icon input-block-level" {{#if_equals instance.status 'Verified'}}disabled="disabled"{{/if}} placeholder="Choose Assignee" value="{{firstnonempty contact.name contact.email ''}}">
+                </div>
+              {{/using}}
             </div>
           </div>
         </div>
-      </div>
+        
+        <div class="row-fluid">
+          <div class="span12">
+            <h6>Task details</h6>
+            <div class="tree-description">
+              {{{firstnonempty instance.description 'No additional details'}}}
+            </div>
+            <br>
+          </div>
+        </div>
+
+        {{#is_dashboard}}
+          {{#using instance=instance.cycle_task_group_object}}
+            {{#using object=instance.object}}
+
+              <div class="row-fluid">
+                <div class="span9">
+                  <h6>Task to be performed on object</h6>
+                  <p>
+                    <i class="grcicon-{{instance.object.reify.class.table_singular}}-color"></i>
+                    <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
+                    {{firstnonempty object.title instance.title}}
+                    {{#if object.viewLink}}
+                      {{#is_allowed "view_object_page" object}}
+                        <a href="{{object.viewLink}}" class="info-action" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
+                          <i class="grcicon-goto"></i>
+                        </a>
+                      {{/is_allowed}}
+                    {{else}}
+                      <span class="error">
+                        Warning: Object deleted or inaccessible
+                      </span>
+                    {{/if}}
+                  </p>
+                </div>
+                <div class="span3">
+                  <h6>Start/End dates</h6>
+                  {{localize_date instance.start_date}}
+                  -
+                  {{localize_date instance.end_date}}
+                </div>
+              </div>
+
+            {{/using}}
+          {{/using}}
+        {{/is_dashboard}}
+        
+        {{#is_dashboard}}
+          {{#using cycle=instance.cycle}}
+          {{#using workflow=cycle.workflow}}
+            
+            <div class="row-fluid">
+              <div class="span12">
+                <h6>Part of the workflow</h6>
+                <a href="{{workflow.viewLink}}">
+                  {{workflow.title}}
+                  <i class="grcicon-goto"></i>
+                </a>
+              </div>
+            </div>
+            
+          {{/using}}
+          {{/using}}
+        {{/is_dashboard}}
+        
+      </section>
 
       {{#if draw_children}}
         {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
             {{#child_options}}
+            <br>
             <div class="row-fluid">
               <div class="span11">
-                <div class="inner-row">
-                  <strong>Comments ({{list.length}})</strong>
-                  <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-                </div>
+                <h6>Comments ({{list.length}})</h6>
+                <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
               </div>
             </div>
             {{/child_options}}
