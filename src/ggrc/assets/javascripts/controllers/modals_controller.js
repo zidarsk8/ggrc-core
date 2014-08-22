@@ -40,7 +40,7 @@ can.Control("GGRC.Controllers.Modals", {
       , modal_confirm : "Confirm"
       , modal_description : "description"
       , modal_title : "Confirm"
-      , content_view : GGRC.mustache_path + "/modals/confirm.mustache" 
+      , content_view : GGRC.mustache_path + "/modals/confirm.mustache"
     }, options))
     .on('click', 'a.btn[data-toggle=confirm]', function(e) {
       var params = $(e.target).closest('.modal').find('form').serializeArray();
@@ -77,9 +77,9 @@ can.Control("GGRC.Controllers.Modals", {
     this.on();
     this.fetch_all()
       .then(this.proxy("apply_object_params"))
-      .then(function() { 
+      .then(function() {
         // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload') 
+        that.element && that.element.trigger('preload')
       })
       .then(this.proxy("autocomplete"));
   }
@@ -101,7 +101,7 @@ can.Control("GGRC.Controllers.Modals", {
     var name = el.attr('name').split('.'),
         instance = this.options.instance,
         value = el.val();
-    
+
     name.pop(); //set the owner to null, not the email
     instance._transient || instance.attr("_transient", new can.Observe({}));
     can.reduce(name.slice(0, -1), function(current, next) {
@@ -223,7 +223,7 @@ can.Control("GGRC.Controllers.Modals", {
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
-    
+
     return dfd.done(function() {
       //  This is to trigger `focus_first_element` in modal_ajax handling
       that.element.trigger("loaded");
@@ -270,7 +270,7 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "input:not([data-lookup]), textarea keyup" : function(el, ev) {
-      if (el.prop('value').length == 0 || 
+      if (el.prop('value').length == 0 ||
         (typeof el.attr('value') !== 'undefined' && el.attr('value').length == 0)) {
         this.set_value_from_element(el);
       }
@@ -339,7 +339,7 @@ can.Control("GGRC.Controllers.Modals", {
 
     if($elem.is("[data-binding]") && $elem.is("[type=checkbox]")){
       can.map($elem, function(el){
-        if(el.value != value.id) 
+        if(el.value != value.id)
           return;
         if($(el).is(":checked")){
           instance.mark_for_addition($elem.data("binding"), value);
