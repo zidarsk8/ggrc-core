@@ -15,7 +15,7 @@
     if (this.attr("status") === "Verified") {
       return "";
     }
-    var date = moment(this.attr("end_date"));
+    var date = moment(this.attr("next_due_date") || this.attr("end_date"));
     if(date && date.isBefore(new Date())){
       return "overdue";
     }

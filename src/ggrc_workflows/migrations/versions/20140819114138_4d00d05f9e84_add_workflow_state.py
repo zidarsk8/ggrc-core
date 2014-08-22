@@ -9,7 +9,7 @@ Create Date: 2014-08-19 11:41:38.723368
 
 # revision identifiers, used by Alembic.
 revision = '4d00d05f9e84'
-down_revision = '2608242ad8ea'
+down_revision = '28f2d0d0362'
 
 from alembic import op
 import sqlalchemy as sa
@@ -24,29 +24,25 @@ def upgrade():
 
   op.execute("""
     UPDATE workflows
-    SET status='Draft', recurrences=true
-    """)
-
-  # one_time workflows don't have recurrences
-  op.execute("""
-    UPDATE workflows
-    SET recurrences=false
-    WHERE frequency='one_time'
+    SET status='Draft', recurrences=false
     """)
 
   # workflows with cycles are active
   op.execute("""
     UPDATE workflows w
     INNER JOIN cycles c ON c.workflow_id = w.id
-    SET w.status='Active'
+    SET w.status='Active', w.recurrences=(w.frequency != 'one_time')
     """)
 
-  # but one_time workflows with cycles are inactive
+  # but one_time workflows with no current cycles are inactive
   op.execute("""
     UPDATE workflows w
     INNER JOIN cycles c ON c.workflow_id = w.id
     SET w.status='Inactive'
-    WHERE w.frequency='one_time'
+    WHERE NOT EXISTS(
+      SELECT * FROM cycles c1
+      WHERE c1.workflow_id = w.id AND c1.is_current = true
+    )
     """)
 
 

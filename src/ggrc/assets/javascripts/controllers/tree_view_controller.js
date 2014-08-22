@@ -753,8 +753,22 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var model = el.closest("[data-model]").data("model");
     model.attr(data[model.constructor.root_object] || data);
     ev.stopPropagation();
-  }
-
+  },
+  reload_list: function() {
+    this._draw_list_deferred = false;
+    this.find_all_deferred = false;
+    this.get_count_deferred = false;
+    this.options.list.replace([]);
+    this.element.children('.cms_controllers_tree_view_node').remove();
+    this.fetch_list().then(this.proxy("draw_list"));
+    this.init_count();
+  },
+  "button[custom-event] click" : function(el, ev) {
+    var event_name = el.attr("custom-event");
+    if(this.options.events && typeof this.options.events[event_name] === "function") {
+      this.options.events[event_name].apply(this, arguments);
+    }
+  },
 });
 
 can.Control("CMS.Controllers.TreeViewNode", {

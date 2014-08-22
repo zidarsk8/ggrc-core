@@ -156,14 +156,14 @@
                 if(result.type == "Person") { return true; }
 
                 if (self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
-                  if (result.type == "Program") //FIXME after backend is done
+                  if (result.type == "Program" || result instanceof CMS.Models.Program) //FIXME after backend is done
                     return true;
 
                   return (result.owners[0] && (result.owners[0].id === self.context.owner.id) &&
                     result.contact && (result.contact.id === self.context.contact.id));
                 }
                 else if (self.context.owner && owner_val !== "") {
-                  if (result.type == "Program") //FIXME after backend is done
+                  if (result.type == "Program" || result instanceof CMS.Models.Program) //FIXME after backend is done
                     return true;
 
                   return (result.owners[0] && owner_val !== "" && result.owners[0].id === self.context.owner.id);

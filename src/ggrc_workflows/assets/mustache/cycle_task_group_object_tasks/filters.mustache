@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+<div class="advanced-filters search-filters">
+  <form class="form-search" onsubmit="return false" autocomplete="off">
+    <div class="row-fluid">
+      <div class="span12">
+        <button class="btn" custom-event="show-history"
+          mapping="{{#if_equals mapping 'object_tasks_with_history'}}object_tasks{{else}}object_tasks_with_history{{/if_equals}}"
+          style="float:right;"
+          >
+          <i class="grcicon-history-color" style="margin-top:0px;"></i>
+          {{#if_equals mapping "object_tasks"}}
+            Show History
+          {{else}}
+            Hide History
+          {{/if_equals}}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
