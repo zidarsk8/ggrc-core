@@ -8,26 +8,24 @@
 <div class="centered">
 {{#instance}}
 <form>
-  <p>By clicking "Proceed", {{instance.task_groups.length}} task groups will be started, tasks will be assigned and notifications will be sent.</p>
-
-  {{^if_equals instance.frequency "one_time"}}
-  {{^if_equals instance.frequency "continuous"}}
-  <p>The cycle will be started for the
-    <b>
-    {{#switch instance.frequency}}
-    {{#case "weekly"}}week{{/case}}
-    {{#case "monthly"}}month{{/case}}
-    {{#case "quarterly"}}quarter{{/case}}
-    {{#case "annually"}}year{{/case}}
-    {{/switch}}
-    </b>
-    including this date:
-    {{! FIXME: Better way of initializing this date? }}
-    <input tabindex="4" class="date input-small" name="base_date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="" {{ (el) -> d = new Date(); el.val("" + (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear()) }}></input>
+  {{#defer 'is_mid_frequency' instance.is_mid_frequency spinner=true}}
+  <p>
+    {{^if is_mid_frequency}}
+      By clicking "Proceed",
+    {{/if}}
+    {{instance.task_groups.length}} task group{{^if_equals instance.task_groups.length 1}}s{{/if_equals}} will be started,
+    tasks will be assigned and notifications will be sent.
   </p>
-  {{/if_equals}}
-  {{/if_equals}}
-  <p>Are you sure you want to proceed?</p>
+
+  {{#if is_mid_frequency}}
+  <p>
+    Do you want to create first workflow cycle starting this
+    <b>{{instance.frequency_duration}}</b>?
+  </p>
+  {{/if}}
+  {{else}}
+  <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+  {{/defer}}
 </form>
 {{/instance}}
 </div>

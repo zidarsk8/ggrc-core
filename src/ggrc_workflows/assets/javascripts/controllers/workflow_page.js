@@ -37,20 +37,31 @@
           modal_title : "Confirm",
           modal_confirm : "Proceed",
           skip_refresh : true,
-          button_view : GGRC.mustache_path + "/modals/confirm_buttons.mustache",
+          button_view : GGRC.mustache_path + "/workflows/confirm_start_buttons.mustache",
           content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
           instance : GGRC.page_instance()
-        }, function(params) {
-          var data = {};
+        }, function(params, option) {
+          var data = {},
+              d = new Date(),
+              base_date,
+              workflow = page_instance;
 
           can.each(params, function(item) {
             data[item.name] = item.value;
           });
 
+          if (option === 'this') {
+            base_date = moment().format('MM/DD/YYYY');
+          }
+          else if (option === 'next') {
+            base_date = moment().add(1,
+              workflow.frequency_duration()).format('MM/DD/YYYY');
+          }
+
           cycle = new CMS.Models.Cycle({
             context: page_instance.context.stub(),
             workflow: { id: page_instance.id, type: "Workflow" },
-            start_date: data.base_date || null,
+            start_date: base_date || null,
             autogenerate: true
           });
 

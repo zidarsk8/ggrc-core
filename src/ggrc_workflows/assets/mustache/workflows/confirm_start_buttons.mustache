@@ -1,0 +1,37 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!div class="modal-footer"}}
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="deny-buttons">
+        <a class="btn" data-dismiss="modal" href="javascript://">Cancel</a>
+      </div>
+    </div>
+    <div class="span3">
+      &nbsp;
+    </div>
+    <div class="span6">
+      <div class="confirm-buttons">
+        {{#defer 'is_mid_frequency' instance.is_mid_frequency}}
+        {{#if is_mid_frequency}}
+          <a class="btn preventdoubleclick" data-toggle="confirm" data-option="next" href="javascript://">
+            No, start next {{instance.frequency_duration}}
+          </a>
+          <a class="btn btn-primary preventdoubleclick" data-option="this" data-toggle="confirm" href="javascript://">
+            Yes
+          </a>
+        {{else}}
+        <a class="btn btn-primary preventdoubleclick" data-toggle="confirm" href="javascript://">
+          Proceed
+        </a>
+        {{/if}}
+        {{/defer}}
+      </div>
+    </div>
+  </div>
+{{!/div}}

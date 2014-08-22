@@ -45,7 +45,7 @@ can.Control("GGRC.Controllers.Modals", {
     .on('click', 'a.btn[data-toggle=confirm]', function(e) {
       var params = $(e.target).closest('.modal').find('form').serializeArray();
       $target.modal('hide').remove();
-      success && success(params);
+      success && success(params, $(e.target).data('option'));
     })
     .on('click.modal-form.close', '[data-dismiss="modal"]', function() {
       $target.modal('hide').remove();
