@@ -80,6 +80,28 @@ class RelativeTimeboxed(Timeboxed):
     return ret
 
   @classmethod
+  def _calc_start_date_of_next_period(cls, base_date, frequency):
+    if frequency == "one_time":
+      ret = base_date
+    elif frequency == "annually":
+      ret = datetime.date(year=base_date.year+1, month=base_date.month, day=base_date.day)
+    elif frequency == "monthly":
+      if base_date.month < 12:
+        new_date = datetime.date(year=base_date.year, month=base_date.month+1, day=base_date.day)
+      else:
+        new_date = datetime.date(year=base_date.year+1, month=1, day=base_date.day)
+      ret = new_date
+    elif frequency == "quarterly":
+      if base_date.month < 10:
+        new_date = datetime.date(year=base_date.year, month=base_date.month+3, day=base_date.day)
+      else:
+        new_date = datetime.date(year=base_date.year+1, month=1, day=base_date.day)
+      ret = new_date
+    elif frequency == "weekly":
+      ret = base_date + datetime.timedelta(days=7)
+    return ret
+
+  @classmethod
   def _calc_start_date(
       cls, base_date, frequency, rel_month, rel_day):
     new_date = cls._calc_relative_date(base_date, frequency, rel_month, rel_day)

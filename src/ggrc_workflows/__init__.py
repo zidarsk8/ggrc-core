@@ -545,18 +545,14 @@ def start_recurring_cycles():
     # Flag the cycle to be saved
     db.session.add(cycle)
     
-    app.logger.info("Starting cycle for workflow {id}".format(id=workflow.id))
-
     # Create the cycle (including all child objects)
     handle_cycle_post(None, cycle)
-
-    app.logger.info("Pushing next_cycle_start_date forward for workflow {id}".format(id=workflow.id))
 
     # Update the workflow next_cycle_start_date to push it ahead based on the frequency.
     base_date = RelativeTimeboxed._calc_base_date(today, workflow.frequency)
     workflow.next_cycle_start_date = \
-      RelativeTimeboxed._calc_start_date(
-        workflow.next_cycle_start_date, workflow.frequency, base_date.month, base_date.day
+      RelativeTimeboxed._calc_start_date_of_next_period(
+        base_date, workflow.frequency
         )
     db.session.add(workflow)
     
