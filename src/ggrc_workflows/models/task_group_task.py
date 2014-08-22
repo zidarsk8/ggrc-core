@@ -106,7 +106,7 @@ class RelativeTimeboxed(Timeboxed):
     return new_date
 
   def calc_start_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+    if self.task_group.workflow.frequency in ("one_time", "continuous"):
       return self.start_date
     else:
       return self._calc_start_date(
@@ -114,7 +114,7 @@ class RelativeTimeboxed(Timeboxed):
           self.relative_start_month, self.relative_start_day)
 
   def calc_end_date(self, base_date):
-    if self.task_group.workflow.frequency == "one_time":
+    if self.task_group.workflow.frequency in ("one_time", "continuous"):
       return self.end_date
     else:
       return self._calc_end_date(
