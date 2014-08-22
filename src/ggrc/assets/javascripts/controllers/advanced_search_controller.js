@@ -193,6 +193,7 @@
 
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
+          this.context.attr("option_search_term", el.val());
           this.triggerSearch();
         }
       }
@@ -201,14 +202,14 @@
 
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
-      var con = this.context;
+      var ctx = this.context;
 
       //Get the selected object value
 
       var selected = $("select.option-type-selector").val(),
         self = this,
         loader, custom_filter,
-        term = $("#search").val() || "",
+        term = ctx.option_search_term || "",
         re = new RegExp("^.*" + term + ".*","gi"),
         filters = [],
         cancel_filter;
@@ -216,7 +217,7 @@
 
       this.set_option_descriptor(selected);
 
-      this.context.filter_list.each(function(filter_obj) {
+      ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
           return;
@@ -235,6 +236,17 @@
         //missing search term.
         return;
       }
+
+      filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+        return GGRC.Models.Search.search_for_types(
+          term,
+          [selected],
+          { contact_id: binding.instance && binding.instance.id }
+          ).then(function(mappings) {
+            return mappings.entries;
+          });
+      }).attach(ctx.owner));
+
 
       if (filters.length > 0) {
         //Object selected count and Add selected button should reset.
@@ -260,63 +272,11 @@
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
-        custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
-          var model_type = result.instance.type,
-            owner_val = $('input.search-by-owner').val(),
-            contact_val = $('input.search-by-contact').val();
-
-          switch(model_type){
-
-            case "Person": //check for only search text, not owner or contact
-              if (term) { return (result.instance.name.match(re)); }
-              else { return true; }
-
-            case "Program": //Fixme, Currently Program is not filtered by owner
-              if ( term && self.context.contact && contact_val !== "" ) {
-                return (result.instance.title.match(re) &&
-                  result.instance.contact && result.instance.contact.id === self.context.contact.id);
-              }
-              else if (self.context.contact && contact_val !== "" ) {
-                return ( result.instance.contact && result.instance.contact.id === self.context.contact.id);
-              }
-              else if(term) { return (result.instance.title.match(re)); }
-              else { return true; }
-
-            default:
-              if (term && self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if( self.context.owner && self.context.contact && owner_val !== "" && contact_val !== ""){
-                return ( result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if (term && self.context.owner && owner_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
-              }
-              else if (self.context.owner && owner_val !== "") {
-                return (result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
-              }
-              else if (term && self.context.contact && contact_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if (self.context.contact && contact_val !== "") {
-                return ( result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else {
-                return true;
-              }
-          }; //end switch
-        }).attach(CMS.Models.get_instance(GGRC.current_user));
-
         this.last_loader = loader;
         this.last_custom_filter = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        custom_filter.refresh_instances().then(function(options) {
+        loader.refresh_instances().then(function(options) {
           var active_fn = function() {
             return self.element &&
                    self.last_custom_filter === custom_filter;
