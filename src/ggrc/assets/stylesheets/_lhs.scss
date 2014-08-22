@@ -6,8 +6,7 @@
  */
 
 .lhs-holder {
-  background: $treeListBgnd;
-  //overflow-x:hidden;
+  background: #eee;
 }
 
 .lhs {
@@ -46,18 +45,6 @@
       background-position:-268px -195px;
       padding-left: 23px;
       font-size:12px;
-    }
-    .checkbox.btn {
-      position: absolute;
-      right: 10px;
-      margin-left: 0;
-      padding-left: 4px;
-         -webkit-border-top-right-radius: 10px;
-             -moz-border-radius-topright: 10px;
-                 border-top-right-radius: 10px;
-      -webkit-border-bottom-right-radius: 10px;
-          -moz-border-radius-bottomright: 10px;
-              border-bottom-right-radius: 10px;
     }
   }
 }
@@ -201,30 +188,21 @@
   ul.sub-level,
   ul.sub-actions {
     background:#fff;
-    border-bottom:1px solid #ccc;
-    border-top:1px solid #ddd;
     display: none;
     overflow: auto;
     max-height: 160px;
 
-    &.in {
-      border-bottom:1px solid #ccc;
-      border-top:1px solid #ddd;
-    }
-
     li {
       font-size:12px;
-      border-bottom:1px solid #ddd;
       &.no-access {
         padding-left:34px;
-        background:#eee;
       }
       a {
         [class*="span"] {
           min-height:24px;
         }
         padding-left:34px;
-        background:#eee;
+        background:$white;
         span.lhs-item {
           display:block;
           width: auto !important;
@@ -260,18 +238,20 @@
         }
       }
       &.add-new {
+        border-bottom:1px solid #ccc;
         a {
-          background:#ddd;
-          color:#666;
+          background:#fff;
+          color:$link;
         }
       }
 
     }
   }
   h2 {
-    font-size:15px;
-    font-weight:normal;
+    font-size:11px;
+    font-weight:bold;
     padding-left:10px;
+    text-transform:uppercase;
   }
   &.recent {
     ul.top-level {
