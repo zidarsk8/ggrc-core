@@ -7,6 +7,55 @@
 
 ;(function(CMS, GGRC, can, $) {
 
+  function _generate_cycle() {
+    var workflow = GGRC.page_instance(),
+        dfd = new $.Deferred(),
+        cycle;
+
+    GGRC.Controllers.Modals.confirm({
+      modal_title : "Confirm",
+      modal_confirm : "Proceed",
+      skip_refresh : true,
+      button_view : GGRC.mustache_path + "/workflows/confirm_start_buttons.mustache",
+      content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
+      instance : workflow
+    }, function(params, option) {
+      var data = {},
+          d = new Date(),
+          base_date;
+
+      can.each(params, function(item) {
+        data[item.name] = item.value;
+      });
+
+      if (option === 'this') {
+        base_date = moment().format('MM/DD/YYYY');
+      }
+      else if (option === 'next') {
+        base_date = moment().add(
+          1, workflow.frequency_duration()).format('MM/DD/YYYY');
+      }
+
+      cycle = new CMS.Models.Cycle({
+        context: workflow.context.stub(),
+        workflow: { id: workflow.id, type: "Workflow" },
+        start_date: base_date || null,
+        autogenerate: true
+      });
+
+      cycle.save().then(function(cycle) {
+        // Cycle created. Workflow started.
+        setTimeout(function() {
+          dfd.resolve();
+          window.location.hash = 'current_widget/cycle/' + cycle.id;
+        }, 250);
+      });
+    }, function() {
+      dfd.reject();
+    });
+    return dfd;
+  }
+
   can.Control("GGRC.Controllers.WorkflowPage", {
     defaults: {
     }
@@ -28,49 +77,41 @@
     tag: "workflow-start-cycle",
     content: "<content/>",
     events: {
+      click: _generate_cycle
+    }
+  });
+
+  can.Component.extend({
+    tag: "workflow-activate",
+    template: "<content/>",
+    events: {
       click: function() {
-        var page_instance = GGRC.page_instance(),
-            that = this,
-            cycle;
-
-        GGRC.Controllers.Modals.confirm({
-          modal_title : "Confirm",
-          modal_confirm : "Proceed",
-          skip_refresh : true,
-          button_view : GGRC.mustache_path + "/workflows/confirm_start_buttons.mustache",
-          content_view : GGRC.mustache_path + "/workflows/confirm_start.mustache",
-          instance : GGRC.page_instance()
-        }, function(params, option) {
-          var data = {},
-              d = new Date(),
-              base_date,
-              workflow = page_instance;
-
-          can.each(params, function(item) {
-            data[item.name] = item.value;
+        var workflow = GGRC.page_instance();
+        if (workflow.frequency !== 'one_time') {
+          workflow.refresh().then(function() {
+            workflow.attr('recurrences', true);
+            workflow.attr('status', "Active");
+            workflow.save();
           });
-
-          if (option === 'this') {
-            base_date = moment().format('MM/DD/YYYY');
-          }
-          else if (option === 'next') {
-            base_date = moment().add(1,
-              workflow.frequency_duration()).format('MM/DD/YYYY');
-          }
-
-          cycle = new CMS.Models.Cycle({
-            context: page_instance.context.stub(),
-            workflow: { id: page_instance.id, type: "Workflow" },
-            start_date: base_date || null,
-            autogenerate: true
+        } else {
+          _generate_cycle().then(function() {
+            workflow.refresh().then(function() {
+              workflow.attr('status', "Active").save();
+            });
           });
+        }
+      }
+    }
+  });
 
-          cycle.save().then(function(cycle) {
-            // Cycle created. Workflow started.
-            setTimeout(function() {
-              window.location.hash = 'current_widget/cycle/' + cycle.id;
-            }, 250);
-          });
+  can.Component.extend({
+    tag: "workflow-deactivate",
+    template: "<content/>",
+    events: {
+      click: function() {
+        var workflow = GGRC.page_instance();
+        workflow.refresh().then(function(workflow) {
+          workflow.attr('recurrences', false).save();
         });
       }
     }

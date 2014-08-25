@@ -99,7 +99,7 @@
               id="search"
               class="input-medium search-icon"
               placeholder="Enter text to search..."
-              value="{{option_search_term}}"
+              can-value="option_search_term"
               type="text"
               autofocus>
           </div>
@@ -119,28 +119,13 @@
             value="{{firstnonempty owner.name owner.email owner.title}}"
             data-lookup="Person"
             data-template="/people/autocomplete_result.mustache"
+            null-if-empty="null-if-empty"
             {{ autocomplete_select }}
             >
         </div>
       </div>
 
-      <div class="span4">
-        <strong>Contact:</strong>
-        <div class="modal-search objective-selector">
-          <i class="grcicon-person-green"></i>
-          <input
-            id="search-by-contact"
-            class="search-by-contact input-medium search-icon"
-            placeholder="Choose contact"
-            type="text"
-            name="contact"
-            value="{{firstnonempty contact.name contact.email contact.title}}"
-            data-lookup="Person"
-            data-template="/people/autocomplete_result.mustache"
-            {{ autocomplete_select }}
-            >
-        </div>
-      </div>
+      <div class="span4">&nbsp;</div>
 
       <div class="span1">
         <a class="btn pull-right objectReview" href="javascript://" id="objectReview">Search</a>

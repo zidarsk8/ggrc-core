@@ -75,7 +75,7 @@
     init: function() {
       this._super.apply(this, arguments);
       this.bind("status", function(ev, newVal) {
-        if(newVal === 'Verified' && this.workflow.reify().object_approval) {
+        if (newVal === 'Verified') {
           this.attr("is_current", false);
           this.save();
         }

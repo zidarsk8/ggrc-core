@@ -209,6 +209,11 @@ def handle_tasks_overdue():
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
+    cycle=get_cycle(task)
+    if cycle is None:
+      continue
+    if cycle.is_current != True:
+      continue
     contact=get_task_contacts(task)
     if contact is None:
       continue
@@ -224,6 +229,11 @@ def handle_tasks_due(num_days):
     filter(models.CycleTaskGroupObjectTask.status != 'Verified').\
     all()
   for task in tasks:
+    cycle=get_cycle(task)
+    if cycle is None:
+      continue
+    if cycle.is_current != True:
+      continue
     contact=get_task_contacts(task)
     if contact is None:
       continue
@@ -432,6 +442,7 @@ def prepare_notification_for_workflow(workflow, subject, notif_pri):
 
 def handle_workflow_cycle_overdue():
   workflow_cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
     filter(models.Cycle.status != 'Finished').\
     filter(models.Cycle.status != 'Verified').\
     filter(models.Cycle.end_date < date.today()).\
@@ -442,6 +453,7 @@ def handle_workflow_cycle_overdue():
 
 def handle_workflow_cycle_due(num_days):
   workflow_cycles=db.session.query(models.Cycle).\
+    filter(models.Cycle.is_current==True).\
     filter(models.Cycle.status != 'Finished').\
     filter(models.Cycle.status != 'Verified').\
     filter(models.Cycle.end_date == (date.today() + timedelta(num_days))).\

@@ -7,15 +7,29 @@
 
 
 {{#is_allowed 'update' instance context='for'}}
-{{#with_mapping_count instance 'current_cycle'}}
-{{^count}}
+{{#if instance.recurrences}}
 <li class="inner-nav-button">
   <workflow-start-cycle workflow="instance">
     <button type="submit" href="#workflowStart" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
-      Activate Workflow
+      Manually Start a Cycle
     </button>
   </workflow-start-cycle>
 </li>
-{{/count}}
-{{/with_mapping_count}}
+<li class="inner-nav-button">
+  <workflow-deactivate workflow="instance">
+    <button type="submit" href="#workflowStart" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+      End Future Recurrences
+    </button>
+  </workflow-deactivate>
+</li>
+{{/if}}
+{{#if_equals instance.status "Draft"}}
+<li class="inner-nav-button">
+  <workflow-activate workflow="instance">
+    <button type="submit" href="#workflowActivate" class="btn" {{^instance.task_groups.length}}disabled="disabled"{{/task_groups}}>
+      Activate Workflow
+    </button>
+  </workflow-activate>
+</li>
+{{/if}}
 {{/is_allowed}}

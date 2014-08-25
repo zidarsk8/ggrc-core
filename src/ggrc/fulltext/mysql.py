@@ -245,14 +245,49 @@ class MysqlIndexer(SqlIndexer):
 
     return query
 
+  def _add_extra_params_query(self, query, extra_params):
+    if not extra_params:
+      return query
+
+    union_queries = []
+    for model, params in extra_params.iteritems():
+      for key, value in params.iteritems():
+        item_query = db.session.query(
+            self.record_type.key.label('key'),
+            self.record_type.type.label('type'))
+        item_query = item_query.filter(and_(
+            MysqlRecordProperty.property == key,
+            MysqlRecordProperty.content == value)
+        )
+        union_queries.append(item_query)
+
+        # Make sure we only filter out the current model
+        item_query = db.session.query(
+            self.record_type.key.label('key'),
+            self.record_type.type.label('type'))
+        item_query = item_query.filter(and_(
+            MysqlRecordProperty.type != model
+        ))
+        union_queries.append(item_query)
+
+    union_query = alias(union(*union_queries))
+    query = query.join(
+        union_query,
+        and_(
+            union_query.c.key == MysqlRecordProperty.key,
+            union_query.c.type == MysqlRecordProperty.type),
+    )
+    return query
+
   def search(
-      self, terms, types=None, permission_type='read', permission_model=None, contact_id=None):
+      self, terms, types=None, permission_type='read', permission_model=None, contact_id=None, extra_params=None):
     query = db.session.query(
         self.record_type.key, self.record_type.type)
     query = query.filter(
         self._get_type_query(types, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
+    query = self._add_extra_params_query(query, extra_params)
     # Sort by title:
     # FIXME: This only orders by `title` if title was the matching property
     query = query.order_by(case(
@@ -260,12 +295,13 @@ class MysqlIndexer(SqlIndexer):
       else_=literal("ZZZZZ")))
     return query
 
-  def counts(self, terms, group_by_type=True, types=None, contact_id=None):
+  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params=None):
     query = db.session.query(
         self.record_type.type, func.count(distinct(self.record_type.key)))
     query = query.filter(self._get_type_query(types))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
+    query = self._add_extra_params_query(query, extra_params)
     query = query.group_by(self.record_type.type)
     # FIXME: Is this needed for correct group_by/count-distinct behavior?
     #query = query.order_by(self.record_type.type, self.record_type.key)
