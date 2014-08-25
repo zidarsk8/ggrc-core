@@ -41,6 +41,7 @@ dashboard-js-template-files:
   - task_group_tasks/task_group_subtree_footer.mustache
   - task_group_tasks/task_group_subtree.mustache
   - workflows/confirm_start.mustache
+  - workflows/confirm_start_buttons.mustache
   - workflows/modal_content.mustache
   - workflows/info.mustache
   - workflows/contacts.mustache
