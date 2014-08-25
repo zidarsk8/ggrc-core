@@ -27,11 +27,11 @@ class Workflow(
 
   VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
-  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
+  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually"]
 
   @classmethod
   def default_frequency(cls):
-    return 'continuous'
+    return 'one_time'
 
   @validates('frequency')
   def validate_frequency(self, key, value):
