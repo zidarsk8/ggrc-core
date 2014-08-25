@@ -7,7 +7,7 @@
 from ggrc import db
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed
+    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful
     )
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.object_owner import Ownable
@@ -22,17 +22,16 @@ from datetime import date
 
 
 class Workflow(
-    HasOwnContext, Timeboxed, Described, Titled, Slugged, Base, db.Model):
+    HasOwnContext, Timeboxed, Described, Titled, Slugged, Stateful, Base, db.Model):
   __tablename__ = 'workflows'
 
-  #Use these states for WorkflowCycle when it is implemented
-  #VALID_STATES = [u"Planned", u"Future", u"In Progress", u"Overdue", u"Finished"]
+  VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
-  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually", "continuous"]
+  VALID_FREQUENCIES = ["one_time", "weekly", "monthly", "quarterly", "annually"]
 
   @classmethod
   def default_frequency(cls):
-    return 'continuous'
+    return 'one_time'
 
   @validates('frequency')
   def validate_frequency(self, key, value):
@@ -56,6 +55,8 @@ class Workflow(
   object_approval = deferred(
     db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
+  recurrences = db.Column(db.Boolean, default=False, nullable=False)
+
   workflow_people = db.relationship(
       'WorkflowPerson', backref='workflow', cascade='all, delete-orphan')
   people = association_proxy(
@@ -70,18 +71,9 @@ class Workflow(
   next_cycle_start_date = deferred(
       db.Column(db.Date, nullable=True), 'Workflow')
 
-  @computed_property
-  def workflow_state(self):
-    cycles = db.session.query(Cycle)\
-      .filter(
-        Cycle.workflow_id == self.id
-      )\
-      .all()
-
-    return WorkflowState.get_state(cycles)
-
   _fulltext_attrs = [
       'notify_custom_message',
+      'status',
       ]
 
   _publish_attrs = [
@@ -89,13 +81,12 @@ class Workflow(
       PublishOnly('people'),
       'task_groups',
       'frequency',
-      PublishOnly('workflow_state'),
       'notify_on_change',
       'notify_custom_message',
       'cycles',
-      'object_approval'
+      'object_approval',
+      'recurrences',
       ]
-  _stub_attrs = ['workflow_state']
 
   def copy(self, _other=None, **kwargs):
     columns = [

@@ -4,4 +4,4 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../src"
 
 
-python -m ggrc.migrate ${@:1}
+python -m ggrc.migrate "${@:1}"

@@ -5,8 +5,20 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
+
+<li class="filters" data-for="{{model.model_singular}}">
+  <a href="javascript://"
+     {{#if_equals filter_params.Workflow.status 'Active'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Active">Active</a>
+  <a href="javascript://"
+     {{#if_equals filter_params.Workflow.status 'Draft'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Draft">Draft</a>
+  <a href="javascript://"
+     {{#if_equals filter_params.Workflow.status 'Inactive'}}class='active'{{/if_equals}}
+     data-key="status" data-value="Inactive">Inactive</a>
+</li>
 {{#list}}
-<li class="{{class.category}}" {{addclass "wf-" workflow_state}} data-model="true" {{data 'model'}}>
+<li class="{{class.category}}" data-model="true" {{data 'model'}}>
   <a href="{{viewLink}}" class="show-extended">
     <div>
       <div class="lhs-main-title">

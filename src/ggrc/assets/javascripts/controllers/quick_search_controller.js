@@ -549,6 +549,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       , spinner_selector: '.spinner'
       , limit : 50
       , observer : null
+      , filter_params: new can.Observe()
     }
 }, {
     display: function() {
@@ -579,7 +580,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       return can.view(template_path, prefs_dfd.then(function(prefs) { return prefs.getLHNState(); })).then(function(frag, xhr) {
         var lhn_prefs = prefs.getLHNState()
           , initial_term
-          , initial_params
+          , initial_params = {}
           ;
 
         self.element.html(frag);
@@ -594,6 +595,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         if (self.options.observer.my_work) {
           initial_params = { "contact_id": GGRC.current_user.id };
         }
+        self.options.filter_params.attr('Workflow', {status: 'Active'});
         self.options.loaded_lists = [];
         self.run_search(initial_term, initial_params);
 
@@ -805,6 +807,7 @@ can.Control("CMS.Controllers.LHN_Search", {
 
         var context = {
             model: CMS.Models[model_name]
+          , filter_params: self.options.filter_params
           , list: self.options.visible_lists[model_name]
           , count: can.compute(function() {
               return self.options.results_lists[model_name].attr('length');
@@ -1002,8 +1005,10 @@ can.Control("CMS.Controllers.LHN_Search", {
   , run_search: function(term, extra_params) {
       var self = this
         , tracker_stop = GGRC.Tracker.start(
-            "LHN_run_search",
-            extra_params && extra_params.contact_id ? "MyWork" : "Normal")
+          "LHN_run_search",
+          extra_params && extra_params.contact_id ? "MyWork" : "Normal")
+        , filter_list = [];
+
         ;
       if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
@@ -1021,7 +1026,21 @@ can.Control("CMS.Controllers.LHN_Search", {
         //  changes)
         this.search_id = (this.search_id || 0) + 1;
         this.current_term = term;
-        this.current_params = extra_params;
+        this.current_params = extra_params || {};
+
+        // Construct extra_params based on filters:
+        delete this.current_params.extra_params;
+        this.options.filter_params.each(function(obj, type) {
+          var properties_list = [];
+          obj.each(function(v, k){
+            properties_list.push(k + "=" + v);
+          });
+          if (properties_list.length) {
+            filter_list.push(type + ":" + properties_list.join(','));
+          }
+        });
+        this.current_params.extra_params = filter_list.join(';');
+
         // Retrieve and display results for visible lists
         return $.when(
             this.refresh_counts(),
@@ -1042,7 +1061,30 @@ can.Control("CMS.Controllers.LHN_Search", {
         if ($list.find(self.options.list_content_selector).hasClass('in'))
           return $list;
       });
+    },
+
+  ".filters a click" : function(el, ev) {
+    var term = this.options.display_prefs.getLHNState().search_text || ""
+        param = {},
+        key = el.data('key'),
+        value = el.data('value'),
+        for_model = el.parent().data('for'),
+        filters = this.options.filter_params;
+    if (this.options.observer.my_work) {
+      param = { "contact_id": GGRC.current_user.id };
     }
+
+    if (el.hasClass('active')) {
+      filters[for_model].removeAttr(key);
+      this.run_search(term, param);
+      return;
+    }
+    if (!(for_model in filters)) {
+      filters.attr(for_model, {});
+    }
+    filters[for_model].attr(key, value);
+    this.run_search(term, param);
+  }
 });
 
 
