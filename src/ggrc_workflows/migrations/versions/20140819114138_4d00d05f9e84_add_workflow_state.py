@@ -27,6 +27,13 @@ def upgrade():
     SET status='Draft', recurrences=false
     """)
 
+  # fix old workflows where frequency is unset
+  op.execute("""
+    UPDATE workflows
+    SET frequency='one_time'
+    WHERE frequency IS NULL
+    """)
+
   # workflows with cycles are active
   op.execute("""
     UPDATE workflows w
