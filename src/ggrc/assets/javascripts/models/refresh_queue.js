@@ -183,8 +183,8 @@ can.Construct("RefreshQueue", {
               });
               // Resolve the original deferred only when all list deferreds
               //   have been resolved
-              $.when.apply($, dfds).then(function() {
-                dfd.resolve();
+              $.when.apply($, dfds).then(function(items) {
+                dfd.resolve(items);
               });
               return;
             }
