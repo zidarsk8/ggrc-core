@@ -1273,14 +1273,6 @@ ul.new-tree {
     @include opacity(1);
     text-decoration:none;
   }
-  &.unmap {
-    margin-left:7px;
-    @include opacity(0.25);
-    &:hover {
-      color:$error;
-      @include opacity(1);
-    }
-  }
   &.relevant-action {
     padding-right: 20px;
     color: $subTitle;
@@ -1472,5 +1464,11 @@ ul.new-tree {
   }
   .accepted {
     color: $green;
+  }
+}
+
+.unmap {
+  &:hover {
+    color:$error;
   }
 }

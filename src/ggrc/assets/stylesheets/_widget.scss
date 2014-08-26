@@ -1049,3 +1049,33 @@
     font-weight: bold;
   }
 }
+
+
+// new action bar
+
+.action-bar {
+  border-bottom:1px solid #eee;
+  margin-bottom:10px;
+  ul {
+    @include reset-list();
+    li {
+      display:inline-block;
+      line-height:24px;
+      margin:0 20px 0 0;
+      [class^="grcicon-"] {
+        margin: 4px 0 0 0;
+      }
+      a {
+        font-size:11px;
+        text-transform:uppercase;
+        font-weight:normal;
+      }
+    }
+    &.additional-links {
+      float:right;
+      li {
+        margin:0 0 0 20px;
+      }
+    }
+  }
+}
