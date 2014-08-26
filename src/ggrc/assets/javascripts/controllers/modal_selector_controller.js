@@ -1940,7 +1940,7 @@
         this.last_loader = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        custom_filter.refresh_instances().then(function(options) {
+        custom_filter.refresh_stubs().then(function(options) {
           var active_fn = function() {
             return self.element &&
                    self.last_loader === custom_filter;
