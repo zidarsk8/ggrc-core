@@ -236,7 +236,7 @@ describe("GDrive Workflows Controller", function() {
   describe("UserRole created event", function() {
 
     it("calls update_permissions only for program with matching context", function() {
-      spyOn(ctl, "update_permissions");
+      spyOn(ctl, "update_permissions").andReturn(new $.Deferred().resolve({}));
 
       var p1 = new CMS.Models.Program({id : 1, context : { id : 1 }});
       var p2 = new CMS.Models.Program({id : 2, context : { id : 2 }});
