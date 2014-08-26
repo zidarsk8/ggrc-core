@@ -105,6 +105,38 @@ def contributed_object_views():
       ]
 
 
+DONE_STATUSES = ("Verified",)
+
+def _get_min_next_due_date(due_dated_objects, exclude_statuses=DONE_STATUSES):
+  next_due_date = None
+
+  for obj in due_dated_objects:
+    if obj.status not in exclude_statuses:
+      obj_next_due_date = obj.next_due_date
+      if isinstance(obj_next_due_date, datetime):
+        obj_next_due_date = obj_next_due_date.date()
+      if obj_next_due_date is not None:
+        if next_due_date is None or next_due_date > obj_next_due_date:
+          next_due_date = obj_next_due_date
+
+  return next_due_date
+
+
+def _get_min_end_date(timeboxed_objects, exclude_statuses=DONE_STATUSES):
+  end_date = None
+
+  for obj in timeboxed_objects:
+    if obj.status not in exclude_statuses:
+      obj_end_date = obj.end_date
+      if isinstance(obj_end_date, datetime):
+        obj_end_date = obj_end_date.date()
+      if obj_end_date is not None:
+        if end_date is None or end_date > obj_end_date:
+          end_date = obj_end_date
+
+  return end_date
+
+
 def _get_date_range(timeboxed_objects):
   start_date = None
   end_date = None
@@ -126,10 +158,7 @@ def _get_date_range(timeboxed_objects):
   return (start_date, end_date)
 
 
-def update_cycle_date_range(cycle):
-  start_date = None
-  end_date = None
-
+def update_cycle_dates(cycle):
   import sqlalchemy.orm
   if cycle.id:
     # If `cycle` is already in the database, then eager load required objects
@@ -142,9 +171,14 @@ def update_cycle_date_range(cycle):
     for ctgo in ctg.cycle_task_group_objects:
       ctgo.start_date, ctgo.end_date = _get_date_range(
           ctgo.cycle_task_group_object_tasks)
+      ctgo.next_due_date = _get_min_end_date(
+          ctgo.cycle_task_group_object_tasks)
     ctg.start_date, ctg.end_date = _get_date_range(
         ctg.cycle_task_group_objects)
+    ctg.next_due_date = _get_min_next_due_date(
+        ctg.cycle_task_group_objects)
   cycle.start_date, cycle.end_date = _get_date_range(cycle.cycle_task_groups)
+  cycle.next_due_date = _get_min_next_due_date(cycle.cycle_task_groups)
 
 
 from ggrc.services.common import Resource
@@ -167,7 +201,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
   obj.context = workflow.context
   obj.title = workflow.title
   obj.description = workflow.description
-  obj.status = 'InProgress'
+  obj.status = 'Assigned'
 
   # Find the starting date of the period containing the start date or today
   if obj.start_date:
@@ -225,7 +259,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
         cycle_task_group_object.cycle_task_group_object_tasks.append(
             cycle_task_group_object_task)
 
-  update_cycle_date_range(obj)
+  update_cycle_dates(obj)
 
   workflow_cycle_start.send(
       obj.__class__,
@@ -379,7 +413,7 @@ def handle_cycle_task_group_object_task_put(
 
   if inspect(obj).attrs.start_date.history.has_changes() \
       or inspect(obj).attrs.end_date.history.has_changes():
-    update_cycle_date_range(obj.cycle)
+    update_cycle_dates(obj.cycle)
 
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_object_parent_state(obj)
@@ -406,6 +440,42 @@ def handle_cycle_task_group_put(
     update_cycle_object_parent_state(obj)
     update_cycle_object_child_state(obj)
 
+def update_workflow_state(workflow):
+  if workflow.recurrences:
+    return
+
+  for cycle in workflow.cycles:
+    if cycle.is_current:
+      return
+
+  # No recurrences and no active cycles, workflow is now Inactive
+  workflow.status = 'Inactive'
+  db.session.add(workflow)
+  db.session.flush()
+
+# Check if workflow should be Inactive after end current cycle
+@Resource.model_put.connect_via(models.Cycle)
+def handle_cycle_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.is_current.history.has_changes():
+    update_workflow_state(obj.workflow)
+
+# Check if workflow should be Inactive after recurrence change
+@Resource.model_put.connect_via(models.Workflow)
+def handle_cycle_put(
+    sender, obj=None, src=None, service=None):
+  if inspect(obj).attrs.recurrences.history.has_changes():
+    update_workflow_state(obj)
+
+
+# Check if workflow should be Inactive after cycle status change
+@status_change.connect_via(models.Cycle)
+def handle_cycle_status_change(sender, obj=None, new_status=None, old_status=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    if obj.status == 'Verified':
+      obj.is_current = False
+      db.session.add(obj)
+      update_workflow_state(obj.workflow)
 
 # FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
 def _get_or_create_personal_context(user):

@@ -425,6 +425,26 @@
     }
   }
   .info {
+    &.tier-info {
+      padding:16px 0 0 0;
+      h3 {
+        .btn-mini {
+          font-weight:normal;
+          margin-left:10px;
+          padding-left:10px;
+          padding-right:10px;
+        }
+      }
+      h6 {
+        text-align:left;
+        margin-left:0;
+        margin-right:0;
+        padding-left:0;
+        padding-right:0;
+        border:none;
+        background:none;
+      }
+    }
     padding:5px 16px 0 16px;
     h6 {
       font-weight:normal;

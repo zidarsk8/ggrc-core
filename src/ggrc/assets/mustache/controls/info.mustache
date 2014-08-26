@@ -7,49 +7,14 @@
 
 <section class="info">
   {{#instance}}
-  <div class="row-fluid">
-    <div class="span6">
-      <h3>{{title}}</h3>
-      {{#if type}}
-      <p>
-        {{type.title}}
-      </p>
-      {{/if}}
-    </div>
-    <div class="span6">&nbsp;</div>
-  </div>
-  <div class="row-fluid">
-    <div class="span6">
-      <div class="rtf-block">
-        {{{firstnonempty description '<h4 class="no-data">No description</h4>'}}}
-      </div>
-      
-      <div class="rtf-block">
-        <strong>Notes</strong>
-        <br>
-        {{{firstnonempty notes '<h4 class="no-data">No notes available</h4>'}}}
-      </div>
-    </div>
-    <div class="span6">
-      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance stacked=true}}}
-      <p>
-        <strong>{{model.title_singular}} URL</strong>
-        <br>
-        <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url url}}" target="_blank">
-          {{url}}
-          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=url}}}
-        </a>
-      </p>
-      <p>
-        <strong>Reference URL</strong>
-        <br>
-        <a class="url" data-popover-trigger="sticky-hover" data-sticky-popover="true" href="{{schemed_url reference_url}}" target="_blank">
-          {{reference_url}}
-          {{{scriptwrap "render" '/static/mustache/pbc/iframe_tooltip.mustache' attr_class="popover-data-content" url=reference_url}}}
-        </a>
-      </p>
-    </div>
-  </div>
+
+  {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+  {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
+  {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
+
+  <br>
+
   <div class="row-fluid">
     <div class="span12">
       <div class="info-expand">
@@ -72,118 +37,117 @@
   </div>
   <div class="hidden-fields-area" style="display:none;">
     <div class="row-fluid">
-      <div class="span6">
-        <p>
-          <strong>Code</strong>
-          <br>
-          <span>{{slug}}</span>
-        </p>
-      </div>
-    </div>
-    <div class="row-fluid">
       <div class="span3">
+        <h6>Code</h6>
         <p>
-          <strong>Kind/Nature</strong>
-          <br>
-          <span>{{#using kind=kind}}{{kind.title}}{{/using}}</span>
+          {{slug}}
         </p>
       </div>
       <div class="span3">
+        <h6>Principal Assessor</h6>
         <p>
-          <strong>Fraud Related</strong>
-          <br>
-          {{#if_equals fraud_related "0"}}<span>No</span>{{/if}}
-          {{#if_equals fraud_related "1"}}<span>Yes</span>{{/if}}
-        </p>
-      </div>
-      <div class="span3">
-        <p>
-          <strong>Significance</strong>
-          <br>
-          {{#if_equals key_control "1"}}<span>Key</span>{{/if}}
-          {{#if_equals key_control "0"}}<span>Non-Key</span>{{/if}}
-        </p>
-      </div>
-      <div class="span3">
-        <p>
-          <strong>Type/Means</strong>
-          <br>
-          <span>{{#using means=means}}{{means.title}}{{/using}}</span>
-        </p>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span6">
-        <p>
-          <strong>Effective Date</strong>
-          <br>
-          <span>{{localize_date start_date}}</span>
-        </p>
-      </div>
-      <div class="span6">
-        <p>
-          <strong>Stop Date</strong>
-          <br>
-          <span>{{localize_date end_date}}</span>
-        </p>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span4">
-        <p>
-          <strong>Frequency</strong>
-          <br>
-          <span>{{#using verify_frequency=verify_frequency}}{{verify_frequency.title}}{{/using}}</span>
-        </p>
-      </div>
-      <div class="span4">
-        <p>
-          <strong>Assertions</strong>
-          <br>
-          {{#using items=assertions}}
-            {{#items}}
-              <p>{{name}}</p>
-            {{/items}}
-          {{/using}}
-        </p>
-      </div>
-      <div class="span4">
-        <p>
-          <strong>Categories</strong>
-          <br>
-          {{#using items=categories}}
-            {{#items}}
-              <p>{{name}}</p>
-            {{/items}}
-          {{/using}}
-        </p>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <div class="span4">
-        <p>
-          <strong>Principal Assessor</strong>
-          <br>
-            {{#using assessor=instance.principal_assessor}}
+          {{#using assessor=instance.principal_assessor}}
             {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
           {{/using}}
         </p>
-      </div>
-      <div class="span4">
+      </div>      
+      <div class="span3">
+        <h6>Secondary Assessor</h6>
         <p>
-          <strong>Secondary Assessor</strong>
-          <br>
           {{#using assessor=instance.secondary_assessor}}
             {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
           {{/using}}
         </p>
       </div>
-      <div class="span4">
+    </div>
+    <div class="row-fluid">
+      <div class="span3">
+        <h6>Kind/Nature</h6>
         <p>
-          <strong>State</strong>
-          <br>
-          <span>{{status}}</span>
+          {{#using kind=kind}}
+            {{kind.title}}
+          {{/using}}
         </p>
+      </div>
+      <div class="span3">
+        <h6>Fraud Related</h6>
+        <p>
+          {{#if_equals fraud_related "0"}}
+            No
+          {{/if}}
+          {{#if_equals fraud_related "1"}}
+            Yes
+          {{/if}}
+        </p>
+      </div>
+      <div class="span3">
+        <h6>Significance</h6>
+        <p>
+          {{#if_equals key_control "1"}}
+            Key
+          {{/if}}
+          {{#if_equals key_control "0"}}
+            Non-Key
+          {{/if}}
+        </p>
+      </div>
+      <div class="span3">
+        <h6>Type/Means</h6>
+        <p>
+          {{#using means=means}}
+            {{means.title}}
+          {{/using}}
+        </p>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span3">
+        <h6>Effective Date</h6>
+        <p>
+          {{localize_date start_date}}
+        </p>
+      </div>
+      <div class="span3">
+        <h6>Stop Date</h6>
+        <p>
+          {{localize_date end_date}}
+        </p>
+      </div>
+      <div class="span3">
+        <p>
+          {{#using verify_frequency=verify_frequency}}
+            {{verify_frequency.title}}
+          {{/using}}
+        </p>
+      </div>
+      <div class="span3">
+        <h6>State</h6>
+        <p>
+          {{status}}
+        </p>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span6">
+        <h6>Assertions</h6>
+        {{#using items=assertions}}
+        <ul>
+          {{#items}}
+            <li>{{name}}</li>
+          {{/items}}
+        </ul>
+        {{/using}}
+      </div>
+      <div class="span6">
+        <h6>Categories</h6>
+        {{#using items=categories}}
+        <ul>
+          {{#items}}
+            <li>{{name}}</li>
+          {{/items}}
+        </ul>
+        {{/using}}
+
       </div>
     </div>
   </div>

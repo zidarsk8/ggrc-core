@@ -15,7 +15,7 @@ class Cycle(
   __tablename__ = 'cycles'
   _title_uniqueness = False
 
-  VALID_STATES = (None, u'InProgress', u'Finished', u'Verified')
+  VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified')
 
   workflow_id = db.Column(
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
@@ -28,6 +28,7 @@ class Cycle(
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
   is_current = db.Column(db.Boolean, default=True, nullable=False)
+  next_due_date = db.Column(db.Date)
 
   @property
   def cycle_task_group_object_objects_for_cache(self):
@@ -40,4 +41,5 @@ class Cycle(
       'workflow',
       'cycle_task_groups',
       'is_current',
+      'next_due_date',
       ]

@@ -15,7 +15,7 @@
     if (this.attr("status") === "Verified") {
       return "";
     }
-    var date = moment(this.attr("end_date"));
+    var date = moment(this.attr("next_due_date") || this.attr("end_date"));
     if(date && date.isBefore(new Date())){
       return "overdue";
     }
@@ -75,12 +75,13 @@
     init: function() {
       this._super.apply(this, arguments);
       this.bind("status", function(ev, newVal) {
-        if(newVal === 'Verified' && this.workflow.reify().object_approval) {
+        if (newVal === 'Verified') {
           this.attr("is_current", false);
           this.save();
         }
       });
-    }
+    },
+    overdue: overdue_compute,
   });
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_entries";

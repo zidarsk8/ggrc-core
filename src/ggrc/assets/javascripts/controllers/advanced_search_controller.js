@@ -28,8 +28,8 @@
   }, {
 
   init_menu: function() {
-      var menu
-        , lookup = {
+      var menu, all_models = [],
+          lookup = {
             governance: 0
           , business: 1
           , entities: 2
@@ -47,6 +47,13 @@
             , items: []
             }
           ];
+
+        //Add All Objects at the top of the list
+        menu[0].items.push({
+          model_name:"AllObjects",
+          model_display:"All Objects"
+        });
+
         can.each(this.options.option_descriptors, function(descriptor) {
           if ( descriptor.model.category === undefined ) {
             ;//do nothing
@@ -55,12 +62,15 @@
             menu[lookup[descriptor.model.category] || 0].items.push({
                 model_name: descriptor.model.shortName
               , model_display: descriptor.model.title_plural
-            })
+            });
+            //Save the model names for All Object search
+            all_models.push(descriptor.model.shortName);
           }
         })
 
         this.options.option_type_menu = menu;
       }
+      this.options.all_models = all_models;
       //hard code some of the submenu
       this.options.option_type_menu_2 = can.map([
             "Program","Regulation", "Policy", "Standard", "Contract", "Clause", "Section", "Objective", "Control",
@@ -73,6 +83,20 @@
   }
 
   , set_option_descriptor: function(option_type) {
+      //Set option descriptor for all objects
+      if(option_type === "AllObjects") {
+        var all_descriptor = {
+          column_view : "/static/mustache/search/advanced_search_option_column.mustache",
+          detail_view: "/static/mustache/selectors/multitype_option_detail.mustache",
+          related_table_plural: "AllObjects",
+          related_table_singular: "AllObject",
+          related_model_singular: "AllObject",
+          new_object_title: "AllObject",
+          items_view: "/static/mustache/search/advanced_search_option_items.mustache",
+          model: "AllObject"
+        };
+        this.options.option_descriptors["AllObjects"] = all_descriptor;
+      }
       var self = this
         , descriptor = this.options.option_descriptors[option_type]
         ;
@@ -114,6 +138,7 @@
           , current_search_term = this.options.option_search_term
           , active_fn
           , draw_fn
+          , ctx = this.context
           ;
 
         active_fn = function() {
@@ -138,49 +163,39 @@
             , __permission_model: join_model
           };
         }
+
+        if (ctx.owner){
+          permission_parms.contact_id = ctx.owner.id;
+        }
+
+        if (current_option_model === "AllObject"){
+          var models = this.options.all_models;
+          return GGRC.Models.Search.search_for_types(current_search_term || '', models, permission_parms)
+            .then(function (search_result){
+              var options = [], op1, temp ; 
+              if (active_fn()) {
+                for(var i = 0; i < models.length; i++){
+                  op1 = search_result.getResultsForType(models[i]);
+                  temp = options.concat(op1);
+                  options = temp;
+                }
+
+                self.option_list.push.apply(self.option_list, options);
+                self._start_pager(options, 20, active_fn, draw_fn);
+              }
+            });
+        }
+
         return GGRC.Models.Search
           .search_for_types(
               current_search_term || '',
               [current_option_model_name],
               permission_parms)
           .then(function(search_result) {
-            var options = [],
-              base_options ;
+            var options = [];
 
             if (active_fn()) {
-
-              function match_object(result){
-                var owner_val = $('input.search-by-owner').val(),
-                    contact_val = $('input.search-by-contact').val();
-
-                if(result.type == "Person") { return true; }
-
-                if (self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
-                  if (result.type == "Program") //FIXME after backend is done
-                    return true;
-
-                  return (result.owners[0] && (result.owners[0].id === self.context.owner.id) &&
-                    result.contact && (result.contact.id === self.context.contact.id));
-                }
-                else if (self.context.owner && owner_val !== "") {
-                  if (result.type == "Program") //FIXME after backend is done
-                    return true;
-
-                  return (result.owners[0] && owner_val !== "" && result.owners[0].id === self.context.owner.id);
-                }
-                else if (self.context.contact && contact_val !== "") {
-                  return (result.contact && result.contact.id === self.context.contact.id);
-                }
-                else
-                  return true;
-              }
-
-              base_options = search_result.getResultsForType(current_option_model_name);
-
-              for (var i = 0 ; i < base_options.length; i++){
-                if(match_object(base_options[i]))
-                  options.push(base_options[i]);
-              }
+              options = search_result.getResultsForType(current_option_model_name);
 
               self.option_list.push.apply(self.option_list, options);
               self._start_pager(options, 20, active_fn, draw_fn);
@@ -193,43 +208,65 @@
 
     , "#search keyup": function(el, ev) {
         if (ev.which == 13) {
+          this.context.attr("option_search_term", el.val());
           this.triggerSearch();
         }
       }
+
+    , "input[null-if-empty] change" : function(el, ev) {
+      if(el.val() === "") {
+        this.context.attr(el.attr("name"), null);
+      }
+    }
 
     , triggerSearch: function(){
 
       // Remove Search Criteria text
       $('.results-wrap span.info').hide();
-      var con = this.context;
+      var ctx = this.context;
 
       //Get the selected object value
 
       var selected = $("select.option-type-selector").val(),
         self = this,
-        loader, custom_filter,
-        term = $("#search").val() || "",
-        re = new RegExp("^.*" + term + ".*","gi"),
+        loader,
+        term = ctx.option_search_term || "",
         filters = [],
         cancel_filter;
 
 
       this.set_option_descriptor(selected);
 
-      this.context.filter_list.each(function(filter_obj) {
+      ctx.filter_list.each(function(filter_obj) {
         if(cancel_filter || !filter_obj.search_filter) {
           cancel_filter = true;
           return;
         }
+        //All Object
+        if(selected === "AllObjects") {//create a multi filter
+          var loaders , local_loaders = [], multi_loader;
+          //Create a multi-list loader
+          loaders = GGRC.Mappings.get_mappings_for(filter_obj.search_filter.constructor.shortName);
+          can.each(loaders, function(loader, name) {
+            if (loader instanceof GGRC.ListLoaders.DirectListLoader
+                || loader instanceof GGRC.ListLoaders.ProxyListLoader) {
+              local_loaders.push(name);
+            }
+          });
 
-        filters.push(
-          // Must type filter here because the canonical mapping
-          //  may be polymorphic.
-          new GGRC.ListLoaders.TypeFilteredListLoader(
-            GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
-            [selected]
-          ).attach(filter_obj.search_filter)
-        );
+          multi_loader = new GGRC.ListLoaders.MultiListLoader(local_loaders).attach(filter_obj.search_filter);
+          filters.push(multi_loader);
+        }
+        else {
+          filters.push(
+            // Must type filter here because the canonical mapping
+            //  may be polymorphic.
+            new GGRC.ListLoaders.TypeFilteredListLoader(
+              GGRC.Mappings.get_canonical_mapping_name(filter_obj.search_filter.constructor.shortName, selected),
+              [selected]
+            ).attach(filter_obj.search_filter)
+          );
+        }
       });
       if(cancel_filter) {
         //missing search term.
@@ -237,21 +274,59 @@
       }
 
       if (filters.length > 0) {
+        // For All Objects, make sure to load only those objects in the list of all_models
+        // Multilist loader might load objects list g-drive folder and context
+        // The Search list loader will filter those objects
+        if(selected === "AllObjects") {
+            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                self.options.all_models,
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+        }
+        else if(ctx.owner || term){
+          filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                [selected],
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+        }
+        /*
+        if(ctx.owner || term){ 
+          if(selected === "AllObjects") {
+            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                self.options.all_models,
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+          }
+          else {
+            filters.push(new GGRC.ListLoaders.SearchListLoader(function(binding) {
+              return GGRC.Models.Search.search_for_types(
+                term,
+                [selected],
+                { contact_id: binding.instance && binding.instance.id }
+                ).then(function(mappings) {
+                  return mappings.entries;
+                });
+            }).attach(ctx.owner || {}));
+          }
+        }*/
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
-
-        //if(filters.length === 1 && !term) {
-        //  //don't bother making an intersecting filter when there's only one source
-        //  loader = filters[0];
-        //} else {
-        //  // make an intersecting loader, that only shows the results that
-        //  //  show up in all sources.
-        //  if(term) {
-        //    filters.push(new GGRC.ListLoaders.SearchListLoader(term, [selected]).attach(GGRC.current_user));
-        //  }
-        //  loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
-        //}
 
         if (filters.length === 1) {
           loader = filters[0];
@@ -260,66 +335,12 @@
           loader = new GGRC.ListLoaders.IntersectingListLoader(filters).attach();
         }
 
-        custom_filter = new GGRC.ListLoaders.CustomFilteredListLoader(loader, function(result) {
-          var model_type = result.instance.type,
-            owner_val = $('input.search-by-owner').val(),
-            contact_val = $('input.search-by-contact').val();
-
-          switch(model_type){
-
-            case "Person": //check for only search text, not owner or contact
-              if (term) { return (result.instance.name.match(re)); }
-              else { return true; }
-
-            case "Program": //Fixme, Currently Program is not filtered by owner
-              if ( term && self.context.contact && contact_val !== "" ) {
-                return (result.instance.title.match(re) &&
-                  result.instance.contact && result.instance.contact.id === self.context.contact.id);
-              }
-              else if (self.context.contact && contact_val !== "" ) {
-                return ( result.instance.contact && result.instance.contact.id === self.context.contact.id);
-              }
-              else if(term) { return (result.instance.title.match(re)); }
-              else { return true; }
-
-            default:
-              if (term && self.context.owner && self.context.contact && owner_val !== "" && contact_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if( self.context.owner && self.context.contact && owner_val !== "" && contact_val !== ""){
-                return ( result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if (term && self.context.owner && owner_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
-              }
-              else if (self.context.owner && owner_val !== "") {
-                return (result.instance.owners[0] && (result.instance.owners[0].id === self.context.owner.id));
-              }
-              else if (term && self.context.contact && contact_val !== "") {
-                return (result.instance.title.match(re) &&
-                  result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else if (self.context.contact && contact_val !== "") {
-                return ( result.instance.contact && (result.instance.contact.id === self.context.contact.id));
-              }
-              else {
-                return true;
-              }
-          }; //end switch
-        }).attach(CMS.Models.get_instance(GGRC.current_user));
-
         this.last_loader = loader;
-        this.last_custom_filter = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        custom_filter.refresh_instances().then(function(options) {
+        loader.refresh_instances().then(function(options) {
           var active_fn = function() {
-            return self.element &&
-                   self.last_custom_filter === custom_filter;
+            return self.element && self.last_loader === loader;
           };
 
           var draw_fn = function(options) {
@@ -330,7 +351,8 @@
               return op.instance;
             }), 20, active_fn, draw_fn);
         });
-      } else {
+      } //if (filters.length > 0)
+      else {
         //Object selected count and Add selected button should reset.
         //User need to make their selection again
         this.reset_selection_count();
@@ -359,16 +381,18 @@
         column_view : GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
         items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
     }
-  }
+  };
 
-  function get_search_multitype_option_set(object_model_name, option_model_name, data, column_view, item_view) {
+  function get_search_multitype_option_set(data, column_view, item_view) {
 
-    var join_descriptors = null
-      , option_descriptors = {}
-      , option_set = {
+    var join_descriptors = null,
+        object_model_name = data.join_object_type,
+        option_model_name = data.join_option_type,
+        option_descriptors = {},
+        option_set = {
             object_model: object_model_name
-        }
-      , exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
+        },
+        exclude_option_types = data.exclude_option_types ? data.exclude_option_types.split(",") : []
       ;
 
     if (!option_model_name) {
@@ -416,14 +440,6 @@
 
     });
 
-    //Fixme later , temporary fix for missing objects
-    var extra_options = {
-            column_view : column_view
-          , items_view  : item_view
-    };
-    option_descriptors["Clause"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Clause", extra_options );
-    option_descriptors["Section"] = ModalOptionDescriptor.from_join_model("TaskGroupObject", "object", "Section", extra_options );
-
     option_set.option_descriptors = option_descriptors;
     return option_set;
   }
@@ -442,37 +458,15 @@
           delete data_set[k];
       });
 
-
       //set up the options for new multitype Object  modal
       var column_view = GGRC.mustache_path + "/search/advanced_search_option_column.mustache",
       item_view =  GGRC.mustache_path + "/search/advanced_search_option_items.mustache" ;
 
-      data_set.join_object_type = "Program";
-      options = get_search_multitype_option_set(
-        data_set.join_object_type, data_set.join_option_type, data_set, column_view, item_view);
-
-
-      //options.selected_object = CMS.Models.get_instance(
-      //    data_set.join_object_type, data_set.join_object_id);
-
-      //No need for the binding -------
-      //options.binding = options.selected_object.get_binding(
-      //    data_set.join_mapping)
-
-      //The below line is not needed, verify and clean up
-      //options.object_params = $this.data("object-params");
+      options = get_search_multitype_option_set(data_set, column_view, item_view);
 
       e.preventDefault();
 
-      // Trigger the controller
-      //GGRC.Controllers.MultitypeObjectModalSelector.launch($this, options)
-      //.on("opened closed", function(ev, data) {
-      //  $this.trigger("modal:" + ev.type, data);
-      //});
       GGRC.Controllers.AdvancedSearchSelector.launch($this, options);
-      //.on("opened closed", function(ev, data) {
-      //  $this.trigger("modal:" + ev.type, data);
-      //});
     });
   });
 

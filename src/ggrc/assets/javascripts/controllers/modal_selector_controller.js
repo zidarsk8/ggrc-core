@@ -1606,7 +1606,7 @@
   multiselect_descriptor_view_option = {
     "Person": {
         column_view : GGRC.mustache_path + "/selectors/multitype_multiselect_option_column.mustache", 
-        items_view  : GGRC.mustache_path + "/search/advanced_search_people_items.mustache"
+        items_view  : GGRC.mustache_path + "/wf_people/people_items.mustache"
     }
   }
 
@@ -1849,6 +1849,14 @@
           this.triggerSearch();
         }
       }
+
+    /* Advanced search and object multi-select is not triggered after a new object addition. There is
+     * no create button on this modal. So we donot have to re-set search. Modal success is triggered after
+     * editing an object.
+    */
+    , " modal:success" : function(el, ev, data, options) {
+      //no op
+    }
 
     , triggerSearch: function(){
       // Remove Search Criteria text

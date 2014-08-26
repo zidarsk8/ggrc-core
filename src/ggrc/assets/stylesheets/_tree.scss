@@ -661,6 +661,11 @@ ul.new-tree {
         }
       }
     }
+    .wrap100 { float:left; min-width:100px; }
+    .wrap150 { float:left; min-width:150px; }
+    .wrap200 { float:left; min-width:200px; }
+    .wrap250 { float:left; min-width:250px; }
+    .wrap300 { float:left; min-width:300px; }
   }
   &.colored-list {
     > li.tree-item {
@@ -689,11 +694,11 @@ ul.new-tree {
       &.tree-item-add {
         padding: 0 0 0 20px;
       }
-      .tree-title-area {
+/*      .tree-title-area {
         [class^="grcicon-"] {
           display: inline-block;
         }
-      }
+      }  */
       .new-tree {
         li.tree-item {
           &.tree-item-add {
