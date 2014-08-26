@@ -680,7 +680,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         $ul.slideDown().addClass("in");
 
         // Remove active class from other lists
-        holder.find('a.active').removeClass('active');
+        holder.find(':not(.filters) > a.active').removeClass('active');
         // Add active class to this list
         el.addClass("active");
 
