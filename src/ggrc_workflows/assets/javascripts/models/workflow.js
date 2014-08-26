@@ -97,7 +97,7 @@
         dfd.resolve(false);
       }
 
-      if (!this.frequency_duration) {
+      if (!this.frequency_duration || this.frequency === 'one_time') {
         return dfd.resolve(false);
       }
 
