@@ -1,7 +1,7 @@
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
       <div class="row-fluid">
-        <div class="span4">
+        <div class="span4 wrap200">
           <div class="oneline">
             {{#is_allowed 'update' instance}}
             <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
@@ -11,7 +11,7 @@
             <span class="inline-data-content">{{instance.title}}</span>
           </div>
         </div>
-        <div class="span2">
+        <div class="span3 wrap150">
           <div class="oneline">
             {{#using assignee=instance.contact}}
               <span class="inline-data-content inline-data-content-small">
@@ -20,7 +20,7 @@
             {{/using}}
           </div>
         </div>
-        <div class="span5">
+        <div class="span4 wrap200">
           <div class="oneline">
             <span class="inline-data-content inline-data-content-small">
               {{#using task_group=instance.task_group}}
