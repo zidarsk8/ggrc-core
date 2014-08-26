@@ -20,6 +20,7 @@ ul.new-tree {
     }
     &.active {
       position: relative;
+      border-bottom:1px solid #eee;
       z-index: 1000;
       font-weight:bold;
       .row-fluid {
@@ -1287,6 +1288,11 @@ ul.new-tree {
     &:hover {
       color: $subTitle;
       @include opacity(1);
+    }
+    &.all-relevant {
+      i {
+        margin-top:4px;
+      }
     }
   }
 }
