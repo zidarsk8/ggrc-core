@@ -338,7 +338,7 @@
         this.last_loader = loader;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        loader.refresh_instances().then(function(options) {
+        loader.refresh_stubs().then(function(options) {
           var active_fn = function() {
             return self.element && self.last_loader === loader;
           };

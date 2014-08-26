@@ -858,7 +858,7 @@
         });
         context.options = options_results;
         context.selected_object = this.options.selected_object;
-        can.view(this.options.option_items_view, context, function(frag) {
+        can.view(this.options.option_items_view, new can.Map(context), function(frag) {
           if (self.element) {
             if (prepend)
               self.element.find('.option_column ul.new-tree').prepend(frag);
@@ -1470,6 +1470,14 @@
       this.update_selected_items(el, ev);
     }
 
+    , ".openclose:not(.active) click" : function(el, ev) {
+        //  Modifying the `result` object is bad, but here it can only affect
+        //  throwaway mapping results.
+        var expandable = el.data("expandable");
+        if (expandable)
+          expandable.attr("expanded", true);
+    }
+
     , reset_selection_count: function(){
         this.context.attr('item_selected', false);
         this.context.attr('items_selected', 0);
@@ -1932,7 +1940,7 @@
         this.last_loader = custom_filter;
         self.option_list.replace([]);
         self.element.find('.option_column ul.new-tree').empty();
-        custom_filter.refresh_instances().then(function(options) {
+        custom_filter.refresh_stubs().then(function(options) {
           var active_fn = function() {
             return self.element &&
                    self.last_loader === custom_filter;
