@@ -1,15 +1,17 @@
-<div class="small-info new-tier">
-
-  {{#is_allowed 'update'}}
-    <div class="row-fluid">
-      <div class="span12">
-        <a href="javascript://" class="pull-right info-action" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+<div class="action-bar">
+  <ul class="change-links">
+    {{#is_allowed 'update'}}
+      <li>
+        <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
           <i class="grcicon-edit"></i>
           <span>Edit risk assessment</span>
         </a>
-      </div>
-    </div>
-  {{/is_allowed}}
+      </li>
+    {{/is_allowed}}
+  </ul>
+</div>
+
+<div class="small-info">
   
   {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 

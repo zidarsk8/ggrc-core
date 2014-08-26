@@ -1054,6 +1054,7 @@
 // new action bar
 
 .action-bar {
+  @include clearfix();
   border-bottom:1px solid #eee;
   margin-bottom:10px;
   ul {
@@ -1071,7 +1072,7 @@
         font-weight:normal;
       }
     }
-    &.additional-links {
+    &.change-links {
       float:right;
       li {
         margin:0 0 0 20px;
