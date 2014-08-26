@@ -3,16 +3,13 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from ggrc.app import app
-from ggrc.extensions import get_extension_modules
-from ggrc.login import login_required
-from ggrc import settings
-from flask import current_app, request, session, redirect
 from ggrc_workflows import start_recurring_cycles
+
 
 def do_start_recurring_cycles():
   start_recurring_cycles()
   return 'Ok'
+
 
 def init_extra_views(app):
   app.add_url_rule(

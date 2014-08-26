@@ -16,7 +16,7 @@ cron:
   schedule: every 10 mins
   timezone: US/Pacific
 
-- description: gGRC workflow: start cycles for workflows with a new period starting today
+- description: gGRC workflow - start cycles for workflows with a new period starting today
   url: /start_recurring_cycles
   schedule: every day 12:01
   timezone: US/Pacific

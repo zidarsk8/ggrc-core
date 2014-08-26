@@ -14,6 +14,7 @@ from ggrc.models.mixins import (
 from ggrc.models.reflection import PublishOnly
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 
+
 class TaskGroupTask(
     WithContact, Titled, Described, RelativeTimeboxed, Base,
     db.Model):

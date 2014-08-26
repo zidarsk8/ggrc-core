@@ -1,6 +1,13 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+
 import datetime, calendar
 from ggrc.models.mixins import Timeboxed
 from ggrc import settings, db
+
 
 class RelativeTimeboxed(Timeboxed):
   # Frequencies and offset:
@@ -130,4 +137,3 @@ class RelativeTimeboxed(Timeboxed):
       return self._calc_end_date(
           base_date, self.task_group.workflow.frequency,
           self.relative_end_month, self.relative_end_day)
-
