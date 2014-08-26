@@ -45,19 +45,6 @@ ul.new-tree {
       padding-left: 0;
     }
   }
-  .task-group-title {
-    h3 {
-      [class^="grcicon-"] {
-        margin-top: 4px;
-      }
-    }
-  }
-  .task-edit-icon {
-    i {
-      margin-top: 0px;
-      margin-left: 3px;
-    }
-  }
   &.request-list,
   &.responses-list {
     .short-field {

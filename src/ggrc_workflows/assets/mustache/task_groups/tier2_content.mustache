@@ -1,32 +1,29 @@
-          <div class="row-fluid">
-            <div class="span12 task-group-title">
-              {{> /static/mustache/base_objects/edit_object_link.mustache}}
-              <h3 class="taskGroupTitle">
-                {{instance.title}}
-                {{!<a href="javascript://" class="toggleClosest"><i class="grcicon-edit"></i></a>}}
-              </h3>
-              <div class="taskGroupTitleForm edit-field hide">
-                <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
-                <a href="javascript://" id="editFieldSave" class="btn btn-success pull-left toggleClosest">Save</a>
-                <a href="javascript://" id="editFieldCancel" class="pull-left toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
-              </div>
-            </div>
-          </div>
-          <div class="row-fluid">
-            <div class="span12">
-              {{#if_equals instance.description ""}}
-              {{!<a href="javascript://" class="toggleClosest">+ Add Details</a>}}
-                <i>No details</i>
-              {{else}}
-              {{{instance.description}}}{{!<a class="task-edit-icon toggleClosest" href="javascript://"><i class="grcicon-edit"></i></a>}}
-              {{/if_equals}}
-            </div>
-            <div class="hide">
-              <div class="wysiwyg-area">
-                <textarea id="program_description" class="span12 double wysihtml5 saveTaskGroupField" data-index="{{@index}}" data-field="description" name="description" placeholder="Enter Description" tabindex="3">{{{instance.description}}}</textarea>
-              </div>
-              <a href="javascript://" class="btn btn-success toggleClosest">Save</a>
-              <a href="javascript://" class="toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
-            </div>
-          </div>
-          <br>
+<div class="small-info">
+  <div class="row-fluid">
+    <div class="span12">
+      {{> /static/mustache/base_objects/edit_object_link.mustache}}
+      <h6>Task Group</h6>
+      <h3 class="taskGroupTitle">
+        {{instance.title}}
+        {{!<a href="javascript://" class="toggleClosest"><i class="grcicon-edit"></i></a>}}
+      </h3>
+      <div class="taskGroupTitleForm edit-field hide">
+        <input type="text" value="{{title}}" class="pull-left saveTaskGroupField" data-index="{{@index}}" data-field="title">
+        <a href="javascript://" id="editFieldSave" class="btn btn-success pull-left toggleClosest">Save</a>
+        <a href="javascript://" id="editFieldCancel" class="pull-left toggleClosest cancel-text"><i class="grcicon-x-grey"></i>Cancel</a>
+      </div>
+    </div>
+  </div>
+  {{#if_equals instance.description ""}}
+  {{else}}
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Description</h6>
+        <div class="tree-description">
+        {{{instance.description}}}
+        </div>
+      </div>
+    </div>
+    <br>
+  {{/if_equals}}
+</div>
