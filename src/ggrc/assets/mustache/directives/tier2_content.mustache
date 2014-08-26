@@ -1,4 +1,4 @@
-
+<div class="small-info">
         <div class="row-fluid">
 
           <div class="span6">
@@ -29,18 +29,7 @@
 
         </div>
 
-        {{#instance.description}}
-          <div class="show-description">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="tree-description short">
-                  {{{instance.description}}}
-                </div>
-                {{{show_long}}}
-              </div>
-            </div>
-          </div>
-        {{/instance.description}}
+        {{{renderLive '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
 
         {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
 
@@ -58,3 +47,4 @@
           </div>
         </div>
         {{/instance.url}}
+</div>

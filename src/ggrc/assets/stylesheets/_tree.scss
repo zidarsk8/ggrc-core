@@ -22,7 +22,6 @@ ul.new-tree {
       position: relative;
       z-index: 1000;
       font-weight:bold;
-      @include box-shadow(0 3px 3px -1px #bbb);
       .row-fluid {
         background:$white;
       }
